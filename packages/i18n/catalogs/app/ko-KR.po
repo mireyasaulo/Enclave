@@ -20,18 +20,18 @@ msgid "音乐"
 msgstr "음악"
 
 #: apps/app/src/components/audio-card.tsx:163
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:103
-#: apps/app/src/routes/channels-page.tsx:1736
-#: apps/app/src/routes/channels-page.tsx:1891
-msgid "暂停"
-msgstr "일시정지"
-
-#: apps/app/src/components/audio-card.tsx:163
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:1736
 #: apps/app/src/routes/channels-page.tsx:1891
 msgid "播放"
 msgstr "재생"
+
+#: apps/app/src/components/audio-card.tsx:163
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:103
+#: apps/app/src/routes/channels-page.tsx:1736
+#: apps/app/src/routes/channels-page.tsx:1891
+msgid "暂停"
+msgstr "일시정지"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:181
@@ -136,8 +136,8 @@ msgstr "채팅으로 전달"
 #: apps/app/src/routes/contacts-page.tsx:2152
 #: apps/app/src/routes/mobile-add-friend-page.tsx:434
 #: apps/app/src/routes/mobile-add-friend-page.tsx:812
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:207
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:531
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:226
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:550
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1275
 msgid "取消"
 msgstr "취소"
@@ -1044,7 +1044,7 @@ msgstr ""
 #: apps/app/src/components/chat-message-list.tsx:3335
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:533
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:619
-#: apps/app/src/routes/contacts-page.tsx:2299
+#: apps/app/src/routes/contacts-page.tsx:2302
 msgid "重试"
 msgstr "다시 시도"
 
@@ -1484,7 +1484,7 @@ msgstr "삭제 중..."
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:980
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1152
 #: apps/app/src/features/search/mobile-search-workspace.tsx:307
-#: apps/app/src/routes/chat-list-page.tsx:1609
+#: apps/app/src/routes/chat-list-page.tsx:1612
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1146
 msgid "删除"
 msgstr "삭제"
@@ -1603,7 +1603,7 @@ msgstr "내 정보"
 #: apps/app/src/routes/mobile-add-friend-page.tsx:104
 #: apps/app/src/routes/mobile-add-friend-page.tsx:755
 #: apps/app/src/routes/moments-page.tsx:320
-#: apps/app/src/routes/moments-page.tsx:419
+#: apps/app/src/routes/moments-page.tsx:429
 #: apps/app/src/routes/profile-page.tsx:105
 msgid "我"
 msgstr "나"
@@ -1715,7 +1715,7 @@ msgstr "첨부파일 저장"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:34
 #: apps/app/src/features/shell/desktop-nav-matching.ts:35
 #: apps/app/src/routes/chat-list-page.tsx:723
-#: apps/app/src/routes/chat-list-page.tsx:1221
+#: apps/app/src/routes/chat-list-page.tsx:1225
 #: apps/app/src/routes/desktop-mobile-page.tsx:119
 #: apps/app/src/routes/desktop-mobile-page.tsx:165
 #: apps/app/src/routes/favorites-page.tsx:71
@@ -2232,20 +2232,6 @@ msgid "人"
 msgstr "명"
 
 #: apps/app/src/components/chat-message-list.tsx:6167
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
-#: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
-#: apps/app/src/features/chat/conversation-thread-panel.tsx:495
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1102
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:371
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1134
-#: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
-#: apps/app/src/routes/character-detail-page.tsx:952
-#: apps/app/src/routes/desktop-mobile-page.tsx:359
-msgid "视频通话"
-msgstr "영상 통화"
-
-#: apps/app/src/components/chat-message-list.tsx:6167
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:489
@@ -2259,6 +2245,20 @@ msgstr "영상 통화"
 #: apps/app/src/routes/desktop-mobile-page.tsx:360
 msgid "语音通话"
 msgstr "음성 통화"
+
+#: apps/app/src/components/chat-message-list.tsx:6167
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
+#: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:495
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1102
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:371
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1134
+#: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
+#: apps/app/src/routes/character-detail-page.tsx:952
+#: apps/app/src/routes/desktop-mobile-page.tsx:359
+msgid "视频通话"
+msgstr "영상 통화"
 
 #: apps/app/src/components/chat-message-list.tsx:6202
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:472
@@ -2365,16 +2365,16 @@ msgstr "제목 없는 메모"
 #: apps/app/src/routes/mobile-favorites-page.tsx:324
 #: apps/app/src/routes/mobile-note-editor-page.tsx:954
 #: apps/app/src/routes/mobile-notes-page.tsx:161
-#: apps/app/src/routes/moments-page.tsx:1430
+#: apps/app/src/routes/moments-page.tsx:1450
 #: apps/app/src/routes/official-accounts-page.tsx:360
 #: apps/app/src/routes/official-accounts-page.tsx:390
 #: apps/app/src/routes/profile-character-import-page.tsx:172
 #: apps/app/src/routes/profile-feedback-page.tsx:172
-#: apps/app/src/routes/profile-info-avatar-page.tsx:121
+#: apps/app/src/routes/profile-info-avatar-page.tsx:122
 #: apps/app/src/routes/profile-info-name-page.tsx:83
 #: apps/app/src/routes/profile-info-page.tsx:51
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:52
-#: apps/app/src/routes/profile-info-signature-page.tsx:80
+#: apps/app/src/routes/profile-info-signature-page.tsx:81
 #: apps/app/src/routes/profile-moments-page.tsx:562
 #: apps/app/src/routes/profile-settings-account-security-page.tsx:49
 #: apps/app/src/routes/profile-settings-language-page.tsx:50
@@ -2524,7 +2524,7 @@ msgstr "팝업 닫기"
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1067
 #: apps/app/src/routes/live-companion-page.tsx:873
 #: apps/app/src/routes/mobile-add-friend-page.tsx:795
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:505
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:524
 msgid "关闭"
 msgstr "닫기"
 
@@ -2547,8 +2547,8 @@ msgid "我知道了"
 msgstr "확인"
 
 #: apps/app/src/components/feature-unavailable-dialog.tsx:49
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:327
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:401
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:341
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:420
 msgid "关闭提示"
 msgstr "힌트 닫기"
 
@@ -2588,7 +2588,7 @@ msgstr "이미지를 갤러리에 저장한 뒤 X / 샤오훙수 / 웨이보에 
 #: apps/app/src/routes/discover-feed-page.tsx:1381
 #: apps/app/src/routes/discover-page.tsx:961
 #: apps/app/src/routes/live-companion-page.tsx:296
-#: apps/app/src/routes/moments-page.tsx:1404
+#: apps/app/src/routes/moments-page.tsx:1424
 #: apps/app/src/routes/profile-info-page.tsx:33
 #: apps/app/src/routes/profile-moments-page.tsx:344
 #: apps/app/src/routes/profile-page.tsx:124
@@ -2889,9 +2889,9 @@ msgstr "도구 공유"
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:47
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:72
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:477
-#: apps/app/src/routes/moments-page.tsx:641
-#: apps/app/src/routes/moments-page.tsx:1533
-#: apps/app/src/routes/moments-page.tsx:1602
+#: apps/app/src/routes/moments-page.tsx:675
+#: apps/app/src/routes/moments-page.tsx:1553
+#: apps/app/src/routes/moments-page.tsx:1636
 #: apps/app/src/routes/official-account-article-page.tsx:208
 #: apps/app/src/routes/official-account-detail-page.tsx:388
 #: apps/app/src/routes/official-account-detail-page.tsx:419
@@ -2953,7 +2953,7 @@ msgstr "문서 공유"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:47
 #: apps/app/src/features/shell/desktop-nav-matching.ts:48
 #: apps/app/src/routes/contacts-page.tsx:2140
-#: apps/app/src/routes/contacts-page.tsx:2332
+#: apps/app/src/routes/contacts-page.tsx:2335
 #: apps/app/src/routes/desktop-mobile-page.tsx:172
 msgid "通讯录"
 msgstr "연락처"
@@ -3319,7 +3319,7 @@ msgstr "공식 계정"
 #: apps/app/src/components/official-article-card.tsx:68
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1399
 #: apps/app/src/i18n/static-dom-seed.ts:919
-#: apps/app/src/routes/chat-list-page.tsx:1567
+#: apps/app/src/routes/chat-list-page.tsx:1570
 #: apps/app/src/routes/subscription-inbox-page.tsx:406
 msgid "置顶"
 msgstr "고정"
@@ -3432,7 +3432,7 @@ msgstr "방금"
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:119
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:500
 #: apps/app/src/routes/chat-details-page.tsx:972
-#: apps/app/src/routes/chat-list-page.tsx:1471
+#: apps/app/src/routes/chat-list-page.tsx:1474
 #: apps/app/src/routes/group-chat-details-page.tsx:769
 msgid "消息免打扰"
 msgstr "알림 끄기"
@@ -4011,8 +4011,8 @@ msgstr "채팅 기록 찾기"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:98
 #: apps/app/src/features/shell/desktop-shell.tsx:644
 #: apps/app/src/routes/chat-list-page.tsx:822
-#: apps/app/src/routes/contacts-page.tsx:2258
-#: apps/app/src/routes/contacts-page.tsx:2332
+#: apps/app/src/routes/contacts-page.tsx:2261
+#: apps/app/src/routes/contacts-page.tsx:2335
 #: apps/app/src/routes/create-group-page.tsx:422
 #: apps/app/src/routes/mobile-add-friend-page.tsx:442
 msgid "搜索"
@@ -4090,7 +4090,7 @@ msgstr "전체 멤버"
 #: apps/app/src/routes/chat-background-page.tsx:342
 #: apps/app/src/routes/chat-details-page.tsx:755
 #: apps/app/src/routes/chat-list-page.tsx:895
-#: apps/app/src/routes/contacts-page.tsx:2320
+#: apps/app/src/routes/contacts-page.tsx:2323
 #: apps/app/src/routes/create-group-page.tsx:433
 #: apps/app/src/routes/discover-feed-page.tsx:1067
 #: apps/app/src/routes/friend-requests-page.tsx:241
@@ -4166,9 +4166,9 @@ msgstr "채팅 기록을 일시적으로 사용할 수 없습니다"
 #: apps/app/src/routes/group-qr-page.tsx:1148
 #: apps/app/src/routes/group-qr-page.tsx:1635
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:520
-#: apps/app/src/routes/moments-page.tsx:642
-#: apps/app/src/routes/moments-page.tsx:1525
-#: apps/app/src/routes/moments-page.tsx:1533
+#: apps/app/src/routes/moments-page.tsx:676
+#: apps/app/src/routes/moments-page.tsx:1545
+#: apps/app/src/routes/moments-page.tsx:1553
 #: apps/app/src/routes/official-account-article-page.tsx:388
 #: apps/app/src/routes/official-account-article-page.tsx:491
 #: apps/app/src/routes/official-account-detail-page.tsx:379
@@ -4356,9 +4356,9 @@ msgstr "대기 중"
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:907
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1096
 #: apps/app/src/routes/mini-programs-page.tsx:364
-#: apps/app/src/routes/profile-info-avatar-page.tsx:138
+#: apps/app/src/routes/profile-info-avatar-page.tsx:139
 #: apps/app/src/routes/profile-info-name-page.tsx:100
-#: apps/app/src/routes/profile-info-signature-page.tsx:97
+#: apps/app/src/routes/profile-info-signature-page.tsx:98
 msgid "完成"
 msgstr "완료"
 
@@ -7329,7 +7329,7 @@ msgstr "연락처 정보를 업데이트했습니다."
 #: apps/app/src/features/search/use-search-index.ts:348
 #: apps/app/src/routes/character-detail-page.tsx:1501
 #: apps/app/src/routes/chat-details-page.tsx:296
-#: apps/app/src/routes/contacts-page.tsx:2522
+#: apps/app/src/routes/contacts-page.tsx:2525
 #: apps/app/src/routes/create-group-page.tsx:553
 #: apps/app/src/routes/group-member-picker-page.tsx:186
 #: apps/app/src/routes/group-member-picker-page.tsx:236
@@ -7518,8 +7518,8 @@ msgstr "소셜 및 콘텐츠"
 #: apps/app/src/routes/friend-moments-page.tsx:647
 #: apps/app/src/routes/mobile-favorites-page.tsx:119
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:332
-#: apps/app/src/routes/moments-page.tsx:1092
-#: apps/app/src/routes/moments-page.tsx:1420
+#: apps/app/src/routes/moments-page.tsx:1126
+#: apps/app/src/routes/moments-page.tsx:1440
 #: apps/app/src/routes/profile-moments-page.tsx:486
 #: apps/app/src/routes/profile-page.tsx:171
 msgid "朋友圈"
@@ -7583,7 +7583,7 @@ msgstr "추가 정보"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:645
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:693
 #: apps/app/src/routes/profile-info-page.tsx:118
-#: apps/app/src/routes/profile-info-signature-page.tsx:73
+#: apps/app/src/routes/profile-info-signature-page.tsx:74
 msgid "个性签名"
 msgstr "개인 서명"
 
@@ -7622,7 +7622,7 @@ msgstr "즐겨찾는 친구"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1616
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:113
 #: apps/app/src/routes/chat-details-page.tsx:978
-#: apps/app/src/routes/chat-list-page.tsx:1496
+#: apps/app/src/routes/chat-list-page.tsx:1499
 #: apps/app/src/routes/group-chat-details-page.tsx:807
 msgid "置顶聊天"
 msgstr "채팅 고정"
@@ -7920,7 +7920,7 @@ msgstr "친구 권한"
 #: apps/app/src/features/contacts/management/contacts-management-modal.tsx:58
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:128
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:129
-#: apps/app/src/routes/contacts-page.tsx:2162
+#: apps/app/src/routes/contacts-page.tsx:2165
 msgid "通讯录管理"
 msgstr "연락처 관리"
 
@@ -7959,7 +7959,7 @@ msgstr "제외"
 #: apps/app/src/features/contacts/management/management-permissions-detail-screen.tsx:124
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:199
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:380
-#: apps/app/src/routes/contacts-page.tsx:2525
+#: apps/app/src/routes/contacts-page.tsx:2528
 msgid "保持联系"
 msgstr "계속 연락하기"
 
@@ -7985,13 +7985,13 @@ msgstr "친구 검색"
 
 #: apps/app/src/features/contacts/management/management-permissions-screen.tsx:67
 #: apps/app/src/routes/contacts-page.tsx:1700
-#: apps/app/src/routes/contacts-page.tsx:2335
+#: apps/app/src/routes/contacts-page.tsx:2338
 msgid "没有找到匹配的联系人"
 msgstr "일치하는 연락처가 없습니다"
 
 #: apps/app/src/features/contacts/management/management-permissions-screen.tsx:68
 #: apps/app/src/routes/contacts-page.tsx:1701
-#: apps/app/src/routes/contacts-page.tsx:2336
+#: apps/app/src/routes/contacts-page.tsx:2339
 msgid "通讯录还是空的"
 msgstr "연락처가 아직 비어 있습니다"
 
@@ -8000,17 +8000,17 @@ msgid "批量管理"
 msgstr "일괄 관리"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:349
-#: apps/app/src/routes/channels-page.tsx:1146
-#: apps/app/src/routes/channels-page.tsx:1291
-msgid "生成中..."
-msgstr "생성 중..."
-
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:349
 #: apps/app/src/i18n/static-dom-seed.ts:49
 #: apps/app/src/routes/channels-page.tsx:1146
 #: apps/app/src/routes/channels-page.tsx:1292
 msgid "换一批"
 msgstr "새로 보기"
+
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:349
+#: apps/app/src/routes/channels-page.tsx:1146
+#: apps/app/src/routes/channels-page.tsx:1291
+msgid "生成中..."
+msgstr "생성 중..."
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:359
 #: apps/app/src/features/shell/desktop-nav-config.ts:89
@@ -9343,7 +9343,7 @@ msgstr "현재 브라우저는 음성 입력을 지원하지 않습니다"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1536
 #: apps/app/src/routes/chat-list-page.tsx:736
-#: apps/app/src/routes/contacts-page.tsx:2173
+#: apps/app/src/routes/contacts-page.tsx:2176
 msgid "打开快捷菜单"
 msgstr "빠른 메뉴 열기"
 
@@ -9459,7 +9459,7 @@ msgid "在独立窗口打开"
 msgstr "별도 창에서 열기"
 
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:113
-#: apps/app/src/routes/chat-list-page.tsx:1567
+#: apps/app/src/routes/chat-list-page.tsx:1570
 msgid "取消置顶"
 msgstr "고정 해제"
 
@@ -10940,7 +10940,7 @@ msgstr "연락처 상세 페이지에서 자주 연락하는 친구를 즐겨찾
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:194
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:375
-#: apps/app/src/routes/contacts-page.tsx:2520
+#: apps/app/src/routes/contacts-page.tsx:2523
 msgid "正在打开会话..."
 msgstr "대화를 여는 중..."
 
@@ -11122,30 +11122,30 @@ msgstr "이미지는 최대 9장, 동영상은 1개이며 5분 이내입니다. 
 
 #: apps/app/src/features/desktop/feed/desktop-feed-compose-panel.tsx:122
 #: apps/app/src/routes/discover-page.tsx:834
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:257
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:271
 msgid "写点想让世界居民都能看到的内容..."
 msgstr "세계 주민 모두가 볼 내용을 적어 보세요..."
 
 #: apps/app/src/features/desktop/feed/desktop-feed-compose-panel.tsx:147
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:147
 #: apps/app/src/routes/discover-page.tsx:863
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:286
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:326
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:338
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:300
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:345
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:357
 msgid "添加图片"
 msgstr "이미지 추가"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-compose-panel.tsx:156
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:156
 #: apps/app/src/routes/discover-page.tsx:878
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:297
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:311
 msgid "更换视频"
 msgstr "동영상 교체"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-compose-panel.tsx:156
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:156
 #: apps/app/src/routes/discover-page.tsx:879
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:297
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:311
 msgid "添加视频"
 msgstr "동영상 추가"
 
@@ -11655,9 +11655,9 @@ msgstr "기능 개발 중"
 #: apps/app/src/features/search/mobile-search-workspace.tsx:556
 #: apps/app/src/routes/desktop-mobile-page.tsx:2017
 #: apps/app/src/routes/live-companion-page.tsx:793
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:352
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:357
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:362
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:371
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:376
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:381
 #: apps/app/src/routes/official-accounts-page.tsx:370
 #: apps/app/src/routes/profile-info-page.tsx:91
 #: apps/app/src/routes/profile-info-page.tsx:104
@@ -13049,13 +13049,13 @@ msgid "h 成熟"
 msgstr "h 성숙"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ 봉지, 판매가"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ 개"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ 봉지, 판매가"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -14193,17 +14193,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "본진을 지키고 적 탱크 20대를 격파하라."
 
 #: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "2P"
-
-#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "픽셀"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "액션"
+
+#: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "2P"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -18782,7 +18782,7 @@ msgstr "세계 캐릭터와 최근 올린 모멘트 콘텐츠를 보여 줍니�
 
 #: apps/app/src/i18n/static-dom-seed.ts:38
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:506
-#: apps/app/src/routes/moments-page.tsx:1513
+#: apps/app/src/routes/moments-page.tsx:1533
 msgid "朋友圈暂时不可用"
 msgstr "모멘트를 일시적으로 사용할 수 없습니다"
 
@@ -19293,8 +19293,8 @@ msgid "我的动态"
 msgstr "내 게시물"
 
 #: apps/app/src/i18n/static-dom-seed.ts:430
-#: apps/app/src/routes/moments-page.tsx:1443
-#: apps/app/src/routes/moments-page.tsx:1602
+#: apps/app/src/routes/moments-page.tsx:1463
+#: apps/app/src/routes/moments-page.tsx:1636
 msgid "发一条朋友圈"
 msgstr "모멘트 올리기"
 
@@ -19303,13 +19303,13 @@ msgid "发表朋友圈"
 msgstr "모멘트 게시"
 
 #: apps/app/src/i18n/static-dom-seed.ts:433
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:213
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:222
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:227
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:241
 msgid "发表"
 msgstr "게시"
 
 #: apps/app/src/i18n/static-dom-seed.ts:434
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:246
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:260
 msgid "这一刻"
 msgstr "이 순간"
 
@@ -19318,8 +19318,8 @@ msgid "会同步到朋友圈时间线，适合发日常照片、短视频和临�
 msgstr "모멘트 타임라인에 동기화되며 일상 사진, 짧은 영상, 순간적인 생각을 올리기에 적합합니다."
 
 #: apps/app/src/i18n/static-dom-seed.ts:436
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:307
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:360
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:321
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:379
 msgid "谁可以看"
 msgstr "볼 수 있는 사람"
 
@@ -19328,13 +19328,13 @@ msgid "当前发布到朋友圈"
 msgstr "현재 모멘트에 게시"
 
 #: apps/app/src/i18n/static-dom-seed.ts:438
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:318
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:368
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:332
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:387
 msgid "图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。"
 msgstr "이미지는 최대 9장, 영상은 현재 5분 이하 1개까지 지원합니다. 이미지와 영상을 섞어 올리는 것은 아직 지원하지 않습니다."
 
 #: apps/app/src/i18n/static-dom-seed.ts:440
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:243
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:262
 msgid "这一刻的想法..."
 msgstr "이 순간의 생각..."
 
@@ -20766,8 +20766,8 @@ msgstr "게임 초대 링크 복사에 실패했습니다. 잠시 후 다시 시
 #: apps/app/src/routes/friend-moments-page.tsx:206
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:132
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:165
-#: apps/app/src/routes/moments-page.tsx:349
-#: apps/app/src/routes/moments-page.tsx:523
+#: apps/app/src/routes/moments-page.tsx:359
+#: apps/app/src/routes/moments-page.tsx:547
 #: apps/app/src/routes/profile-moments-page.tsx:155
 #: apps/app/src/routes/profile-moments-page.tsx:200
 msgid "朋友圈互动已更新。"
@@ -20788,7 +20788,7 @@ msgid "正在读取角色朋友圈..."
 msgstr "캐릭터 모멘트 불러오는 중..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1081
-#: apps/app/src/routes/moments-page.tsx:1590
+#: apps/app/src/routes/moments-page.tsx:1624
 msgid "还很安静"
 msgstr "아직 조용합니다"
 
@@ -22244,7 +22244,7 @@ msgstr "채널 상호작용이 업데이트되었습니다."
 #: apps/app/src/routes/discover-page.tsx:498
 #: apps/app/src/routes/friend-moments-page.tsx:183
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:142
-#: apps/app/src/routes/moments-page.tsx:484
+#: apps/app/src/routes/moments-page.tsx:494
 #: apps/app/src/routes/profile-moments-page.tsx:166
 msgid "请先输入评论内容。"
 msgstr "먼저 댓글 내용을 입력하세요."
@@ -22982,12 +22982,12 @@ msgstr "삭제를 취소했습니다."
 
 #: apps/app/src/routes/chat-list-page.tsx:736
 #: apps/app/src/routes/contacts-page.tsx:2133
-#: apps/app/src/routes/contacts-page.tsx:2173
+#: apps/app/src/routes/contacts-page.tsx:2176
 msgid "关闭快捷菜单"
 msgstr "빠른 메뉴 닫기"
 
 #: apps/app/src/routes/chat-list-page.tsx:815
-#: apps/app/src/routes/contacts-page.tsx:2255
+#: apps/app/src/routes/contacts-page.tsx:2258
 msgid "打开搜一搜"
 msgstr "검색 열기"
 
@@ -23016,39 +23016,39 @@ msgstr "최근 대화와 메시지 항목을 동기화하는 중입니다. 잠�
 msgid "消息页暂时不可用"
 msgstr "메시지 페이지를 잠시 사용할 수 없습니다"
 
-#: apps/app/src/routes/chat-list-page.tsx:1222
+#: apps/app/src/routes/chat-list-page.tsx:1226
 msgid "还没有新消息"
 msgstr "아직 새 메시지가 없습니다"
 
-#: apps/app/src/routes/chat-list-page.tsx:1224
+#: apps/app/src/routes/chat-list-page.tsx:1228
 msgid "等角色、群聊或服务号开始发消息后，这里会显示最近会话。"
 msgstr "캐릭터, 그룹 채팅 또는 서비스 계정에서 메시지를 보내면 최근 대화가 여기에 표시됩니다."
 
-#: apps/app/src/routes/chat-list-page.tsx:1235
+#: apps/app/src/routes/chat-list-page.tsx:1239
 msgid "去通讯录看看"
 msgstr "연락처 보기"
 
-#: apps/app/src/routes/chat-list-page.tsx:1335
+#: apps/app/src/routes/chat-list-page.tsx:1339
 msgid "标已读"
 msgstr "읽음"
 
-#: apps/app/src/routes/chat-list-page.tsx:1335
+#: apps/app/src/routes/chat-list-page.tsx:1339
 msgid "标未读"
 msgstr "안 읽음"
 
-#: apps/app/src/routes/chat-list-page.tsx:1353
+#: apps/app/src/routes/chat-list-page.tsx:1357
 msgid "从这里开始第一句问候"
 msgstr "여기에서 첫 인사를 시작하세요"
 
-#: apps/app/src/routes/chat-list-page.tsx:1478
+#: apps/app/src/routes/chat-list-page.tsx:1481
 msgid "有未读消息"
 msgstr "읽지 않은 메시지 있음"
 
-#: apps/app/src/routes/chat-list-page.tsx:1582
+#: apps/app/src/routes/chat-list-page.tsx:1585
 msgid "取消免打扰"
 msgstr "알림 켜기"
 
-#: apps/app/src/routes/chat-list-page.tsx:1582
+#: apps/app/src/routes/chat-list-page.tsx:1585
 msgid "免打扰"
 msgstr "알림 끄기"
 
@@ -23245,7 +23245,7 @@ msgid "先从新的朋友里建立关系，或者去看看世界角色。"
 msgstr "새 친구에서 관계를 만들거나 세계 캐릭터를 둘러보세요."
 
 #: apps/app/src/routes/contacts-page.tsx:1714
-#: apps/app/src/routes/contacts-page.tsx:2350
+#: apps/app/src/routes/contacts-page.tsx:2353
 #: apps/app/src/routes/official-accounts-page.tsx:335
 #: apps/app/src/routes/world-characters-page.tsx:356
 #: apps/app/src/routes/world-characters-page.tsx:468
@@ -23269,23 +23269,23 @@ msgstr "세계 캐릭터 검색 결과"
 msgid "世界角色目录"
 msgstr "세계 캐릭터 목록"
 
-#: apps/app/src/routes/contacts-page.tsx:2321
+#: apps/app/src/routes/contacts-page.tsx:2324
 msgid "正在刷新通讯录"
 msgstr "연락처 새로고침 중"
 
-#: apps/app/src/routes/contacts-page.tsx:2322
+#: apps/app/src/routes/contacts-page.tsx:2325
 msgid "稍等一下，正在同步联系人、群聊和服务入口。"
 msgstr "연락처, 그룹 채팅, 서비스 입구를 동기화 중입니다. 잠시만 기다려 주세요."
 
-#: apps/app/src/routes/contacts-page.tsx:2340
+#: apps/app/src/routes/contacts-page.tsx:2343
 msgid "换个关键词试试，或者继续搜索世界角色。"
 msgstr "다른 키워드를 시도하거나 세계 캐릭터를 계속 검색해 보세요."
 
-#: apps/app/src/routes/contacts-page.tsx:2341
+#: apps/app/src/routes/contacts-page.tsx:2344
 msgid "先处理新的朋友，或者去浏览世界角色。"
 msgstr "먼저 새 친구를 처리하거나 세계 캐릭터를 둘러보세요."
 
-#: apps/app/src/routes/contacts-page.tsx:2358
+#: apps/app/src/routes/contacts-page.tsx:2361
 msgid "查看世界角色"
 msgstr "세계 캐릭터 보기"
 
@@ -24507,9 +24507,9 @@ msgstr "광장 답글을 보냈습니다."
 #: apps/app/src/routes/discover-feed-page.tsx:699
 #: apps/app/src/routes/discover-page.tsx:632
 #: apps/app/src/routes/friend-moments-page.tsx:323
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:158
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:158
-#: apps/app/src/routes/moments-page.tsx:908
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:172
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:177
+#: apps/app/src/routes/moments-page.tsx:942
 #: apps/app/src/routes/profile-moments-page.tsx:359
 msgid "图片选择失败，请稍后重试。"
 msgstr "이미지 선택에 실패했습니다. 잠시 후 다시 시도하세요."
@@ -24517,9 +24517,9 @@ msgstr "이미지 선택에 실패했습니다. 잠시 후 다시 시도하세�
 #: apps/app/src/routes/discover-feed-page.tsx:711
 #: apps/app/src/routes/discover-page.tsx:644
 #: apps/app/src/routes/friend-moments-page.tsx:333
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:168
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:168
-#: apps/app/src/routes/moments-page.tsx:920
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:182
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:187
+#: apps/app/src/routes/moments-page.tsx:954
 #: apps/app/src/routes/profile-moments-page.tsx:371
 msgid "视频选择失败，请稍后重试。"
 msgstr "동영상 선택에 실패했습니다. 잠시 후 다시 시도하세요."
@@ -24595,12 +24595,12 @@ msgid "复制这条动态摘要"
 msgstr "이 게시물 요약 복사"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1340
-#: apps/app/src/routes/moments-page.tsx:1617
+#: apps/app/src/routes/moments-page.tsx:1608
 msgid "正在加载更多…"
 msgstr "더 불러오는 중…"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1344
-#: apps/app/src/routes/moments-page.tsx:1621
+#: apps/app/src/routes/moments-page.tsx:1614
 msgid "已经到底了"
 msgstr "마지막입니다"
 
@@ -24618,7 +24618,7 @@ msgid "场景相遇"
 msgstr "장소 만남"
 
 #: apps/app/src/routes/discover-page.tsx:158
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:361
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:380
 msgid "公开"
 msgstr "공개"
 
@@ -25052,8 +25052,8 @@ msgid "该游戏"
 msgstr "이 게임"
 
 #: apps/app/src/routes/games-page.tsx:307
-msgid "{launchedName} 已加入最近玩过。首期先以游戏中心内容工作区承接，后续再接小游戏容器。"
-msgstr "{launchedName}이(가) 최근 플레이에 추가되었습니다. 1차에는 게임 센터 콘텐츠 워크스페이스로 처리하고, 이후 미니게임 컨테이너로 연결됩니다."
+msgid "{launchedName} 已加入最近玩过，正在准备入口。"
+msgstr ""
 
 #: apps/app/src/routes/games-page.tsx:328
 msgid "已再次邀请 {inviteFriendName} 一起玩{inviteGameName}。"
@@ -26646,61 +26646,61 @@ msgid "收藏操作"
 msgstr ""
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:47
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:196
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:210
 msgid "返回广场"
 msgstr "광장으로 돌아가기"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:176
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:190
 msgid "正在回到桌面广场"
 msgstr "데스크톱 광장으로 돌아가는 중…"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:177
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:191
 msgid "发广场动态在桌面布局里已经并入广场工作区，这里会自动带你返回桌面入口。"
 msgstr "광장 게시물은 데스크톱 워크스페이스에 통합되었습니다. 데스크톱으로 이동합니다."
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:178
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:192
 msgid "正在打开广场..."
 msgstr "광장을 여는 중…"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:186
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:200
 msgid "发表广场动态"
 msgstr "광장에 게시"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:213
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:222
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:227
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:241
 msgid "发表中"
 msgstr "게시 중"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:249
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:263
 msgid "发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。"
 msgstr "광장에 올리면 세계 주민이 보고 좋아요를 누르거나 대화를 이어갈 수 있습니다."
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:310
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:324
 msgid "当前发布到广场"
 msgstr "현재 광장에 게시 중"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:314
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:328
 msgid "公开可见"
 msgstr "공개 표시"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:334
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:408
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:348
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:427
 msgid "放弃发表"
 msgstr "게시 포기"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:337
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:411
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:351
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:430
 msgid "返回会丢失已编辑的文字与媒体，确定不发布吗？"
 msgstr "돌아가면 편집한 텍스트와 미디어가 사라집니다. 정말 게시하지 않겠습니까?"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:346
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:420
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:360
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:439
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1341
 msgid "继续编辑"
 msgstr "계속 편집"
 
-#: apps/app/src/routes/mobile-feed-publish-page.tsx:353
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:427
+#: apps/app/src/routes/mobile-feed-publish-page.tsx:367
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:446
 msgid "放弃"
 msgstr "버리기"
 
@@ -26713,19 +26713,19 @@ msgid "好友"
 msgstr "친구"
 
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:415
-#: apps/app/src/routes/moments-page.tsx:1699
+#: apps/app/src/routes/moments-page.tsx:1714
 #: apps/app/src/routes/profile-moments-page.tsx:591
 msgid "正在刷新..."
 msgstr "새로고침 중…"
 
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:417
-#: apps/app/src/routes/moments-page.tsx:1701
+#: apps/app/src/routes/moments-page.tsx:1716
 #: apps/app/src/routes/profile-moments-page.tsx:593
 msgid "松手刷新"
 msgstr "놓아서 새로고침"
 
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:418
-#: apps/app/src/routes/moments-page.tsx:1702
+#: apps/app/src/routes/moments-page.tsx:1717
 #: apps/app/src/routes/profile-moments-page.tsx:594
 msgid "下拉刷新"
 msgstr "당겨서 새로고침"
@@ -26746,43 +26746,43 @@ msgstr "이 캐릭터의 모먼트를 읽는 중 오류가 발생했습니다."
 msgid "先把这页留着，等 TA 下次更新时再回来看看。"
 msgstr "이 페이지를 일단 남겨 두고, 다음 업데이트 때 다시 돌아와 보세요."
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:176
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:195
 msgid "正在回到桌面朋友圈"
 msgstr "데스크톱 모먼트로 돌아가는 중"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:177
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:196
 msgid "发朋友圈在桌面布局里已经并入朋友圈工作区，这里会自动带你返回桌面入口。"
 msgstr "모먼트 게시는 데스크톱 레이아웃에서 모먼트 워크스페이스로 통합되었습니다. 자동으로 데스크톱 진입점으로 돌아갑니다."
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:178
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:197
 msgid "正在打开朋友圈..."
 msgstr "모먼트 여는 중..."
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:271
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:290
 msgid "移除图片"
 msgstr "사진 제거"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:306
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:325
 msgid "移除视频"
 msgstr "동영상 제거"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:350
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:369
 msgid "所在位置"
 msgstr "위치"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:351
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:370
 msgid "不显示位置"
 msgstr "위치 표시 안 함"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:355
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:374
 msgid "提醒谁看"
 msgstr "알릴 대상"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:513
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:532
 msgid "从相册选择图片"
 msgstr "앨범에서 선택"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:524
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:543
 msgid "选择视频"
 msgstr "동영상 선택"
 
@@ -26795,9 +26795,9 @@ msgid "切换桌面笔记..."
 msgstr "데스크톱 메모로 전환 중…"
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:995
-#: apps/app/src/routes/profile-info-avatar-page.tsx:138
+#: apps/app/src/routes/profile-info-avatar-page.tsx:139
 #: apps/app/src/routes/profile-info-name-page.tsx:100
-#: apps/app/src/routes/profile-info-signature-page.tsx:97
+#: apps/app/src/routes/profile-info-signature-page.tsx:98
 msgid "保存中"
 msgstr "저장 중…"
 
@@ -26842,45 +26842,83 @@ msgstr "첨부 파일만 있는 임시 저장"
 msgid "草稿 · 更新于 {0}"
 msgstr "임시 저장 · {0}에 업데이트됨"
 
-#: apps/app/src/routes/moments-page.tsx:590
+#: apps/app/src/routes/moments-page.tsx:347
+msgid "重试点赞"
+msgstr ""
+
+#. placeholder {0}: error.message
+#: apps/app/src/routes/moments-page.tsx:351
+msgid "点赞失败：{0}"
+msgstr ""
+
+#: apps/app/src/routes/moments-page.tsx:352
+#: apps/app/src/routes/profile-moments-page.tsx:149
+msgid "点赞失败，请稍后重试。"
+msgstr ""
+
+#. placeholder {0}: err.message
+#: apps/app/src/routes/moments-page.tsx:538
+msgid "评论失败：{0}"
+msgstr ""
+
+#: apps/app/src/routes/moments-page.tsx:539
+#: apps/app/src/routes/profile-moments-page.tsx:214
+msgid "评论失败，请稍后重试。"
+msgstr ""
+
+#: apps/app/src/routes/moments-page.tsx:612
+msgid "重试删除"
+msgstr ""
+
+#. placeholder {0}: error.message
+#: apps/app/src/routes/moments-page.tsx:616
+msgid "删除失败：{0}"
+msgstr ""
+
+#: apps/app/src/routes/moments-page.tsx:617
+#: apps/app/src/routes/profile-moments-page.tsx:273
+msgid "删除失败，请稍后重试。"
+msgstr ""
+
+#: apps/app/src/routes/moments-page.tsx:624
 #: apps/app/src/routes/profile-moments-page.tsx:279
 msgid "已删除这条朋友圈。"
 msgstr "게시물이 삭제되었습니다."
 
-#: apps/app/src/routes/moments-page.tsx:948
+#: apps/app/src/routes/moments-page.tsx:982
 msgid "正在打开好友朋友圈"
 msgstr "친구 모먼트 여는 중"
 
-#: apps/app/src/routes/moments-page.tsx:949
+#: apps/app/src/routes/moments-page.tsx:983
 msgid "正在切换到桌面好友朋友圈工作区，马上显示对应居民的动态。"
 msgstr "데스크톱 친구 모먼트 워크스페이스로 전환 중입니다. 곧 해당 주민의 게시물을 표시합니다."
 
-#: apps/app/src/routes/moments-page.tsx:950
+#: apps/app/src/routes/moments-page.tsx:984
 msgid "正在切换到桌面朋友圈..."
 msgstr "데스크톱 모먼트로 전환 중..."
 
-#: apps/app/src/routes/moments-page.tsx:969
+#: apps/app/src/routes/moments-page.tsx:1003
 msgid "正在打开桌面朋友圈"
 msgstr "데스크톱 모먼트 여는 중"
 
-#: apps/app/src/routes/moments-page.tsx:970
+#: apps/app/src/routes/moments-page.tsx:1004
 msgid "正在载入桌面朋友圈工作区，马上显示动态和详情。"
 msgstr "데스크톱 모먼트 워크스페이스를 로드 중입니다. 곧 게시물과 상세를 표시합니다."
 
-#: apps/app/src/routes/moments-page.tsx:971
+#: apps/app/src/routes/moments-page.tsx:1005
 msgid "载入桌面朋友圈..."
 msgstr "데스크톱 모먼트 로드 중..."
 
-#: apps/app/src/routes/moments-page.tsx:1198
+#: apps/app/src/routes/moments-page.tsx:1232
 #: apps/app/src/routes/profile-moments-page.tsx:672
 msgid "确定删除这条朋友圈吗？"
 msgstr "이 게시물을 삭제할까요?"
 
-#: apps/app/src/routes/moments-page.tsx:1506
+#: apps/app/src/routes/moments-page.tsx:1526
 msgid "正在刷新朋友圈"
 msgstr "모먼트 새로 고치는 중"
 
-#: apps/app/src/routes/moments-page.tsx:1593
+#: apps/app/src/routes/moments-page.tsx:1627
 msgid "你先发一条动态，或者等世界里的角色们先开口。"
 msgstr "먼저 게시물을 하나 올리거나, 세계의 캐릭터들이 먼저 말을 걸기를 기다리세요."
 
@@ -27142,35 +27180,35 @@ msgstr "어떤 화면에서 무엇을 보았고, 어떻게 동작하길 기대�
 msgid "反馈会同步到隐界云端控制台，处理结果可能不会逐条回复。涉及账号问题请前往设置。"
 msgstr "피드백은 Enclave 클라우드 콘솔로 동기화되며, 개별 회신이 어려울 수 있습니다. 계정 문제는 설정에서 확인해 주세요."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:84
+#: apps/app/src/routes/profile-info-avatar-page.tsx:85
 msgid "图片过大，请压缩到 1MB 以内再试。"
 msgstr "이미지가 너무 큽니다. 1MB 이하로 압축한 후 다시 시도해 주세요."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:90
+#: apps/app/src/routes/profile-info-avatar-page.tsx:91
 msgid "读取图片失败，请换一张试试。"
 msgstr "이미지를 불러오지 못했습니다. 다른 이미지를 시도해 주세요."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:114
+#: apps/app/src/routes/profile-info-avatar-page.tsx:115
 msgid "更换头像"
 msgstr "아바타 변경"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:146
+#: apps/app/src/routes/profile-info-avatar-page.tsx:147
 msgid "点击下方更换"
 msgstr "아래를 탭하여 변경"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:152
+#: apps/app/src/routes/profile-info-avatar-page.tsx:153
 msgid "图片地址"
 msgstr "이미지 URL"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:160
+#: apps/app/src/routes/profile-info-avatar-page.tsx:161
 msgid "粘贴图片 URL 或留空"
 msgstr "이미지 URL을 붙여넣거나 비워두세요"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:176
+#: apps/app/src/routes/profile-info-avatar-page.tsx:177
 msgid "从相册选择"
 msgstr "앨범에서 선택"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:179
+#: apps/app/src/routes/profile-info-avatar-page.tsx:180
 msgid "图片大小不超过 1MB"
 msgstr "이미지는 1MB 이하여야 합니다"
 
@@ -27183,9 +27221,13 @@ msgstr "이름"
 msgid "输入名字"
 msgstr "이름 입력"
 
-#: apps/app/src/routes/profile-info-name-page.tsx:118
+#: apps/app/src/routes/profile-info-name-page.tsx:121
 msgid "好名字让朋友更容易找到你，至少 {NAME_MIN_LENGTH} 个字、最多 {NAME_MAX_LENGTH} 个字符。"
 msgstr ""
+
+#: apps/app/src/routes/profile-info-name-page.tsx:129
+msgid "名字太短啦，至少要 {NAME_MIN_LENGTH} 个字符。"
+msgstr "이름이 너무 짧습니다 — 최소 {NAME_MIN_LENGTH}자가 필요합니다."
 
 #: apps/app/src/routes/profile-info-page.tsx:39
 msgid "个人信息"
@@ -27212,21 +27254,9 @@ msgstr "QR 카드 기능을 곧 만나보실 수 있습니다."
 msgid "更多资料字段开发中，敬请期待。"
 msgstr "프로필 항목이 곧 추가됩니다."
 
-#: apps/app/src/routes/profile-info-signature-page.tsx:108
+#: apps/app/src/routes/profile-info-signature-page.tsx:109
 msgid "写一句此刻想说的话"
 msgstr "지금 하고 싶은 말을 한 마디 써보세요"
-
-#: apps/app/src/routes/profile-moments-page.tsx:149
-msgid "点赞失败，请稍后重试。"
-msgstr ""
-
-#: apps/app/src/routes/profile-moments-page.tsx:214
-msgid "评论失败，请稍后重试。"
-msgstr ""
-
-#: apps/app/src/routes/profile-moments-page.tsx:273
-msgid "删除失败，请稍后重试。"
-msgstr ""
 
 #: apps/app/src/routes/profile-moments-page.tsx:380
 msgid "正在打开桌面我的朋友圈"

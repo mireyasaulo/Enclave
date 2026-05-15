@@ -111,6 +111,9 @@ export function ProfileInfoNamePage() {
           placeholder={t(msg`输入名字`)}
           className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[15px] shadow-none focus:translate-y-0"
         />
+        <div className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]" data-i18n-skip="true">
+          {draft.length}/{NAME_MAX_LENGTH}
+        </div>
       </div>
 
       <div className="px-4 pt-2 text-[11px] leading-5 text-[color:var(--text-muted)]">
@@ -118,6 +121,14 @@ export function ProfileInfoNamePage() {
           msg`好名字让朋友更容易找到你，至少 ${NAME_MIN_LENGTH} 个字、最多 ${NAME_MAX_LENGTH} 个字符。`,
         )}
       </div>
+
+      {/* 用户已经动过输入框但还短于下限时，把 disabled 「完成」的原因明确告诉他；
+          只在 dirty 时才提示，避免一打开页面就跳出红字。 */}
+      {dirty && trimmed.length > 0 && trimmed.length < NAME_MIN_LENGTH ? (
+        <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
+          {t(msg`名字太短啦，至少要 ${NAME_MIN_LENGTH} 个字符。`)}
+        </div>
+      ) : null}
 
       {errorMessage ? (
         <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(220,38,38,0.18)] bg-[rgba(254,242,242,0.96)] px-3 py-2 text-[12px] leading-5 text-[color:var(--state-danger-text)]">
