@@ -448,7 +448,10 @@ export function MobileMomentsPublishPage() {
       ) : null}
 
       {discardConfirmOpen ? (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
+        // z-[1300]：alert 必须盖在 toast (z-1100) / mediaPickerSheet (z-1200) 之上。
+        // 之前 z-[100] 太低，用户在 1.6s 内连点 SettingRow → 取消，刚冒的 toast 会
+        // 把 modal 底边吃掉。
+        <div className="fixed inset-0 z-[1300] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
           <button
             type="button"
             aria-label={t(msg`关闭提示`)}

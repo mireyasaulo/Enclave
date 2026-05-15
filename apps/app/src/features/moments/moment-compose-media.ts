@@ -118,6 +118,23 @@ export function useMomentComposeDraft() {
       }
 
       const nextDrafts = await createMomentImageDrafts(pickedFiles);
+      // 二次校验：createMomentImageDrafts 之间用户可能已经走完另一边的「选择视频」
+      // 流程把 videoDraft 塞进来；此时再 setImageDrafts 会让 imageDrafts + videoDraft
+      // 同时存在，publish 时 buildMomentCreateRequest 只看 videoDraft 分支直接把图片
+      // 静默丢掉。先把刚 decode 出来的 preview URL release 再抛错。
+      if (videoDraftRef.current) {
+        releaseMomentImageDrafts(nextDrafts);
+        throw new Error(t(msg`当前不支持图片和视频混发。`));
+      }
+      // 同样的并发用户也可能在另一边并发添加图片把 remaining slot 吃光，二次卡
+      // 「9 张上限」避免 setImageDrafts 之后总数超 9。
+      if (
+        imageDraftsRef.current.length + nextDrafts.length >
+        MAX_IMAGE_COUNT
+      ) {
+        releaseMomentImageDrafts(nextDrafts);
+        throw new Error(t(msg`图片动态最多支持 ${MAX_IMAGE_COUNT} 张图片。`));
+      }
       setImageDrafts((current) => [...current, ...nextDrafts]);
     },
     async replaceVideoFile(file: File | null | undefined) {
@@ -132,6 +149,13 @@ export function useMomentComposeDraft() {
       }
 
       const nextDraft = await createMomentVideoDraft(file);
+      // 二次校验：createMomentVideoDraft 期间（视频元数据 + 封面生成可能要几秒）
+      // 用户可能从初始 110×110 入口已经走完图片选择把 imageDrafts 塞进来。此时再
+      // setVideoDraft 会让两者并存，publish 时只取 videoDraft 把图片静默丢掉。
+      if (imageDraftsRef.current.length > 0) {
+        releaseMomentVideoDraft(nextDraft);
+        throw new Error(t(msg`当前不支持图片和视频混发。`));
+      }
       setVideoDraft((current) => {
         releaseMomentVideoDraft(current);
         return nextDraft;
