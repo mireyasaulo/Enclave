@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FarmCropId, FarmPlot } from "@yinjie/contracts";
@@ -51,12 +51,24 @@ export function NeighborFarmModal({
             characterName: detailQuery.data!.characterName,
             expiresAt: Date.now() + 3500,
           });
-          window.setTimeout(() => setToast(null), 3500);
         },
         onError: (err) => setErrorMsg((err as Error).message),
       },
     );
   }
+
+  // 跟着 toast.expiresAt 走带 cleanup 的定时器；之前用裸 setTimeout，关掉模态或快连
+  // 偷两次会留下野定时器，要么把后一个 toast 提前抹掉，要么对已卸载组件 setState。
+  useEffect(() => {
+    if (!toast) return;
+    const remaining = toast.expiresAt - Date.now();
+    if (remaining <= 0) {
+      setToast(null);
+      return;
+    }
+    const timer = window.setTimeout(() => setToast(null), remaining);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-stone-900/40 sm:items-center">
