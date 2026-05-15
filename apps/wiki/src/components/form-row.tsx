@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
-import { HintTooltip } from "./hint-tooltip";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 
 type FormRowProps = {
   label: ReactNode;
@@ -42,5 +43,66 @@ export function FormRow({
         </span>
       )}
     </label>
+  );
+}
+
+function HintTooltip({ children }: { children: ReactNode }) {
+  const t = translateRuntimeMessage;
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLSpanElement | null>(null);
+  const titleText = typeof children === "string" ? children : undefined;
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const node = wrapRef.current;
+      if (!node) return;
+      if (event.target instanceof Node && node.contains(event.target)) return;
+      setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  return (
+    <span ref={wrapRef} className="relative inline-flex">
+      <button
+        type="button"
+        aria-label={t(msg`说明`)}
+        aria-expanded={open}
+        title={titleText}
+        onPointerEnter={(event) => {
+          if (event.pointerType === "mouse") setOpen(true);
+        }}
+        onPointerLeave={(event) => {
+          if (event.pointerType === "mouse") setOpen(false);
+        }}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        className="inline-flex h-[14px] w-[14px] items-center justify-center rounded-full border border-[color:var(--text-muted)]/40 text-[10px] font-semibold leading-none text-[color:var(--text-muted)] transition hover:border-[color:var(--text-secondary)] hover:text-[color:var(--text-secondary)]"
+      >
+        ?
+      </button>
+      {open && (
+        <span
+          role="tooltip"
+          className="pointer-events-none absolute left-5 top-full z-20 mt-1 w-max max-w-[240px] whitespace-normal rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--surface-overlay)] px-2.5 py-1.5 text-xs font-normal leading-relaxed text-[color:var(--text-primary)] shadow-md"
+        >
+          {children}
+        </span>
+      )}
+    </span>
   );
 }
