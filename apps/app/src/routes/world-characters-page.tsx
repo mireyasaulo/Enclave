@@ -161,10 +161,14 @@ function MobileWorldCharactersPage() {
   );
 
   useEffect(() => {
-    if (searchText !== routeState.keyword) {
-      setSearchText(routeState.keyword);
-    }
-  }, [routeState.keyword, searchText]);
+    // 仅在 URL hash 变化时把 keyword 同步回本地 state（如浏览器前进/后退）。
+    // 不能把 searchText 放进 deps —— 否则会和下面"searchText → URL"的 effect
+    // 形成 setState ↔ navigate 死循环，每次按键都触发
+    // "Maximum update depth exceeded"。functional setState 在值未变时会自然 bail out。
+    setSearchText((current) =>
+      current === routeState.keyword ? current : routeState.keyword,
+    );
+  }, [routeState.keyword]);
 
   useEffect(() => {
     if (normalizedSearchText || !sections.length) {
