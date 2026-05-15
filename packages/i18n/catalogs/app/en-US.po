@@ -24863,7 +24863,7 @@ msgstr "{0} noticed you at {sceneLabel}: {greeting}"
 
 #: apps/app/src/routes/discover-scene-page.tsx:294
 msgid "在熟悉的场景里偶遇世界居民"
-msgstr ""
+msgstr "Run into world residents in familiar places."
 
 #: apps/app/src/routes/discover-scene-page.tsx:299
 msgid "今日已偶遇 {encounterCount} 人"
@@ -24871,7 +24871,7 @@ msgstr "Encountered {encounterCount} today"
 
 #: apps/app/src/routes/discover-scene-page.tsx:300
 msgid "挑一个常去的地方，附近的居民会主动打招呼。"
-msgstr ""
+msgstr "Pick a place you often visit — nearby residents will say hi first."
 
 #: apps/app/src/routes/discover-scene-page.tsx:316
 msgid "去通过"
