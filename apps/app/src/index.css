@@ -188,10 +188,12 @@ a {
   box-sizing: border-box;
 }
 
-button,
-input,
-textarea {
-  font: inherit;
+@layer base {
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
 }
 
 #root {
