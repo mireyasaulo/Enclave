@@ -270,11 +270,22 @@ export function ChannelsPage() {
   });
   const generateMutation = useMutation({
     mutationFn: () => generateChannelPost(baseUrl),
-    onSuccess: async () => {
-      setNoticeTone("success");
+    onSuccess: async (data) => {
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice(t(msg`已生成一条新的 AI 视频号内容。`));
+      if (!data) {
+        // 后端跳过生成（MiniMax key 未配 / 视频额度今日用完 / 没有可发帖的角色）
+        // 时返回 null。原来还是显示"已生成"，但首页 refetch 完一条新内容都没有，
+        // 用户被骗一脸——直接告诉他暂时生成不了。
+        setNoticeTone("info");
+        setNotice(t(msg`视频号生成额度今日已用完，明天再试。`));
+        return;
+      }
+      setNoticeTone("success");
+      // 后端只是把 draft 写进 DB + 异步排队 MiniMax 出视频，要等 callback
+      // 才会落到 publishStatus='published'。home 这次 refetch 通常看不到。
+      // 把文案从 "已生成" 改成 "正在生成"，对齐真实状态。
+      setNotice(t(msg`新视频号正在生成中，几分钟后刷新看看。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
       });

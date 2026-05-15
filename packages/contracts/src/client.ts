@@ -3561,13 +3561,18 @@ export function generateChannelPost(baseUrl?: string) {
   const resolvedBaseUrl = resolveCoreApiBaseUrl(baseUrl, {
     allowDefault: false,
   });
-  return requestLegacyApi<FeedPost>(
+  // 后端 generateChannelPost 在以下几种情况都返回 null（HTTP 201 + 空 body）：
+  // MINIMAX_API_KEY 没配 / 视频额度今日用完 / 没有 feedFrequency>0 的角色。
+  // requestLegacyApi 拿到空 body 会返回 undefined，传给 normalizeFeedPost
+  // 会读 `post.media` 抛 TypeError——上层 mutation 又没 onError，UI 上
+  // 用户看到的就是一坨堆栈。这里直接挡掉，让 mutation 自己判 null。
+  return requestLegacyApi<FeedPost | null | undefined>(
     "/feed/channels/generate",
     {
       method: "POST",
     },
     baseUrl,
-  ).then((post) => normalizeFeedPost(post, resolvedBaseUrl));
+  ).then((post) => (post ? normalizeFeedPost(post, resolvedBaseUrl) : null));
 }
 
 export function listOfficialAccounts(baseUrl?: string) {
