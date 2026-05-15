@@ -67,6 +67,7 @@ import {
   getFeedSummaryText,
   resolveFeedMomentContentType,
 } from "../features/feed/feed-media";
+import { stripToolCallSyntax } from "../features/moments/moment-content";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
@@ -982,6 +983,7 @@ const pendingLikePostId = likeMutation.isPending
             variant="ghost"
             size="icon"
             className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
+            aria-label={t(msg`返回`)}
           >
             <ArrowLeft size={17} />
           </Button>
@@ -1081,8 +1083,9 @@ const pendingLikePostId = likeMutation.isPending
 
           {visiblePosts.map((post) => {
             const sourceId = `feed-${post.id}`;
+            const displayText = stripToolCallSyntax(post.text);
             const postSummaryText = getFeedSummaryText(post);
-            const summaryText = post.text.trim() ? "" : postSummaryText;
+            const summaryText = displayText ? "" : postSummaryText;
 
             return (
               <div key={post.id} className="yj-list-item-virtual-card">
@@ -1134,7 +1137,7 @@ const pendingLikePostId = likeMutation.isPending
                         {t(msg`居民公开可见`)}
                       </div>
                     ) : null}
-                    {post.text.trim() ? <div>{post.text}</div> : null}
+                    {displayText ? <div>{displayText}</div> : null}
                     {post.media.length > 0 ? (
                       <MomentMediaGallery
                         contentType={resolveFeedMomentContentType(post.media)}
@@ -1181,6 +1184,7 @@ const pendingLikePostId = likeMutation.isPending
                               ) ?? null
                             : null;
                           const replyToName = replyToComment?.authorName ?? null;
+                          const cleanCommentText = stripToolCallSyntax(comment.text);
                           const openReply = () => {
                             if (!post.canInteract) return;
                             setCommentBarTarget({
@@ -1243,7 +1247,7 @@ const pendingLikePostId = likeMutation.isPending
                                   )}
                                 </>
                               ) : null}
-                              <span>：{comment.text}</span>
+                              <span>：{cleanCommentText}</span>
                             </div>
                           );
                         })}
