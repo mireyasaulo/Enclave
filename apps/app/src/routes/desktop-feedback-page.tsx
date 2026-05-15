@@ -391,7 +391,7 @@ export function DesktopFeedbackPage() {
             ) : null}
           </InlineNotice>
         ) : null}
-        {error ? <InlineNotice tone="info">{error}</InlineNotice> : null}
+        {error ? <InlineNotice tone="danger">{error}</InlineNotice> : null}
         {systemStatusQuery.isError &&
         systemStatusQuery.error instanceof Error ? (
           <div className="mt-4">
@@ -693,13 +693,16 @@ export function DesktopFeedbackPage() {
   }
 
   function buildFeedbackPackage() {
+    // 用原始 label 拼 "优先级：高"，避免 resolvePriorityLabel 拼出的 "优先级：高优先级"。
+    const priorityOption = priorityOptions.find(
+      (item) => item.id === draft.priority,
+    );
+    const priorityRawLabel = priorityOption?.label ?? t(msg`未标记`);
     return [
       t(
         msg`反馈分类：${resolveCategoryLabel(draft.category, categoryOptions, t)}`,
       ),
-      t(
-        msg`优先级：${resolvePriorityLabel(draft.priority, priorityOptions, t)}`,
-      ),
+      t(msg`优先级：${priorityRawLabel}`),
       t(msg`标题：${draft.title.trim() || t(msg`未填写`)}`),
       t(msg`问题描述：${draft.detail.trim() || t(msg`未填写`)}`),
       t(msg`复现步骤：${draft.reproduction.trim() || t(msg`未填写`)}`),
