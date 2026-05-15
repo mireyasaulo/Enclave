@@ -1291,6 +1291,14 @@ const pendingLikePostId = likeMutation.isPending
                               },
                             });
                           };
+                          // 评论作者名字用蓝色 #576B95 显示，过去无脑包成 <button> —
+                          // 但 openCharacterDetail 对 authorType==='user'（世界主人自己）
+                          // 直接 return，按起来视觉是"可点"实际无任何反应，是 round 3
+                          // 修过的 post 头像同款误导。authorType=character 才渲成 button。
+                          const authorIsCharacter =
+                            comment.authorType === "character";
+                          const replyAuthorIsCharacter =
+                            replyToComment?.authorType === "character";
                           return (
                             <div
                               key={comment.id}
@@ -1305,23 +1313,29 @@ const pendingLikePostId = likeMutation.isPending
                               }}
                               className="block w-full cursor-pointer text-left text-[#1A1A1A] active:bg-[#EFEFEF]"
                             >
-                              <button
-                                type="button"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  openCharacterDetail(
-                                    comment.authorId,
-                                    comment.authorType,
-                                  );
-                                }}
-                                className="text-[#576B95] hover:opacity-80"
-                              >
-                                {comment.authorName}
-                              </button>
+                              {authorIsCharacter ? (
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    openCharacterDetail(
+                                      comment.authorId,
+                                      comment.authorType,
+                                    );
+                                  }}
+                                  className="text-[#576B95] hover:opacity-80"
+                                >
+                                  {comment.authorName}
+                                </button>
+                              ) : (
+                                <span className="text-[#576B95]">
+                                  {comment.authorName}
+                                </span>
+                              )}
                               {replyToName ? (
                                 <>
                                   <span> {t(msg`回复`)} </span>
-                                  {replyToComment ? (
+                                  {replyToComment && replyAuthorIsCharacter ? (
                                     <button
                                       type="button"
                                       onClick={(event) => {
