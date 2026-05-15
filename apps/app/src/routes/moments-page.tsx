@@ -1592,7 +1592,33 @@ function MobileMomentsView({
           {/* like/comment/delete 失败统一冒到顶部 notice（带「重试」+ 2.4s 自动收），
               所以这里不再单独挂一块永驻的底部错误块。 */}
 
-          {!momentsLoading && !momentsError && !visibleMoments.length ? (
+          {/* 触底 sentinel：只要还有下一页就挂，即使 visibleMoments 是空（拉到的整页
+              都被 blockedCharacterIds 过滤掉时）也得继续拉，否则会卡在"还很安静"
+              空状态——但其实后面还有非屏蔽的动态。"已经到底了" 标签仅在已经有渲染
+              内容时才显示，否则空状态卡更直白。 */}
+          {hasNextPage ? (
+            <>
+              <div
+                ref={loadMoreRef}
+                className="h-1 w-full"
+                aria-hidden="true"
+              />
+              {isFetchingNextPage ? (
+                <div className="py-4 text-center text-[12px] text-[#9A9A9A]">
+                  {t(msg`正在加载更多…`)}
+                </div>
+              ) : null}
+            </>
+          ) : visibleMoments.length > 0 ? (
+            <div className="py-4 text-center text-[12px] text-[#C0C0C0]">
+              {t(msg`已经到底了`)}
+            </div>
+          ) : null}
+
+          {!momentsLoading &&
+          !momentsError &&
+          !visibleMoments.length &&
+          !hasNextPage ? (
             <div className="px-4 pt-12 pb-16 text-center">
               <div className="text-[14px] font-medium text-[#1A1A1A]">
                 {t(msg`还很安静`)}
@@ -1611,25 +1637,6 @@ function MobileMomentsView({
                 </Button>
               </div>
             </div>
-          ) : null}
-
-          {visibleMoments.length > 0 ? (
-            <>
-              <div
-                ref={loadMoreRef}
-                className="h-1 w-full"
-                aria-hidden="true"
-              />
-              {isFetchingNextPage ? (
-                <div className="py-4 text-center text-[12px] text-[#9A9A9A]">
-                  {t(msg`正在加载更多…`)}
-                </div>
-              ) : !hasNextPage ? (
-                <div className="py-4 text-center text-[12px] text-[#C0C0C0]">
-                  {t(msg`已经到底了`)}
-                </div>
-              ) : null}
-            </>
           ) : null}
 
           <div className="h-[calc(env(safe-area-inset-bottom,0px)+24px)]" />
