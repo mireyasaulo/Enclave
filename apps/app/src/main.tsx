@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
+import { track } from "@yinjie/analytics";
 import {
   AppLocaleProvider,
   readPersistedLocale,
@@ -9,6 +10,7 @@ import {
   type SupportedLocale,
 } from "@yinjie/i18n";
 import { setWorldLanguage } from "@yinjie/contracts";
+import { TelemetryErrorBoundary } from "@yinjie/ui";
 import "@yinjie/ui/tokens.css";
 import "./index.css";
 import { BootstrapScreen } from "./components/bootstrap-screen";
@@ -143,34 +145,46 @@ async function bootstrap() {
 
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-      <AppLocaleProvider
-        surface="app"
-        fallback={<BootstrapScreen />}
-        initialLocale={initialLocale ?? null}
-        onLocaleChange={handleLocaleChange}
-        preferredLocales={preferredLocales}
-        // 公网隧道下 i18n 主 catalog ~106KB gzipped、过隧道 0.3-1s。原本 catalog
-        // 没回来时整棵 React 树都被 fallback=<BootstrapScreen /> 卡住。renderBe
-        // foreReady=true 让 children 立即渲染，catalog 到位再无缝替换：源 ID
-        // 是中文，zh-CN 用户视觉无差别；en/ja/ko 用户首屏看到 ~0.3-1s 中文
-        // flash 然后切回目标语言，是可接受的代价。
-        renderBeforeReady
+      <TelemetryErrorBoundary
+        onError={(error, info) => {
+          const err = error instanceof Error ? error : null;
+          track("react_render_error", {
+            message: err?.message ?? String(error).slice(0, 1000),
+            name: err?.name ?? null,
+            stack: err?.stack?.slice(0, 2000) ?? null,
+            componentStack: info.componentStack?.slice(0, 2000) ?? null,
+          });
+        }}
       >
-        <NativeLocaleSync
-          syncDesktopLocaleOnMount={Boolean(explicitWebLocalePreference)}
-        />
-        <BackendLocaleSync
-          hasExplicitWebLocalePreference={Boolean(explicitWebLocalePreference)}
-        />
-        <QueryClientProvider client={queryClient}>
-          {/* GoogleOAuthProvider 已下移到 routes/welcome-page.tsx 内仅包裹
-              GoogleLogin 组件 — 唯一用 GoogleLogin 的地方。这样首屏不再
-              拉 @react-oauth/google 包 (~25-35KB)，登录页第一次访问时才拉。 */}
-          <Suspense fallback={<BootstrapScreen />}>
-            <RouterProvider router={router} />
-          </Suspense>
-        </QueryClientProvider>
-      </AppLocaleProvider>
+        <AppLocaleProvider
+          surface="app"
+          fallback={<BootstrapScreen />}
+          initialLocale={initialLocale ?? null}
+          onLocaleChange={handleLocaleChange}
+          preferredLocales={preferredLocales}
+          // 公网隧道下 i18n 主 catalog ~106KB gzipped、过隧道 0.3-1s。原本 catalog
+          // 没回来时整棵 React 树都被 fallback=<BootstrapScreen /> 卡住。renderBe
+          // foreReady=true 让 children 立即渲染，catalog 到位再无缝替换：源 ID
+          // 是中文，zh-CN 用户视觉无差别；en/ja/ko 用户首屏看到 ~0.3-1s 中文
+          // flash 然后切回目标语言，是可接受的代价。
+          renderBeforeReady
+        >
+          <NativeLocaleSync
+            syncDesktopLocaleOnMount={Boolean(explicitWebLocalePreference)}
+          />
+          <BackendLocaleSync
+            hasExplicitWebLocalePreference={Boolean(explicitWebLocalePreference)}
+          />
+          <QueryClientProvider client={queryClient}>
+            {/* GoogleOAuthProvider 已下移到 routes/welcome-page.tsx 内仅包裹
+                GoogleLogin 组件 — 唯一用 GoogleLogin 的地方。这样首屏不再
+                拉 @react-oauth/google 包 (~25-35KB)，登录页第一次访问时才拉。 */}
+            <Suspense fallback={<BootstrapScreen />}>
+              <RouterProvider router={router} />
+            </Suspense>
+          </QueryClientProvider>
+        </AppLocaleProvider>
+      </TelemetryErrorBoundary>
     </React.StrictMode>,
   );
 

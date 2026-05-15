@@ -97,6 +97,49 @@ function shouldDropFrontendError(event: ErrorEvent): boolean {
   return false;
 }
 
+// 资源加载错误（<img>/<script>/<link>/<audio>/<video>/<source>/<iframe> 拉 src 失败）
+// 不会冒泡到 window，必须用 capture 阶段监听才能拿到。返回 null 表示不上报。
+function buildResourceErrorProps(
+  event: Event,
+): Record<string, unknown> | null {
+  const target = event.target;
+  if (!(target instanceof Element) || target === (event.currentTarget as unknown)) {
+    return null;
+  }
+  const tag = target.tagName.toLowerCase();
+  // 业务里 <img src=""> 占位经常拿不到资源；先 narrow 一下感兴趣的标签。
+  if (
+    tag !== "img" &&
+    tag !== "script" &&
+    tag !== "link" &&
+    tag !== "audio" &&
+    tag !== "video" &&
+    tag !== "source" &&
+    tag !== "iframe"
+  ) {
+    return null;
+  }
+  // 不同标签 url 字段不同
+  const anyEl = target as HTMLImageElement &
+    HTMLLinkElement &
+    HTMLScriptElement &
+    HTMLMediaElement &
+    HTMLSourceElement &
+    HTMLIFrameElement;
+  const url = anyEl.src || anyEl.href || anyEl.currentSrc || null;
+  if (!url) return null;
+  // 浏览器扩展注入的 <script>/<img> 不算业务错误
+  if (EXTENSION_STACK_PATTERN.test(url)) return null;
+  // data: / blob: 失败信息不全且大多是预期失败，忽略
+  if (url.startsWith("data:") || url.startsWith("blob:")) return null;
+  return {
+    tag,
+    url: url.slice(0, 1000),
+    // <link rel="stylesheet"> 的 type/rel 帮助分流 CSS vs preload
+    rel: tag === "link" ? anyEl.rel || null : null,
+  };
+}
+
 export function attachAutoCapture(): void {
   if (attached || typeof window === "undefined" || !isInitialized()) return;
   attached = true;
@@ -111,6 +154,38 @@ export function attachAutoCapture(): void {
       stack: (event.error as Error | undefined)?.stack?.slice(0, 2000) ?? null,
     });
   });
+
+  // 资源加载错误另起一条事件名，capture 阶段才拿得到。bubbling 的 'error' 监听器
+  // 上面那个永远收不到 <img>/<script>/<link> 的失败，因为它们的 error 事件不冒泡。
+  window.addEventListener(
+    "error",
+    (event) => {
+      const props = buildResourceErrorProps(event);
+      if (!props) return;
+      emitInternal("resource_error", "error", props);
+    },
+    { capture: true },
+  );
+
+  // CSP 违规：浏览器会触发但不会进 window.error/onerror。
+  // 没有 CSP 头时这个事件永远不会触发，挂上也没成本。
+  if (typeof document !== "undefined") {
+    document.addEventListener(
+      "securitypolicyviolation",
+      (event) => {
+        emitInternal("csp_violation", "error", {
+          blockedUri: event.blockedURI?.slice(0, 500) ?? null,
+          violatedDirective: event.violatedDirective ?? null,
+          effectiveDirective: event.effectiveDirective ?? null,
+          sourceFile: event.sourceFile?.slice(0, 500) ?? null,
+          lineNumber: event.lineNumber ?? null,
+          columnNumber: event.columnNumber ?? null,
+          disposition: event.disposition ?? null,
+          sample: event.sample?.slice(0, 200) ?? null,
+        });
+      },
+    );
+  }
 
   window.addEventListener("unhandledrejection", (event) => {
     const reason = event.reason as unknown;
