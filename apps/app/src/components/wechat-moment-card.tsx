@@ -152,8 +152,12 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
       <article
         id={cardId}
         ref={ref}
+        // scroll-mt 给 hash 跳转用：moments-page useEffect 里走的是
+        // scrollIntoView({block:"start"})，但移动端顶上有 sticky TabPageTopBar
+        // (~56px)，对齐到 y=0 会把作者头连同前半段正文藏到顶栏底下。给文章
+        // 加 scroll-margin-top 让浏览器在 scrollIntoView 时把这点高度还回来。
         className={cn(
-          "flex w-full items-start gap-2.5",
+          "flex w-full items-start gap-2.5 scroll-mt-[72px]",
           flush ? "" : "px-4 pb-3.5 pt-3.5",
         )}
       >
