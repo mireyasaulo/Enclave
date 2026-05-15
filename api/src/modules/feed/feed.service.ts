@@ -3690,7 +3690,10 @@ export class FeedService implements OnModuleInit {
       .getOne();
   }
 
-  private async decrementPostCounter(postId: string, key: 'favoriteCount') {
+  private async decrementPostCounter(
+    postId: string,
+    key: 'favoriteCount' | 'likeCount',
+  ) {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post) {
       return;
