@@ -319,6 +319,8 @@ export interface Character {
   activeHoursEnd?: number | null;
   triggerScenes?: string[] | null;
   intimacyLevel: number;
+  socialOpenness?: "open" | "normal" | "private";
+  proactiveBrowseChance?: number;
   lastActiveAt?: string | null;
   aiRelationships?: CharacterAiRelationship[] | null;
   currentStatus?: string | null;

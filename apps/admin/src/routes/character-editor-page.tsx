@@ -61,6 +61,9 @@ const emptyCharacterDraft: CharacterDraft = {
   activeHoursStart: 8,
   activeHoursEnd: 23,
   intimacyLevel: 0,
+  socialOpenness: "normal",
+  proactiveBrowseChance: 0.3,
+  aiRelationships: [],
   triggerScenes: [],
   profile: {
     characterId: "",
@@ -299,6 +302,7 @@ export function CharacterEditorPage() {
     { key: "scenes", label: t(msg`场景提示词`) },
     { key: "memory", label: t(msg`记忆提示词`) },
     { key: "life", label: t(msg`生活策略`) },
+    { key: "social_params", label: t(msg`社交参数`) },
   ];
   const { characterId } = useParams({ from: "/characters/$characterId" });
   const isNew = characterId === "new";
@@ -1212,6 +1216,150 @@ export function CharacterEditorPage() {
                 }))
               }
             />
+          </div>
+        </Card>
+      ) : null}
+
+      {/* Tab: 社交参数 */}
+      {activeTab === "social_params" ? (
+        <Card className="bg-[color:var(--surface-console)]">
+          <SectionHeading>{t(msg`社交参数`)}</SectionHeading>
+          <p className="mt-2 text-sm text-[color:var(--text-secondary)]">
+            {t(msg`这一组是角色在朋友圈、跟其他角色互动、自治浏览时用到的字段。注意：亲密度与关系网会在运行时被自动调节。`)}
+          </p>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            <SelectField
+              label={t(msg`社交开放度`)}
+              value={draft.socialOpenness ?? "normal"}
+              onChange={(value) =>
+                setDraft((current) => ({
+                  ...current,
+                  socialOpenness: value as "open" | "normal" | "private",
+                }))
+              }
+              options={[
+                { value: "open", label: t(msg`open 公开`) },
+                { value: "normal", label: t(msg`normal 普通`) },
+                { value: "private", label: t(msg`private 仅好友`) },
+              ]}
+            />
+            <Field
+              label={t(msg`主动浏览概率`)}
+              placeholder="0.3"
+              value={String(draft.proactiveBrowseChance ?? 0.3)}
+              onChange={(value) => {
+                const parsed = Number.parseFloat(value);
+                if (!Number.isFinite(parsed)) return;
+                const clamped = Math.max(0, Math.min(1, parsed));
+                setDraft((current) => ({
+                  ...current,
+                  proactiveBrowseChance: clamped,
+                }));
+              }}
+            />
+            <Field
+              label={t(msg`亲密度种子（0–100）`)}
+              placeholder="0"
+              value={String(draft.intimacyLevel ?? 0)}
+              onChange={(value) => {
+                const parsed = Number.parseInt(value, 10);
+                if (!Number.isFinite(parsed)) return;
+                const clamped = Math.max(0, Math.min(100, parsed));
+                setDraft((current) => ({
+                  ...current,
+                  intimacyLevel: clamped,
+                }));
+              }}
+            />
+          </div>
+          <InlineNotice className="mt-4" tone="warning">
+            {t(msg`亲密度（intimacyLevel）会被 farm-state 与 social 服务根据真实互动自动改写，此处编辑仅作为初始种子值。`)}
+          </InlineNotice>
+
+          <div className="mt-6">
+            <SectionHeading>{t(msg`AI 关系网（aiRelationships）`)}</SectionHeading>
+            <InlineNotice className="mt-2" tone="muted">
+              {t(msg`仅在角色首次入库时由 character-friendship 服务 seed 进 character_friendships 表，后续以朋友表为准；现编辑只对新角色或重 seed 场景生效。`)}
+            </InlineNotice>
+            <div className="mt-3 space-y-3">
+              {(draft.aiRelationships ?? []).map((rel, index) => (
+                <div
+                  key={index}
+                  className="grid gap-3 rounded-md border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-3 md:grid-cols-[1fr,1fr,1fr,auto]"
+                >
+                  <Field
+                    label={t(msg`目标角色 ID`)}
+                    value={rel.characterId}
+                    onChange={(value) =>
+                      setDraft((current) => {
+                        const list = [...(current.aiRelationships ?? [])];
+                        list[index] = { ...list[index], characterId: value };
+                        return { ...current, aiRelationships: list };
+                      })
+                    }
+                  />
+                  <Field
+                    label={t(msg`关系类型`)}
+                    placeholder={t(msg`如 friend / family / mentor`)}
+                    value={rel.relationshipType}
+                    onChange={(value) =>
+                      setDraft((current) => {
+                        const list = [...(current.aiRelationships ?? [])];
+                        list[index] = {
+                          ...list[index],
+                          relationshipType: value,
+                        };
+                        return { ...current, aiRelationships: list };
+                      })
+                    }
+                  />
+                  <Field
+                    label={t(msg`强度 0–1`)}
+                    placeholder="0.5"
+                    value={String(rel.strength)}
+                    onChange={(value) => {
+                      const parsed = Number.parseFloat(value);
+                      if (!Number.isFinite(parsed)) return;
+                      const clamped = Math.max(0, Math.min(1, parsed));
+                      setDraft((current) => {
+                        const list = [...(current.aiRelationships ?? [])];
+                        list[index] = { ...list[index], strength: clamped };
+                        return { ...current, aiRelationships: list };
+                      });
+                    }}
+                  />
+                  <div className="flex items-end">
+                    <Button
+                      variant="secondary"
+                      onClick={() =>
+                        setDraft((current) => ({
+                          ...current,
+                          aiRelationships: (
+                            current.aiRelationships ?? []
+                          ).filter((_, i) => i !== index),
+                        }))
+                      }
+                    >
+                      {t(msg`删除`)}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  setDraft((current) => ({
+                    ...current,
+                    aiRelationships: [
+                      ...(current.aiRelationships ?? []),
+                      { characterId: "", relationshipType: "friend", strength: 0.5 },
+                    ],
+                  }))
+                }
+              >
+                {t(msg`+ 添加关系`)}
+              </Button>
+            </div>
           </div>
         </Card>
       ) : null}
