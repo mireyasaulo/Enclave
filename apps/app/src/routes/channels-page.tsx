@@ -568,6 +568,13 @@ export function ChannelsPage() {
       return;
     }
 
+    // 关注 tab 空态：用户没关注任何作者，"换一批" 没意义（生成不会
+    // 自动产生关注），改成切回推荐 tab 让用户去那边点 +关注。
+    if (activeSection === "following") {
+      handleSectionChange("recommended");
+      return;
+    }
+
     generateMutation.mutate();
   }
 
@@ -1118,23 +1125,47 @@ export function ChannelsPage() {
         {!channelsQuery.isLoading && !errorMessage && !visiblePosts.length ? (
           <MobileChannelsStatusCard
             badge={t(msg`视频号`)}
-            title={t(msg`还没有内容`)}
-            description={t(
-              msg`再生成一批内容后，这里会逐步形成更连续的视频推荐流。`,
-            )}
+            title={
+              activeSection === "following"
+                ? t(msg`还没关注任何视频号`)
+                : activeSection === "friends"
+                  ? t(msg`朋友还没有视频号动态`)
+                  : activeSection === "live"
+                    ? t(msg`暂无正在直播`)
+                    : t(msg`还没有内容`)
+            }
+            description={
+              activeSection === "following"
+                ? t(
+                    msg`去推荐 tab 找一找感兴趣的作者，点 +关注 把他们留下来，新内容会在这里聚合显示。`,
+                  )
+                : activeSection === "friends"
+                  ? t(
+                      msg`等通讯录里的角色发新视频号动态，这里就会聚合显示。`,
+                    )
+                  : activeSection === "live"
+                    ? t(msg`稍后再来看看，可能有角色开播。`)
+                    : t(
+                        msg`再生成一批内容后，这里会逐步形成更连续的视频推荐流。`,
+                      )
+            }
             action={
               <Button
                 variant="primary"
                 size="sm"
                 className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
-                disabled={generateMutation.isPending}
+                disabled={
+                  activeSection !== "following" && generateMutation.isPending
+                }
                 onClick={handleEmptyStateAction}
               >
                 {safeReturnPath
                   ? t(msg`返回上一页`)
-                  : generateMutation.isPending
-                    ? t(msg`生成中...`)
-                    : t(msg`换一批`)}
+                  : activeSection === "following"
+                    ? t(msg`去推荐看看`)
+                    : generateMutation.isPending
+                      ? t(msg`生成中...`)
+                      : t(msg`换一批`)}
               </Button>
             }
           />
