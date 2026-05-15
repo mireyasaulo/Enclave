@@ -22,23 +22,38 @@ export type WikiAvatarUploadResult = {
 // 头像图片单文件上限 4 MB —— 写真级别足够，避免 wiki child 内存被恶意大文件打爆。
 export const WIKI_AVATAR_UPLOAD_LIMIT_BYTES = 4 * 1024 * 1024;
 
+// 显式 allow-list，禁掉 image/svg+xml —— SVG 里可以塞 <script>，直接访问头像 URL
+// 会在 wiki 同源里执行 JS → 偷 localStorage 里的 JWT。同理也禁掉 avif/heic 这类
+// 不会主动出现在用户截图里、但可能藏 EXIF 解析漏洞的格式。
+const ALLOWED_AVATAR_MIME = new Map<string, string>([
+  ['image/png', '.png'],
+  ['image/jpeg', '.jpg'],
+  ['image/webp', '.webp'],
+  ['image/gif', '.gif'],
+]);
+
 @Injectable()
 export class WikiAvatarService {
   async saveUploadedAvatar(
     file: UploadedWikiAvatarFile,
   ): Promise<WikiAvatarUploadResult> {
-    if (!file.mimetype.startsWith('image/')) {
+    // 用 mimetype（multer 从 Content-Type 拿）查白名单。扩展名一律不信，避免
+    // "evil.svg" 配 image/png mimetype 通过校验后还是按 .svg 落盘 → 静态服务
+    // 又把它当 image/svg+xml 吐回去 → XSS。
+    const safeExtension = ALLOWED_AVATAR_MIME.get(file.mimetype.toLowerCase());
+    if (!safeExtension) {
       throw new AppError('WIKI_AVATAR_IMAGE_ONLY', {
         status: HttpStatus.BAD_REQUEST,
-        legacyMessage: '头像只支持图片文件（png/jpg/webp/gif）。',
+        legacyMessage: '头像只支持 PNG / JPG / WebP / GIF。',
       });
     }
 
     const originalName = sanitizeFileName(file.originalname ?? 'avatar');
-    const extension =
-      path.extname(originalName) || guessImageExtension(file.mimetype);
-    const baseName = path.basename(originalName, extension) || 'avatar';
-    const storedFileName = `${Date.now()}-${randomUUID().slice(0, 8)}-${sanitizeFileName(baseName)}${extension}`;
+    // basename 时把所有 . 之前都剥掉，避免 "foo.bar.html" 这种 baseName 带 ext。
+    const baseName =
+      sanitizeFileName(path.basename(originalName).replace(/\..*$/, '')) ||
+      'avatar';
+    const storedFileName = `${Date.now()}-${randomUUID().slice(0, 8)}-${baseName}${safeExtension}`;
     const storageDir = this.resolveStorageDir();
 
     await mkdir(storageDir, { recursive: true });
@@ -86,11 +101,4 @@ function sanitizeFileName(value: string) {
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
     .toLowerCase();
-}
-
-function guessImageExtension(mimeType: string) {
-  if (mimeType === 'image/png') return '.png';
-  if (mimeType === 'image/webp') return '.webp';
-  if (mimeType === 'image/gif') return '.gif';
-  return '.jpg';
 }
