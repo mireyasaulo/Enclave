@@ -501,13 +501,30 @@ export function SubscriptionPanel({
       <AppSection className="overflow-hidden rounded-[28px] border-black/5 bg-[linear-gradient(135deg,#f7fff8,#ffffff)] px-6 py-6 shadow-none">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-              {t(msg`订阅`)}
-            </div>
-            <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
-              {t(msg`会员中心`)}
-            </h2>
-            <p className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">
+            {/*
+              embedded 模式下外面 SettingsSection 已经写了一个 "会员中心" 标题
+              （desktop /desktop/settings 里这是 settings tab 本身的 section title），
+              这里再渲染同样的 "订阅" eyebrow + "会员中心" h2 就会让用户看到两个
+              一模一样的会员中心叠在一起。只在独立 /profile/subscription 模式下
+              保留这一组 title。
+            */}
+            {embedded ? null : (
+              <>
+                <div className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                  {t(msg`订阅`)}
+                </div>
+                <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
+                  {t(msg`会员中心`)}
+                </h2>
+              </>
+            )}
+            <p
+              className={
+                embedded
+                  ? "text-sm leading-7 text-[color:var(--text-secondary)]"
+                  : "mt-2 text-sm leading-7 text-[color:var(--text-secondary)]"
+              }
+            >
               {isSynthesizedEmailPhone(profile.phone || phone) ? (
                 // 邮箱注册的用户没真手机号，挂上一个 "9xxxxxxxxxxxxx" 合成号
                 // 不如直接展示昵称（cloud_users.displayName，比如 yuanzui0728
