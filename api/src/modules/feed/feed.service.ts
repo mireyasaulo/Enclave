@@ -10,8 +10,8 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { AppError } from '../../common/app-error.exception';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, MoreThanOrEqual, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, In, MoreThanOrEqual, Repository } from 'typeorm';
 import { FeedPostEntity } from './feed-post.entity';
 import { FeedCommentEntity } from './feed-comment.entity';
 import { FeedPostLikeEntity } from './feed-post-like.entity';
@@ -23,6 +23,10 @@ import { CharactersService } from '../characters/characters.service';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { SocialService } from '../social/social.service';
 import { CharacterFriendshipService } from '../social/character-friendship.service';
+import {
+  FriendRemarkResolver,
+  type FriendRemarkMap,
+} from '../social/friend-remark-resolver.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import type {
   MomentImageAsset,
@@ -73,6 +77,7 @@ type FeedAvatarContext = {
   visibleCharacterIds: Set<string>;
   ownerFriendCharacterIds: Set<string>;
   characterAvatarById: Map<string, string>;
+  remarkMap: FriendRemarkMap;
 };
 
 type FeedListItem = ReturnType<FeedService['serializePost']> & {
@@ -140,12 +145,73 @@ export class FeedService implements OnModuleInit {
     private readonly chatService: ChatService,
     @Inject(forwardRef(() => ChatGateway))
     private readonly chatGateway: ChatGateway,
+    private readonly remarkResolver: FriendRemarkResolver,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   async onModuleInit() {
+    // 索引必须先建好，再做后续清理；否则 toggleLike / createPostInteraction 一旦在
+    // 启动后被调，仍可能撞上历史重复行。dedupe + create unique index 是幂等的。
+    await this.ensureFeedUniqueIndexes();
     await this.backfillFeedAuthorAvatars();
     await this.cleanupBrokenChannelPosts();
     await this.cleanupLegacyDemoChannelPosts();
+  }
+
+  // 修复历史 race condition 留下的重复 like / interaction 行，并补上 unique index
+  // 防止再次发生。同时基于 like 表实际行数把 likeCount/favoriteCount 重算一遍，
+  // 把之前漂移的计数拉回真值。线上重启时跑一次即可，幂等。
+  private async ensureFeedUniqueIndexes(): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      // 1. 去重 feed_post_likes：每对 (postId, authorId) 只保留 createdAt 最早一行
+      await queryRunner.query(`
+        DELETE FROM feed_post_likes
+        WHERE id NOT IN (
+          SELECT MIN(id) FROM feed_post_likes GROUP BY postId, authorId
+        )
+      `);
+      await queryRunner.query(`
+        CREATE UNIQUE INDEX IF NOT EXISTS uniq_feed_post_likes_post_author
+        ON feed_post_likes(postId, authorId)
+      `);
+
+      // 2. 去重 user_feed_interactions：每组 (userId, postId, type) 只保留最早一行
+      await queryRunner.query(`
+        DELETE FROM user_feed_interactions
+        WHERE id NOT IN (
+          SELECT MIN(id) FROM user_feed_interactions GROUP BY userId, postId, type
+        )
+      `);
+      await queryRunner.query(`
+        CREATE UNIQUE INDEX IF NOT EXISTS uniq_user_feed_interactions_owner_post_type
+        ON user_feed_interactions(userId, postId, type)
+      `);
+
+      // 3. 用 like 表实际行数重算 likeCount；同理用 type='favorite' 重算 favoriteCount
+      await queryRunner.query(`
+        UPDATE feed_posts
+        SET likeCount = COALESCE((
+          SELECT COUNT(*) FROM feed_post_likes WHERE feed_post_likes.postId = feed_posts.id
+        ), 0)
+      `);
+      await queryRunner.query(`
+        UPDATE feed_posts
+        SET favoriteCount = COALESCE((
+          SELECT COUNT(*) FROM user_feed_interactions
+          WHERE user_feed_interactions.postId = feed_posts.id
+            AND user_feed_interactions.type = 'favorite'
+        ), 0)
+      `);
+    } catch (error) {
+      this.logger.error(
+        `ensureFeedUniqueIndexes failed: ${(error as Error).message}`,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async getFeed(
@@ -310,7 +376,12 @@ export class FeedService implements OnModuleInit {
 
     return {
       authorId: latestPost.authorId,
-      authorName: latestPost.authorName,
+      authorName: this.remarkResolver.applyCharacterRemark(
+        latestPost.authorType,
+        latestPost.authorId,
+        latestPost.authorName,
+        avatarContext.remarkMap,
+      ),
       authorAvatar: this.resolveFeedAuthorAvatar(
         latestPost.authorType,
         latestPost.authorId,
@@ -1446,22 +1517,38 @@ export class FeedService implements OnModuleInit {
     authorAvatar: string,
     authorType = 'user',
   ): Promise<{ liked: boolean }> {
-    const existing = await this.likeRepo.findOneBy({ postId, authorId });
-    if (existing) {
-      await this.likeRepo.delete(existing.id);
-      await this.postRepo.decrement({ id: postId }, 'likeCount', 1);
-      return { liked: false };
-    }
-    const like = this.likeRepo.create({
-      postId,
-      authorId,
-      authorName,
-      authorAvatar,
-      authorType,
+    // 两次连续点击 / 多端同时点：必须靠 unique(postId, authorId) + 事务来保证
+    // likeCount 不漂移。INSERT 走 ON CONFLICT DO NOTHING 取消重复插入，
+    // 计数器仅在 INSERT/DELETE 真正影响 1 行时才加减。
+    return this.dataSource.transaction(async (manager) => {
+      const likeRepo = manager.getRepository(FeedPostLikeEntity);
+      const postRepo = manager.getRepository(FeedPostEntity);
+
+      const existing = await likeRepo.findOneBy({ postId, authorId });
+      if (existing) {
+        const deletion = await likeRepo.delete({ id: existing.id });
+        if (deletion.affected && deletion.affected > 0) {
+          await postRepo.decrement({ id: postId }, 'likeCount', 1);
+        }
+        return { liked: false };
+      }
+
+      const insert = await likeRepo
+        .createQueryBuilder()
+        .insert()
+        .into(FeedPostLikeEntity)
+        .values({ postId, authorId, authorName, authorAvatar, authorType })
+        .orIgnore()
+        .execute();
+      const inserted =
+        Array.isArray(insert.identifiers) && insert.identifiers.length > 0
+          ? insert.identifiers[0]?.id != null
+          : false;
+      if (inserted) {
+        await postRepo.increment({ id: postId }, 'likeCount', 1);
+      }
+      return { liked: true };
     });
-    await this.likeRepo.save(like);
-    await this.postRepo.increment({ id: postId }, 'likeCount', 1);
-    return { liked: true };
   }
 
   private jitterPastTimestamp(maxMs: number): Date {
@@ -2478,7 +2565,12 @@ export class FeedService implements OnModuleInit {
                 post.authorAvatar,
                 avatarContext,
               ),
-        authorName: post.authorName,
+        authorName: this.remarkResolver.applyCharacterRemark(
+          post.authorType,
+          post.authorId,
+          post.authorName,
+          avatarContext?.remarkMap,
+        ),
         authorType: post.authorType,
         latestCreatedAt: post.createdAt,
         postCount: 1,
@@ -2513,25 +2605,33 @@ export class FeedService implements OnModuleInit {
           (post.topicTags ?? []).some((tag) => tag.includes('直播')),
       )
       .slice(0, 6)
-      .map((post) => ({
-        id: `live-${post.id}`,
-        postId: post.id,
-        title: post.title?.trim() || `${post.authorName} 的视频号直播`,
-        authorId: post.authorId,
-        authorName: post.authorName,
-        authorAvatar:
-          avatarContext === undefined
-            ? post.authorAvatar
-            : this.resolveFeedAuthorAvatar(
-                post.authorType,
-                post.authorId,
-                post.authorAvatar,
-                avatarContext,
-              ),
-        startedAt: post.createdAt.toISOString(),
-        status: 'replay' as const,
-        coverUrl: post.coverUrl ?? null,
-      }));
+      .map((post) => {
+        const displayAuthorName = this.remarkResolver.applyCharacterRemark(
+          post.authorType,
+          post.authorId,
+          post.authorName,
+          avatarContext?.remarkMap,
+        );
+        return {
+          id: `live-${post.id}`,
+          postId: post.id,
+          title: post.title?.trim() || `${displayAuthorName} 的视频号直播`,
+          authorId: post.authorId,
+          authorName: displayAuthorName,
+          authorAvatar:
+            avatarContext === undefined
+              ? post.authorAvatar
+              : this.resolveFeedAuthorAvatar(
+                  post.authorType,
+                  post.authorId,
+                  post.authorAvatar,
+                  avatarContext,
+                ),
+          startedAt: post.createdAt.toISOString(),
+          status: 'replay' as const,
+          coverUrl: post.coverUrl ?? null,
+        };
+      });
   }
 
   private async buildChannelSectionCounts(
@@ -2812,6 +2912,7 @@ export class FeedService implements OnModuleInit {
       order: { createdAt: 'DESC' },
     });
 
+    const remarkMap = await this.remarkResolver.getOwnerRemarkMap(owner.id);
     if (latestPost) {
       const character =
         latestPost.authorType === 'character'
@@ -2819,7 +2920,12 @@ export class FeedService implements OnModuleInit {
           : null;
       return {
         authorId: latestPost.authorId,
-        authorName: latestPost.authorName,
+        authorName: this.remarkResolver.applyCharacterRemark(
+          latestPost.authorType,
+          latestPost.authorId,
+          latestPost.authorName,
+          remarkMap,
+        ),
         authorAvatar:
           character?.avatar ??
           (latestPost.authorId === owner.id && owner.avatar
@@ -2833,7 +2939,7 @@ export class FeedService implements OnModuleInit {
     if (character) {
       return {
         authorId: character.id,
-        authorName: character.name,
+        authorName: remarkMap.get(character.id) ?? character.name,
         authorAvatar: character.avatar,
         authorType: 'character',
       };
@@ -3217,7 +3323,12 @@ export class FeedService implements OnModuleInit {
     return {
       id: post.id,
       authorId: post.authorId,
-      authorName: post.authorName,
+      authorName: this.remarkResolver.applyCharacterRemark(
+        post.authorType,
+        post.authorId,
+        post.authorName,
+        avatarContext?.remarkMap,
+      ),
       authorAvatar:
         avatarContext === undefined
           ? post.authorAvatar
@@ -3297,7 +3408,12 @@ export class FeedService implements OnModuleInit {
       id: comment.id,
       postId: comment.postId,
       authorId: comment.authorId,
-      authorName: comment.authorName,
+      authorName: this.remarkResolver.applyCharacterRemark(
+        comment.authorType,
+        comment.authorId,
+        comment.authorName,
+        avatarContext?.remarkMap,
+      ),
       authorAvatar:
         avatarContext === undefined
           ? comment.authorAvatar
@@ -3330,10 +3446,12 @@ export class FeedService implements OnModuleInit {
             id: input.ownerId,
             avatar: input.ownerAvatar ?? '',
           };
-    const [visibleCharacters, ownerFriendCharacterIds] = await Promise.all([
-      this.characters.findAllVisibleToOwner(owner.id),
-      this.characters.getActiveFriendCharacterIdSet(owner.id),
-    ]);
+    const [visibleCharacters, ownerFriendCharacterIds, remarkMap] =
+      await Promise.all([
+        this.characters.findAllVisibleToOwner(owner.id),
+        this.characters.getActiveFriendCharacterIdSet(owner.id),
+        this.remarkResolver.getOwnerRemarkMap(owner.id),
+      ]);
 
     return {
       ownerAvatar: owner.avatar?.trim() || '',
@@ -3345,6 +3463,7 @@ export class FeedService implements OnModuleInit {
       characterAvatarById: new Map(
         visibleCharacters.map((character) => [character.id, character.avatar]),
       ),
+      remarkMap,
     };
   }
 
@@ -3446,24 +3565,44 @@ export class FeedService implements OnModuleInit {
     payload?: Record<string, unknown> | null;
   }) {
     await this.assertPostExists(input.postId);
-    const existing = await this.interactionRepo.findOneBy({
-      ownerId: input.ownerId,
-      postId: input.postId,
-      type: input.type,
-    });
 
-    if (existing) {
-      return;
-    }
-
-    await this.interactionRepo.save(
-      this.interactionRepo.create({
+    // 用 unique(userId, postId, type) + INSERT OR IGNORE 保证幂等：
+    // 双击 / 多端同时点收藏，不会重复插行也不会让 favoriteCount 漂移。
+    const inserted = await this.dataSource.transaction(async (manager) => {
+      const interactionRepo = manager.getRepository(UserFeedInteractionEntity);
+      const postRepo = manager.getRepository(FeedPostEntity);
+      const entity = interactionRepo.create({
         ownerId: input.ownerId,
         postId: input.postId,
         type: input.type,
         payload: input.payload ?? null,
-      }),
-    );
+      });
+      // values 拒绝把 simple-json 的 Record 当成嵌套 entity；用 as any 绕过该校验。
+      const result = await interactionRepo
+        .createQueryBuilder()
+        .insert()
+        .into(UserFeedInteractionEntity)
+        .values(entity as never)
+        .orIgnore()
+        .execute();
+      const didInsert =
+        Array.isArray(result.identifiers) && result.identifiers.length > 0
+          ? result.identifiers[0]?.id != null
+          : false;
+      if (didInsert && input.incrementColumn) {
+        await postRepo.increment(
+          { id: input.postId },
+          input.incrementColumn,
+          1,
+        );
+      }
+      return didInsert;
+    });
+
+    if (!inserted) {
+      return;
+    }
+
     void this.cyberAvatar.captureSignal({
       ownerId: input.ownerId,
       signalType: 'feed_interaction',
@@ -3478,14 +3617,6 @@ export class FeedService implements OnModuleInit {
         payload: input.payload ?? null,
       },
     });
-
-    if (input.incrementColumn) {
-      await this.postRepo.increment(
-        { id: input.postId },
-        input.incrementColumn,
-        1,
-      );
-    }
   }
 
   private async assertPostExists(postId: string) {
