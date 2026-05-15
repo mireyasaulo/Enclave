@@ -58,16 +58,20 @@ export function SearchPage() {
                 >
                   {r.name || r.characterId}
                 </Link>
-                <span className="text-xs text-[color:var(--text-muted)]">
-                  {r.relationship}
-                </span>
+                {r.relationship && (
+                  <span className="text-xs text-[color:var(--text-muted)]">
+                    {r.relationship}
+                  </span>
+                )}
                 <span className="ml-auto text-xs text-[color:var(--text-muted)]">
                   <Trans>相关度 {Math.round(r.score * 100) / 100}</Trans>
                 </span>
               </div>
-              <p className="mt-1 line-clamp-2 text-sm text-[color:var(--text-secondary)]">
-                {r.bio}
-              </p>
+              {r.bio && (
+                <p className="mt-1 line-clamp-2 text-sm text-[color:var(--text-secondary)]">
+                  {r.bio}
+                </p>
+              )}
             </li>
           ))}
         </ul>
