@@ -46,6 +46,11 @@ import { useWorldOwnerStore } from "../store/world-owner-store";
 // 与 welcome-page / profile-info-name-page 对齐：避免单字"w"这种 placeholder 式
 // 名字混过保存。
 const MIN_OWNER_NAME_LENGTH = 2;
+// 与移动端 profile-info-name-page / profile-info-signature-page 的 max 限制对齐——
+// 之前桌面端没设上限，移动端 counter 显示 30/30 后桌面端还能继续敲，存到后端的
+// 字符串比移动端列表/卡片渲染时预期的更长。
+const MAX_OWNER_NAME_LENGTH = 20;
+const MAX_OWNER_SIGNATURE_LENGTH = 30;
 
 type SettingsTab =
   | "profile"
@@ -357,17 +362,32 @@ export function ProfileSettingsPage() {
               <TextField
                 value={draftName}
                 onChange={(event) => setDraftName(event.target.value)}
+                maxLength={MAX_OWNER_NAME_LENGTH}
                 placeholder={t(msg`输入显示名称`)}
                 className="rounded-[11px] border-[color:var(--border-faint)] px-3.5 py-2.5 text-[13px] shadow-none focus:translate-y-0"
               />
+              <div className="mt-1 flex items-center justify-between text-[10px] text-[color:var(--text-dim)]">
+                <span>
+                  {t(
+                    msg`至少 ${MIN_OWNER_NAME_LENGTH} 个字、最多 ${MAX_OWNER_NAME_LENGTH} 个字符。`,
+                  )}
+                </span>
+                <span data-i18n-skip="true">
+                  {draftName.length}/{MAX_OWNER_NAME_LENGTH}
+                </span>
+              </div>
             </SettingsFieldGroup>
             <SettingsFieldGroup label={t(msg`签名`)}>
               <TextAreaField
                 value={draftSignature}
                 onChange={(event) => setDraftSignature(event.target.value)}
+                maxLength={MAX_OWNER_SIGNATURE_LENGTH}
                 className="min-h-[5.5rem] resize-none rounded-[11px] border-[color:var(--border-faint)] px-3.5 py-2.5 text-[13px] leading-[1.35rem] shadow-none focus:translate-y-0"
                 placeholder={t(msg`介绍一下你自己，或者写一句当前状态`)}
               />
+              <div className="mt-1 text-right text-[10px] text-[color:var(--text-dim)]" data-i18n-skip="true">
+                {draftSignature.length}/{MAX_OWNER_SIGNATURE_LENGTH}
+              </div>
             </SettingsFieldGroup>
           </div>
 
