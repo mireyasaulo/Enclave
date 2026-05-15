@@ -264,10 +264,11 @@ function trySpawnEnemy(world: GameWorld, now: number): void {
 }
 
 function isAreaClear(world: GameWorld, x: number, y: number): boolean {
-  for (const t of world.tanks) {
-    if (aabbOverlap(x, y, 16, 16, t.x, t.y, 16, 16)) return false;
-  }
-  return true;
+  // 既要没坦克挡，又要地形可站。原版只查坦克 AABB——如果关卡 row 0 在 col
+  // 0/6/12 写了 steel/water/brick (历史上 stage 7/18/22/24/26/29/31/33 都中过)，
+  // 新坦克会落在墙里直接卡死。selfId=-1 因为还没生成；canTankBeAt 内部 if
+  // (o.id === selfId) continue 跳不到我们。
+  return canTankBeAt(world, x, y, -1);
 }
 
 function countEnemiesOnField(world: GameWorld): number {
