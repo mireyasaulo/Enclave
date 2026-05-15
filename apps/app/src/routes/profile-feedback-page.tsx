@@ -65,12 +65,6 @@ export function ProfileFeedbackPage() {
     }
   }, [isDesktopLayout, navigate]);
 
-  // 桌面布局先 render mobile 表单再被 effect 推到 /desktop/feedback 会有一帧闪烁，
-  // 跟其它 profile-info 子页一致：早 return null 让 redirect 一拍内完成。
-  if (isDesktopLayout) {
-    return null;
-  }
-
   useEffect(() => {
     return () => {
       if (navTimeoutRef.current !== null) {
@@ -85,6 +79,14 @@ export function ProfileFeedbackPage() {
       categoryOptionConfigs.map((item) => ({ ...item, label: t(item.label) })),
     [t],
   );
+
+  // 桌面布局先 render mobile 表单再被 effect 推到 /desktop/feedback 会有一帧闪烁，
+  // 跟其它 profile-info 子页一致：早 return null 让 redirect 一拍内完成。
+  // hooks 必须先全部声明完再 early return，否则布局切换时会触发
+  // "Rendered fewer hooks than expected" 崩溃。
+  if (isDesktopLayout) {
+    return null;
+  }
 
   const goBack = () =>
     navigateBackOrFallback(
