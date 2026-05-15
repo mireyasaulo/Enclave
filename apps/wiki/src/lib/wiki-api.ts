@@ -985,6 +985,12 @@ export const wikiApi = {
   },
 };
 
+export type PrivateCharacterAiRelationship = {
+  characterId: string;
+  relationshipType: string;
+  strength: number;
+};
+
 export type PrivateCharacterRecord = {
   id: string;
   ownerUserId: string;
@@ -998,6 +1004,19 @@ export type PrivateCharacterRecord = {
   triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipe | null;
   profile?: unknown | null;
+  // —— 2026-05-15 起：和隐界后台 character editor 一一对应的字段 ——
+  isOnline?: boolean;
+  onlineMode?: string;
+  activityMode?: string;
+  currentActivity?: string | null;
+  sourceType?: string;
+  sourceKey?: string | null;
+  deletionPolicy?: string;
+  isTemplate?: boolean;
+  socialOpenness?: string;
+  proactiveBrowseChance?: number;
+  intimacyLevel?: number;
+  aiRelationships?: PrivateCharacterAiRelationship[] | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1013,14 +1032,30 @@ export type PrivateCharacterDto = {
   triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipe | null;
   profile?: unknown | null;
+  isOnline?: boolean;
+  onlineMode?: string;
+  activityMode?: string;
+  currentActivity?: string | null;
+  sourceType?: string;
+  sourceKey?: string | null;
+  deletionPolicy?: string;
+  isTemplate?: boolean;
+  socialOpenness?: string;
+  proactiveBrowseChance?: number;
+  intimacyLevel?: number;
+  aiRelationships?: PrivateCharacterAiRelationship[] | null;
 };
 
 /**
- * 8 个 AI 生成 section：7 个分 section + 1 个 'all' 一次性全部。
+ * 7 个 AI 生成 section：6 个分 section + 1 个 'all' 一次性全部。
  * 命名严格对齐 apps/admin/src/routes/character-editor-page.tsx 的 TABS 数组
- * （basics / core_logic / chat / scenes / memory / life）+ reasoning。
+ * （basics / core_logic / chat / scenes / memory / life）。
  * 与后端 api/src/modules/wiki/services/wiki-private-character-ai.prompts.ts 的
  * SectionKey 同义。
+ *
+ * 注：social_params 不进 AI 生成范围（admin 也是手填），所以即便 wiki UI 新增
+ * 「社交参数」section，AiGenerateSection 也不包含它。reasoning 已于 2026-05-15
+ * 从 wiki UI 删除，对应 AI section 也一并移除。
  */
 export type AiGenerateSection =
   | "basics"
@@ -1029,7 +1064,6 @@ export type AiGenerateSection =
   | "scenes"
   | "memory"
   | "life"
-  | "reasoning"
   | "all";
 
 /** AI 生成返回的 partial draft；只包含**当前为空**字段的建议。 */
@@ -1046,7 +1080,6 @@ export type AiGeneratedDraft = {
     tone?: Partial<CharacterBlueprintRecipe["tone"]>;
     prompting?: Partial<CharacterBlueprintRecipe["prompting"]>;
     memorySeed?: Partial<CharacterBlueprintRecipe["memorySeed"]>;
-    reasoning?: Partial<CharacterBlueprintRecipe["reasoning"]>;
     lifeStrategy?: Partial<CharacterBlueprintRecipe["lifeStrategy"]>;
   };
 };

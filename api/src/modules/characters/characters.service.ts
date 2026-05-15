@@ -455,6 +455,20 @@ export class CharactersService implements OnModuleInit {
     triggerScenes?: string[] | null;
     recipe?: CharacterBlueprintRecipeValue | null;
     profile?: PersonalityProfile | null;
+    isOnline?: boolean;
+    onlineMode?: string;
+    activityMode?: string;
+    currentActivity?: string | null;
+    sourceType?: string;
+    sourceKey?: string | null;
+    deletionPolicy?: string;
+    isTemplate?: boolean;
+    socialOpenness?: string;
+    proactiveBrowseChance?: number;
+    intimacyLevel?: number;
+    aiRelationships?:
+      | { characterId: string; relationshipType: string; strength: number }[]
+      | null;
   }): Promise<{ character: CharacterEntity; overwrote: boolean }> {
     const trimmedName = (input.name ?? '').trim();
     if (!trimmedName) {
@@ -518,6 +532,44 @@ export class CharactersService implements OnModuleInit {
       const derived = this.tryDeriveProfileFromRecipe(input.recipe, trimmedName);
       if (derived) patch.profile = derived;
     }
+
+    // —— 2026-05-15 起：wiki 私有角色已和 admin 一一对应到这 11 个字段，
+    // 透传到 CharacterEntity；undefined 表示用户没填（保留旧值/默认值）。
+    if (typeof input.isOnline === 'boolean') patch.isOnline = input.isOnline;
+    if (typeof input.onlineMode === 'string') {
+      patch.onlineMode = input.onlineMode as CharacterEntity['onlineMode'];
+    }
+    if (typeof input.activityMode === 'string') {
+      patch.activityMode = input.activityMode as CharacterEntity['activityMode'];
+    }
+    if (input.currentActivity !== undefined) {
+      patch.currentActivity = (input.currentActivity ??
+        undefined) as CharacterEntity['currentActivity'];
+    }
+    if (typeof input.deletionPolicy === 'string') {
+      patch.deletionPolicy =
+        input.deletionPolicy as CharacterEntity['deletionPolicy'];
+    }
+    if (typeof input.isTemplate === 'boolean') {
+      patch.isTemplate = input.isTemplate;
+    }
+    if (typeof input.socialOpenness === 'string') {
+      patch.socialOpenness =
+        input.socialOpenness as CharacterEntity['socialOpenness'];
+    }
+    if (typeof input.proactiveBrowseChance === 'number') {
+      patch.proactiveBrowseChance = input.proactiveBrowseChance;
+    }
+    if (typeof input.intimacyLevel === 'number') {
+      patch.intimacyLevel = input.intimacyLevel;
+    }
+    if (input.aiRelationships !== undefined) {
+      patch.aiRelationships = input.aiRelationships ?? undefined;
+    }
+    // sourceType / sourceKey 不让 import 路径改写：它们是 import-personal
+    // 自身的身份标识（'private_import' + name），用户在 wiki 编辑页改这俩
+    // 只对私有角色行本地有效，不应该污染 world 里 CharacterEntity 的 source 标签
+    // —— 否则下次 import 时第 485 行的 sourceType 校验会拒绝覆盖。
 
     let saved: CharacterEntity;
     if (existing) {

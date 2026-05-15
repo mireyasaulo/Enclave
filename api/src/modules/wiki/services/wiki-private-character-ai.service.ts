@@ -43,7 +43,6 @@ export type AiGeneratedDraft = {
       recentSummaryPrompt?: string;
       coreMemoryPrompt?: string;
     };
-    reasoning?: Partial<CharacterBlueprintRecipe['reasoning']>;
     lifeStrategy?: Partial<CharacterBlueprintRecipe['lifeStrategy']>;
   };
 };
@@ -148,7 +147,6 @@ function normalizeAiOutput(
       normalizeScenes(asObj(raw.scenes), currentDraft, optimize),
       normalizeMemory(asObj(raw.memory), currentDraft, optimize),
       normalizeLife(asObj(raw.life), currentDraft, optimize),
-      normalizeReasoning(asObj(raw.reasoning), currentDraft, optimize),
     );
   }
 
@@ -165,8 +163,6 @@ function normalizeAiOutput(
       return normalizeMemory(raw, currentDraft, optimize);
     case 'life':
       return normalizeLife(raw, currentDraft, optimize);
-    case 'reasoning':
-      return normalizeReasoning(raw, currentDraft, optimize);
     default:
       return {};
   }
@@ -202,12 +198,6 @@ function mergeDrafts(...parts: AiGeneratedDraft[]): AiGeneratedDraft {
         recipe.memorySeed = {
           ...(recipe.memorySeed ?? {}),
           ...p.recipe.memorySeed,
-        };
-      }
-      if (p.recipe.reasoning) {
-        recipe.reasoning = {
-          ...(recipe.reasoning ?? {}),
-          ...p.recipe.reasoning,
         };
       }
       if (p.recipe.lifeStrategy) {
@@ -448,25 +438,6 @@ function normalizeLife(
 
   if (Object.keys(ls).length > 0) out.recipe = { lifeStrategy: ls };
   return out;
-}
-
-function normalizeReasoning(
-  raw: Record<string, unknown>,
-  _current: PrivateCharacterDto,
-  _optimize: boolean,
-): AiGeneratedDraft {
-  // reasoning 三 toggle 都有默认值 false，无 sacred 概念；
-  // AI 返回 boolean 就交给前端决定覆盖时机（前端 setIfEmptyStr 等同样套路）。
-  const rs: Partial<CharacterBlueprintRecipe['reasoning']> = {};
-  if (typeof raw.enableCoT === 'boolean') rs.enableCoT = raw.enableCoT;
-  if (typeof raw.enableReflection === 'boolean') {
-    rs.enableReflection = raw.enableReflection;
-  }
-  if (typeof raw.enableRouting === 'boolean') {
-    rs.enableRouting = raw.enableRouting;
-  }
-  if (Object.keys(rs).length === 0) return {};
-  return { recipe: { reasoning: rs } };
 }
 
 // ───── helpers ─────

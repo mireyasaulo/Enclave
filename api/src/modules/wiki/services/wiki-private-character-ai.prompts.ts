@@ -2,16 +2,19 @@
 // 设计要点（2026-05-15 重写，对齐 admin character-editor-page TABS 数组）：
 //
 // 1. SectionKey 与前端 apps/wiki/src/lib/wiki-api.ts:AiGenerateSection 保持完全一致：
-//    basics / core_logic / chat / scenes / memory / life / reasoning / all。
+//    basics / core_logic / chat / scenes / memory / life / all。
 //    每个 key 对齐 apps/admin/src/routes/character-editor-page.tsx 的 TABS 数组
-//    （去掉 model_routing —— wiki 不暴露平台/账户字段），新增 reasoning Tab。
-// 2. 旧 8 个 section（identity / bioPersonality / expertise / tone / prompting / memory / rhythm）
+//    （去掉 model_routing 与 social_params —— 前者是 admin-only，后者无 AI 生成意义）。
+// 2. reasoning section 已于 2026-05-15 二次精简移除：admin character editor 实际
+//    没有暴露 reasoning tab（line 1384 那段是死代码），wiki 也跟着对齐，
+//    recipe.reasoning 字段保留在 schema 里，但既不在 wiki UI 编辑、也不再做 AI 生成。
+// 3. 旧 8 个 section（identity / bioPersonality / expertise / tone / prompting / memory / rhythm）
 //    生成的子字段（occupation / background / motivation / worldview /
 //    expertiseDescription / knowledgeLimits / refusalStyle / tone.* 全部 /
 //    memorySummary / coreMemory / recentSummarySeed）已被 wiki UI 砍掉，
 //    AI 也不再生成。后端 normalizeAiOutput 会丢弃多余字段；wiki-private-character.service
 //    的 applyDto 会 strip recipe JSON 里的废字段；data-cleanup hook 会清空已存数据。
-// 3. SHARED_SYSTEM_PROMPT 不变（"sacred 字段"现在指 name / relationship / bio 三项，
+// 4. SHARED_SYSTEM_PROMPT 不变（"sacred 字段"现在指 name / relationship / bio 三项，
 //    personality 字段已从 wiki 删除）。
 
 import type { CharacterBlueprintRecipeValue as CharacterBlueprintRecipe } from '../../characters/character-blueprint.types';
@@ -23,7 +26,6 @@ export type SectionKey =
   | 'scenes'
   | 'memory'
   | 'life'
-  | 'reasoning'
   | 'all';
 
 export const SECTION_KEYS: readonly SectionKey[] = [
@@ -33,7 +35,6 @@ export const SECTION_KEYS: readonly SectionKey[] = [
   'scenes',
   'memory',
   'life',
-  'reasoning',
   'all',
 ] as const;
 
@@ -168,20 +169,6 @@ Schema：
   "triggerScenes": "string[], 2-4 个触发场景的英文 tag。例：['coffee_shop', 'gym', 'library', 'late_night']。"
 }`;
 
-const REASONING_TEMPLATE = `当前角色信息：
-- 姓名：{{name}}
-{{? bio}}- 简介：{{bio}}{{/?}}
-{{? coreLogic}}- 底层逻辑：{{coreLogic}}{{/?}}
-
-根据角色的思考风格，给出推理链路开关的建议。
-
-Schema：
-{
-  "enableCoT": "boolean。角色性格适合慢思考、爱推理就 true；急性子或闲聊角色就 false。",
-  "enableReflection": "boolean。角色会自省、有反思习惯就 true。",
-  "enableRouting": "boolean。角色乐于在不懂时寻求其他角色协助就 true。"
-}`;
-
 // 不要在 ALL 模板里写完整的 JSON 示例骨架。reasoning 模型（GLM 系列）会把
 // 示例当作"reference"输出在 <think>...</think> 块里，导致 extractJsonFromModelOutput
 // 抓到 <think> 里那段示例 + 真正的 JSON 合并成无法解析的字符串。
@@ -191,9 +178,9 @@ const ALL_TEMPLATE = `当前角色信息（3 个 sacred 字段已填）：
 - 简介：{{bio}}
 - 关系：{{relationship}}
 
-请为这个角色一次性生成 6 个 section 的所有空白字段。section 内部要保持自洽（例：scenePrompts 引用 coreLogic 的精神；reasoning 与 coreLogic 的思考节奏一致）。
+请为这个角色一次性生成 6 个 section 的所有空白字段。section 内部要保持自洽（例：scenePrompts 引用 coreLogic 的精神）。
 
-输出一个嵌套 JSON 对象，**只能有 6 个顶层键**：basics / core_logic / chat / scenes / memory / life / reasoning（共 7 个，对齐 7 个 section）。
+输出一个嵌套 JSON 对象，**只能有 6 个顶层键**：basics / core_logic / chat / scenes / memory / life。
 
 各子对象的字段规范（每个字段的类型、长度、枚举值都要严格遵守）：
 
@@ -223,11 +210,6 @@ const ALL_TEMPLATE = `当前角色信息（3 个 sacred 字段已填）：
 - activeHoursStart: int 0-23 或 null
 - activeHoursEnd: int 0-23 或 null
 - triggerScenes: string[] 2-4 个英文 tag
-
-[reasoning]
-- enableCoT: boolean
-- enableReflection: boolean
-- enableRouting: boolean
 
 再次提醒：**不要在你的回复中输出任何 JSON 示例代码、不要解释、不要 markdown 代码块、不要写"我会..."这种开场白**。第一个字符就是 \`{\`，最后一个字符就是 \`}\`。`;
 
@@ -276,13 +258,6 @@ export const SECTION_PROMPTS: Record<SectionKey, PromptTemplate> = {
     userPromptTemplate: LIFE_TEMPLATE,
     temperature: 0.45,
     maxTokens: 1000,
-    fallback: {},
-  },
-  reasoning: {
-    systemPrompt: SHARED_SYSTEM_PROMPT,
-    userPromptTemplate: REASONING_TEMPLATE,
-    temperature: 0.4,
-    maxTokens: 800,
     fallback: {},
   },
   all: {

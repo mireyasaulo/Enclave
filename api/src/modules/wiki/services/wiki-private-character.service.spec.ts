@@ -26,7 +26,7 @@ function makeService(opts: {
       return null;
     }),
     create: jest.fn((init: Partial<Row>) => ({ ...init }) as Row),
-    save: jest.fn(async (row: Row) => ({ id: 'new-uuid', ...row }) as Row),
+    save: jest.fn(async (row: Row) => ({ ...row, id: row.id ?? 'new-uuid' }) as Row),
     delete: jest.fn(),
   } as unknown as ConstructorParameters<typeof WikiPrivateCharacterService>[0];
   return new WikiPrivateCharacterService(repo);

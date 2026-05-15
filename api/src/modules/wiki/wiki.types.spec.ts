@@ -119,7 +119,7 @@ describe('pickWikiContent', () => {
         relationship: 'r',
         relationshipType: 'rt',
         expertDomains: [],
-        isOnline: undefined,
+        modelRoutingMode: undefined,
       }),
     ).not.toThrow();
   });

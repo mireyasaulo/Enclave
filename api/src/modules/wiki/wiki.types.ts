@@ -20,22 +20,17 @@ export const WIKI_CONTENT_FIELDS = [
 export type WikiContentField = (typeof WIKI_CONTENT_FIELDS)[number];
 
 /**
- * D 类（运行时态）+ E 类（平台/账户）字段：永远不允许通过 wiki 通道写入。
- * 来自 CharacterEntity，详情见 plan 字段归属决策表。
+ * 永远不允许通过 wiki 通道写入的字段。范围比早期版本收窄：
+ * - 5 个 model routing 字段：wiki 用户不能选自己的推理账户/模型（用户明确保留 admin-only）
+ * - 2 个真正的纯运行时态：currentStatus / lastActiveAt 由 world 内部 tick 更新，不该被人工 seed
+ *
+ * 注：isOnline / onlineMode / activityMode / currentActivity / intimacyLevel / aiRelationships /
+ * sourceType / sourceKey / deletionPolicy / isTemplate 这 10 个字段在 2026-05-15 之后被允许
+ * 通过 wiki 私有角色编辑页写入，与隐界后台 character editor 一一对应（除了 model routing）。
  */
 export const WIKI_REJECTED_FIELDS = [
-  'isOnline',
-  'onlineMode',
-  'activityMode',
   'currentStatus',
-  'currentActivity',
   'lastActiveAt',
-  'intimacyLevel',
-  'aiRelationships',
-  'sourceType',
-  'sourceKey',
-  'deletionPolicy',
-  'isTemplate',
   'modelRoutingMode',
   'inferenceProviderAccountId',
   'inferenceModelId',

@@ -82,6 +82,12 @@ export function stripRejectedRecipeFields(
   return clone as unknown as CharacterBlueprintRecipeValue;
 }
 
+export type AiRelationshipSeed = {
+  characterId: string;
+  relationshipType: string;
+  strength: number;
+};
+
 export type PrivateCharacterDto = {
   name: string;
   avatar?: string;
@@ -93,6 +99,19 @@ export type PrivateCharacterDto = {
   triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipeValue | null;
   profile?: PersonalityProfile | null;
+  // —— 2026-05-15 起对齐 admin character editor 的字段 ——
+  isOnline?: boolean;
+  onlineMode?: string;
+  activityMode?: string;
+  currentActivity?: string | null;
+  sourceType?: string;
+  sourceKey?: string | null;
+  deletionPolicy?: string;
+  isTemplate?: boolean;
+  socialOpenness?: string;
+  proactiveBrowseChance?: number;
+  intimacyLevel?: number;
+  aiRelationships?: AiRelationshipSeed[] | null;
 };
 
 export type PrivateCharacterExportBundle = {
@@ -107,6 +126,18 @@ export type PrivateCharacterExportBundle = {
   triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipeValue | null;
   profile?: PersonalityProfile | null;
+  isOnline?: boolean;
+  onlineMode?: string;
+  activityMode?: string;
+  currentActivity?: string | null;
+  sourceType?: string;
+  sourceKey?: string | null;
+  deletionPolicy?: string;
+  isTemplate?: boolean;
+  socialOpenness?: string;
+  proactiveBrowseChance?: number;
+  intimacyLevel?: number;
+  aiRelationships?: AiRelationshipSeed[] | null;
   meta: {
     exportedAt: string;
     exportedBy: string;
@@ -287,6 +318,18 @@ export class WikiPrivateCharacterService {
       triggerScenes: record.triggerScenes ?? null,
       recipe: stripRejectedRecipeFields(record.recipe),
       profile: record.profile ?? null,
+      isOnline: record.isOnline,
+      onlineMode: record.onlineMode,
+      activityMode: record.activityMode,
+      currentActivity: record.currentActivity ?? null,
+      sourceType: record.sourceType,
+      sourceKey: record.sourceKey ?? null,
+      deletionPolicy: record.deletionPolicy,
+      isTemplate: record.isTemplate,
+      socialOpenness: record.socialOpenness,
+      proactiveBrowseChance: record.proactiveBrowseChance,
+      intimacyLevel: record.intimacyLevel,
+      aiRelationships: record.aiRelationships ?? null,
       meta: {
         exportedAt: new Date().toISOString(),
         exportedBy,
@@ -346,6 +389,29 @@ export class WikiPrivateCharacterService {
         !Array.isArray(p.profile)
           ? (p.profile as PersonalityProfile)
           : undefined,
+      isOnline: typeof p.isOnline === 'boolean' ? p.isOnline : undefined,
+      onlineMode: typeof p.onlineMode === 'string' ? p.onlineMode : undefined,
+      activityMode:
+        typeof p.activityMode === 'string' ? p.activityMode : undefined,
+      currentActivity:
+        typeof p.currentActivity === 'string' ? p.currentActivity : undefined,
+      sourceType: typeof p.sourceType === 'string' ? p.sourceType : undefined,
+      sourceKey: typeof p.sourceKey === 'string' ? p.sourceKey : undefined,
+      deletionPolicy:
+        typeof p.deletionPolicy === 'string' ? p.deletionPolicy : undefined,
+      isTemplate:
+        typeof p.isTemplate === 'boolean' ? p.isTemplate : undefined,
+      socialOpenness:
+        typeof p.socialOpenness === 'string' ? p.socialOpenness : undefined,
+      proactiveBrowseChance:
+        typeof p.proactiveBrowseChance === 'number'
+          ? p.proactiveBrowseChance
+          : undefined,
+      intimacyLevel:
+        typeof p.intimacyLevel === 'number' ? p.intimacyLevel : undefined,
+      aiRelationships: Array.isArray(p.aiRelationships)
+        ? sanitizeAiRelationships(p.aiRelationships)
+        : undefined,
     };
   }
 
@@ -388,5 +454,62 @@ export class WikiPrivateCharacterService {
       target.profile =
         pf && typeof pf === 'object' && !Array.isArray(pf) ? pf : null;
     }
+    if (typeof dto.isOnline === 'boolean') target.isOnline = dto.isOnline;
+    if (typeof dto.onlineMode === 'string') target.onlineMode = dto.onlineMode;
+    if (typeof dto.activityMode === 'string') {
+      target.activityMode = dto.activityMode;
+    }
+    if (dto.currentActivity !== undefined) {
+      target.currentActivity = dto.currentActivity ?? null;
+    }
+    if (typeof dto.sourceType === 'string') target.sourceType = dto.sourceType;
+    if (dto.sourceKey !== undefined) {
+      target.sourceKey = dto.sourceKey ?? null;
+    }
+    if (typeof dto.deletionPolicy === 'string') {
+      target.deletionPolicy = dto.deletionPolicy;
+    }
+    if (typeof dto.isTemplate === 'boolean') target.isTemplate = dto.isTemplate;
+    if (typeof dto.socialOpenness === 'string') {
+      target.socialOpenness = dto.socialOpenness;
+    }
+    if (typeof dto.proactiveBrowseChance === 'number') {
+      target.proactiveBrowseChance = dto.proactiveBrowseChance;
+    }
+    if (typeof dto.intimacyLevel === 'number') {
+      target.intimacyLevel = dto.intimacyLevel;
+    }
+    if (dto.aiRelationships !== undefined) {
+      target.aiRelationships = Array.isArray(dto.aiRelationships)
+        ? sanitizeAiRelationships(dto.aiRelationships)
+        : null;
+    }
   }
+}
+
+// 尽量宽松地清洗 aiRelationships 数组：跳过不合规则的项；保留合法项的最小子集。
+// strength 钳到 [0,1]，characterId 必须非空字符串。
+function sanitizeAiRelationships(input: unknown): AiRelationshipSeed[] {
+  if (!Array.isArray(input)) return [];
+  const out: AiRelationshipSeed[] = [];
+  for (const item of input) {
+    if (!item || typeof item !== 'object') continue;
+    const it = item as Record<string, unknown>;
+    const characterId =
+      typeof it.characterId === 'string' ? it.characterId.trim() : '';
+    if (!characterId) continue;
+    const relationshipType =
+      typeof it.relationshipType === 'string' ? it.relationshipType.trim() : '';
+    const strengthRaw = it.strength;
+    const strength =
+      typeof strengthRaw === 'number' && Number.isFinite(strengthRaw)
+        ? Math.max(0, Math.min(1, strengthRaw))
+        : 0.5;
+    out.push({
+      characterId,
+      relationshipType: relationshipType || 'friend',
+      strength,
+    });
+  }
+  return out;
 }

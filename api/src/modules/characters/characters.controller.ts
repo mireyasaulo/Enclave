@@ -143,6 +143,20 @@ function parsePrivateCharacterImportBody(payload: unknown): {
   triggerScenes?: string[] | null;
   recipe?: unknown;
   profile?: unknown;
+  isOnline?: boolean;
+  onlineMode?: string;
+  activityMode?: string;
+  currentActivity?: string | null;
+  sourceType?: string;
+  sourceKey?: string | null;
+  deletionPolicy?: string;
+  isTemplate?: boolean;
+  socialOpenness?: string;
+  proactiveBrowseChance?: number;
+  intimacyLevel?: number;
+  aiRelationships?:
+    | { characterId: string; relationshipType: string; strength: number }[]
+    | null;
 } {
   if (!payload || typeof payload !== 'object') {
     throw new AppError('PRIVATE_IMPORT_INVALID', {
@@ -196,5 +210,43 @@ function parsePrivateCharacterImportBody(payload: unknown): {
       p.profile && typeof p.profile === 'object' && !Array.isArray(p.profile)
         ? p.profile
         : undefined,
+    isOnline: typeof p.isOnline === 'boolean' ? p.isOnline : undefined,
+    onlineMode: typeof p.onlineMode === 'string' ? p.onlineMode : undefined,
+    activityMode:
+      typeof p.activityMode === 'string' ? p.activityMode : undefined,
+    currentActivity:
+      typeof p.currentActivity === 'string' ? p.currentActivity : undefined,
+    sourceType: typeof p.sourceType === 'string' ? p.sourceType : undefined,
+    sourceKey: typeof p.sourceKey === 'string' ? p.sourceKey : undefined,
+    deletionPolicy:
+      typeof p.deletionPolicy === 'string' ? p.deletionPolicy : undefined,
+    isTemplate: typeof p.isTemplate === 'boolean' ? p.isTemplate : undefined,
+    socialOpenness:
+      typeof p.socialOpenness === 'string' ? p.socialOpenness : undefined,
+    proactiveBrowseChance:
+      typeof p.proactiveBrowseChance === 'number'
+        ? p.proactiveBrowseChance
+        : undefined,
+    intimacyLevel:
+      typeof p.intimacyLevel === 'number' ? p.intimacyLevel : undefined,
+    aiRelationships: Array.isArray(p.aiRelationships)
+      ? (p.aiRelationships as unknown[])
+          .filter(
+            (item): item is Record<string, unknown> =>
+              !!item && typeof item === 'object' && !Array.isArray(item),
+          )
+          .map((it) => ({
+            characterId: String(it.characterId ?? '').trim(),
+            relationshipType:
+              typeof it.relationshipType === 'string'
+                ? it.relationshipType
+                : 'friend',
+            strength:
+              typeof it.strength === 'number' && Number.isFinite(it.strength)
+                ? Math.max(0, Math.min(1, it.strength))
+                : 0.5,
+          }))
+          .filter((rel) => rel.characterId.length > 0)
+      : undefined,
   };
 }

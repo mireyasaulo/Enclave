@@ -54,6 +54,47 @@ export class UserPrivateCharacterEntity {
   @Column('simple-json', { nullable: true })
   profile?: PersonalityProfile | null;
 
+  // —— 2026-05-15 起：以下字段对齐隐界后台 character editor，wiki 编辑页一一暴露 ——
+  // model routing 字段除外（仍在 WIKI_REJECTED_FIELDS 中由后端拦下）。
+
+  @Column({ type: 'boolean', default: false })
+  isOnline: boolean;
+
+  @Column({ default: 'auto' })
+  onlineMode: string; // 'auto' | 'manual'
+
+  @Column({ default: 'auto' })
+  activityMode: string; // 'auto' | 'manual'
+
+  @Column({ type: 'text', nullable: true })
+  currentActivity?: string | null; // 'working' | 'eating' | 'resting' | 'commuting' | 'free' | 'sleeping'
+
+  @Column({ default: 'manual_admin' })
+  sourceType: string;
+
+  @Column({ type: 'text', nullable: true })
+  sourceKey?: string | null;
+
+  @Column({ default: 'archive_allowed' })
+  deletionPolicy: string; // 'protected' | 'archive_allowed'
+
+  @Column({ type: 'boolean', default: false })
+  isTemplate: boolean;
+
+  @Column({ default: 'normal' })
+  socialOpenness: string; // 'open' | 'normal' | 'private'
+
+  @Column({ type: 'real', default: 0.3 })
+  proactiveBrowseChance: number;
+
+  @Column({ type: 'integer', default: 0 })
+  intimacyLevel: number; // 0-100 种子，运行时会被 farm-state / social 服务自动改写
+
+  @Column('simple-json', { nullable: true })
+  aiRelationships?:
+    | { characterId: string; relationshipType: string; strength: number }[]
+    | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
