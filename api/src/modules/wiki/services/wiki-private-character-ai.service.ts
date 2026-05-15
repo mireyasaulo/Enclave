@@ -58,6 +58,13 @@ export class WikiPrivateCharacterAiService {
     section: SectionKey;
     currentDraft: PrivateCharacterDto;
     ownerId: string;
+    /**
+     * 优化模式：true 时 normalizer 不再"目标为空才填"，让 AI 覆盖整节。
+     * 仅前端模态确认后才会传 true。后端对 sacred 字段
+     * (bio / personality / relationship) 保留"非空才填"作为兜底，
+     * 即便 optimize=true 也不返回它们。
+     */
+    optimize?: boolean;
   }): Promise<AiGeneratedDraft> {
     const template = SECTION_PROMPTS[input.section];
     const vars = buildTemplateVars(input.currentDraft);
@@ -104,7 +111,12 @@ export class WikiPrivateCharacterAiService {
       if (parsed) raw = parsed;
     }
 
-    return normalizeAiOutput(input.section, raw, input.currentDraft);
+    return normalizeAiOutput(
+      input.section,
+      raw,
+      input.currentDraft,
+      input.optimize === true,
+    );
   }
 }
 
@@ -140,34 +152,35 @@ function normalizeAiOutput(
   section: SectionKey,
   raw: Record<string, unknown>,
   currentDraft: PrivateCharacterDto,
+  optimize: boolean,
 ): AiGeneratedDraft {
   // 'all' 返回 6 个嵌套 section，分发到对应 normalizer。
   if (section === 'all') {
     return mergeDrafts(
-      normalizeIdentity(asObj(raw.identity), currentDraft),
-      normalizeExpertise(asObj(raw.expertise), currentDraft),
-      normalizeTone(asObj(raw.tone), currentDraft),
-      normalizePrompting(asObj(raw.prompting), currentDraft),
-      normalizeMemory(asObj(raw.memory), currentDraft),
-      normalizeRhythm(asObj(raw.rhythm), currentDraft),
+      normalizeIdentity(asObj(raw.identity), currentDraft, optimize),
+      normalizeExpertise(asObj(raw.expertise), currentDraft, optimize),
+      normalizeTone(asObj(raw.tone), currentDraft, optimize),
+      normalizePrompting(asObj(raw.prompting), currentDraft, optimize),
+      normalizeMemory(asObj(raw.memory), currentDraft, optimize),
+      normalizeRhythm(asObj(raw.rhythm), currentDraft, optimize),
     );
   }
 
   switch (section) {
     case 'identity':
-      return normalizeIdentity(raw, currentDraft);
+      return normalizeIdentity(raw, currentDraft, optimize);
     case 'bioPersonality':
-      return normalizeBioPersonality(raw, currentDraft);
+      return normalizeBioPersonality(raw, currentDraft, optimize);
     case 'expertise':
-      return normalizeExpertise(raw, currentDraft);
+      return normalizeExpertise(raw, currentDraft, optimize);
     case 'tone':
-      return normalizeTone(raw, currentDraft);
+      return normalizeTone(raw, currentDraft, optimize);
     case 'prompting':
-      return normalizePrompting(raw, currentDraft);
+      return normalizePrompting(raw, currentDraft, optimize);
     case 'memory':
-      return normalizeMemory(raw, currentDraft);
+      return normalizeMemory(raw, currentDraft, optimize);
     case 'rhythm':
-      return normalizeRhythm(raw, currentDraft);
+      return normalizeRhythm(raw, currentDraft, optimize);
     default:
       return {};
   }
@@ -240,6 +253,7 @@ function mergeDrafts(...parts: AiGeneratedDraft[]): AiGeneratedDraft {
 function normalizeIdentity(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
+  optimize: boolean,
 ): AiGeneratedDraft {
   const out: AiGeneratedDraft = {};
   const id: Partial<CharacterBlueprintRecipe['identity']> = {};
@@ -248,25 +262,35 @@ function normalizeIdentity(
     CharacterBlueprintRecipe['identity']
   >;
 
+  // avatar 在 DTO 顶层和 recipe.identity.avatar 都可能存在；前端 useState
+  // 直接绑定 dto.avatar，所以这里以 current.avatar 为准判空。
+  // 同时把首个 emoji 字符截出来，避免模型把"🪷 心理咨询师"这种文字一起塞进来。
+  const avatar = takeFirstEmoji(trimStr(raw.avatar));
+  if (avatar && (optimize || !current.avatar?.trim())) id.avatar = avatar;
+
   const occupation = trimStr(raw.occupation);
-  if (occupation && !curId.occupation?.trim()) id.occupation = occupation;
+  if (occupation && (optimize || !curId.occupation?.trim())) {
+    id.occupation = occupation;
+  }
 
   const background = trimStr(raw.background);
-  if (background && !curId.background?.trim()) id.background = background;
+  if (background && (optimize || !curId.background?.trim())) {
+    id.background = background;
+  }
 
-  // relationship 既存在 recipe.identity.relationship 又有顶层 dto.relationship；
-  // 以顶层 dto 为准（用户在表单里改的是顶层）。
+  // relationship 是 sacred 字段：即便 optimize=true 也保留"非空才填"语义。
+  // 用户在表单里改的是顶层 dto.relationship。
   const relationship = trimStr(raw.relationship);
   if (relationship && !current.relationship?.trim()) {
     out.relationship = relationship;
   }
 
+  // relationshipType 是带默认值的枚举（前端初始 "friend"），按"非空"过滤会让
+  // AI 永远填不进去。这里只做白名单校验，交给前端 applyUpdatesFillEmptyOnly
+  // 决定是否覆盖（与 tone 枚举 / scheduler / reasoning toggles 同款"AI 返回则
+  // 覆盖默认值"语义）。
   const relationshipType = trimStr(raw.relationshipType);
-  if (
-    relationshipType &&
-    VALID_RELATIONSHIP_TYPES.has(relationshipType) &&
-    !current.relationshipType?.trim()
-  ) {
+  if (relationshipType && VALID_RELATIONSHIP_TYPES.has(relationshipType)) {
     out.relationshipType = relationshipType;
   }
 
@@ -277,6 +301,7 @@ function normalizeIdentity(
 function normalizeBioPersonality(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
+  optimize: boolean,
 ): AiGeneratedDraft {
   const out: AiGeneratedDraft = {};
   const id: Partial<CharacterBlueprintRecipe['identity']> = {};
@@ -285,6 +310,9 @@ function normalizeBioPersonality(
     CharacterBlueprintRecipe['identity']
   >;
 
+  // bio / personality 是 sacred：即便 optimize=true 也保留"非空才填"语义。
+  // 前端 bioPersonality 节"已填满"会走到"sacred 提示，不发请求"的特例分支；
+  // 这里是即便前端漏拦也保住 sacred 的兜底。
   const bio = trimStr(raw.bio);
   if (bio && !current.bio?.trim()) out.bio = bio;
 
@@ -292,10 +320,14 @@ function normalizeBioPersonality(
   if (personality && !current.personality?.trim()) out.personality = personality;
 
   const motivation = trimStr(raw.motivation);
-  if (motivation && !curId.motivation?.trim()) id.motivation = motivation;
+  if (motivation && (optimize || !curId.motivation?.trim())) {
+    id.motivation = motivation;
+  }
 
   const worldview = trimStr(raw.worldview);
-  if (worldview && !curId.worldview?.trim()) id.worldview = worldview;
+  if (worldview && (optimize || !curId.worldview?.trim())) {
+    id.worldview = worldview;
+  }
 
   if (Object.keys(id).length > 0) out.recipe = { identity: id };
   return out;
@@ -304,6 +336,7 @@ function normalizeBioPersonality(
 function normalizeExpertise(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
+  optimize: boolean,
 ): AiGeneratedDraft {
   const out: AiGeneratedDraft = {};
   const ex: Partial<CharacterBlueprintRecipe['expertise']> = {};
@@ -314,22 +347,25 @@ function normalizeExpertise(
 
   // expertDomains 顶层；其它三个都是 recipe.expertise.*
   const expertDomains = cleanStringArray(raw.expertDomains);
-  if (expertDomains.length > 0 && (current.expertDomains ?? []).length === 0) {
+  if (
+    expertDomains.length > 0 &&
+    (optimize || (current.expertDomains ?? []).length === 0)
+  ) {
     out.expertDomains = expertDomains;
   }
 
   const expertiseDescription = trimStr(raw.expertiseDescription);
-  if (expertiseDescription && !curEx.expertiseDescription?.trim()) {
+  if (expertiseDescription && (optimize || !curEx.expertiseDescription?.trim())) {
     ex.expertiseDescription = expertiseDescription;
   }
 
   const knowledgeLimits = trimStr(raw.knowledgeLimits);
-  if (knowledgeLimits && !curEx.knowledgeLimits?.trim()) {
+  if (knowledgeLimits && (optimize || !curEx.knowledgeLimits?.trim())) {
     ex.knowledgeLimits = knowledgeLimits;
   }
 
   const refusalStyle = trimStr(raw.refusalStyle);
-  if (refusalStyle && !curEx.refusalStyle?.trim()) {
+  if (refusalStyle && (optimize || !curEx.refusalStyle?.trim())) {
     ex.refusalStyle = refusalStyle;
   }
 
@@ -340,6 +376,7 @@ function normalizeExpertise(
 function normalizeTone(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
+  optimize: boolean,
 ): AiGeneratedDraft {
   const tn: Partial<CharacterBlueprintRecipe['tone']> = {};
   const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
@@ -360,35 +397,51 @@ function normalizeTone(
   }
 
   const emotionalTone = trimStr(raw.emotionalTone);
-  if (emotionalTone && !curTn.emotionalTone?.trim()) {
+  if (emotionalTone && (optimize || !curTn.emotionalTone?.trim())) {
     tn.emotionalTone = emotionalTone;
   }
   const workStyle = trimStr(raw.workStyle);
-  if (workStyle && !curTn.workStyle?.trim()) tn.workStyle = workStyle;
+  if (workStyle && (optimize || !curTn.workStyle?.trim())) {
+    tn.workStyle = workStyle;
+  }
   const socialStyle = trimStr(raw.socialStyle);
-  if (socialStyle && !curTn.socialStyle?.trim()) tn.socialStyle = socialStyle;
+  if (socialStyle && (optimize || !curTn.socialStyle?.trim())) {
+    tn.socialStyle = socialStyle;
+  }
 
   const speechPatterns = cleanStringArray(raw.speechPatterns);
-  if (speechPatterns.length > 0 && (curTn.speechPatterns ?? []).length === 0) {
+  if (
+    speechPatterns.length > 0 &&
+    (optimize || (curTn.speechPatterns ?? []).length === 0)
+  ) {
     tn.speechPatterns = speechPatterns;
   }
   const catchphrases = cleanStringArray(raw.catchphrases);
-  if (catchphrases.length > 0 && (curTn.catchphrases ?? []).length === 0) {
+  if (
+    catchphrases.length > 0 &&
+    (optimize || (curTn.catchphrases ?? []).length === 0)
+  ) {
     tn.catchphrases = catchphrases;
   }
   const topicsOfInterest = cleanStringArray(raw.topicsOfInterest);
   if (
     topicsOfInterest.length > 0 &&
-    (curTn.topicsOfInterest ?? []).length === 0
+    (optimize || (curTn.topicsOfInterest ?? []).length === 0)
   ) {
     tn.topicsOfInterest = topicsOfInterest;
   }
   const taboos = cleanStringArray(raw.taboos);
-  if (taboos.length > 0 && (curTn.taboos ?? []).length === 0) {
+  if (
+    taboos.length > 0 &&
+    (optimize || (curTn.taboos ?? []).length === 0)
+  ) {
     tn.taboos = taboos;
   }
   const quirks = cleanStringArray(raw.quirks);
-  if (quirks.length > 0 && (curTn.quirks ?? []).length === 0) {
+  if (
+    quirks.length > 0 &&
+    (optimize || (curTn.quirks ?? []).length === 0)
+  ) {
     tn.quirks = quirks;
   }
 
@@ -398,6 +451,7 @@ function normalizeTone(
 function normalizePrompting(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
+  optimize: boolean,
 ): AiGeneratedDraft {
   const pr: Partial<CharacterBlueprintRecipe['prompting']> = {};
   const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
@@ -406,7 +460,9 @@ function normalizePrompting(
   >;
 
   const coreLogic = trimStr(raw.coreLogic);
-  if (coreLogic && !curPr.coreLogic?.trim()) pr.coreLogic = coreLogic;
+  if (coreLogic && (optimize || !curPr.coreLogic?.trim())) {
+    pr.coreLogic = coreLogic;
+  }
 
   const sp = asObj(raw.scenePrompts);
   const curSp = (curPr.scenePrompts ?? {}) as Partial<
@@ -429,7 +485,7 @@ function normalizePrompting(
   for (const k of sceneKeys) {
     const keyStr = String(k);
     const v = trimStr(sp[keyStr]);
-    if (v && !curSp[k]?.trim()) scenes[k] = v;
+    if (v && (optimize || !curSp[k]?.trim())) scenes[k] = v;
   }
   if (Object.keys(scenes).length > 0) {
     pr.scenePrompts = {
@@ -451,6 +507,7 @@ function normalizePrompting(
 function normalizeMemory(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
+  optimize: boolean,
 ): AiGeneratedDraft {
   const ms: Partial<CharacterBlueprintRecipe['memorySeed']> = {};
   const rs: Partial<CharacterBlueprintRecipe['reasoning']> = {};
@@ -460,15 +517,22 @@ function normalizeMemory(
   >;
 
   const memorySummary = trimStr(raw.memorySummary);
-  if (memorySummary && !curMs.memorySummary?.trim()) {
+  if (memorySummary && (optimize || !curMs.memorySummary?.trim())) {
     ms.memorySummary = memorySummary;
   }
   const coreMemory = trimStr(raw.coreMemory);
-  if (coreMemory && !curMs.coreMemory?.trim()) ms.coreMemory = coreMemory;
+  if (coreMemory && (optimize || !curMs.coreMemory?.trim())) {
+    ms.coreMemory = coreMemory;
+  }
   const recentSummarySeed = trimStr(raw.recentSummarySeed);
-  if (recentSummarySeed && !curMs.recentSummarySeed?.trim()) {
+  if (recentSummarySeed && (optimize || !curMs.recentSummarySeed?.trim())) {
     ms.recentSummarySeed = recentSummarySeed;
   }
+
+  // forgettingCurve 是带默认值的数字（前端初始 70），与 toggles / scheduler 同款
+  // "AI 返回则采用"语义；这里只做范围 clamp，由前端决定覆盖时机。
+  const forgettingCurve = clampInt(raw.forgettingCurve, 0, 100);
+  if (forgettingCurve !== null) ms.forgettingCurve = forgettingCurve;
 
   // recommendedReasoningToggles 是 prompt 设计里要求 LLM 输出建议，
   // 前端会把它当作"如果用户没碰过这三个开关，按建议设"——但 v1 前端
@@ -493,6 +557,7 @@ function normalizeMemory(
 function normalizeRhythm(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
+  optimize: boolean,
 ): AiGeneratedDraft {
   const ls: Partial<CharacterBlueprintRecipe['lifeStrategy']> = {};
   const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
@@ -504,31 +569,46 @@ function normalizeRhythm(
   if (
     activityFrequency &&
     VALID_ACTIVITY_FREQUENCY.has(activityFrequency) &&
-    !curLs.activityFrequency
+    (optimize || !curLs.activityFrequency)
   ) {
     ls.activityFrequency = activityFrequency;
   }
 
   const momentsFrequency = clampInt(raw.momentsFrequency, 0, 5);
-  if (momentsFrequency !== null && curLs.momentsFrequency === undefined) {
+  if (
+    momentsFrequency !== null &&
+    (optimize || curLs.momentsFrequency === undefined)
+  ) {
     ls.momentsFrequency = momentsFrequency;
   }
   const feedFrequency = clampInt(raw.feedFrequency, 0, 3);
-  if (feedFrequency !== null && curLs.feedFrequency === undefined) {
+  if (
+    feedFrequency !== null &&
+    (optimize || curLs.feedFrequency === undefined)
+  ) {
     ls.feedFrequency = feedFrequency;
   }
   const activeHoursStart = clampIntOrNull(raw.activeHoursStart, 0, 23);
-  if (activeHoursStart !== undefined && curLs.activeHoursStart === undefined) {
+  if (
+    activeHoursStart !== undefined &&
+    (optimize || curLs.activeHoursStart === undefined)
+  ) {
     ls.activeHoursStart = activeHoursStart;
   }
   const activeHoursEnd = clampIntOrNull(raw.activeHoursEnd, 0, 23);
-  if (activeHoursEnd !== undefined && curLs.activeHoursEnd === undefined) {
+  if (
+    activeHoursEnd !== undefined &&
+    (optimize || curLs.activeHoursEnd === undefined)
+  ) {
     ls.activeHoursEnd = activeHoursEnd;
   }
 
   const triggerScenes = cleanStringArray(raw.triggerScenes);
   const out: AiGeneratedDraft = {};
-  if (triggerScenes.length > 0 && (current.triggerScenes ?? []).length === 0) {
+  if (
+    triggerScenes.length > 0 &&
+    (optimize || (current.triggerScenes ?? []).length === 0)
+  ) {
     out.triggerScenes = triggerScenes;
   }
 
@@ -542,6 +622,22 @@ function trimStr(v: unknown): string | null {
   if (typeof v !== 'string') return null;
   const trimmed = v.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+/**
+ * 从字符串里抓第一个 emoji（含 ZWJ 合体字符与 variation selector）。
+ * AI 偶尔会输出 "🪷 心理咨询师" 这样带文字的混合串，截到第一个 emoji 即可。
+ * 抓不到就回退到原字符串（避免误判把合法 emoji 丢掉）。
+ */
+function takeFirstEmoji(s: string | null): string | null {
+  if (!s) return null;
+  // \p{Extended_Pictographic} 覆盖大部分 emoji；后续 ZWJ 序列 + variation selector
+  // 用 (‍\p{Extended_Pictographic}️?)* 贪婪连接。
+  const match = s.match(
+    /\p{Extended_Pictographic}️?(‍\p{Extended_Pictographic}️?)*/u,
+  );
+  if (match) return match[0];
+  return s;
 }
 
 function cleanStringArray(v: unknown): string[] {

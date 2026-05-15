@@ -122,7 +122,12 @@ export class WikiPrivateCharacterController {
   @UseGuards(WikiAiGenerateRateLimitGuard)
   async aiGenerate(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: { section?: string; currentDraft?: PrivateCharacterDto },
+    @Body()
+    body: {
+      section?: string;
+      currentDraft?: PrivateCharacterDto;
+      optimize?: boolean;
+    },
   ) {
     const section = body?.section as SectionKey | undefined;
     if (!section || !SECTION_KEYS.includes(section)) {
@@ -154,6 +159,7 @@ export class WikiPrivateCharacterController {
       section,
       currentDraft: draft,
       ownerId: user.id,
+      optimize: body?.optimize === true,
     });
   }
 }
