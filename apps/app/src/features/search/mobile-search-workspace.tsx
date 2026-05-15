@@ -329,20 +329,28 @@ export function MobileSearchWorkspace({
                   {history.map((item) => (
                     <div
                       key={item.keyword}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-console)] px-3 py-1.5 text-[11px] text-[color:var(--text-secondary)]"
+                      className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-console)] px-3 py-1.5 text-[11px] text-[color:var(--text-secondary)]"
                     >
                       <button
                         type="button"
                         onClick={() => onApplyHistory(item.keyword)}
-                        className="inline-flex items-center gap-1"
+                        className="inline-flex min-w-0 items-center gap-1"
                       >
-                        <Clock3 size={12} />
-                        <span>{item.keyword}</span>
+                        <Clock3 size={12} className="shrink-0" />
+                        {/* 关键词写得很长（一句话/带逗号的列表）时之前直接撑满
+                            行宽并把内部「删除」推到下一行，pill 形变。max-w + truncate
+                            把超长 keyword 截断成 "...完整 keyword" 的 title tooltip。 */}
+                        <span
+                          className="max-w-[14rem] truncate"
+                          title={item.keyword}
+                        >
+                          {item.keyword}
+                        </span>
                       </button>
                       <button
                         type="button"
                         onClick={() => onRemoveHistory(item.keyword)}
-                        className="text-[10px] text-[color:var(--text-dim)]"
+                        className="shrink-0 text-[10px] text-[color:var(--text-dim)]"
                       >
                         {t(msg`删除`)}
                       </button>
