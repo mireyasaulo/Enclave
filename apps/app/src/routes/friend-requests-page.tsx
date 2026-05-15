@@ -294,6 +294,18 @@ function MobileFriendRequestsPage() {
           <section className="mt-1 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
             {(requestsQuery.data ?? []).map((request, index) => {
               const expired = isFriendRequestExpired(request.expiresAt);
+              const acceptErrorForRow =
+                acceptMutation.isError &&
+                acceptMutation.variables === request.id &&
+                acceptMutation.error instanceof Error
+                  ? acceptMutation.error
+                  : null;
+              const declineErrorForRow =
+                declineMutation.isError &&
+                declineMutation.variables === request.id &&
+                declineMutation.error instanceof Error
+                  ? declineMutation.error
+                  : null;
               return (
               <div
                 key={request.id}
@@ -361,6 +373,29 @@ function MobileFriendRequestsPage() {
                       {request.greeting || t(msg`想认识你。`)}
                     </div>
 
+                    {acceptErrorForRow || declineErrorForRow ? (
+                      <div className="mt-2 rounded-[10px] border border-[color:var(--border-danger)] bg-[color:var(--state-danger-bg)] px-2.5 py-1.5 text-[11px] leading-4 text-[color:var(--state-danger-text)]">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="min-w-0 flex-1">
+                            {(acceptErrorForRow ?? declineErrorForRow)?.message}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={
+                              acceptErrorForRow
+                                ? handleRetryAccept
+                                : handleRetryDecline
+                            }
+                            className="shrink-0 rounded-full border border-[rgba(220,38,38,0.18)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
+                          >
+                            {acceptErrorForRow
+                              ? t(msg`重试通过`)
+                              : t(msg`重试拒绝`)}
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+
                     <div className="mt-2.5 flex items-center justify-end gap-2">
                       <Button
                         disabled={
@@ -401,83 +436,6 @@ function MobileFriendRequestsPage() {
             );
             })}
           </section>
-        ) : null}
-
-        {acceptMutation.isError && acceptMutation.error instanceof Error ? (
-          <div className="px-3 pt-2">
-            <InlineNotice
-              tone="danger"
-              className="rounded-[11px] px-2.5 py-1.5 text-[10px] leading-4 shadow-none"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 flex-1">
-                  {acceptMutation.error.message}
-                </span>
-                <div className="flex shrink-0 items-center gap-1.5">
-                  {acceptMutation.variables ? (
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
-                      onClick={handleRetryAccept}
-                    >
-                      {t(msg`重试通过`)}
-                    </Button>
-                  ) : null}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
-                    onClick={handleStatusBack}
-                  >
-                    {safeReturnPath
-                      ? t(msg`返回上一页`)
-                      : t(msg`浏览世界角色`)}
-                  </Button>
-                </div>
-              </div>
-            </InlineNotice>
-          </div>
-        ) : null}
-        {declineMutation.isError && declineMutation.error instanceof Error ? (
-          <div className="px-3 pt-2">
-            <InlineNotice
-              tone="danger"
-              className="rounded-[11px] px-2.5 py-1.5 text-[10px] leading-4 shadow-none"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 flex-1">
-                  {declineMutation.error.message}
-                </span>
-                <div className="flex shrink-0 items-center gap-1.5">
-                  {declineMutation.variables ? (
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
-                      onClick={handleRetryDecline}
-                    >
-                      {t(msg`重试拒绝`)}
-                    </Button>
-                  ) : null}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
-                    onClick={handleStatusBack}
-                  >
-                    {safeReturnPath
-                      ? t(msg`返回上一页`)
-                      : t(msg`浏览世界角色`)}
-                  </Button>
-                </div>
-              </div>
-            </InlineNotice>
-          </div>
         ) : null}
 
         {!requestsQuery.isLoading &&
