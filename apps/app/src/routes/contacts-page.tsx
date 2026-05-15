@@ -62,6 +62,7 @@ import {
   parseDesktopContactsRouteState,
 } from "../features/contacts/contacts-route-state";
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
+import { buildMobileAddFriendRouteHash } from "../features/contacts/mobile-add-friend-route-state";
 import { buildMobileFriendRequestsRouteHash } from "../features/contacts/mobile-friend-requests-route-state";
 import { buildContactTagGroups } from "../features/contacts/contact-tag-groups";
 import {
@@ -243,11 +244,13 @@ function buildDesktopSelectionFromRouteState(hash: string): DesktopSelection {
   };
 }
 
+type MobileQuickActionRoute = "/group/new" | "/add-friend";
+
 type MobileQuickActionItem = {
   key: string;
   label: ContactsMessage;
   icon: typeof Users;
-  to?: "/group/new";
+  to?: MobileQuickActionRoute;
   disabled?: boolean;
   disabledLabel?: ContactsMessage;
 };
@@ -260,6 +263,12 @@ const mobileQuickActionItems: MobileQuickActionItem[] = [
     label: msg`发起群聊`,
     icon: Users,
     to: "/group/new",
+  },
+  {
+    key: "add-friend",
+    label: msg`添加朋友`,
+    icon: UserPlus,
+    to: "/add-friend",
   },
   {
     key: "scan",
@@ -1089,9 +1098,18 @@ export function ContactsPage() {
     });
   }
 
-  function handleMobileQuickActionNavigate(to: "/group/new") {
+  function handleMobileQuickActionNavigate(to: MobileQuickActionRoute) {
     setIsQuickMenuOpen(false);
     setNotice(null);
+    if (to === "/add-friend") {
+      void navigate({
+        to,
+        hash: buildMobileAddFriendRouteHash({
+          returnPath: pathname,
+        }),
+      });
+      return;
+    }
     void navigate({
       to,
       hash: buildCreateGroupRouteHash({

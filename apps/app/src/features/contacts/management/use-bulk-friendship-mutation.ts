@@ -3,12 +3,15 @@ import {
   bulkFriendshipAction,
   type BulkFriendshipRequest,
 } from "@yinjie/contracts";
+import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 
 export function useBulkFriendshipMutation(onDone?: () => void) {
   const queryClient = useQueryClient();
+  const runtimeConfig = useAppRuntimeConfig();
+  const baseUrl = runtimeConfig.apiBaseUrl;
   return useMutation({
     mutationFn: (payload: BulkFriendshipRequest) =>
-      bulkFriendshipAction(payload),
+      bulkFriendshipAction(payload, baseUrl),
     onSuccess: () => {
       void queryClient.invalidateQueries({
         predicate: (query) => {
