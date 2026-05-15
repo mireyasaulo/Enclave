@@ -28,6 +28,7 @@ import {
   getBlockedCharacters,
   getFeed,
   likeFeedPost,
+  listFeedComments,
   replyFeedComment,
   unlikeFeedPost,
   type FeedAuthorType,
@@ -125,6 +126,15 @@ export function DiscoverFeedPage() {
     replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
+  // 「查看全部 N 条评论」点开后，按 postId 把 listFeedComments 的全量结果放进来；
+  // 命中即在 secondary 区用全量替换 commentsPreview。loadingPostId 用来在点击
+  // 后把按钮文案换成"正在读取..."避免重复触发请求。
+  const [fullCommentsByPostId, setFullCommentsByPostId] = useState<
+    Record<string, FeedComment[]>
+  >({});
+  const [loadingFullCommentsPostId, setLoadingFullCommentsPostId] = useState<
+    string | null
+  >(null);
   const [notice, setNotice] = useState("");
   const [noticeTone, setNoticeTone] = useState<"success" | "info">("success");
   const [noticeActionLabel, setNoticeActionLabel] = useState<string | null>(
@@ -414,6 +424,20 @@ export function DiscoverFeedPage() {
       void queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] });
       void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
       void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
+      // 「查看全部」展开后再发评论：同步刷一次该 post 的完整评论列表，
+      // 不然新评论只进 commentsPreview，展开视图里看不到自己刚发的那条。
+      if (fullCommentsByPostId[input.postId]) {
+        void listFeedComments(input.postId, baseUrl)
+          .then((all) => {
+            setFullCommentsByPostId((current) => ({
+              ...current,
+              [input.postId]: all,
+            }));
+          })
+          .catch(() => {
+            // 静默：展开视图刷新失败时下次再点「查看全部」会重新拉。
+          });
+      }
     },
   });
 
@@ -572,7 +596,37 @@ const pendingLikePostId = likeMutation.isPending
     setNoticeActionLabel(null);
     setNoticeAction(null);
     setNotice(""); // i18n-ignore-line
+    setFullCommentsByPostId({});
+    setLoadingFullCommentsPostId(null);
   }, [baseUrl, resetComposeDraft]);
+
+  async function expandFullComments(postId: string) {
+    if (loadingFullCommentsPostId === postId) return;
+    if (fullCommentsByPostId[postId]) return;
+    setLoadingFullCommentsPostId(postId);
+    try {
+      const all = await listFeedComments(postId, baseUrl);
+      setFullCommentsByPostId((current) => ({
+        ...current,
+        [postId]: all,
+      }));
+    } catch (error) {
+      setNoticeTone("info");
+      setNoticeActionLabel(t(msg`重试`));
+      setNoticeAction(() => () => {
+        void expandFullComments(postId);
+      });
+      setNotice(
+        error instanceof Error
+          ? t(msg`读取全部评论失败：${error.message}`)
+          : t(msg`读取全部评论失败，请稍后重试。`),
+      );
+    } finally {
+      setLoadingFullCommentsPostId((current) =>
+        current === postId ? null : current,
+      );
+    }
+  }
 
   useEffect(() => {
     if (isDesktopLayout) {
@@ -1205,13 +1259,16 @@ const pendingLikePostId = likeMutation.isPending
                     </div>
                   ) : null
                 }
-                secondary={
-                  post.commentsPreview.length > 0 ? (
+                secondary={(() => {
+                  const expandedComments = fullCommentsByPostId[post.id] ?? null;
+                  const renderedComments = expandedComments ?? post.commentsPreview;
+                  if (renderedComments.length === 0) return null;
+                  return (
                     <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">
                       <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
-                        {post.commentsPreview.map((comment) => {
+                        {renderedComments.map((comment) => {
                           const replyToComment = comment.replyToCommentId
-                            ? post.commentsPreview.find(
+                            ? renderedComments.find(
                                 (item) => item.id === comment.replyToCommentId,
                               ) ?? null
                             : null;
@@ -1283,25 +1340,25 @@ const pendingLikePostId = likeMutation.isPending
                             </div>
                           );
                         })}
-                        {post.commentCount > post.commentsPreview.length ? (
+                        {post.commentCount > renderedComments.length &&
+                        !expandedComments ? (
                           <button
                             type="button"
                             onClick={() => {
-                              if (!post.canInteract) return;
-                              setCommentBarTarget({
-                                postId: post.id,
-                                replyTo: null,
-                              });
+                              void expandFullComments(post.id);
                             }}
-                            className="mt-1 block text-left text-[12px] text-[#576B95] active:opacity-60"
+                            disabled={loadingFullCommentsPostId === post.id}
+                            className="mt-1 block text-left text-[12px] text-[#576B95] active:opacity-60 disabled:opacity-50"
                           >
-                            {t(msg`查看全部 ${post.commentCount} 条评论`)}
+                            {loadingFullCommentsPostId === post.id
+                              ? t(msg`正在读取全部评论…`)
+                              : t(msg`查看全部 ${post.commentCount} 条评论`)}
                           </button>
                         ) : null}
                       </div>
                     </div>
-                  ) : null
-                }
+                  );
+                })()}
               />
               </div>
             );
