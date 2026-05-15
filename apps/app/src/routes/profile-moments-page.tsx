@@ -647,37 +647,46 @@ export function ProfileMomentsPage() {
             </div>
           ) : null}
 
-          {ownMoments.map((moment, index) => (
-            <div
-              key={moment.id}
-              className={
-                index === 0
-                  ? "yj-list-item-virtual-card"
-                  : "yj-list-item-virtual-card border-t border-[#ECECEC]"
-              }
-            >
-              <PersonalAlbumRow
-                moment={moment}
-                ownerId={ownerId}
-                onOpenActionMenu={(rect) =>
-                  setActionBubble({ momentId: moment.id, anchorRect: rect })
+          {ownMoments.map((moment, index) => {
+            const previous = index > 0 ? ownMoments[index - 1] : null;
+            // 微信样式：同一天发的多条只在第一条显示「日／月」，避免左侧
+            // 「15 五月」「15 五月」「15 五月」连续重复——用户已经看到一次就够了，
+            // 后续条目的日期柱留空保留对齐宽度。
+            const showDate =
+              !previous || !isSameLocalDay(previous.postedAt, moment.postedAt);
+            return (
+              <div
+                key={moment.id}
+                className={
+                  index === 0
+                    ? "yj-list-item-virtual-card"
+                    : "yj-list-item-virtual-card border-t border-[#ECECEC]"
                 }
-                onDoubleTapLike={() => likeMutation.mutate(moment.id)}
-                onCommentTap={(comment) => onCommentTap(moment.id, comment)}
-                onLikeAuthorTap={openLikerCharacterDetail}
-                onDelete={() => {
-                  if (deleteMutation.isPending) return;
-                  if (
-                    typeof window !== "undefined" &&
-                    !window.confirm(t(msg`确定删除这条朋友圈吗？`))
-                  ) {
-                    return;
+              >
+                <PersonalAlbumRow
+                  moment={moment}
+                  ownerId={ownerId}
+                  showDate={showDate}
+                  onOpenActionMenu={(rect) =>
+                    setActionBubble({ momentId: moment.id, anchorRect: rect })
                   }
-                  deleteMutation.mutate(moment.id);
-                }}
-              />
-            </div>
-          ))}
+                  onDoubleTapLike={() => likeMutation.mutate(moment.id)}
+                  onCommentTap={(comment) => onCommentTap(moment.id, comment)}
+                  onLikeAuthorTap={openLikerCharacterDetail}
+                  onDelete={() => {
+                    if (deleteMutation.isPending) return;
+                    if (
+                      typeof window !== "undefined" &&
+                      !window.confirm(t(msg`确定删除这条朋友圈吗？`))
+                    ) {
+                      return;
+                    }
+                    deleteMutation.mutate(moment.id);
+                  }}
+                />
+              </div>
+            );
+          })}
 
           <div className="h-[calc(env(safe-area-inset-bottom,0px)+24px)]" />
         </div>
@@ -745,9 +754,23 @@ export function ProfileMomentsPage() {
   );
 }
 
+function isSameLocalDay(aIso: string, bIso: string): boolean {
+  const a = new Date(aIso);
+  const b = new Date(bIso);
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) {
+    return false;
+  }
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
 function PersonalAlbumRow({
   moment,
   ownerId,
+  showDate,
   onOpenActionMenu,
   onDoubleTapLike,
   onCommentTap,
@@ -756,6 +779,7 @@ function PersonalAlbumRow({
 }: {
   moment: Moment;
   ownerId: string | null;
+  showDate: boolean;
   onOpenActionMenu: (rect: DOMRect) => void;
   onDoubleTapLike: () => void;
   onCommentTap: (comment: MomentComment | null) => void;
@@ -771,13 +795,17 @@ function PersonalAlbumRow({
     : new Intl.DateTimeFormat(getActiveLocale(), { month: "long" }).format(date);
   return (
     <div className="flex items-start gap-2 px-4 py-3.5">
-      <div className="w-12 shrink-0 pt-1 text-right">
-        <div className="text-[26px] font-semibold leading-none text-[#1A1A1A]">
-          {day}
-        </div>
-        <div className="mt-1 text-[11px] tracking-[0.04em] text-[#9A9A9A]">
-          {monthLabel}
-        </div>
+      <div className="w-12 shrink-0 pt-1 text-right" aria-hidden={!showDate}>
+        {showDate ? (
+          <>
+            <div className="text-[26px] font-semibold leading-none text-[#1A1A1A]">
+              {day}
+            </div>
+            <div className="mt-1 text-[11px] tracking-[0.04em] text-[#9A9A9A]">
+              {monthLabel}
+            </div>
+          </>
+        ) : null}
       </div>
       <div className="min-w-0 flex-1 pr-4">
         <WeChatMomentCard
