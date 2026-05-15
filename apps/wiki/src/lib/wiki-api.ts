@@ -1029,14 +1029,10 @@ export type PrivateCharacterDto = {
   relationship?: string;
   relationshipType?: string;
   expertDomains?: string[];
-  triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipe | null;
   profile?: unknown | null;
   // —— admin 对齐字段（不含 isOnline / isTemplate / sourceType / sourceKey /
-  // deletionPolicy —— 这 5 个 admin-only，wiki 不接受写入） ——
-  onlineMode?: string;
-  activityMode?: string;
-  currentActivity?: string | null;
+  // deletionPolicy / 生活策略整组 —— 这些都是 admin-only，wiki 不接受写入） ——
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
@@ -1044,15 +1040,16 @@ export type PrivateCharacterDto = {
 };
 
 /**
- * 7 个 AI 生成 section：6 个分 section + 1 个 'all' 一次性全部。
+ * 6 个 AI 生成 section：5 个分 section + 1 个 'all' 一次性全部。
  * 命名严格对齐 apps/admin/src/routes/character-editor-page.tsx 的 TABS 数组
- * （basics / core_logic / chat / scenes / memory / life）。
+ * （basics / core_logic / chat / scenes / memory）。
  * 与后端 api/src/modules/wiki/services/wiki-private-character-ai.prompts.ts 的
  * SectionKey 同义。
  *
- * 注：social_params 不进 AI 生成范围（admin 也是手填），所以即便 wiki UI 新增
- * 「社交参数」section，AiGenerateSection 也不包含它。reasoning 已于 2026-05-15
- * 从 wiki UI 删除，对应 AI section 也一并移除。
+ * 注：social_params / life 不进 AI 生成范围 ——
+ * - social_params：admin 也是手填
+ * - life：已于 2026-05-15 验收时被整组从 wiki UI 移除
+ * reasoning 同样早已移除（admin TABS 没有 reasoning tab）。
  */
 export type AiGenerateSection =
   | "basics"
@@ -1060,7 +1057,6 @@ export type AiGenerateSection =
   | "chat"
   | "scenes"
   | "memory"
-  | "life"
   | "all";
 
 /** AI 生成返回的 partial draft；只包含**当前为空**字段的建议。 */

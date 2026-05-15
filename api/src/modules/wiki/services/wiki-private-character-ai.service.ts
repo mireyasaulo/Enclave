@@ -18,8 +18,6 @@ const VALID_RELATIONSHIP_TYPES = new Set([
   'expert',
   'custom',
 ]);
-const VALID_ACTIVITY_FREQUENCY = new Set(['occasional', 'normal', 'frequent']);
-
 /**
  * AI 生成的返回结构：扁平化后再交给前端。
  * 用 Partial 因为只填空字段，sacred 和已填字段不在结果里。
@@ -33,8 +31,7 @@ export type AiGeneratedDraft = {
   // 顶层 DTO 字段
   relationshipType?: string;
   expertDomains?: string[];
-  triggerScenes?: string[];
-  // 嵌套 recipe（只含 admin 编辑器读取的子字段）
+  // 嵌套 recipe（只含 admin 编辑器读取的子字段；life / lifeStrategy 已下线）
   recipe?: {
     identity?: { avatar?: string };
     prompting?: Partial<CharacterBlueprintRecipe['prompting']>;
@@ -43,7 +40,6 @@ export type AiGeneratedDraft = {
       recentSummaryPrompt?: string;
       coreMemoryPrompt?: string;
     };
-    lifeStrategy?: Partial<CharacterBlueprintRecipe['lifeStrategy']>;
   };
 };
 
@@ -146,7 +142,6 @@ function normalizeAiOutput(
       normalizeChat(asObj(raw.chat), currentDraft, optimize),
       normalizeScenes(asObj(raw.scenes), currentDraft, optimize),
       normalizeMemory(asObj(raw.memory), currentDraft, optimize),
-      normalizeLife(asObj(raw.life), currentDraft, optimize),
     );
   }
 
@@ -161,8 +156,6 @@ function normalizeAiOutput(
       return normalizeScenes(raw, currentDraft, optimize);
     case 'memory':
       return normalizeMemory(raw, currentDraft, optimize);
-    case 'life':
-      return normalizeLife(raw, currentDraft, optimize);
     default:
       return {};
   }
@@ -183,7 +176,6 @@ function mergeDrafts(...parts: AiGeneratedDraft[]): AiGeneratedDraft {
       out.relationshipType = p.relationshipType;
     }
     if (p.expertDomains !== undefined) out.expertDomains = p.expertDomains;
-    if (p.triggerScenes !== undefined) out.triggerScenes = p.triggerScenes;
     if (p.recipe) {
       if (p.recipe.identity) {
         recipe.identity = { ...(recipe.identity ?? {}), ...p.recipe.identity };
@@ -198,12 +190,6 @@ function mergeDrafts(...parts: AiGeneratedDraft[]): AiGeneratedDraft {
         recipe.memorySeed = {
           ...(recipe.memorySeed ?? {}),
           ...p.recipe.memorySeed,
-        };
-      }
-      if (p.recipe.lifeStrategy) {
-        recipe.lifeStrategy = {
-          ...(recipe.lifeStrategy ?? {}),
-          ...p.recipe.lifeStrategy,
         };
       }
     }
@@ -378,67 +364,7 @@ function normalizeMemory(
   return { recipe: { memorySeed: ms } };
 }
 
-function normalizeLife(
-  raw: Record<string, unknown>,
-  current: PrivateCharacterDto,
-  optimize: boolean,
-): AiGeneratedDraft {
-  const ls: Partial<CharacterBlueprintRecipe['lifeStrategy']> = {};
-  const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
-  const curLs = (curRecipe.lifeStrategy ?? {}) as Partial<
-    CharacterBlueprintRecipe['lifeStrategy']
-  >;
-
-  const activityFrequency = trimStr(raw.activityFrequency);
-  if (
-    activityFrequency &&
-    VALID_ACTIVITY_FREQUENCY.has(activityFrequency) &&
-    (optimize || !curLs.activityFrequency)
-  ) {
-    ls.activityFrequency = activityFrequency;
-  }
-
-  const momentsFrequency = clampInt(raw.momentsFrequency, 0, 5);
-  if (
-    momentsFrequency !== null &&
-    (optimize || curLs.momentsFrequency === undefined)
-  ) {
-    ls.momentsFrequency = momentsFrequency;
-  }
-  const feedFrequency = clampInt(raw.feedFrequency, 0, 3);
-  if (
-    feedFrequency !== null &&
-    (optimize || curLs.feedFrequency === undefined)
-  ) {
-    ls.feedFrequency = feedFrequency;
-  }
-  const activeHoursStart = clampIntOrNull(raw.activeHoursStart, 0, 23);
-  if (
-    activeHoursStart !== undefined &&
-    (optimize || curLs.activeHoursStart === undefined)
-  ) {
-    ls.activeHoursStart = activeHoursStart;
-  }
-  const activeHoursEnd = clampIntOrNull(raw.activeHoursEnd, 0, 23);
-  if (
-    activeHoursEnd !== undefined &&
-    (optimize || curLs.activeHoursEnd === undefined)
-  ) {
-    ls.activeHoursEnd = activeHoursEnd;
-  }
-
-  const triggerScenes = cleanStringArray(raw.triggerScenes);
-  const out: AiGeneratedDraft = {};
-  if (
-    triggerScenes.length > 0 &&
-    (optimize || (current.triggerScenes ?? []).length === 0)
-  ) {
-    out.triggerScenes = triggerScenes;
-  }
-
-  if (Object.keys(ls).length > 0) out.recipe = { lifeStrategy: ls };
-  return out;
-}
+// normalizeLife removed 2026-05-15 along with the wiki life section.
 
 // ───── helpers ─────
 
@@ -486,13 +412,4 @@ function clampInt(v: unknown, min: number, max: number): number | null {
   return null;
 }
 
-function clampIntOrNull(
-  v: unknown,
-  min: number,
-  max: number,
-): number | null | undefined {
-  if (v === null) return null;
-  if (v === undefined) return undefined;
-  return clampInt(v, min, max);
-}
 // i18n-ignore-end

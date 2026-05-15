@@ -2,19 +2,22 @@
 // 设计要点（2026-05-15 重写，对齐 admin character-editor-page TABS 数组）：
 //
 // 1. SectionKey 与前端 apps/wiki/src/lib/wiki-api.ts:AiGenerateSection 保持完全一致：
-//    basics / core_logic / chat / scenes / memory / life / all。
+//    basics / core_logic / chat / scenes / memory / all。
 //    每个 key 对齐 apps/admin/src/routes/character-editor-page.tsx 的 TABS 数组
 //    （去掉 model_routing 与 social_params —— 前者是 admin-only，后者无 AI 生成意义）。
 // 2. reasoning section 已于 2026-05-15 二次精简移除：admin character editor 实际
 //    没有暴露 reasoning tab（line 1384 那段是死代码），wiki 也跟着对齐，
 //    recipe.reasoning 字段保留在 schema 里，但既不在 wiki UI 编辑、也不再做 AI 生成。
-// 3. 旧 8 个 section（identity / bioPersonality / expertise / tone / prompting / memory / rhythm）
+// 3. life section 已于 2026-05-15 验收时整组从 wiki 移除（用户决策：生活策略调度类
+//    字段不让 wiki 用户碰，留给 admin/preset 管）；AI 也不再生成。recipe.lifeStrategy
+//    保留在 schema 里满足 required，但 wiki 走默认值。
+// 4. 旧 8 个 section（identity / bioPersonality / expertise / tone / prompting / memory / rhythm）
 //    生成的子字段（occupation / background / motivation / worldview /
 //    expertiseDescription / knowledgeLimits / refusalStyle / tone.* 全部 /
 //    memorySummary / coreMemory / recentSummarySeed）已被 wiki UI 砍掉，
 //    AI 也不再生成。后端 normalizeAiOutput 会丢弃多余字段；wiki-private-character.service
 //    的 applyDto 会 strip recipe JSON 里的废字段；data-cleanup hook 会清空已存数据。
-// 4. SHARED_SYSTEM_PROMPT 不变（"sacred 字段"现在指 name / relationship / bio 三项，
+// 5. SHARED_SYSTEM_PROMPT 不变（"sacred 字段"现在指 name / relationship / bio 三项，
 //    personality 字段已从 wiki 删除）。
 
 import type { CharacterBlueprintRecipeValue as CharacterBlueprintRecipe } from '../../characters/character-blueprint.types';
@@ -25,7 +28,6 @@ export type SectionKey =
   | 'chat'
   | 'scenes'
   | 'memory'
-  | 'life'
   | 'all';
 
 export const SECTION_KEYS: readonly SectionKey[] = [
@@ -34,7 +36,6 @@ export const SECTION_KEYS: readonly SectionKey[] = [
   'chat',
   'scenes',
   'memory',
-  'life',
   'all',
 ] as const;
 
@@ -152,23 +153,6 @@ Schema：
   "coreMemoryPrompt": "string, 2-3 句。指示模板。变量：{{name}}、{{interactionHistory}}。让 AI 把所有过往交互提炼为'核心记忆'。要可执行。"
 }`;
 
-const LIFE_TEMPLATE = `当前角色信息：
-- 姓名：{{name}}
-{{? bio}}- 简介：{{bio}}{{/?}}
-{{? relationship}}- 关系：{{relationship}}{{/?}}
-
-根据角色"是否话痨/夜猫子/有日常工作"，给一组合理的活跃节奏参数。
-
-Schema：
-{
-  "activityFrequency": "枚举：'occasional' | 'normal' | 'frequent'",
-  "momentsFrequency": "int, 0-5。每天主动发朋友圈次数。0 = 不主动发。",
-  "feedFrequency": "int, 0-3。每周主动发 Feed / 视频号次数。",
-  "activeHoursStart": "int, 0-23 或 null。全天活跃就 null。例：夜猫子角色 20。",
-  "activeHoursEnd": "int, 0-23 或 null。例：夜猫子角色 2。",
-  "triggerScenes": "string[], 2-4 个触发场景的英文 tag。例：['coffee_shop', 'gym', 'library', 'late_night']。"
-}`;
-
 // 不要在 ALL 模板里写完整的 JSON 示例骨架。reasoning 模型（GLM 系列）会把
 // 示例当作"reference"输出在 <think>...</think> 块里，导致 extractJsonFromModelOutput
 // 抓到 <think> 里那段示例 + 真正的 JSON 合并成无法解析的字符串。
@@ -178,9 +162,9 @@ const ALL_TEMPLATE = `当前角色信息（3 个 sacred 字段已填）：
 - 简介：{{bio}}
 - 关系：{{relationship}}
 
-请为这个角色一次性生成 6 个 section 的所有空白字段。section 内部要保持自洽（例：scenePrompts 引用 coreLogic 的精神）。
+请为这个角色一次性生成 5 个 section 的所有空白字段。section 内部要保持自洽（例：scenePrompts 引用 coreLogic 的精神）。
 
-输出一个嵌套 JSON 对象，**只能有 6 个顶层键**：basics / core_logic / chat / scenes / memory / life。
+输出一个嵌套 JSON 对象，**只能有 5 个顶层键**：basics / core_logic / chat / scenes / memory。
 
 各子对象的字段规范（每个字段的类型、长度、枚举值都要严格遵守）：
 
@@ -202,14 +186,6 @@ const ALL_TEMPLATE = `当前角色信息（3 个 sacred 字段已填）：
 [memory]
 - recentSummaryPrompt: string, 2-3 句指示模板
 - coreMemoryPrompt: string, 2-3 句指示模板
-
-[life]
-- activityFrequency: 枚举 "occasional" | "normal" | "frequent"
-- momentsFrequency: int 0-5
-- feedFrequency: int 0-3
-- activeHoursStart: int 0-23 或 null
-- activeHoursEnd: int 0-23 或 null
-- triggerScenes: string[] 2-4 个英文 tag
 
 再次提醒：**不要在你的回复中输出任何 JSON 示例代码、不要解释、不要 markdown 代码块、不要写"我会..."这种开场白**。第一个字符就是 \`{\`，最后一个字符就是 \`}\`。`;
 
@@ -251,13 +227,6 @@ export const SECTION_PROMPTS: Record<SectionKey, PromptTemplate> = {
     userPromptTemplate: MEMORY_TEMPLATE,
     temperature: 0.5,
     maxTokens: 1500,
-    fallback: {},
-  },
-  life: {
-    systemPrompt: SHARED_SYSTEM_PROMPT,
-    userPromptTemplate: LIFE_TEMPLATE,
-    temperature: 0.45,
-    maxTokens: 1000,
     fallback: {},
   },
   all: {

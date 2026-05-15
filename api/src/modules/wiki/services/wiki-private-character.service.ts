@@ -96,15 +96,11 @@ export type PrivateCharacterDto = {
   relationship?: string;
   relationshipType?: string;
   expertDomains?: string[];
-  triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipeValue | null;
   profile?: PersonalityProfile | null;
   // —— 2026-05-15 起对齐 admin character editor 的字段（不含 isOnline /
-  // isTemplate / sourceType / sourceKey / deletionPolicy —— 这 5 个 admin-only，
-  // wiki 写入路径不接受） ——
-  onlineMode?: string;
-  activityMode?: string;
-  currentActivity?: string | null;
+  // isTemplate / sourceType / sourceKey / deletionPolicy / 生活策略整组 ——
+  // 都是 admin-only，wiki 写入路径不接受） ——
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
@@ -120,13 +116,9 @@ export type PrivateCharacterExportBundle = {
   relationship: string;
   relationshipType: string;
   expertDomains: string[];
-  triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipeValue | null;
   profile?: PersonalityProfile | null;
   // export bundle 跟着 DTO 走，admin-only 字段不写出。
-  onlineMode?: string;
-  activityMode?: string;
-  currentActivity?: string | null;
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
@@ -308,15 +300,11 @@ export class WikiPrivateCharacterService {
       relationship: record.relationship,
       relationshipType: record.relationshipType,
       expertDomains: record.expertDomains ?? [],
-      triggerScenes: record.triggerScenes ?? null,
       recipe: stripRejectedRecipeFields(record.recipe),
       profile: record.profile ?? null,
       // admin-only 字段（isOnline / isTemplate / sourceType / sourceKey /
-      // deletionPolicy）不进 bundle，避免来回 export → import 把 wiki 用户其实
-      // 不该碰的字段往 CharacterEntity 上传。
-      onlineMode: record.onlineMode,
-      activityMode: record.activityMode,
-      currentActivity: record.currentActivity ?? null,
+      // deletionPolicy / 生活策略整组：onlineMode / activityMode / currentActivity /
+      // triggerScenes）不进 bundle —— wiki 用户既改不到也不应导出。
       socialOpenness: record.socialOpenness,
       proactiveBrowseChance: record.proactiveBrowseChance,
       intimacyLevel: record.intimacyLevel,
@@ -362,9 +350,6 @@ export class WikiPrivateCharacterService {
       expertDomains: Array.isArray(p.expertDomains)
         ? p.expertDomains.filter((x): x is string => typeof x === 'string')
         : undefined,
-      triggerScenes: Array.isArray(p.triggerScenes)
-        ? p.triggerScenes.filter((x): x is string => typeof x === 'string')
-        : undefined,
       // typeof null/array 都是 'object'，要再排掉 Array — 否则
       // {"recipe":[1,2,3]} 会被误当成合法 recipe 存进去，下游读
       // recipe.identity 会炸。
@@ -381,12 +366,7 @@ export class WikiPrivateCharacterService {
           ? (p.profile as PersonalityProfile)
           : undefined,
       // admin-only 字段（isOnline / isTemplate / sourceType / sourceKey /
-      // deletionPolicy）就算上传文件里有也忽略：wiki 用户没权限设它们。
-      onlineMode: typeof p.onlineMode === 'string' ? p.onlineMode : undefined,
-      activityMode:
-        typeof p.activityMode === 'string' ? p.activityMode : undefined,
-      currentActivity:
-        typeof p.currentActivity === 'string' ? p.currentActivity : undefined,
+      // deletionPolicy / 生活策略整组）就算上传文件里有也忽略：wiki 用户没权限设。
       socialOpenness:
         typeof p.socialOpenness === 'string' ? p.socialOpenness : undefined,
       proactiveBrowseChance:
@@ -421,9 +401,6 @@ export class WikiPrivateCharacterService {
     if (Array.isArray(dto.expertDomains)) {
       target.expertDomains = dto.expertDomains;
     }
-    if (dto.triggerScenes !== undefined) {
-      target.triggerScenes = dto.triggerScenes ?? null;
-    }
     // 同样防 PUT body 把 recipe/profile 传成 array 或非 object：
     // 入库前再用 stripRejectedRecipeFields 剥去 wiki 已砍掉的子字段（identity.occupation
     // 等），即便老前端 / 第三方脚本继续 PUT 也不会污染 DB。
@@ -441,14 +418,9 @@ export class WikiPrivateCharacterService {
         pf && typeof pf === 'object' && !Array.isArray(pf) ? pf : null;
     }
     // admin-only 字段（isOnline / isTemplate / sourceType / sourceKey /
-    // deletionPolicy）不在这里 apply：即便 PUT body 强塞，也以 entity 默认 / 已有值为准。
-    if (typeof dto.onlineMode === 'string') target.onlineMode = dto.onlineMode;
-    if (typeof dto.activityMode === 'string') {
-      target.activityMode = dto.activityMode;
-    }
-    if (dto.currentActivity !== undefined) {
-      target.currentActivity = dto.currentActivity ?? null;
-    }
+    // deletionPolicy / 生活策略整组：onlineMode / activityMode / currentActivity /
+    // triggerScenes）不在这里 apply：即便 PUT body 强塞，也以 entity 默认 /
+    // 已有值为准。
     if (typeof dto.socialOpenness === 'string') {
       target.socialOpenness = dto.socialOpenness;
     }
