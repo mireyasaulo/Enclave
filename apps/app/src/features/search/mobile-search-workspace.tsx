@@ -138,10 +138,36 @@ export function MobileSearchWorkspace({
   const t = useRuntimeTranslator();
   const getCategoryTitle = useSearchCategoryTitle();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const chipsRef = useRef<HTMLDivElement | null>(null);
+  const chipRefs = useRef<Partial<Record<SearchCategory, HTMLButtonElement | null>>>({});
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // 切到非「全部」 chip——常见路径是点下面的 quickScopeCard / 「查看更多」——
+  // chip 行不主动滚动，活动 chip 经常在右侧屏外，用户点完看不到 active chip，
+  // 以为没生效。activeCategory 变化时把当前 active chip 滚到可视区，只滚 chip
+  // 行自己（横向），不滚外层页面（纵向）。
+  useEffect(() => {
+    const chip = chipRefs.current[activeCategory];
+    const container = chipsRef.current;
+    if (!chip || !container) {
+      return;
+    }
+    const chipLeft = chip.offsetLeft;
+    const chipRight = chipLeft + chip.offsetWidth;
+    const viewLeft = container.scrollLeft;
+    const viewRight = viewLeft + container.clientWidth;
+    if (chipLeft < viewLeft) {
+      container.scrollTo({ left: chipLeft - 8, behavior: "smooth" });
+    } else if (chipRight > viewRight) {
+      container.scrollTo({
+        left: chipRight - container.clientWidth + 8,
+        behavior: "smooth",
+      });
+    }
+  }, [activeCategory]);
 
   // 「全部」视图里展示的分组顺序：messages/contacts 最常用排前面，
   // officialAccounts/favorites 次之，moments/feed 是社交内容放后面。
@@ -199,7 +225,15 @@ export function MobileSearchWorkspace({
             {searchText ? (
               <button
                 type="button"
-                onClick={onClearKeyword}
+                // 在 pointerdown 阶段就阻止默认行为，避免 button 抢走焦点：
+                // 之前点「清空」会把 activeElement 切到 body，iOS 上键盘随即
+                // 收起，用户清完又得再点一次输入框才能继续输入。preventDefault
+                // 阻止 focus 转移，input 保持聚焦、键盘不退。
+                onPointerDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onClearKeyword();
+                  inputRef.current?.focus();
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-[color:var(--text-muted)]"
               >
                 {t(msg`清空`)}
@@ -208,11 +242,17 @@ export function MobileSearchWorkspace({
           </form>
         </div>
 
-        <div className="mt-2.5 flex gap-1.5 overflow-x-auto pb-0.5">
+        <div
+          ref={chipsRef}
+          className="mt-2.5 flex gap-1.5 overflow-x-auto pb-0.5"
+        >
           {searchCategoryLabelDescriptors.map((item) => (
             <button
               key={item.id}
               type="button"
+              ref={(el) => {
+                chipRefs.current[item.id] = el;
+              }}
               onClick={() => setActiveCategory(item.id)}
               className={cn(
                 "shrink-0 rounded-full px-3 py-1.5 text-[11px] font-medium transition",
