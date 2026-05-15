@@ -437,16 +437,35 @@ export function useSearchIndex(
     }));
 
     const momentResults: SearchResultItem[] = (momentsQuery.data ?? []).map(
-      (moment) => ({
+      (moment) => {
+        // 无文字的图/视频/音频动态——直接显示空 description 的话搜索卡
+        // 内容区是一块空白。退到 location 或按 contentType / media 数量
+        // 给个含义提示。仅影响显示，keywords 不变。
+        const descriptionFallback = moment.location?.trim()
+          ? t(msg`📍 ${moment.location.trim()}`)
+          : moment.contentType === "video"
+            ? t(msg`[视频动态]`)
+            : moment.contentType === "audio_card"
+              ? t(msg`[音乐动态]`)
+              : moment.contentType === "live_photo"
+                ? t(msg`[实况照片]`)
+                : moment.media.length
+                  ? t(msg`[${moment.media.length} 张图片]`)
+                  : t(msg`查看这条朋友圈动态。`);
+        return ({
         id: `moment-${moment.id}`,
         category: "moments",
         title: moment.authorName,
-        description: moment.text,
+        description: moment.text.trim() || descriptionFallback,
         meta: t(msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`),
         keywords: [
           moment.authorName,
           moment.text,
           moment.location,
+          // 点赞者名字也算「这条朋友圈跟某个 AI 有关」的依据：用户搜某
+          // 个 AI 的名字想找它的互动痕迹，如果它只点了赞没评论，原来
+          // 整条 moment 都搜不到。
+          ...moment.likes.map((item) => item.authorName),
           ...moment.comments.map((item) => `${item.authorName} ${item.text}`),
         ]
           .filter(Boolean)
@@ -458,7 +477,8 @@ export function useSearchIndex(
         avatarName: moment.authorName,
         avatarSrc: moment.authorAvatar,
         sortTime: parseTimestamp(moment.postedAt) ?? 0,
-      }),
+      });
+      },
     );
 
     const feedResults: SearchResultItem[] = (feedQuery.data?.posts ?? []).map(
