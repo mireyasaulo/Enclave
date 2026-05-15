@@ -541,16 +541,23 @@ export function useSearchIndex(
           return null;
         }
 
+        // 后端 searchConversationMessages / searchGroupMessages 单次返回上限 8
+        // 条 / 会话（见上面 messageSearchIndexQuery 里的 limit: 8）。这里别再
+        // slice(0, 3)——drilldown 视图（查看全部聊天记录）依赖完整命中条数，
+        // 不然「查看全部」点进去每个会话仍然只显示 3 条，跟"全部"的语义对不
+        // 上。preview 视图（全部结果聚合页）由 desktop-search-workspace 自己
+        // 再切一次。
+        const sortedMessages = [...messages].sort(
+          (left, right) => right.sortTime - left.sortTime,
+        );
         return {
           id: `message-group-${conversationId}`,
           header,
-          totalHits: messages.length,
-          messages: [...messages]
-            .sort((left, right) => right.sortTime - left.sortTime)
-            .slice(0, 3),
+          totalHits: sortedMessages.length,
+          messages: sortedMessages,
           sortTime: Math.max(
             header.sortTime,
-            messages[0]?.sortTime ?? header.sortTime,
+            sortedMessages[0]?.sortTime ?? header.sortTime,
           ),
         };
       })

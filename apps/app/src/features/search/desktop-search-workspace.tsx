@@ -267,8 +267,16 @@ export function DesktopSearchWorkspace({
         const previewFeatureResults = isDesktopFeatureCardCategory(section.category)
           ? section.results.slice(0, section.category === "favorites" ? 3 : 4)
           : [];
+        // 全部结果聚合视图里只露 3 个会话组、每组最多 3 条消息——drilldown
+        // 视图（查看全部）才把每组完整命中（最多 8 条）展开。所以这里要二次
+        // 切 messages，不能直接复用 hook 返回的 group。
         const previewMessageGroups =
-          section.category === "messages" ? messageGroups.slice(0, 3) : [];
+          section.category === "messages"
+            ? messageGroups.slice(0, 3).map((group) => ({
+                ...group,
+                messages: group.messages.slice(0, 3),
+              }))
+            : [];
         const previewMessageConversations =
           section.category === "messages"
             ? messageConversationOnlyResults.slice(
