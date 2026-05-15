@@ -5,7 +5,7 @@ import { translateRuntimeMessage } from "@yinjie/i18n";
 import { FARM_CROP_CATALOG, type FarmCropId } from "@yinjie/contracts";
 
 const t = translateRuntimeMessage;
-import { FarmClockProvider, useFarmClock } from "./farm-clock-context";
+import { FarmClockProvider, useSetFarmServerNow } from "./farm-clock-context";
 import { useFarmState } from "./use-farm-state";
 import { CoinDisplay } from "./components/coin-display";
 import { EventLogPanel } from "./components/event-log-panel";
@@ -36,7 +36,7 @@ interface HarvestToast {
 
 function FarmPageInner() {
   const stateQuery = useFarmState();
-  const clock = useFarmClock();
+  const setServerNowMs = useSetFarmServerNow();
   const [selectedPlotIndex, setSelectedPlotIndex] = useState<number | null>(null);
   const [seedShopOpen, setSeedShopOpen] = useState(false);
   const [warehouseOpen, setWarehouseOpen] = useState(false);
@@ -59,9 +59,9 @@ function FarmPageInner() {
 
   useEffect(() => {
     if (stateQuery.data?.serverNowMs) {
-      clock.setServerNowMs(stateQuery.data.serverNowMs);
+      setServerNowMs(stateQuery.data.serverNowMs);
     }
-  }, [stateQuery.data?.serverNowMs, clock]);
+  }, [stateQuery.data?.serverNowMs, setServerNowMs]);
 
   useEffect(() => {
     if (!toast) return;
@@ -125,6 +125,7 @@ function FarmPageInner() {
         <header className="flex items-center justify-between">
           <Link
             to="/tabs/games"
+            search={{ game: "yinjie-farm" }}
             className="rounded-full px-2 py-1 text-xs text-stone-500 hover:bg-white/60"
           >
             ← {t(msg`返回`)}
