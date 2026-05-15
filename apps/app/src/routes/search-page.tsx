@@ -409,6 +409,35 @@ export function SearchPage() {
     return navigationTarget;
   }
 
+  // 移动端不像桌面那样把 keyword / category 实时同步进 URL hash（避免
+  // 每次按键都 push 一条 history entry），URL 一直停在用户首次进入时的状态。
+  // 用户点结果跳过去后再按返回，搜索页就 remount 出 hash 里没 keyword 的
+  // 初始状态——输入框空白，要重新打一遍。这里在导航离开前用
+  // history.replaceState 把当前 keyword / category baked 进当前条目，
+  // 这样返回时 URL 仍带 q=...，组件 mount 后能从 hash 读回来恢复输入。
+  function persistSearchStateInUrlBeforeLeave() {
+    if (isDesktopLayout) {
+      return;
+    }
+
+    const trimmedKeyword = effectiveSearchText.trim();
+    if (!trimmedKeyword && activeCategory === "all") {
+      return;
+    }
+
+    const nextHash = buildSearchRouteHash({
+      category: activeCategory,
+      keyword: trimmedKeyword,
+      source: routeState.source,
+    });
+
+    const targetHash = nextHash ? `#${nextHash}` : "";
+    if (typeof window !== "undefined" && window.location.hash !== targetHash) {
+      const newUrl = `${window.location.pathname}${window.location.search}${targetHash}`;
+      window.history.replaceState(window.history.state, "", newUrl);
+    }
+  }
+
   function handleOpenResult(item: SearchResultItem) {
     const navigationTarget = applySearchNavigationContext(
       resolveSearchNavigationTarget(item, {
@@ -416,6 +445,7 @@ export function SearchPage() {
       }),
     );
     handleCommitSearch(effectiveSearchText);
+    persistSearchStateInUrlBeforeLeave();
     void navigate({
       to: navigationTarget.to as never,
       search: searchStringToObject(navigationTarget.search) as never,
@@ -433,6 +463,7 @@ export function SearchPage() {
         desktopLayout: isDesktopLayout,
       }),
     );
+    persistSearchStateInUrlBeforeLeave();
     void navigate({
       to: navigationTarget.to as never,
       search: searchStringToObject(navigationTarget.search) as never,
