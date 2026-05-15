@@ -26675,19 +26675,19 @@ msgstr "No notes yet"
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:400
 msgid "该分类下还没有收藏"
-msgstr ""
+msgstr "No favorites in this category yet"
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:407
 msgid "点击右上角\"新建笔记\"，把第一条收藏笔记写下来。"
-msgstr ""
+msgstr "Tap \"New note\" in the top right to capture your first favorite note."
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:409
 msgid "切到其他分类继续查看，或去对应入口把内容加入收藏。"
-msgstr ""
+msgstr "Switch to another category, or head to the source page to add items to favorites."
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:436
 msgid "收藏操作"
-msgstr ""
+msgstr "Favorites actions"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:47
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:210

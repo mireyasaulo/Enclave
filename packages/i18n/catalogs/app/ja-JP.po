@@ -26675,19 +26675,19 @@ msgstr "メモはまだありません"
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:400
 msgid "该分类下还没有收藏"
-msgstr ""
+msgstr "このカテゴリーにはまだお気に入りがありません"
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:407
 msgid "点击右上角\"新建笔记\"，把第一条收藏笔记写下来。"
-msgstr ""
+msgstr "右上の「新規ノート」をタップして、最初のお気に入りノートを書き留めましょう。"
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:409
 msgid "切到其他分类继续查看，或去对应入口把内容加入收藏。"
-msgstr ""
+msgstr "他のカテゴリーに切り替えて確認するか、該当する入口でお気に入りに追加してください。"
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:436
 msgid "收藏操作"
-msgstr ""
+msgstr "お気に入り操作"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:47
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:210

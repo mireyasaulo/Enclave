@@ -26675,19 +26675,19 @@ msgstr "메모가 없습니다"
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:400
 msgid "该分类下还没有收藏"
-msgstr ""
+msgstr "이 카테고리에 아직 즐겨찾기가 없습니다"
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:407
 msgid "点击右上角\"新建笔记\"，把第一条收藏笔记写下来。"
-msgstr ""
+msgstr "오른쪽 위의 \"새 노트\"를 눌러 첫 번째 즐겨찾기 노트를 작성하세요."
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:409
 msgid "切到其他分类继续查看，或去对应入口把内容加入收藏。"
-msgstr ""
+msgstr "다른 카테고리로 전환해 보거나, 해당 입구에서 항목을 즐겨찾기에 추가하세요."
 
 #: apps/app/src/routes/mobile-favorites-page.tsx:436
 msgid "收藏操作"
-msgstr ""
+msgstr "즐겨찾기 작업"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:47
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:210
