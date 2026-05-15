@@ -18,6 +18,7 @@ import {
   StatusPill,
 } from "@yinjie/ui";
 import {
+  AdminCallout,
   AdminDangerZone,
   AdminEmptyState,
   AdminErrorState,
@@ -71,6 +72,7 @@ export function CharactersPage() {
   const queryClient = useQueryClient();
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("overview");
   const [selectedCharacterId, setSelectedCharacterId] = useState("");
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [relationshipFilter, setRelationshipFilter] = useState<
@@ -91,6 +93,7 @@ export function CharactersPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminApi.deleteCharacter(id),
     onSuccess: async () => {
+      setPendingDeleteId(null);
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["admin-characters-crud", baseUrl],
@@ -113,6 +116,7 @@ export function CharactersPage() {
     : null;
   const resetDeleteMutation = useEffectEvent(() => {
     deleteMutation.reset();
+    setPendingDeleteId(null);
   });
 
   useEffect(() => {
@@ -193,6 +197,12 @@ export function CharactersPage() {
       setSelectedCharacterId(filteredCharacters[0].id);
     }
   }, [filteredCharacters, selectedCharacterId]);
+
+  useEffect(() => {
+    if (pendingDeleteId && pendingDeleteId !== selectedCharacterId) {
+      setPendingDeleteId(null);
+    }
+  }, [pendingDeleteId, selectedCharacterId]);
 
   const selectedCharacter = useMemo(
     () =>
@@ -811,21 +821,50 @@ export function CharactersPage() {
                         : t(msg`删除角色会移除关联的好友、会话、动态和蓝图数据。`)
                     }
                   >
-                    <Button
-                      variant="danger"
-                      className="w-full justify-center"
-                      disabled={
-                        deleteMutation.isPending ||
-                        isProtectedCharacter(selectedCharacter)
-                      }
-                      onClick={() => deleteMutation.mutate(selectedCharacter.id)}
-                    >
-                      {isProtectedCharacter(selectedCharacter)
-                        ? t(msg`默认角色受保护`)
-                        : deletingCharacterId === selectedCharacter.id
-                          ? t(msg`删除中...`)
+                    {pendingDeleteId === selectedCharacter.id &&
+                    !isProtectedCharacter(selectedCharacter) ? (
+                      <AdminCallout
+                        tone="warning"
+                        title={t(msg`确认删除「${selectedCharacter.name}」？`)}
+                        description={t(msg`此操作会级联清理该角色的会话、动态、Feed、好友关系、蓝图等数据，且不可撤销。`)}
+                        actions={
+                          <>
+                            <Button
+                              variant="danger"
+                              onClick={() =>
+                                deleteMutation.mutate(selectedCharacter.id)
+                              }
+                              disabled={deleteMutation.isPending}
+                            >
+                              {deletingCharacterId === selectedCharacter.id
+                                ? t(msg`删除中...`)
+                                : t(msg`确认删除`)}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              onClick={() => setPendingDeleteId(null)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              {t(msg`取消`)}
+                            </Button>
+                          </>
+                        }
+                      />
+                    ) : (
+                      <Button
+                        variant="danger"
+                        className="w-full justify-center"
+                        disabled={
+                          deleteMutation.isPending ||
+                          isProtectedCharacter(selectedCharacter)
+                        }
+                        onClick={() => setPendingDeleteId(selectedCharacter.id)}
+                      >
+                        {isProtectedCharacter(selectedCharacter)
+                          ? t(msg`默认角色受保护`)
                           : t(msg`删除当前角色`)}
-                    </Button>
+                      </Button>
+                    )}
                   </AdminDangerZone>
                 </div>
               ) : (

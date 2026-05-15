@@ -563,6 +563,9 @@ export function CharacterEditorPage() {
                 }))
               }
               options={[
+                ...(draft.relationshipType === "self"
+                  ? [{ value: "self", label: t(msg`自己`) }]
+                  : []),
                 { value: "family", label: t(msg`家人`) },
                 { value: "friend", label: t(msg`朋友`) },
                 { value: "expert", label: t(msg`专家`) },
