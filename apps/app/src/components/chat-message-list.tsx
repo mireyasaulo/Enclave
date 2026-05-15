@@ -543,7 +543,14 @@ export function ChatMessageList({
 
   useEffect(() => {
     setContextMenuState(null);
-    setMobileActionMessage(null);
+    // 长按 sheet 只在目标消息消失时关——socket 推新消息也会触发这个 effect，
+    // 如果无条件清空会把用户的点击意图打断。和下面 reminderTarget /
+    // quoteSelection / forward 等 7 个面板的 pattern 对齐。
+    setMobileActionMessage((current) =>
+      current && messages.some((message) => message.id === current.id)
+        ? current
+        : null,
+    );
     setReminderTargetMessage((current) =>
       current && messages.some((message) => message.id === current.id)
         ? current

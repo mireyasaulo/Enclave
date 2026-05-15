@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { sanitizeAiText } from '../ai/ai-text-sanitizer';
 import { WorldOwnerService } from '../auth/world-owner.service';
+import { CharactersService } from '../characters/characters.service';
 import { SystemConfigService } from '../config/config.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { ConversationEntity } from './conversation.entity';
@@ -131,6 +132,7 @@ export class FavoritesService implements OnModuleInit {
     private readonly systemConfigService: SystemConfigService,
     private readonly cyberAvatar: CyberAvatarService,
     private readonly remarkResolver: FriendRemarkResolver,
+    private readonly characters: CharactersService,
   ) {}
 
   async onModuleInit() {
@@ -138,6 +140,62 @@ export class FavoritesService implements OnModuleInit {
     // 旧 key 写入会被清空，下次启动看到 raw=null 直接跳过。
     await this.migrateFavoritesFromConfig();
     await this.migrateFavoriteNotesFromConfig();
+    // 老版本 buildConversationMessageFavorite 没顺着 senderId 拉头像，存的
+    // 直聊消息收藏 avatarSrc 全是 null。一次性补一下，避免桌面收藏卡都显示成
+    // 名字占位渐变。
+    await this.backfillDirectMessageFavoriteAvatars();
+  }
+
+  private async backfillDirectMessageFavoriteAvatars(): Promise<void> {
+    try {
+      const rows = await this.favoriteRepo.find({
+        where: { category: 'messages' },
+      });
+      const missing = rows.filter(
+        (row) => !row.avatarSrc && row.to.startsWith('/chat/'),
+      );
+      if (!missing.length) return;
+
+      const avatarCache = new Map<string, string | undefined>();
+      const resolveAvatarForConversation = async (
+        conversationId: string,
+      ): Promise<string | undefined> => {
+        if (avatarCache.has(conversationId)) {
+          return avatarCache.get(conversationId);
+        }
+        const conversation = await this.conversationRepo.findOneBy({
+          id: conversationId,
+        });
+        const characterId = conversation?.participants?.[0];
+        const avatar = await this.resolveCharacterAvatar(characterId);
+        avatarCache.set(conversationId, avatar);
+        return avatar;
+      };
+
+      let patched = 0;
+      for (const row of missing) {
+        // to 格式: /chat/<conversationId>#chat-message-<messageId>
+        const match = row.to.match(/^\/chat\/([^#]+)/);
+        const conversationId = match?.[1]?.trim();
+        if (!conversationId) continue;
+        const avatar = await resolveAvatarForConversation(conversationId);
+        if (!avatar) continue;
+        await this.favoriteRepo.update(
+          { sourceId: row.sourceId },
+          { avatarSrc: avatar },
+        );
+        patched += 1;
+      }
+      if (patched > 0) {
+        this.logger.log(
+          `backfilled avatarSrc on ${patched} direct-message favorites`,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `backfillDirectMessageFavoriteAvatars failed: ${(error as Error).message}`,
+      );
+    }
   }
 
   private async migrateFavoritesFromConfig(): Promise<void> {
@@ -472,6 +530,12 @@ export class FavoritesService implements OnModuleInit {
     }
 
     const remarkMap = await this.remarkResolver.getOwnerRemarkMap(owner.id);
+    // 直聊里 messages 表没有 senderAvatar 列（不像 group_messages 有），
+    // 顺着 senderId 去 characters 拉一下，避免收藏卡显示成名字占位渐变。
+    const senderAvatar =
+      message.senderType === 'character'
+        ? await this.resolveCharacterAvatar(message.senderId)
+        : undefined;
     return this.buildFavoriteRecord({
       badge: '聊天消息',
       threadPath: `/chat/${conversation.id}#chat-message-${message.id}`,
@@ -484,6 +548,7 @@ export class FavoritesService implements OnModuleInit {
           message.senderName,
           remarkMap,
         ),
+        senderAvatar,
         text: message.text,
         type: message.type as FavoriteMessageSnapshot['type'],
         attachment: this.parseAttachment(
@@ -494,6 +559,13 @@ export class FavoritesService implements OnModuleInit {
       },
       emptySenderLabel: '对方',
     });
+  }
+
+  private async resolveCharacterAvatar(characterId?: string | null) {
+    const normalized = characterId?.trim();
+    if (!normalized) return undefined;
+    const character = await this.characters.findById(normalized);
+    return character?.avatar?.trim() || undefined;
   }
 
   private async buildGroupMessageFavorite(
