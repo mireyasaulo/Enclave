@@ -56,7 +56,9 @@ export function useConversationThread(conversationId: string) {
     null,
   );
   const [socketError, setSocketError] = useState<string | null>(null);
-  const [conversationTitle, setConversationTitle] = useState("Conversation");
+  // 标题初始值留空：activeConversation 拉到之前先不显示，比闪一下英文 "Conversation"
+  // 在非英文用户那里好。conversationsQuery / onConversationUpdated 拿到数据后会立刻 set。
+  const [conversationTitle, setConversationTitle] = useState("");
   const [participants, setParticipants] = useState<string[]>([]);
   const [initialUnreadCount, setInitialUnreadCount] = useState(0);
   const [initialUnreadCutoff, setInitialUnreadCutoff] = useState<string | null>(
