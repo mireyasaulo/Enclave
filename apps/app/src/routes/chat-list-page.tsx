@@ -720,7 +720,11 @@ function MobileChatListPage() {
               size="icon"
               onClick={() => setIsQuickMenuOpen((current) => !current)}
               className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
-              aria-label={t(msg`打开快捷菜单`)}
+              aria-label={
+                isQuickMenuOpen ? t(msg`关闭快捷菜单`) : t(msg`打开快捷菜单`)
+              }
+              aria-expanded={isQuickMenuOpen}
+              aria-haspopup="menu"
             >
               <Plus size={15} strokeWidth={2.4} />
             </Button>
