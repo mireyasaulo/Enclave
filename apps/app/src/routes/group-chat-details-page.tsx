@@ -15,7 +15,7 @@ import {
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { InlineNoticeActionButton } from "../components/inline-notice-action-button";
 import { getChatBackgroundLabel } from "../features/chat/backgrounds/chat-background-helpers";
-import { useDefaultChatBackground } from "../features/chat/backgrounds/use-conversation-background";
+import { useGroupBackground } from "../features/chat/backgrounds/use-conversation-background";
 import { ChatCallFallbackSection } from "../features/chat-details/chat-call-fallback-section";
 import { ChatDetailsShell } from "../features/chat-details/chat-details-shell";
 import { ChatDetailsSection } from "../features/chat-details/chat-details-section";
@@ -81,7 +81,11 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
   const [dangerSheetAction, setDangerSheetAction] = useState<
     "hide" | "clear" | "leave" | null
   >(null);
-  const ownerQuery = useDefaultChatBackground();
+  // 这一行展示的是「这个群当前实际生效的背景」——可能继承全局默认，也可能是
+  // group-chat-background-page 单独保存过的 custom 背景，必须用 group 维度的
+  // background query 取 effectiveBackground，否则覆盖后这里还是显示全局默认，
+  // 和点进去能看到的实际不符。
+  const backgroundQuery = useGroupBackground(groupId);
   const groupRouteHash = useMemo(
     () =>
       buildMobileGroupRouteHash({
@@ -745,7 +749,7 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
               <ChatSettingRow
                 label={t(msg`聊天背景`)}
                 value={getChatBackgroundLabel(
-                  ownerQuery.data?.defaultChatBackground,
+                  backgroundQuery.data?.effectiveBackground,
                 )}
                 variant="wechat"
                 onClick={() => {
