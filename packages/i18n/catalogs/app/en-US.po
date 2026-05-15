@@ -550,7 +550,7 @@ msgstr "Hold to talk"
 
 #: apps/app/src/components/chat-composer.tsx:3372
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:309
-#: apps/app/src/features/shell/desktop-shell.tsx:630
+#: apps/app/src/features/shell/desktop-shell.tsx:633
 msgid "更多功能"
 msgstr "More Features"
 
@@ -4014,7 +4014,7 @@ msgstr "Search chat history"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:149
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:473
 #: apps/app/src/features/shell/desktop-nav-matching.ts:98
-#: apps/app/src/features/shell/desktop-shell.tsx:644
+#: apps/app/src/features/shell/desktop-shell.tsx:647
 #: apps/app/src/routes/chat-list-page.tsx:834
 #: apps/app/src/routes/contacts-page.tsx:2263
 #: apps/app/src/routes/contacts-page.tsx:2337
@@ -7402,7 +7402,7 @@ msgstr "Enter contact tags"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:219
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:519
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:82
-#: apps/app/src/features/shell/desktop-shell.tsx:984
+#: apps/app/src/features/shell/desktop-shell.tsx:987
 #: apps/app/src/routes/mobile-add-friend-page.tsx:700
 msgid "打开中..."
 msgstr "Opening..."
@@ -7411,7 +7411,7 @@ msgstr "Opening..."
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:520
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:82
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:916
-#: apps/app/src/features/shell/desktop-shell.tsx:984
+#: apps/app/src/features/shell/desktop-shell.tsx:987
 #: apps/app/src/routes/character-detail-page.tsx:296
 #: apps/app/src/routes/mobile-add-friend-page.tsx:700
 msgid "发消息"
@@ -7512,7 +7512,7 @@ msgstr "Social and Content"
 #: apps/app/src/features/search/use-search-index.ts:481
 #: apps/app/src/features/shell/desktop-nav-matching.ts:71
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
-#: apps/app/src/features/shell/desktop-shell.tsx:977
+#: apps/app/src/features/shell/desktop-shell.tsx:980
 #: apps/app/src/i18n/static-dom-seed.ts:33
 #: apps/app/src/routes/character-detail-page.tsx:315
 #: apps/app/src/routes/discover-page.tsx:118
@@ -8505,7 +8505,7 @@ msgstr "Search this chat"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1565
 #: apps/app/src/features/shell/desktop-nav-config.ts:95
 #: apps/app/src/features/shell/desktop-nav-config.ts:96
-#: apps/app/src/features/shell/desktop-shell.tsx:648
+#: apps/app/src/features/shell/desktop-shell.tsx:651
 #: apps/app/src/routes/desktop-chat-files-page.tsx:482
 #: apps/app/src/routes/desktop-chat-files-page.tsx:755
 msgid "聊天文件"
@@ -11679,18 +11679,18 @@ msgstr "Open"
 
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
-#: apps/app/src/i18n/static-dom-seed.ts:195
-msgid "移出常用"
-msgstr "Remove from frequent"
-
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:278
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
 #: apps/app/src/i18n/static-dom-seed.ts:197
 msgid "加入常用"
 msgstr "Add to frequent"
+
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
+#: apps/app/src/i18n/static-dom-seed.ts:195
+msgid "移出常用"
+msgstr "Remove from frequent"
 
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:802
@@ -12314,62 +12314,62 @@ msgstr "Shared {imageCount} images"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:50
 msgid "一楼休息区"
-msgstr "一楼休息区"
+msgstr "First-floor Lounge"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:52
 msgid "沙发与暖光，是来客先到的地方。"
-msgstr "沙发与暖光，是来客先到的地方。"
+msgstr "Sofas and warm lamps — the first place guests arrive."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:56
 msgid "猫窝阁楼"
-msgstr "猫窝阁楼"
+msgstr "Cat-nest Loft"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:58
 msgid "小阁楼，给爱躲起来的人和猫。"
-msgstr "小阁楼，给爱躲起来的人和猫。"
+msgstr "A little loft for shy people and shy cats."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:62
 msgid "茶吧角"
-msgstr "茶吧角"
+msgstr "Tea Bar Corner"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:64
 msgid "一壶热茶配窗外夜色。"
-msgstr "一壶热茶配窗外夜色。"
+msgstr "A pot of hot tea with a view of the night outside."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:71
 msgid "绒毛地毯"
-msgstr "绒毛地毯"
+msgstr "Fluffy Rug"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:77
 msgid "暖黄落地灯"
-msgstr "暖黄落地灯"
+msgstr "Warm Floor Lamp"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:83
 msgid "高高猫爬架"
-msgstr "高高猫爬架"
+msgstr "Tall Cat Tree"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:89
 msgid "猫窝软垫"
-msgstr "猫窝软垫"
+msgstr "Plush Cat Bed"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:95
 msgid "茶具一套"
-msgstr "茶具一套"
+msgstr "Tea Set"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:101
 msgid "香薰蜡烛"
-msgstr "香薰蜡烛"
+msgstr "Scented Candle"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:112
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:44
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:55
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:53
 msgid "苏屿"
-msgstr "苏屿"
+msgstr "Su Yu"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:117
 msgid "想找个能闻到蜡烛的茶角坐一会儿。"
-msgstr "想找个能闻到蜡烛的茶角坐一会儿。"
+msgstr "Looking for a tea corner where I can smell the candles."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:121
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:60
@@ -12382,7 +12382,7 @@ msgstr "Lin Mian"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:126
 msgid "太困了，能睡到一只猫旁边吗。"
-msgstr "太困了，能睡到一只猫旁边吗。"
+msgstr "I'm so sleepy — can I sleep next to a cat?"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:130
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:52
@@ -12395,18 +12395,18 @@ msgstr "Axun"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:135
 msgid "先在大堂坐会儿，灯亮一点更安心。"
-msgstr "先在大堂坐会儿，灯亮一点更安心。"
+msgstr "I'll sit in the lobby for a bit — brighter lights feel safer."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:139
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:76
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:66
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:73
 msgid "林沉"
-msgstr "林沉"
+msgstr "Lin Chen"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:144
 msgid "深夜的茶要有香气和软椅子。"
-msgstr "深夜的茶要有香气和软椅子。"
+msgstr "Late-night tea calls for fragrance and a soft chair."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:148
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:68
@@ -12418,7 +12418,7 @@ msgstr "Zhou Ran"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:153
 msgid "训练完，就想看猫爬上爬下。"
-msgstr "训练完，就想看猫爬上爬下。"
+msgstr "After training, I just want to watch cats climb around."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:157
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:84
@@ -12429,17 +12429,17 @@ msgstr "Xu Zhe"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:162
 msgid "签合同前，先来杯茶。"
-msgstr "签合同前，先来杯茶。"
+msgstr "A cup of tea before signing any contract."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:166
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:92
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:88
 msgid "月一"
-msgstr "月一"
+msgstr "Yueyi"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:170
 msgid "月光下的猫窝最安心。"
-msgstr "月光下的猫窝最安心。"
+msgstr "A cat nest under moonlight feels safest."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:64
 #: apps/app/src/features/games/game-center-data.ts:193
@@ -12450,75 +12450,75 @@ msgstr "Cat Cafe Inn"
 #. placeholder {0}: state.servedOutcomes.length + 1
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:68
 msgid "第 {0} / {GUESTS_PER_ROUND} 位"
-msgstr "第 {0} / {GUESTS_PER_ROUND} 位"
+msgstr "Guest {0} / {GUESTS_PER_ROUND}"
 
 #. placeholder {0}: getRoomSpec(currentGuest.preferredRoom).name
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:103
 msgid "想去 {0}"
-msgstr "想去 {0}"
+msgstr "Wants to go to {0}"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:110
 msgid "偏爱"
-msgstr "偏爱"
+msgstr "Prefers"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:131
 msgid "婉拒"
-msgstr "婉拒"
+msgstr "Politely decline"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:139
 msgid "迎客入住"
-msgstr "迎客入住"
+msgstr "Welcome guest"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:206
 msgid "空位 · 点这里布置"
-msgstr "空位 · 点这里布置"
+msgstr "Empty · tap to decorate"
 
 #. placeholder {0}: roomSpec.name
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:213
 msgid "选一件家具放进 {0}"
-msgstr "选一件家具放进 {0}"
+msgstr "Choose a piece of furniture for {0}"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:243
 msgid "匹配"
-msgstr "匹配"
+msgstr "Match"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:259
 msgid "清空这一格"
-msgstr "清空这一格"
+msgstr "Clear this slot"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:280
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:305
 msgid "再开一晚"
-msgstr "再开一晚"
+msgstr "Open another night"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:280
 msgid "今晚营业（{GUESTS_PER_ROUND} 位客人）"
-msgstr "今晚营业（{GUESTS_PER_ROUND} 位客人）"
+msgstr "Open tonight ({GUESTS_PER_ROUND} guests)"
 
 #. placeholder {0}: formatRemaining(state.remainingMs)
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:284
 msgid "剩余时间 {0}"
-msgstr "剩余时间 {0}"
+msgstr "Time left {0}"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:292
 msgid "今晚结算"
-msgstr "今晚结算"
+msgstr "Tonight's results"
 
 #. placeholder {0}: state.servedOutcomes.filter((o) => o.outcome === "happy").length
 #. placeholder {1}: state.servedOutcomes.filter((o) => o.outcome === "ok").length
 #. placeholder {2}: state.servedOutcomes.filter((o) => o.outcome === "left").length
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:296
 msgid "满意 {0} / 一般 {1} / 离开 {2}"
-msgstr "满意 {0} / 一般 {1} / 离开 {2}"
+msgstr "Happy {0} / OK {1} / Left {2}"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:312
 #: apps/app/src/features/games/night-market/night-market-game.tsx:409
 msgid "先打烊"
-msgstr "先打烊"
+msgstr "Close for tonight"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:321
 msgid "旅馆日志"
-msgstr "旅馆日志"
+msgstr "Inn log"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:328
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:267
@@ -12529,72 +12529,72 @@ msgstr "旅馆日志"
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:267
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:310
 msgid "重置"
-msgstr "重置"
+msgstr "Reset"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:334
 #: apps/app/src/features/games/night-market/night-market-game.tsx:266
 msgid "等待开张…"
-msgstr "等待开张…"
+msgstr "Waiting to open…"
 
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:139
 msgid "时间到，今晚就到这里。"
-msgstr "时间到，今晚就到这里。"
+msgstr "Time's up — that's all for tonight."
 
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:151
 msgid "今晚旅馆开张，等客人上门。"
-msgstr "今晚旅馆开张，等客人上门。"
+msgstr "The inn is open tonight — waiting for guests."
 
 #. placeholder {0}: guest.name
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:181
 msgid "{0} 非常满意：+1 春季家具票 / +6 好感。"
-msgstr "{0} 非常满意：+1 春季家具票 / +6 好感。"
+msgstr "{0} is very happy: +1 spring furniture ticket / +6 affinity."
 
 #. placeholder {0}: guest.name
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:189
 msgid "{0} 还算满意：+3 好感。"
-msgstr "{0} 还算满意：+3 好感。"
+msgstr "{0} is fairly satisfied: +3 affinity."
 
 #. placeholder {0}: guest.name
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:196
 msgid "{0} 没找到想要的角落，离开了。"
-msgstr "{0} 没找到想要的角落，离开了。"
+msgstr "{0} didn't find the right corner and left."
 
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:209
 msgid "今晚结束：满意 {happy} / 一般 {ok} / 离开 {left}。"
-msgstr "今晚结束：满意 {happy} / 一般 {ok} / 离开 {left}。"
+msgstr "Night closed: happy {happy} / OK {ok} / left {left}."
 
 #. placeholder {0}: guest?.name ?? t(msg`这位客人`)
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:226
 msgid "婉拒了 {0}，下次再来。"
-msgstr "婉拒了 {0}，下次再来。"
+msgstr "Politely declined {0} — come back next time."
 
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:226
 msgid "这位客人"
-msgstr "这位客人"
+msgstr "This guest"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:35
 msgid "胡萝卜"
-msgstr "胡萝卜"
+msgstr "Carrots"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:48
 msgid "草莓"
-msgstr "草莓"
+msgstr "Strawberries"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:61
 msgid "玉米"
-msgstr "玉米"
+msgstr "Corn"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:92
 msgid "收 5 个胡萝卜"
-msgstr "收 5 个胡萝卜"
+msgstr "Harvest 5 carrots"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:101
 msgid "收 3 个草莓"
-msgstr "收 3 个草莓"
+msgstr "Harvest 3 strawberries"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:110
 msgid "帮邻居浇水 3 次"
-msgstr "帮邻居浇水 3 次"
+msgstr "Help water a neighbor 3 times"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:37
 #: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:74
@@ -12620,36 +12620,36 @@ msgstr "EXP {0} / {1}"
 #. placeholder {1}: state.totalNeighborHelps
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:97
 msgid "累计收 {0} 株 · 互访 {1} 次"
-msgstr "累计收 {0} 株 · 互访 {1} 次"
+msgstr "Harvested {0} total · {1} visits"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:132
 msgid "种什么"
-msgstr "种什么"
+msgstr "What to plant"
 
 #. placeholder {0}: Math.ceil((state.neighborCooldownUntilMs - now) / 1000)
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:197
 msgid "互访冷却 {0}s"
-msgstr "互访冷却 {0}s"
+msgstr "Visit cooldown {0}s"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:199
 msgid "帮邻居浇水（+{NEIGHBOR_HELP_REWARD} 币）"
-msgstr "帮邻居浇水（+{NEIGHBOR_HELP_REWARD} 币）"
+msgstr "Help a neighbor water (+{NEIGHBOR_HELP_REWARD} coins)"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:210
 msgid "一键收菜"
-msgstr "一键收菜"
+msgstr "Harvest all"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:217
 msgid "本周联营订单"
-msgstr "本周联营订单"
+msgstr "Weekly co-op orders"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:260
 msgid "农场日志"
-msgstr "农场日志"
+msgstr "Farm log"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:273
 msgid "点空地开始种植…"
-msgstr "点空地开始种植…"
+msgstr "Tap an empty plot to start planting…"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:323
 #: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:78
@@ -12659,77 +12659,77 @@ msgstr "Empty plot"
 #. placeholder {0}: formatRemaining(witherInMs)
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:327
 msgid "可收 {0}"
-msgstr "可收 {0}"
+msgstr "Ready {0}"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:328
 msgid "枯萎"
-msgstr "枯萎"
+msgstr "Withered"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:349
 msgid "种"
-msgstr "种"
+msgstr "Plant"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:352
 msgid "已浇"
-msgstr "已浇"
+msgstr "Watered"
 
 #. placeholder {0}: plot.waterCount
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:353
 msgid "浇水 ({0}/{MAX_WATERINGS})"
-msgstr "浇水 ({0}/{MAX_WATERINGS})"
+msgstr "Water ({0}/{MAX_WATERINGS})"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:355
 msgid "收"
-msgstr "收"
+msgstr "Harvest"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:356
 msgid "清理"
-msgstr "清理"
+msgstr "Clear"
 
 #. placeholder {0}: order.label
 #. placeholder {1}: order.reward
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:145
 msgid "周任务完成：{0}（+{1} 花圃币）"
-msgstr "周任务完成：{0}（+{1} 花圃币）"
+msgstr "Weekly task done: {0} (+{1} garden coins)"
 
 #. placeholder {0}: state.level
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:160
 msgid "农场升到 {0} 级。"
-msgstr "农场升到 {0} 级。"
+msgstr "Farm leveled up to {0}."
 
 #. placeholder {0}: plot.id + 1
 #. placeholder {1}: c.name
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:180
 msgid "第 {0} 块地的 {1} 熟了。"
-msgstr "第 {0} 块地的 {1} 熟了。"
+msgstr "{1} on plot {0} is ripe."
 
 #. placeholder {0}: plot.id + 1
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:191
 msgid "第 {0} 块地没及时收，作物枯萎了。"
-msgstr "第 {0} 块地没及时收，作物枯萎了。"
+msgstr "Plot {0} wasn't harvested in time — crops withered."
 
 #. placeholder {0}: crop.name
 #. placeholder {1}: crop.seedCost
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:208
 msgid "花圃币不够买 {0} 种子（{1} 币）"
-msgstr "花圃币不够买 {0} 种子（{1} 币）"
+msgstr "Not enough garden coins to buy {0} seeds ({1} coins)"
 
 #. placeholder {0}: plot.id + 1
 #. placeholder {1}: crop.name
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:223
 msgid "第 {0} 块地种下 {1}。"
-msgstr "第 {0} 块地种下 {1}。"
+msgstr "Planted {1} on plot {0}."
 
 #. placeholder {0}: plot.id + 1
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:236
 msgid "第 {0} 块地已经浇够了。"
-msgstr "第 {0} 块地已经浇够了。"
+msgstr "Plot {0} has been watered enough."
 
 #. placeholder {0}: plot.id + 1
 #. placeholder {1}: WATER_SPEEDUP_MS / 1000
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:246
 msgid "第 {0} 块地浇了水（提早 {1}s）。"
-msgstr "第 {0} 块地浇了水（提早 {1}s）。"
+msgstr "Plot {0} watered (sped up by {1}s)."
 
 #. placeholder {0}: plot.id + 1
 #. placeholder {1}: crop.name
@@ -12737,20 +12737,20 @@ msgstr "第 {0} 块地浇了水（提早 {1}s）。"
 #. placeholder {3}: crop.experience
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:264
 msgid "第 {0} 块地收 {1}：+{2} 花圃币 / +{3} 经验"
-msgstr "第 {0} 块地收 {1}：+{2} 花圃币 / +{3} 经验"
+msgstr "Plot {0} harvested {1}: +{2} garden coins / +{3} XP"
 
 #. placeholder {0}: plot.id + 1
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:290
 msgid "清理了第 {0} 块地的枯萎作物。"
-msgstr "清理了第 {0} 块地的枯萎作物。"
+msgstr "Cleared withered crops on plot {0}."
 
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:303
 msgid "互访冷却中，再等 {left}s。"
-msgstr "互访冷却中，再等 {left}s。"
+msgstr "Visit cooldown — wait another {left}s."
 
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:315
 msgid "帮邻居浇了一次水（+{NEIGHBOR_HELP_REWARD} 花圃币）。"
-msgstr "帮邻居浇了一次水（+{NEIGHBOR_HELP_REWARD} 花圃币）。"
+msgstr "Helped water a neighbor (+{NEIGHBOR_HELP_REWARD} garden coins)."
 
 #. placeholder {0}: state.experience
 #: apps/app/src/features/games/farm/components/coin-display.tsx:47
@@ -12816,16 +12816,16 @@ msgid "买了种子"
 msgstr "Bought seeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
-msgid "卖了"
-msgstr "Sold"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
 msgid "作物"
 msgstr "Crops"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
+msgid "卖了"
+msgstr "Sold"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -13059,13 +13059,13 @@ msgid "h 成熟"
 msgstr "h to ripen"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ pack, price"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ each"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ pack, price"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -13189,167 +13189,167 @@ msgstr "Level up!"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:47
 msgid "花店窗后"
-msgstr "花店窗后"
+msgstr "Behind the flower shop window"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:48
 msgid "她说昨晚把多余的花插进了空咖啡杯。"
-msgstr "她说昨晚把多余的花插进了空咖啡杯。"
+msgstr "She said she put last night's extra flowers in empty coffee cups."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:55
 msgid "巷口的灯"
-msgstr "巷口的灯"
+msgstr "The alley-mouth lamp"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:56
 msgid "他每晚都顺路把巷口那盏不亮的灯敲一敲。"
-msgstr "他每晚都顺路把巷口那盏不亮的灯敲一敲。"
+msgstr "Every night he taps the broken lamp at the alley entrance."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:63
 msgid "午后小睡"
-msgstr "午后小睡"
+msgstr "Afternoon nap"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:64
 msgid "她把午后的阳光卷成毛毯盖在身上。"
-msgstr "她把午后的阳光卷成毛毯盖在身上。"
+msgstr "She rolls the afternoon sun into a blanket and covers herself."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:71
 msgid "深夜训练"
-msgstr "深夜训练"
+msgstr "Late-night training"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:72
 msgid "她说月亮亮的时候跑得比较稳。"
-msgstr "她说月亮亮的时候跑得比较稳。"
+msgstr "She says she runs steadier when the moon is bright."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:79
 msgid "零点信号"
-msgstr "零点信号"
+msgstr "Midnight signal"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:80
 msgid "他凌晨四点收到了一封没人寄的信。"
-msgstr "他凌晨四点收到了一封没人寄的信。"
+msgstr "At 4am he received a letter that nobody sent."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:87
 msgid "合同便签"
-msgstr "合同便签"
+msgstr "Contract sticky note"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:88
 msgid "他在每张名片背后写一句不签合同的话。"
-msgstr "他在每张名片背后写一句不签合同的话。"
+msgstr "He writes a no-contract line on the back of every business card."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:94
 msgid "月光台阶"
-msgstr "月光台阶"
+msgstr "Moonlight steps"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:95
 msgid "她数完台阶就走到了海边。"
-msgstr "她数完台阶就走到了海边。"
+msgstr "She finishes counting the steps and arrives at the sea."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:99
 msgid "声风"
-msgstr "声风"
+msgstr "Soundwind"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:101
 msgid "耳机里的浪"
-msgstr "耳机里的浪"
+msgstr "Waves in the headphones"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:102
 msgid "他录下海风，剪成给夜班司机的伴奏。"
-msgstr "他录下海风，剪成给夜班司机的伴奏。"
+msgstr "He records the sea breeze and cuts it into background music for night-shift drivers."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:122
 msgid "星野原线"
-msgstr "星野原线"
+msgstr "Hoshino Plain Line"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:123
 msgid "默认线路，6 站慢车。"
-msgstr "默认线路，6 站慢车。"
+msgstr "Default route, 6-stop local."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:126
 msgid "晨雾站"
-msgstr "晨雾站"
+msgstr "Morning Mist Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:127
 msgid "花田站"
-msgstr "花田站"
+msgstr "Flower Field Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:128
 msgid "原野站"
-msgstr "原野站"
+msgstr "Wildfield Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:129
 msgid "午枕站"
-msgstr "午枕站"
+msgstr "Noon Pillow Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:130
 msgid "星野站"
-msgstr "星野站"
+msgstr "Hoshino Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:131
 msgid "终点弧站"
-msgstr "终点弧站"
+msgstr "Arc Terminus"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:136
 msgid "海边支线"
-msgstr "海边支线"
+msgstr "Seaside Branch"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:137
 msgid "新增支线，需 2 张海边车票解锁。"
-msgstr "新增支线，需 2 张海边车票解锁。"
+msgstr "New branch — unlock with 2 seaside tickets."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:141
 msgid "潮汐站"
-msgstr "潮汐站"
+msgstr "Tide Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:142
 msgid "灯塔站"
-msgstr "灯塔站"
+msgstr "Lighthouse Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:143
 msgid "沙岸站"
-msgstr "沙岸站"
+msgstr "Sandy Shore Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:144
 msgid "岛屿站"
-msgstr "岛屿站"
+msgstr "Island Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:145
 msgid "暗潮站"
-msgstr "暗潮站"
+msgstr "Undertow Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:146
 msgid "回港站"
-msgstr "回港站"
+msgstr "Return Port Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:151
 msgid "城环夜线"
-msgstr "城环夜线"
+msgstr "City Loop Night Line"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:152
 msgid "攒满 4 张车票后开放。"
-msgstr "攒满 4 张车票后开放。"
+msgstr "Opens after collecting 4 tickets."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:155
 msgid "霓虹站"
-msgstr "霓虹站"
+msgstr "Neon Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:156
 msgid "小巷站"
-msgstr "小巷站"
+msgstr "Alley Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:157
 msgid "广场站"
-msgstr "广场站"
+msgstr "Plaza Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:158
 msgid "高架站"
-msgstr "高架站"
+msgstr "Elevated Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:159
 msgid "零点站"
-msgstr "零点站"
+msgstr "Midnight Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:160
 msgid "回程站"
-msgstr "回程站"
+msgstr "Return Stn."
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:80
 #: apps/app/src/features/games/game-center-data.ts:212
@@ -13360,147 +13360,147 @@ msgstr "Starfield Train"
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:116
 msgid "停靠 {0}"
-msgstr "停靠 {0}"
+msgstr "Stopped at {0}"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:118
 msgid "已收车"
-msgstr "已收车"
+msgstr "Service ended"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:119
 msgid "准备出发"
-msgstr "准备出发"
+msgstr "Ready to depart"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:189
 msgid "不停"
-msgstr "不停"
+msgstr "Skip"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:196
 msgid "拾取碎片"
-msgstr "拾取碎片"
+msgstr "Pick up fragment"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:210
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:327
 msgid "再发一班"
-msgstr "再发一班"
+msgstr "Send another train"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:210
 msgid "列车出发"
-msgstr "列车出发"
+msgstr "Train departs"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:217
 msgid "选择线路"
-msgstr "选择线路"
+msgstr "Choose route"
 
 #. placeholder {0}: collectedHere.length
 #. placeholder {1}: passengerStations.length
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:219
 msgid "本线收集 {0} / {1}"
-msgstr "本线收集 {0} / {1}"
+msgstr "Collected on this line {0} / {1}"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:252
 msgid "支线"
-msgstr "支线"
+msgstr "Branch"
 
 #. placeholder {0}: collected.length
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:265
 msgid "收集 {0} / {passengerCount} 位故事"
-msgstr "收集 {0} / {passengerCount} 位故事"
+msgstr "Collected {0} / {passengerCount} stories"
 
 #. placeholder {0}: r.unlockTickets
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:267
 msgid "需要 {0} 张车票"
-msgstr "需要 {0} 张车票"
+msgstr "Requires {0} tickets"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:281
 msgid "故事手账"
-msgstr "故事手账"
+msgstr "Story journal"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:314
 msgid "本班结束"
-msgstr "本班结束"
+msgstr "This run ended"
 
 #. placeholder {0}: state.totalFragments
 #. placeholder {1}: state.ticketCount
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:318
 msgid "累计故事碎片 {0} · 海边车票 {1}"
-msgstr "累计故事碎片 {0} · 海边车票 {1}"
+msgstr "Total story fragments {0} · seaside tickets {1}"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:334
 msgid "回到月台"
-msgstr "回到月台"
+msgstr "Back to platform"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:343
 msgid "列车日志"
-msgstr "列车日志"
+msgstr "Train log"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:356
 msgid "等待发车…"
-msgstr "等待发车…"
+msgstr "Waiting to depart…"
 
 #. placeholder {0}: route.unlockTickets
 #. placeholder {1}: route.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:108
 msgid "需要 {0} 张车票才能开往 {1}。"
-msgstr "需要 {0} 张车票才能开往 {1}。"
+msgstr "Need {0} tickets to head for {1}."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:132
 msgid "列车到 {0}，有人在月台等着。"
-msgstr "列车到 {0}，有人在月台等着。"
+msgstr "Train arrives at {0} — someone is waiting on the platform."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:140
 msgid "列车驶离始发站 {0}。"
-msgstr "列车驶离始发站 {0}。"
+msgstr "Train leaves origin station {0}."
 
 #. placeholder {0}: p?.name ?? t(msg`一位乘客`)
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:167
 msgid "{0} 走远了，没赶上拾取。"
-msgstr "{0} 走远了，没赶上拾取。"
+msgstr "{0} drifted away — missed the pickup."
 
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:167
 msgid "一位乘客"
-msgstr "一位乘客"
+msgstr "A passenger"
 
 #. placeholder {0}: route.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:194
 msgid "跑完 {0} 并收齐乘客故事，+1 海边车票。"
-msgstr "跑完 {0} 并收齐乘客故事，+1 海边车票。"
+msgstr "Finished {0} with all stories collected: +1 seaside ticket."
 
 #. placeholder {0}: route.name
 #. placeholder {1}: collected.length
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:203
 msgid "跑完 {0}，本次收集 {1} 位故事。"
-msgstr "跑完 {0}，本次收集 {1} 位故事。"
+msgstr "Finished {0} with {1} stories collected."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:221
 msgid "列车进 {0}，月台上有人。"
-msgstr "列车进 {0}，月台上有人。"
+msgstr "Train enters {0} — someone on the platform."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:230
 msgid "{0} 又过了一遍，故事已收。"
-msgstr "{0} 又过了一遍，故事已收。"
+msgstr "{0} passes again — story already collected."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:231
 msgid "列车经过 {0}（风景站）。"
-msgstr "列车经过 {0}（风景站）。"
+msgstr "Train passes {0} (scenic stop)."
 
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:242
 msgid "时间到，列车收车回库。"
-msgstr "时间到，列车收车回库。"
+msgstr "Time's up — train returns to depot."
 
 #. placeholder {0}: p?.name ?? ""
 #. placeholder {1}: p?.fragmentTitle ?? ""
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:264
 msgid "拾取 {0}：{1}"
-msgstr "拾取 {0}：{1}"
+msgstr "Picked up {0}: {1}"
 
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:276
 msgid "列车不停，乘客继续等下一班。"
-msgstr "列车不停，乘客继续等下一班。"
+msgstr "Train doesn't stop — passengers wait for the next one."
 
 #: apps/app/src/features/games/game-center-data.ts:89
 #: apps/app/src/i18n/static-dom-seed.ts:50
@@ -14203,17 +14203,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "Hold the base and wipe out 20 enemy tanks."
 
 #: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "Co-op"
+
+#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "Pixel"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "Action"
-
-#: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "Co-op"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -14564,232 +14564,232 @@ msgstr "» Game Center handoff."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:44
 msgid "木吉他"
-msgstr "木吉他"
+msgstr "Acoustic guitar"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:47
 msgid "稳定加分，适合上手。"
-msgstr "稳定加分，适合上手。"
+msgstr "Steady scoring — great for starters."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:51
 msgid "架子鼓"
-msgstr "架子鼓"
+msgstr "Drum kit"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:54
 msgid "每拍 +2 分，节拍要稳。"
-msgstr "每拍 +2 分，节拍要稳。"
+msgstr "+2 per beat — keep the tempo steady."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:58
 msgid "合成器"
-msgstr "合成器"
+msgstr "Synth"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:61
 msgid "电子音色，节奏带感。"
-msgstr "电子音色，节奏带感。"
+msgstr "Electronic tone with a driving rhythm."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:65
 msgid "和声 mic"
-msgstr "和声 mic"
+msgstr "Harmony mic"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:68
 msgid "高音段 +1，最适合海风曲。"
-msgstr "高音段 +1，最适合海风曲。"
+msgstr "+1 on high notes — best for sea-breeze songs."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:75
 msgid "极光灯阵"
-msgstr "极光灯阵"
+msgstr "Aurora light array"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:78
 msgid "补光更好看。"
-msgstr "补光更好看。"
+msgstr "Better fill light."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:82
 msgid "海风旗阵"
-msgstr "海风旗阵"
+msgstr "Sea-breeze flag array"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:85
 msgid "旗帜随风，气氛拉满。"
-msgstr "旗帜随风，气氛拉满。"
+msgstr "Flags in the wind — max vibe."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:89
 msgid "篝火台"
-msgstr "篝火台"
+msgstr "Bonfire stage"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:92
 msgid "暖色背景。"
-msgstr "暖色背景。"
+msgstr "Warm-toned backdrop."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:96
 msgid "双层喇叭"
-msgstr "双层喇叭"
+msgstr "Twin-layer speakers"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:99
 msgid "音浪覆盖海岸线。"
-msgstr "音浪覆盖海岸线。"
+msgstr "Sound waves wash over the coastline."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:106
 msgid "海风返场"
-msgstr "海风返场"
+msgstr "Sea Breeze Encore"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:107
 msgid "轻快 6 拍。"
-msgstr "轻快 6 拍。"
+msgstr "Light 6-beat."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:114
 msgid "灯塔合唱"
-msgstr "灯塔合唱"
+msgstr "Lighthouse Chorus"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:115
 msgid "稳定 8 拍。"
-msgstr "稳定 8 拍。"
+msgstr "Steady 8-beat."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:122
 msgid "潮汐流行"
-msgstr "潮汐流行"
+msgstr "Tide Pop"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:123
 msgid "快节奏 10 拍。"
-msgstr "快节奏 10 拍。"
+msgstr "Fast 10-beat."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:130
 msgid "月光之上"
-msgstr "月光之上"
+msgstr "Above the Moonlight"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:131
 msgid "高音段 8 拍。"
-msgstr "高音段 8 拍。"
+msgstr "High-pitched 8-beat."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:138
 msgid "烟花段子"
-msgstr "烟花段子"
+msgstr "Fireworks Bit"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:139
 msgid "重拍 12 拍。"
-msgstr "重拍 12 拍。"
+msgstr "Heavy 12-beat."
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:80
 msgid "编排中"
-msgstr "编排中"
+msgstr "Arranging"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:82
 msgid "演出中"
-msgstr "演出中"
+msgstr "Performing"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:84
 msgid "间歇"
-msgstr "间歇"
+msgstr "Intermission"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:127
 msgid "下一首准备中…"
-msgstr "下一首准备中…"
+msgstr "Next song queuing…"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:129
 msgid "今晚演出结束"
-msgstr "今晚演出结束"
+msgstr "Tonight's show is over"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:130
 msgid "选好乐器、道具与曲目后开演"
-msgstr "选好乐器、道具与曲目后开演"
+msgstr "Pick instruments, props and setlist, then start the show"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:165
 msgid "开演（编排 {SETLIST_SIZE} 首已完成）"
-msgstr "开演（编排 {SETLIST_SIZE} 首已完成）"
+msgstr "Start show ({SETLIST_SIZE} songs arranged)"
 
 #. placeholder {0}: SETLIST_SIZE - state.setlist.length
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:167
 msgid "再选 {0} 首曲目"
-msgstr "再选 {0} 首曲目"
+msgstr "Choose {0} more songs"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:173
 msgid "今晚演出结算"
-msgstr "今晚演出结算"
+msgstr "Tonight's show results"
 
 #. placeholder {0}: state.totalScore
 #. placeholder {1}: state.posters
 #. placeholder {2}: state.ensemblePoints
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:177
 msgid "总节奏分 {0} · 单曲达 {POSTER_THRESHOLD} 分送海报，已收 {1} 张 · 合奏积分 +{2}"
-msgstr "总节奏分 {0} · 单曲达 {POSTER_THRESHOLD} 分送海报，已收 {1} 张 · 合奏积分 +{2}"
+msgstr "Total rhythm {0} · songs hitting {POSTER_THRESHOLD} grant a poster (got {1}) · ensemble +{2}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:202
 msgid "再排一场"
-msgstr "再排一场"
+msgstr "Arrange another show"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:209
 msgid "回到编排"
-msgstr "回到编排"
+msgstr "Back to arrangement"
 
 #. placeholder {0}: state.currentSongIndex + 1
 #. placeholder {1}: state.setlist.length
 #. placeholder {2}: formatRemaining(state.remainingMs)
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:216
 msgid "第 {0} / {1} 首 · 剩余 {2}"
-msgstr "第 {0} / {1} 首 · 剩余 {2}"
+msgstr "Song {0} / {1} · {2} left"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:225
 msgid "选乐器"
-msgstr "选乐器"
+msgstr "Choose instruments"
 
 #. placeholder {0}: i.scoreBonus
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:232
 msgid "节奏 +{0}"
-msgstr "节奏 +{0}"
+msgstr "Rhythm +{0}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:240
 msgid "舞台道具（最多 {STAGE_PROP_LIMIT}）"
-msgstr "舞台道具（最多 {STAGE_PROP_LIMIT}）"
+msgstr "Stage props (max {STAGE_PROP_LIMIT})"
 
 #. placeholder {0}: p.posterBonus
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:247
 msgid "海报 +{0}"
-msgstr "海报 +{0}"
+msgstr "Poster +{0}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:257
 msgid "编排曲目（{SETLIST_SIZE} 首）"
-msgstr "编排曲目（{SETLIST_SIZE} 首）"
+msgstr "Set the setlist ({SETLIST_SIZE} songs)"
 
 #. placeholder {0}: s.beatCount
 #. placeholder {1}: (s.intervalMs / 1000).toFixed(2)
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:262
 msgid "{0} 拍 · {1}s/拍"
-msgstr "{0} 拍 · {1}s/拍"
+msgstr "{0} beats · {1}s/beat"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:277
 msgid "后台日志"
-msgstr "后台日志"
+msgstr "Backstage log"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:290
 msgid "等待开演…"
-msgstr "等待开演…"
+msgstr "Waiting to start…"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:337
 msgid "节拍"
-msgstr "节拍"
+msgstr "Beat"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:340
 msgid "节奏分 {currentScore}"
-msgstr "节奏分 {currentScore}"
+msgstr "Rhythm score {currentScore}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:340
 msgid "连击 {streak}"
-msgstr "连击 {streak}"
+msgstr "Combo {streak}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:354
 msgid "点！"
-msgstr "点！"
+msgstr "Tap!"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:354
 msgid "等节拍亮起再点"
-msgstr "等节拍亮起再点"
+msgstr "Wait for the beat to light, then tap"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:423
 msgid "已选"
-msgstr "已选"
+msgstr "Selected"
 
 #. placeholder {0}: songIndex + 1
 #. placeholder {1}: song?.title ?? songId
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:146
 msgid "第 {0} 首：{1}"
-msgstr "第 {0} 首：{1}"
+msgstr "Song {0}: {1}"
 
 #. placeholder {0}: song?.title ?? t(msg`本曲`)
 #. placeholder {1}: result.score
@@ -14798,128 +14798,128 @@ msgstr "第 {0} 首：{1}"
 #. placeholder {4}: result.misses
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:171
 msgid "{0} 结束：节奏分 {1} (完美 {2} / 命中 {3} / 错过 {4})"
-msgstr "{0} 结束：节奏分 {1} (完美 {2} / 命中 {3} / 错过 {4})"
+msgstr "{0} ended: rhythm {1} (perfect {2} / hit {3} / miss {4})"
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:171
 msgid "本曲"
-msgstr "本曲"
+msgstr "This song"
 
 #. placeholder {0}: state.totalScore
 #. placeholder {1}: state.songResults.filter((r) => r.score >= POSTER_THRESHOLD).length + bonusPosters
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:190
 msgid "今晚演出结束：总分 {0} · 海报 +{1}"
-msgstr "今晚演出结束：总分 {0} · 海报 +{1}"
+msgstr "Show ended: total {0} · posters +{1}"
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:237
 msgid "请先编排 {SETLIST_SIZE} 首曲目。"
-msgstr "请先编排 {SETLIST_SIZE} 首曲目。"
+msgstr "Please arrange {SETLIST_SIZE} songs first."
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:251
 msgid "海风夜灯亮起，演出开始。"
-msgstr "海风夜灯亮起，演出开始。"
+msgstr "Sea-breeze lights up — the show begins."
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:310
 msgid "时间到，今晚到此为止。"
-msgstr "时间到，今晚到此为止。"
+msgstr "Time's up — that's all for tonight."
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:348
 msgid "{STREAK_BONUS_AT} 连击！+3 节奏分。"
-msgstr "{STREAK_BONUS_AT} 连击！+3 节奏分。"
+msgstr "{STREAK_BONUS_AT} combo! +3 rhythm."
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:23
 msgid "卤味烤串摊"
-msgstr "卤味烤串摊"
+msgstr "Braised & Skewer Stand"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:32
 msgid "柠茶气泡摊"
-msgstr "柠茶气泡摊"
+msgstr "Lemon Tea Soda Stand"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:41
 msgid "手作文创摊"
-msgstr "手作文创摊"
+msgstr "Handmade Goods Stand"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:50
 msgid "套圈打靶摊"
-msgstr "套圈打靶摊"
+msgstr "Ring Toss & Shooting Stand"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:62
 msgid "食物"
-msgstr "食物"
+msgstr "Food"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:63
 msgid "饮品"
-msgstr "饮品"
+msgstr "Drinks"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:64
 msgid "文创"
-msgstr "文创"
+msgstr "Goods"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:86
 msgid "卤味摊招待 30 位顾客"
-msgstr "卤味摊招待 30 位顾客"
+msgstr "Serve 30 customers at the braised stand"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:96
 msgid "文创摊招待 18 位顾客"
-msgstr "文创摊招待 18 位顾客"
+msgstr "Serve 18 customers at the goods stand"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:106
 msgid "周内本场总顾客达 80 位"
-msgstr "周内本场总顾客达 80 位"
+msgstr "Reach 80 total customers this week"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:184
 msgid "周末夜市开张，客流双倍。"
-msgstr "周末夜市开张，客流双倍。"
+msgstr "Weekend night-market open — double foot traffic."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:185
 msgid "夜市开张，今晚加油。"
-msgstr "夜市开张，今晚加油。"
+msgstr "Night market is open — let's go tonight."
 
 #. placeholder {0}: spec.name
 #: apps/app/src/features/games/night-market/night-market-engine.ts:243
 msgid "{0} 涌来 {customers} 位顾客（待收银 {income} 券）。"
-msgstr "{0} 涌来 {customers} 位顾客（待收银 {income} 券）。"
+msgstr "{0} drew {customers} customers ({income} pending)."
 
 #. placeholder {0}: getStallSpec(wave.kind).name
 #. placeholder {1}: wave.customers
 #: apps/app/src/features/games/night-market/night-market-engine.ts:270
 msgid "{0} 顾客等不及走了 {1} 位。"
-msgstr "{0} 顾客等不及走了 {1} 位。"
+msgstr "{1} customers at {0} got tired of waiting and left."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:325
 msgid "本轮高收益，送一张摊位许可。"
-msgstr "本轮高收益，送一张摊位许可。"
+msgstr "Big round — earned a stall permit."
 
 #. placeholder {0}: state.totalCustomersThisRound
 #. placeholder {1}: state.totalIncomeThisRound
 #: apps/app/src/features/games/night-market/night-market-engine.ts:330
 msgid "今夜营业结束：{0} 位顾客 / +{1} 夜市券。"
-msgstr "今夜营业结束：{0} 位顾客 / +{1} 夜市券。"
+msgstr "Night closed: {0} customers / +{1} night-market vouchers."
 
 #. placeholder {0}: order.label
 #. placeholder {1}: order.rewardCoupon
 #. placeholder {2}: order.rewardPermit
 #: apps/app/src/features/games/night-market/night-market-engine.ts:356
 msgid "周任务完成：{0}（+{1} 券 / +{2} 许可）。"
-msgstr "周任务完成：{0}（+{1} 券 / +{2} 许可）。"
+msgstr "Weekly task done: {0} (+{1} vouchers / +{2} permits)."
 
 #. placeholder {0}: getStallSpec(kind).name
 #: apps/app/src/features/games/night-market/night-market-engine.ts:389
 msgid "{0} 收银：{customers} 位顾客 / +{income} 券。"
-msgstr "{0} 收银：{customers} 位顾客 / +{income} 券。"
+msgstr "{0} cashed out: {customers} customers / +{income} vouchers."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:417
 msgid "夜市券不够，攒一会儿再升级。"
-msgstr "夜市券不够，攒一会儿再升级。"
+msgstr "Not enough night-market vouchers — earn some, then upgrade."
 
 #. placeholder {0}: getStallSpec(kind).name
 #. placeholder {1}: stall.level
 #: apps/app/src/features/games/night-market/night-market-engine.ts:424
 msgid "{0} 升到 {1} 级（-{cost} 券）。"
-msgstr "{0} 升到 {1} 级（-{cost} 券）。"
+msgstr "{0} upgraded to level {1} (-{cost} vouchers)."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:438
 msgid "本周任务都做完了。"
-msgstr "本周任务都做完了。"
+msgstr "All weekly tasks done."
 
 #. placeholder {0}: target.label
 #: apps/app/src/features/games/night-market/night-market-engine.ts:450
@@ -14928,110 +14928,110 @@ msgstr "互访好友夜市，\\\"{0}\\\" 推进 +{bump}。"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:483
 msgid "所有摊位已满级，许可留着下次。"
-msgstr "所有摊位已满级，许可留着下次。"
+msgstr "All stalls maxed — save the permit for later."
 
 #. placeholder {0}: getStallSpec(candidate.kind).name
 #. placeholder {1}: candidate.level
 #: apps/app/src/features/games/night-market/night-market-engine.ts:491
 msgid "使用许可，{0} 升到 {1} 级。"
-msgstr "使用许可，{0} 升到 {1} 级。"
+msgstr "Used a permit — {0} upgraded to level {1}."
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:87
 msgid "周末双倍"
-msgstr "周末双倍"
+msgstr "Weekend 2x"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:117
 msgid "营业时段"
-msgstr "营业时段"
+msgstr "Open hours"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:119
 msgid "收摊冲刺"
-msgstr "收摊冲刺"
+msgstr "Closing sprint"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:125
 msgid "未开张"
-msgstr "未开张"
+msgstr "Not yet open"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:152
 #: apps/app/src/features/games/night-market/night-market-game.tsx:402
 msgid "再开一轮"
-msgstr "再开一轮"
+msgstr "Open another round"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:152
 msgid "开张营业（8 分钟）"
-msgstr "开张营业（8 分钟）"
+msgstr "Open for business (8 min)"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:168
 msgid "一键收银（+{totalPending}）"
-msgstr "一键收银（+{totalPending}）"
+msgstr "Cash out all (+{totalPending})"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:175
 msgid "提前收摊"
-msgstr "提前收摊"
+msgstr "Close early"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:185
 msgid "互访好友"
-msgstr "互访好友"
+msgstr "Visit friends"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:194
 msgid "用许可升级"
-msgstr "用许可升级"
+msgstr "Upgrade with permit"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:203
 msgid "本周任务"
-msgstr "本周任务"
+msgstr "Weekly tasks"
 
 #. placeholder {0}: state.weeklyOrders.length
 #: apps/app/src/features/games/night-market/night-market-game.tsx:206
 msgid "完成 {completedOrders} / {0}"
-msgstr "完成 {completedOrders} / {0}"
+msgstr "Done {completedOrders} / {0}"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:252
 msgid "营业日志"
-msgstr "营业日志"
+msgstr "Business log"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:257
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:264
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:307
 msgid "重置进度"
-msgstr "重置进度"
+msgstr "Reset progress"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:335
 msgid "吸客 ≤{attractCap}"
-msgstr "吸客 ≤{attractCap}"
+msgstr "Attract ≤{attractCap}"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:339
 msgid "单客 +{perCustomer}"
-msgstr "单客 +{perCustomer}"
+msgstr "Per customer +{perCustomer}"
 
 #. placeholder {0}: stall.pendingCustomers
 #. placeholder {1}: stall.pendingIncome
 #: apps/app/src/features/games/night-market/night-market-game.tsx:354
 msgid "收银 {0} 位 (+{1})"
-msgstr "收银 {0} 位 (+{1})"
+msgstr "Cashed out {0} (+{1})"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:355
 msgid "等顾客上门"
-msgstr "等顾客上门"
+msgstr "Waiting for customers"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:370
 msgid "已满级"
-msgstr "已满级"
+msgstr "Max level"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:371
 msgid "升级 {cost} 券"
-msgstr "升级 {cost} 券"
+msgstr "Upgrade ({cost} vouchers)"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:389
 msgid "今夜营业结算"
-msgstr "今夜营业结算"
+msgstr "Tonight's business results"
 
 #. placeholder {0}: state.totalCustomersThisRound
 #. placeholder {1}: state.totalIncomeThisRound
 #. placeholder {2}: state.permitTickets
 #: apps/app/src/features/games/night-market/night-market-game.tsx:393
 msgid "{0} 位顾客 · +{1} 夜市券 · 当前许可 {2} 张"
-msgstr "{0} 位顾客 · +{1} 夜市券 · 当前许可 {2} 张"
+msgstr "{0} customers · +{1} vouchers · {2} permits"
 
 #: apps/app/src/features/games/parking-war/parking-war-data.ts:20
 msgid "代步车"
@@ -15430,82 +15430,82 @@ msgstr "{hours} hours ago"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:40
 msgid "一拳贴墙，特技节奏猛。"
-msgstr "一拳贴墙，特技节奏猛。"
+msgstr "Wall-pinning punches with strong special-move rhythm."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:51
 msgid "节奏均衡，盾招更稳。"
-msgstr "节奏均衡，盾招更稳。"
+msgstr "Balanced rhythm — shield moves are more stable."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:62
 msgid "守得稳，反打才出特技。"
-msgstr "守得稳，反打才出特技。"
+msgstr "Hold steady — special moves come from counters."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:73
 msgid "深夜节拍，特技精准。"
-msgstr "深夜节拍，特技精准。"
+msgstr "Late-night tempo — pinpoint specials."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:84
 msgid "睡眼朦胧时反打最猛。"
-msgstr "睡眼朦胧时反打最猛。"
+msgstr "Counters hit hardest when half-asleep."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:94
 msgid "月光暴击，攻击优先。"
-msgstr "月光暴击，攻击优先。"
+msgstr "Moonlight crits — offense first."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:37
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:159
 msgid "攻击"
-msgstr "攻击"
+msgstr "Attack"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:39
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:166
 msgid "防御"
-msgstr "防御"
+msgstr "Defend"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:41
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:173
 msgid "必杀"
-msgstr "必杀"
+msgstr "Finisher"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:75
 msgid "5 回合制"
-msgstr "5 回合制"
+msgstr "Best of 5"
 
 #. placeholder {0}: state.winStreak
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:81
 msgid "连胜 {0}"
-msgstr "连胜 {0}"
+msgstr "{0}-win streak"
 
 #. placeholder {0}: lastRound.round
 #. placeholder {1}: moveLabel(lastRound.playerMove)
 #. placeholder {2}: moveLabel(lastRound.npcMove)
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:122
 msgid "第 {0} 回合：你{1} / 对手{2}"
-msgstr "第 {0} 回合：你{1} / 对手{2}"
+msgstr "Round {0}: you {1} / opponent {2}"
 
 #. placeholder {0}: lastRound.outcome.npcDamage
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:126
 msgid "命中 -{0}"
-msgstr "命中 -{0}"
+msgstr "Hit -{0}"
 
 #. placeholder {0}: lastRound.outcome.playerDamage
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:131
 msgid "受击 -{0}"
-msgstr "受击 -{0}"
+msgstr "Took -{0}"
 
 #. placeholder {0}: lastRound.outcome.playerDamage
 #. placeholder {1}: lastRound.outcome.npcDamage
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:137
 msgid "互伤：你 -{0} / 对手 -{1}"
-msgstr "互伤：你 -{0} / 对手 -{1}"
+msgstr "Both hit: you -{0} / opp -{1}"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:143
 msgid "攻击被防住"
-msgstr "攻击被防住"
+msgstr "Attack blocked"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:148
 msgid "两人对峙"
-msgstr "两人对峙"
+msgstr "Standoff"
 
 #. placeholder {0}: 12 + (player?.atkBonus ?? 0)
 #. placeholder {0}: 8 + (player?.atkBonus ?? 0)
@@ -15516,86 +15516,86 @@ msgstr "-{0}"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:167
 msgid "挡攻击"
-msgstr "挡攻击"
+msgstr "Blocked attack"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:188
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:263
 msgid "再战一场"
-msgstr "再战一场"
+msgstr "Fight again"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:188
 msgid "开始对打"
-msgstr "开始对打"
+msgstr "Start the match"
 
 #. placeholder {0}: state.round
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:192
 msgid "第 {0} / {ROUND_COUNT} 回合"
-msgstr "第 {0} / {ROUND_COUNT} 回合"
+msgstr "Round {0} / {ROUND_COUNT}"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:198
 msgid "选择我的角色"
-msgstr "选择我的角色"
+msgstr "Pick my character"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:237
 msgid "总胜场"
-msgstr "总胜场"
+msgstr "Total wins"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:238
 msgid "最佳连胜"
-msgstr "最佳连胜"
+msgstr "Best streak"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:239
 msgid "连胜章"
-msgstr "连胜章"
+msgstr "Streak badge"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:247
 msgid "赢下这场！"
-msgstr "赢下这场！"
+msgstr "Won this round!"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:249
 msgid "这场让对手压制了。"
-msgstr "这场让对手压制了。"
+msgstr "The opponent dominated this round."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:250
 msgid "平局，下次见胜负。"
-msgstr "平局，下次见胜负。"
+msgstr "Draw — settle it next time."
 
 #. placeholder {0}: state.playerHp
 #. placeholder {1}: state.npcHp
 #. placeholder {2}: state.winStreak
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:254
 msgid "HP 残：你 {0} / 对手 {1} · 当前连胜 {2}"
-msgstr "HP 残：你 {0} / 对手 {1} · 当前连胜 {2}"
+msgstr "HP left: you {0} / opp {1} · current streak {2}"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:270
 msgid "回到擂台"
-msgstr "回到擂台"
+msgstr "Back to the arena"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:279
 msgid "擂台日志"
-msgstr "擂台日志"
+msgstr "Arena log"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:292
 msgid "等待开局…"
-msgstr "等待开局…"
+msgstr "Waiting for match…"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:101
 msgid "攻"
-msgstr "攻"
+msgstr "Atk"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:103
 msgid "防"
-msgstr "防"
+msgstr "Def"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:105
 msgid "杀"
-msgstr "杀"
+msgstr "Fin"
 
 #. placeholder {0}: player.name
 #. placeholder {1}: npc.name
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:161
 msgid "{0} vs {1}，第一回合开始。"
-msgstr "{0} vs {1}，第一回合开始。"
+msgstr "{0} vs {1} — Round 1."
 
 #. placeholder {0}: next.round
 #. placeholder {1}: moveLabel(action.move)
@@ -15603,461 +15603,461 @@ msgstr "{0} vs {1}，第一回合开始。"
 #. placeholder {3}: outcome.summary === "p_hits" ? t(msg`你打中`) : outcome.summary === "n_hits" ? t(msg`被打中`) : outcome.summary === "trade" ? t(msg`互伤`) : outcome.summary === "block" ? t(msg`被防住`) : t(msg`僵持`)
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:187
 msgid "第 {0} 回合 · 你出{1} / 对方出{2} · {3}"
-msgstr "第 {0} 回合 · 你出{1} / 对方出{2} · {3}"
+msgstr "Round {0} · you {1} / opp {2} · {3}"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:189
 msgid "你打中"
-msgstr "你打中"
+msgstr "You hit"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:191
 msgid "被打中"
-msgstr "被打中"
+msgstr "You got hit"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:193
 msgid "互伤"
-msgstr "互伤"
+msgstr "Trade"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:195
 msgid "被防住"
-msgstr "被防住"
+msgstr "Blocked"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:196
 msgid "僵持"
-msgstr "僵持"
+msgstr "Stalemate"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:249
 msgid "三连胜达成！+1 双人皮肤券。"
-msgstr "三连胜达成！+1 双人皮肤券。"
+msgstr "Three-win streak! +1 duo skin voucher."
 
 #. placeholder {0}: player?.name ?? t(msg`玩家`)
 #. placeholder {1}: npc?.name ?? t(msg`对手`)
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:256
 msgid "{0} 胜 {1}。"
-msgstr "{0} 胜 {1}。"
+msgstr "{0} beat {1}."
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:256
 msgid "玩家"
-msgstr "玩家"
+msgstr "Player"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:256
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:265
 msgid "对手"
-msgstr "对手"
+msgstr "Opponent"
 
 #. placeholder {0}: npc?.name ?? t(msg`对手`)
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:265
 msgid "{0} 赢了，连胜清零。"
-msgstr "{0} 赢了，连胜清零。"
+msgstr "{0} won — streak resets."
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:270
 msgid "5 回合战平。"
-msgstr "5 回合战平。"
+msgstr "Draw after 5 rounds."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:36
 msgid "巷口扫一眼就知道哪条街最闹。"
-msgstr "巷口扫一眼就知道哪条街最闹。"
+msgstr "One glance at the alley tells which street is busiest."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:46
 msgid "一击就能把敌方信号源敲哑。"
-msgstr "一击就能把敌方信号源敲哑。"
+msgstr "Silences enemy signal sources in one strike."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:56
 msgid "包扎和递水的速度比谁都快。"
-msgstr "包扎和递水的速度比谁都快。"
+msgstr "Bandages and hands out water faster than anyone."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:66
 msgid "谁来都先掏出名片，再说后面的事。"
-msgstr "谁来都先掏出名片，再说后面的事。"
+msgstr "Hands out business cards first, then talks business."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:76
 msgid "深夜动作精准到一毫秒。"
-msgstr "深夜动作精准到一毫秒。"
+msgstr "Late-night moves accurate to the millisecond."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:86
 msgid "犯困也能补给，醒着更狠。"
-msgstr "犯困也能补给，醒着更狠。"
+msgstr "Resupplies even when drowsy — even better when awake."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:94
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:161
 msgid "斥候"
-msgstr "斥候"
+msgstr "Scout"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:95
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:163
 msgid "狙击"
-msgstr "狙击"
+msgstr "Sniper"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:96
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:164
 #: apps/app/src/lib/character-i18n.ts:14
 msgid "医疗"
-msgstr "医疗"
+msgstr "Medic"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:165
 msgid "敌方信号扑过来了，需要 {skillName} 队员压制。"
-msgstr "敌方信号扑过来了，需要 {skillName} 队员压制。"
+msgstr "Enemy signal incoming — need a {skillName} member to suppress."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:167
 msgid "协同窗口打开，连点两位队员锁定。"
-msgstr "协同窗口打开，连点两位队员锁定。"
+msgstr "Sync window open — double-tap two members to lock."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:169
 msgid "补给信号到货，任意队员都可领取。"
-msgstr "补给信号到货，任意队员都可领取。"
+msgstr "Supply signal arrived — any member can collect."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:186
 msgid "错过敌方信号，士气受挫。"
-msgstr "错过敌方信号，士气受挫。"
+msgstr "Missed an enemy signal — morale takes a hit."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:188
 msgid "协同窗口关闭，没能连点两位队员。"
-msgstr "协同窗口关闭，没能连点两位队员。"
+msgstr "Sync window closed — didn't catch two taps."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:190
 msgid "补给落空，等下一次。"
-msgstr "补给落空，等下一次。"
+msgstr "Supply missed — wait for next."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:217
 msgid "小队就位，开始压制信号塔。"
-msgstr "小队就位，开始压制信号塔。"
+msgstr "Squad in position — suppressing the signal tower."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:313
 msgid "信号塔已稳，本局 +{teamGain} 团队积分 / +{badgeGain} 赛季徽章。"
-msgstr "信号塔已稳，本局 +{teamGain} 团队积分 / +{badgeGain} 赛季徽章。"
+msgstr "Signal tower secured — +{teamGain} team points / +{badgeGain} season badges."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:320
 msgid "时间到。本局压制完成度 {towerScore}%，+{teamGain} 团队积分。"
-msgstr "时间到。本局压制完成度 {towerScore}%，+{teamGain} 团队积分。"
+msgstr "Time's up. Suppression {towerScore}%, +{teamGain} team points."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:325
 msgid "小队失守，等下一局再来。"
-msgstr "小队失守，等下一局再来。"
+msgstr "Squad fell — try again next round."
 
 #. placeholder {0}: def.name
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:354
 msgid "{0} 一发就压住了敌方信号源。"
-msgstr "{0} 一发就压住了敌方信号源。"
+msgstr "{0} silenced the enemy signal in one shot."
 
 #. placeholder {0}: def.name
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:364
 msgid "{0} 不是这事件的人选，反被打了一下。"
-msgstr "{0} 不是这事件的人选，反被打了一下。"
+msgstr "{0} wasn't the right pick — took a hit instead."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:382
 msgid "双人协同压制完成，士气回涨。"
-msgstr "双人协同压制完成，士气回涨。"
+msgstr "Two-person sync complete — morale rises."
 
 #. placeholder {0}: def.name
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:391
 msgid "{0} 已就位，再点一位队员锁定。"
-msgstr "{0} 已就位，再点一位队员锁定。"
+msgstr "{0} in position — tap one more member to lock."
 
 #. placeholder {0}: def.name
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:405
 msgid "{0} 把补给搬上来了。"
-msgstr "{0} 把补给搬上来了。"
+msgstr "{0} brought up supplies."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:425
 msgid "协同压制释放，全队推塔。"
-msgstr "协同压制释放，全队推塔。"
+msgstr "Sync suppression released — whole squad pushes the tower."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:48
 msgid "就绪"
-msgstr "就绪"
+msgstr "Ready"
 
 #. placeholder {0}: Math.ceil(left / 1000)
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:49
 msgid "{0} 秒"
-msgstr "{0} 秒"
+msgstr "{0}s"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:104
 msgid "阵容"
-msgstr "阵容"
+msgstr "Lineup"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:121
 msgid "信号塔压制"
-msgstr "信号塔压制"
+msgstr "Signal-tower suppression"
 
 #. placeholder {0}: state.badgePoints
 #. placeholder {1}: state.teamScore
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:134
 msgid "徽章 {0} · 团队积分 {1}"
-msgstr "徽章 {0} · 团队积分 {1}"
+msgstr "Badges {0} · team points {1}"
 
 #. placeholder {0}: state.syncSkillUses
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:137
 msgid "协同压制 ×{0}"
-msgstr "协同压制 ×{0}"
+msgstr "Sync suppression ×{0}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:206
 msgid "本局目标：完成两次协同压制并稳住终点信号塔。"
-msgstr "本局目标：完成两次协同压制并稳住终点信号塔。"
+msgstr "Match goal: complete two sync suppressions and hold the final tower."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:214
 msgid "开始本局"
-msgstr "开始本局"
+msgstr "Start match"
 
 #. placeholder {0}: 18
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:238
 msgid "释放协同压制（+{0}% 信号塔）"
-msgstr "释放协同压制（+{0}% 信号塔）"
+msgstr "Release sync suppression (+{0}% tower)"
 
 #. placeholder {0}: formatCooldown(state, now)
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:239
 msgid "协同压制冷却中：{0}"
-msgstr "协同压制冷却中：{0}"
+msgstr "Sync suppression cooldown: {0}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:259
 msgid "本局信号日志"
-msgstr "本局信号日志"
+msgstr "Match signal log"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:273
 msgid "等待小队就位…"
-msgstr "等待小队就位…"
+msgstr "Waiting for squad to deploy…"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:308
 msgid "敌方信号入侵"
-msgstr "敌方信号入侵"
+msgstr "Enemy signal incoming"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:310
 msgid "协同窗口已开启"
-msgstr "协同窗口已开启"
+msgstr "Sync window open"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:311
 msgid "补给信号到货"
-msgstr "补给信号到货"
+msgstr "Supply signal arrived"
 
 #. placeholder {0}: SKILL_LABEL[event.needSkill ?? "scout"]
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:314
 msgid "点击 {0} 队员压制"
-msgstr "点击 {0} 队员压制"
+msgstr "Tap a {0} member to suppress"
 
 #. placeholder {0}: event.matchedBy.length
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:316
 msgid "连点两位队员锁定（已点 {0}/2）"
-msgstr "连点两位队员锁定（已点 {0}/2）"
+msgstr "Tap two members to lock ({0}/2)"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:317
 msgid "点击任意队员领取补给"
-msgstr "点击任意队员领取补给"
+msgstr "Tap any member to collect supplies"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:354
 msgid "信号塔已稳"
-msgstr "信号塔已稳"
+msgstr "Signal tower secured"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:355
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:355
 msgid "时间到"
-msgstr "时间到"
+msgstr "Time's up"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:356
 msgid "小队失守"
-msgstr "小队失守"
+msgstr "Squad fell"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:362
 msgid "本局结束"
-msgstr "本局结束"
+msgstr "Match ended"
 
 #. placeholder {0}: state.resolvedCount
 #. placeholder {1}: state.missedCount
 #. placeholder {2}: state.syncSkillUses
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:366
 msgid "本局完成度 {tower}% · 响应 {0} / 错过 {1} · 协同压制 ×{2}"
-msgstr "本局完成度 {tower}% · 响应 {0} / 错过 {1} · 协同压制 ×{2}"
+msgstr "Completion {tower}% · responded {0} / missed {1} · sync ×{2}"
 
 #. placeholder {0}: state.badgePoints
 #. placeholder {1}: state.teamScore
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:371
 msgid "赛季徽章 {0} · 团队积分 {1}"
-msgstr "赛季徽章 {0} · 团队积分 {1}"
+msgstr "Season badges {0} · team points {1}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:379
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:284
 msgid "再来一局"
-msgstr "再来一局"
+msgstr "Play again"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:386
 msgid "返回选阵"
-msgstr "返回选阵"
+msgstr "Back to lineup"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:421
 msgid "选择 3 位队员"
-msgstr "选择 3 位队员"
+msgstr "Pick 3 members"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:424
 msgid "本局结束后再调整"
-msgstr "本局结束后再调整"
+msgstr "Adjust after this match"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:483
 msgid "确定阵容"
-msgstr "确定阵容"
+msgstr "Confirm lineup"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:23
 msgid "晨光海湾"
-msgstr "晨光海湾"
+msgstr "Morning Bay"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:24
 msgid "平直海岸线，最适合先把节奏找到。"
-msgstr "平直海岸线，最适合先把节奏找到。"
+msgstr "Flat coastline — best place to find your rhythm."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:33
 msgid "两段加速门连续触发，限时开放。"
-msgstr "两段加速门连续触发，限时开放。"
+msgstr "Two consecutive boost gates — limited-time."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:42
 msgid "银河峡谷"
-msgstr "银河峡谷"
+msgstr "Galaxy Canyon"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:43
 msgid "急弯多，需要稳定节拍。"
-msgstr "急弯多，需要稳定节拍。"
+msgstr "Tight turns — needs a steady beat."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:51
 msgid "午夜弧线"
-msgstr "午夜弧线"
+msgstr "Midnight Arc"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:52
 msgid "深夜赛道，每个加速门都贴在临界。"
-msgstr "深夜赛道，每个加速门都贴在临界。"
+msgstr "Late-night track — every boost gate is on the edge."
 
 #. placeholder {0}: track.unlockShards
 #. placeholder {1}: track.name
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:102
 msgid "星章不够，攒到 {0} 颗再来 {1}。"
-msgstr "星章不够，攒到 {0} 颗再来 {1}。"
+msgstr "Not enough star tokens — get to {0} to enter {1}."
 
 #. placeholder {0}: track.name
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:132
 msgid "{0} 开赛，把握节拍。"
-msgstr "{0} 开赛，把握节拍。"
+msgstr "{0} starts — find the rhythm."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:168
 msgid "错过加速门 {0}，速度被拖慢。"
-msgstr "错过加速门 {0}，速度被拖慢。"
+msgstr "Missed boost gate {0} — speed dropped."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:205
 msgid "点早了，加速门 {0} 没踩中。"
-msgstr "点早了，加速门 {0} 没踩中。"
+msgstr "Too early — boost gate {0} missed."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:222
 msgid "完美加速门 {0} ×1.9 速度。"
-msgstr "完美加速门 {0} ×1.9 速度。"
+msgstr "Perfect boost gate {0} — ×1.9 speed."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:233
 msgid "稳稳点中加速门 {0}。"
-msgstr "稳稳点中加速门 {0}。"
+msgstr "Solid tap on boost gate {0}."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:243
 msgid "抢拍偏了，加速门 {0} 没踩中。"
-msgstr "抢拍偏了，加速门 {0} 没踩中。"
+msgstr "Off-beat — boost gate {0} missed."
 
 #. placeholder {0}: track.name
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:286
 msgid "刷新 {0} 最佳圈速。"
-msgstr "刷新 {0} 最佳圈速。"
+msgstr "New best lap on {0}."
 
 #. placeholder {0}: track.name
 #. placeholder {1}: (state.raceTimeMs / 1000).toFixed(1)
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:294
 msgid "完赛 {0}：{1} 秒 / +{shards} 星章。"
-msgstr "完赛 {0}：{1} 秒 / +{shards} 星章。"
+msgstr "Finished {0}: {1}s / +{shards} star tokens."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:305
 msgid "时间到，本圈完成度 {pct}%。"
-msgstr "时间到，本圈完成度 {pct}%。"
+msgstr "Time's up — lap completion {pct}%."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:320
 msgid "放弃本圈，下次再来。"
-msgstr "放弃本圈，下次再来。"
+msgstr "Abandoned this lap — try again later."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:127
 msgid "待出发"
-msgstr "待出发"
+msgstr "Ready to start"
 
 #. placeholder {0}: state.hits.perfect
 #. placeholder {1}: state.hits.good
 #. placeholder {2}: state.hits.missed
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:170
 msgid "完美 {0} · 稳点 {1} · 失误 {2}"
-msgstr "完美 {0} · 稳点 {1} · 失误 {2}"
+msgstr "Perfect {0} · steady {1} · misses {2}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:173
 msgid "× 加速中"
-msgstr "× 加速中"
+msgstr "× boosting"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:173
 msgid "× 减速"
-msgstr "× 减速"
+msgstr "× slowing"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:173
 msgid "巡航"
-msgstr "巡航"
+msgstr "Cruise"
 
 #. placeholder {0}: upcomingGate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:193
 msgid "点中第 {0} 道加速门"
-msgstr "点中第 {0} 道加速门"
+msgstr "Hit boost gate #{0}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:194
 msgid "已无加速门"
-msgstr "已无加速门"
+msgstr "No more boost gates"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:195
 msgid "等待出发"
-msgstr "等待出发"
+msgstr "Waiting to start"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:207
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:376
 msgid "再跑一圈"
-msgstr "再跑一圈"
+msgstr "Run another lap"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:207
 msgid "出发（2 分钟内冲线）"
-msgstr "出发（2 分钟内冲线）"
+msgstr "Start (finish within 2 min)"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:216
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:356
 msgid "弃赛"
-msgstr "弃赛"
+msgstr "Forfeit"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:223
 msgid "选择赛道"
-msgstr "选择赛道"
+msgstr "Pick track"
 
 #. placeholder {0}: state.starShards
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:225
 msgid "星章 {0}"
-msgstr "星章 {0}"
+msgstr "Star tokens {0}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:264
 msgid "限时"
-msgstr "限时"
+msgstr "Limited time"
 
 #. placeholder {0}: tr.unlockShards
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:282
 msgid "需要 {0} 星章"
-msgstr "需要 {0} 星章"
+msgstr "Requires {0} star tokens"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:284
 msgid "未挑战"
-msgstr "未挑战"
+msgstr "Not yet attempted"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:302
 msgid "赛道日志"
-msgstr "赛道日志"
+msgstr "Track log"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:316
 msgid "等待出发…"
-msgstr "等待出发…"
+msgstr "Waiting to start…"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:353
 msgid "完赛"
-msgstr "完赛"
+msgstr "Finished"
 
 #. placeholder {0}: track?.name ?? t(msg`赛道`)
 #. placeholder {1}: state.hits.perfect
@@ -16065,20 +16065,20 @@ msgstr "完赛"
 #. placeholder {3}: state.hits.missed
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:362
 msgid "{0} · 圈速 {lap} · 完美 {1} / 稳点 {2} / 失误 {3}"
-msgstr "{0} · 圈速 {lap} · 完美 {1} / 稳点 {2} / 失误 {3}"
+msgstr "{0} · lap {lap} · perfect {1} / steady {2} / miss {3}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:362
 msgid "赛道"
-msgstr "赛道"
+msgstr "Track"
 
 #. placeholder {0}: formatTime(best)
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:367
 msgid "最佳圈速 {0}"
-msgstr "最佳圈速 {0}"
+msgstr "Best lap {0}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:383
 msgid "回到选赛道"
-msgstr "回到选赛道"
+msgstr "Back to track select"
 
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:99
 msgid "暂停游戏"
@@ -16184,73 +16184,73 @@ msgstr "Continue {0}'s group sign-up chain"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:267
 msgid "结果已回填，当前已全部确认"
-msgstr "结果已回填，当前已全部确认"
+msgstr "Results filled back — all confirmed"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:270
 msgid "结果已回填，可继续覆盖"
-msgstr "结果已回填，可继续覆盖"
+msgstr "Results filled back — can be overwritten"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:274
 msgid "名单已整理，待回填"
-msgstr "名单已整理，待回填"
+msgstr "List organized — ready to fill back"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:277
 msgid "名单整理中，待继续"
-msgstr "名单整理中，待继续"
+msgstr "List being organized — continuing"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:293
 msgid "1. 已从{sourceLabel}群聊完成本轮群接龙结果回填。"
-msgstr "1. 已从{sourceLabel}群聊完成本轮群接龙结果回填。"
+msgstr "1. Group sign-up results from {sourceLabel} have been filled back."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:294
 msgid "2. 当前名单已经全部确认，群里看到的是这一轮的最终完成结果。"
-msgstr "2. 当前名单已经全部确认，群里看到的是这一轮的最终完成结果。"
+msgstr "2. The list is fully confirmed — the group now sees this round's final result."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:295
 msgid "3. 如后续有人补报或变更，再次打开群接龙并回填即可覆盖新的最终状态。"
-msgstr "3. 如后续有人补报或变更，再次打开群接龙并回填即可覆盖新的最终状态。"
+msgstr "3. If anyone signs up later or makes changes, reopen the sign-up and fill back to overwrite the final state."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:301
 msgid "1. 已从{sourceLabel}群聊再次打开群接龙工作台。"
-msgstr "1. 已从{sourceLabel}群聊再次打开群接龙工作台。"
+msgstr "1. The group sign-up workspace has been reopened from {sourceLabel}."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:302
 msgid "2. 当前统计结果已经再次回填到原群聊，正文说明和人数状态已按最新一轮覆盖。"
-msgstr "2. 当前统计结果已经再次回填到原群聊，正文说明和人数状态已按最新一轮覆盖。"
+msgstr "2. Tallies have been filled back to the original chat — body text and counts overwritten with the latest round."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:303
 msgid "3. 如需继续调整，后续回填会继续覆盖这轮结果，不再保留过期版本。"
-msgstr "3. 如需继续调整，后续回填会继续覆盖这轮结果，不再保留过期版本。"
+msgstr "3. If further changes are needed, future fills will keep overwriting this round; outdated versions are not retained."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:308
 #: apps/app/src/features/mini-programs/group-relay-message.ts:316
 #: apps/app/src/features/mini-programs/group-relay-message.ts:323
 msgid "1. 已从{sourceLabel}群聊打开群接龙工作台。"
-msgstr "1. 已从{sourceLabel}群聊打开群接龙工作台。"
+msgstr "1. Opened the group sign-up workspace from {sourceLabel}."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:309
 msgid "2. 当前统计结果已经回填到原群聊，可继续在群里跟进补充名单。"
-msgstr "2. 当前统计结果已经回填到原群聊，可继续在群里跟进补充名单。"
+msgstr "2. Tallies have been filled back to the original chat — you can keep adding to the list there."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:310
 msgid "3. 如需继续调整，重新打开群接龙后再次回填即可覆盖最新结果。"
-msgstr "3. 如需继续调整，重新打开群接龙后再次回填即可覆盖最新结果。"
+msgstr "3. To make further changes, reopen the sign-up and fill back again to overwrite with the latest result."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:317
 msgid "2. 当前名单和未确认成员已经整理完成，随时可以回填到原群聊。"
-msgstr "2. 当前名单和未确认成员已经整理完成，随时可以回填到原群聊。"
+msgstr "2. The list and unconfirmed members are ready — fill back to the original chat any time."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:318
 msgid "3. 请确认最终结果后再一键回填，避免群里出现过期统计。"
-msgstr "3. 请确认最终结果后再一键回填，避免群里出现过期统计。"
+msgstr "3. Confirm the final result before filling back, so the group doesn't show outdated tallies."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:324
 msgid "2. 当前正在整理接龙名单和未确认成员。"
-msgstr "2. 当前正在整理接龙名单和未确认成员。"
+msgstr "2. Currently organizing the sign-up list and unconfirmed members."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:325
 msgid "3. 请按顺序继续接龙，或直接在群里补充结果。"
-msgstr "3. 请按顺序继续接龙，或直接在群里补充结果。"
+msgstr "3. Please continue signing up in order, or add results directly in the group chat."
 
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:76
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:298
@@ -18242,7 +18242,7 @@ msgstr "Feedback"
 
 #: apps/app/src/features/shell/desktop-nav-config.ts:123
 #: apps/app/src/features/shell/desktop-nav-config.ts:124
-#: apps/app/src/features/shell/desktop-shell.tsx:646
+#: apps/app/src/features/shell/desktop-shell.tsx:649
 #: apps/app/src/routes/desktop-mobile-page.tsx:186
 #: apps/app/src/routes/profile-page.tsx:151
 #: apps/app/src/routes/profile-settings-page.tsx:313
@@ -18363,106 +18363,106 @@ msgstr "Please wait..."
 msgid "再试一次"
 msgstr "Try again"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:378
+#: apps/app/src/features/shell/desktop-shell.tsx:381
 msgid "口令不正确，请重新输入。"
 msgstr "Incorrect passcode. Please try again."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:390
+#: apps/app/src/features/shell/desktop-shell.tsx:393
 msgid "请设置 4 到 6 位数字口令。"
 msgstr "Set a 4 to 6 digit passcode."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:395
+#: apps/app/src/features/shell/desktop-shell.tsx:398
 msgid "两次输入的口令不一致。"
 msgstr "The two passcodes do not match."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:406
+#: apps/app/src/features/shell/desktop-shell.tsx:409
 msgid "桌面锁定口令已设置，请输入口令解锁。"
 msgstr "Desktop lock passcode is set. Enter it to unlock."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:438
+#: apps/app/src/features/shell/desktop-shell.tsx:441
 msgid "当前世界还没有\"我自己\"角色。"
 msgstr "The current world has no 'Me' character yet."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:456
+#: apps/app/src/features/shell/desktop-shell.tsx:459
 msgid "打开会话失败，请稍后再试。"
 msgstr "Failed to open the conversation. Please try again later."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:497
+#: apps/app/src/features/shell/desktop-shell.tsx:500
 #: apps/app/src/i18n/static-dom-seed.ts:737
 msgid "关闭浮层"
 msgstr "Close overlay"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:529
+#: apps/app/src/features/shell/desktop-shell.tsx:532
 #: apps/app/src/i18n/static-dom-seed.ts:382
 msgid "打开世界主人快捷卡片"
 msgstr "Open world owner quick card"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:682
+#: apps/app/src/features/shell/desktop-shell.tsx:685
 msgid "设置桌面锁定口令"
 msgstr "Set Desktop Lock Passcode"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:683
+#: apps/app/src/features/shell/desktop-shell.tsx:686
 msgid "桌面已锁定"
 msgstr "Desktop Locked"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:706
+#: apps/app/src/features/shell/desktop-shell.tsx:709
 msgid "首次锁定需要先设置本机口令"
 msgstr "Set a local passcode before locking for the first time"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:707
+#: apps/app/src/features/shell/desktop-shell.tsx:710
 msgid "输入本机口令后恢复桌面访问"
 msgstr "Enter the local passcode to restore desktop access"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:713
+#: apps/app/src/features/shell/desktop-shell.tsx:716
 msgid "口令仅保存在当前浏览器或桌面客户端本地，用来阻止离开座位时工作区继续暴露。"
 msgstr "The passcode is saved only in this browser or desktop client, and keeps the workspace covered when you step away."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:717
+#: apps/app/src/features/shell/desktop-shell.tsx:720
 msgid "当前已启用 {lockPasscodeLength} 位本地锁定口令。"
 msgstr "A {lockPasscodeLength}-digit local lock passcode is enabled."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:719
+#: apps/app/src/features/shell/desktop-shell.tsx:722
 msgid "当前设备尚未保存锁定口令。"
 msgstr "No lock passcode is saved on this device yet."
 
 #. placeholder {0}: formatTimestamp(lockedAt)
-#: apps/app/src/features/shell/desktop-shell.tsx:724
+#: apps/app/src/features/shell/desktop-shell.tsx:727
 msgid "锁定时间 {0}"
 msgstr "Locked at {0}"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:758
+#: apps/app/src/features/shell/desktop-shell.tsx:761
 msgid "设置 4 到 6 位数字口令"
 msgstr "Set a 4 to 6 digit passcode"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:777
+#: apps/app/src/features/shell/desktop-shell.tsx:780
 msgid "再次输入口令确认"
 msgstr "Enter the passcode again to confirm"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:786
+#: apps/app/src/features/shell/desktop-shell.tsx:789
 msgid "设置口令并锁定"
 msgstr "Set Passcode and Lock"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:794
+#: apps/app/src/features/shell/desktop-shell.tsx:797
 msgid "取消锁定"
 msgstr "Cancel Lock"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:816
+#: apps/app/src/features/shell/desktop-shell.tsx:819
 msgid "输入桌面锁定口令"
 msgstr "Enter desktop lock passcode"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:825
+#: apps/app/src/features/shell/desktop-shell.tsx:828
 msgid "解锁继续使用"
 msgstr "Unlock to Continue"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:934
+#: apps/app/src/features/shell/desktop-shell.tsx:937
 msgid "还没有签名，去个人资料写一句吧"
 msgstr "No bio yet — head to your profile to write one"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:978
+#: apps/app/src/features/shell/desktop-shell.tsx:981
 msgid "看看我最近发了什么"
 msgstr "See what I posted recently"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:986
+#: apps/app/src/features/shell/desktop-shell.tsx:989
 msgid "和\"我自己\"对话"
 msgstr "Chat with 'Me'"
 
@@ -21185,385 +21185,385 @@ msgstr "Daily steal limit reached ({0}/day)."
 
 #: apps/app/src/lib/error-translate.ts:102
 msgid "请先选择一个朋友圈媒体文件。"
-msgstr "请先选择一个朋友圈媒体文件。"
+msgstr "Please select a Moments media file first."
 
 #: apps/app/src/lib/error-translate.ts:104
 msgid "朋友圈当前仅支持图片或视频。"
-msgstr "朋友圈当前仅支持图片或视频。"
+msgstr "Moments only supports images or videos right now."
 
 #: apps/app/src/lib/error-translate.ts:106
 msgid "朋友圈媒体不存在。"
-msgstr "朋友圈媒体不存在。"
+msgstr "Moments media not found."
 
 #: apps/app/src/lib/error-translate.ts:108
 msgid "朋友圈不存在。"
-msgstr "朋友圈不存在。"
+msgstr "Moments post not found."
 
 #: apps/app/src/lib/error-translate.ts:110
 #: apps/app/src/lib/error-translate.ts:537
 msgid "需先加为好友才能互动。"
-msgstr "需先加为好友才能互动。"
+msgstr "You need to be friends to interact."
 
 #: apps/app/src/lib/error-translate.ts:112
 msgid "朋友圈内容和媒体不能同时为空。"
-msgstr "朋友圈内容和媒体不能同时为空。"
+msgstr "Moments post needs either text or media."
 
 #: apps/app/src/lib/error-translate.ts:114
 msgid "纯文本朋友圈不能附带图片或视频。"
-msgstr "纯文本朋友圈不能附带图片或视频。"
+msgstr "Text-only Moments cannot include images or videos."
 
 #: apps/app/src/lib/error-translate.ts:116
 msgid "视频朋友圈必须且只能包含 1 条视频。"
-msgstr "视频朋友圈必须且只能包含 1 条视频。"
+msgstr "Video Moments must contain exactly one video."
 
 #: apps/app/src/lib/error-translate.ts:118
 msgid "朋友圈视频时长不能超过 5 分钟。"
-msgstr "朋友圈视频时长不能超过 5 分钟。"
+msgstr "Moments video cannot exceed 5 minutes."
 
 #. placeholder {0}: String(params.max ?? 9)
 #: apps/app/src/lib/error-translate.ts:121
 msgid "图片朋友圈最多支持 {0} 张图片。"
-msgstr "图片朋友圈最多支持 {0} 张图片。"
+msgstr "Image Moments supports at most {0} images."
 
 #: apps/app/src/lib/error-translate.ts:124
 msgid "图片朋友圈当前只支持图片资源。"
-msgstr "图片朋友圈当前只支持图片资源。"
+msgstr "Image Moments only supports image assets."
 
 #: apps/app/src/lib/error-translate.ts:126
 msgid "limit 必须是正整数。"
-msgstr "limit 必须是正整数。"
+msgstr "limit must be a positive integer."
 
 #: apps/app/src/lib/error-translate.ts:128
 msgid "只有激活中的提醒可以完成。"
-msgstr "只有激活中的提醒可以完成。"
+msgstr "Only active reminders can be completed."
 
 #: apps/app/src/lib/error-translate.ts:130
 msgid "只有激活中的提醒可以延后。"
-msgstr "只有激活中的提醒可以延后。"
+msgstr "Only active reminders can be snoozed."
 
 #: apps/app/src/lib/error-translate.ts:132
 msgid "提醒不存在。"
-msgstr "提醒不存在。"
+msgstr "Reminder not found."
 
 #: apps/app/src/lib/error-translate.ts:134
 msgid "until 不是有效时间。"
-msgstr "until 不是有效时间。"
+msgstr "until is not a valid time."
 
 #: apps/app/src/lib/error-translate.ts:136
 msgid "请提供有效的延后时间。"
-msgstr "请提供有效的延后时间。"
+msgstr "Please provide a valid snooze time."
 
 #. placeholder {0}: String(params.id ?? "")
 #: apps/app/src/lib/error-translate.ts:143
 msgid "角色已存在：{0}"
-msgstr "角色已存在：{0}"
+msgstr "Character already exists: {0}"
 
 #: apps/app/src/lib/error-translate.ts:146
 msgid "默认保底角色不可删除。"
-msgstr "默认保底角色不可删除。"
+msgstr "The default fallback character cannot be deleted."
 
 #. placeholder {0}: String(params.presetKey ?? "")
 #: apps/app/src/lib/error-translate.ts:149
 msgid "预设角色不存在：{0}"
-msgstr "预设角色不存在：{0}"
+msgstr "Preset character not found: {0}"
 
 #: apps/app/src/lib/error-translate.ts:152
 msgid "至少选择一个预设角色。"
-msgstr "至少选择一个预设角色。"
+msgstr "Please select at least one preset character."
 
 #: apps/app/src/lib/error-translate.ts:154
 msgid "需要提供聊天样本。"
-msgstr "需要提供聊天样本。"
+msgstr "Chat samples are required."
 
 #. placeholder {0}: String(params.revisionId ?? "")
 #: apps/app/src/lib/error-translate.ts:157
 msgid "角色蓝图版本不存在：{0}"
-msgstr "角色蓝图版本不存在：{0}"
+msgstr "Character blueprint version not found: {0}"
 
 #: apps/app/src/lib/error-translate.ts:160
 msgid "摇一摇当前已在后台停用。"
-msgstr "摇一摇当前已在后台停用。"
+msgstr "Shake is currently disabled in the backend."
 
 #. placeholder {0}: String(params.cooldownMinutes ?? "?")
 #: apps/app/src/lib/error-translate.ts:163
 msgid "请至少间隔 {0} 分钟再摇一次。"
-msgstr "请至少间隔 {0} 分钟再摇一次。"
+msgstr "Please wait at least {0} minutes between shakes."
 
 #: apps/app/src/lib/error-translate.ts:166
 msgid "今日摇一摇次数已达到上限。"
-msgstr "今日摇一摇次数已达到上限。"
+msgstr "You've reached today's shake limit."
 
 #: apps/app/src/lib/error-translate.ts:169
 msgid "当前赛博分身信号不足，暂时还不能生成新的摇一摇角色。"
-msgstr "当前赛博分身信号不足，暂时还不能生成新的摇一摇角色。"
+msgstr "Your cyber-clone signal is too weak to generate a new shake character right now."
 
 #. placeholder {0}: String(params.sessionId ?? "")
 #: apps/app/src/lib/error-translate.ts:173
 msgid "摇一摇会话不存在：{0}"
-msgstr "摇一摇会话不存在：{0}"
+msgstr "Shake session not found: {0}"
 
 #: apps/app/src/lib/error-translate.ts:176
 msgid "当前摇一摇结果已经不可再放弃。"
-msgstr "当前摇一摇结果已经不可再放弃。"
+msgstr "This shake result can no longer be discarded."
 
 #: apps/app/src/lib/error-translate.ts:179
 msgid "当前摇一摇结果已保留，但角色记录不存在。"
-msgstr "当前摇一摇结果已保留，但角色记录不存在。"
+msgstr "Shake result was kept, but the character record is missing."
 
 #: apps/app/src/lib/error-translate.ts:182
 msgid "当前摇一摇结果已经不能再保留。"
-msgstr "当前摇一摇结果已经不能再保留。"
+msgstr "This shake result can no longer be kept."
 
 #: apps/app/src/lib/error-translate.ts:184
 msgid "当前摇一摇结果缺少角色草稿。"
-msgstr "当前摇一摇结果缺少角色草稿。"
+msgstr "This shake result is missing the character draft."
 
 #: apps/app/src/lib/error-translate.ts:186
 msgid "当前摇一摇结果无法创建对应角色。"
-msgstr "当前摇一摇结果无法创建对应角色。"
+msgstr "Cannot create a character from this shake result."
 
 #: apps/app/src/lib/error-translate.ts:188
 msgid "没有可用的摇一摇方向。"
-msgstr "没有可用的摇一摇方向。"
+msgstr "No shake direction is available."
 
 #: apps/app/src/lib/error-translate.ts:190
 msgid "用户名与密码不能为空。"
-msgstr "用户名与密码不能为空。"
+msgstr "Username and password cannot be empty."
 
 #: apps/app/src/lib/error-translate.ts:192
 msgid "用户名已被占用。"
-msgstr "用户名已被占用。"
+msgstr "That username is already taken."
 
 #: apps/app/src/lib/error-translate.ts:194
 msgid "账号或密码错误。"
-msgstr "账号或密码错误。"
+msgstr "Incorrect account or password."
 
 #: apps/app/src/lib/error-translate.ts:197
 msgid "该账号通过邮箱验证码注册，请使用邮箱验证码登录。"
-msgstr "该账号通过邮箱验证码注册，请使用邮箱验证码登录。"
+msgstr "This account was registered via email code — please sign in with the email code."
 
 #: apps/app/src/lib/error-translate.ts:200
 msgid "服务器未配置 JWT_SECRET。"
-msgstr "服务器未配置 JWT_SECRET。"
+msgstr "Server is not configured with JWT_SECRET."
 
 #: apps/app/src/lib/error-translate.ts:202
 msgid "验证码不能为空。"
-msgstr "验证码不能为空。"
+msgstr "Verification code cannot be empty."
 
 #: apps/app/src/lib/error-translate.ts:204
 msgid "验证码错误。"
-msgstr "验证码错误。"
+msgstr "Incorrect verification code."
 
 #: apps/app/src/lib/error-translate.ts:206
 msgid "该验证码已使用。"
-msgstr "该验证码已使用。"
+msgstr "This verification code has already been used."
 
 #: apps/app/src/lib/error-translate.ts:208
 msgid "验证码已过期。"
-msgstr "验证码已过期。"
+msgstr "Verification code has expired."
 
 #: apps/app/src/lib/error-translate.ts:210
 msgid "邮箱格式不正确。"
-msgstr "邮箱格式不正确。"
+msgstr "Invalid email format."
 
 #: apps/app/src/lib/error-translate.ts:212
 msgid "缺少访问令牌。"
-msgstr "缺少访问令牌。"
+msgstr "Missing access token."
 
 #: apps/app/src/lib/error-translate.ts:214
 msgid "访问令牌无效或已过期。"
-msgstr "访问令牌无效或已过期。"
+msgstr "Access token is invalid or expired."
 
 #: apps/app/src/lib/error-translate.ts:216
 msgid "用户不存在。"
-msgstr "用户不存在。"
+msgstr "User not found."
 
 #: apps/app/src/lib/error-translate.ts:218
 msgid "邮箱绑定失败，请稍后重试。"
-msgstr "邮箱绑定失败，请稍后重试。"
+msgstr "Email binding failed — please try again later."
 
 #: apps/app/src/lib/error-translate.ts:220
 msgid "验证码发送失败，请稍后重试。"
-msgstr "验证码发送失败，请稍后重试。"
+msgstr "Failed to send verification code — please try again later."
 
 #. placeholder {0}: String(params.retryAfter ?? "?")
 #: apps/app/src/lib/error-translate.ts:223
 msgid "验证码发送过于频繁，请在 {0} 秒后重试。"
-msgstr "验证码发送过于频繁，请在 {0} 秒后重试。"
+msgstr "Verification codes are being sent too often — try again in {0}s."
 
 #: apps/app/src/lib/error-translate.ts:226
 msgid "该邮箱验证码请求次数过多，请稍后再试。"
-msgstr "该邮箱验证码请求次数过多，请稍后再试。"
+msgstr "Too many verification-code requests for this email — try again later."
 
 #: apps/app/src/lib/error-translate.ts:230
 msgid "当前语音模式暂不支持。"
-msgstr "当前语音模式暂不支持。"
+msgstr "The current voice mode is not supported yet."
 
 #: apps/app/src/lib/error-translate.ts:232
 msgid "请先提供要播报的文本。"
-msgstr "请先提供要播报的文本。"
+msgstr "Please provide text to speak first."
 
 #: apps/app/src/lib/error-translate.ts:234
 msgid "语音生成结果为空，请稍后再试。"
-msgstr "语音生成结果为空，请稍后再试。"
+msgstr "Empty voice result — please try again later."
 
 #: apps/app/src/lib/error-translate.ts:236
 msgid "语音请求重试失败。"
-msgstr "语音请求重试失败。"
+msgstr "Voice request retries failed."
 
 #. placeholder {0}: String(params.message)
 #: apps/app/src/lib/error-translate.ts:240
 msgid "请求过于频繁：{0}"
-msgstr "请求过于频繁：{0}"
+msgstr "Too many requests: {0}"
 
 #: apps/app/src/lib/error-translate.ts:241
 msgid "请求过于频繁，请稍后再试。"
-msgstr "请求过于频繁，请稍后再试。"
+msgstr "Too many requests — please try again later."
 
 #: apps/app/src/lib/error-translate.ts:244
 msgid "当前 AI 服务不可用，请稍后再试。"
-msgstr "当前 AI 服务不可用，请稍后再试。"
+msgstr "The AI service is unavailable — please try again later."
 
 #: apps/app/src/lib/error-translate.ts:246
 msgid "请先提供图片生成描述。"
-msgstr "请先提供图片生成描述。"
+msgstr "Please provide an image-generation description first."
 
 #: apps/app/src/lib/error-translate.ts:248
 msgid "图片生成结果为空，请稍后再试。"
-msgstr "图片生成结果为空，请稍后再试。"
+msgstr "Empty image result — please try again later."
 
 #: apps/app/src/lib/error-translate.ts:250
 msgid "图片生成服务不可用，请稍后再试。"
-msgstr "图片生成服务不可用，请稍后再试。"
+msgstr "Image generation service is unavailable — please try again later."
 
 #: apps/app/src/lib/error-translate.ts:252
 msgid "没有收到可转写的音频内容。"
-msgstr "没有收到可转写的音频内容。"
+msgstr "No transcribable audio received."
 
 #: apps/app/src/lib/error-translate.ts:254
 msgid "录音文件过大，请缩短单次语音输入时长。"
-msgstr "录音文件过大，请缩短单次语音输入时长。"
+msgstr "Recording is too large — please shorten the voice input."
 
 #: apps/app/src/lib/error-translate.ts:256
 msgid "录音文件格式不受支持，请重试。"
-msgstr "录音文件格式不受支持，请重试。"
+msgstr "Recording format is not supported — please try again."
 
 #: apps/app/src/lib/error-translate.ts:258
 msgid "语音转写服务不可用，请稍后再试。"
-msgstr "语音转写服务不可用，请稍后再试。"
+msgstr "Voice transcription service is unavailable — please try again later."
 
 #: apps/app/src/lib/error-translate.ts:262
 msgid "语音资源不存在。"
-msgstr "语音资源不存在。"
+msgstr "Voice resource not found."
 
 #: apps/app/src/lib/error-translate.ts:264
 msgid "Provider 账户名称不能为空。"
-msgstr "Provider 账户名称不能为空。"
+msgstr "Provider account name cannot be empty."
 
 #: apps/app/src/lib/error-translate.ts:266
 msgid "Provider 接口地址不能为空。"
-msgstr "Provider 接口地址不能为空。"
+msgstr "Provider endpoint URL cannot be empty."
 
 #. placeholder {0}: String(params.id ?? params.providerAccountId ?? "")
 #: apps/app/src/lib/error-translate.ts:269
 msgid "Provider 账户不存在：{0}"
-msgstr "Provider 账户不存在：{0}"
+msgstr "Provider account not found: {0}"
 
 #: apps/app/src/lib/error-translate.ts:272
 msgid "请先启用该 Provider 账户，再设为默认。"
-msgstr "请先启用该 Provider 账户，再设为默认。"
+msgstr "Please enable this provider account before setting it as default."
 
 #: apps/app/src/lib/error-translate.ts:275
 msgid "请先启用目标 Provider 账户，再批量换绑模型人格角色。"
-msgstr "请先启用目标 Provider 账户，再批量换绑模型人格角色。"
+msgstr "Please enable the target provider account before bulk-rebinding model personas."
 
 #: apps/app/src/lib/error-translate.ts:278
 msgid "请先填写默认模型 ID。"
-msgstr "请先填写默认模型 ID。"
+msgstr "Please fill in the default model ID first."
 
 #: apps/app/src/lib/error-translate.ts:280
 msgid "默认 Provider 账户不存在。"
-msgstr "默认 Provider 账户不存在。"
+msgstr "Default provider account not found."
 
 #: apps/app/src/lib/error-translate.ts:282
 msgid "至少选择一个可安装的模型目录项。"
-msgstr "至少选择一个可安装的模型目录项。"
+msgstr "Please select at least one installable model directory item."
 
 #: apps/app/src/lib/error-translate.ts:284
 msgid "至少选择一个已登记的模型目录项。"
-msgstr "至少选择一个已登记的模型目录项。"
+msgstr "Please select at least one registered model directory item."
 
 #: apps/app/src/lib/error-translate.ts:286
 msgid "管理后台尚未配置访问密钥。"
-msgstr "管理后台尚未配置访问密钥。"
+msgstr "The admin backend has no access key configured."
 
 #: apps/app/src/lib/error-translate.ts:288
 msgid "管理后台访问密钥无效。"
-msgstr "管理后台访问密钥无效。"
+msgstr "Invalid admin access key."
 
 #: apps/app/src/lib/error-translate.ts:290
 msgid "items 必填。"
-msgstr "items 必填。"
+msgstr "items is required."
 
 #: apps/app/src/lib/error-translate.ts:293
 msgid "characterId 与 expectedStableRevisionId 必填。"
-msgstr "characterId 与 expectedStableRevisionId 必填。"
+msgstr "characterId and expectedStableRevisionId are required."
 
 #. placeholder {0}: String(params.conversationId ?? "")
 #: apps/app/src/lib/error-translate.ts:297
 msgid "对话不存在：{0}"
-msgstr "对话不存在：{0}"
+msgstr "Conversation not found: {0}"
 
 #. placeholder {0}: String(params.conversationId ?? "")
 #: apps/app/src/lib/error-translate.ts:301
 msgid "对话 {0} 没有角色参与者。"
-msgstr "对话 {0} 没有角色参与者。"
+msgstr "Conversation {0} has no character participants."
 
 #. placeholder {0}: String(params.messageId ?? "")
 #: apps/app/src/lib/error-translate.ts:305
 #: apps/app/src/lib/error-translate.ts:363
 msgid "消息不存在：{0}"
-msgstr "消息不存在：{0}"
+msgstr "Message not found: {0}"
 
 #: apps/app/src/lib/error-translate.ts:308
 msgid "World owner 不存在。"
-msgstr "World owner 不存在。"
+msgstr "World owner not found."
 
 #: apps/app/src/lib/error-translate.ts:310
 msgid "未知的 self-agent workspace 文档名。"
-msgstr "未知的 self-agent workspace 文档名。"
+msgstr "Unknown self-agent workspace document name."
 
 #: apps/app/src/lib/error-translate.ts:312
 msgid "至少选择一个联系人。"
-msgstr "至少选择一个联系人。"
+msgstr "Please select at least one contact."
 
 #: apps/app/src/lib/error-translate.ts:314
 msgid "单次最多预览 20 个联系人。"
-msgstr "单次最多预览 20 个联系人。"
+msgstr "You can preview at most 20 contacts at a time."
 
 #: apps/app/src/lib/error-translate.ts:316
 msgid "至少选择一个预览通过的联系人。"
-msgstr "至少选择一个预览通过的联系人。"
+msgstr "Please select at least one contact that passed preview."
 
 #: apps/app/src/lib/error-translate.ts:318
 msgid "单次最多导入 20 个联系人。"
-msgstr "单次最多导入 20 个联系人。"
+msgstr "You can import at most 20 contacts at a time."
 
 #: apps/app/src/lib/error-translate.ts:320
 msgid "联系人导入角色不存在。"
-msgstr "联系人导入角色不存在。"
+msgstr "The contact-import character does not exist."
 
 #: apps/app/src/lib/error-translate.ts:322
 msgid "只支持补建联系人导入角色的好友关系。"
-msgstr "只支持补建联系人导入角色的好友关系。"
+msgstr "Only the contact-import character's friend relationship can be back-filled."
 
 #: apps/app/src/lib/error-translate.ts:324
 msgid "好友关系补建失败。"
-msgstr "好友关系补建失败。"
+msgstr "Failed to back-fill friend relationship."
 
 #: apps/app/src/lib/error-translate.ts:326
 msgid "只支持回滚联系人导入角色。"
-msgstr "只支持回滚联系人导入角色。"
+msgstr "Only the contact-import character can be rolled back."
 
 #: apps/app/src/lib/error-translate.ts:328
 msgid "请先选择一张聊天背景。"

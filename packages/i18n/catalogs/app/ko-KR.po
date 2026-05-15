@@ -550,7 +550,7 @@ msgstr "길게 눌러 말하기"
 
 #: apps/app/src/components/chat-composer.tsx:3372
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:309
-#: apps/app/src/features/shell/desktop-shell.tsx:630
+#: apps/app/src/features/shell/desktop-shell.tsx:633
 msgid "更多功能"
 msgstr "더 많은 기능"
 
@@ -4014,7 +4014,7 @@ msgstr "채팅 기록 찾기"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:149
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:473
 #: apps/app/src/features/shell/desktop-nav-matching.ts:98
-#: apps/app/src/features/shell/desktop-shell.tsx:644
+#: apps/app/src/features/shell/desktop-shell.tsx:647
 #: apps/app/src/routes/chat-list-page.tsx:834
 #: apps/app/src/routes/contacts-page.tsx:2263
 #: apps/app/src/routes/contacts-page.tsx:2337
@@ -7402,7 +7402,7 @@ msgstr "연락처 태그 입력"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:219
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:519
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:82
-#: apps/app/src/features/shell/desktop-shell.tsx:984
+#: apps/app/src/features/shell/desktop-shell.tsx:987
 #: apps/app/src/routes/mobile-add-friend-page.tsx:700
 msgid "打开中..."
 msgstr "여는 중..."
@@ -7411,7 +7411,7 @@ msgstr "여는 중..."
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:520
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:82
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:916
-#: apps/app/src/features/shell/desktop-shell.tsx:984
+#: apps/app/src/features/shell/desktop-shell.tsx:987
 #: apps/app/src/routes/character-detail-page.tsx:296
 #: apps/app/src/routes/mobile-add-friend-page.tsx:700
 msgid "发消息"
@@ -7512,7 +7512,7 @@ msgstr "소셜 및 콘텐츠"
 #: apps/app/src/features/search/use-search-index.ts:481
 #: apps/app/src/features/shell/desktop-nav-matching.ts:71
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
-#: apps/app/src/features/shell/desktop-shell.tsx:977
+#: apps/app/src/features/shell/desktop-shell.tsx:980
 #: apps/app/src/i18n/static-dom-seed.ts:33
 #: apps/app/src/routes/character-detail-page.tsx:315
 #: apps/app/src/routes/discover-page.tsx:118
@@ -8505,7 +8505,7 @@ msgstr "현재 채팅 검색"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1565
 #: apps/app/src/features/shell/desktop-nav-config.ts:95
 #: apps/app/src/features/shell/desktop-nav-config.ts:96
-#: apps/app/src/features/shell/desktop-shell.tsx:648
+#: apps/app/src/features/shell/desktop-shell.tsx:651
 #: apps/app/src/routes/desktop-chat-files-page.tsx:482
 #: apps/app/src/routes/desktop-chat-files-page.tsx:755
 msgid "聊天文件"
@@ -11679,18 +11679,18 @@ msgstr "열기"
 
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
-#: apps/app/src/i18n/static-dom-seed.ts:195
-msgid "移出常用"
-msgstr "자주 사용에서 제거"
-
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:278
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
 #: apps/app/src/i18n/static-dom-seed.ts:197
 msgid "加入常用"
 msgstr "자주 사용에 추가"
+
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
+#: apps/app/src/i18n/static-dom-seed.ts:195
+msgid "移出常用"
+msgstr "자주 사용에서 제거"
 
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:802
@@ -12314,62 +12314,62 @@ msgstr "이미지 {imageCount}장을 공유했습니다"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:50
 msgid "一楼休息区"
-msgstr "一楼休息区"
+msgstr "1층 휴게실"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:52
 msgid "沙发与暖光，是来客先到的地方。"
-msgstr "沙发与暖光，是来客先到的地方。"
+msgstr "소파와 따스한 조명, 손님이 가장 먼저 도착하는 공간."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:56
 msgid "猫窝阁楼"
-msgstr "猫窝阁楼"
+msgstr "고양이 다락방"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:58
 msgid "小阁楼，给爱躲起来的人和猫。"
-msgstr "小阁楼，给爱躲起来的人和猫。"
+msgstr "숨고 싶은 사람과 고양이를 위한 작은 다락방."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:62
 msgid "茶吧角"
-msgstr "茶吧角"
+msgstr "차 바 코너"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:64
 msgid "一壶热茶配窗外夜色。"
-msgstr "一壶热茶配窗外夜色。"
+msgstr "따뜻한 차 한 주전자와 창밖의 밤풍경."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:71
 msgid "绒毛地毯"
-msgstr "绒毛地毯"
+msgstr "솜털 러그"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:77
 msgid "暖黄落地灯"
-msgstr "暖黄落地灯"
+msgstr "따뜻한 플로어 램프"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:83
 msgid "高高猫爬架"
-msgstr "高高猫爬架"
+msgstr "키 큰 캣타워"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:89
 msgid "猫窝软垫"
-msgstr "猫窝软垫"
+msgstr "푹신한 고양이 방석"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:95
 msgid "茶具一套"
-msgstr "茶具一套"
+msgstr "차 도구 세트"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:101
 msgid "香薰蜡烛"
-msgstr "香薰蜡烛"
+msgstr "향초"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:112
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:44
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:55
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:53
 msgid "苏屿"
-msgstr "苏屿"
+msgstr "수위"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:117
 msgid "想找个能闻到蜡烛的茶角坐一会儿。"
-msgstr "想找个能闻到蜡烛的茶角坐一会儿。"
+msgstr "양초 향이 나는 차 코너에 잠시 앉고 싶어요."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:121
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:60
@@ -12382,7 +12382,7 @@ msgstr "Lin Mian"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:126
 msgid "太困了，能睡到一只猫旁边吗。"
-msgstr "太困了，能睡到一只猫旁边吗。"
+msgstr "너무 졸려요. 고양이 옆에서 잘 수 있나요?"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:130
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:52
@@ -12395,18 +12395,18 @@ msgstr "Axun"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:135
 msgid "先在大堂坐会儿，灯亮一点更安心。"
-msgstr "先在大堂坐会儿，灯亮一点更安心。"
+msgstr "우선 로비에 잠시 앉을게요. 조명이 밝아야 안심돼요."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:139
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:76
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:66
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:73
 msgid "林沉"
-msgstr "林沉"
+msgstr "린천"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:144
 msgid "深夜的茶要有香气和软椅子。"
-msgstr "深夜的茶要有香气和软椅子。"
+msgstr "늦은 밤의 차에는 향과 푹신한 의자가 필요해요."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:148
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:68
@@ -12418,7 +12418,7 @@ msgstr "Zhou Ran"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:153
 msgid "训练完，就想看猫爬上爬下。"
-msgstr "训练完，就想看猫爬上爬下。"
+msgstr "훈련 끝나면 고양이들이 오르락내리락하는 걸 보고 싶어요."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:157
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:84
@@ -12429,17 +12429,17 @@ msgstr "Xu Zhe"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:162
 msgid "签合同前，先来杯茶。"
-msgstr "签合同前，先来杯茶。"
+msgstr "계약서에 사인하기 전에 차 한 잔부터."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:166
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:92
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:88
 msgid "月一"
-msgstr "月一"
+msgstr "월이"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-data.ts:170
 msgid "月光下的猫窝最安心。"
-msgstr "月光下的猫窝最安心。"
+msgstr "달빛 아래 고양이 둥지가 가장 편안해요."
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:64
 #: apps/app/src/features/games/game-center-data.ts:193
@@ -12450,75 +12450,75 @@ msgstr "고양이 카페 여관"
 #. placeholder {0}: state.servedOutcomes.length + 1
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:68
 msgid "第 {0} / {GUESTS_PER_ROUND} 位"
-msgstr "第 {0} / {GUESTS_PER_ROUND} 位"
+msgstr "{0} / {GUESTS_PER_ROUND}번째 손님"
 
 #. placeholder {0}: getRoomSpec(currentGuest.preferredRoom).name
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:103
 msgid "想去 {0}"
-msgstr "想去 {0}"
+msgstr "{0}에 가고 싶어 함"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:110
 msgid "偏爱"
-msgstr "偏爱"
+msgstr "선호"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:131
 msgid "婉拒"
-msgstr "婉拒"
+msgstr "정중히 거절"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:139
 msgid "迎客入住"
-msgstr "迎客入住"
+msgstr "손님 맞이"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:206
 msgid "空位 · 点这里布置"
-msgstr "空位 · 点这里布置"
+msgstr "빈 자리 · 눌러서 배치"
 
 #. placeholder {0}: roomSpec.name
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:213
 msgid "选一件家具放进 {0}"
-msgstr "选一件家具放进 {0}"
+msgstr "{0}에 둘 가구 선택"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:243
 msgid "匹配"
-msgstr "匹配"
+msgstr "매치"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:259
 msgid "清空这一格"
-msgstr "清空这一格"
+msgstr "이 칸 비우기"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:280
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:305
 msgid "再开一晚"
-msgstr "再开一晚"
+msgstr "하룻밤 더 영업"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:280
 msgid "今晚营业（{GUESTS_PER_ROUND} 位客人）"
-msgstr "今晚营业（{GUESTS_PER_ROUND} 位客人）"
+msgstr "오늘 밤 영업 (손님 {GUESTS_PER_ROUND}명)"
 
 #. placeholder {0}: formatRemaining(state.remainingMs)
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:284
 msgid "剩余时间 {0}"
-msgstr "剩余时间 {0}"
+msgstr "남은 시간 {0}"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:292
 msgid "今晚结算"
-msgstr "今晚结算"
+msgstr "오늘 밤 정산"
 
 #. placeholder {0}: state.servedOutcomes.filter((o) => o.outcome === "happy").length
 #. placeholder {1}: state.servedOutcomes.filter((o) => o.outcome === "ok").length
 #. placeholder {2}: state.servedOutcomes.filter((o) => o.outcome === "left").length
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:296
 msgid "满意 {0} / 一般 {1} / 离开 {2}"
-msgstr "满意 {0} / 一般 {1} / 离开 {2}"
+msgstr "만족 {0} / 보통 {1} / 떠남 {2}"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:312
 #: apps/app/src/features/games/night-market/night-market-game.tsx:409
 msgid "先打烊"
-msgstr "先打烊"
+msgstr "오늘 영업 종료"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:321
 msgid "旅馆日志"
-msgstr "旅馆日志"
+msgstr "여관 로그"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:328
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:267
@@ -12529,72 +12529,72 @@ msgstr "旅馆日志"
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:267
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:310
 msgid "重置"
-msgstr "重置"
+msgstr "초기화"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:334
 #: apps/app/src/features/games/night-market/night-market-game.tsx:266
 msgid "等待开张…"
-msgstr "等待开张…"
+msgstr "개점 대기 중…"
 
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:139
 msgid "时间到，今晚就到这里。"
-msgstr "时间到，今晚就到这里。"
+msgstr "시간 종료, 오늘 밤은 여기까지."
 
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:151
 msgid "今晚旅馆开张，等客人上门。"
-msgstr "今晚旅馆开张，等客人上门。"
+msgstr "오늘 밤 여관이 문을 열었습니다. 손님을 기다립니다."
 
 #. placeholder {0}: guest.name
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:181
 msgid "{0} 非常满意：+1 春季家具票 / +6 好感。"
-msgstr "{0} 非常满意：+1 春季家具票 / +6 好感。"
+msgstr "{0}님이 매우 만족: 봄 가구 티켓 +1 / 호감도 +6."
 
 #. placeholder {0}: guest.name
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:189
 msgid "{0} 还算满意：+3 好感。"
-msgstr "{0} 还算满意：+3 好感。"
+msgstr "{0}님이 만족: 호감도 +3."
 
 #. placeholder {0}: guest.name
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:196
 msgid "{0} 没找到想要的角落，离开了。"
-msgstr "{0} 没找到想要的角落，离开了。"
+msgstr "{0}님이 원하는 자리를 찾지 못하고 떠났습니다."
 
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:209
 msgid "今晚结束：满意 {happy} / 一般 {ok} / 离开 {left}。"
-msgstr "今晚结束：满意 {happy} / 一般 {ok} / 离开 {left}。"
+msgstr "오늘 밤 종료: 만족 {happy} / 보통 {ok} / 떠남 {left}."
 
 #. placeholder {0}: guest?.name ?? t(msg`这位客人`)
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:226
 msgid "婉拒了 {0}，下次再来。"
-msgstr "婉拒了 {0}，下次再来。"
+msgstr "{0}님을 정중히 거절했습니다. 다음에 다시 와 주세요."
 
 #: apps/app/src/features/games/cat-inn/use-cat-inn-state.ts:226
 msgid "这位客人"
-msgstr "这位客人"
+msgstr "이 손님"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:35
 msgid "胡萝卜"
-msgstr "胡萝卜"
+msgstr "당근"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:48
 msgid "草莓"
-msgstr "草莓"
+msgstr "딸기"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:61
 msgid "玉米"
-msgstr "玉米"
+msgstr "옥수수"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:92
 msgid "收 5 个胡萝卜"
-msgstr "收 5 个胡萝卜"
+msgstr "당근 5개 수확"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:101
 msgid "收 3 个草莓"
-msgstr "收 3 个草莓"
+msgstr "딸기 3개 수확"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:110
 msgid "帮邻居浇水 3 次"
-msgstr "帮邻居浇水 3 次"
+msgstr "이웃 물주기 3회 돕기"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:37
 #: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:74
@@ -12620,36 +12620,36 @@ msgstr "경험치 {0} / {1}"
 #. placeholder {1}: state.totalNeighborHelps
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:97
 msgid "累计收 {0} 株 · 互访 {1} 次"
-msgstr "累计收 {0} 株 · 互访 {1} 次"
+msgstr "누적 수확 {0}그루 · 방문 {1}회"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:132
 msgid "种什么"
-msgstr "种什么"
+msgstr "무엇을 심을까"
 
 #. placeholder {0}: Math.ceil((state.neighborCooldownUntilMs - now) / 1000)
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:197
 msgid "互访冷却 {0}s"
-msgstr "互访冷却 {0}s"
+msgstr "방문 쿨다운 {0}초"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:199
 msgid "帮邻居浇水（+{NEIGHBOR_HELP_REWARD} 币）"
-msgstr "帮邻居浇水（+{NEIGHBOR_HELP_REWARD} 币）"
+msgstr "이웃 물주기 돕기 (+{NEIGHBOR_HELP_REWARD} 코인)"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:210
 msgid "一键收菜"
-msgstr "一键收菜"
+msgstr "전체 수확"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:217
 msgid "本周联营订单"
-msgstr "本周联营订单"
+msgstr "이번 주 공동 운영 주문"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:260
 msgid "农场日志"
-msgstr "农场日志"
+msgstr "농장 로그"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:273
 msgid "点空地开始种植…"
-msgstr "点空地开始种植…"
+msgstr "빈 땅을 눌러 심기 시작…"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:323
 #: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:78
@@ -12659,77 +12659,77 @@ msgstr "빈 땅"
 #. placeholder {0}: formatRemaining(witherInMs)
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:327
 msgid "可收 {0}"
-msgstr "可收 {0}"
+msgstr "수확 가능 {0}"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:328
 msgid "枯萎"
-msgstr "枯萎"
+msgstr "시듦"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:349
 msgid "种"
-msgstr "种"
+msgstr "심기"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:352
 msgid "已浇"
-msgstr "已浇"
+msgstr "물 줌"
 
 #. placeholder {0}: plot.waterCount
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:353
 msgid "浇水 ({0}/{MAX_WATERINGS})"
-msgstr "浇水 ({0}/{MAX_WATERINGS})"
+msgstr "물주기 ({0}/{MAX_WATERINGS})"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:355
 msgid "收"
-msgstr "收"
+msgstr "수확"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:356
 msgid "清理"
-msgstr "清理"
+msgstr "정리"
 
 #. placeholder {0}: order.label
 #. placeholder {1}: order.reward
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:145
 msgid "周任务完成：{0}（+{1} 花圃币）"
-msgstr "周任务完成：{0}（+{1} 花圃币）"
+msgstr "주간 임무 완료: {0} (+{1} 화원 코인)"
 
 #. placeholder {0}: state.level
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:160
 msgid "农场升到 {0} 级。"
-msgstr "农场升到 {0} 级。"
+msgstr "농장이 {0} 레벨로 올랐습니다."
 
 #. placeholder {0}: plot.id + 1
 #. placeholder {1}: c.name
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:180
 msgid "第 {0} 块地的 {1} 熟了。"
-msgstr "第 {0} 块地的 {1} 熟了。"
+msgstr "{0}번 밭의 {1}이(가) 익었습니다."
 
 #. placeholder {0}: plot.id + 1
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:191
 msgid "第 {0} 块地没及时收，作物枯萎了。"
-msgstr "第 {0} 块地没及时收，作物枯萎了。"
+msgstr "{0}번 밭을 제때 수확하지 못해 작물이 시들었습니다."
 
 #. placeholder {0}: crop.name
 #. placeholder {1}: crop.seedCost
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:208
 msgid "花圃币不够买 {0} 种子（{1} 币）"
-msgstr "花圃币不够买 {0} 种子（{1} 币）"
+msgstr "{0} 씨앗을 살 화원 코인이 부족합니다 ({1} 코인)"
 
 #. placeholder {0}: plot.id + 1
 #. placeholder {1}: crop.name
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:223
 msgid "第 {0} 块地种下 {1}。"
-msgstr "第 {0} 块地种下 {1}。"
+msgstr "{0}번 밭에 {1}을(를) 심었습니다."
 
 #. placeholder {0}: plot.id + 1
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:236
 msgid "第 {0} 块地已经浇够了。"
-msgstr "第 {0} 块地已经浇够了。"
+msgstr "{0}번 밭은 이미 충분히 물을 줬습니다."
 
 #. placeholder {0}: plot.id + 1
 #. placeholder {1}: WATER_SPEEDUP_MS / 1000
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:246
 msgid "第 {0} 块地浇了水（提早 {1}s）。"
-msgstr "第 {0} 块地浇了水（提早 {1}s）。"
+msgstr "{0}번 밭에 물주기 ({1}초 단축)."
 
 #. placeholder {0}: plot.id + 1
 #. placeholder {1}: crop.name
@@ -12737,20 +12737,20 @@ msgstr "第 {0} 块地浇了水（提早 {1}s）。"
 #. placeholder {3}: crop.experience
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:264
 msgid "第 {0} 块地收 {1}：+{2} 花圃币 / +{3} 经验"
-msgstr "第 {0} 块地收 {1}：+{2} 花圃币 / +{3} 经验"
+msgstr "{0}번 밭에서 {1} 수확: +{2} 화원 코인 / +{3} 경험치"
 
 #. placeholder {0}: plot.id + 1
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:290
 msgid "清理了第 {0} 块地的枯萎作物。"
-msgstr "清理了第 {0} 块地的枯萎作物。"
+msgstr "{0}번 밭의 시든 작물을 정리했습니다."
 
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:303
 msgid "互访冷却中，再等 {left}s。"
-msgstr "互访冷却中，再等 {left}s。"
+msgstr "방문 쿨다운 중, {left}초 더 기다리세요."
 
 #: apps/app/src/features/games/cloud-farm/use-cloud-farm-state.ts:315
 msgid "帮邻居浇了一次水（+{NEIGHBOR_HELP_REWARD} 花圃币）。"
-msgstr "帮邻居浇了一次水（+{NEIGHBOR_HELP_REWARD} 花圃币）。"
+msgstr "이웃 물주기를 도왔습니다 (+{NEIGHBOR_HELP_REWARD} 화원 코인)."
 
 #. placeholder {0}: state.experience
 #: apps/app/src/features/games/farm/components/coin-display.tsx:47
@@ -12816,16 +12816,16 @@ msgid "买了种子"
 msgstr "씨앗 구매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
-msgid "卖了"
-msgstr "판매 완료"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
 msgid "作物"
 msgstr "작물"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
+msgid "卖了"
+msgstr "판매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -13059,13 +13059,13 @@ msgid "h 成熟"
 msgstr "h 성숙"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ 봉지, 판매가"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ 개"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ 봉지, 판매가"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -13189,167 +13189,167 @@ msgstr "레벨 업!"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:47
 msgid "花店窗后"
-msgstr "花店窗后"
+msgstr "꽃집 창문 뒤"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:48
 msgid "她说昨晚把多余的花插进了空咖啡杯。"
-msgstr "她说昨晚把多余的花插进了空咖啡杯。"
+msgstr "어젯밤 남은 꽃을 빈 커피잔에 꽂았다고 말했어요."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:55
 msgid "巷口的灯"
-msgstr "巷口的灯"
+msgstr "골목 입구 가로등"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:56
 msgid "他每晚都顺路把巷口那盏不亮的灯敲一敲。"
-msgstr "他每晚都顺路把巷口那盏不亮的灯敲一敲。"
+msgstr "그는 매일 밤 골목 입구의 꺼진 가로등을 두드리며 지나가요."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:63
 msgid "午后小睡"
-msgstr "午后小睡"
+msgstr "오후 낮잠"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:64
 msgid "她把午后的阳光卷成毛毯盖在身上。"
-msgstr "她把午后的阳光卷成毛毯盖在身上。"
+msgstr "그녀는 오후 햇살을 담요처럼 말아 몸에 덮어요."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:71
 msgid "深夜训练"
-msgstr "深夜训练"
+msgstr "심야 훈련"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:72
 msgid "她说月亮亮的时候跑得比较稳。"
-msgstr "她说月亮亮的时候跑得比较稳。"
+msgstr "달이 밝을 때 더 안정적으로 달린다고 해요."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:79
 msgid "零点信号"
-msgstr "零点信号"
+msgstr "자정 신호"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:80
 msgid "他凌晨四点收到了一封没人寄的信。"
-msgstr "他凌晨四点收到了一封没人寄的信。"
+msgstr "새벽 4시에 아무도 보내지 않은 편지를 받았어요."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:87
 msgid "合同便签"
-msgstr "合同便签"
+msgstr "계약 메모"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:88
 msgid "他在每张名片背后写一句不签合同的话。"
-msgstr "他在每张名片背后写一句不签合同的话。"
+msgstr "그는 명함 뒷면마다 계약하지 않는 말을 한 줄씩 적어요."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:94
 msgid "月光台阶"
-msgstr "月光台阶"
+msgstr "달빛 계단"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:95
 msgid "她数完台阶就走到了海边。"
-msgstr "她数完台阶就走到了海边。"
+msgstr "계단을 다 세고 나면 바닷가에 도착해요."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:99
 msgid "声风"
-msgstr "声风"
+msgstr "사운드 윈드"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:101
 msgid "耳机里的浪"
-msgstr "耳机里的浪"
+msgstr "이어폰 속의 파도"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:102
 msgid "他录下海风，剪成给夜班司机的伴奏。"
-msgstr "他录下海风，剪成给夜班司机的伴奏。"
+msgstr "바닷바람을 녹음해 야간 운전자를 위한 배경 음악으로 편집해요."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:122
 msgid "星野原线"
-msgstr "星野原线"
+msgstr "성야원선"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:123
 msgid "默认线路，6 站慢车。"
-msgstr "默认线路，6 站慢车。"
+msgstr "기본 노선, 6역 완행."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:126
 msgid "晨雾站"
-msgstr "晨雾站"
+msgstr "조무역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:127
 msgid "花田站"
-msgstr "花田站"
+msgstr "꽃밭역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:128
 msgid "原野站"
-msgstr "原野站"
+msgstr "들판역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:129
 msgid "午枕站"
-msgstr "午枕站"
+msgstr "오침역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:130
 msgid "星野站"
-msgstr "星野站"
+msgstr "성야역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:131
 msgid "终点弧站"
-msgstr "终点弧站"
+msgstr "종점호역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:136
 msgid "海边支线"
-msgstr "海边支线"
+msgstr "해변 지선"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:137
 msgid "新增支线，需 2 张海边车票解锁。"
-msgstr "新增支线，需 2 张海边车票解锁。"
+msgstr "새 지선, 해변 티켓 2장으로 잠금 해제."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:141
 msgid "潮汐站"
-msgstr "潮汐站"
+msgstr "조석역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:142
 msgid "灯塔站"
-msgstr "灯塔站"
+msgstr "등대역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:143
 msgid "沙岸站"
-msgstr "沙岸站"
+msgstr "모래해변역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:144
 msgid "岛屿站"
-msgstr "岛屿站"
+msgstr "섬역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:145
 msgid "暗潮站"
-msgstr "暗潮站"
+msgstr "암조역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:146
 msgid "回港站"
-msgstr "回港站"
+msgstr "귀항역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:151
 msgid "城环夜线"
-msgstr "城环夜线"
+msgstr "도심 순환 야간선"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:152
 msgid "攒满 4 张车票后开放。"
-msgstr "攒满 4 张车票后开放。"
+msgstr "티켓 4장을 모으면 열립니다."
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:155
 msgid "霓虹站"
-msgstr "霓虹站"
+msgstr "네온역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:156
 msgid "小巷站"
-msgstr "小巷站"
+msgstr "골목역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:157
 msgid "广场站"
-msgstr "广场站"
+msgstr "광장역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:158
 msgid "高架站"
-msgstr "高架站"
+msgstr "고가역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:159
 msgid "零点站"
-msgstr "零点站"
+msgstr "자정역"
 
 #: apps/app/src/features/games/forest-train/forest-train-data.ts:160
 msgid "回程站"
-msgstr "回程站"
+msgstr "회귀역"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:80
 #: apps/app/src/features/games/game-center-data.ts:212
@@ -13360,147 +13360,147 @@ msgstr "별들판 열차"
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:116
 msgid "停靠 {0}"
-msgstr "停靠 {0}"
+msgstr "{0} 정차"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:118
 msgid "已收车"
-msgstr "已收车"
+msgstr "운행 종료"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:119
 msgid "准备出发"
-msgstr "准备出发"
+msgstr "출발 준비"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:189
 msgid "不停"
-msgstr "不停"
+msgstr "통과"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:196
 msgid "拾取碎片"
-msgstr "拾取碎片"
+msgstr "조각 줍기"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:210
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:327
 msgid "再发一班"
-msgstr "再发一班"
+msgstr "다음 편 운행"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:210
 msgid "列车出发"
-msgstr "列车出发"
+msgstr "열차 출발"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:217
 msgid "选择线路"
-msgstr "选择线路"
+msgstr "노선 선택"
 
 #. placeholder {0}: collectedHere.length
 #. placeholder {1}: passengerStations.length
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:219
 msgid "本线收集 {0} / {1}"
-msgstr "本线收集 {0} / {1}"
+msgstr "이 노선 수집 {0} / {1}"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:252
 msgid "支线"
-msgstr "支线"
+msgstr "지선"
 
 #. placeholder {0}: collected.length
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:265
 msgid "收集 {0} / {passengerCount} 位故事"
-msgstr "收集 {0} / {passengerCount} 位故事"
+msgstr "이야기 수집 {0} / {passengerCount}"
 
 #. placeholder {0}: r.unlockTickets
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:267
 msgid "需要 {0} 张车票"
-msgstr "需要 {0} 张车票"
+msgstr "티켓 {0}장 필요"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:281
 msgid "故事手账"
-msgstr "故事手账"
+msgstr "이야기 수첩"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:314
 msgid "本班结束"
-msgstr "本班结束"
+msgstr "이번 운행 종료"
 
 #. placeholder {0}: state.totalFragments
 #. placeholder {1}: state.ticketCount
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:318
 msgid "累计故事碎片 {0} · 海边车票 {1}"
-msgstr "累计故事碎片 {0} · 海边车票 {1}"
+msgstr "누적 이야기 조각 {0} · 해변 티켓 {1}"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:334
 msgid "回到月台"
-msgstr "回到月台"
+msgstr "승강장으로 돌아가기"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:343
 msgid "列车日志"
-msgstr "列车日志"
+msgstr "열차 로그"
 
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:356
 msgid "等待发车…"
-msgstr "等待发车…"
+msgstr "발차 대기 중…"
 
 #. placeholder {0}: route.unlockTickets
 #. placeholder {1}: route.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:108
 msgid "需要 {0} 张车票才能开往 {1}。"
-msgstr "需要 {0} 张车票才能开往 {1}。"
+msgstr "{1}(으)로 가려면 티켓 {0}장이 필요합니다."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:132
 msgid "列车到 {0}，有人在月台等着。"
-msgstr "列车到 {0}，有人在月台等着。"
+msgstr "열차가 {0}에 도착, 승강장에 누군가 기다리고 있어요."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:140
 msgid "列车驶离始发站 {0}。"
-msgstr "列车驶离始发站 {0}。"
+msgstr "열차가 시발역 {0}에서 출발."
 
 #. placeholder {0}: p?.name ?? t(msg`一位乘客`)
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:167
 msgid "{0} 走远了，没赶上拾取。"
-msgstr "{0} 走远了，没赶上拾取。"
+msgstr "{0}이(가) 멀어져 줍지 못했습니다."
 
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:167
 msgid "一位乘客"
-msgstr "一位乘客"
+msgstr "승객 한 명"
 
 #. placeholder {0}: route.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:194
 msgid "跑完 {0} 并收齐乘客故事，+1 海边车票。"
-msgstr "跑完 {0} 并收齐乘客故事，+1 海边车票。"
+msgstr "{0} 완주 + 모든 승객 이야기 수집: 해변 티켓 +1."
 
 #. placeholder {0}: route.name
 #. placeholder {1}: collected.length
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:203
 msgid "跑完 {0}，本次收集 {1} 位故事。"
-msgstr "跑完 {0}，本次收集 {1} 位故事。"
+msgstr "{0} 완주, 이번 운행에서 이야기 {1}개 수집."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:221
 msgid "列车进 {0}，月台上有人。"
-msgstr "列车进 {0}，月台上有人。"
+msgstr "열차가 {0}에 진입, 승강장에 사람이 있어요."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:230
 msgid "{0} 又过了一遍，故事已收。"
-msgstr "{0} 又过了一遍，故事已收。"
+msgstr "{0}을(를) 다시 지나갑니다. 이야기는 이미 수집됨."
 
 #. placeholder {0}: station.name
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:231
 msgid "列车经过 {0}（风景站）。"
-msgstr "列车经过 {0}（风景站）。"
+msgstr "열차가 {0}을(를) 통과 (경관 정거장)."
 
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:242
 msgid "时间到，列车收车回库。"
-msgstr "时间到，列车收车回库。"
+msgstr "시간 종료, 열차가 차고로 복귀."
 
 #. placeholder {0}: p?.name ?? ""
 #. placeholder {1}: p?.fragmentTitle ?? ""
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:264
 msgid "拾取 {0}：{1}"
-msgstr "拾取 {0}：{1}"
+msgstr "{0} 줍기: {1}"
 
 #: apps/app/src/features/games/forest-train/use-forest-train-state.ts:276
 msgid "列车不停，乘客继续等下一班。"
-msgstr "列车不停，乘客继续等下一班。"
+msgstr "열차가 정차하지 않아 승객들이 다음 편을 기다립니다."
 
 #: apps/app/src/features/games/game-center-data.ts:89
 #: apps/app/src/i18n/static-dom-seed.ts:50
@@ -14203,17 +14203,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "본진을 지키고 적 탱크 20대를 격파하라."
 
 #: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "2P"
+
+#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "픽셀"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "액션"
-
-#: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "2P"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -14564,232 +14564,232 @@ msgstr "》의 게임 센터 이어보기."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:44
 msgid "木吉他"
-msgstr "木吉他"
+msgstr "어쿠스틱 기타"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:47
 msgid "稳定加分，适合上手。"
-msgstr "稳定加分，适合上手。"
+msgstr "안정적인 가산, 입문에 적합."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:51
 msgid "架子鼓"
-msgstr "架子鼓"
+msgstr "드럼"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:54
 msgid "每拍 +2 分，节拍要稳。"
-msgstr "每拍 +2 分，节拍要稳。"
+msgstr "박자마다 +2점, 박자를 안정적으로."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:58
 msgid "合成器"
-msgstr "合成器"
+msgstr "신디사이저"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:61
 msgid "电子音色，节奏带感。"
-msgstr "电子音色，节奏带感。"
+msgstr "전자 음색, 그루브 있는 리듬."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:65
 msgid "和声 mic"
-msgstr "和声 mic"
+msgstr "하모니 mic"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:68
 msgid "高音段 +1，最适合海风曲。"
-msgstr "高音段 +1，最适合海风曲。"
+msgstr "고음 구간 +1, 바닷바람 곡에 최적."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:75
 msgid "极光灯阵"
-msgstr "极光灯阵"
+msgstr "오로라 조명"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:78
 msgid "补光更好看。"
-msgstr "补光更好看。"
+msgstr "보조 조명이 더 멋져 보입니다."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:82
 msgid "海风旗阵"
-msgstr "海风旗阵"
+msgstr "바닷바람 깃발"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:85
 msgid "旗帜随风，气氛拉满。"
-msgstr "旗帜随风，气氛拉满。"
+msgstr "깃발이 바람에 휘날려 분위기 최고."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:89
 msgid "篝火台"
-msgstr "篝火台"
+msgstr "캠프파이어 스테이지"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:92
 msgid "暖色背景。"
-msgstr "暖色背景。"
+msgstr "따뜻한 톤 배경."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:96
 msgid "双层喇叭"
-msgstr "双层喇叭"
+msgstr "이중 스피커"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:99
 msgid "音浪覆盖海岸线。"
-msgstr "音浪覆盖海岸线。"
+msgstr "음파가 해안선 전체에 퍼집니다."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:106
 msgid "海风返场"
-msgstr "海风返场"
+msgstr "바닷바람 앵콜"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:107
 msgid "轻快 6 拍。"
-msgstr "轻快 6 拍。"
+msgstr "경쾌한 6박."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:114
 msgid "灯塔合唱"
-msgstr "灯塔合唱"
+msgstr "등대 합창"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:115
 msgid "稳定 8 拍。"
-msgstr "稳定 8 拍。"
+msgstr "안정적인 8박."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:122
 msgid "潮汐流行"
-msgstr "潮汐流行"
+msgstr "조류 팝"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:123
 msgid "快节奏 10 拍。"
-msgstr "快节奏 10 拍。"
+msgstr "빠른 10박."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:130
 msgid "月光之上"
-msgstr "月光之上"
+msgstr "달빛 위에서"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:131
 msgid "高音段 8 拍。"
-msgstr "高音段 8 拍。"
+msgstr "고음 8박."
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:138
 msgid "烟花段子"
-msgstr "烟花段子"
+msgstr "불꽃놀이 곡"
 
 #: apps/app/src/features/games/island-concert/island-concert-data.ts:139
 msgid "重拍 12 拍。"
-msgstr "重拍 12 拍。"
+msgstr "강박 12박."
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:80
 msgid "编排中"
-msgstr "编排中"
+msgstr "편성 중"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:82
 msgid "演出中"
-msgstr "演出中"
+msgstr "공연 중"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:84
 msgid "间歇"
-msgstr "间歇"
+msgstr "휴식"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:127
 msgid "下一首准备中…"
-msgstr "下一首准备中…"
+msgstr "다음 곡 준비 중…"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:129
 msgid "今晚演出结束"
-msgstr "今晚演出结束"
+msgstr "오늘 밤 공연 종료"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:130
 msgid "选好乐器、道具与曲目后开演"
-msgstr "选好乐器、道具与曲目后开演"
+msgstr "악기, 소품, 곡 선택 후 공연 시작"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:165
 msgid "开演（编排 {SETLIST_SIZE} 首已完成）"
-msgstr "开演（编排 {SETLIST_SIZE} 首已完成）"
+msgstr "공연 시작 ({SETLIST_SIZE}곡 편성 완료)"
 
 #. placeholder {0}: SETLIST_SIZE - state.setlist.length
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:167
 msgid "再选 {0} 首曲目"
-msgstr "再选 {0} 首曲目"
+msgstr "{0}곡 더 선택"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:173
 msgid "今晚演出结算"
-msgstr "今晚演出结算"
+msgstr "오늘 밤 공연 정산"
 
 #. placeholder {0}: state.totalScore
 #. placeholder {1}: state.posters
 #. placeholder {2}: state.ensemblePoints
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:177
 msgid "总节奏分 {0} · 单曲达 {POSTER_THRESHOLD} 分送海报，已收 {1} 张 · 合奏积分 +{2}"
-msgstr "总节奏分 {0} · 单曲达 {POSTER_THRESHOLD} 分送海报，已收 {1} 张 · 合奏积分 +{2}"
+msgstr "총 리듬 점수 {0} · 단일곡 {POSTER_THRESHOLD}점 달성 시 포스터 ({1}장 획득) · 합주 점수 +{2}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:202
 msgid "再排一场"
-msgstr "再排一场"
+msgstr "다음 공연 편성"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:209
 msgid "回到编排"
-msgstr "回到编排"
+msgstr "편성으로 돌아가기"
 
 #. placeholder {0}: state.currentSongIndex + 1
 #. placeholder {1}: state.setlist.length
 #. placeholder {2}: formatRemaining(state.remainingMs)
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:216
 msgid "第 {0} / {1} 首 · 剩余 {2}"
-msgstr "第 {0} / {1} 首 · 剩余 {2}"
+msgstr "{0} / {1}번째 곡 · 남은 시간 {2}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:225
 msgid "选乐器"
-msgstr "选乐器"
+msgstr "악기 선택"
 
 #. placeholder {0}: i.scoreBonus
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:232
 msgid "节奏 +{0}"
-msgstr "节奏 +{0}"
+msgstr "리듬 +{0}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:240
 msgid "舞台道具（最多 {STAGE_PROP_LIMIT}）"
-msgstr "舞台道具（最多 {STAGE_PROP_LIMIT}）"
+msgstr "무대 소품 (최대 {STAGE_PROP_LIMIT}개)"
 
 #. placeholder {0}: p.posterBonus
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:247
 msgid "海报 +{0}"
-msgstr "海报 +{0}"
+msgstr "포스터 +{0}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:257
 msgid "编排曲目（{SETLIST_SIZE} 首）"
-msgstr "编排曲目（{SETLIST_SIZE} 首）"
+msgstr "곡 편성 ({SETLIST_SIZE}곡)"
 
 #. placeholder {0}: s.beatCount
 #. placeholder {1}: (s.intervalMs / 1000).toFixed(2)
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:262
 msgid "{0} 拍 · {1}s/拍"
-msgstr "{0} 拍 · {1}s/拍"
+msgstr "{0}박 · {1}초/박"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:277
 msgid "后台日志"
-msgstr "后台日志"
+msgstr "백스테이지 로그"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:290
 msgid "等待开演…"
-msgstr "等待开演…"
+msgstr "공연 시작 대기 중…"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:337
 msgid "节拍"
-msgstr "节拍"
+msgstr "박자"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:340
 msgid "节奏分 {currentScore}"
-msgstr "节奏分 {currentScore}"
+msgstr "리듬 점수 {currentScore}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:340
 msgid "连击 {streak}"
-msgstr "连击 {streak}"
+msgstr "콤보 {streak}"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:354
 msgid "点！"
-msgstr "点！"
+msgstr "탭!"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:354
 msgid "等节拍亮起再点"
-msgstr "等节拍亮起再点"
+msgstr "박자가 밝아지면 탭하세요"
 
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:423
 msgid "已选"
-msgstr "已选"
+msgstr "선택됨"
 
 #. placeholder {0}: songIndex + 1
 #. placeholder {1}: song?.title ?? songId
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:146
 msgid "第 {0} 首：{1}"
-msgstr "第 {0} 首：{1}"
+msgstr "{0}번째 곡: {1}"
 
 #. placeholder {0}: song?.title ?? t(msg`本曲`)
 #. placeholder {1}: result.score
@@ -14798,128 +14798,128 @@ msgstr "第 {0} 首：{1}"
 #. placeholder {4}: result.misses
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:171
 msgid "{0} 结束：节奏分 {1} (完美 {2} / 命中 {3} / 错过 {4})"
-msgstr "{0} 结束：节奏分 {1} (完美 {2} / 命中 {3} / 错过 {4})"
+msgstr "{0} 종료: 리듬 {1} (퍼펙트 {2} / 히트 {3} / 미스 {4})"
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:171
 msgid "本曲"
-msgstr "本曲"
+msgstr "이 곡"
 
 #. placeholder {0}: state.totalScore
 #. placeholder {1}: state.songResults.filter((r) => r.score >= POSTER_THRESHOLD).length + bonusPosters
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:190
 msgid "今晚演出结束：总分 {0} · 海报 +{1}"
-msgstr "今晚演出结束：总分 {0} · 海报 +{1}"
+msgstr "오늘 공연 종료: 총점 {0} · 포스터 +{1}"
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:237
 msgid "请先编排 {SETLIST_SIZE} 首曲目。"
-msgstr "请先编排 {SETLIST_SIZE} 首曲目。"
+msgstr "먼저 {SETLIST_SIZE}곡을 편성해 주세요."
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:251
 msgid "海风夜灯亮起，演出开始。"
-msgstr "海风夜灯亮起，演出开始。"
+msgstr "바닷바람 야간등이 켜지고 공연이 시작됩니다."
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:310
 msgid "时间到，今晚到此为止。"
-msgstr "时间到，今晚到此为止。"
+msgstr "시간 종료, 오늘 밤은 여기까지."
 
 #: apps/app/src/features/games/island-concert/use-island-concert-state.ts:348
 msgid "{STREAK_BONUS_AT} 连击！+3 节奏分。"
-msgstr "{STREAK_BONUS_AT} 连击！+3 节奏分。"
+msgstr "{STREAK_BONUS_AT} 콤보! +3 리듬 점수."
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:23
 msgid "卤味烤串摊"
-msgstr "卤味烤串摊"
+msgstr "조림 꼬치 노점"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:32
 msgid "柠茶气泡摊"
-msgstr "柠茶气泡摊"
+msgstr "레몬티 탄산 노점"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:41
 msgid "手作文创摊"
-msgstr "手作文创摊"
+msgstr "수공예 굿즈 노점"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:50
 msgid "套圈打靶摊"
-msgstr "套圈打靶摊"
+msgstr "고리 던지기·사격 노점"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:62
 msgid "食物"
-msgstr "食物"
+msgstr "음식"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:63
 msgid "饮品"
-msgstr "饮品"
+msgstr "음료"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:64
 msgid "文创"
-msgstr "文创"
+msgstr "굿즈"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:86
 msgid "卤味摊招待 30 位顾客"
-msgstr "卤味摊招待 30 位顾客"
+msgstr "조림 노점에서 손님 30명 응대"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:96
 msgid "文创摊招待 18 位顾客"
-msgstr "文创摊招待 18 位顾客"
+msgstr "굿즈 노점에서 손님 18명 응대"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:106
 msgid "周内本场总顾客达 80 位"
-msgstr "周内本场总顾客达 80 位"
+msgstr "이번 주 누적 손님 80명 달성"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:184
 msgid "周末夜市开张，客流双倍。"
-msgstr "周末夜市开张，客流双倍。"
+msgstr "주말 야시장 개장, 방문객 2배."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:185
 msgid "夜市开张，今晚加油。"
-msgstr "夜市开张，今晚加油。"
+msgstr "야시장 개장, 오늘 밤도 화이팅."
 
 #. placeholder {0}: spec.name
 #: apps/app/src/features/games/night-market/night-market-engine.ts:243
 msgid "{0} 涌来 {customers} 位顾客（待收银 {income} 券）。"
-msgstr "{0} 涌来 {customers} 位顾客（待收银 {income} 券）。"
+msgstr "{0}에 손님 {customers}명 ({income} 정산 대기)."
 
 #. placeholder {0}: getStallSpec(wave.kind).name
 #. placeholder {1}: wave.customers
 #: apps/app/src/features/games/night-market/night-market-engine.ts:270
 msgid "{0} 顾客等不及走了 {1} 位。"
-msgstr "{0} 顾客等不及走了 {1} 位。"
+msgstr "{0}에서 손님 {1}명이 기다리다 떠났습니다."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:325
 msgid "本轮高收益，送一张摊位许可。"
-msgstr "本轮高收益，送一张摊位许可。"
+msgstr "이번 라운드 고수익, 노점 허가증 1장 획득."
 
 #. placeholder {0}: state.totalCustomersThisRound
 #. placeholder {1}: state.totalIncomeThisRound
 #: apps/app/src/features/games/night-market/night-market-engine.ts:330
 msgid "今夜营业结束：{0} 位顾客 / +{1} 夜市券。"
-msgstr "今夜营业结束：{0} 位顾客 / +{1} 夜市券。"
+msgstr "오늘 영업 종료: 손님 {0}명 / +{1} 야시장 쿠폰."
 
 #. placeholder {0}: order.label
 #. placeholder {1}: order.rewardCoupon
 #. placeholder {2}: order.rewardPermit
 #: apps/app/src/features/games/night-market/night-market-engine.ts:356
 msgid "周任务完成：{0}（+{1} 券 / +{2} 许可）。"
-msgstr "周任务完成：{0}（+{1} 券 / +{2} 许可）。"
+msgstr "주간 임무 완료: {0} (+{1} 쿠폰 / +{2} 허가증)."
 
 #. placeholder {0}: getStallSpec(kind).name
 #: apps/app/src/features/games/night-market/night-market-engine.ts:389
 msgid "{0} 收银：{customers} 位顾客 / +{income} 券。"
-msgstr "{0} 收银：{customers} 位顾客 / +{income} 券。"
+msgstr "{0} 정산: 손님 {customers}명 / +{income} 쿠폰."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:417
 msgid "夜市券不够，攒一会儿再升级。"
-msgstr "夜市券不够，攒一会儿再升级。"
+msgstr "야시장 쿠폰이 부족합니다. 조금 더 모은 뒤 업그레이드하세요."
 
 #. placeholder {0}: getStallSpec(kind).name
 #. placeholder {1}: stall.level
 #: apps/app/src/features/games/night-market/night-market-engine.ts:424
 msgid "{0} 升到 {1} 级（-{cost} 券）。"
-msgstr "{0} 升到 {1} 级（-{cost} 券）。"
+msgstr "{0}이(가) 레벨 {1}로 (-{cost} 쿠폰)."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:438
 msgid "本周任务都做完了。"
-msgstr "本周任务都做完了。"
+msgstr "이번 주 임무를 모두 완료했습니다."
 
 #. placeholder {0}: target.label
 #: apps/app/src/features/games/night-market/night-market-engine.ts:450
@@ -14928,110 +14928,110 @@ msgstr "互访好友夜市，\\\"{0}\\\" 推进 +{bump}。"
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:483
 msgid "所有摊位已满级，许可留着下次。"
-msgstr "所有摊位已满级，许可留着下次。"
+msgstr "모든 노점이 최대 레벨, 허가증은 다음을 위해 보관."
 
 #. placeholder {0}: getStallSpec(candidate.kind).name
 #. placeholder {1}: candidate.level
 #: apps/app/src/features/games/night-market/night-market-engine.ts:491
 msgid "使用许可，{0} 升到 {1} 级。"
-msgstr "使用许可，{0} 升到 {1} 级。"
+msgstr "허가증 사용, {0}이(가) 레벨 {1}로 상승."
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:87
 msgid "周末双倍"
-msgstr "周末双倍"
+msgstr "주말 2배"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:117
 msgid "营业时段"
-msgstr "营业时段"
+msgstr "영업 시간"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:119
 msgid "收摊冲刺"
-msgstr "收摊冲刺"
+msgstr "마감 스퍼트"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:125
 msgid "未开张"
-msgstr "未开张"
+msgstr "미개장"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:152
 #: apps/app/src/features/games/night-market/night-market-game.tsx:402
 msgid "再开一轮"
-msgstr "再开一轮"
+msgstr "한 번 더 영업"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:152
 msgid "开张营业（8 分钟）"
-msgstr "开张营业（8 分钟）"
+msgstr "영업 시작 (8분)"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:168
 msgid "一键收银（+{totalPending}）"
-msgstr "一键收银（+{totalPending}）"
+msgstr "일괄 정산 (+{totalPending})"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:175
 msgid "提前收摊"
-msgstr "提前收摊"
+msgstr "조기 마감"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:185
 msgid "互访好友"
-msgstr "互访好友"
+msgstr "친구 방문"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:194
 msgid "用许可升级"
-msgstr "用许可升级"
+msgstr "허가증으로 업그레이드"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:203
 msgid "本周任务"
-msgstr "本周任务"
+msgstr "이번 주 임무"
 
 #. placeholder {0}: state.weeklyOrders.length
 #: apps/app/src/features/games/night-market/night-market-game.tsx:206
 msgid "完成 {completedOrders} / {0}"
-msgstr "完成 {completedOrders} / {0}"
+msgstr "완료 {completedOrders} / {0}"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:252
 msgid "营业日志"
-msgstr "营业日志"
+msgstr "영업 로그"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:257
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:264
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:307
 msgid "重置进度"
-msgstr "重置进度"
+msgstr "진행 초기화"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:335
 msgid "吸客 ≤{attractCap}"
-msgstr "吸客 ≤{attractCap}"
+msgstr "고객 유치 ≤{attractCap}"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:339
 msgid "单客 +{perCustomer}"
-msgstr "单客 +{perCustomer}"
+msgstr "고객당 +{perCustomer}"
 
 #. placeholder {0}: stall.pendingCustomers
 #. placeholder {1}: stall.pendingIncome
 #: apps/app/src/features/games/night-market/night-market-game.tsx:354
 msgid "收银 {0} 位 (+{1})"
-msgstr "收银 {0} 位 (+{1})"
+msgstr "{0}명 정산 (+{1})"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:355
 msgid "等顾客上门"
-msgstr "等顾客上门"
+msgstr "손님 대기 중"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:370
 msgid "已满级"
-msgstr "已满级"
+msgstr "최고 레벨"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:371
 msgid "升级 {cost} 券"
-msgstr "升级 {cost} 券"
+msgstr "업그레이드 {cost} 쿠폰"
 
 #: apps/app/src/features/games/night-market/night-market-game.tsx:389
 msgid "今夜营业结算"
-msgstr "今夜营业结算"
+msgstr "오늘 밤 영업 정산"
 
 #. placeholder {0}: state.totalCustomersThisRound
 #. placeholder {1}: state.totalIncomeThisRound
 #. placeholder {2}: state.permitTickets
 #: apps/app/src/features/games/night-market/night-market-game.tsx:393
 msgid "{0} 位顾客 · +{1} 夜市券 · 当前许可 {2} 张"
-msgstr "{0} 位顾客 · +{1} 夜市券 · 当前许可 {2} 张"
+msgstr "손님 {0}명 · +{1} 쿠폰 · 허가증 {2}장"
 
 #: apps/app/src/features/games/parking-war/parking-war-data.ts:20
 msgid "代步车"
@@ -15430,82 +15430,82 @@ msgstr "{hours}시간 전"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:40
 msgid "一拳贴墙，特技节奏猛。"
-msgstr "一拳贴墙，特技节奏猛。"
+msgstr "벽에 박는 한 방, 특수기 리듬이 강력합니다."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:51
 msgid "节奏均衡，盾招更稳。"
-msgstr "节奏均衡，盾招更稳。"
+msgstr "균형 잡힌 리듬, 방어기가 더 안정적."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:62
 msgid "守得稳，反打才出特技。"
-msgstr "守得稳，反打才出特技。"
+msgstr "안정적인 방어 뒤 반격에서 특수기가 발동."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:73
 msgid "深夜节拍，特技精准。"
-msgstr "深夜节拍，特技精准。"
+msgstr "심야의 리듬, 정확한 특수기."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:84
 msgid "睡眼朦胧时反打最猛。"
-msgstr "睡眼朦胧时反打最猛。"
+msgstr "잠이 덜 깬 상태에서 반격이 가장 강력."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:94
 msgid "月光暴击，攻击优先。"
-msgstr "月光暴击，攻击优先。"
+msgstr "달빛 크리티컬, 공격 우선."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:37
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:159
 msgid "攻击"
-msgstr "攻击"
+msgstr "공격"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:39
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:166
 msgid "防御"
-msgstr "防御"
+msgstr "방어"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:41
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:173
 msgid "必杀"
-msgstr "必杀"
+msgstr "필살기"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:75
 msgid "5 回合制"
-msgstr "5 回合制"
+msgstr "5라운드 제"
 
 #. placeholder {0}: state.winStreak
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:81
 msgid "连胜 {0}"
-msgstr "连胜 {0}"
+msgstr "{0}연승"
 
 #. placeholder {0}: lastRound.round
 #. placeholder {1}: moveLabel(lastRound.playerMove)
 #. placeholder {2}: moveLabel(lastRound.npcMove)
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:122
 msgid "第 {0} 回合：你{1} / 对手{2}"
-msgstr "第 {0} 回合：你{1} / 对手{2}"
+msgstr "{0}라운드: 본인 {1} / 상대 {2}"
 
 #. placeholder {0}: lastRound.outcome.npcDamage
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:126
 msgid "命中 -{0}"
-msgstr "命中 -{0}"
+msgstr "명중 -{0}"
 
 #. placeholder {0}: lastRound.outcome.playerDamage
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:131
 msgid "受击 -{0}"
-msgstr "受击 -{0}"
+msgstr "피격 -{0}"
 
 #. placeholder {0}: lastRound.outcome.playerDamage
 #. placeholder {1}: lastRound.outcome.npcDamage
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:137
 msgid "互伤：你 -{0} / 对手 -{1}"
-msgstr "互伤：你 -{0} / 对手 -{1}"
+msgstr "상호 피해: 본인 -{0} / 상대 -{1}"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:143
 msgid "攻击被防住"
-msgstr "攻击被防住"
+msgstr "공격이 막힘"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:148
 msgid "两人对峙"
-msgstr "两人对峙"
+msgstr "대치"
 
 #. placeholder {0}: 12 + (player?.atkBonus ?? 0)
 #. placeholder {0}: 8 + (player?.atkBonus ?? 0)
@@ -15516,86 +15516,86 @@ msgstr "-{0}"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:167
 msgid "挡攻击"
-msgstr "挡攻击"
+msgstr "공격 막음"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:188
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:263
 msgid "再战一场"
-msgstr "再战一场"
+msgstr "다시 한 판"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:188
 msgid "开始对打"
-msgstr "开始对打"
+msgstr "대전 시작"
 
 #. placeholder {0}: state.round
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:192
 msgid "第 {0} / {ROUND_COUNT} 回合"
-msgstr "第 {0} / {ROUND_COUNT} 回合"
+msgstr "{0} / {ROUND_COUNT}라운드"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:198
 msgid "选择我的角色"
-msgstr "选择我的角色"
+msgstr "내 캐릭터 선택"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:237
 msgid "总胜场"
-msgstr "总胜场"
+msgstr "총 승수"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:238
 msgid "最佳连胜"
-msgstr "最佳连胜"
+msgstr "최고 연승"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:239
 msgid "连胜章"
-msgstr "连胜章"
+msgstr "연승 배지"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:247
 msgid "赢下这场！"
-msgstr "赢下这场！"
+msgstr "이 경기 승리!"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:249
 msgid "这场让对手压制了。"
-msgstr "这场让对手压制了。"
+msgstr "이번 경기는 상대에게 압도당했습니다."
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:250
 msgid "平局，下次见胜负。"
-msgstr "平局，下次见胜负。"
+msgstr "무승부, 다음에 승부를 가립시다."
 
 #. placeholder {0}: state.playerHp
 #. placeholder {1}: state.npcHp
 #. placeholder {2}: state.winStreak
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:254
 msgid "HP 残：你 {0} / 对手 {1} · 当前连胜 {2}"
-msgstr "HP 残：你 {0} / 对手 {1} · 当前连胜 {2}"
+msgstr "남은 HP: 본인 {0} / 상대 {1} · 현재 연승 {2}"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:270
 msgid "回到擂台"
-msgstr "回到擂台"
+msgstr "경기장으로 돌아가기"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:279
 msgid "擂台日志"
-msgstr "擂台日志"
+msgstr "경기장 로그"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:292
 msgid "等待开局…"
-msgstr "等待开局…"
+msgstr "경기 시작 대기 중…"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:101
 msgid "攻"
-msgstr "攻"
+msgstr "공"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:103
 msgid "防"
-msgstr "防"
+msgstr "방"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:105
 msgid "杀"
-msgstr "杀"
+msgstr "필"
 
 #. placeholder {0}: player.name
 #. placeholder {1}: npc.name
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:161
 msgid "{0} vs {1}，第一回合开始。"
-msgstr "{0} vs {1}，第一回合开始。"
+msgstr "{0} vs {1}, 1라운드 시작."
 
 #. placeholder {0}: next.round
 #. placeholder {1}: moveLabel(action.move)
@@ -15603,461 +15603,461 @@ msgstr "{0} vs {1}，第一回合开始。"
 #. placeholder {3}: outcome.summary === "p_hits" ? t(msg`你打中`) : outcome.summary === "n_hits" ? t(msg`被打中`) : outcome.summary === "trade" ? t(msg`互伤`) : outcome.summary === "block" ? t(msg`被防住`) : t(msg`僵持`)
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:187
 msgid "第 {0} 回合 · 你出{1} / 对方出{2} · {3}"
-msgstr "第 {0} 回合 · 你出{1} / 对方出{2} · {3}"
+msgstr "{0}라운드 · 본인 {1} / 상대 {2} · {3}"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:189
 msgid "你打中"
-msgstr "你打中"
+msgstr "명중"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:191
 msgid "被打中"
-msgstr "被打中"
+msgstr "피격"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:193
 msgid "互伤"
-msgstr "互伤"
+msgstr "상호 피해"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:195
 msgid "被防住"
-msgstr "被防住"
+msgstr "막힘"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:196
 msgid "僵持"
-msgstr "僵持"
+msgstr "교착"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:249
 msgid "三连胜达成！+1 双人皮肤券。"
-msgstr "三连胜达成！+1 双人皮肤券。"
+msgstr "3연승 달성! +1 듀오 스킨 쿠폰."
 
 #. placeholder {0}: player?.name ?? t(msg`玩家`)
 #. placeholder {1}: npc?.name ?? t(msg`对手`)
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:256
 msgid "{0} 胜 {1}。"
-msgstr "{0} 胜 {1}。"
+msgstr "{0}이(가) {1}을(를) 이김."
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:256
 msgid "玩家"
-msgstr "玩家"
+msgstr "플레이어"
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:256
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:265
 msgid "对手"
-msgstr "对手"
+msgstr "상대"
 
 #. placeholder {0}: npc?.name ?? t(msg`对手`)
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:265
 msgid "{0} 赢了，连胜清零。"
-msgstr "{0} 赢了，连胜清零。"
+msgstr "{0} 승리, 연승 초기화."
 
 #: apps/app/src/features/games/pixel-arena/use-pixel-arena-state.ts:270
 msgid "5 回合战平。"
-msgstr "5 回合战平。"
+msgstr "5라운드 끝에 무승부."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:36
 msgid "巷口扫一眼就知道哪条街最闹。"
-msgstr "巷口扫一眼就知道哪条街最闹。"
+msgstr "골목 입구만 봐도 어느 거리가 가장 시끌벅적한지 압니다."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:46
 msgid "一击就能把敌方信号源敲哑。"
-msgstr "一击就能把敌方信号源敲哑。"
+msgstr "한 방에 적의 신호원을 잠재웁니다."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:56
 msgid "包扎和递水的速度比谁都快。"
-msgstr "包扎和递水的速度比谁都快。"
+msgstr "붕대 감기와 물 건네기가 누구보다 빠릅니다."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:66
 msgid "谁来都先掏出名片，再说后面的事。"
-msgstr "谁来都先掏出名片，再说后面的事。"
+msgstr "누가 와도 명함부터 건네고 이야기를 시작합니다."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:76
 msgid "深夜动作精准到一毫秒。"
-msgstr "深夜动作精准到一毫秒。"
+msgstr "심야의 동작은 밀리초 단위로 정확합니다."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:86
 msgid "犯困也能补给，醒着更狠。"
-msgstr "犯困也能补给，醒着更狠。"
+msgstr "졸려도 보급 가능, 깨어 있으면 더욱 강력."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:94
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:161
 msgid "斥候"
-msgstr "斥候"
+msgstr "정찰"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:95
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:163
 msgid "狙击"
-msgstr "狙击"
+msgstr "저격"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-data.ts:96
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:164
 #: apps/app/src/lib/character-i18n.ts:14
 msgid "医疗"
-msgstr "医疗"
+msgstr "의료"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:165
 msgid "敌方信号扑过来了，需要 {skillName} 队员压制。"
-msgstr "敌方信号扑过来了，需要 {skillName} 队员压制。"
+msgstr "적 신호 접근, {skillName} 대원의 제압이 필요합니다."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:167
 msgid "协同窗口打开，连点两位队员锁定。"
-msgstr "协同窗口打开，连点两位队员锁定。"
+msgstr "협동 윈도우 열림, 두 대원을 연속 탭하여 고정."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:169
 msgid "补给信号到货，任意队员都可领取。"
-msgstr "补给信号到货，任意队员都可领取。"
+msgstr "보급 신호 도착, 모든 대원이 수령 가능."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:186
 msgid "错过敌方信号，士气受挫。"
-msgstr "错过敌方信号，士气受挫。"
+msgstr "적 신호를 놓쳐 사기가 떨어졌습니다."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:188
 msgid "协同窗口关闭，没能连点两位队员。"
-msgstr "协同窗口关闭，没能连点两位队员。"
+msgstr "협동 윈도우 닫힘, 두 대원을 탭하지 못함."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:190
 msgid "补给落空，等下一次。"
-msgstr "补给落空，等下一次。"
+msgstr "보급 실패, 다음 기회를 기다리세요."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:217
 msgid "小队就位，开始压制信号塔。"
-msgstr "小队就位，开始压制信号塔。"
+msgstr "분대 배치 완료, 신호탑 제압 시작."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:313
 msgid "信号塔已稳，本局 +{teamGain} 团队积分 / +{badgeGain} 赛季徽章。"
-msgstr "信号塔已稳，本局 +{teamGain} 团队积分 / +{badgeGain} 赛季徽章。"
+msgstr "신호탑 안정, +{teamGain} 팀 점수 / +{badgeGain} 시즌 배지."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:320
 msgid "时间到。本局压制完成度 {towerScore}%，+{teamGain} 团队积分。"
-msgstr "时间到。本局压制完成度 {towerScore}%，+{teamGain} 团队积分。"
+msgstr "시간 종료. 이번 판 제압도 {towerScore}%, +{teamGain} 팀 점수."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:325
 msgid "小队失守，等下一局再来。"
-msgstr "小队失守，等下一局再来。"
+msgstr "분대 함락, 다음 라운드를 기다리세요."
 
 #. placeholder {0}: def.name
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:354
 msgid "{0} 一发就压住了敌方信号源。"
-msgstr "{0} 一发就压住了敌方信号源。"
+msgstr "{0}이(가) 한 방에 적 신호원을 제압."
 
 #. placeholder {0}: def.name
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:364
 msgid "{0} 不是这事件的人选，反被打了一下。"
-msgstr "{0} 不是这事件的人选，反被打了一下。"
+msgstr "{0}이(가) 이 상황에 맞지 않아 오히려 피격."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:382
 msgid "双人协同压制完成，士气回涨。"
-msgstr "双人协同压制完成，士气回涨。"
+msgstr "2인 협동 제압 완료, 사기 회복."
 
 #. placeholder {0}: def.name
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:391
 msgid "{0} 已就位，再点一位队员锁定。"
-msgstr "{0} 已就位，再点一位队员锁定。"
+msgstr "{0} 배치 완료, 한 명 더 탭하여 고정."
 
 #. placeholder {0}: def.name
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:405
 msgid "{0} 把补给搬上来了。"
-msgstr "{0} 把补给搬上来了。"
+msgstr "{0}이(가) 보급품을 가져왔습니다."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-engine.ts:425
 msgid "协同压制释放，全队推塔。"
-msgstr "协同压制释放，全队推塔。"
+msgstr "협동 제압 발동, 전체 분대가 탑을 공격."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:48
 msgid "就绪"
-msgstr "就绪"
+msgstr "준비 완료"
 
 #. placeholder {0}: Math.ceil(left / 1000)
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:49
 msgid "{0} 秒"
-msgstr "{0} 秒"
+msgstr "{0}초"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:104
 msgid "阵容"
-msgstr "阵容"
+msgstr "라인업"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:121
 msgid "信号塔压制"
-msgstr "信号塔压制"
+msgstr "신호탑 제압"
 
 #. placeholder {0}: state.badgePoints
 #. placeholder {1}: state.teamScore
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:134
 msgid "徽章 {0} · 团队积分 {1}"
-msgstr "徽章 {0} · 团队积分 {1}"
+msgstr "배지 {0} · 팀 점수 {1}"
 
 #. placeholder {0}: state.syncSkillUses
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:137
 msgid "协同压制 ×{0}"
-msgstr "协同压制 ×{0}"
+msgstr "협동 제압 ×{0}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:206
 msgid "本局目标：完成两次协同压制并稳住终点信号塔。"
-msgstr "本局目标：完成两次协同压制并稳住终点信号塔。"
+msgstr "이번 판 목표: 협동 제압 2회 후 최종 신호탑 사수."
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:214
 msgid "开始本局"
-msgstr "开始本局"
+msgstr "이번 판 시작"
 
 #. placeholder {0}: 18
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:238
 msgid "释放协同压制（+{0}% 信号塔）"
-msgstr "释放协同压制（+{0}% 信号塔）"
+msgstr "협동 제압 발동 (신호탑 +{0}%)"
 
 #. placeholder {0}: formatCooldown(state, now)
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:239
 msgid "协同压制冷却中：{0}"
-msgstr "协同压制冷却中：{0}"
+msgstr "협동 제압 쿨다운: {0}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:259
 msgid "本局信号日志"
-msgstr "本局信号日志"
+msgstr "이번 판 신호 로그"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:273
 msgid "等待小队就位…"
-msgstr "等待小队就位…"
+msgstr "분대 배치 대기 중…"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:308
 msgid "敌方信号入侵"
-msgstr "敌方信号入侵"
+msgstr "적 신호 침투"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:310
 msgid "协同窗口已开启"
-msgstr "协同窗口已开启"
+msgstr "협동 윈도우 열림"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:311
 msgid "补给信号到货"
-msgstr "补给信号到货"
+msgstr "보급 신호 도착"
 
 #. placeholder {0}: SKILL_LABEL[event.needSkill ?? "scout"]
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:314
 msgid "点击 {0} 队员压制"
-msgstr "点击 {0} 队员压制"
+msgstr "{0} 대원을 눌러 제압"
 
 #. placeholder {0}: event.matchedBy.length
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:316
 msgid "连点两位队员锁定（已点 {0}/2）"
-msgstr "连点两位队员锁定（已点 {0}/2）"
+msgstr "두 대원을 탭하여 고정 ({0}/2 탭)"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:317
 msgid "点击任意队员领取补给"
-msgstr "点击任意队员领取补给"
+msgstr "아무 대원이나 탭하여 보급 수령"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:354
 msgid "信号塔已稳"
-msgstr "信号塔已稳"
+msgstr "신호탑 안정"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:355
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:355
 msgid "时间到"
-msgstr "时间到"
+msgstr "시간 종료"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:356
 msgid "小队失守"
-msgstr "小队失守"
+msgstr "분대 함락"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:362
 msgid "本局结束"
-msgstr "本局结束"
+msgstr "이번 판 종료"
 
 #. placeholder {0}: state.resolvedCount
 #. placeholder {1}: state.missedCount
 #. placeholder {2}: state.syncSkillUses
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:366
 msgid "本局完成度 {tower}% · 响应 {0} / 错过 {1} · 协同压制 ×{2}"
-msgstr "本局完成度 {tower}% · 响应 {0} / 错过 {1} · 协同压制 ×{2}"
+msgstr "완성도 {tower}% · 대응 {0} / 미스 {1} · 협동 제압 ×{2}"
 
 #. placeholder {0}: state.badgePoints
 #. placeholder {1}: state.teamScore
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:371
 msgid "赛季徽章 {0} · 团队积分 {1}"
-msgstr "赛季徽章 {0} · 团队积分 {1}"
+msgstr "시즌 배지 {0} · 팀 점수 {1}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:379
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:284
 msgid "再来一局"
-msgstr "再来一局"
+msgstr "한 판 더"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:386
 msgid "返回选阵"
-msgstr "返回选阵"
+msgstr "라인업으로 돌아가기"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:421
 msgid "选择 3 位队员"
-msgstr "选择 3 位队员"
+msgstr "대원 3명 선택"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:424
 msgid "本局结束后再调整"
-msgstr "本局结束后再调整"
+msgstr "이번 판 종료 후 조정"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:483
 msgid "确定阵容"
-msgstr "确定阵容"
+msgstr "라인업 확정"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:23
 msgid "晨光海湾"
-msgstr "晨光海湾"
+msgstr "새벽 만"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:24
 msgid "平直海岸线，最适合先把节奏找到。"
-msgstr "平直海岸线，最适合先把节奏找到。"
+msgstr "평탄한 해안선, 리듬을 잡기에 최적."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:33
 msgid "两段加速门连续触发，限时开放。"
-msgstr "两段加速门连续触发，限时开放。"
+msgstr "가속 게이트 2단 연속 발동, 한시 개방."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:42
 msgid "银河峡谷"
-msgstr "银河峡谷"
+msgstr "은하 협곡"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:43
 msgid "急弯多，需要稳定节拍。"
-msgstr "急弯多，需要稳定节拍。"
+msgstr "급커브가 많아 안정적인 박자가 필요합니다."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:51
 msgid "午夜弧线"
-msgstr "午夜弧线"
+msgstr "심야 곡선"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-data.ts:52
 msgid "深夜赛道，每个加速门都贴在临界。"
-msgstr "深夜赛道，每个加速门都贴在临界。"
+msgstr "심야 코스, 모든 가속 게이트가 임계선에 있습니다."
 
 #. placeholder {0}: track.unlockShards
 #. placeholder {1}: track.name
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:102
 msgid "星章不够，攒到 {0} 颗再来 {1}。"
-msgstr "星章不够，攒到 {0} 颗再来 {1}。"
+msgstr "스타 칩이 부족합니다. {0}개를 모은 뒤 {1}에 도전하세요."
 
 #. placeholder {0}: track.name
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:132
 msgid "{0} 开赛，把握节拍。"
-msgstr "{0} 开赛，把握节拍。"
+msgstr "{0} 시작, 리듬을 잡으세요."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:168
 msgid "错过加速门 {0}，速度被拖慢。"
-msgstr "错过加速门 {0}，速度被拖慢。"
+msgstr "가속 게이트 {0}을(를) 놓쳤습니다. 속도가 떨어졌어요."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:205
 msgid "点早了，加速门 {0} 没踩中。"
-msgstr "点早了，加速门 {0} 没踩中。"
+msgstr "너무 빨랐습니다. 가속 게이트 {0}을(를) 놓쳤어요."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:222
 msgid "完美加速门 {0} ×1.9 速度。"
-msgstr "完美加速门 {0} ×1.9 速度。"
+msgstr "퍼펙트 가속 게이트 {0}, 속도 ×1.9."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:233
 msgid "稳稳点中加速门 {0}。"
-msgstr "稳稳点中加速门 {0}。"
+msgstr "가속 게이트 {0}을(를) 안정적으로 탭."
 
 #. placeholder {0}: gate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:243
 msgid "抢拍偏了，加速门 {0} 没踩中。"
-msgstr "抢拍偏了，加速门 {0} 没踩中。"
+msgstr "박자가 어긋나 가속 게이트 {0}을(를) 놓쳤습니다."
 
 #. placeholder {0}: track.name
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:286
 msgid "刷新 {0} 最佳圈速。"
-msgstr "刷新 {0} 最佳圈速。"
+msgstr "{0}의 최고 랩 타임 갱신."
 
 #. placeholder {0}: track.name
 #. placeholder {1}: (state.raceTimeMs / 1000).toFixed(1)
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:294
 msgid "完赛 {0}：{1} 秒 / +{shards} 星章。"
-msgstr "完赛 {0}：{1} 秒 / +{shards} 星章。"
+msgstr "{0} 완주: {1}초 / +{shards} 스타 칩."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:305
 msgid "时间到，本圈完成度 {pct}%。"
-msgstr "时间到，本圈完成度 {pct}%。"
+msgstr "시간 종료, 이번 랩 완주율 {pct}%."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-engine.ts:320
 msgid "放弃本圈，下次再来。"
-msgstr "放弃本圈，下次再来。"
+msgstr "이번 랩 포기, 다음에 다시 도전하세요."
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:127
 msgid "待出发"
-msgstr "待出发"
+msgstr "출발 대기"
 
 #. placeholder {0}: state.hits.perfect
 #. placeholder {1}: state.hits.good
 #. placeholder {2}: state.hits.missed
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:170
 msgid "完美 {0} · 稳点 {1} · 失误 {2}"
-msgstr "完美 {0} · 稳点 {1} · 失误 {2}"
+msgstr "퍼펙트 {0} · 안정 {1} · 미스 {2}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:173
 msgid "× 加速中"
-msgstr "× 加速中"
+msgstr "× 가속 중"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:173
 msgid "× 减速"
-msgstr "× 减速"
+msgstr "× 감속"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:173
 msgid "巡航"
-msgstr "巡航"
+msgstr "정속"
 
 #. placeholder {0}: upcomingGate.index + 1
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:193
 msgid "点中第 {0} 道加速门"
-msgstr "点中第 {0} 道加速门"
+msgstr "{0}번 가속 게이트 명중"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:194
 msgid "已无加速门"
-msgstr "已无加速门"
+msgstr "가속 게이트 없음"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:195
 msgid "等待出发"
-msgstr "等待出发"
+msgstr "출발 대기"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:207
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:376
 msgid "再跑一圈"
-msgstr "再跑一圈"
+msgstr "한 바퀴 더"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:207
 msgid "出发（2 分钟内冲线）"
-msgstr "出发（2 分钟内冲线）"
+msgstr "출발 (2분 내 결승선)"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:216
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:356
 msgid "弃赛"
-msgstr "弃赛"
+msgstr "기권"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:223
 msgid "选择赛道"
-msgstr "选择赛道"
+msgstr "트랙 선택"
 
 #. placeholder {0}: state.starShards
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:225
 msgid "星章 {0}"
-msgstr "星章 {0}"
+msgstr "스타 칩 {0}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:264
 msgid "限时"
-msgstr "限时"
+msgstr "한시"
 
 #. placeholder {0}: tr.unlockShards
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:282
 msgid "需要 {0} 星章"
-msgstr "需要 {0} 星章"
+msgstr "스타 칩 {0}개 필요"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:284
 msgid "未挑战"
-msgstr "未挑战"
+msgstr "미도전"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:302
 msgid "赛道日志"
-msgstr "赛道日志"
+msgstr "트랙 로그"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:316
 msgid "等待出发…"
-msgstr "等待出发…"
+msgstr "출발 대기 중…"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:353
 msgid "完赛"
-msgstr "完赛"
+msgstr "완주"
 
 #. placeholder {0}: track?.name ?? t(msg`赛道`)
 #. placeholder {1}: state.hits.perfect
@@ -16065,20 +16065,20 @@ msgstr "完赛"
 #. placeholder {3}: state.hits.missed
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:362
 msgid "{0} · 圈速 {lap} · 完美 {1} / 稳点 {2} / 失误 {3}"
-msgstr "{0} · 圈速 {lap} · 完美 {1} / 稳点 {2} / 失误 {3}"
+msgstr "{0} · 랩 {lap} · 퍼펙트 {1} / 안정 {2} / 미스 {3}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:362
 msgid "赛道"
-msgstr "赛道"
+msgstr "트랙"
 
 #. placeholder {0}: formatTime(best)
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:367
 msgid "最佳圈速 {0}"
-msgstr "最佳圈速 {0}"
+msgstr "최고 랩 {0}"
 
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:383
 msgid "回到选赛道"
-msgstr "回到选赛道"
+msgstr "트랙 선택으로 돌아가기"
 
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:99
 msgid "暂停游戏"
@@ -16184,73 +16184,73 @@ msgstr "{0}의 그룹 사인업 결과를 계속 작성"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:267
 msgid "结果已回填，当前已全部确认"
-msgstr "结果已回填，当前已全部确认"
+msgstr "결과 반영 완료, 모두 확인됨"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:270
 msgid "结果已回填，可继续覆盖"
-msgstr "结果已回填，可继续覆盖"
+msgstr "결과 반영 완료, 계속 덮어쓰기 가능"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:274
 msgid "名单已整理，待回填"
-msgstr "名单已整理，待回填"
+msgstr "명단 정리 완료, 반영 대기"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:277
 msgid "名单整理中，待继续"
-msgstr "名单整理中，待继续"
+msgstr "명단 정리 중, 계속 대기"
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:293
 msgid "1. 已从{sourceLabel}群聊完成本轮群接龙结果回填。"
-msgstr "1. 已从{sourceLabel}群聊完成本轮群接龙结果回填。"
+msgstr "1. {sourceLabel} 그룹 채팅에서 이번 라운드 단체 사인업 결과 반영을 완료했습니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:294
 msgid "2. 当前名单已经全部确认，群里看到的是这一轮的最终完成结果。"
-msgstr "2. 当前名单已经全部确认，群里看到的是这一轮的最终完成结果。"
+msgstr "2. 현재 명단이 모두 확정되었고, 그룹에 표시되는 것은 이번 라운드의 최종 결과입니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:295
 msgid "3. 如后续有人补报或变更，再次打开群接龙并回填即可覆盖新的最终状态。"
-msgstr "3. 如后续有人补报或变更，再次打开群接龙并回填即可覆盖新的最终状态。"
+msgstr "3. 이후 추가 신청이나 변경이 생기면 단체 사인업을 다시 열고 반영하여 최신 최종 상태로 덮어쓸 수 있습니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:301
 msgid "1. 已从{sourceLabel}群聊再次打开群接龙工作台。"
-msgstr "1. 已从{sourceLabel}群聊再次打开群接龙工作台。"
+msgstr "1. {sourceLabel} 그룹 채팅에서 단체 사인업 작업판을 다시 열었습니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:302
 msgid "2. 当前统计结果已经再次回填到原群聊，正文说明和人数状态已按最新一轮覆盖。"
-msgstr "2. 当前统计结果已经再次回填到原群聊，正文说明和人数状态已按最新一轮覆盖。"
+msgstr "2. 현재 집계 결과가 원본 그룹 채팅에 다시 반영되었고, 본문 설명과 인원 상태가 최신 라운드로 덮어쓰여졌습니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:303
 msgid "3. 如需继续调整，后续回填会继续覆盖这轮结果，不再保留过期版本。"
-msgstr "3. 如需继续调整，后续回填会继续覆盖这轮结果，不再保留过期版本。"
+msgstr "3. 계속 조정이 필요하면 이후 반영이 이번 라운드를 덮어쓰며, 만료된 버전은 보관되지 않습니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:308
 #: apps/app/src/features/mini-programs/group-relay-message.ts:316
 #: apps/app/src/features/mini-programs/group-relay-message.ts:323
 msgid "1. 已从{sourceLabel}群聊打开群接龙工作台。"
-msgstr "1. 已从{sourceLabel}群聊打开群接龙工作台。"
+msgstr "1. {sourceLabel} 그룹 채팅에서 단체 사인업 작업판을 열었습니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:309
 msgid "2. 当前统计结果已经回填到原群聊，可继续在群里跟进补充名单。"
-msgstr "2. 当前统计结果已经回填到原群聊，可继续在群里跟进补充名单。"
+msgstr "2. 현재 집계 결과가 원본 그룹 채팅에 반영되었으며, 그룹에서 명단을 계속 추가할 수 있습니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:310
 msgid "3. 如需继续调整，重新打开群接龙后再次回填即可覆盖最新结果。"
-msgstr "3. 如需继续调整，重新打开群接龙后再次回填即可覆盖最新结果。"
+msgstr "3. 추가로 조정하려면 단체 사인업을 다시 열고 반영하여 최신 결과로 덮어쓰면 됩니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:317
 msgid "2. 当前名单和未确认成员已经整理完成，随时可以回填到原群聊。"
-msgstr "2. 当前名单和未确认成员已经整理完成，随时可以回填到原群聊。"
+msgstr "2. 현재 명단과 미확정 멤버 정리가 완료되어 언제든 원본 그룹 채팅에 반영 가능합니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:318
 msgid "3. 请确认最终结果后再一键回填，避免群里出现过期统计。"
-msgstr "3. 请确认最终结果后再一键回填，避免群里出现过期统计。"
+msgstr "3. 최종 결과를 확인한 뒤 일괄 반영하여 그룹에 만료된 집계가 표시되지 않도록 하세요."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:324
 msgid "2. 当前正在整理接龙名单和未确认成员。"
-msgstr "2. 当前正在整理接龙名单和未确认成员。"
+msgstr "2. 현재 단체 사인업 명단과 미확정 멤버를 정리 중입니다."
 
 #: apps/app/src/features/mini-programs/group-relay-message.ts:325
 msgid "3. 请按顺序继续接龙，或直接在群里补充结果。"
-msgstr "3. 请按顺序继续接龙，或直接在群里补充结果。"
+msgstr "3. 순서대로 계속 사인업하거나 그룹 채팅에 직접 결과를 추가해 주세요."
 
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:76
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:298
@@ -18242,7 +18242,7 @@ msgstr "피드백"
 
 #: apps/app/src/features/shell/desktop-nav-config.ts:123
 #: apps/app/src/features/shell/desktop-nav-config.ts:124
-#: apps/app/src/features/shell/desktop-shell.tsx:646
+#: apps/app/src/features/shell/desktop-shell.tsx:649
 #: apps/app/src/routes/desktop-mobile-page.tsx:186
 #: apps/app/src/routes/profile-page.tsx:151
 #: apps/app/src/routes/profile-settings-page.tsx:313
@@ -18363,106 +18363,106 @@ msgstr "잠시만 기다려 주세요..."
 msgid "再试一次"
 msgstr "다시 시도"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:378
+#: apps/app/src/features/shell/desktop-shell.tsx:381
 msgid "口令不正确，请重新输入。"
 msgstr "암호가 올바르지 않습니다. 다시 입력하세요."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:390
+#: apps/app/src/features/shell/desktop-shell.tsx:393
 msgid "请设置 4 到 6 位数字口令。"
 msgstr "4~6자리 숫자 암호를 설정하세요."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:395
+#: apps/app/src/features/shell/desktop-shell.tsx:398
 msgid "两次输入的口令不一致。"
 msgstr "두 번 입력한 암호가 일치하지 않습니다."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:406
+#: apps/app/src/features/shell/desktop-shell.tsx:409
 msgid "桌面锁定口令已设置，请输入口令解锁。"
 msgstr "데스크톱 잠금 암호가 설정되었습니다. 암호를 입력해 잠금을 해제하세요."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:438
+#: apps/app/src/features/shell/desktop-shell.tsx:441
 msgid "当前世界还没有\"我自己\"角色。"
 msgstr "현재 월드에는 아직 '내 자신' 캐릭터가 없습니다."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:456
+#: apps/app/src/features/shell/desktop-shell.tsx:459
 msgid "打开会话失败，请稍后再试。"
 msgstr "대화를 열지 못했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:497
+#: apps/app/src/features/shell/desktop-shell.tsx:500
 #: apps/app/src/i18n/static-dom-seed.ts:737
 msgid "关闭浮层"
 msgstr "오버레이 닫기"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:529
+#: apps/app/src/features/shell/desktop-shell.tsx:532
 #: apps/app/src/i18n/static-dom-seed.ts:382
 msgid "打开世界主人快捷卡片"
 msgstr "월드 주인 빠른 카드 열기"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:682
+#: apps/app/src/features/shell/desktop-shell.tsx:685
 msgid "设置桌面锁定口令"
 msgstr "데스크톱 잠금 암호 설정"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:683
+#: apps/app/src/features/shell/desktop-shell.tsx:686
 msgid "桌面已锁定"
 msgstr "데스크톱 잠김"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:706
+#: apps/app/src/features/shell/desktop-shell.tsx:709
 msgid "首次锁定需要先设置本机口令"
 msgstr "처음 잠그기 전에 로컬 암호를 설정하세요"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:707
+#: apps/app/src/features/shell/desktop-shell.tsx:710
 msgid "输入本机口令后恢复桌面访问"
 msgstr "로컬 암호를 입력해 데스크톱 접근 복원"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:713
+#: apps/app/src/features/shell/desktop-shell.tsx:716
 msgid "口令仅保存在当前浏览器或桌面客户端本地，用来阻止离开座位时工作区继续暴露。"
 msgstr "암호는 현재 브라우저 또는 데스크톱 클라이언트에만 저장되며, 자리를 비웠을 때 작업 공간이 계속 노출되지 않도록 합니다."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:717
+#: apps/app/src/features/shell/desktop-shell.tsx:720
 msgid "当前已启用 {lockPasscodeLength} 位本地锁定口令。"
 msgstr "{lockPasscodeLength}자리 로컬 잠금 암호가 활성화되어 있습니다."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:719
+#: apps/app/src/features/shell/desktop-shell.tsx:722
 msgid "当前设备尚未保存锁定口令。"
 msgstr "현재 기기에 저장된 잠금 암호가 아직 없습니다."
 
 #. placeholder {0}: formatTimestamp(lockedAt)
-#: apps/app/src/features/shell/desktop-shell.tsx:724
+#: apps/app/src/features/shell/desktop-shell.tsx:727
 msgid "锁定时间 {0}"
 msgstr "잠금 시간 {0}"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:758
+#: apps/app/src/features/shell/desktop-shell.tsx:761
 msgid "设置 4 到 6 位数字口令"
 msgstr "4~6자리 숫자 암호 설정"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:777
+#: apps/app/src/features/shell/desktop-shell.tsx:780
 msgid "再次输入口令确认"
 msgstr "확인을 위해 암호를 다시 입력"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:786
+#: apps/app/src/features/shell/desktop-shell.tsx:789
 msgid "设置口令并锁定"
 msgstr "암호 설정 후 잠금"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:794
+#: apps/app/src/features/shell/desktop-shell.tsx:797
 msgid "取消锁定"
 msgstr "잠금 취소"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:816
+#: apps/app/src/features/shell/desktop-shell.tsx:819
 msgid "输入桌面锁定口令"
 msgstr "데스크톱 잠금 암호 입력"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:825
+#: apps/app/src/features/shell/desktop-shell.tsx:828
 msgid "解锁继续使用"
 msgstr "잠금 해제 후 계속 사용"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:934
+#: apps/app/src/features/shell/desktop-shell.tsx:937
 msgid "还没有签名，去个人资料写一句吧"
 msgstr "아직 소개가 없습니다. 프로필에서 한 줄 적어보세요"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:978
+#: apps/app/src/features/shell/desktop-shell.tsx:981
 msgid "看看我最近发了什么"
 msgstr "최근 게시물 보기"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:986
+#: apps/app/src/features/shell/desktop-shell.tsx:989
 msgid "和\"我自己\"对话"
 msgstr "'내 자신'과 대화"
 
@@ -21185,385 +21185,385 @@ msgstr "오늘 수확 훔치기 횟수 한도에 도달했습니다（{0}/일）
 
 #: apps/app/src/lib/error-translate.ts:102
 msgid "请先选择一个朋友圈媒体文件。"
-msgstr "请先选择一个朋友圈媒体文件。"
+msgstr "먼저 모멘트 미디어 파일을 선택해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:104
 msgid "朋友圈当前仅支持图片或视频。"
-msgstr "朋友圈当前仅支持图片或视频。"
+msgstr "모멘트는 현재 이미지와 동영상만 지원합니다."
 
 #: apps/app/src/lib/error-translate.ts:106
 msgid "朋友圈媒体不存在。"
-msgstr "朋友圈媒体不存在。"
+msgstr "모멘트 미디어를 찾을 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:108
 msgid "朋友圈不存在。"
-msgstr "朋友圈不存在。"
+msgstr "모멘트 게시물을 찾을 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:110
 #: apps/app/src/lib/error-translate.ts:537
 msgid "需先加为好友才能互动。"
-msgstr "需先加为好友才能互动。"
+msgstr "친구를 추가한 뒤 상호작용할 수 있습니다."
 
 #: apps/app/src/lib/error-translate.ts:112
 msgid "朋友圈内容和媒体不能同时为空。"
-msgstr "朋友圈内容和媒体不能同时为空。"
+msgstr "모멘트 게시물은 본문과 미디어 중 하나는 있어야 합니다."
 
 #: apps/app/src/lib/error-translate.ts:114
 msgid "纯文本朋友圈不能附带图片或视频。"
-msgstr "纯文本朋友圈不能附带图片或视频。"
+msgstr "텍스트 모멘트에는 이미지나 동영상을 첨부할 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:116
 msgid "视频朋友圈必须且只能包含 1 条视频。"
-msgstr "视频朋友圈必须且只能包含 1 条视频。"
+msgstr "동영상 모멘트는 동영상 1개만 포함해야 합니다."
 
 #: apps/app/src/lib/error-translate.ts:118
 msgid "朋友圈视频时长不能超过 5 分钟。"
-msgstr "朋友圈视频时长不能超过 5 分钟。"
+msgstr "모멘트 동영상은 5분을 초과할 수 없습니다."
 
 #. placeholder {0}: String(params.max ?? 9)
 #: apps/app/src/lib/error-translate.ts:121
 msgid "图片朋友圈最多支持 {0} 张图片。"
-msgstr "图片朋友圈最多支持 {0} 张图片。"
+msgstr "이미지 모멘트는 최대 {0}장까지 가능합니다."
 
 #: apps/app/src/lib/error-translate.ts:124
 msgid "图片朋友圈当前只支持图片资源。"
-msgstr "图片朋友圈当前只支持图片资源。"
+msgstr "이미지 모멘트는 이미지 리소스만 지원합니다."
 
 #: apps/app/src/lib/error-translate.ts:126
 msgid "limit 必须是正整数。"
-msgstr "limit 必须是正整数。"
+msgstr "limit는 양의 정수여야 합니다."
 
 #: apps/app/src/lib/error-translate.ts:128
 msgid "只有激活中的提醒可以完成。"
-msgstr "只有激活中的提醒可以完成。"
+msgstr "활성 상태인 알림만 완료할 수 있습니다."
 
 #: apps/app/src/lib/error-translate.ts:130
 msgid "只有激活中的提醒可以延后。"
-msgstr "只有激活中的提醒可以延后。"
+msgstr "활성 상태인 알림만 미룰 수 있습니다."
 
 #: apps/app/src/lib/error-translate.ts:132
 msgid "提醒不存在。"
-msgstr "提醒不存在。"
+msgstr "알림을 찾을 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:134
 msgid "until 不是有效时间。"
-msgstr "until 不是有效时间。"
+msgstr "until가 유효한 시간이 아닙니다."
 
 #: apps/app/src/lib/error-translate.ts:136
 msgid "请提供有效的延后时间。"
-msgstr "请提供有效的延后时间。"
+msgstr "유효한 미루기 시간을 입력해 주세요."
 
 #. placeholder {0}: String(params.id ?? "")
 #: apps/app/src/lib/error-translate.ts:143
 msgid "角色已存在：{0}"
-msgstr "角色已存在：{0}"
+msgstr "캐릭터가 이미 존재합니다: {0}"
 
 #: apps/app/src/lib/error-translate.ts:146
 msgid "默认保底角色不可删除。"
-msgstr "默认保底角色不可删除。"
+msgstr "기본 보장 캐릭터는 삭제할 수 없습니다."
 
 #. placeholder {0}: String(params.presetKey ?? "")
 #: apps/app/src/lib/error-translate.ts:149
 msgid "预设角色不存在：{0}"
-msgstr "预设角色不存在：{0}"
+msgstr "프리셋 캐릭터를 찾을 수 없습니다: {0}"
 
 #: apps/app/src/lib/error-translate.ts:152
 msgid "至少选择一个预设角色。"
-msgstr "至少选择一个预设角色。"
+msgstr "프리셋 캐릭터를 최소 한 명 선택해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:154
 msgid "需要提供聊天样本。"
-msgstr "需要提供聊天样本。"
+msgstr "채팅 샘플이 필요합니다."
 
 #. placeholder {0}: String(params.revisionId ?? "")
 #: apps/app/src/lib/error-translate.ts:157
 msgid "角色蓝图版本不存在：{0}"
-msgstr "角色蓝图版本不存在：{0}"
+msgstr "캐릭터 블루프린트 버전을 찾을 수 없습니다: {0}"
 
 #: apps/app/src/lib/error-translate.ts:160
 msgid "摇一摇当前已在后台停用。"
-msgstr "摇一摇当前已在后台停用。"
+msgstr "흔들기 기능이 현재 백엔드에서 비활성화되어 있습니다."
 
 #. placeholder {0}: String(params.cooldownMinutes ?? "?")
 #: apps/app/src/lib/error-translate.ts:163
 msgid "请至少间隔 {0} 分钟再摇一次。"
-msgstr "请至少间隔 {0} 分钟再摇一次。"
+msgstr "다음 흔들기까지 최소 {0}분을 기다려 주세요."
 
 #: apps/app/src/lib/error-translate.ts:166
 msgid "今日摇一摇次数已达到上限。"
-msgstr "今日摇一摇次数已达到上限。"
+msgstr "오늘 흔들기 횟수 한도에 도달했습니다."
 
 #: apps/app/src/lib/error-translate.ts:169
 msgid "当前赛博分身信号不足，暂时还不能生成新的摇一摇角色。"
-msgstr "当前赛博分身信号不足，暂时还不能生成新的摇一摇角色。"
+msgstr "사이버 분신 신호가 부족하여 지금은 새 흔들기 캐릭터를 생성할 수 없습니다."
 
 #. placeholder {0}: String(params.sessionId ?? "")
 #: apps/app/src/lib/error-translate.ts:173
 msgid "摇一摇会话不存在：{0}"
-msgstr "摇一摇会话不存在：{0}"
+msgstr "흔들기 세션을 찾을 수 없습니다: {0}"
 
 #: apps/app/src/lib/error-translate.ts:176
 msgid "当前摇一摇结果已经不可再放弃。"
-msgstr "当前摇一摇结果已经不可再放弃。"
+msgstr "현재 흔들기 결과는 더 이상 폐기할 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:179
 msgid "当前摇一摇结果已保留，但角色记录不存在。"
-msgstr "当前摇一摇结果已保留，但角色记录不存在。"
+msgstr "흔들기 결과는 보관되었지만 캐릭터 기록을 찾을 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:182
 msgid "当前摇一摇结果已经不能再保留。"
-msgstr "当前摇一摇结果已经不能再保留。"
+msgstr "현재 흔들기 결과는 더 이상 보관할 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:184
 msgid "当前摇一摇结果缺少角色草稿。"
-msgstr "当前摇一摇结果缺少角色草稿。"
+msgstr "현재 흔들기 결과에 캐릭터 초안이 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:186
 msgid "当前摇一摇结果无法创建对应角色。"
-msgstr "当前摇一摇结果无法创建对应角色。"
+msgstr "현재 흔들기 결과로 해당 캐릭터를 생성할 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:188
 msgid "没有可用的摇一摇方向。"
-msgstr "没有可用的摇一摇方向。"
+msgstr "사용 가능한 흔들기 방향이 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:190
 msgid "用户名与密码不能为空。"
-msgstr "用户名与密码不能为空。"
+msgstr "사용자 이름과 비밀번호는 비워둘 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:192
 msgid "用户名已被占用。"
-msgstr "用户名已被占用。"
+msgstr "이미 사용 중인 사용자 이름입니다."
 
 #: apps/app/src/lib/error-translate.ts:194
 msgid "账号或密码错误。"
-msgstr "账号或密码错误。"
+msgstr "계정 또는 비밀번호가 잘못되었습니다."
 
 #: apps/app/src/lib/error-translate.ts:197
 msgid "该账号通过邮箱验证码注册，请使用邮箱验证码登录。"
-msgstr "该账号通过邮箱验证码注册，请使用邮箱验证码登录。"
+msgstr "이 계정은 이메일 인증 코드로 가입했습니다. 이메일 인증 코드로 로그인해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:200
 msgid "服务器未配置 JWT_SECRET。"
-msgstr "服务器未配置 JWT_SECRET。"
+msgstr "서버에 JWT_SECRET이 설정되지 않았습니다."
 
 #: apps/app/src/lib/error-translate.ts:202
 msgid "验证码不能为空。"
-msgstr "验证码不能为空。"
+msgstr "인증 코드를 비워둘 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:204
 msgid "验证码错误。"
-msgstr "验证码错误。"
+msgstr "인증 코드가 잘못되었습니다."
 
 #: apps/app/src/lib/error-translate.ts:206
 msgid "该验证码已使用。"
-msgstr "该验证码已使用。"
+msgstr "이 인증 코드는 이미 사용되었습니다."
 
 #: apps/app/src/lib/error-translate.ts:208
 msgid "验证码已过期。"
-msgstr "验证码已过期。"
+msgstr "인증 코드가 만료되었습니다."
 
 #: apps/app/src/lib/error-translate.ts:210
 msgid "邮箱格式不正确。"
-msgstr "邮箱格式不正确。"
+msgstr "이메일 형식이 잘못되었습니다."
 
 #: apps/app/src/lib/error-translate.ts:212
 msgid "缺少访问令牌。"
-msgstr "缺少访问令牌。"
+msgstr "액세스 토큰이 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:214
 msgid "访问令牌无效或已过期。"
-msgstr "访问令牌无效或已过期。"
+msgstr "액세스 토큰이 유효하지 않거나 만료되었습니다."
 
 #: apps/app/src/lib/error-translate.ts:216
 msgid "用户不存在。"
-msgstr "用户不存在。"
+msgstr "사용자를 찾을 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:218
 msgid "邮箱绑定失败，请稍后重试。"
-msgstr "邮箱绑定失败，请稍后重试。"
+msgstr "이메일 연결에 실패했습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:220
 msgid "验证码发送失败，请稍后重试。"
-msgstr "验证码发送失败，请稍后重试。"
+msgstr "인증 코드 전송에 실패했습니다. 잠시 후 다시 시도해 주세요."
 
 #. placeholder {0}: String(params.retryAfter ?? "?")
 #: apps/app/src/lib/error-translate.ts:223
 msgid "验证码发送过于频繁，请在 {0} 秒后重试。"
-msgstr "验证码发送过于频繁，请在 {0} 秒后重试。"
+msgstr "인증 코드 전송이 너무 잦습니다. {0}초 뒤에 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:226
 msgid "该邮箱验证码请求次数过多，请稍后再试。"
-msgstr "该邮箱验证码请求次数过多，请稍后再试。"
+msgstr "이 이메일의 인증 코드 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:230
 msgid "当前语音模式暂不支持。"
-msgstr "当前语音模式暂不支持。"
+msgstr "현재 음성 모드는 아직 지원되지 않습니다."
 
 #: apps/app/src/lib/error-translate.ts:232
 msgid "请先提供要播报的文本。"
-msgstr "请先提供要播报的文本。"
+msgstr "먼저 음성으로 재생할 텍스트를 입력해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:234
 msgid "语音生成结果为空，请稍后再试。"
-msgstr "语音生成结果为空，请稍后再试。"
+msgstr "음성 생성 결과가 비어 있습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:236
 msgid "语音请求重试失败。"
-msgstr "语音请求重试失败。"
+msgstr "음성 요청 재시도에 실패했습니다."
 
 #. placeholder {0}: String(params.message)
 #: apps/app/src/lib/error-translate.ts:240
 msgid "请求过于频繁：{0}"
-msgstr "请求过于频繁：{0}"
+msgstr "요청이 너무 잦습니다: {0}"
 
 #: apps/app/src/lib/error-translate.ts:241
 msgid "请求过于频繁，请稍后再试。"
-msgstr "请求过于频繁，请稍后再试。"
+msgstr "요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:244
 msgid "当前 AI 服务不可用，请稍后再试。"
-msgstr "当前 AI 服务不可用，请稍后再试。"
+msgstr "현재 AI 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:246
 msgid "请先提供图片生成描述。"
-msgstr "请先提供图片生成描述。"
+msgstr "먼저 이미지 생성을 위한 설명을 입력해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:248
 msgid "图片生成结果为空，请稍后再试。"
-msgstr "图片生成结果为空，请稍后再试。"
+msgstr "이미지 생성 결과가 비어 있습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:250
 msgid "图片生成服务不可用，请稍后再试。"
-msgstr "图片生成服务不可用，请稍后再试。"
+msgstr "이미지 생성 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:252
 msgid "没有收到可转写的音频内容。"
-msgstr "没有收到可转写的音频内容。"
+msgstr "전사할 수 있는 오디오를 받지 못했습니다."
 
 #: apps/app/src/lib/error-translate.ts:254
 msgid "录音文件过大，请缩短单次语音输入时长。"
-msgstr "录音文件过大，请缩短单次语音输入时长。"
+msgstr "녹음 파일이 너무 큽니다. 한 번의 음성 입력 길이를 줄여 주세요."
 
 #: apps/app/src/lib/error-translate.ts:256
 msgid "录音文件格式不受支持，请重试。"
-msgstr "录音文件格式不受支持，请重试。"
+msgstr "녹음 파일 형식이 지원되지 않습니다. 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:258
 msgid "语音转写服务不可用，请稍后再试。"
-msgstr "语音转写服务不可用，请稍后再试。"
+msgstr "음성 전사 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:262
 msgid "语音资源不存在。"
-msgstr "语音资源不存在。"
+msgstr "음성 리소스를 찾을 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:264
 msgid "Provider 账户名称不能为空。"
-msgstr "Provider 账户名称不能为空。"
+msgstr "공급자 계정 이름을 비워둘 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:266
 msgid "Provider 接口地址不能为空。"
-msgstr "Provider 接口地址不能为空。"
+msgstr "공급자 엔드포인트 URL을 비워둘 수 없습니다."
 
 #. placeholder {0}: String(params.id ?? params.providerAccountId ?? "")
 #: apps/app/src/lib/error-translate.ts:269
 msgid "Provider 账户不存在：{0}"
-msgstr "Provider 账户不存在：{0}"
+msgstr "공급자 계정을 찾을 수 없습니다: {0}"
 
 #: apps/app/src/lib/error-translate.ts:272
 msgid "请先启用该 Provider 账户，再设为默认。"
-msgstr "请先启用该 Provider 账户，再设为默认。"
+msgstr "이 공급자 계정을 활성화한 뒤 기본값으로 설정해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:275
 msgid "请先启用目标 Provider 账户，再批量换绑模型人格角色。"
-msgstr "请先启用目标 Provider 账户，再批量换绑模型人格角色。"
+msgstr "대상 공급자 계정을 먼저 활성화한 뒤 모델 페르소나 캐릭터를 일괄로 다시 연결해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:278
 msgid "请先填写默认模型 ID。"
-msgstr "请先填写默认模型 ID。"
+msgstr "먼저 기본 모델 ID를 입력해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:280
 msgid "默认 Provider 账户不存在。"
-msgstr "默认 Provider 账户不存在。"
+msgstr "기본 공급자 계정이 존재하지 않습니다."
 
 #: apps/app/src/lib/error-translate.ts:282
 msgid "至少选择一个可安装的模型目录项。"
-msgstr "至少选择一个可安装的模型目录项。"
+msgstr "설치 가능한 모델 카탈로그 항목을 하나 이상 선택해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:284
 msgid "至少选择一个已登记的模型目录项。"
-msgstr "至少选择一个已登记的模型目录项。"
+msgstr "등록된 모델 카탈로그 항목을 하나 이상 선택해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:286
 msgid "管理后台尚未配置访问密钥。"
-msgstr "管理后台尚未配置访问密钥。"
+msgstr "관리 백엔드에 액세스 키가 설정되지 않았습니다."
 
 #: apps/app/src/lib/error-translate.ts:288
 msgid "管理后台访问密钥无效。"
-msgstr "管理后台访问密钥无效。"
+msgstr "관리 백엔드 액세스 키가 유효하지 않습니다."
 
 #: apps/app/src/lib/error-translate.ts:290
 msgid "items 必填。"
-msgstr "items 必填。"
+msgstr "items는 필수입니다."
 
 #: apps/app/src/lib/error-translate.ts:293
 msgid "characterId 与 expectedStableRevisionId 必填。"
-msgstr "characterId 与 expectedStableRevisionId 必填。"
+msgstr "characterId와 expectedStableRevisionId는 필수입니다."
 
 #. placeholder {0}: String(params.conversationId ?? "")
 #: apps/app/src/lib/error-translate.ts:297
 msgid "对话不存在：{0}"
-msgstr "对话不存在：{0}"
+msgstr "대화를 찾을 수 없습니다: {0}"
 
 #. placeholder {0}: String(params.conversationId ?? "")
 #: apps/app/src/lib/error-translate.ts:301
 msgid "对话 {0} 没有角色参与者。"
-msgstr "对话 {0} 没有角色参与者。"
+msgstr "대화 {0}에 캐릭터 참가자가 없습니다."
 
 #. placeholder {0}: String(params.messageId ?? "")
 #: apps/app/src/lib/error-translate.ts:305
 #: apps/app/src/lib/error-translate.ts:363
 msgid "消息不存在：{0}"
-msgstr "消息不存在：{0}"
+msgstr "메시지를 찾을 수 없습니다: {0}"
 
 #: apps/app/src/lib/error-translate.ts:308
 msgid "World owner 不存在。"
-msgstr "World owner 不存在。"
+msgstr "월드 소유자를 찾을 수 없습니다."
 
 #: apps/app/src/lib/error-translate.ts:310
 msgid "未知的 self-agent workspace 文档名。"
-msgstr "未知的 self-agent workspace 文档名。"
+msgstr "알 수 없는 self-agent workspace 문서 이름."
 
 #: apps/app/src/lib/error-translate.ts:312
 msgid "至少选择一个联系人。"
-msgstr "至少选择一个联系人。"
+msgstr "연락처를 하나 이상 선택해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:314
 msgid "单次最多预览 20 个联系人。"
-msgstr "单次最多预览 20 个联系人。"
+msgstr "한 번에 최대 20개 연락처까지 미리 볼 수 있습니다."
 
 #: apps/app/src/lib/error-translate.ts:316
 msgid "至少选择一个预览通过的联系人。"
-msgstr "至少选择一个预览通过的联系人。"
+msgstr "미리보기를 통과한 연락처를 하나 이상 선택해 주세요."
 
 #: apps/app/src/lib/error-translate.ts:318
 msgid "单次最多导入 20 个联系人。"
-msgstr "单次最多导入 20 个联系人。"
+msgstr "한 번에 최대 20개 연락처까지 가져올 수 있습니다."
 
 #: apps/app/src/lib/error-translate.ts:320
 msgid "联系人导入角色不存在。"
-msgstr "联系人导入角色不存在。"
+msgstr "연락처 가져오기 캐릭터가 존재하지 않습니다."
 
 #: apps/app/src/lib/error-translate.ts:322
 msgid "只支持补建联系人导入角色的好友关系。"
-msgstr "只支持补建联系人导入角色的好友关系。"
+msgstr "연락처 가져오기 캐릭터의 친구 관계만 보완 생성할 수 있습니다."
 
 #: apps/app/src/lib/error-translate.ts:324
 msgid "好友关系补建失败。"
-msgstr "好友关系补建失败。"
+msgstr "친구 관계 보완 생성에 실패했습니다."
 
 #: apps/app/src/lib/error-translate.ts:326
 msgid "只支持回滚联系人导入角色。"
-msgstr "只支持回滚联系人导入角色。"
+msgstr "연락처 가져오기 캐릭터만 롤백할 수 있습니다."
 
 #: apps/app/src/lib/error-translate.ts:328
 msgid "请先选择一张聊天背景。"
