@@ -288,14 +288,36 @@ export class MomentsService implements OnModuleInit {
   ): Promise<MomentCommentEntity> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.assertOwnerCanInteractWithPost(postId);
+    // 前端 WeChatCommentBar 已经用 value.trim().length>0 拦过空提交，但 curl /
+    // 第三方客户端直接 POST 仍能写入空字符串或纯空白，DB 里会出现"w："这种渲染
+    // 不出正文的脏评论。在服务端再拦一次，统一入口。
+    const trimmedText = typeof text === 'string' ? text.trim() : '';
+    if (!trimmedText) {
+      throw new AppError('MOMENT_COMMENT_EMPTY', {
+        legacyMessage: '评论内容不能为空。',
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+    // 校验 replyToCommentId 必须属于同一条 moment —— 否则 UI 找不到目标只能退化成
+    // 普通评论展示，但 replyToAuthorId 还留着，语义错乱。
+    const replyToCommentId = replyTo?.replyToCommentId?.trim() || null;
+    if (replyToCommentId) {
+      const target = await this.commentRepo.findOneBy({ id: replyToCommentId });
+      if (!target || target.postId !== postId) {
+        throw new AppError('MOMENT_COMMENT_REPLY_TARGET_INVALID', {
+          legacyMessage: '被回复的评论不存在或已被删除。',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+    }
     return this.addComment(
       postId,
       owner.id,
       owner.username?.trim() || 'You',
       owner.avatar ?? '',
-      text,
+      trimmedText,
       'user',
-      replyTo,
+      { ...replyTo, replyToCommentId },
     );
   }
 
