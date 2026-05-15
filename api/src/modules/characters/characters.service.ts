@@ -826,6 +826,23 @@ const PRIVATE_CHARACTER_FIELD_LIMITS = {
   profileJsonBytes: 64 * 1024,
 } as const;
 
+/**
+ * Avatar 安全 schema：放行 emoji / 字面量字符串 / http(s) URL / 站内绝对路径。
+ * 拒绝 `javascript:` / `data:` / `file:` 等可能引发 XSS / SSRF 的 scheme。
+ * 与 apps/wiki/src/lib/string-utils.ts 的 isSafeAvatarValue 严格对齐——
+ * 前端早 reject 体感更好，但后端必须再守一道：curl PUT 可以绕过前端。
+ */
+function isSafeAvatarValueBackend(raw: string): boolean {
+  const value = raw.trim();
+  if (!value) return true;
+  if (value.startsWith('/')) return true;
+  if (!value.includes(':')) return true;
+  const lc = value.toLowerCase();
+  return lc.startsWith('http://') || lc.startsWith('https://');
+}
+
+const SOCIAL_OPENNESS_VALUES = ['open', 'normal', 'private'] as const;
+
 export function assertPrivateCharacterFieldLimits(input: {
   name?: string;
   avatar?: string;
@@ -837,6 +854,9 @@ export function assertPrivateCharacterFieldLimits(input: {
   triggerScenes?: string[] | null;
   recipe?: unknown;
   profile?: unknown;
+  socialOpenness?: string;
+  proactiveBrowseChance?: number;
+  intimacyLevel?: number;
 }): void {
   const L = PRIVATE_CHARACTER_FIELD_LIMITS;
   const tooLong = (label: string, max: number) =>
@@ -903,6 +923,56 @@ export function assertPrivateCharacterFieldLimits(input: {
       throw new AppError('PRIVATE_IMPORT_INVALID', {
         status: HttpStatus.BAD_REQUEST,
         legacyMessage: `profile JSON 不可序列化：${(err as Error).message}`,
+      });
+    }
+  }
+  // avatar scheme：javascript:/data:/file: 是 XSS/SSRF 攻击面。前端 isSafeAvatarValue
+  // 已挡，但 curl PUT 能绕过 —— 后端再守一道。
+  if (typeof input.avatar === 'string' && !isSafeAvatarValueBackend(input.avatar)) {
+    throw new AppError('PRIVATE_IMPORT_INVALID', {
+      status: HttpStatus.BAD_REQUEST,
+      legacyMessage: 'avatar 只能填 emoji、http(s) URL 或 / 开头的站内路径。',
+    });
+  }
+  // socialOpenness 必须是 open / normal / private 之一。
+  // 前端 SelectField 只给 3 个值，但任意字符串能从 PUT body 写进 DB，让下游
+  // moments / social 服务读到非法值（落到默认分支前可能先 throw / NaN）。
+  if (
+    input.socialOpenness !== undefined &&
+    !SOCIAL_OPENNESS_VALUES.includes(
+      input.socialOpenness as (typeof SOCIAL_OPENNESS_VALUES)[number],
+    )
+  ) {
+    throw new AppError('PRIVATE_IMPORT_INVALID', {
+      status: HttpStatus.BAD_REQUEST,
+      legacyMessage: `socialOpenness 取值只能是 ${SOCIAL_OPENNESS_VALUES.join(' / ')}。`,
+    });
+  }
+  // proactiveBrowseChance ∈ [0, 1]；越界值前端会被 parseFloatInRange 卡掉，
+  // 这里挡住 curl 直传 99 这种把 social tick 概率拉满的 misuse。
+  if (typeof input.proactiveBrowseChance === 'number') {
+    if (
+      !Number.isFinite(input.proactiveBrowseChance) ||
+      input.proactiveBrowseChance < 0 ||
+      input.proactiveBrowseChance > 1
+    ) {
+      throw new AppError('PRIVATE_IMPORT_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'proactiveBrowseChance 必须在 0 - 1 之间。',
+      });
+    }
+  }
+  // intimacyLevel ∈ [0, 100]，整数。世界运行时会自动调整，初值越界会让
+  // 亲密度系统的归一化 / step 函数出现 NaN 或负偏移。
+  if (typeof input.intimacyLevel === 'number') {
+    if (
+      !Number.isFinite(input.intimacyLevel) ||
+      input.intimacyLevel < 0 ||
+      input.intimacyLevel > 100
+    ) {
+      throw new AppError('PRIVATE_IMPORT_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'intimacyLevel 必须在 0 - 100 之间。',
       });
     }
   }
