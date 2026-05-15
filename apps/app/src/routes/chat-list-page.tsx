@@ -539,6 +539,18 @@ function MobileChatListPage() {
     setSwipeResetVersion((current) => current + 1);
   }, [isActiveTab]);
 
+  // 「聊天已置顶」「已开启消息免打扰」这类成功提示之前没有 auto-dismiss——
+  // setNotice 后会一直挂在搜索框下面，直到用户下一次操作或离开 tab，看起来
+  // 像未完成的状态。pendingHideConversation 有自己的 5s 撤销窗口，这里只
+  // 给纯文本的 notice 加个 3.5s 自动消失。
+  useEffect(() => {
+    if (!notice || pendingHideConversation) {
+      return;
+    }
+    const timer = window.setTimeout(() => setNotice(null), 3500);
+    return () => window.clearTimeout(timer);
+  }, [notice, pendingHideConversation]);
+
   // 点 + 菜单容器之外（顶栏标题、搜索按钮、会话行等）任意位置都关菜单。
   // 之前用 z-30 fixed overlay 拦 click 会有两个问题：
   // 1) TabPageTopBar 是 sticky z-40，topbar 内的点击不会冒泡到 overlay；
@@ -1215,7 +1227,11 @@ function MobileChatListPage() {
                 />
               ))}
             </section>
-          ) : (
+          ) : pendingHideConversation ? null : (
+            // pendingHideConversation 在 5s 撤销窗口内同时把 hasConversations 拉成
+            // false——这时上方 InlineNotice 已经在显示「xxx 已从列表移除，5 秒内可
+            // 撤销」，再叠一张「还没有新消息」会误导用户以为永久没了；空态等撤销
+            // 窗口过期或被取消后下一次渲染再补。
             <div className="px-3 pt-2">
               <MobileChatListStatusCard
                 badge={t(msg`消息`)}
@@ -1409,9 +1425,8 @@ function ConversationListItemLinkImpl({
       -swipeActionWidth,
       0,
     );
-    if (Math.abs(deltaX) > 6) {
-      event.preventDefault();
-    }
+    // 容器 `touch-action: pan-y` 已经把横向手势让给了 JS（浏览器只负责竖向滚动），
+    // 之前在 React onTouchMove 里 preventDefault 是 no-op + 控制台噪音，删掉。
     updateSwipeOffset(nextOffset);
   };
 
@@ -1547,7 +1562,7 @@ function ConversationListItemLinkImpl({
   return (
     <div
       className={cn(
-        "yj-list-item-virtual relative overflow-hidden bg-[#c4c7cc]",
+        "yj-list-item-virtual relative overflow-hidden bg-[#c4c7cc] touch-pan-y",
         className,
       )}
       onTouchStart={handleTouchStart}
