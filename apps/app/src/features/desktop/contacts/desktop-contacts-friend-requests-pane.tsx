@@ -12,7 +12,6 @@ type DesktopContactsFriendRequestsPaneProps = {
   loading: boolean;
   error?: string | null;
   actionError?: string | null;
-  notice?: string | null;
   acceptPendingId?: string | null;
   declinePendingId?: string | null;
   onAccept: (requestId: string) => void;
@@ -24,7 +23,6 @@ export function DesktopContactsFriendRequestsPane({
   loading,
   error = null,
   actionError = null,
-  notice = null,
   acceptPendingId = null,
   declinePendingId = null,
   onAccept,
@@ -51,12 +49,6 @@ export function DesktopContactsFriendRequestsPane({
       </div>
 
       <div className="flex-1 px-8 py-6">
-        {notice ? (
-          <div className="mb-4">
-            <InlineNotice tone="success">{notice}</InlineNotice>
-          </div>
-        ) : null}
-
         {actionError ? (
           <div className="mb-4">
             <InlineNotice tone="danger">{actionError}</InlineNotice>

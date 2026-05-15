@@ -225,6 +225,7 @@ function MobileChatListPage() {
   const localMessageActionState = useLocalChatMessageActionState();
   const { reminders, clearReminder, clearReminders } = useMessageReminders();
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const quickMenuRef = useRef<HTMLDivElement | null>(null);
   const [isNotifiedReminderGroupExpanded, setIsNotifiedReminderGroupExpanded] =
     useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -538,6 +539,26 @@ function MobileChatListPage() {
     setSwipeResetVersion((current) => current + 1);
   }, [isActiveTab]);
 
+  // 点 + 菜单容器之外（顶栏标题、搜索按钮、会话行等）任意位置都关菜单。
+  // 之前用 z-30 fixed overlay 拦 click 会有两个问题：
+  // 1) TabPageTopBar 是 sticky z-40，topbar 内的点击不会冒泡到 overlay；
+  // 2) overlay 覆盖会话行的点击，菜单关闭但会话不会被点开（要点两次）。
+  // 改用 pointerdown 文档级监听 + ref 判断，参考 chat-composer.tsx#885。
+  useEffect(() => {
+    if (!isQuickMenuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!quickMenuRef.current?.contains(event.target as Node)) {
+        setIsQuickMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    return () => window.removeEventListener("pointerdown", handlePointerDown);
+  }, [isQuickMenuOpen]);
+
   useEffect(() => {
     if (
       openSwipeConversationId &&
@@ -698,22 +719,13 @@ function MobileChatListPage() {
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
-      {isQuickMenuOpen ? (
-        <button
-          type="button"
-          aria-label={t(msg`关闭快捷菜单`)}
-          onClick={() => setIsQuickMenuOpen(false)}
-          className="fixed inset-0 z-30 bg-black/[0.03]"
-        />
-      ) : null}
-
       <TabPageTopBar
         title={t(msg`消息`)}
         className="z-40 mx-0 mt-0 space-y-1.5 overflow-visible border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none sm:mx-0"
         titleAlign="center"
         titleClassName="text-[17px] font-medium tracking-normal"
         rightActions={
-          <div className="relative">
+          <div ref={quickMenuRef} className="relative">
             <Button
               type="button"
               variant="ghost"
