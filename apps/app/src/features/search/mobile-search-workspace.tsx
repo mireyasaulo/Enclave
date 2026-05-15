@@ -255,7 +255,12 @@ export function MobileSearchWorkspace({
 
         <div
           ref={chipsRef}
-          className="mt-2.5 flex gap-1.5 overflow-x-auto pb-0.5"
+          // chip 行 overflow-x-auto 在桌面 Chromium / Web embed 里会冒出 16px
+          // 的横向滚动条（含 ← → 箭头），把"凹槽"叠在 chip 下面非常显眼，
+          // 跟其它 mobile shell 里横向滑动的容器写法对齐：scrollbar-width:none
+          // + ::-webkit-scrollbar:hidden 把原生滚动条彻底藏掉，仅靠手势 / 触摸板
+          // 滚（pan-x 行为不变）。
+          className="mt-2.5 flex gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {searchCategoryLabelDescriptors.map((item) => {
             // chip 后挂的命中条数原来对所有非「全部」分类都挂；当结果是 0 时
