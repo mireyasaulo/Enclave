@@ -51,6 +51,7 @@ import { ChannelsForwardPicker } from "../components/channels-forward-picker";
 import { resolveAppMediaUrl } from "../lib/media-url";
 import { ExpandableText } from "../components/expandable-text";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { stripToolCallSyntax } from "../features/moments/moment-content";
 import {
   buildDesktopChannelsRouteHash,
   parseDesktopChannelsRouteHash,
@@ -1003,6 +1004,7 @@ export function ChannelsPage() {
             variant="ghost"
             size="icon"
             className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
+            aria-label={t(msg`返回`)}
           >
             <ArrowLeft size={17} />
           </Button>
@@ -1134,6 +1136,7 @@ export function ChannelsPage() {
         ) : null}
         {!channelsQuery.isLoading && visiblePosts.length ? (
           <MobileChannelsViewport
+            activeSection={activeSection}
             likePendingPostId={pendingLikePostId}
             posts={visiblePosts}
             routeSelectedPostId={routeSelectedPostId}
@@ -1814,6 +1817,7 @@ function createDesktopChannelRoutePost(
 }
 
 type MobileChannelsViewportProps = {
+  activeSection: FeedChannelHomeSection;
   likePendingPostId: string | null;
   posts: FeedPostListItem[];
   routeSelectedPostId: string | null;
@@ -1827,7 +1831,25 @@ type MobileChannelsViewportProps = {
   onVisiblePost: (postId: string) => void;
 };
 
+function getChannelsSectionBadge(
+  section: FeedChannelHomeSection,
+  t: ReturnType<typeof useRuntimeTranslator>,
+) {
+  switch (section) {
+    case "friends":
+      return t(msg`朋友视频号`);
+    case "following":
+      return t(msg`关注视频号`);
+    case "live":
+      return t(msg`视频号直播`);
+    case "recommended":
+    default:
+      return t(msg`视频号推荐`);
+  }
+}
+
 function MobileChannelsViewport({
+  activeSection,
   likePendingPostId,
   posts,
   routeSelectedPostId,
@@ -1953,6 +1975,7 @@ function MobileChannelsViewport({
 }
 
 type MobileChannelsCardProps = {
+  activeSection: FeedChannelHomeSection;
   active: boolean;
   favorite: boolean;
   likePending: boolean;
@@ -1970,6 +1993,7 @@ type MobileChannelsCardProps = {
 };
 
 function MobileChannelsCard({
+  activeSection,
   active,
   favorite,
   likePending,
@@ -2004,7 +2028,7 @@ function MobileChannelsCard({
 
         <div className="absolute left-3.5 top-3.5 flex items-center gap-1.5">
           <div className="rounded-full bg-[rgba(15,23,42,0.62)] px-2.5 py-1 text-[10px] font-medium tracking-[0.04em] text-white">
-            {t(msg`视频号推荐`)}
+            {getChannelsSectionBadge(activeSection, t)}
           </div>
         </div>
 
@@ -2096,7 +2120,7 @@ function MobileChannelsCard({
               </div>
             ) : null}
             <ExpandableText
-              text={post.text}
+              text={stripToolCallSyntax(post.text)}
               className="mt-1"
               textClassName="text-[12px] leading-[1.35rem] text-white"
               toggleClassName="text-[11px] text-white/82"
@@ -2128,7 +2152,7 @@ function MobileChannelsCard({
                         <span className="font-medium">
                           {comment.authorName}
                         </span>
-                        {`：${comment.text}`}
+                        {`：${stripToolCallSyntax(comment.text)}`}
                       </div>
                     ))}
                   </div>
@@ -2293,7 +2317,12 @@ function MobileChannelCommentsSheet({
               </div>
             </div>
             <div className="mt-1 line-clamp-2 text-[11px] leading-[1.35rem] text-[#6b7280]">
-              {post.title ? `${post.title} · ${post.text}` : post.text}
+              {(() => {
+                const cleanText = stripToolCallSyntax(post.text);
+                return post.title
+                  ? `${post.title}${cleanText ? ` · ${cleanText}` : ""}`
+                  : cleanText;
+              })()}
             </div>
           </div>
           <button
@@ -2378,7 +2407,7 @@ function MobileChannelCommentsSheet({
                               {"："}
                             </span>
                           ) : null}
-                          {comment.text}
+                          {stripToolCallSyntax(comment.text)}
                         </div>
                         <div className="mt-2 flex items-center gap-4 text-[11px] text-[#6b7280]">
                           <button
