@@ -6,7 +6,7 @@ import {
   unblockCharacter,
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { Button } from "@yinjie/ui";
+import { Button, InlineNotice } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 
@@ -77,6 +77,14 @@ export function ManagementBlacklistScreen() {
 
   return (
     <div className="px-3 py-3">
+      {unblockMutation.isError && unblockMutation.error instanceof Error ? (
+        <InlineNotice
+          tone="danger"
+          className="mb-3 rounded-[11px] px-2.5 py-1.5 text-[11px] leading-4 shadow-none"
+        >
+          {unblockMutation.error.message}
+        </InlineNotice>
+      ) : null}
       <ul className="overflow-hidden rounded-[12px] bg-white shadow-[0_1px_0_rgba(15,23,42,0.04)]">
         {blocked.map((entry, index) => {
           const character = characterMap.get(entry.characterId);
@@ -114,7 +122,10 @@ export function ManagementBlacklistScreen() {
                   disabled={unblockMutation.isPending}
                   className="h-8 shrink-0 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[12px]"
                 >
-                  {t(msg`移出`)}
+                  {unblockMutation.isPending &&
+                  unblockMutation.variables === entry.characterId
+                    ? t(msg`处理中...`)
+                    : t(msg`移出`)}
                 </Button>
               </div>
             </li>

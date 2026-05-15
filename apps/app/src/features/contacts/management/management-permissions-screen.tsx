@@ -28,14 +28,17 @@ export function ManagementPermissionsScreen({ onPickFriend }: Props) {
 
   const [search, setSearch] = useState("");
   const trimmedSearch = search.trim();
+  // matchesFriendSearch 默认 haystack 已 toLowerCase，needle 也得是 lowercase
+  // 才能匹配上。直接传 trimmedSearch 会让用户输入 "Andrej" 找不到 "Andrej Karpathy"。
+  const normalizedSearch = trimmedSearch.toLowerCase();
 
   const sections = useMemo(() => {
     const items = createFriendDirectoryItems(friendsQuery.data ?? []);
-    const filtered = trimmedSearch
-      ? items.filter((item) => matchesFriendSearch(item, trimmedSearch))
+    const filtered = normalizedSearch
+      ? items.filter((item) => matchesFriendSearch(item, normalizedSearch))
       : items;
     return buildContactSections(filtered);
-  }, [friendsQuery.data, trimmedSearch]);
+  }, [friendsQuery.data, normalizedSearch]);
 
   const isLoading = friendsQuery.isLoading;
 

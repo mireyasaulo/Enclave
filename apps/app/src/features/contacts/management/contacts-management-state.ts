@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type ManagementScreen =
   | { type: "root" }
@@ -19,9 +19,14 @@ export function useManagementScreenStack(open: boolean) {
     [],
   );
 
-  if (!open && stack.length > 1) {
-    queueMicrotask(reset);
-  }
+  // 关闭弹窗后清栈，下次打开从根屏开始；原实现在 render 里调 queueMicrotask
+  // 是 side-effect-in-render（StrictMode / concurrent 渲染下会多次入队、违反
+  // React render 纯函数前提），改成 useEffect 才是正经写法。
+  useEffect(() => {
+    if (!open && stack.length > 1) {
+      reset();
+    }
+  }, [open, reset, stack.length]);
 
   return {
     stack,
