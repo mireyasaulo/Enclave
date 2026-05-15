@@ -24,6 +24,7 @@ import { WikiRoleService } from './wiki-role.service';
 import {
   WIKI_CONTENT_FIELDS,
   assertWikiEditSummary,
+  assertWikiNameNotVisuallyEmpty,
   createDefaultWikiRecipe,
   diffFields,
   diffPaths,
@@ -146,12 +147,10 @@ export class WikiEditService {
         submittedPick as Record<string, unknown>
       )[field];
     }
-    if (!submitted.name.trim()) {
-      throw new AppError('WIKI_VALIDATION_FAILED', {
-        params: { detail: 'name 不能为空' },
-        legacyMessage: 'name 不能为空',
-      });
-    }
+    // 不能用 trim() 单独判断空——纯零宽字符 (U+200B-U+200D / U+FEFF / U+2060)
+    // 不会被 trim 干掉，会让 wiki 列表/卡片显示空白行且不可点（私有角色 2026-05-15
+    // v2 走查时同一类型坑已经修过，这里复用统一 helper）。
+    assertWikiNameNotVisuallyEmpty(submitted.name);
     let after = submitted;
     let changed = diffFields(before, after);
     let changeSource = 'edit';
@@ -319,11 +318,19 @@ export class WikiEditService {
       input.recipeSnapshot ??
       input.contentSnapshot ??
       ({} as Record<string, unknown>);
+    // 在 normalize 把缺失字段补成 '未命名角色' 之前，先校验用户实际**提交了**一个
+    // 视觉非空的 name。否则 curl 一打 `{}` 或 `{"contentSnapshot":{"name":""}}`
+    // 就能起一条名为「未命名角色」的占位词条，patroller 队列 / 列表里全是垃圾。
+    const seededName = extractSeedName(seedInput);
+    assertWikiNameNotVisuallyEmpty(seededName);
     const recipe = normalizeWikiRecipe(
       seedInput,
       createDefaultWikiRecipe(seedInput),
     );
     const content = snapshotFromRecipe(recipe);
+    // 二次兜底：normalize 完之后 content.name 仍可能因 trim 后是空（兜底进 fallback
+    // 的极端 case，例如 seedInput.name=' '）—— assert 一次确保 DB 落下来一定非空。
+    assertWikiNameNotVisuallyEmpty(content.name);
     this.assertEditSummary({
       operation: 'create',
       riskLevel: 'high',
@@ -865,6 +872,10 @@ export class WikiEditService {
     }
     await this.fieldProtection.assertCanEditPaths(user, characterId, changed);
     const afterContent = snapshotFromRecipe(afterRecipe);
+    // recipe 路径同样要拒"视觉为空"的 identity.name——前面 normalizeWikiRecipe
+    // 在 source.identity.name='' 时**不会**回退到 base.identity.name（str()
+    // 只有非字符串才走 fallback），所以恶意客户端能把已发布角色 name 清空。
+    assertWikiNameNotVisuallyEmpty(afterContent.name);
 
     const riskReport = isHighRiskRecipeChange(changed);
     let riskLevel = riskReport.highRisk ? 'high' : 'low';
@@ -1189,5 +1200,25 @@ export class WikiEditService {
       });
     }
   }
+}
+
+/**
+ * 从 createPage seed payload 里"挖"出用户实际提交的 name —— 不能交给
+ * normalizeWikiRecipe / createDefaultWikiRecipe 之后再判，那一层会把缺失的 name
+ * 兜底成 '未命名角色'，使空 body 创建一个占位词条。两个可能位置：
+ *   1. seedInput.name（即 contentSnapshot 顶层）
+ *   2. seedInput.identity.name（即 recipeSnapshot 嵌套）
+ */
+function extractSeedName(seedInput: Record<string, unknown>): string {
+  if (typeof seedInput.name === 'string') return seedInput.name;
+  const identity = (seedInput as { identity?: unknown }).identity;
+  if (
+    identity &&
+    typeof identity === 'object' &&
+    typeof (identity as { name?: unknown }).name === 'string'
+  ) {
+    return (identity as { name: string }).name;
+  }
+  return '';
 }
 // i18n-ignore-end

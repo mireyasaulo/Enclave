@@ -69,6 +69,33 @@ export const WIKI_RECIPE_ROOT_PATHS = [
   'realityLink',
 ] as const;
 
+/**
+ * trim 后再剥掉零宽字符（U+200B-U+200D / U+FEFF / U+2060）。
+ * 用来判定 name 是否"视觉上为空"——纯 ZWS 名字会让 wiki 列表 / 角色卡片
+ * 出现空白行且不可点。私有角色服务里已有同名 helper（2026-05-15 v2 走查加的），
+ * 这里把同一份逻辑提到 wiki.types.ts，供 create / edit / submitRecipeEdit
+ * 三条 wiki 页路径共享。
+ */
+export function isNameVisuallyEmpty(raw: string): boolean {
+  const trimmed = raw.trim();
+  if (!trimmed) return true;
+  return trimmed.replace(/[​-‍﻿⁠]/g, '').length === 0;
+}
+
+/**
+ * 三条 wiki 页写入路径（createPage / submit 内容路径 / submitRecipeEdit）的
+ * 统一 name 校验。所有 wiki 写入都该最终落地到一个非空、视觉非空的 name，
+ * 不允许 ""、纯空白、或纯 ZWS。
+ */
+export function assertWikiNameNotVisuallyEmpty(raw: string): void {
+  if (isNameVisuallyEmpty(raw)) {
+    throw new AppError('WIKI_VALIDATION_FAILED', {
+      params: { detail: 'name 不能为空' },
+      legacyMessage: 'name 不能为空',
+    });
+  }
+}
+
 export function pickWikiContent(input: Record<string, unknown>): WikiContentSnapshot {
   const rejected = WIKI_REJECTED_FIELDS.filter((key) => input[key] !== undefined);
   if (rejected.length > 0) {
