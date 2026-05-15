@@ -253,7 +253,14 @@ export function MobileMomentsPublishPage() {
         rightActions={
           <button
             type="button"
-            onClick={() => createMutation.mutate()}
+            onClick={() => {
+              // JS 层兜底防双击：disabled 属性靠 React 下次 commit 才生效，
+              // 用户在第一次 mutate 触发到 isPending 翻 true 中间那一帧再点一下
+              // 也会再发一份 mutation —— TanStack Query 不去重，两条 POST 都会
+              // 跑完，朋友圈直接出两条一模一样的帖子。
+              if (!canSubmit) return;
+              createMutation.mutate();
+            }}
             disabled={!canSubmit}
             className={cn(
               "h-7 rounded-[3px] px-3 text-[14px] font-medium transition",
@@ -361,13 +368,10 @@ export function MobileMomentsPublishPage() {
               {showAddTile && !showVideoSlot ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    if (imageCount === 0) {
-                      setMediaPickerOpen(true);
-                    } else {
-                      imageInputRef.current?.click();
-                    }
-                  }}
+                  // 走到这里 grid 已经在渲染（showImageGrid 或 showVideoSlot 触发），
+                  // 又因为 !showVideoSlot 排除了纯视频情况，剩下只可能是 imageCount>0，
+                  // 用户已经在"图片相册"模式里，再 + 就直接进系统相册，跳过中间 sheet。
+                  onClick={() => imageInputRef.current?.click()}
                   className="flex items-center justify-center bg-[#F7F7F7] text-[#B0B0B0] active:bg-[#EFEFEF]"
                   style={{ aspectRatio: "1 / 1" }}
                   aria-label={t(msg`添加图片`)}
