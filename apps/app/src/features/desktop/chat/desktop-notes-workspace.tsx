@@ -37,6 +37,7 @@ import {
   extractNoteTextFromHtml,
   filterAssetsByHtml,
   isFavoriteNoteMissingError,
+  isNoteContentEmpty,
   mergeNoteAssets,
   normalizeEditorHtml,
   shouldDiscardEmptyDraftForApi,
@@ -376,6 +377,19 @@ export function DesktopNotesWorkspace({
       )
         ? null
         : localDraftRaw;
+      // 草稿是空的且 API 还没回，等一下：API 一旦带回真实正文，
+      // shouldDiscardEmptyDraftForApi 会把空草稿丢掉走 API 分支回填。
+      // 否则现在用空 state 初始化 + initializedSessionKeyRef 锁住会让
+      // 后续 noteQuery.data 落地时 effect 早退，原文永远不回填。
+      if (
+        localDraft &&
+        isNoteContentEmpty(localDraft) &&
+        !missingSelectedNote &&
+        noteQuery.isLoading &&
+        !noteQuery.data
+      ) {
+        return;
+      }
       if (localDraft) {
         const treatLocalDraftAsNewNote = Boolean(missingSelectedNote);
         applyNoteSource({
