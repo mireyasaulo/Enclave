@@ -91,18 +91,31 @@ export class FarmNpcTickService {
 
       let mutated = false;
 
-      const harvested = this.harvestRipePlots(npc, character.id);
-      if (harvested > 0) {
-        harvestCount += harvested;
+      const harvestedByCrop = this.harvestRipePlots(npc, character.id);
+      const totalHarvested = Object.values(harvestedByCrop).reduce(
+        (acc, n) => acc + n,
+        0,
+      );
+      if (totalHarvested > 0) {
+        harvestCount += totalHarvested;
         mutated = true;
-        await this.eventService.recordEvent({
-          ownerId: owner.id,
-          kind: 'harvest',
-          actorType: 'character',
-          actorId: character.id,
-          actorName: character.name,
-          payload: { count: harvested },
-        });
+        // 一次 tick 可能同时收多块不同作物，按 crop 分别记一条事件——前端事件流和
+        // 邻居「近期动向」按 cropId 渲染中文作物名（"X 收了一茬（白菜）"），缺了
+        // cropId 就只剩 "X 收了一茬" 完全没信息量。
+        for (const [cropId, amount] of Object.entries(harvestedByCrop) as [
+          FarmCropId,
+          number,
+        ][]) {
+          await this.eventService.recordEvent({
+            ownerId: owner.id,
+            kind: 'harvest',
+            actorType: 'character',
+            actorId: character.id,
+            actorName: character.name,
+            cropId,
+            payload: { amount },
+          });
+        }
       }
 
       const planted = this.maybePlantNewCrop(npc, character);
@@ -164,13 +177,13 @@ export class FarmNpcTickService {
   private harvestRipePlots(
     npc: FarmNpcStateEntity,
     characterId: string,
-  ): number {
+  ): Partial<Record<FarmCropId, number>> {
     const now = Date.now();
     const plots = ensurePlotsArray(npc.plotsPayload, npc.plotCount).map((p) =>
       refreshPlotStage(p, now),
     );
     const warehouse = { ...(npc.warehousePayload ?? {}) };
-    let harvested = 0;
+    const perCropCount: Partial<Record<FarmCropId, number>> = {};
     for (let i = 0; i < plots.length; i += 1) {
       const plot = plots[i]!;
       if (
@@ -190,11 +203,11 @@ export class FarmNpcTickService {
       warehouse[plot.cropId] = (warehouse[plot.cropId] ?? 0) + amount;
       npc.coins += coinsGained;
       plots[i] = createEmptyNpcPlot(i);
-      harvested += 1;
+      perCropCount[plot.cropId] = (perCropCount[plot.cropId] ?? 0) + 1;
     }
     npc.plotsPayload = plots;
     npc.warehousePayload = warehouse;
-    return harvested;
+    return perCropCount;
   }
 
   private maybePlantNewCrop(
