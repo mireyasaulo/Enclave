@@ -337,10 +337,20 @@ export function MomentsPage() {
       });
       return { snapshots };
     },
-    onError: (_error, _momentId, context) => {
+    onError: (error, momentId, context) => {
       context?.snapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
+      // 之前 error 只回滚 cache、UI 沉默到底部那块 likeError 一直挂着不消失。
+      // 把错误冒到顶 notice 通道，2.4s 自动收 + 给个「重试点赞」按钮。
+      setNoticeTone("info");
+      setNoticeActionLabel(t(msg`重试点赞`));
+      setNoticeAction(() => () => likeMutation.mutate(momentId));
+      setNotice(
+        error instanceof Error
+          ? t(msg`点赞失败：${error.message}`)
+          : t(msg`点赞失败，请稍后重试。`),
+      );
     },
     onSuccess: () => {
       setNoticeTone("success");
@@ -494,9 +504,12 @@ export function MomentsPage() {
         baseUrl,
       );
     },
-    onError: (_err, momentId, context) => {
+    onError: (err, momentId, context) => {
       delete commentSubmitArgsRef.current[momentId];
-      if (!context || context.skipped) return;
+      if (!context || context.skipped) {
+        // skipped 是 onMutate 自己拒绝（空文本/未登录），不算用户期望的提交，不报。
+        return;
+      }
       context.flatSnapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
@@ -514,6 +527,17 @@ export function MomentsPage() {
       if (context.savedMobileReply) {
         setCommentBarTarget(context.savedMobileReply);
       }
+      // 顶 notice 走错误提示，2.4s 自动收。
+      // 不放「重试」按钮——commentBar 已经被 setCommentBarTarget 重新打开，
+      // 用户直接在评论框内点「发送」就能再试。
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(
+        err instanceof Error
+          ? t(msg`评论失败：${err.message}`)
+          : t(msg`评论失败，请稍后重试。`),
+      );
     },
     onSuccess: (realComment, momentId, context) => {
       delete commentSubmitArgsRef.current[momentId];
@@ -578,10 +602,20 @@ export function MomentsPage() {
       });
       return { snapshots };
     },
-    onError: (_error, _momentId, context) => {
+    onError: (error, momentId, context) => {
       context?.snapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
+      // 删除失败也冒到 notice，给「重试删除」按钮——之前完全沉默，
+      // 用户只看到帖子又出现了，根本搞不清是不是删除生效。
+      setNoticeTone("info");
+      setNoticeActionLabel(t(msg`重试删除`));
+      setNoticeAction(() => () => deleteMutation.mutate(momentId));
+      setNotice(
+        error instanceof Error
+          ? t(msg`删除失败：${error.message}`)
+          : t(msg`删除失败，请稍后重试。`),
+      );
     },
     onSuccess: () => {
       setNoticeTone("success");
@@ -1259,16 +1293,6 @@ export function MomentsPage() {
       onRetry={handleRetryLoad}
       onEmptyAction={handleEmptyStateAction}
       onNoticeBack={handleStatusBack}
-      likeError={
-        likeMutation.isError && likeMutation.error instanceof Error
-          ? likeMutation.error
-          : null
-      }
-      commentError={
-        commentMutation.isError && commentMutation.error instanceof Error
-          ? commentMutation.error
-          : null
-      }
     />
   );
 }
@@ -1311,8 +1335,6 @@ type MobileMomentsViewProps = {
   onRetry: () => void;
   onEmptyAction: () => void;
   onNoticeBack: () => void;
-  likeError: Error | null;
-  commentError: Error | null;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
@@ -1353,8 +1375,6 @@ function MobileMomentsView({
   onRetry,
   onEmptyAction,
   onNoticeBack,
-  likeError,
-  commentError,
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
@@ -1569,20 +1589,8 @@ function MobileMomentsView({
             </div>
           ))}
 
-          {likeError ? (
-            <div className="px-4 pt-3">
-              <MobileMomentsInlineNotice tone="info">
-                {likeError.message}
-              </MobileMomentsInlineNotice>
-            </div>
-          ) : null}
-          {commentError ? (
-            <div className="px-4 pt-3">
-              <MobileMomentsInlineNotice tone="info">
-                {commentError.message}
-              </MobileMomentsInlineNotice>
-            </div>
-          ) : null}
+          {/* like/comment/delete 失败统一冒到顶部 notice（带「重试」+ 2.4s 自动收），
+              所以这里不再单独挂一块永驻的底部错误块。 */}
 
           {!momentsLoading && !momentsError && !visibleMoments.length ? (
             <div className="px-4 pt-12 pb-16 text-center">
