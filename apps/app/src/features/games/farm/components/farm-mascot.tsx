@@ -19,7 +19,12 @@ export function FarmMascot({ state }: FarmMascotProps) {
   return (
     <button
       type="button"
-      className="farm-mascot group fixed right-4 top-20 z-30 flex items-end gap-2 lg:absolute lg:right-2 lg:top-2"
+      // 移动端 top-20 (80px) 会盖住 header + CoinDisplay 右侧的等级 pill；
+      // 隐界农场是独立页（不挂 /tabs 底部 nav），所以挪到右下不挡其它任何东西。
+      // 桌面端用 lg:absolute 钉在 FarmSky 右上角小按钮，需要显式 lg:bottom-auto
+      // 把上一行的 bottom 重置掉，否则同时设置 top+bottom 会被 absolute 拉伸成竖条。
+      className="farm-mascot group fixed right-4 z-30 flex items-end gap-2 lg:absolute lg:right-2 lg:top-2 lg:bottom-auto"
+      style={{ bottom: "max(1rem, env(safe-area-inset-bottom, 0px))" }}
       onClick={() => setCursor((c) => c + 1)}
       title={t(msg`点我换一句`)}
     >
