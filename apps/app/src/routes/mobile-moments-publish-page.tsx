@@ -150,9 +150,7 @@ export function MobileMomentsPublishPage() {
     const handleKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       if (discardConfirmOpen) {
-        setDiscardConfirmOpen(false);
-        // ESC 关 modal 后焦点也丢，跟点「继续编辑」是同一回事，把焦点还回 textarea。
-        textareaRef.current?.focus();
+        dismissDiscardConfirm();
         return;
       }
       if (mediaPickerOpen) {
@@ -191,6 +189,13 @@ export function MobileMomentsPublishPage() {
       return;
     }
     performBack();
+  }
+
+  // 关闭「放弃发表」modal 的三个路径都一样：先收 modal、再把焦点还回 textarea。
+  // 用户语义就是要接着写，焦点丢失会让他得再 tap 一次 textarea 才能唤回键盘。
+  function dismissDiscardConfirm() {
+    setDiscardConfirmOpen(false);
+    textareaRef.current?.focus();
   }
 
   function handleConfirmDiscard() {
@@ -473,12 +478,7 @@ export function MobileMomentsPublishPage() {
           <button
             type="button"
             aria-label={t(msg`关闭提示`)}
-            onClick={() => {
-              setDiscardConfirmOpen(false);
-              // 焦点丢失会让用户回到 publish 页后没法直接继续打字——modal 关掉
-              // 那一刻焦点落到 body，textarea 不再处于编辑态。手动把焦点还回去。
-              textareaRef.current?.focus();
-            }}
+            onClick={dismissDiscardConfirm}
             className="absolute inset-0"
           />
           <div className="relative w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-[12px] bg-white shadow-[var(--shadow-overlay)]">
@@ -499,11 +499,7 @@ export function MobileMomentsPublishPage() {
             <div className="grid grid-cols-2 border-t border-[#ECECEC]">
               <button
                 type="button"
-                onClick={() => {
-                  setDiscardConfirmOpen(false);
-                  // 同上：「继续编辑」语义就是用户想接着写，必须把焦点送回 textarea。
-                  textareaRef.current?.focus();
-                }}
+                onClick={dismissDiscardConfirm}
                 className="border-r border-[#ECECEC] py-3 text-[15px] text-[#576B95] active:bg-black/[0.04]"
               >
                 {t(msg`继续编辑`)}
