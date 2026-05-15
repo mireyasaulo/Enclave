@@ -215,7 +215,7 @@ function ReviewCard({
           params={{ characterId: rev.characterId }}
           className="font-medium text-[color:var(--text-primary)] hover:underline"
         >
-          {rev.characterId}
+          {rev.contentSnapshot?.name || rev.characterId}
         </Link>
         <StatusPill>v{rev.version}</StatusPill>
         <StatusPill>{rev.operation}</StatusPill>
