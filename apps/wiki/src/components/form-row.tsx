@@ -85,6 +85,7 @@ function HintTooltip({ children }: { children: ReactNode }) {
   }, [open]);
 
   // 自适应位置：fixed 定位，默认 ? 右下；若超视口右边则向左推到刚好贴右边距
+  // tooltip 初始 inline style 已经是 fixed + 屏外，所以它不会污染 wrap 的 boundingRect
   useLayoutEffect(() => {
     if (!open) return;
     const tip = tipRef.current;
@@ -92,7 +93,6 @@ function HintTooltip({ children }: { children: ReactNode }) {
     if (!tip || !wrap) return;
     const wr = wrap.getBoundingClientRect();
     const margin = 8;
-    tip.style.position = "fixed";
     tip.style.top = `${wr.bottom + 4}px`;
     tip.style.left = `${wr.right + 4}px`;
     tip.style.right = "auto";
@@ -131,6 +131,8 @@ function HintTooltip({ children }: { children: ReactNode }) {
         <span
           ref={tipRef}
           role="tooltip"
+          // 初始就是 fixed + 屏外，避免一帧 flash 到 (0,0) 同时不影响 wrap 的 boundingRect
+          style={{ position: "fixed", top: -9999, left: -9999 }}
           className="pointer-events-none z-20 w-max max-w-[min(280px,calc(100vw-1rem))] whitespace-normal rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--surface-overlay)] px-2.5 py-1.5 text-xs font-normal leading-relaxed text-[color:var(--text-primary)] shadow-md"
         >
           {children}
