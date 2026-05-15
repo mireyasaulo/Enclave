@@ -220,6 +220,17 @@ export function MobileSearchWorkspace({
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               placeholder={t(msg`搜索聊天、联系人、公众号、朋友圈和广场`)}
+              // enterKeyHint="search": 手机软键盘 return 键显示放大镜图标，
+              // 让用户一眼看出 enter 触发搜索（type="search" 自带的 WebKit
+              // 原生 "×" 由 index.css 里的全局规则 appearance:none 抹掉，
+              // 避免跟右侧自定义「清空」叠成两个清除控件）。autoCorrect /
+              // autoCapitalize / spellCheck 关掉防止中文输入法被英文
+              // autocorrect 抢词。
+              enterKeyHint="search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
               className="h-9 w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] pl-9 pr-11 text-[13px] text-[color:var(--text-primary)] outline-none transition-[background-color,border-color] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.18)] focus:bg-white"
             />
             {searchText ? (
@@ -246,27 +257,40 @@ export function MobileSearchWorkspace({
           ref={chipsRef}
           className="mt-2.5 flex gap-1.5 overflow-x-auto pb-0.5"
         >
-          {searchCategoryLabelDescriptors.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              ref={(el) => {
-                chipRefs.current[item.id] = el;
-              }}
-              onClick={() => setActiveCategory(item.id)}
-              className={cn(
-                "shrink-0 rounded-full px-3 py-1.5 text-[11px] font-medium transition",
-                activeCategory === item.id
-                  ? "bg-[#07c160] text-white"
-                  : "border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] text-[color:var(--text-secondary)]",
-              )}
-            >
-              {t(item.label)}
-              {item.id !== "all" && hasKeyword
-                ? ` ${matchedCounts[item.id]}`
-                : ""}
-            </button>
-          ))}
+          {searchCategoryLabelDescriptors.map((item) => {
+            // chip 后挂的命中条数原来对所有非「全部」分类都挂；当结果是 0 时
+            // 显示 "联系人 0" / "朋友圈 0" 看起来像未读徽标，但其实是空命中，
+            // 干扰视觉。只在 count > 0 时挂出来。
+            // miniPrograms 永远是 ComingSoonOverlay「功能开发中」、scope 没接索
+            // 引，count 永远 0，挂个 "小程序 0" 跟 overlay 表达的"还没做"自相
+            // 矛盾——直接不挂。
+            const matchableId =
+              item.id !== "all" && item.id !== "miniPrograms" ? item.id : null;
+            const showCount =
+              matchableId !== null &&
+              hasKeyword &&
+              matchedCounts[matchableId] > 0;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                ref={(el) => {
+                  chipRefs.current[item.id] = el;
+                }}
+                onClick={() => setActiveCategory(item.id)}
+                aria-pressed={activeCategory === item.id}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1.5 text-[11px] font-medium transition",
+                  activeCategory === item.id
+                    ? "bg-[#07c160] text-white"
+                    : "border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] text-[color:var(--text-secondary)]",
+                )}
+              >
+                {t(item.label)}
+                {showCount && matchableId ? ` ${matchedCounts[matchableId]}` : ""}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -371,9 +395,14 @@ export function MobileSearchWorkspace({
                   <button
                     key={item.key}
                     type="button"
-                    onClick={() =>
-                      setActiveCategory(item.key as SearchCategory)
-                    }
+                    onClick={() => {
+                      setActiveCategory(item.key as SearchCategory);
+                      // 点 quickScopeCard 时只切了 activeCategory（顶部 chip 变绿）
+                      // ——但因为还没输入 keyword，下方主区还停在原来的「最近搜索 /
+                      // 快捷范围 / 可搜索范围」，视觉上看不出任何变化，用户以为没
+                      // 反应。把焦点拨回输入框，引导用户立刻开始打字。
+                      inputRef.current?.focus();
+                    }}
                     className={cn(
                       "flex w-full items-center gap-3 px-4 py-2.5 text-left",
                       "transition-colors hover:bg-[color:var(--surface-card-hover)]",
@@ -569,9 +598,12 @@ function MobileSearchStatusCard({
           : "border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]",
       )}
     >
+      {/* 原来是 text-[8px] + tracking-[0.04em]：8px 中文已经接近不可读，再叠
+          letter-spacing 几乎糊成一个块。统一回 11px，跟同样移动端的
+          MobileChatListStatusCard 的 badge 一致。 */}
       <div
         className={cn(
-          "mx-auto inline-flex rounded-full px-2 py-0.5 text-[8px] font-medium tracking-[0.04em]",
+          "mx-auto inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium tracking-[0.04em]",
           tone === "danger"
             ? "bg-[rgba(220,38,38,0.08)] text-[color:var(--state-danger-text)]"
             : "bg-[rgba(7,193,96,0.1)] text-[#07c160]",
