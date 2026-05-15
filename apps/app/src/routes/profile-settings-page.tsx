@@ -418,7 +418,11 @@ export function ProfileSettingsPage() {
           title={t(msg`聊天快捷键`)}
           description={t(msg`调整桌面和 Web 键盘聊天输入时的发送快捷键。`)}
         >
-          <div className="overflow-hidden rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)]">
+          <div
+            role="radiogroup"
+            aria-label={t(msg`发送消息的快捷键`)}
+            className="overflow-hidden rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)]"
+          >
             {chatSendShortcutOptions.map((option, index) => {
               const selected = sendMessageShortcut === option.id;
 
@@ -426,6 +430,8 @@ export function ProfileSettingsPage() {
                 <button
                   key={option.id}
                   type="button"
+                  role="radio"
+                  aria-checked={selected}
                   onClick={() => setSendMessageShortcut(option.id)}
                   className={cn(
                     "flex w-full items-center gap-3 px-4 py-2 text-left transition",
