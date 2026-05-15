@@ -19,6 +19,7 @@ import { WikiTalkThreadEntity } from './entities/wiki-talk-thread.entity';
 import { WikiTalkPostEntity } from './entities/wiki-talk-post.entity';
 import { WikiWatchlistEntity } from './entities/wiki-watchlist.entity';
 import { UserPrivateCharacterEntity } from './entities/user-private-character.entity';
+import { CharacterDraftEntity } from './entities/character-draft.entity';
 import { WikiAiGenerateRateLimitGuard } from './guards/wiki-ai-generate-rate-limit.guard';
 import { WikiRateLimitGuard } from './guards/wiki-rate-limit.guard';
 import { WikiRoleGuard } from './guards/wiki-role.guard';
@@ -55,6 +56,9 @@ import { WikiSoftDeleteController } from './controllers/wiki-soft-delete.control
 import { WikiReportController } from './controllers/wiki-report.controller';
 import { WikiAvatarController } from './controllers/wiki-avatar.controller';
 import { WikiAvatarService } from './services/wiki-avatar.service';
+import { WikiAiGenerateController } from './controllers/wiki-ai-generate.controller';
+import { CharacterDraftController } from './controllers/character-draft.controller';
+import { CharacterDraftService } from './services/character-draft.service';
 
 @Module({
   imports: [
@@ -78,6 +82,7 @@ import { WikiAvatarService } from './services/wiki-avatar.service';
       AbuseFilterHitEntity,
       WikiFieldProtectionEntity,
       UserPrivateCharacterEntity,
+      CharacterDraftEntity,
     ]),
   ],
   controllers: [
@@ -96,6 +101,8 @@ import { WikiAvatarService } from './services/wiki-avatar.service';
     WikiStatsController,
     WikiPrivateCharacterController,
     WikiAvatarController,
+    WikiAiGenerateController,
+    CharacterDraftController,
   ],
   providers: [
     WikiPageService,
@@ -116,6 +123,7 @@ import { WikiAvatarService } from './services/wiki-avatar.service';
     WikiPrivateCharacterAiService,
     WikiPrivateCharacterCleanupService,
     WikiAvatarService,
+    CharacterDraftService,
     WikiRoleGuard,
     WikiRateLimitGuard,
     WikiAiGenerateRateLimitGuard,

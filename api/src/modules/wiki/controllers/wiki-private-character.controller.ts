@@ -128,6 +128,9 @@ export class WikiPrivateCharacterController {
       section?: string;
       currentDraft?: PrivateCharacterDto;
       optimize?: boolean;
+      // 创建页传 true，编辑页不传。section='all' + persistAsDraft=true 时
+      // 后端把 merge 后的 draft 写入 character_drafts。
+      persistAsDraft?: boolean;
     },
   ) {
     const section = body?.section as SectionKey | undefined;
@@ -162,6 +165,8 @@ export class WikiPrivateCharacterController {
       currentDraft: draft,
       ownerId: user.id,
       optimize: body?.optimize === true,
+      persistAsDraft:
+        body?.persistAsDraft === true ? { kind: 'private' } : undefined,
     });
   }
 }

@@ -5,6 +5,10 @@ import { AiOrchestratorService } from '../../ai/ai-orchestrator.service';
 import type { AiUsageContext } from '../../ai/ai.types';
 import type { PrivateCharacterDto } from './wiki-private-character.service';
 import {
+  CharacterDraftService,
+  type DraftKind,
+} from './character-draft.service';
+import {
   SECTION_PROMPTS,
   type SectionKey,
   buildTemplateVars,
@@ -47,7 +51,10 @@ export type AiGeneratedDraft = {
 export class WikiPrivateCharacterAiService {
   private readonly logger = new Logger(WikiPrivateCharacterAiService.name);
 
-  constructor(private readonly orchestrator: AiOrchestratorService) {}
+  constructor(
+    private readonly orchestrator: AiOrchestratorService,
+    private readonly draftService: CharacterDraftService,
+  ) {}
 
   async generateForSection(input: {
     section: SectionKey;
@@ -58,6 +65,14 @@ export class WikiPrivateCharacterAiService {
      * sacred 字段 (name / relationship / bio) 后端兜底，即便 optimize=true 也不返回。
      */
     optimize?: boolean;
+    /**
+     * 仅在「新建」场景下由 controller 注入。section='all' 完成后会把
+     * currentDraft 与 AI 输出合并，写入 character_drafts 表。
+     *
+     * 关键：写库在 await orchestrator 之后同步执行，与本次响应是否能送达
+     * 客户端无关 —— 用户在生成中关 tab 也能保留草稿。
+     */
+    persistAsDraft?: { kind: DraftKind } | undefined;
   }): Promise<AiGeneratedDraft> {
     const template = SECTION_PROMPTS[input.section];
     const vars = buildTemplateVars(input.currentDraft);
@@ -95,13 +110,92 @@ export class WikiPrivateCharacterAiService {
       if (parsed) raw = parsed;
     }
 
-    return normalizeAiOutput(
+    const updates = normalizeAiOutput(
       input.section,
       raw,
       input.currentDraft,
       input.optimize === true,
     );
+
+    // 创建场景下，把"用户已填 + AI 生成"merge 后落草稿。失败只 log，不影响
+    // AI 结果返回 —— 用户哪怕看到错误也比丢内容强。
+    if (input.persistAsDraft && input.section === 'all') {
+      const merged = mergeDraftWithUpdates(input.currentDraft, updates);
+      try {
+        await this.draftService.createFromAi(
+          input.ownerId,
+          input.persistAsDraft.kind,
+          merged,
+        );
+      } catch (err) {
+        this.logger.warn(
+          `failed to persist character draft for owner=${input.ownerId} kind=${input.persistAsDraft.kind}: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+
+    return updates;
   }
+}
+
+/**
+ * 把 AI 返回的增量字段 merge 进当前表单 draft 形成完整的 PrivateCharacterDto。
+ * AiGeneratedDraft 经过 normalizer 已经只含"应该填"的字段（fill-empty-only 或
+ * optimize 覆盖），所以这里只做"非 undefined 即覆盖"的浅 merge，但 recipe
+ * 子树要深 merge。
+ */
+function mergeDraftWithUpdates(
+  current: PrivateCharacterDto,
+  updates: AiGeneratedDraft,
+): PrivateCharacterDto {
+  const out: PrivateCharacterDto = { ...current };
+  if (updates.relationshipType !== undefined) {
+    out.relationshipType = updates.relationshipType;
+  }
+  if (updates.expertDomains !== undefined) {
+    out.expertDomains = updates.expertDomains;
+  }
+  if (updates.recipe) {
+    const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
+    const nextRecipe: Record<string, unknown> = { ...curRecipe };
+    if (updates.recipe.identity) {
+      nextRecipe.identity = {
+        ...((curRecipe.identity ?? {}) as Record<string, unknown>),
+        ...updates.recipe.identity,
+      };
+    }
+    if (updates.recipe.prompting) {
+      const curPr = (curRecipe.prompting ?? {}) as Record<string, unknown>;
+      const upPr = updates.recipe.prompting as Record<string, unknown>;
+      const mergedPr: Record<string, unknown> = { ...curPr };
+      for (const [k, v] of Object.entries(upPr)) {
+        if (k === 'scenePrompts' && v && typeof v === 'object') {
+          // scenePrompts 全字段 normalizer 会回填空串占位；只覆盖非空。
+          const curSp = (curPr.scenePrompts ?? {}) as Record<string, string>;
+          const upSp = v as Record<string, string>;
+          const nextSp: Record<string, string> = { ...curSp };
+          for (const [sk, sv] of Object.entries(upSp)) {
+            if (typeof sv === 'string' && sv.trim()) nextSp[sk] = sv;
+          }
+          mergedPr.scenePrompts = nextSp;
+        } else if (k === 'coreLogic' && typeof v === 'string' && !v.trim()) {
+          // normalizer 在 chat / scenes 子结果里塞了空 coreLogic 占位，跳过。
+          continue;
+        } else if (v !== undefined) {
+          mergedPr[k] = v;
+        }
+      }
+      nextRecipe.prompting = mergedPr;
+    }
+    if (updates.recipe.memorySeed) {
+      nextRecipe.memorySeed = {
+        ...((curRecipe.memorySeed ?? {}) as Record<string, unknown>),
+        ...updates.recipe.memorySeed,
+      };
+    }
+    out.recipe = nextRecipe as unknown as CharacterBlueprintRecipe;
+  }
+  return out;
 }
 
 /**
