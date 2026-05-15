@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { msg } from "@lingui/macro";
-import type { Group } from "@yinjie/contracts";
+import { getGroupMembers, type Group } from "@yinjie/contracts";
 import { MessageSquarePlus, Search } from "lucide-react";
 import { Button, ErrorBlock, LoadingBlock, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
+import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { GroupAvatarChip } from "../../../components/group-avatar-chip";
 import { formatConversationTimestamp } from "../../../lib/format";
+import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 
 type DesktopContactsGroupsPaneProps = {
   groups: Group[];
@@ -184,45 +187,11 @@ export function DesktopContactsGroupsPane({
       <section className="min-w-0 flex-1 bg-[color:var(--bg-app)]">
         <div className="flex h-full min-h-0 items-center justify-center p-8">
           {selectedGroup ? (
-            <div className="w-full max-w-[520px] rounded-[20px] border border-[color:var(--border-faint)] bg-white p-8 shadow-[var(--shadow-card)]">
-              <div className="flex items-center gap-4">
-                <GroupAvatarChip name={selectedGroup.name} size="wechat" />
-                <div className="min-w-0">
-                  <div className="truncate text-xl font-semibold text-[color:var(--text-primary)]">
-                    {selectedGroup.name}
-                  </div>
-                  <div className="mt-1 text-sm text-[color:var(--text-muted)]">
-                    {t(msg`最近活跃`)}
-                    {formatConversationTimestamp(
-                      selectedGroup.savedToContactsAt ??
-                        selectedGroup.lastActivityAt,
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-5 py-4 text-sm leading-6 text-[color:var(--text-muted)]">
-                {getGroupDescription(selectedGroup, t)}
-              </div>
-
-              <div className="mt-6 flex gap-3">
-                <Button
-                  type="button"
-                  className="flex-1 rounded-[10px] bg-[color:var(--brand-primary)] text-white hover:opacity-95"
-                  onClick={() => onOpenGroup(selectedGroup.id)}
-                >
-                  {t(msg`进入群聊`)}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="flex-1 rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
-                  onClick={() => onOpenGroupDetails(selectedGroup.id)}
-                >
-                  {t(msg`群聊信息`)}
-                </Button>
-              </div>
-            </div>
+            <DesktopGroupDetailCard
+              group={selectedGroup}
+              onOpenGroup={onOpenGroup}
+              onOpenGroupDetails={onOpenGroupDetails}
+            />
           ) : (
             <div className="max-w-sm">
               <EmptyState
@@ -252,4 +221,112 @@ function getGroupDescription(
   return group.isMuted
     ? t(msg`${statusLabel} · 已开启消息免打扰`)
     : statusLabel;
+}
+
+const MEMBER_PREVIEW_LIMIT = 8;
+
+function DesktopGroupDetailCard({
+  group,
+  onOpenGroup,
+  onOpenGroupDetails,
+}: {
+  group: Group;
+  onOpenGroup: (groupId: string) => void;
+  onOpenGroupDetails: (groupId: string) => void;
+}) {
+  const t = useRuntimeTranslator();
+  const runtimeConfig = useAppRuntimeConfig();
+  const baseUrl = runtimeConfig.apiBaseUrl;
+  const membersQuery = useQuery({
+    queryKey: ["app-contacts-group-members", baseUrl, group.id],
+    queryFn: () => getGroupMembers(group.id, baseUrl),
+  });
+  const members = membersQuery.data ?? [];
+  const memberCount = members.length;
+  const previewMembers = members.slice(0, MEMBER_PREVIEW_LIMIT);
+  const overflowCount = Math.max(0, memberCount - previewMembers.length);
+  const lastActivityLabel = formatConversationTimestamp(
+    group.savedToContactsAt ?? group.lastActivityAt,
+  );
+
+  return (
+    <div className="w-full max-w-[520px] rounded-[20px] border border-[color:var(--border-faint)] bg-white p-8 shadow-[var(--shadow-card)]">
+      <div className="flex items-center gap-4">
+        <GroupAvatarChip
+          name={group.name}
+          members={previewMembers
+            .map((member) => member.memberName ?? member.memberId)
+            .filter(Boolean)}
+          size="wechat"
+        />
+        <div className="min-w-0">
+          <div className="truncate text-xl font-semibold text-[color:var(--text-primary)]">
+            {group.name}
+          </div>
+          <div className="mt-1 text-sm text-[color:var(--text-muted)]">
+            {memberCount > 0
+              ? t(msg`${memberCount} 人 · 最近活跃 ${lastActivityLabel}`)
+              : t(msg`最近活跃 ${lastActivityLabel}`)}
+          </div>
+        </div>
+      </div>
+
+      {membersQuery.isLoading ? (
+        <div className="mt-6">
+          <LoadingBlock label={t(msg`正在读取群成员...`)} />
+        </div>
+      ) : memberCount > 0 ? (
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          {previewMembers.map((member) => (
+            <div
+              key={member.id}
+              className="flex w-14 min-w-0 flex-col items-center gap-1"
+              title={member.memberName ?? ""}
+            >
+              <AvatarChip
+                name={member.memberName}
+                src={member.memberAvatar}
+                size="sm"
+              />
+              <span className="w-full truncate text-center text-[11px] text-[color:var(--text-muted)]">
+                {member.memberName ?? "—"}
+              </span>
+            </div>
+          ))}
+          {overflowCount > 0 ? (
+            <div className="flex w-14 min-w-0 flex-col items-center gap-1">
+              <div className="flex h-9 w-9 items-center justify-center rounded-[16px] border border-dashed border-[color:var(--border-faint)] text-[11px] text-[color:var(--text-muted)]">
+                +{overflowCount}
+              </div>
+              <span className="w-full truncate text-center text-[11px] text-[color:var(--text-muted)]">
+                {t(msg`更多`)}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="mt-6 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-5 py-4 text-sm leading-6 text-[color:var(--text-muted)]">
+        {getGroupDescription(group, t)}
+      </div>
+
+      <div className="mt-6 flex gap-3">
+        <Button
+          type="button"
+          className="flex-1 rounded-[10px] bg-[color:var(--brand-primary)] text-white hover:opacity-95"
+          onClick={() => onOpenGroup(group.id)}
+        >
+          {t(msg`进入群聊`)}
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          className="flex-1 rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
+          onClick={() => onOpenGroupDetails(group.id)}
+        >
+          {t(msg`群聊信息`)}
+        </Button>
+      </div>
+    </div>
+  );
 }
