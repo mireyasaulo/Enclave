@@ -76,6 +76,13 @@ function MobileDiscoverEncounterPage() {
       await keepShakeSession(preview.id, baseUrl);
       return preview;
     },
+    onMutate: () => {
+      // 上一次"X 已加入通讯录"的 success notice 在新一次摇一摇等 AI（~60s）期间
+      // 还挂在原地，按钮 disabled 成"正在寻找..."又显示着上一个人的名字，用户会
+      // 怀疑是不是还没真的开始摇。统一在 mutate 起手时清掉旧 notice。
+      setMessage(""); // i18n-ignore-line: clearing state
+      setTone("info");
+    },
     onSuccess: (result) => {
       if (!result) {
         setTone("warning");
