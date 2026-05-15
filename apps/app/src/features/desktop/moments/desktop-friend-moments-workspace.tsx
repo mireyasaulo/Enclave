@@ -423,7 +423,7 @@ export function DesktopFriendMomentsWorkspace({
         moment={shareMoment}
         liked={shareLiked}
         ownerId={ownerId ?? null}
-        ownerDisplayName={displayName}
+        ownerDisplayName={ownerUsername?.trim() || t(msg`世界主人`)}
         onClose={() => setShareMomentId(null)}
       />
     </div>
