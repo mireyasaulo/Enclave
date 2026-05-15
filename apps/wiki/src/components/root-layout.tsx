@@ -324,15 +324,15 @@ function UserMenu({
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-white px-3 py-1.5 text-left text-xs leading-tight transition-colors hover:bg-[color:var(--surface-card-hover)]"
       >
-        <span className="hidden md:block">
+        <div className="hidden md:block">
           <div className="font-medium text-[color:var(--text-primary)]">
             {user.username}
           </div>
           <div className="text-[color:var(--text-muted)]">
             {roleLabel(user.role)}
           </div>
-        </span>
-        <span className="md:hidden font-medium text-[color:var(--text-primary)]">
+        </div>
+        <span className="font-medium text-[color:var(--text-primary)] md:hidden">
           {user.username}
         </span>
         <span aria-hidden className="text-[10px] text-[color:var(--text-muted)]">

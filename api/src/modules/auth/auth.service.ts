@@ -152,7 +152,9 @@ export class AuthService {
     newPassword: string,
   ): Promise<{ ok: true }> {
     const user = await this.requireUserWithEmail(userId);
-    const password = (newPassword ?? '').trim();
+    // 不 trim：前导/尾随空白本身就是合法密码字符，trim 会让 "abc " 和 "abc" 在登录时
+    // 表现一致但落库不一致——用户下次输 "abc " 反而登不上去。
+    const password = newPassword ?? '';
     if (password.length < MIN_PASSWORD_LENGTH) {
       throw new AppError('AUTH_PASSWORD_TOO_SHORT', {
         status: HttpStatus.BAD_REQUEST,
