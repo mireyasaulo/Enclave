@@ -253,8 +253,18 @@ export function ProfileSettingsPage() {
     ? t(msg`返回消息`)
     : t(msg`返回资料`);
 
+  // 一旦在桌面布局下落到 /desktop/settings 就锁定；之后用户从这里 navigate 回
+  // /tabs/chat 或 /tabs/profile 时，TanStack 会先把 location.pathname 切走、
+  // 再 unmount 旧 page，期间这里的 useEffect 不能再 replace 回 /desktop/settings
+  // 把目标导航吞掉（与 chat-list/contacts/search 已踩过的同类坑）。
+  const desktopSettingsPathStabilizedRef = useRef(false);
+
   useEffect(() => {
     if (!desktopPathMismatch) {
+      desktopSettingsPathStabilizedRef.current = true;
+      return;
+    }
+    if (desktopSettingsPathStabilizedRef.current) {
       return;
     }
 

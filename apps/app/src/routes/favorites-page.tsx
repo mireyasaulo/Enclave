@@ -4,6 +4,7 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { msg } from "@lingui/macro";
@@ -185,8 +186,18 @@ export function FavoritesPage() {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
+  // 一旦在桌面布局下落到 /tabs/favorites 就锁定；之后用户从这里 navigate 到
+  // /character/$id 等兄弟路由时，TanStack 会先把 location.pathname 切走、
+  // 再 unmount 旧 page，期间这里的 useEffect 不能再 replace 回 /tabs/favorites
+  // 把目标导航吞掉（与 chat-list/contacts/search 已踩过的同类坑）。
+  const desktopFavoritesPathStabilizedRef = useRef(false);
+
   useEffect(() => {
     if (!desktopPathMismatch) {
+      desktopFavoritesPathStabilizedRef.current = true;
+      return;
+    }
+    if (desktopFavoritesPathStabilizedRef.current) {
       return;
     }
 

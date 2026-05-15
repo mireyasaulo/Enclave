@@ -636,6 +636,12 @@ const pendingLikePostId = likeMutation.isPending
     setDesktopSelectedPostId(routeSelectedPostId);
   }, [routeSelectedPostId]);
 
+  // 一旦在桌面布局下落到 /tabs/feed 就锁定；之后用户从这里 navigate 到
+  // /character/$id 等兄弟路由时，TanStack 会先把 location.pathname 切走、
+  // 再 unmount 旧 page，期间这里的 useEffect 不能再 replace 回 /tabs/feed
+  // 把目标导航吞掉（与 chat-list/contacts/search 已踩过的同类坑）。
+  const desktopFeedPathStabilizedRef = useRef(false);
+
   useEffect(() => {
     if (
       !isDesktopLayout ||
@@ -647,7 +653,19 @@ const pendingLikePostId = likeMutation.isPending
             returnHash: safeReturnHash,
           }) ?? ""))
     ) {
+      if (!desktopPathMismatch) {
+        desktopFeedPathStabilizedRef.current = true;
+      }
       return;
+    }
+    // pathname 已不在 /tabs/feed 上：要么是用户主动跳走（hash 同步无意义），
+    // 要么是首次从 /discover/feed 旧路径进来（需要 canonicalize 一次）。
+    // 已经在 /tabs/feed 上稳定过的会话不再做路径 replace，避免吞掉出站导航。
+    if (desktopPathMismatch && desktopFeedPathStabilizedRef.current) {
+      return;
+    }
+    if (!desktopPathMismatch) {
+      desktopFeedPathStabilizedRef.current = true;
     }
 
     void navigate({

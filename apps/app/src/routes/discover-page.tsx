@@ -585,8 +585,18 @@ export function DiscoverPage() {
     setSuccessNotice("");
   }, [baseUrl, resetComposeDraft]);
 
+  // 一旦在桌面布局下落到 /tabs/discover 就锁定；之后用户从这里 navigate 到
+  // /character/$id 等兄弟路由时，TanStack 会先把 location.pathname 切走、
+  // 再 unmount 旧 page，期间这里的 useEffect 不能再 replace 回 /tabs/discover
+  // 把目标导航吞掉（与 chat-list/contacts/search 已踩过的同类坑）。
+  const desktopDiscoverPathStabilizedRef = useRef(false);
+
   useEffect(() => {
     if (!desktopPathMismatch) {
+      desktopDiscoverPathStabilizedRef.current = true;
+      return;
+    }
+    if (desktopDiscoverPathStabilizedRef.current) {
       return;
     }
 
