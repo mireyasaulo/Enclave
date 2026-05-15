@@ -465,6 +465,25 @@ export function ChannelsPage() {
   });
 
   const visiblePosts = channelsQuery.data?.posts ?? EMPTY_CHANNEL_POSTS;
+
+  // 推荐流里有大量非好友角色的帖子，后端对这些 post 的 like / comment /
+  // favorite / comment_like 都会 403 FEED_NOT_FRIEND。前端原本没有 gating，按
+  // 钮照点 → 用户看到 403 而不是友好提示。这里集中拦在 mutate 前，提示一句
+  // 后直接 return；share / view / not-interested / 转发 仍开放给非好友。
+  function ensureCanInteract(post: { canInteract?: boolean } | undefined | null) {
+    if (!post || post.canInteract === false) {
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(t(msg`需先加为好友才能互动。`));
+      return false;
+    }
+    return true;
+  }
+  function ensureCommentPostCanInteract(postId: string) {
+    const post = visiblePosts.find((p) => p.id === postId);
+    return ensureCanInteract(post);
+  }
   const desktopMissingRoutePostId =
     isDesktopLayout &&
     routeSelectedPostId &&
@@ -861,6 +880,7 @@ export function ChannelsPage() {
   }
 
   function toggleFavorite(post: (typeof visiblePosts)[number]) {
+    if (!ensureCanInteract(post)) return;
     const sourceId = `channels-${post.id}`;
     const routeHash = buildDesktopChannelsRouteHash({
       postId: post.id,
@@ -1004,6 +1024,7 @@ export function ChannelsPage() {
       } | null;
     },
   ) {
+    if (!ensureCommentPostCanInteract(postId)) return;
     commentMutation.mutate({
       postId,
       replyTarget: options?.replyTarget ?? null,
@@ -1064,7 +1085,10 @@ export function ChannelsPage() {
           onCommentSubmit={(postId) =>
             submitComment(postId, { replyTarget: desktopReplyTarget })
           }
-          onLike={(postId) => likeMutation.mutate(postId)}
+          onLike={(postId) => {
+            if (!ensureCommentPostCanInteract(postId)) return;
+            likeMutation.mutate(postId);
+          }}
           onRefresh={() => generateMutation.mutate()}
           refreshPending={generateMutation.isPending}
           comments={desktopCommentsQuery.data ?? []}
@@ -1081,12 +1105,13 @@ export function ChannelsPage() {
           }
           onSectionChange={handleSectionChange}
           onToggleFavorite={toggleFavorite}
-          onLikeComment={(comment) =>
+          onLikeComment={(comment) => {
+            if (!ensureCommentPostCanInteract(comment.postId)) return;
             likeCommentMutation.mutate({
               commentId: comment.id,
               postId: comment.postId,
-            })
-          }
+            });
+          }}
           onReplyToComment={(comment) =>
             setDesktopReplyTarget({
               authorId: comment.authorId,
@@ -1300,7 +1325,10 @@ export function ChannelsPage() {
             likePendingPostId={pendingLikePostId}
             posts={visiblePosts}
             routeSelectedPostId={routeSelectedPostId}
-            onLike={(postId) => likeMutation.mutate(postId)}
+            onLike={(postId) => {
+              if (!ensureCommentPostCanInteract(postId)) return;
+              likeMutation.mutate(postId);
+            }}
             onOpenAuthor={(post) =>
               openChannelAuthor(post.authorId, { sourcePostId: post.id })
             }
@@ -1346,12 +1374,13 @@ export function ChannelsPage() {
           updateCommentDraft(mobileCommentSheetPost.id, value);
         }}
         onErrorAction={mobileCommentSheetRetryAction?.onClick}
-        onLikeComment={(comment) =>
+        onLikeComment={(comment) => {
+          if (!ensureCommentPostCanInteract(comment.postId)) return;
           likeCommentMutation.mutate({
             commentId: comment.id,
             postId: comment.postId,
-          })
-        }
+          });
+        }}
         onReply={(comment) =>
           setMobileReplyTarget({
             authorId: comment.authorId,
