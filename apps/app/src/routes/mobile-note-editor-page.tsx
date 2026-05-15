@@ -161,6 +161,7 @@ function MobileNoteEditor({
   const editorRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const initializedSessionKeyRef = useRef("");
+  const autoFocusedSessionKeyRef = useRef("");
 
   const draftIdParam = routeState?.draftId;
   const selectedNoteId = routeState?.noteId;
@@ -563,6 +564,22 @@ function MobileNoteEditor({
     const timer = window.setTimeout(() => setNotice(null), 2400);
     return () => window.clearTimeout(timer);
   }, [notice]);
+
+  // 新建笔记时自动聚焦正文，让用户落到 /notes/new 之后立刻能输入。每个
+  // sessionKey 只 focus 一次，避免用户主动失焦/编辑过程中再次抢焦点。
+  // 已有笔记 (selectedNoteId) 不强制聚焦，保留滚动查看的体验。
+  useEffect(() => {
+    if (selectedNoteId) return;
+    if (!editorRef.current) return;
+    if (initializedSessionKeyRef.current !== sessionKey) return;
+    if (autoFocusedSessionKeyRef.current === sessionKey) return;
+    if (editorState.contentText.trim()) return;
+    autoFocusedSessionKeyRef.current = sessionKey;
+    const handle = window.requestAnimationFrame(() => {
+      focusEditorAtEnd();
+    });
+    return () => window.cancelAnimationFrame(handle);
+  }, [editorState.contentText, selectedNoteId, sessionKey]);
 
   function applyNoteSource(input: {
     draftId: string;
