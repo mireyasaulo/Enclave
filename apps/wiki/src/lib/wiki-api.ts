@@ -841,11 +841,12 @@ export const wikiApi = {
     );
   },
   /**
-   * AI 自动生成私有角色的字段。
-   * - section='identity'|'bioPersonality'|'expertise'|'tone'|'prompting'|'memory'|'rhythm'：
+   * AI 自动生成私有角色的字段。section 完全对齐 apps/admin 的 character-editor-page
+   * TABS 数组（去掉 model_routing）+ reasoning Tab：
+   * - 'basics' / 'core_logic' / 'chat' / 'scenes' / 'memory' / 'life' / 'reasoning'
    *   生成该 section 字段
-   * - section='all'：一次性生成 6 个非-sacred section 全部字段（顶部"一键生成"按钮用）。
-   *   需要 name + bio + relationship + personality 都已填好，否则后端返回 400。
+   * - 'all'：一次性生成上述 6 个非 sacred section 全部字段（顶部"一键生成"按钮用）。
+   *   需要 name + bio + relationship 三个 sacred 字段都已填好，否则后端返回 400。
    * 返回值是只包含**当前为空字段**建议的 partial DTO（后端 normalizeAiOutput 已经过一道
    * "用户已填的不返回"过滤；前端再过一道双保险）。
    */
@@ -1014,15 +1015,21 @@ export type PrivateCharacterDto = {
   profile?: unknown | null;
 };
 
-/** 8 个 AI 生成 section：7 个分 section + 1 个 'all' 一次性全部。 */
+/**
+ * 8 个 AI 生成 section：7 个分 section + 1 个 'all' 一次性全部。
+ * 命名严格对齐 apps/admin/src/routes/character-editor-page.tsx 的 TABS 数组
+ * （basics / core_logic / chat / scenes / memory / life）+ reasoning。
+ * 与后端 api/src/modules/wiki/services/wiki-private-character-ai.prompts.ts 的
+ * SectionKey 同义。
+ */
 export type AiGenerateSection =
-  | "identity"
-  | "bioPersonality"
-  | "expertise"
-  | "tone"
-  | "prompting"
+  | "basics"
+  | "core_logic"
+  | "chat"
+  | "scenes"
   | "memory"
-  | "rhythm"
+  | "life"
+  | "reasoning"
   | "all";
 
 /** AI 生成返回的 partial draft；只包含**当前为空**字段的建议。 */

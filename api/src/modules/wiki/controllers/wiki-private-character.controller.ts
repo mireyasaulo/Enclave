@@ -116,7 +116,8 @@ export class WikiPrivateCharacterController {
   }
 
   // AI 自动生成：根据当前已填字段调一次 LLM，返回需要补全的字段。
-  // 7 个 section 各自路由 + 1 个 'all' 整体生成。
+  // 7 个 section（basics/core_logic/chat/scenes/memory/life/reasoning，对齐
+  // admin character-editor-page TABS）+ 1 个 'all' 整体生成。
   // 单独的 rate limit（15/h/user），与 CRUD 桶（60/h）分开。
   @Post('ai-generate')
   @UseGuards(WikiAiGenerateRateLimitGuard)
@@ -145,10 +146,11 @@ export class WikiPrivateCharacterController {
       );
     }
     if (section === 'all') {
+      // sacred gate（2026-05-15 起对齐 wiki UI）：name 已由 L142 检查；
+      // 这里只需 bio + relationship。personality 字段已从 wiki 砍掉。
       const missing: string[] = [];
       if (!draft.bio?.trim()) missing.push('角色简介');
       if (!draft.relationship?.trim()) missing.push('关系描述');
-      if (!draft.personality?.trim()) missing.push('性格语气');
       if (missing.length > 0) {
         throw new BadRequestException(
           `顶部一键生成需要先填写：${missing.join('、')}。`,

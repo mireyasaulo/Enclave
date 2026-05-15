@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UserPrivateCharacterEntity } from '../entities/user-private-character.entity';
 import type { CharacterBlueprintRecipeValue } from '../../characters/character-blueprint.types';
 import { assertPrivateCharacterFieldLimits } from '../../characters/characters.service';
@@ -14,6 +14,73 @@ import type { PersonalityProfile } from '../../ai/ai.types';
 
 export const PRIVATE_CHARACTER_EXPORT_SCHEMA =
   'yinjie-private-character/v1' as const;
+
+/**
+ * Recipe 里 wiki UI 已砍掉、admin character-editor-page 也不暴露的字段。
+ * 2026-05-15 起所有写入 user_private_characters 的 recipe 都会通过本函数
+ * 剥离这些字段，确保 DB 里 JSON 不残留 occupation / tone 子树 / memorySummary 等。
+ *
+ * 注意：CharacterBlueprintRecipeValue 类型本身保留这些字段（admin character-factory
+ * 仍在用，preset 数据也依赖），所以这里只在 wiki 写入路径上 strip；
+ * recipe schema 不动。
+ *
+ * 幂等：对已经 strip 过的 recipe 再 strip 一次完全等价。
+ */
+export function stripRejectedRecipeFields(
+  recipe: CharacterBlueprintRecipeValue | null | undefined,
+): CharacterBlueprintRecipeValue | null {
+  if (!recipe || typeof recipe !== 'object') return null;
+  const clone = { ...recipe } as Record<string, unknown>;
+  // identity 子字段砍：occupation / background / motivation / worldview / region。
+  if (clone.identity && typeof clone.identity === 'object') {
+    const id = clone.identity as Record<string, unknown>;
+    const {
+      occupation: _occupation,
+      background: _background,
+      motivation: _motivation,
+      worldview: _worldview,
+      region: _region,
+      ...kept
+    } = id;
+    void _occupation;
+    void _background;
+    void _motivation;
+    void _worldview;
+    void _region;
+    clone.identity = kept;
+  }
+  // expertise 子字段砍：expertiseDescription / knowledgeLimits / refusalStyle。
+  if (clone.expertise && typeof clone.expertise === 'object') {
+    const ex = clone.expertise as Record<string, unknown>;
+    const {
+      expertiseDescription: _expertiseDescription,
+      knowledgeLimits: _knowledgeLimits,
+      refusalStyle: _refusalStyle,
+      ...kept
+    } = ex;
+    void _expertiseDescription;
+    void _knowledgeLimits;
+    void _refusalStyle;
+    clone.expertise = kept;
+  }
+  // tone 整段砍掉。
+  delete clone.tone;
+  // memorySeed 子字段砍：memorySummary / coreMemory / recentSummarySeed。
+  if (clone.memorySeed && typeof clone.memorySeed === 'object') {
+    const ms = clone.memorySeed as Record<string, unknown>;
+    const {
+      memorySummary: _memorySummary,
+      coreMemory: _coreMemory,
+      recentSummarySeed: _recentSummarySeed,
+      ...kept
+    } = ms;
+    void _memorySummary;
+    void _coreMemory;
+    void _recentSummarySeed;
+    clone.memorySeed = kept;
+  }
+  return clone as unknown as CharacterBlueprintRecipeValue;
+}
 
 export type PrivateCharacterDto = {
   name: string;
@@ -59,6 +126,27 @@ export class WikiPrivateCharacterService {
       where: { ownerUserId },
       order: { updatedAt: 'DESC' },
     });
+  }
+
+  /**
+   * 管理员视角：批量统计若干 owner 各自的私有角色数量。
+   * 返回 Map<ownerUserId, count>；ownerIds 里没有任何私有角色的人不会出现在 Map 里（调用方按缺省 0 处理）。
+   * 实现走 find + JS aggregate：避免 getRawMany 的 alias 行为在不同 TypeORM/driver 版本上
+   * 漂移（错位时不会报错，counts 全部静默回落到 0）。每个用户私有角色数量本就很小（典型 < 10），
+   * 加载行做内存计数完全够用。
+   */
+  async countByOwners(ownerIds: string[]): Promise<Map<string, number>> {
+    const result = new Map<string, number>();
+    const uniq = Array.from(new Set(ownerIds)).filter((x) => !!x);
+    if (uniq.length === 0) return result;
+    const records = await this.repo.find({
+      where: { ownerUserId: In(uniq) },
+      select: { id: true, ownerUserId: true },
+    });
+    for (const record of records) {
+      result.set(record.ownerUserId, (result.get(record.ownerUserId) ?? 0) + 1);
+    }
+    return result;
   }
 
   async getById(
@@ -184,6 +272,9 @@ export class WikiPrivateCharacterService {
     record: UserPrivateCharacterEntity,
     exportedBy: string,
   ): PrivateCharacterExportBundle {
+    // 导出时再过一道 strip：库里历史脏数据 / 老 client 写入的废字段不会被导出，
+    // 让 export → app 端 import-personal → buildProfileFromRecipe 链路只见到
+    // admin 编辑器认识的子结构。
     return {
       $schema: PRIVATE_CHARACTER_EXPORT_SCHEMA,
       name: record.name,
@@ -194,7 +285,7 @@ export class WikiPrivateCharacterService {
       relationshipType: record.relationshipType,
       expertDomains: record.expertDomains ?? [],
       triggerScenes: record.triggerScenes ?? null,
-      recipe: record.recipe ?? null,
+      recipe: stripRejectedRecipeFields(record.recipe),
       profile: record.profile ?? null,
       meta: {
         exportedAt: new Date().toISOString(),
@@ -282,10 +373,15 @@ export class WikiPrivateCharacterService {
       target.triggerScenes = dto.triggerScenes ?? null;
     }
     // 同样防 PUT body 把 recipe/profile 传成 array 或非 object：
+    // 入库前再用 stripRejectedRecipeFields 剥去 wiki 已砍掉的子字段（identity.occupation
+    // 等），即便老前端 / 第三方脚本继续 PUT 也不会污染 DB。
     if (dto.recipe !== undefined) {
       const r = dto.recipe;
-      target.recipe =
-        r && typeof r === 'object' && !Array.isArray(r) ? r : null;
+      const safe =
+        r && typeof r === 'object' && !Array.isArray(r)
+          ? (r as CharacterBlueprintRecipeValue)
+          : null;
+      target.recipe = stripRejectedRecipeFields(safe);
     }
     if (dto.profile !== undefined) {
       const pf = dto.profile;

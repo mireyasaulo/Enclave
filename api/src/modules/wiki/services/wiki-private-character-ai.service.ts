@@ -18,31 +18,31 @@ const VALID_RELATIONSHIP_TYPES = new Set([
   'expert',
   'custom',
 ]);
-const VALID_EMOJI_USAGE = new Set(['none', 'occasional', 'frequent']);
-const VALID_RESPONSE_LENGTH = new Set(['short', 'medium', 'long']);
 const VALID_ACTIVITY_FREQUENCY = new Set(['occasional', 'normal', 'frequent']);
 
 /**
  * AI 生成的返回结构：扁平化后再交给前端。
  * 用 Partial 因为只填空字段，sacred 和已填字段不在结果里。
  *
- * 用嵌套 recipe 结构方便前端按 section 匹配 useState。
+ * 2026-05-15 重构：与 admin character-editor-page 对齐后，AI 只生成 admin 可见字段。
+ * 旧字段（identity.occupation/background/motivation/worldview、expertise.{description,limits,refusal}、
+ * tone.* 全部、memorySeed.{memorySummary,coreMemory,recentSummarySeed}、personality）
+ * 不再返回；类型上保留嵌套 recipe 结构以便前端按 section 分发。
  */
 export type AiGeneratedDraft = {
   // 顶层 DTO 字段
-  bio?: string;
-  personality?: string;
-  relationship?: string;
   relationshipType?: string;
   expertDomains?: string[];
   triggerScenes?: string[];
-  // 嵌套 recipe
+  // 嵌套 recipe（只含 admin 编辑器读取的子字段）
   recipe?: {
-    identity?: Partial<CharacterBlueprintRecipe['identity']>;
-    expertise?: Partial<CharacterBlueprintRecipe['expertise']>;
-    tone?: Partial<CharacterBlueprintRecipe['tone']>;
+    identity?: { avatar?: string };
     prompting?: Partial<CharacterBlueprintRecipe['prompting']>;
-    memorySeed?: Partial<CharacterBlueprintRecipe['memorySeed']>;
+    memorySeed?: {
+      forgettingCurve?: number;
+      recentSummaryPrompt?: string;
+      coreMemoryPrompt?: string;
+    };
     reasoning?: Partial<CharacterBlueprintRecipe['reasoning']>;
     lifeStrategy?: Partial<CharacterBlueprintRecipe['lifeStrategy']>;
   };
@@ -60,9 +60,7 @@ export class WikiPrivateCharacterAiService {
     ownerId: string;
     /**
      * 优化模式：true 时 normalizer 不再"目标为空才填"，让 AI 覆盖整节。
-     * 仅前端模态确认后才会传 true。后端对 sacred 字段
-     * (bio / personality / relationship) 保留"非空才填"作为兜底，
-     * 即便 optimize=true 也不返回它们。
+     * sacred 字段 (name / relationship / bio) 后端兜底，即便 optimize=true 也不返回。
      */
     optimize?: boolean;
   }): Promise<AiGeneratedDraft> {
@@ -72,8 +70,6 @@ export class WikiPrivateCharacterAiService {
     const combinedPrompt = `${template.systemPrompt}\n\n---\n\n${userPrompt}`;
 
     const usageContext: AiUsageContext = {
-      // 'wiki' 不在 AiUsageSurface 枚举里；私有角色 AI 生成是用户从 wiki UI 触发，
-      // 用 'app' 最贴近（用户主动行为，非 cron 任务）。
       surface: 'app',
       scene: `wiki_private_character_generate_${input.section}`,
       scopeType: 'character',
@@ -89,13 +85,6 @@ export class WikiPrivateCharacterAiService {
       fallback: template.fallback,
     });
 
-    // 兜底：generateJsonObject 内部的 extractJsonFromModelOutput 用"first { 到
-    // last }"启发式抓 JSON。reasoning 模型（GLM 系列）会输出 <think>...</think>
-    // 块，里面可能包含 { 字符（举例、复述 schema），让抓取的范围错误，最终
-    // JSON.parse 失败返回 fallback {}。
-    //
-    // 这里检测到 raw 几乎为空时，改用 generatePlainText 自己处理：strip <think>
-    // 后再 extract JSON。
     if (!raw || Object.keys(raw).length === 0) {
       this.logger.warn(
         `generateJsonObject returned empty for section=${input.section}; retrying via plain text + manual extraction`,
@@ -121,15 +110,11 @@ export class WikiPrivateCharacterAiService {
 }
 
 /**
- * 把模型输出里 `<think>...</think>` reasoning 块剥掉，然后从剩余文本里抓
- * 第一个 `{` 到最后一个 `}` 的 JSON 对象。专门处理 reasoning 模型把
- * 思考写在 content 里挤掉/弄乱 JSON 的情况。
+ * 把模型输出里 `<think>...</think>` reasoning 块剥掉，然后抓 JSON。
  */
 function parseJsonAfterThink(text: string): Record<string, unknown> | null {
   if (!text) return null;
-  // 移除任意数量的 <think>...</think> 块（贪婪到对应 </think>）。
   const stripped = text.replace(/<think>[\s\S]*?<\/think>/g, '');
-  // 也支持没闭合的情况：从最后一个 </think> 之后取
   const lastThinkEnd = stripped.lastIndexOf('</think>');
   const body =
     lastThinkEnd >= 0 ? stripped.slice(lastThinkEnd + 8) : stripped;
@@ -154,33 +139,34 @@ function normalizeAiOutput(
   currentDraft: PrivateCharacterDto,
   optimize: boolean,
 ): AiGeneratedDraft {
-  // 'all' 返回 6 个嵌套 section，分发到对应 normalizer。
+  // 'all' 返回嵌套 section 结构，分发到对应 normalizer。
   if (section === 'all') {
     return mergeDrafts(
-      normalizeIdentity(asObj(raw.identity), currentDraft, optimize),
-      normalizeExpertise(asObj(raw.expertise), currentDraft, optimize),
-      normalizeTone(asObj(raw.tone), currentDraft, optimize),
-      normalizePrompting(asObj(raw.prompting), currentDraft, optimize),
+      normalizeBasics(asObj(raw.basics), currentDraft, optimize),
+      normalizeCoreLogic(asObj(raw.core_logic), currentDraft, optimize),
+      normalizeChat(asObj(raw.chat), currentDraft, optimize),
+      normalizeScenes(asObj(raw.scenes), currentDraft, optimize),
       normalizeMemory(asObj(raw.memory), currentDraft, optimize),
-      normalizeRhythm(asObj(raw.rhythm), currentDraft, optimize),
+      normalizeLife(asObj(raw.life), currentDraft, optimize),
+      normalizeReasoning(asObj(raw.reasoning), currentDraft, optimize),
     );
   }
 
   switch (section) {
-    case 'identity':
-      return normalizeIdentity(raw, currentDraft, optimize);
-    case 'bioPersonality':
-      return normalizeBioPersonality(raw, currentDraft, optimize);
-    case 'expertise':
-      return normalizeExpertise(raw, currentDraft, optimize);
-    case 'tone':
-      return normalizeTone(raw, currentDraft, optimize);
-    case 'prompting':
-      return normalizePrompting(raw, currentDraft, optimize);
+    case 'basics':
+      return normalizeBasics(raw, currentDraft, optimize);
+    case 'core_logic':
+      return normalizeCoreLogic(raw, currentDraft, optimize);
+    case 'chat':
+      return normalizeChat(raw, currentDraft, optimize);
+    case 'scenes':
+      return normalizeScenes(raw, currentDraft, optimize);
     case 'memory':
       return normalizeMemory(raw, currentDraft, optimize);
-    case 'rhythm':
-      return normalizeRhythm(raw, currentDraft, optimize);
+    case 'life':
+      return normalizeLife(raw, currentDraft, optimize);
+    case 'reasoning':
+      return normalizeReasoning(raw, currentDraft, optimize);
     default:
       return {};
   }
@@ -197,9 +183,6 @@ function mergeDrafts(...parts: AiGeneratedDraft[]): AiGeneratedDraft {
   const out: AiGeneratedDraft = {};
   const recipe: AiGeneratedDraft['recipe'] = {};
   for (const p of parts) {
-    if (p.bio !== undefined) out.bio = p.bio;
-    if (p.personality !== undefined) out.personality = p.personality;
-    if (p.relationship !== undefined) out.relationship = p.relationship;
     if (p.relationshipType !== undefined) {
       out.relationshipType = p.relationshipType;
     }
@@ -208,15 +191,6 @@ function mergeDrafts(...parts: AiGeneratedDraft[]): AiGeneratedDraft {
     if (p.recipe) {
       if (p.recipe.identity) {
         recipe.identity = { ...(recipe.identity ?? {}), ...p.recipe.identity };
-      }
-      if (p.recipe.expertise) {
-        recipe.expertise = {
-          ...(recipe.expertise ?? {}),
-          ...p.recipe.expertise,
-        };
-      }
-      if (p.recipe.tone) {
-        recipe.tone = { ...(recipe.tone ?? {}), ...p.recipe.tone };
       }
       if (p.recipe.prompting) {
         recipe.prompting = {
@@ -250,104 +224,20 @@ function mergeDrafts(...parts: AiGeneratedDraft[]): AiGeneratedDraft {
 
 // ───── per-section normalizers ─────
 
-function normalizeIdentity(
+function normalizeBasics(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
   optimize: boolean,
 ): AiGeneratedDraft {
   const out: AiGeneratedDraft = {};
-  const id: Partial<CharacterBlueprintRecipe['identity']> = {};
-  const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
-  const curId = (curRecipe.identity ?? {}) as Partial<
-    CharacterBlueprintRecipe['identity']
-  >;
 
-  // avatar 在 DTO 顶层和 recipe.identity.avatar 都可能存在；前端 useState
-  // 直接绑定 dto.avatar，所以这里以 current.avatar 为准判空。
-  // 同时把首个 emoji 字符截出来，避免模型把"🪷 心理咨询师"这种文字一起塞进来。
+  // avatar：取第一个 emoji；非空且（optimize 或 current.avatar 为空）才填。
   const avatar = takeFirstEmoji(trimStr(raw.avatar));
-  if (avatar && (optimize || !current.avatar?.trim())) id.avatar = avatar;
-
-  const occupation = trimStr(raw.occupation);
-  if (occupation && (optimize || !curId.occupation?.trim())) {
-    id.occupation = occupation;
+  if (avatar && (optimize || !current.avatar?.trim())) {
+    out.recipe = { identity: { avatar } };
   }
 
-  const background = trimStr(raw.background);
-  if (background && (optimize || !curId.background?.trim())) {
-    id.background = background;
-  }
-
-  // relationship 是 sacred 字段：即便 optimize=true 也保留"非空才填"语义。
-  // 用户在表单里改的是顶层 dto.relationship。
-  const relationship = trimStr(raw.relationship);
-  if (relationship && !current.relationship?.trim()) {
-    out.relationship = relationship;
-  }
-
-  // relationshipType 是带默认值的枚举（前端初始 "friend"），按"非空"过滤会让
-  // AI 永远填不进去。这里只做白名单校验，交给前端 applyUpdatesFillEmptyOnly
-  // 决定是否覆盖（与 tone 枚举 / scheduler / reasoning toggles 同款"AI 返回则
-  // 覆盖默认值"语义）。
-  const relationshipType = trimStr(raw.relationshipType);
-  if (relationshipType && VALID_RELATIONSHIP_TYPES.has(relationshipType)) {
-    out.relationshipType = relationshipType;
-  }
-
-  if (Object.keys(id).length > 0) out.recipe = { identity: id };
-  return out;
-}
-
-function normalizeBioPersonality(
-  raw: Record<string, unknown>,
-  current: PrivateCharacterDto,
-  optimize: boolean,
-): AiGeneratedDraft {
-  const out: AiGeneratedDraft = {};
-  const id: Partial<CharacterBlueprintRecipe['identity']> = {};
-  const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
-  const curId = (curRecipe.identity ?? {}) as Partial<
-    CharacterBlueprintRecipe['identity']
-  >;
-
-  // bio / personality 是 sacred：即便 optimize=true 也保留"非空才填"语义。
-  // bioPersonality 节里含两类字段——sacred (bio / personality) + 非-sacred
-  // (motivation / worldview)。优化模式下 motivation / worldview 会被 AI 覆盖，
-  // 而 bio / personality 由这里的 sacred 兜底保住（即便前端 applyUpdatesOverwrite
-  // 已经跳过它们，后端再过一道）。
-  const bio = trimStr(raw.bio);
-  if (bio && !current.bio?.trim()) out.bio = bio;
-
-  const personality = trimStr(raw.personality);
-  if (personality && !current.personality?.trim()) out.personality = personality;
-
-  const motivation = trimStr(raw.motivation);
-  if (motivation && (optimize || !curId.motivation?.trim())) {
-    id.motivation = motivation;
-  }
-
-  const worldview = trimStr(raw.worldview);
-  if (worldview && (optimize || !curId.worldview?.trim())) {
-    id.worldview = worldview;
-  }
-
-  if (Object.keys(id).length > 0) out.recipe = { identity: id };
-  return out;
-}
-
-function normalizeExpertise(
-  raw: Record<string, unknown>,
-  current: PrivateCharacterDto,
-  optimize: boolean,
-): AiGeneratedDraft {
-  const out: AiGeneratedDraft = {};
-  const ex: Partial<CharacterBlueprintRecipe['expertise']> = {};
-  const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
-  const curEx = (curRecipe.expertise ?? {}) as Partial<
-    CharacterBlueprintRecipe['expertise']
-  >;
-
-  // expertDomains 顶层；其它三个都是 recipe.expertise.*
+  // expertDomains：3-5 项，去重、trim。
   const expertDomains = cleanStringArray(raw.expertDomains);
   if (
     expertDomains.length > 0 &&
@@ -356,101 +246,16 @@ function normalizeExpertise(
     out.expertDomains = expertDomains;
   }
 
-  const expertiseDescription = trimStr(raw.expertiseDescription);
-  if (expertiseDescription && (optimize || !curEx.expertiseDescription?.trim())) {
-    ex.expertiseDescription = expertiseDescription;
+  // relationshipType：枚举白名单收敛，前端决定覆盖时机。
+  const relationshipType = trimStr(raw.relationshipType);
+  if (relationshipType && VALID_RELATIONSHIP_TYPES.has(relationshipType)) {
+    out.relationshipType = relationshipType;
   }
 
-  const knowledgeLimits = trimStr(raw.knowledgeLimits);
-  if (knowledgeLimits && (optimize || !curEx.knowledgeLimits?.trim())) {
-    ex.knowledgeLimits = knowledgeLimits;
-  }
-
-  const refusalStyle = trimStr(raw.refusalStyle);
-  if (refusalStyle && (optimize || !curEx.refusalStyle?.trim())) {
-    ex.refusalStyle = refusalStyle;
-  }
-
-  if (Object.keys(ex).length > 0) out.recipe = { expertise: ex };
   return out;
 }
 
-function normalizeTone(
-  raw: Record<string, unknown>,
-  current: PrivateCharacterDto,
-  optimize: boolean,
-): AiGeneratedDraft {
-  const tn: Partial<CharacterBlueprintRecipe['tone']> = {};
-  const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
-  const curTn = (curRecipe.tone ?? {}) as Partial<
-    CharacterBlueprintRecipe['tone']
-  >;
-
-  // 枚举字段：tone 的 v1 策略是只在"用户从未碰过且当前为默认值之外的空"时填。
-  // 但 useState 初始就是 'occasional' / 'medium'。前端会再过一遍"只填空字符串"
-  // 过滤；后端这里只做白名单收敛，不判空（无法判断是否用户主动选了默认值）。
-  const emojiUsage = trimStr(raw.emojiUsage);
-  if (emojiUsage && VALID_EMOJI_USAGE.has(emojiUsage)) {
-    tn.emojiUsage = emojiUsage as 'none' | 'occasional' | 'frequent';
-  }
-  const responseLength = trimStr(raw.responseLength);
-  if (responseLength && VALID_RESPONSE_LENGTH.has(responseLength)) {
-    tn.responseLength = responseLength as 'short' | 'medium' | 'long';
-  }
-
-  const emotionalTone = trimStr(raw.emotionalTone);
-  if (emotionalTone && (optimize || !curTn.emotionalTone?.trim())) {
-    tn.emotionalTone = emotionalTone;
-  }
-  const workStyle = trimStr(raw.workStyle);
-  if (workStyle && (optimize || !curTn.workStyle?.trim())) {
-    tn.workStyle = workStyle;
-  }
-  const socialStyle = trimStr(raw.socialStyle);
-  if (socialStyle && (optimize || !curTn.socialStyle?.trim())) {
-    tn.socialStyle = socialStyle;
-  }
-
-  const speechPatterns = cleanStringArray(raw.speechPatterns);
-  if (
-    speechPatterns.length > 0 &&
-    (optimize || (curTn.speechPatterns ?? []).length === 0)
-  ) {
-    tn.speechPatterns = speechPatterns;
-  }
-  const catchphrases = cleanStringArray(raw.catchphrases);
-  if (
-    catchphrases.length > 0 &&
-    (optimize || (curTn.catchphrases ?? []).length === 0)
-  ) {
-    tn.catchphrases = catchphrases;
-  }
-  const topicsOfInterest = cleanStringArray(raw.topicsOfInterest);
-  if (
-    topicsOfInterest.length > 0 &&
-    (optimize || (curTn.topicsOfInterest ?? []).length === 0)
-  ) {
-    tn.topicsOfInterest = topicsOfInterest;
-  }
-  const taboos = cleanStringArray(raw.taboos);
-  if (
-    taboos.length > 0 &&
-    (optimize || (curTn.taboos ?? []).length === 0)
-  ) {
-    tn.taboos = taboos;
-  }
-  const quirks = cleanStringArray(raw.quirks);
-  if (
-    quirks.length > 0 &&
-    (optimize || (curTn.quirks ?? []).length === 0)
-  ) {
-    tn.quirks = quirks;
-  }
-
-  return Object.keys(tn).length > 0 ? { recipe: { tone: tn } } : {};
-}
-
-function normalizePrompting(
+function normalizeCoreLogic(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
   optimize: boolean,
@@ -466,16 +271,66 @@ function normalizePrompting(
     pr.coreLogic = coreLogic;
   }
 
-  const sp = asObj(raw.scenePrompts);
-  const curSp = (curPr.scenePrompts ?? {}) as Partial<
+  // forgettingCurve 是带默认值的数字（前端初始 70）；AI 返回则交给前端
+  // applyUpdatesFillEmptyOnly 决定覆盖时机，这里只做范围 clamp。
+  const forgettingCurve = clampInt(raw.forgettingCurve, 0, 100);
+
+  const recipeOut: AiGeneratedDraft['recipe'] = {};
+  if (Object.keys(pr).length > 0) recipeOut.prompting = pr;
+  if (forgettingCurve !== null) {
+    recipeOut.memorySeed = { forgettingCurve };
+  }
+  if (Object.keys(recipeOut).length === 0) return {};
+  return { recipe: recipeOut };
+}
+
+function normalizeChat(
+  raw: Record<string, unknown>,
+  current: PrivateCharacterDto,
+  optimize: boolean,
+): AiGeneratedDraft {
+  const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
+  const curSp = ((curRecipe.prompting ?? {}).scenePrompts ?? {}) as Partial<
     CharacterBlueprintRecipe['prompting']['scenePrompts']
   >;
-  const scenes: Partial<CharacterBlueprintRecipe['prompting']['scenePrompts']> =
-    {};
+  const chat = trimStr(raw.chat);
+  if (!chat) return {};
+  if (!optimize && curSp.chat?.trim()) return {};
+  return {
+    recipe: {
+      prompting: {
+        coreLogic: '',
+        scenePrompts: {
+          chat,
+          moments_post: '',
+          moments_comment: '',
+          feed_post: '',
+          channel_post: '',
+          feed_comment: '',
+          greeting: '',
+          proactive: '',
+        },
+      },
+    },
+  };
+}
+
+function normalizeScenes(
+  raw: Record<string, unknown>,
+  current: PrivateCharacterDto,
+  optimize: boolean,
+): AiGeneratedDraft {
+  const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
+  const curSp = ((curRecipe.prompting ?? {}).scenePrompts ?? {}) as Partial<
+    CharacterBlueprintRecipe['prompting']['scenePrompts']
+  >;
+  // 7 个非 chat 场景（chat 走单独 section）
   const sceneKeys: Array<
-    keyof CharacterBlueprintRecipe['prompting']['scenePrompts']
+    Exclude<
+      keyof CharacterBlueprintRecipe['prompting']['scenePrompts'],
+      'chat'
+    >
   > = [
-    'chat',
     'moments_post',
     'moments_comment',
     'feed_post',
@@ -484,26 +339,31 @@ function normalizePrompting(
     'greeting',
     'proactive',
   ];
+  const scenes: Partial<CharacterBlueprintRecipe['prompting']['scenePrompts']> =
+    {};
   for (const k of sceneKeys) {
-    const keyStr = String(k);
-    const v = trimStr(sp[keyStr]);
+    const v = trimStr(raw[k]);
     if (v && (optimize || !curSp[k]?.trim())) scenes[k] = v;
   }
-  if (Object.keys(scenes).length > 0) {
-    pr.scenePrompts = {
-      chat: '',
-      moments_post: '',
-      moments_comment: '',
-      feed_post: '',
-      channel_post: '',
-      feed_comment: '',
-      greeting: '',
-      proactive: '',
-      ...scenes,
-    };
-  }
-
-  return Object.keys(pr).length > 0 ? { recipe: { prompting: pr } } : {};
+  if (Object.keys(scenes).length === 0) return {};
+  return {
+    recipe: {
+      prompting: {
+        coreLogic: '',
+        scenePrompts: {
+          chat: '',
+          moments_post: '',
+          moments_comment: '',
+          feed_post: '',
+          channel_post: '',
+          feed_comment: '',
+          greeting: '',
+          proactive: '',
+          ...scenes,
+        },
+      },
+    },
+  };
 }
 
 function normalizeMemory(
@@ -511,52 +371,24 @@ function normalizeMemory(
   current: PrivateCharacterDto,
   optimize: boolean,
 ): AiGeneratedDraft {
-  const ms: Partial<CharacterBlueprintRecipe['memorySeed']> = {};
-  const rs: Partial<CharacterBlueprintRecipe['reasoning']> = {};
   const curRecipe = (current.recipe ?? {}) as Partial<CharacterBlueprintRecipe>;
   const curMs = (curRecipe.memorySeed ?? {}) as Partial<
     CharacterBlueprintRecipe['memorySeed']
   >;
-
-  const memorySummary = trimStr(raw.memorySummary);
-  if (memorySummary && (optimize || !curMs.memorySummary?.trim())) {
-    ms.memorySummary = memorySummary;
+  const ms: { recentSummaryPrompt?: string; coreMemoryPrompt?: string } = {};
+  const recentSummaryPrompt = trimStr(raw.recentSummaryPrompt);
+  if (recentSummaryPrompt && (optimize || !curMs.recentSummaryPrompt?.trim())) {
+    ms.recentSummaryPrompt = recentSummaryPrompt;
   }
-  const coreMemory = trimStr(raw.coreMemory);
-  if (coreMemory && (optimize || !curMs.coreMemory?.trim())) {
-    ms.coreMemory = coreMemory;
+  const coreMemoryPrompt = trimStr(raw.coreMemoryPrompt);
+  if (coreMemoryPrompt && (optimize || !curMs.coreMemoryPrompt?.trim())) {
+    ms.coreMemoryPrompt = coreMemoryPrompt;
   }
-  const recentSummarySeed = trimStr(raw.recentSummarySeed);
-  if (recentSummarySeed && (optimize || !curMs.recentSummarySeed?.trim())) {
-    ms.recentSummarySeed = recentSummarySeed;
-  }
-
-  // forgettingCurve 是带默认值的数字（前端初始 70），与 toggles / scheduler 同款
-  // "AI 返回则采用"语义；这里只做范围 clamp，由前端决定覆盖时机。
-  const forgettingCurve = clampInt(raw.forgettingCurve, 0, 100);
-  if (forgettingCurve !== null) ms.forgettingCurve = forgettingCurve;
-
-  // recommendedReasoningToggles 是 prompt 设计里要求 LLM 输出建议，
-  // 前端会把它当作"如果用户没碰过这三个开关，按建议设"——但 v1 前端
-  // 只对字符串字段做"空"判断，所以这里把建议也返回，前端可决定是否应用。
-  const toggles = asObj(raw.recommendedReasoningToggles);
-  if (typeof toggles.enableCoT === 'boolean') rs.enableCoT = toggles.enableCoT;
-  if (typeof toggles.enableReflection === 'boolean') {
-    rs.enableReflection = toggles.enableReflection;
-  }
-  if (typeof toggles.enableRouting === 'boolean') {
-    rs.enableRouting = toggles.enableRouting;
-  }
-
-  const out: AiGeneratedDraft = {};
-  const recipe: AiGeneratedDraft['recipe'] = {};
-  if (Object.keys(ms).length > 0) recipe.memorySeed = ms;
-  if (Object.keys(rs).length > 0) recipe.reasoning = rs;
-  if (Object.keys(recipe).length > 0) out.recipe = recipe;
-  return out;
+  if (Object.keys(ms).length === 0) return {};
+  return { recipe: { memorySeed: ms } };
 }
 
-function normalizeRhythm(
+function normalizeLife(
   raw: Record<string, unknown>,
   current: PrivateCharacterDto,
   optimize: boolean,
@@ -618,6 +450,25 @@ function normalizeRhythm(
   return out;
 }
 
+function normalizeReasoning(
+  raw: Record<string, unknown>,
+  _current: PrivateCharacterDto,
+  _optimize: boolean,
+): AiGeneratedDraft {
+  // reasoning 三 toggle 都有默认值 false，无 sacred 概念；
+  // AI 返回 boolean 就交给前端决定覆盖时机（前端 setIfEmptyStr 等同样套路）。
+  const rs: Partial<CharacterBlueprintRecipe['reasoning']> = {};
+  if (typeof raw.enableCoT === 'boolean') rs.enableCoT = raw.enableCoT;
+  if (typeof raw.enableReflection === 'boolean') {
+    rs.enableReflection = raw.enableReflection;
+  }
+  if (typeof raw.enableRouting === 'boolean') {
+    rs.enableRouting = raw.enableRouting;
+  }
+  if (Object.keys(rs).length === 0) return {};
+  return { recipe: { reasoning: rs } };
+}
+
 // ───── helpers ─────
 
 function trimStr(v: unknown): string | null {
@@ -627,14 +478,10 @@ function trimStr(v: unknown): string | null {
 }
 
 /**
- * 从字符串里抓第一个 emoji（含 ZWJ 合体字符与 variation selector）。
- * AI 偶尔会输出 "🪷 心理咨询师" 这样带文字的混合串，截到第一个 emoji 即可。
- * 抓不到就回退到原字符串（避免误判把合法 emoji 丢掉）。
+ * 从字符串里抓第一个 emoji。AI 偶尔会输出 "🪷 心理咨询师" 这样的混合串。
  */
 function takeFirstEmoji(s: string | null): string | null {
   if (!s) return null;
-  // \p{Extended_Pictographic} 覆盖大部分 emoji；后续 ZWJ 序列 + variation selector
-  // 用 (‍\p{Extended_Pictographic}️?)* 贪婪连接。
   const match = s.match(
     /\p{Extended_Pictographic}️?(‍\p{Extended_Pictographic}️?)*/u,
   );
@@ -673,7 +520,6 @@ function clampIntOrNull(
   min: number,
   max: number,
 ): number | null | undefined {
-  // 返回 undefined 表示"AI 没有给值"；null 表示 AI 明确给 null；数字就 clamp。
   if (v === null) return null;
   if (v === undefined) return undefined;
   return clampInt(v, min, max);

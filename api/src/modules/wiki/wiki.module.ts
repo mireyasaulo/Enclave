@@ -40,6 +40,7 @@ import { WikiTalkService } from './services/wiki-talk.service';
 import { WikiWatchlistService } from './services/wiki-watchlist.service';
 import { WikiPrivateCharacterService } from './services/wiki-private-character.service';
 import { WikiPrivateCharacterAiService } from './services/wiki-private-character-ai.service';
+import { WikiPrivateCharacterCleanupService } from './services/wiki-private-character-cleanup.service';
 import { WikiReportService } from './services/wiki-report.service';
 import { WikiPageController } from './controllers/wiki-page.controller';
 import { WikiReviewController } from './controllers/wiki-review.controller';
@@ -113,6 +114,7 @@ import { WikiAvatarService } from './services/wiki-avatar.service';
     WikiStatsService,
     WikiPrivateCharacterService,
     WikiPrivateCharacterAiService,
+    WikiPrivateCharacterCleanupService,
     WikiAvatarService,
     WikiRoleGuard,
     WikiRateLimitGuard,
