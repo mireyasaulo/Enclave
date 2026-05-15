@@ -803,8 +803,15 @@ function MobileNoteEditor({
       setCloseConfirmOpen(true);
       return;
     }
+    // 用户从 + 菜单进编辑器但没编辑就退出：chat-list-page 在 navigate 前已经
+    // createDesktopNoteDraft() 占了 draftId 入参，如果不清理这里，localStorage
+    // 会一直攒空草稿——每次进入 readDesktopNoteDrafts() 都要解析全表，长期变慢。
+    // 已保存（有 noteId）的草稿当缓存留下，下次进来还能恢复；只清没保存的空草稿。
+    if (!noteId && activeDraftId && isNoteContentEmpty(editorState)) {
+      clearDesktopNoteDraft(activeDraftId);
+    }
     void leaveEditor();
-  }, [isDirty, leaveEditor]);
+  }, [activeDraftId, editorState, isDirty, leaveEditor, noteId]);
 
   async function handleSaveAndClose() {
     const savedNote = await handleSave();
