@@ -218,15 +218,36 @@ export function ProfileSettingsPage() {
 
   const saveApiKeyMutation = useMutation({
     mutationFn: async () => {
+      const trimmedApiBase = apiBaseDraft.trim();
+      // Base URL 后端不校验直接落库（world-owner.service.ts setOwnerApiKey），
+      // 运行时 ai-orchestrator.normalizeProviderEndpoint 也只 trim 尾斜杠不校验合法性。
+      // 用户敲错（"asdf" / "https//x"）会一路过到 fetch 才 "Failed to construct URL"，
+      // 没办法把锅甩回这个设置项。这里先在客户端拦掉。
+      if (trimmedApiBase) {
+        let parsed: URL | null = null;
+        try {
+          parsed = new URL(trimmedApiBase);
+        } catch {
+          parsed = null;
+        }
+        if (!parsed || (parsed.protocol !== "http:" && parsed.protocol !== "https:")) {
+          throw new Error(
+            t(msg`Base URL 必须是合法的 http/https 地址，例如 https://api.openai.com/v1。`),
+          );
+        }
+      }
       const owner = await setWorldOwnerApiKey(
         {
           apiKey: apiKeyDraft.trim(),
-          apiBase: apiBaseDraft.trim() || undefined,
+          apiBase: trimmedApiBase || undefined,
         },
         baseUrl,
       );
       queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
+      // 后端 trim 过的值同步回 draft，避免用户敲了 "  https://x/  " 看到的还是
+      // 带空格的旧 draft、想再改 Base URL 时困惑「我刚不是已经存过了」。
+      setApiBaseDraft(owner.customApiBase ?? "");
     },
     onSuccess: () => {
       setApiKeyDraft("");
