@@ -1179,6 +1179,12 @@ const pendingLikePostId = likeMutation.isPending
                 cardId={`feed-post-${post.id}`}
                 authorName={post.authorName}
                 authorAvatar={post.authorAvatar}
+                onAuthorClick={
+                  post.authorType === "character"
+                    ? () =>
+                        openCharacterDetail(post.authorId, post.authorType)
+                    : undefined
+                }
                 meta={`${formatTimestamp(post.createdAt)} · ${
                   post.authorType === "user"
                     ? t(msg`世界主人`)
