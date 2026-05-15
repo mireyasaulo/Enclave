@@ -24,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  SELF_CHARACTER_ID,
   addFeedComment,
   favoriteFeedPost,
   followChannelAuthor,
@@ -2092,20 +2093,26 @@ function MobileChannelsCard({
                   </div>
                 </div>
               </button>
-              <button
-                type="button"
-                onClick={onToggleFollowAuthor}
-                className={cn(
-                  "rounded-full px-2.5 py-1 text-[10px] font-medium transition",
-                  post.ownerState?.isFollowingAuthor
-                    ? "border border-white/20 bg-white/10 text-white/72"
-                    : "bg-[#07c160] text-white",
-                )}
-              >
-                {post.ownerState?.isFollowingAuthor
-                  ? t(msg`已关注`)
-                  : t(msg`+关注`)}
-              </button>
+              {post.authorId !== SELF_CHARACTER_ID ? (
+                // 「我自己」是用户的代理角色，关注 / 取消关注自己没语义；前后端
+                // 都没禁——但后端 followChannelAuthor 对 owner===authorId 才
+                // no-op，char-default-self 不是 owner.id，会真插一行 follow 记录，
+                // 视觉上落到 "已关注" 来回切看着很怪。直接在 UI 隐掉。
+                <button
+                  type="button"
+                  onClick={onToggleFollowAuthor}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 text-[10px] font-medium transition",
+                    post.ownerState?.isFollowingAuthor
+                      ? "border border-white/20 bg-white/10 text-white/72"
+                      : "bg-[#07c160] text-white",
+                  )}
+                >
+                  {post.ownerState?.isFollowingAuthor
+                    ? t(msg`已关注`)
+                    : t(msg`+关注`)}
+                </button>
+              ) : null}
             </div>
             {post.title ? (
               <div className="mt-2 text-[13px] font-medium text-white">

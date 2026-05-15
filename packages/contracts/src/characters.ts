@@ -1,5 +1,9 @@
 export const SELF_CHARACTER_SOURCE_KEY = "self" as const;
 export const ACTION_OPERATOR_SOURCE_KEY = "action_operator" as const;
+// 「我自己」角色的 ID——前端用来识别"这条 feed/视频号 post 的作者是不是用户自己的
+// 代理角色"，从而隐藏关注按钮、特殊化交互等。和 api/.../default-characters.ts
+// 里的 SELF_CHARACTER_ID 保持一致。
+export const SELF_CHARACTER_ID = "char-default-self" as const;
 
 export type RelationshipType =
   | "family"

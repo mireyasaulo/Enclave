@@ -9,11 +9,12 @@ import {
 import { msg } from "@lingui/macro";
 import { useRuntimeTranslator, translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate } from "@tanstack/react-router";
-import type {
-  FeedChannelAuthorProfile,
-  FeedChannelHomeSection,
-  FeedComment,
-  FeedPostListItem,
+import {
+  SELF_CHARACTER_ID,
+  type FeedChannelAuthorProfile,
+  type FeedChannelHomeSection,
+  type FeedComment,
+  type FeedPostListItem,
 } from "@yinjie/contracts";
 import {
   Button,
@@ -826,20 +827,26 @@ function ChannelFeedSlide({
                   </div>
                 </div>
               </button>
-              <button
-                type="button"
-                onClick={onToggleAuthorFollow}
-                className={cn(
-                  "rounded-full px-3 py-1 text-[12px] transition",
-                  post.ownerState?.isFollowingAuthor
-                    ? "border border-white/28 bg-transparent text-white/85 hover:bg-white/10"
-                    : "bg-[color:var(--brand-primary)] text-white hover:opacity-95",
-                )}
-              >
-                {post.ownerState?.isFollowingAuthor
-                  ? t(msg`已关注`)
-                  : t(msg`+ 关注`)}
-              </button>
+              {post.authorId !== SELF_CHARACTER_ID ? (
+                // 「我自己」是用户自己的代理角色，不让用户关注 / 取消关注自己——
+                // 后端 followChannelAuthor 也对 owner.id===authorId 做了 no-op，
+                // 但 char-default-self 是角色而非 owner，会真插一行 follow 记录，
+                // 视觉上落到 "已关注" / 点了又能 "+ 关注"，徒增困惑。
+                <button
+                  type="button"
+                  onClick={onToggleAuthorFollow}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-[12px] transition",
+                    post.ownerState?.isFollowingAuthor
+                      ? "border border-white/28 bg-transparent text-white/85 hover:bg-white/10"
+                      : "bg-[color:var(--brand-primary)] text-white hover:opacity-95",
+                  )}
+                >
+                  {post.ownerState?.isFollowingAuthor
+                    ? t(msg`已关注`)
+                    : t(msg`+ 关注`)}
+                </button>
+              ) : null}
             </div>
             {post.title ? (
               <div className="mt-3 line-clamp-2 text-[15px] font-semibold text-white">
@@ -1175,20 +1182,22 @@ function DesktopChannelAuthorPanel({
           </div>
 
           <div className="mt-4 flex gap-2">
-            <Button
-              variant={profile.isFollowing ? "secondary" : "primary"}
-              size="sm"
-              onClick={() =>
-                onToggleFollow(profile.authorId, profile.isFollowing)
-              }
-              className={
-                profile.isFollowing
-                  ? "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
-                  : "bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
-              }
-            >
-              {profile.isFollowing ? t(msg`已关注`) : t(msg`+关注`)}
-            </Button>
+            {profile.authorId !== SELF_CHARACTER_ID ? (
+              <Button
+                variant={profile.isFollowing ? "secondary" : "primary"}
+                size="sm"
+                onClick={() =>
+                  onToggleFollow(profile.authorId, profile.isFollowing)
+                }
+                className={
+                  profile.isFollowing
+                    ? "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
+                    : "bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
+                }
+              >
+                {profile.isFollowing ? t(msg`已关注`) : t(msg`+关注`)}
+              </Button>
+            ) : null}
             <Button
               variant="secondary"
               size="sm"
