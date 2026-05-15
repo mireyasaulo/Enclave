@@ -179,11 +179,18 @@ export class ShakeDiscoveryService {
     });
 
     const sessionId = randomUUID();
+    // 已经 unshift 进 sessions 的失败记录用这个标记，outer catch 看到就跳过二次写入，
+    // 避免 inner+outer 各 unshift 一条同 id 失败记录导致 daily limit 多扣一次。
+    let failedSessionRecorded = false;
 
     try {
       const planningRaw = await this.ai.generateJsonObject({
         prompt: planningPrompt,
-        maxTokens: 1800,
+        // 推理模型（n1n 把 gpt-4.1 偶发路由到带 thinking 的变体）一发 <think>
+        // 就吃掉一两千 tokens，原来 1800 在 thinking + 4 directions JSON 之间常被
+        // 截断；给到 4000 后再算上 extractJsonFromModelOutput 的截断 fence 兜底，
+        // 实测能稳住。
+        maxTokens: 4000,
         temperature: 0.45,
         usageContext: {
           surface: 'app',
@@ -223,6 +230,7 @@ export class ShakeDiscoveryService {
         });
         sessions.unshift(failedSession);
         await this.writeSessions(owner.id, sessions);
+        failedSessionRecorded = true;
         if (aiPlanningEmpty) {
           throw new AppError('SHAKE_AI_PLANNING_FAILED', {
             legacyMessage: '摇一摇生成失败，请稍后重试。',
@@ -241,6 +249,12 @@ export class ShakeDiscoveryService {
       let generationPrompt: string | null = null;
       let generated: ShakeDiscoveryGeneratedCharacterDraft | null = null;
       let restrictedCategory: RestrictedRoleCategory | null = null;
+      // AI 输出格式坏（unescaped quote / 截断到 name 之前）导致 generateJsonObject
+      // 回退 {}：normalizeGeneratedCharacterDraft 会把 direction.relationshipLabel
+      // 误当 name 兜底，结果就是用户看到一个名字叫"在群里看到你们讨论走查测试工
+      // 具时插了一句，提到了"的角色。把"AI 没给名字"识别成生成失败，换下一个方向
+      // 重试；全部方向都没给名字时再走失败分支抛出 SHAKE_AI_GENERATION_FAILED。
+      let aiGenerationEmpty = false;
 
       while (remainingDirections.length > 0) {
         const candidateDirection = pickDirection(remainingDirections);
@@ -251,7 +265,8 @@ export class ShakeDiscoveryService {
         });
         const generationRaw = await this.ai.generateJsonObject({
           prompt: candidatePrompt,
-          maxTokens: 1800,
+          // 同 planning：给 thinking 留够余量。
+          maxTokens: 4000,
           temperature: 0.82,
           usageContext: {
             surface: 'app',
@@ -262,6 +277,14 @@ export class ShakeDiscoveryService {
             ownerId: owner.id,
           },
         });
+        if (!hasUsableGeneratedName(generationRaw)) {
+          aiGenerationEmpty = true;
+          removeDirectionByKey(
+            remainingDirections,
+            candidateDirection.directionKey,
+          );
+          continue;
+        }
         const candidateGenerated = normalizeGeneratedCharacterDraft(
           generationRaw,
           candidateDirection,
@@ -287,6 +310,13 @@ export class ShakeDiscoveryService {
       }
 
       if (!selectedDirection || !generationPrompt || !generated) {
+        const failureReason = restrictedCategory
+          ? `生成结果命中了已禁用的${labelForRestrictedCategory(
+              restrictedCategory,
+            )}角色类型。`
+          : aiGenerationEmpty
+            ? 'AI 没有返回可用的角色草稿（推理模型 thinking 截断或 JSON 字段缺失）。'
+            : '没有生成出符合约束的摇一摇角色。';
         sessions.unshift(
           buildFailedSession({
             id: sessionId,
@@ -297,16 +327,20 @@ export class ShakeDiscoveryService {
               summary: planning.summary,
               directions: weightedDirections,
             },
-            failureReason: restrictedCategory
-              ? `生成结果命中了已禁用的${labelForRestrictedCategory(
-                  restrictedCategory,
-                )}角色类型。`
-              : '没有生成出符合约束的摇一摇角色。',
+            failureReason,
             signalSummary: signalTexts.join('\n'),
             cyberAvatarSummary: buildCyberAvatarSummary(cyberAvatarProfile),
           }),
         );
         await this.writeSessions(owner.id, sessions);
+        failedSessionRecorded = true;
+        // 区分：AI 真的没给角色 → 抛 SHAKE_AI_GENERATION_FAILED 让前端展示明确错误；
+        // 都被 medical/legal/finance 等过滤掉 → 走 null 让前端展示"没有新的相遇"。
+        if (aiGenerationEmpty && !restrictedCategory) {
+          throw new AppError('SHAKE_AI_GENERATION_FAILED', {
+            legacyMessage: '摇一摇生成失败，请稍后重试。',
+          });
+        }
         return null;
       }
 
@@ -343,20 +377,22 @@ export class ShakeDiscoveryService {
       await this.writeSessions(owner.id, sessions);
       return preview;
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : '摇一摇生成失败。';
-      sessions.unshift(
-        buildFailedSession({
-          id: sessionId,
-          ownerId: owner.id,
-          createdAt: now,
-          planningPrompt,
-          failureReason: message,
-          signalSummary: signalTexts.join('\n'),
-          cyberAvatarSummary: buildCyberAvatarSummary(cyberAvatarProfile),
-        }),
-      );
-      await this.writeSessions(owner.id, sessions);
+      if (!failedSessionRecorded) {
+        const message =
+          error instanceof Error ? error.message : '摇一摇生成失败。';
+        sessions.unshift(
+          buildFailedSession({
+            id: sessionId,
+            ownerId: owner.id,
+            createdAt: now,
+            planningPrompt,
+            failureReason: message,
+            signalSummary: signalTexts.join('\n'),
+            cyberAvatarSummary: buildCyberAvatarSummary(cyberAvatarProfile),
+          }),
+        );
+        await this.writeSessions(owner.id, sessions);
+      }
       throw error;
     }
   }
@@ -1031,6 +1067,17 @@ function sanitizeBoolean(value: unknown, fallback: boolean) {
 
 function sanitizeText(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
+}
+
+// 判断 AI 是否真的返回了一个"能用的角色"——必须至少有 name 字段。
+// generateJsonObject 在解析失败时会回退 {}，此处用来识别这种情况，
+// 避免 normalizeGeneratedCharacterDraft 把 relationshipLabel 兜底当 name 用。
+// 同时 name 太长（>16 字）八成是把整段关系描述塞进了 name，也判定为不可用。
+function hasUsableGeneratedName(raw: Record<string, unknown>) {
+  const name = sanitizeText(raw.name);
+  if (!name) return false;
+  if (name.length > 16) return false;
+  return true;
 }
 
 function normalizeStoredSessions(

@@ -4,8 +4,9 @@ import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
+import { CharacterPageEntity } from '../entities/character-page.entity';
 import { WikiFieldProtectionEntity } from '../entities/wiki-field-protection.entity';
-import { rankOf } from '../guards/wiki-role.guard';
+import { WIKI_ROLE_RANK, rankOf } from '../guards/wiki-role.guard';
 import { WIKI_FIELD_PROTECTION_SEEDS } from '../seed/field-protections.seed';
 
 export type FieldPolicyMap = Map<string, string>; // fieldPath -> minRole
@@ -17,6 +18,8 @@ export class WikiFieldProtectionService implements OnModuleInit {
   constructor(
     @InjectRepository(WikiFieldProtectionEntity)
     private readonly repo: Repository<WikiFieldProtectionEntity>,
+    @InjectRepository(CharacterPageEntity)
+    private readonly pageRepo: Repository<CharacterPageEntity>,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -95,7 +98,54 @@ export class WikiFieldProtectionService implements OnModuleInit {
       'characterId' | 'fieldPath' | 'minRoleToEdit' | 'reason'
     > & { createdBy?: string | null },
   ): Promise<WikiFieldProtectionEntity> {
-    return this.repo.save(this.repo.create(input));
+    // 2026-05-16 R2 走查发现：缺 minRoleToEdit 时入库直接 500（SQLite NOT NULL），
+    // 缺 fieldPath 或非法 characterId（不是 '*' 也不是真词条）时静默写入"幽灵"策略。
+    // 这里把校验前置，让前端拿到 400 而不是 500，并禁止指向不存在的词条。
+    const characterId = (input.characterId ?? '').trim();
+    const fieldPath = (input.fieldPath ?? '').trim();
+    const minRoleToEdit = (input.minRoleToEdit ?? '').trim();
+    if (!characterId) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { detail: 'characterId 不能为空（用 "*" 表示全局）' },
+        legacyMessage: 'characterId 不能为空（用 "*" 表示全局）',
+      });
+    }
+    if (!fieldPath) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { detail: 'fieldPath 不能为空' },
+        legacyMessage: 'fieldPath 不能为空',
+      });
+    }
+    if (!minRoleToEdit || !(minRoleToEdit in WIKI_ROLE_RANK)) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: {
+          detail:
+            'minRoleToEdit 必须是 newcomer / autoconfirmed / patroller / admin 之一',
+        },
+        legacyMessage:
+          'minRoleToEdit 必须是 newcomer / autoconfirmed / patroller / admin 之一',
+      });
+    }
+    if (characterId !== '*') {
+      const page = await this.pageRepo.findOne({ where: { characterId } });
+      if (!page) {
+        throw new AppError('WIKI_PAGE_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          legacyMessage: `角色 ${characterId} 不存在`,
+        });
+      }
+    }
+    return this.repo.save(
+      this.repo.create({
+        ...input,
+        characterId,
+        fieldPath,
+        minRoleToEdit,
+      }),
+    );
   }
 
   async update(

@@ -313,6 +313,11 @@ function DesktopDiscoverWorkspace() {
       await keepShakeSession(preview.id, baseUrl);
       return preview;
     },
+    onMutate: () => {
+      // 摇一摇要等 AI ~60s，期间按钮显示"正在寻找..."但 sceneMessage 还挂着上一次的
+      // 「X 已加入通讯录: Y」，用户看不出新一次到底有没有真的开始。统一清掉。
+      setSceneMessage(""); // i18n-ignore-line: clearing state
+    },
     onSuccess: async (result) => {
       if (!result) {
         setSceneMessage(t(msg`附近暂时没有新的相遇。`));
