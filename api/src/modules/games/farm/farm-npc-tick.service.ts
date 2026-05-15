@@ -305,6 +305,8 @@ export class FarmNpcTickService {
       intimacyDelta: -3,
       payload: { plotIndex: ripe.index, amount, coinsGained },
     });
+    // 上面那条 'steal' 事件已经带 intimacyDelta=-3，这里关掉重复的 intimacy_change
+    // 事件，只保留实际把 thief.intimacyLevel-3 的副作用。
     await this.eventService.applyIntimacyChange(
       ownerId,
       thief.id,
@@ -312,6 +314,7 @@ export class FarmNpcTickService {
       -3,
       'character',
       thief.name,
+      { recordEvent: false },
     );
     const broadcasted = await this.eventService.maybeBroadcastIncident({
       ownerId,
