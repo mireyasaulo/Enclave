@@ -1087,7 +1087,7 @@ export function MomentsPage() {
                   category: "moments",
                   title: moment.authorName,
                   description: getMomentSummaryText(moment),
-                  meta: t(msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`),
+                  meta: formatTimestamp(moment.postedAt),
                   to: `/tabs/moments${routeHash ? `#${routeHash}` : ""}`,
                   badge: t(msg`朋友圈`),
                   avatarName: moment.authorName,

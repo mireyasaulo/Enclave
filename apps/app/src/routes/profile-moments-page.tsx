@@ -481,9 +481,7 @@ export function ProfileMomentsPage() {
                   category: "moments",
                   title: moment.authorName,
                   description: getMomentSummaryText(moment),
-                  meta: t(
-                    msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`,
-                  ),
+                  meta: formatTimestamp(moment.postedAt),
                   to: "/profile/moments",
                   badge: t(msg`朋友圈`),
                   avatarName: moment.authorName,

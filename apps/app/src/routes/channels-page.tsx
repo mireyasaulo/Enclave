@@ -751,7 +751,7 @@ export function ChannelsPage() {
         category: "channels",
         title: post.authorName,
         description: post.text,
-        meta: t(msg`视频号 · ${formatTimestamp(post.createdAt)}`),
+        meta: formatTimestamp(post.createdAt),
         to: `/tabs/channels${routeHash ? `#${routeHash}` : ""}`,
         badge: t(msg`视频号`),
         avatarName: post.authorName,

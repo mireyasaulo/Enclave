@@ -452,7 +452,7 @@ const pendingLikePostId = likeMutation.isPending
           category: "feed",
           title: post.authorName,
           description: getFeedSummaryText(post),
-          meta: t(msg`广场动态 · ${formatTimestamp(post.createdAt)}`),
+          meta: formatTimestamp(post.createdAt),
           to: `/tabs/feed${buildFeedRouteHash({ postId: post.id }) ? `#${buildFeedRouteHash({ postId: post.id })}` : ""}`,
           badge: t(msg`广场动态`),
           avatarName: post.authorName,
