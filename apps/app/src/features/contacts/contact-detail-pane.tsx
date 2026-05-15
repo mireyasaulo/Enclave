@@ -66,6 +66,8 @@ type FriendProfileFormState = {
 
 type EditableProfileField = "remarkName" | "tags" | null;
 
+type DangerConfirm = "block" | "delete" | null;
+
 export function ContactDetailPane({
   character,
   friendship,
@@ -99,6 +101,7 @@ export function ContactDetailPane({
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const [editingField, setEditingField] = useState<EditableProfileField>(null);
+  const [dangerConfirm, setDangerConfirm] = useState<DangerConfirm>(null);
   const [profileNotice, setProfileNotice] = useState<string | null>(null);
   const [profileForm, setProfileForm] = useState<FriendProfileFormState>({
     remarkName: "",
@@ -107,6 +110,7 @@ export function ContactDetailPane({
 
   useEffect(() => {
     setEditingField(null);
+    setDangerConfirm(null);
     setProfileNotice(null);
     setProfileForm({
       remarkName: friendship?.remarkName ?? "",
@@ -403,7 +407,16 @@ export function ContactDetailPane({
                       ? t(msg`移出黑名单`)
                       : t(msg`不再接收这个联系人的互动`)
                 }
-                onClick={onToggleBlock}
+                // 拉黑前先要二次确认，避免误点直接把人甩进黑名单（被拉黑后联系人
+                // 会从通讯录消失，要从「设置 → 黑名单」找回来才能恢复）；移出黑名单
+                // 是恢复操作，可直接执行无需确认。
+                onClick={() => {
+                  if (isBlocked) {
+                    onToggleBlock();
+                  } else {
+                    setDangerConfirm("block");
+                  }
+                }}
                 danger
                 disabled={blockPending}
               />
@@ -414,7 +427,7 @@ export function ContactDetailPane({
                 value={
                   deletePending ? t(msg`正在删除...`) : t(msg`从通讯录移除`)
                 }
-                onClick={onDeleteFriend}
+                onClick={() => setDangerConfirm("delete")}
                 danger
                 disabled={deletePending}
               />
@@ -443,6 +456,91 @@ export function ContactDetailPane({
           }}
         />
       ) : null}
+
+      {dangerConfirm === "block" && onToggleBlock ? (
+        <DangerConfirmDialog
+          title={t(msg`确定加入黑名单？`)}
+          description={t(
+            msg`将不再收到 ${displayName} 的互动；TA 会从通讯录消失，可在「通讯录管理 → 黑名单」恢复。`,
+          )}
+          confirmLabel={t(msg`加入黑名单`)}
+          pending={blockPending}
+          onCancel={() => setDangerConfirm(null)}
+          onConfirm={() => {
+            setDangerConfirm(null);
+            onToggleBlock();
+          }}
+        />
+      ) : null}
+
+      {dangerConfirm === "delete" && onDeleteFriend ? (
+        <DangerConfirmDialog
+          title={t(msg`确定从通讯录删除 ${displayName}？`)}
+          description={t(msg`删除后将不会通知对方，可重新添加。`)}
+          confirmLabel={t(msg`删除`)}
+          pending={deletePending}
+          onCancel={() => setDangerConfirm(null)}
+          onConfirm={() => {
+            setDangerConfirm(null);
+            onDeleteFriend();
+          }}
+        />
+      ) : null}
     </DesktopContactProfileShell>
+  );
+}
+
+function DangerConfirmDialog({
+  title,
+  description,
+  confirmLabel,
+  pending,
+  onCancel,
+  onConfirm,
+}: {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  pending: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const t = useRuntimeTranslator();
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
+      <button
+        type="button"
+        aria-label={t(msg`关闭`)}
+        onClick={onCancel}
+        className="absolute inset-0"
+      />
+      <div className="relative w-full max-w-[380px] overflow-hidden rounded-[16px] bg-white shadow-[var(--shadow-overlay)]">
+        <div className="px-5 py-5 text-center">
+          <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
+            {title}
+          </div>
+          <p className="mt-2 text-[12px] leading-5 text-[color:var(--text-muted)]">
+            {description}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 border-t border-[color:var(--border-faint)]">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="h-11 text-[14px] text-[color:var(--text-secondary)]"
+          >
+            {t(msg`取消`)}
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={pending}
+            className="h-11 border-l border-[color:var(--border-faint)] text-[14px] font-medium text-[#d74b45] disabled:opacity-50"
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

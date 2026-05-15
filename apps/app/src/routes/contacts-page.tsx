@@ -759,6 +759,10 @@ export function ContactsPage() {
         variables.blocked ? t(msg`已移出黑名单。`) : t(msg`已加入黑名单。`),
       );
       await Promise.all([
+        // 加入黑名单后服务端把 friendship.status 改成 'blocked'，getFriends() 会
+        // 把它过滤掉。如果不 invalidate app-friends，列表里这位「已黑」联系人
+        // 仍然显示成普通好友（连星标徽章都还在），看上去拉黑没生效。
+        queryClient.invalidateQueries({ queryKey: ["app-friends", baseUrl] }),
         queryClient.invalidateQueries({
           queryKey: ["app-contacts-blocked", baseUrl],
         }),

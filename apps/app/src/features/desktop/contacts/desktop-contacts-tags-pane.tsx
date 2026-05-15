@@ -178,6 +178,10 @@ export function DesktopContactsTagsPane() {
         variables.blocked ? t(msg`已移出黑名单。`) : t(msg`已加入黑名单。`),
       );
       await Promise.all([
+        // 同 contacts-page.tsx：拉黑后服务端把 friendship.status 改成 'blocked'，
+        // 不 invalidate app-friends 的话标签 pane 里这位"已黑"联系人仍然挂在
+        // 原 tag 下面像普通好友一样可点。
+        queryClient.invalidateQueries({ queryKey: ["app-friends", baseUrl] }),
         queryClient.invalidateQueries({
           queryKey: ["app-contacts-blocked", baseUrl],
         }),
