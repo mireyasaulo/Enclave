@@ -24,6 +24,7 @@ import {
   type SceneId,
   type SceneMatchSource,
 } from './scene-matching';
+import { sanitizeGreeting } from './greeting-sanitizer';
 import { ChatService } from '../chat/chat.service';
 import { CharactersService } from '../characters/characters.service';
 import { AppEvents, EventBusService } from '../events/event-bus.service';
@@ -452,12 +453,13 @@ export class SocialService {
     // fallback 命中的角色与请求场景无关，用「不期而遇」的 shake 文案更连贯；
     // scene 命中才让 AI 顺着「在 X 里遇到你」开场。
     const isFallback = matchSource === 'fallback';
-    let greeting = isFallback
+    const greetingFallback = isFallback
       ? await this.worldLanguage.buildShakeGreetingFallback(char.name)
       : await this.worldLanguage.buildSceneGreetingFallback({
           characterName: char.name,
           scene: promptScene,
         });
+    let greeting = greetingFallback;
     const greetingTask = isFallback
       ? await this.worldLanguage.formatShakeGreetingTask()
       : await this.worldLanguage.formatFriendRequestGreetingTask(promptScene);
@@ -480,7 +482,9 @@ export class SocialService {
           characterName: char.name,
         },
       });
-      greeting = result.text;
+      // 推理模型偶发会把"任务回声 + 候选评估"直接吐出来当回复。
+      // sanitizeGreeting 检测到就回退到静态开场白，避免一长篇内心戏直接落到用户的好友申请里。
+      greeting = sanitizeGreeting(result.text, greetingFallback);
     } catch {
       this.logger.debug('Falling back to default scene greeting');
     }
@@ -523,9 +527,10 @@ export class SocialService {
     const preset = available[Math.floor(Math.random() * available.length)];
     const char = preset.character as CharacterEntity;
 
-    let greeting = await this.worldLanguage.buildShakeGreetingFallback(
+    const shakeFallback = await this.worldLanguage.buildShakeGreetingFallback(
       char.name,
     );
+    let greeting = shakeFallback;
     const runtimeProfile =
       (await this.charactersService.getRuntimeProfileFromCharacter(char)) ??
       char.profile;
@@ -545,7 +550,7 @@ export class SocialService {
           characterName: char.name,
         },
       });
-      greeting = result.text;
+      greeting = sanitizeGreeting(result.text, shakeFallback);
     } catch {
       this.logger.debug('Falling back to default shake greeting');
     }
