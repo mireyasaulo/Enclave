@@ -80,6 +80,9 @@ function classify(realModelId) {
   if (!realModelId) return null;
   // 用户原话："除了 gpt4o 以及 gpt 相关的模型" —— 就当 gpt-* 前缀算"gpt 相关"，
   // o-series（o1/o3/o4-mini-all）虽然也是 OpenAI 但叫"o"不叫"gpt"，且 n1n 价目里要么贵要么是黑洞，一并塞去 minimax。
+  // 例外：gpt-5 在 n1n 上是 pure reasoning 模型，普通 chat max_tokens (200~600) 全被 reasoning_tokens 吃光、content=""，
+  //   表现就是"角色不说话"。它和 o-series 同类，统一塞 minimax；其余 gpt-* (gpt-4o / 4o-mini / 4.1 / 4.1-mini) 保留 OpenAI 真身。
+  if (/^gpt-5(\b|$|-)/i.test(realModelId)) return 'minimax';
   if (/^gpt-/i.test(realModelId)) return 'gpt';
   return 'minimax';
 }
