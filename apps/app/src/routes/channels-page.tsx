@@ -56,6 +56,7 @@ import {
   buildDesktopChannelsRouteHash,
   parseDesktopChannelsRouteHash,
 } from "../features/channels/channels-route-state";
+import { getChannelsSectionBadge } from "../features/channels/channels-section-badge";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import {
   removeDesktopFavorite,
@@ -941,6 +942,7 @@ export function ChannelsPage() {
           }
           onLike={(postId) => likeMutation.mutate(postId)}
           onRefresh={() => generateMutation.mutate()}
+          refreshPending={generateMutation.isPending}
           comments={desktopCommentsQuery.data ?? []}
           commentsErrorMessage={desktopCommentPanelErrorMessage}
           commentsLoading={desktopCommentsQuery.isLoading}
@@ -1089,14 +1091,16 @@ export function ChannelsPage() {
                 >
                   {t(msg`重试读取`)}
                 </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
-                  onClick={handleStatusBack}
-                >
-                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
-                </Button>
+                {safeReturnPath ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
+                    onClick={handleStatusBack}
+                  >
+                    {t(msg`返回上一页`)}
+                  </Button>
+                ) : null}
               </div>
             }
           />
@@ -1110,7 +1114,7 @@ export function ChannelsPage() {
           />
         ) : null}
 
-        {!channelsQuery.isLoading && !visiblePosts.length ? (
+        {!channelsQuery.isLoading && !errorMessage && !visiblePosts.length ? (
           <MobileChannelsStatusCard
             badge={t(msg`视频号`)}
             title={t(msg`还没有内容`)}
@@ -2037,6 +2041,11 @@ function MobileChannelsCard({
             <ActionRailButton
               active={Boolean(post.ownerState?.hasLiked)}
               label={likePending ? t(msg`处理中`) : String(post.likeCount)}
+              ariaLabel={
+                post.ownerState?.hasLiked
+                  ? t(msg`取消点赞，当前 ${post.likeCount} 赞`)
+                  : t(msg`点赞，当前 ${post.likeCount} 赞`)
+              }
               onClick={onLike}
             >
               <ThumbsUp
@@ -2048,6 +2057,7 @@ function MobileChannelsCard({
             </ActionRailButton>
             <ActionRailButton
               label={String(post.commentCount)}
+              ariaLabel={t(msg`打开评论，当前 ${post.commentCount} 条`)}
               onClick={onOpenComments}
             >
               <MessageCircleMore size={17} />
@@ -2119,12 +2129,22 @@ function MobileChannelsCard({
                 {post.title}
               </div>
             ) : null}
-            <ExpandableText
-              text={stripToolCallSyntax(post.text)}
-              className="mt-1"
-              textClassName="text-[12px] leading-[1.35rem] text-white"
-              toggleClassName="text-[11px] text-white/82"
-            />
+            {(() => {
+              // 视频号 audio post 后端常把 title 和 text 都填成 "X·音乐"，
+              // 标题和正文重复出现没意义；只在两者不一致时才渲染正文。
+              const cleanText = stripToolCallSyntax(post.text);
+              if (!cleanText || cleanText === post.title) {
+                return null;
+              }
+              return (
+                <ExpandableText
+                  text={cleanText}
+                  className="mt-1"
+                  textClassName="text-[12px] leading-[1.35rem] text-white"
+                  toggleClassName="text-[11px] text-white/82"
+                />
+              );
+            })()}
             {post.topicTags?.length ? (
               <div className="mt-2 flex flex-wrap gap-1.5 text-[9px] text-white/72">
                 {post.topicTags.slice(0, 3).map((tag) => (
@@ -2168,7 +2188,13 @@ function MobileChannelsCard({
       <div className="flex items-center justify-between gap-3 border-t border-[color:var(--border-subtle)] bg-white px-3.5 py-3">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-[color:var(--text-muted)]">
           <span>
-            {post.mediaType === "video" ? t(msg`短片`) : t(msg`内容卡片`)}
+            {post.mediaType === "video"
+              ? t(msg`短片`)
+              : post.mediaType === "audio"
+                ? t(msg`音乐`)
+                : post.mediaType === "image"
+                  ? t(msg`图集`)
+                  : t(msg`内容卡片`)}
           </span>
           <span>{t(msg`${post.likeCount} 赞`)}</span>
           <span>{t(msg`${post.commentCount} 评论`)}</span>
@@ -2189,11 +2215,13 @@ function MobileChannelsCard({
 function ActionRailButton({
   children,
   label,
+  ariaLabel,
   active = false,
   onClick,
 }: {
   children: ReactNode;
   label: string;
+  ariaLabel?: string;
   active?: boolean;
   onClick: () => void;
 }) {
@@ -2201,6 +2229,7 @@ function ActionRailButton({
     <button
       type="button"
       onClick={onClick}
+      aria-label={ariaLabel ?? label}
       className="flex flex-col items-center gap-1 text-white transition-transform active:scale-[0.97]"
     >
       <span
@@ -2319,9 +2348,12 @@ function MobileChannelCommentsSheet({
             <div className="mt-1 line-clamp-2 text-[11px] leading-[1.35rem] text-[#6b7280]">
               {(() => {
                 const cleanText = stripToolCallSyntax(post.text);
-                return post.title
-                  ? `${post.title}${cleanText ? ` · ${cleanText}` : ""}`
-                  : cleanText;
+                if (post.title) {
+                  return cleanText && cleanText !== post.title
+                    ? `${post.title} · ${cleanText}`
+                    : post.title;
+                }
+                return cleanText;
               })()}
             </div>
           </div>
