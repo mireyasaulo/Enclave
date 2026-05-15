@@ -818,6 +818,24 @@ export const wikiApi = {
       { method: "DELETE" },
     );
   },
+  /**
+   * AI 自动生成私有角色的字段。
+   * - section='identity'|'bioPersonality'|'expertise'|'tone'|'prompting'|'memory'|'rhythm'：
+   *   生成该 section 字段
+   * - section='all'：一次性生成 6 个非-sacred section 全部字段（顶部"一键生成"按钮用）。
+   *   需要 name + bio + relationship + personality 都已填好，否则后端返回 400。
+   * 返回值是只包含**当前为空字段**建议的 partial DTO（后端 normalizeAiOutput 已经过一道
+   * "用户已填的不返回"过滤；前端再过一道双保险）。
+   */
+  generateMyCharacterFields(input: {
+    section: AiGenerateSection;
+    currentDraft: PrivateCharacterDto;
+  }) {
+    return request<AiGeneratedDraft>("/wiki/my-characters/ai-generate", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
   /** 触发浏览器下载 export bundle 文件。 */
   async exportMyCharacter(id: string, fallbackName: string): Promise<void> {
     const token = getToken();
@@ -923,6 +941,36 @@ export type PrivateCharacterDto = {
   triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipe | null;
   profile?: unknown | null;
+};
+
+/** 8 个 AI 生成 section：7 个分 section + 1 个 'all' 一次性全部。 */
+export type AiGenerateSection =
+  | "identity"
+  | "bioPersonality"
+  | "expertise"
+  | "tone"
+  | "prompting"
+  | "memory"
+  | "rhythm"
+  | "all";
+
+/** AI 生成返回的 partial draft；只包含**当前为空**字段的建议。 */
+export type AiGeneratedDraft = {
+  bio?: string;
+  personality?: string;
+  relationship?: string;
+  relationshipType?: string;
+  expertDomains?: string[];
+  triggerScenes?: string[];
+  recipe?: {
+    identity?: Partial<CharacterBlueprintRecipe["identity"]>;
+    expertise?: Partial<CharacterBlueprintRecipe["expertise"]>;
+    tone?: Partial<CharacterBlueprintRecipe["tone"]>;
+    prompting?: Partial<CharacterBlueprintRecipe["prompting"]>;
+    memorySeed?: Partial<CharacterBlueprintRecipe["memorySeed"]>;
+    reasoning?: Partial<CharacterBlueprintRecipe["reasoning"]>;
+    lifeStrategy?: Partial<CharacterBlueprintRecipe["lifeStrategy"]>;
+  };
 };
 
 export type FieldProtection = {
