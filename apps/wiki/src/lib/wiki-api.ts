@@ -906,6 +906,49 @@ export const wikiApi = {
     // Safari 全平台稳定下载。
     setTimeout(() => URL.revokeObjectURL(url), 500);
   },
+  /**
+   * 上传一张图片作为头像。返回 `/api/wiki/avatars/<file>` 站内 URL，调用方再把
+   * 这个 URL 写到 PrivateCharacterDto.avatar 上即可（isSafeAvatarValue 允许 `/` 开头）。
+   */
+  async uploadAvatar(file: File): Promise<{ url: string }> {
+    const token = getToken();
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${API_BASE}/wiki/avatars`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: formData,
+    });
+    const text = await res.text();
+    let payload: unknown = null;
+    if (text) {
+      try {
+        payload = JSON.parse(text);
+      } catch {
+        payload = text;
+      }
+    }
+    if (!res.ok) {
+      if (res.status === 401) {
+        clearSession();
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.startsWith("/login") &&
+          !window.location.pathname.startsWith("/register")
+        ) {
+          const redirect = window.location.pathname + window.location.search;
+          window.location.href = `/login?redirect=${encodeURIComponent(redirect)}`;
+        }
+      }
+      const message =
+        (payload && typeof payload === "object" && "message" in payload
+          ? String((payload as { message: unknown }).message)
+          : null) ??
+        translateRuntimeMessage(msg`头像上传失败 (${res.status})`);
+      throw new WikiApiError(res.status, payload, message);
+    }
+    return payload as { url: string };
+  },
   /** 上传一个 JSON 文件，按 name upsert 到当前用户的私有角色。 */
   async importMyCharacter(
     file: File,

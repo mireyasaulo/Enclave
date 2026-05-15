@@ -52,6 +52,8 @@ import { WikiWatchlistController } from './controllers/wiki-watchlist.controller
 import { WikiPrivateCharacterController } from './controllers/wiki-private-character.controller';
 import { WikiSoftDeleteController } from './controllers/wiki-soft-delete.controller';
 import { WikiReportController } from './controllers/wiki-report.controller';
+import { WikiAvatarController } from './controllers/wiki-avatar.controller';
+import { WikiAvatarService } from './services/wiki-avatar.service';
 
 @Module({
   imports: [
@@ -92,6 +94,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiFieldProtectionController,
     WikiStatsController,
     WikiPrivateCharacterController,
+    WikiAvatarController,
   ],
   providers: [
     WikiPageService,
@@ -110,6 +113,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiStatsService,
     WikiPrivateCharacterService,
     WikiPrivateCharacterAiService,
+    WikiAvatarService,
     WikiRoleGuard,
     WikiRateLimitGuard,
     WikiAiGenerateRateLimitGuard,
@@ -127,6 +131,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     AbuseFilterService,
     WikiFieldProtectionService,
     WikiSystemUserService,
+    WikiPrivateCharacterService,
   ],
 })
 export class WikiModule {}
