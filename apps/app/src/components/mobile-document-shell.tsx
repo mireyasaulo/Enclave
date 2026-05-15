@@ -127,7 +127,7 @@ export function MobileDocumentShell({
             variant="ghost"
             size="icon"
             className="h-10 w-10 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4"
-            aria-label={t(msg`返回设置`)}
+            aria-label={isDesktopLayout ? t(msg`返回设置`) : t(msg`返回`)}
           >
             <ArrowLeft size={18} />
           </Button>
@@ -171,12 +171,12 @@ export function MobileDocumentShell({
                             void navigate({
                               to: isDesktopLayout
                                 ? "/desktop/settings"
-                                : "/profile/settings",
+                                : "/tabs/profile",
                             });
                           },
                           isDesktopLayout
                             ? "/desktop/settings"
-                            : "/profile/settings",
+                            : "/tabs/profile",
                         )
                       }
                       className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
