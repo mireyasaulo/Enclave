@@ -141,6 +141,8 @@ export function MobileMomentsPublishPage() {
       if (event.key !== "Escape") return;
       if (discardConfirmOpen) {
         setDiscardConfirmOpen(false);
+        // ESC 关 modal 后焦点也丢，跟点「继续编辑」是同一回事，把焦点还回 textarea。
+        textareaRef.current?.focus();
         return;
       }
       if (mediaPickerOpen) {
@@ -451,26 +453,47 @@ export function MobileMomentsPublishPage() {
         // z-[1300]：alert 必须盖在 toast (z-1100) / mediaPickerSheet (z-1200) 之上。
         // 之前 z-[100] 太低，用户在 1.6s 内连点 SettingRow → 取消，刚冒的 toast 会
         // 把 modal 底边吃掉。
-        <div className="fixed inset-0 z-[1300] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="moments-publish-discard-title"
+          aria-describedby="moments-publish-discard-desc"
+          className="fixed inset-0 z-[1300] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]"
+        >
           <button
             type="button"
             aria-label={t(msg`关闭提示`)}
-            onClick={() => setDiscardConfirmOpen(false)}
+            onClick={() => {
+              setDiscardConfirmOpen(false);
+              // 焦点丢失会让用户回到 publish 页后没法直接继续打字——modal 关掉
+              // 那一刻焦点落到 body，textarea 不再处于编辑态。手动把焦点还回去。
+              textareaRef.current?.focus();
+            }}
             className="absolute inset-0"
           />
           <div className="relative w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-[12px] bg-white shadow-[var(--shadow-overlay)]">
             <div className="px-6 pb-3 pt-6 text-center">
-              <div className="text-[16px] font-medium text-[#1A1A1A]">
+              <div
+                id="moments-publish-discard-title"
+                className="text-[16px] font-medium text-[#1A1A1A]"
+              >
                 {t(msg`放弃发表`)}
               </div>
-              <div className="mt-2 text-[13px] leading-6 text-[#9A9A9A]">
+              <div
+                id="moments-publish-discard-desc"
+                className="mt-2 text-[13px] leading-6 text-[#9A9A9A]"
+              >
                 {t(msg`返回会丢失已编辑的文字与媒体，确定不发布吗？`)}
               </div>
             </div>
             <div className="grid grid-cols-2 border-t border-[#ECECEC]">
               <button
                 type="button"
-                onClick={() => setDiscardConfirmOpen(false)}
+                onClick={() => {
+                  setDiscardConfirmOpen(false);
+                  // 同上：「继续编辑」语义就是用户想接着写，必须把焦点送回 textarea。
+                  textareaRef.current?.focus();
+                }}
                 className="border-r border-[#ECECEC] py-3 text-[15px] text-[#576B95] active:bg-black/[0.04]"
               >
                 {t(msg`继续编辑`)}
@@ -553,7 +576,12 @@ function MediaPickerSheet({
   videoDisabled?: boolean;
 }) {
   return (
-    <div className="fixed inset-0 z-[1200] flex items-end justify-center bg-black/40">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={t(msg`选择媒体`)}
+      className="fixed inset-0 z-[1200] flex items-end justify-center bg-black/40"
+    >
       <button
         type="button"
         onClick={onClose}
