@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { ChevronRight } from "lucide-react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
@@ -28,12 +28,25 @@ export function DesktopContactPaneEmptyState() {
 export function DesktopContactProfileShell({
   children,
   className,
+  scrollResetKey,
 }: {
   children: ReactNode;
   className?: string;
+  /** 切到不同联系人时把右侧详情滚动回顶；不传则保留滚动位置（兼容老调用方）。
+   *  ContactDetailPane 会传 character.id，因此 A → B 切换时 B 的详情从顶部开始
+   *  看，不会停在上一位联系人「删除联系人」那一行。 */
+  scrollResetKey?: string | null;
 }) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (scrollResetKey === undefined) return;
+    const el = scrollRef.current;
+    if (el) el.scrollTop = 0;
+  }, [scrollResetKey]);
+
   return (
-    <div className="h-full overflow-auto bg-[#f5f5f5]">
+    <div ref={scrollRef} className="h-full overflow-auto bg-[#f5f5f5]">
       <div
         className={cn(
           "mx-auto w-full max-w-[560px] bg-[#f5f5f5] px-6 py-10",

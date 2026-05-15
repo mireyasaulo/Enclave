@@ -199,7 +199,7 @@ export function ContactDetailPane({
   }
 
   return (
-    <DesktopContactProfileShell>
+    <DesktopContactProfileShell scrollResetKey={character.id}>
       <DesktopContactProfileHeader
         avatar={character.avatar}
         name={character.name}
