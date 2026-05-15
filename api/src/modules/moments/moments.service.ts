@@ -115,6 +115,7 @@ export interface Moment {
 
 type MomentAvatarContext = {
   ownerAvatar: string;
+  ownerUsername: string;
   ownerId: string;
   visibleCharacterIds: Set<string>;
   ownerFriendCharacterIds: Set<string>;
@@ -249,6 +250,7 @@ export class MomentsService implements OnModuleInit {
     const avatarContext = await this.buildMomentAvatarContext({
       ownerId: owner.id,
       ownerAvatar: owner.avatar,
+      ownerUsername: owner.username,
     });
     const posts = await this.postRepo.find({ order: { postedAt: 'DESC' } });
     const visiblePosts = posts.filter((post) =>
@@ -281,6 +283,7 @@ export class MomentsService implements OnModuleInit {
     const avatarContext = await this.buildMomentAvatarContext({
       ownerId: owner.id,
       ownerAvatar: owner.avatar,
+      ownerUsername: owner.username,
     });
     const post = await this.postRepo.findOneBy({ id: postId });
     if (
@@ -1157,7 +1160,12 @@ export class MomentsService implements OnModuleInit {
       authorName: this.remarkResolver.applyCharacterRemark(
         post.authorType,
         post.authorId,
-        post.authorName,
+        this.resolveMomentAuthorName(
+          post.authorType,
+          post.authorId,
+          post.authorName,
+          resolvedAvatarContext,
+        ),
         resolvedAvatarContext.remarkMap,
       ),
       authorAvatar: this.resolveMomentAuthorAvatar(
@@ -1209,7 +1217,12 @@ export class MomentsService implements OnModuleInit {
       authorName: this.remarkResolver.applyCharacterRemark(
         like.authorType,
         like.authorId,
-        like.authorName,
+        this.resolveMomentAuthorName(
+          like.authorType,
+          like.authorId,
+          like.authorName,
+          avatarContext,
+        ),
         avatarContext.remarkMap,
       ),
       authorAvatar: this.resolveMomentAuthorAvatar(
@@ -1230,7 +1243,12 @@ export class MomentsService implements OnModuleInit {
       authorName: this.remarkResolver.applyCharacterRemark(
         comment.authorType,
         comment.authorId,
-        comment.authorName,
+        this.resolveMomentAuthorName(
+          comment.authorType,
+          comment.authorId,
+          comment.authorName,
+          avatarContext,
+        ),
         avatarContext.remarkMap,
       ),
       authorAvatar: this.resolveMomentAuthorAvatar(
@@ -1245,7 +1263,12 @@ export class MomentsService implements OnModuleInit {
   private async buildMomentAvatarContext(input?: {
     ownerId?: string;
     ownerAvatar?: string | null;
+    ownerUsername?: string | null;
   }): Promise<MomentAvatarContext> {
+    // ownerUsername 没显式传时，必须从 owner 表实时查；
+    // 不能从入参拼的 partial owner（只有 id/avatar）里漏出旧 username，
+    // 否则 serializeMoment 会把旧名字回灌给前端 — 这正是改名后历史朋友圈
+    // 还显示旧名字的根因。
     const owner =
       input?.ownerId === undefined
         ? await this.worldOwnerService.getOwnerOrThrow()
@@ -1260,8 +1283,20 @@ export class MomentsService implements OnModuleInit {
         this.remarkResolver.getOwnerRemarkMap(owner.id),
       ]);
 
+    let ownerUsername =
+      input?.ownerUsername === undefined
+        ? null
+        : (input.ownerUsername ?? '').trim() || '';
+    if (ownerUsername === null) {
+      ownerUsername =
+        'username' in owner
+          ? (owner.username ?? '').trim()
+          : ((await this.worldOwnerService.getOwnerOrThrow()).username ?? '')
+              .trim();
+    }
     return {
       ownerAvatar: owner.avatar?.trim() || '',
+      ownerUsername,
       ownerId: owner.id,
       visibleCharacterIds: new Set(
         visibleCharacters.map((character) => character.id),
@@ -1295,6 +1330,27 @@ export class MomentsService implements OnModuleInit {
     }
 
     return currentAvatar ?? '';
+  }
+
+  // 跟 resolveMomentAuthorAvatar 对称：moment_post / moment_comment / moment_like
+  // 的 authorName 也是在写入那一刻拍快照。世界主人在「我」→「名字」改名后，
+  // 历史的 post.authorName / like.authorName / comment.authorName 仍是旧名字，
+  // 朋友圈页跟数据看起来好像没改名。这里在序列化时按当前 owner.username
+  // 覆盖（character 路径仍走 applyCharacterRemark 不受影响）。
+  private resolveMomentAuthorName(
+    authorType: string | null | undefined,
+    authorId: string | null | undefined,
+    currentName: string | null | undefined,
+    avatarContext: MomentAvatarContext,
+  ) {
+    if (
+      authorType === 'user' &&
+      authorId === avatarContext.ownerId &&
+      avatarContext.ownerUsername
+    ) {
+      return avatarContext.ownerUsername;
+    }
+    return currentName ?? '';
   }
 
   private async backfillCharacterMomentsToFeed() {
