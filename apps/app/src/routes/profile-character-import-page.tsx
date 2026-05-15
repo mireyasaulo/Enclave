@@ -51,9 +51,12 @@ export function ProfileCharacterImportPage() {
   const [dragging, setDragging] = useState(false);
 
   const goBack = () =>
-    navigateBackOrFallback(() => {
-      void navigate({ to: "/tabs/profile" });
-    });
+    navigateBackOrFallback(
+      () => {
+        void navigate({ to: "/tabs/profile", replace: true });
+      },
+      "/tabs/profile",
+    );
 
   async function readFile(file: File) {
     // 清掉之前的预览和结果，避免新文件解析失败时还残留上一张预览卡误导用户

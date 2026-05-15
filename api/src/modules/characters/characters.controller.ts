@@ -13,8 +13,6 @@ import { AppError } from '../../common/app-error.exception';
 import { CharactersService } from './characters.service';
 import { CharacterEntity } from './character.entity';
 import { AdminGuard } from '../admin/admin.guard';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { PrivateCharacterRateLimitGuard } from './guards/private-character-rate-limit.guard';
 
 @Controller('characters')
 export class CharactersController {
@@ -114,9 +112,15 @@ export class CharactersController {
    * Tenant-facing 导入端点：接收 wiki "我的私有角色" 导出 JSON，按 name upsert
    * 到 characters 表，并自动为 world-owner 建 friendship。
    * 同名→覆盖（仅限 sourceType='private_import' 的旧记录）；不存在→新建。
+   *
+   * 不挂 JwtAuthGuard / PrivateCharacterRateLimitGuard：world API 是单租户
+   * 进程，与 social.controller / setDefaultVoiceReply 等用户级 mutation 一致，
+   * 隔离靠 nginx + 端口分配。多租户公网部署时 cloud-api 反代会把客户端的
+   * Authorization 剥掉（避免泄漏给 child world），所以这条路径根本拿不到
+   * JWT，挂 JwtAuthGuard 必 401。RateLimitGuard 同样依赖 req.user，会跟着 401。
+   * 滥用防护可在 cloud-api 反代层（已知 cloud phone）按需补，不在这一层做。
    */
   @Post('import-personal')
-  @UseGuards(JwtAuthGuard, PrivateCharacterRateLimitGuard)
   async importPersonal(@Body() body: unknown) {
     const parsed = parsePrivateCharacterImportBody(body);
     type ServiceInput = Parameters<
