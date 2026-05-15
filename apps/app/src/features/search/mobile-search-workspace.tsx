@@ -119,11 +119,16 @@ export function MobileSearchWorkspace({
     inputRef.current?.focus();
   }, []);
 
+  // 「全部」视图里展示的分组顺序：messages/contacts 最常用排前面，
+  // officialAccounts/favorites 次之，moments/feed 是社交内容放后面。
+  // miniPrograms 当前是 ComingSoonOverlay，不进「全部」；和 chip 一致。
   const allViewCategories: SearchResultCategory[] = [
     "messages",
     "contacts",
     "officialAccounts",
     "favorites",
+    "moments",
+    "feed",
   ];
   const sectionByCategory = new Map(
     groupedResults.map((section) => [section.category, section]),
