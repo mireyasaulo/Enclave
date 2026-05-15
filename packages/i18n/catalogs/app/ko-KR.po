@@ -14924,7 +14924,7 @@ msgstr "이번 주 임무를 모두 완료했습니다."
 #. placeholder {0}: target.label
 #: apps/app/src/features/games/night-market/night-market-engine.ts:450
 msgid "互访好友夜市，\"{0}\" 推进 +{bump}。"
-msgstr "互访好友夜市，\\\"{0}\\\" 推进 +{bump}。"
+msgstr "친구의 야시장 방문 — \"{0}\" +{bump} 진전."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:483
 msgid "所有摊位已满级，许可留着下次。"

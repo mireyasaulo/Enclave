@@ -14924,7 +14924,7 @@ msgstr "All weekly tasks done."
 #. placeholder {0}: target.label
 #: apps/app/src/features/games/night-market/night-market-engine.ts:450
 msgid "互访好友夜市，\"{0}\" 推进 +{bump}。"
-msgstr "互访好友夜市，\\\"{0}\\\" 推进 +{bump}。"
+msgstr "Visited a friend's night market — \"{0}\" advanced +{bump}."
 
 #: apps/app/src/features/games/night-market/night-market-engine.ts:483
 msgid "所有摊位已满级，许可留着下次。"
