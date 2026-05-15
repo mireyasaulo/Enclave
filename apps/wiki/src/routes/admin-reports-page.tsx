@@ -15,6 +15,7 @@ import {
 import { wikiApi, type ModerationReport } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 import { formatDateTime } from "../lib/format";
+import { useUsernameMap } from "../lib/use-username-map";
 
 export function AdminReportsPage() {
   const t = translateRuntimeMessage;
@@ -80,27 +81,51 @@ export function AdminReportsPage() {
       {reportsQ.data?.length === 0 && (
         <PanelEmpty message={t(msg`当前分类下暂无举报。`)} />
       )}
-      <ul className="space-y-2">
-        {reportsQ.data?.map((r) => (
-          <li key={r.id}>
-            <ReportCard
-              report={r}
-              onDecide={(s) => setStatusMut.mutate({ id: r.id, status: s })}
-              disabled={setStatusMut.isPending}
-            />
-          </li>
-        ))}
-      </ul>
+      <ReportList
+        reports={reportsQ.data ?? []}
+        onDecide={(id, s) => setStatusMut.mutate({ id, status: s })}
+        disabled={setStatusMut.isPending}
+      />
     </PageShell>
+  );
+}
+
+function ReportList({
+  reports,
+  onDecide,
+  disabled,
+}: {
+  reports: ModerationReport[];
+  onDecide: (id: string, s: "resolved" | "dismissed") => void;
+  disabled: boolean;
+}) {
+  const { resolve: resolveOwner } = useUsernameMap(
+    reports.map((r) => r.ownerId),
+  );
+  return (
+    <ul className="space-y-2">
+      {reports.map((r) => (
+        <li key={r.id}>
+          <ReportCard
+            report={r}
+            ownerLabel={resolveOwner(r.ownerId)}
+            onDecide={(s) => onDecide(r.id, s)}
+            disabled={disabled}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }
 
 function ReportCard({
   report,
+  ownerLabel,
   onDecide,
   disabled,
 }: {
   report: ModerationReport;
+  ownerLabel: string;
   onDecide: (s: "resolved" | "dismissed") => void;
   disabled: boolean;
 }) {
@@ -112,8 +137,7 @@ function ReportCard({
         <StatusPill>{report.status}</StatusPill>
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
           <Trans>
-            举报人 {report.ownerId.slice(0, 8)} ·{" "}
-            {formatDateTime(report.createdAt)}
+            举报人 {ownerLabel} · {formatDateTime(report.createdAt)}
           </Trans>
         </span>
       </div>

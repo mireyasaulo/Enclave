@@ -2782,6 +2782,10 @@ msgstr "エントリ検索"
 msgid "搜索中..."
 msgstr "検索中…"
 
+#: apps/wiki/src/routes/search-page.tsx:29
+msgid "搜索请求失败，请稍后重试。"
+msgstr "検索リクエストに失敗しました。しばらくしてからもう一度お試しください。"
+
 #. placeholder {0}: resultsQ.data?.length ?? 0
 #: apps/wiki/src/routes/search-page.tsx:28
 msgid "命中 {0} 条相关词条"

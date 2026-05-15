@@ -20,6 +20,7 @@ import {
   type WikiTalkThread,
 } from "../lib/wiki-api";
 import { formatDateTime } from "../lib/format";
+import { useUsernameMap } from "../lib/use-username-map";
 
 export function TalkPanel({ characterId }: { characterId: string }) {
   const t = translateRuntimeMessage;
@@ -212,6 +213,9 @@ function ThreadDetail({
   });
 
   const isPatroller = hasRole(user, "patroller");
+  const { resolve: resolveAuthor } = useUsernameMap(
+    (postsQ.data ?? []).map((p) => p.authorId),
+  );
 
   return (
     <div className="mt-3 space-y-2 border-t border-[var(--border-subtle)] pt-3">
@@ -239,6 +243,7 @@ function ThreadDetail({
       )}
       <PostTree
         posts={postsQ.data ?? []}
+        resolveAuthor={resolveAuthor}
         onReply={(postId) => setReplyTo(postId)}
         onDelete={(postId) => {
           if (window.confirm(t(msg`确认删除这条回复？删除后会标记为「已删除」。`))) {
@@ -288,6 +293,7 @@ function ThreadDetail({
 
 function PostTree({
   posts,
+  resolveAuthor,
   onReply,
   onDelete,
   canDelete,
@@ -295,6 +301,7 @@ function PostTree({
   depth = 0,
 }: {
   posts: WikiTalkPost[];
+  resolveAuthor: (id: string) => string;
   onReply: (id: string) => void;
   onDelete: (id: string) => void;
   canDelete: (post: WikiTalkPost) => boolean;
@@ -314,7 +321,7 @@ function PostTree({
         >
           <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
             <strong className="text-[var(--text-primary)]">
-              {post.authorId.slice(0, 8)}
+              {resolveAuthor(post.authorId)}
             </strong>
             <span>{formatDateTime(post.createdAt)}</span>
             {post.deletedAt && (
@@ -346,6 +353,7 @@ function PostTree({
           <div className="mt-1 whitespace-pre-wrap">{post.body}</div>
           <PostTree
             posts={posts}
+            resolveAuthor={resolveAuthor}
             onReply={onReply}
             onDelete={onDelete}
             canDelete={canDelete}
