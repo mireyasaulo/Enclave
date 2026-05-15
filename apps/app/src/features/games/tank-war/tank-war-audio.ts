@@ -158,6 +158,12 @@ export function createSfx(): Sfx {
   }
 
   function play(id: SfxId): void {
+    // 先打 ensureCtx：iOS Safari 要求 AudioContext.resume() 在 user gesture 里
+    // 调用才能真正出声；如果先 if (muted) return 跳过 ensureCtx，等以后用户
+    // 再去 toggle 静音，play 是从 RAF 调的（非 gesture），ctx 永远 suspended。
+    // 让 ensureCtx 早走一步，gesture handler 里 nudge play() 即使是静音状态也
+    // 能把 ctx unlocked，后面取消静音就直接出声。
+    ensureCtx();
     if (muted) return;
     switch (id) {
       case "fire":

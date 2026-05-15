@@ -163,10 +163,20 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
     return () => window.clearInterval(id);
   }, []);
 
+  // iOS Safari 要求 AudioContext 在 user gesture 里 resume 才能出声。引擎里
+  // 第一声 audio.play 来自 RAF 的 fireBullet —— 那不算 gesture，于是 ctx 一直
+  // suspended，整局都是哑的，要等用户去点 pause 按钮（pause 路径在 togglePause
+  // 里直接调 audio.play）才会"解锁"。这里在 onClick 起的 start/resume/restart
+  // 里 nudge 一下 audio.play("stageStart")，第一次按"开始游戏"就把 ctx 解锁。
+  const nudgeAudio = (id: "stageStart" | "pause") => {
+    sfxRef.current?.play(id);
+  };
+
   const start = useCallback((mode: PlayerMode, stage: number) => {
     const w = worldRef.current;
     startStage(w, stage, mode, { resetLives: true, resetScores: true });
     setHud(snapshot(w, persistRef.current));
+    nudgeAudio("stageStart");
   }, []);
 
   const resume = useCallback(() => {
@@ -175,6 +185,7 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
       const next = Math.min(35, w.stage + 1);
       startStage(w, next, w.mode);
       setHud(snapshot(w, persistRef.current));
+      nudgeAudio("stageStart");
     } else if (w.status === "paused") {
       togglePause(w, sfxRef.current);
     }
@@ -184,6 +195,7 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
     const w = worldRef.current;
     startStage(w, 1, w.mode, { resetLives: true, resetScores: true });
     setHud(snapshot(w, persistRef.current));
+    nudgeAudio("stageStart");
   }, []);
 
   const toggleMute = useCallback(() => {
@@ -192,6 +204,10 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
     savePersist(persistRef.current);
     engineSetMuted(worldRef.current, sfxRef.current, next);
     setHud(snapshot(worldRef.current, persistRef.current));
+    // 从 muted -> unmuted 时 nudge 一下，让 ctx 在 gesture 里 resume，否则
+    // 用户保留静音存档启动后取消静音，下一发子弹的 fire 是 RAF 调的、不会
+    // 把 ctx 唤醒，要等到点 pause 按钮才有声。
+    if (!next) nudgeAudio("pause");
   }, []);
 
   const togglePauseCb = useCallback(() => {
