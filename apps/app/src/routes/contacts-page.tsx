@@ -2233,26 +2233,28 @@ export function ContactsPage() {
             )
           }
         >
-          <div className="pt-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                void navigate({
-                  to: "/tabs/search",
-                  hash: buildSearchRouteHash({
-                    category: "all",
-                    keyword: "",
-                    source: "contacts",
-                  }),
-                });
-              }}
-              className="flex h-9 w-full items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[12px] text-[color:var(--text-dim)]"
-              aria-label={t(msg`打开搜一搜`)}
-            >
-              <Search size={14} className="shrink-0" />
-              <span className="min-w-0 flex-1 text-left">{t(msg`搜索`)}</span>
-            </button>
-          </div>
+          {bulkMode ? null : (
+            <div className="pt-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  void navigate({
+                    to: "/tabs/search",
+                    hash: buildSearchRouteHash({
+                      category: "all",
+                      keyword: "",
+                      source: "contacts",
+                    }),
+                  });
+                }}
+                className="flex h-9 w-full items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[12px] text-[color:var(--text-dim)]"
+                aria-label={t(msg`打开搜一搜`)}
+              >
+                <Search size={14} className="shrink-0" />
+                <span className="min-w-0 flex-1 text-left">{t(msg`搜索`)}</span>
+              </button>
+            </div>
+          )}
         </TabPageTopBar>
 
         <div className="pb-8">
@@ -2300,11 +2302,13 @@ export function ContactsPage() {
             </div>
           ) : null}
 
-          <ContactShortcutList
-            items={mobileShortcutItems}
-            mobileDense
-            className="mt-0.5 border-x-0 shadow-none"
-          />
+          {bulkMode ? null : (
+            <ContactShortcutList
+              items={mobileShortcutItems}
+              mobileDense
+              className="mt-0.5 border-x-0 shadow-none"
+            />
+          )}
 
           <section className="mt-1.5 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
             {friendsQuery.isLoading ? (
