@@ -391,12 +391,16 @@ export function MobileSearchWorkspace({
           </InlineNotice>
         ) : null}
 
-        {/* 「无结果」卡片只在「确实没东西可看」时出：消息索引还在补全时
-            （searchingMessages）继续展示下面的局部结果 + 上面的补全 banner，
-            避免用户先看到「没有找到相关内容」、过两秒消息又冒出来的反复。
-            只有当前分类的命中受消息索引影响（全部 / 聊天记录）时才等；contacts/
-            moments 这种分类下，消息还在 loading 也不该挡掉「无结果」反馈。 */}
-        {!loading && !error && hasKeyword && !visibleResults.length && !(
+        {/* 「无结果」卡片只在「确实没东西可看」时出：
+            - 消息索引还在补全时（searchingMessages）继续展示下面的局部结果 +
+              上面的补全 banner，避免用户先看到「没有找到相关内容」、过两秒
+              消息又冒出来的反复；只对受消息索引影响的分类（全部 / 聊天记录）
+              做这层等待。
+            - miniPrograms 整个分类自带 ComingSoonOverlay 表达「功能开发中」，
+              再叠一条「没有找到相关内容」会让用户分不清是"真没有"还是
+              "本来就还做不出来"——直接 suppress，让 overlay 自己说。 */}
+        {!loading && !error && hasKeyword && !visibleResults.length &&
+        activeCategory !== "miniPrograms" && !(
           searchingMessages && (activeCategory === "all" || activeCategory === "messages")
         ) ? (
           <div className="pt-3">
