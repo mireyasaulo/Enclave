@@ -852,14 +852,13 @@ export const wikiApi = {
     );
   },
   /**
-   * AI 自动生成私有角色的字段。section 完全对齐 apps/admin 的 character-editor-page
-   * TABS 数组（去掉 model_routing）+ reasoning Tab：
-   * - 'basics' / 'core_logic' / 'chat' / 'scenes' / 'memory' / 'life' / 'reasoning'
-   *   生成该 section 字段
-   * - 'all'：一次性生成上述 6 个非 sacred section 全部字段（顶部"一键生成"按钮用）。
+   * AI 自动生成私有角色的字段。section 与 [[AiGenerateSection]] 类型完全一致：
+   * - 'basics' / 'core_logic' / 'chat' / 'scenes' / 'memory' 生成该 section 字段
+   * - 'all'：一次性生成上述 5 个非 sacred section 全部字段（顶部"一键生成"按钮用）。
    *   需要 name + bio + relationship 三个 sacred 字段都已填好，否则后端返回 400。
    * 返回值是只包含**当前为空字段**建议的 partial DTO（后端 normalizeAiOutput 已经过一道
    * "用户已填的不返回"过滤；前端再过一道双保险）。
+   * 历史上还有 life / reasoning，2026-05-15 起从 wiki 编辑路径下线，详见 AiGenerateSection 注释。
    */
   generateMyCharacterFields(input: {
     section: AiGenerateSection;

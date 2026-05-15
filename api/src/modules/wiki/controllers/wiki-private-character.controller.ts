@@ -116,8 +116,8 @@ export class WikiPrivateCharacterController {
   }
 
   // AI 自动生成：根据当前已填字段调一次 LLM，返回需要补全的字段。
-  // 7 个 section（basics/core_logic/chat/scenes/memory/life/reasoning，对齐
-  // admin character-editor-page TABS）+ 1 个 'all' 整体生成。
+  // 5 个 section（basics/core_logic/chat/scenes/memory）+ 1 个 'all' 整体生成；
+  // 实际可用 key 见 SECTION_KEYS。life / reasoning 已于 2026-05-15 下线（详见 prompts.ts 顶部）。
   // 单独的 rate limit（15/h/user），与 CRUD 桶（60/h）分开。
   @Post('ai-generate')
   @UseGuards(WikiAiGenerateRateLimitGuard)
