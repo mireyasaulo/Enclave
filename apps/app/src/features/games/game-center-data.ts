@@ -255,7 +255,11 @@ export const gameCenterGames: GameCenterGame[] = [
     heroLabel: t(msg`小时级农场`),
     category: "strategy",
     tone: "forest",
-    playersLabel: t(msg`世界自治`),
+    // 注意：playersLabel 不要和 badge 同字 ("世界自治")——卡片上 badge
+    // 已经在左上角显示，playersLabel 又在底部出现一次会重复。其它游戏
+    // 这里都是 "X 万人在玩" 这类数字面板；隐界农场没有真实玩家数，用
+    // "NPC 在场" 表意更准、跟 badge 区分开。
+    playersLabel: t(msg`NPC 自治在场`),
     friendsLabel: t(msg`全员 NPC`),
     updateNote: t(msg`首发 14 种作物 + 偷菜小道消息`),
     deckLabel: t(msg`世界经营`),
