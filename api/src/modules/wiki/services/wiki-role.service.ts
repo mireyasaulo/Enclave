@@ -104,7 +104,13 @@ export class WikiRoleService {
       });
     }
     if (user.role === 'admin' && input.role !== 'admin') {
-      const adminCount = await this.userRepo.count({ where: { role: 'admin' } });
+      // 只数真实 wiki_member admin —— __system_wiki_admin_sync__ /
+      // __system_wiki_antivandal_bot__ 这俩 system bot 也是 admin，
+      // 但它们不是 wiki_member、不能被 demote、也不在登录路径上。把它们算进总数会
+      // 让唯一的 wiki_member admin 仍能 demote 自己，事后没人能 promote 回来。
+      const adminCount = await this.userRepo.count({
+        where: { role: 'admin', userType: 'wiki_member' },
+      });
       if (adminCount <= 1) {
         throw new AppError('WIKI_FORBIDDEN', {
         status: HttpStatus.FORBIDDEN,
