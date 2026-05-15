@@ -1,5 +1,5 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { AppError } from '../../common/app-error.exception';
 import { randomUUID } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,12 +9,15 @@ import { WorldOwnerService } from '../auth/world-owner.service';
 import { SystemConfigService } from '../config/config.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { ConversationEntity } from './conversation.entity';
+import { FavoriteEntity } from './favorite.entity';
+import { FavoriteNoteEntity } from './favorite-note.entity';
 import { GroupEntity } from './group.entity';
 import { GroupMemberEntity } from './group-member.entity';
 import { GroupMessageEntity } from './group-message.entity';
 import type { MessageAttachment } from './chat.types';
 import { MessageEntity } from './message.entity';
 import { describeAttachmentForDisplay } from './attachment-semantic-text';
+import { FriendRemarkResolver } from '../social/friend-remark-resolver.service';
 
 export interface FavoriteRecord {
   id: string;
@@ -106,7 +109,9 @@ const MAX_FAVORITE_NOTE_TAGS = 8;
 const chatReplyPrefixPattern = /^\[\[chat_reply:([^\]]+)\]\]\n?/;
 
 @Injectable()
-export class FavoritesService {
+export class FavoritesService implements OnModuleInit {
+  private readonly logger = new Logger(FavoritesService.name);
+
   constructor(
     @InjectRepository(ConversationEntity)
     private readonly conversationRepo: Repository<ConversationEntity>,
@@ -118,10 +123,112 @@ export class FavoritesService {
     private readonly groupMemberRepo: Repository<GroupMemberEntity>,
     @InjectRepository(GroupMessageEntity)
     private readonly groupMessageRepo: Repository<GroupMessageEntity>,
+    @InjectRepository(FavoriteEntity)
+    private readonly favoriteRepo: Repository<FavoriteEntity>,
+    @InjectRepository(FavoriteNoteEntity)
+    private readonly favoriteNoteRepo: Repository<FavoriteNoteEntity>,
     private readonly worldOwnerService: WorldOwnerService,
     private readonly systemConfigService: SystemConfigService,
     private readonly cyberAvatar: CyberAvatarService,
+    private readonly remarkResolver: FriendRemarkResolver,
   ) {}
+
+  async onModuleInit() {
+    // 把旧版 system_config 里的 JSON blob 一次性搬到行级表里。幂等：迁移完成后
+    // 旧 key 写入会被清空，下次启动看到 raw=null 直接跳过。
+    await this.migrateFavoritesFromConfig();
+    await this.migrateFavoriteNotesFromConfig();
+  }
+
+  private async migrateFavoritesFromConfig(): Promise<void> {
+    try {
+      const raw = await this.systemConfigService.getConfig(
+        FAVORITES_CONFIG_KEY,
+      );
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+        await this.systemConfigService.setConfig(FAVORITES_CONFIG_KEY, '');
+        return;
+      }
+      const records = parsed.filter(isFavoriteRecord) as FavoriteRecord[];
+      for (const record of records) {
+        await this.favoriteRepo.upsert(
+          {
+            sourceId: record.sourceId,
+            recordId: record.id,
+            category: record.category,
+            title: record.title,
+            description: record.description,
+            meta: record.meta,
+            to: record.to,
+            badge: record.badge,
+            avatarName: record.avatarName ?? null,
+            avatarSrc: record.avatarSrc ?? null,
+            collectedAt: record.collectedAt,
+          },
+          ['sourceId'],
+        );
+      }
+      // 清空旧 key，避免下次启动重复迁移；用空字符串而非 delete，因为
+      // SystemConfigService 没有 delete 方法。
+      await this.systemConfigService.setConfig(FAVORITES_CONFIG_KEY, '');
+      this.logger.log(
+        `migrated ${records.length} favorites from system_config to chat_favorites`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `migrateFavoritesFromConfig failed: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  private async migrateFavoriteNotesFromConfig(): Promise<void> {
+    try {
+      const raw = await this.systemConfigService.getConfig(
+        FAVORITE_NOTE_DOCUMENTS_CONFIG_KEY,
+      );
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+        await this.systemConfigService.setConfig(
+          FAVORITE_NOTE_DOCUMENTS_CONFIG_KEY,
+          '',
+        );
+        return;
+      }
+      const notes = parsed
+        .filter(isFavoriteNoteDocument)
+        .map((item) => normalizeFavoriteNoteDocument(item));
+      for (const note of notes) {
+        await this.favoriteNoteRepo.upsert(
+          {
+            id: note.id,
+            title: note.title,
+            excerpt: note.excerpt,
+            contentHtml: note.contentHtml,
+            contentText: note.contentText,
+            tags: note.tags,
+            assets: note.assets,
+            createdAt: note.createdAt,
+            updatedAt: note.updatedAt,
+          },
+          ['id'],
+        );
+      }
+      await this.systemConfigService.setConfig(
+        FAVORITE_NOTE_DOCUMENTS_CONFIG_KEY,
+        '',
+      );
+      this.logger.log(
+        `migrated ${notes.length} favorite notes from system_config to chat_favorite_notes`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `migrateFavoriteNotesFromConfig failed: ${(error as Error).message}`,
+      );
+    }
+  }
 
   async listFavorites(): Promise<FavoriteRecord[]> {
     const [favorites, notes] = await Promise.all([
@@ -150,13 +257,23 @@ export class FavoritesService {
       input.threadType === 'group'
         ? await this.buildGroupMessageFavorite(input)
         : await this.buildConversationMessageFavorite(input);
-    const current = await this.readFavorites();
-    const nextFavorites = [
-      favorite,
-      ...current.filter((item) => item.sourceId !== favorite.sourceId),
-    ].slice(0, MAX_FAVORITES);
-
-    await this.writeFavorites(nextFavorites);
+    await this.favoriteRepo.upsert(
+      {
+        sourceId: favorite.sourceId,
+        recordId: favorite.id,
+        category: favorite.category,
+        title: favorite.title,
+        description: favorite.description,
+        meta: favorite.meta,
+        to: favorite.to,
+        badge: favorite.badge,
+        avatarName: favorite.avatarName ?? null,
+        avatarSrc: favorite.avatarSrc ?? null,
+        collectedAt: favorite.collectedAt,
+      },
+      ['sourceId'],
+    );
+    await this.trimFavoritesIfNeeded();
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.captureFavoriteAction(owner.id, {
       sourceEntityType: 'favorite_message',
@@ -187,15 +304,7 @@ export class FavoritesService {
       return this.removeFavoriteNote(noteId);
     }
 
-    const current = await this.readFavorites();
-    const nextFavorites = current.filter(
-      (item) => item.sourceId !== normalizedSourceId,
-    );
-
-    if (nextFavorites.length !== current.length) {
-      await this.writeFavorites(nextFavorites);
-    }
-
+    await this.favoriteRepo.delete({ sourceId: normalizedSourceId });
     return { success: true as const };
   }
 
@@ -219,12 +328,19 @@ export class FavoritesService {
       updatedAt: timestamp,
       input,
     });
-    const nextNotes = [note, ...(await this.readFavoriteNoteDocuments())].slice(
-      0,
-      MAX_FAVORITE_NOTES,
-    );
+    await this.favoriteNoteRepo.insert({
+      id: note.id,
+      title: note.title,
+      excerpt: note.excerpt,
+      contentHtml: note.contentHtml,
+      contentText: note.contentText,
+      tags: note.tags,
+      assets: note.assets,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+    });
+    await this.trimFavoriteNotesIfNeeded();
 
-    await this.writeFavoriteNoteDocuments(nextNotes);
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.captureFavoriteAction(owner.id, {
       sourceEntityType: 'favorite_note',
@@ -260,12 +376,18 @@ export class FavoritesService {
       updatedAt: new Date().toISOString(),
       input,
     });
-    const nextNotes = (await this.readFavoriteNoteDocuments())
-      .map((note) => (note.id === normalizedId ? nextNote : note))
-      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
-      .slice(0, MAX_FAVORITE_NOTES);
-
-    await this.writeFavoriteNoteDocuments(nextNotes);
+    await this.favoriteNoteRepo.update(
+      { id: normalizedId },
+      {
+        title: nextNote.title,
+        excerpt: nextNote.excerpt,
+        contentHtml: nextNote.contentHtml,
+        contentText: nextNote.contentText,
+        tags: nextNote.tags,
+        assets: nextNote.assets,
+        updatedAt: nextNote.updatedAt,
+      },
+    );
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.captureFavoriteAction(owner.id, {
       sourceEntityType: 'favorite_note',
@@ -291,13 +413,14 @@ export class FavoritesService {
       });
     }
 
-    const current = await this.readFavoriteNoteDocuments();
-    const removedNote =
-      current.find((note) => note.id === normalizedId) ?? null;
-    const nextNotes = current.filter((note) => note.id !== normalizedId);
-
-    if (nextNotes.length !== current.length) {
-      await this.writeFavoriteNoteDocuments(nextNotes);
+    const removedRow = await this.favoriteNoteRepo.findOneBy({
+      id: normalizedId,
+    });
+    const removedNote = removedRow
+      ? this.rowToFavoriteNoteDocument(removedRow)
+      : null;
+    if (removedNote) {
+      await this.favoriteNoteRepo.delete({ id: normalizedId });
     }
 
     if (removedNote) {
@@ -348,13 +471,19 @@ export class FavoritesService {
       });
     }
 
+    const remarkMap = await this.remarkResolver.getOwnerRemarkMap(owner.id);
     return this.buildFavoriteRecord({
       badge: '聊天消息',
       threadPath: `/chat/${conversation.id}#chat-message-${message.id}`,
       snapshot: {
         id: message.id,
         senderType: message.senderType as 'user' | 'character' | 'system',
-        senderName: message.senderName,
+        senderName: this.remarkResolver.applyCharacterRemark(
+          message.senderType,
+          message.senderId,
+          message.senderName,
+          remarkMap,
+        ),
         text: message.text,
         type: message.type as FavoriteMessageSnapshot['type'],
         attachment: this.parseAttachment(
@@ -407,13 +536,19 @@ export class FavoritesService {
       });
     }
 
+    const remarkMap = await this.remarkResolver.getOwnerRemarkMap(owner.id);
     return this.buildFavoriteRecord({
       badge: '群聊消息',
       threadPath: `/group/${group.id}#chat-message-${message.id}`,
       snapshot: {
         id: message.id,
         senderType: message.senderType as 'user' | 'character' | 'system',
-        senderName: message.senderName,
+        senderName: this.remarkResolver.applyCharacterRemark(
+          message.senderType,
+          message.senderId,
+          message.senderName,
+          remarkMap,
+        ),
         senderAvatar: message.senderAvatar ?? undefined,
         text: message.text,
         type: message.type as FavoriteMessageSnapshot['type'],
@@ -527,11 +662,8 @@ export class FavoritesService {
       });
     }
 
-    const note = (await this.readFavoriteNoteDocuments()).find(
-      (item) => item.id === normalizedId,
-    );
-
-    if (!note) {
+    const row = await this.favoriteNoteRepo.findOneBy({ id: normalizedId });
+    if (!row) {
       throw new AppError('CHAT_NOTE_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
         params: { noteId: normalizedId },
@@ -539,68 +671,91 @@ export class FavoritesService {
       });
     }
 
-    return note;
+    return this.rowToFavoriteNoteDocument(row);
   }
 
   private async readFavorites(): Promise<FavoriteRecord[]> {
-    const raw = await this.systemConfigService.getConfig(FAVORITES_CONFIG_KEY);
-    if (!raw) {
-      return [];
-    }
-
-    try {
-      const parsed = JSON.parse(raw) as FavoriteRecord[];
-      if (!Array.isArray(parsed)) {
-        return [];
-      }
-
-      return parsed
-        .filter(isFavoriteRecord)
-        .sort((left, right) =>
-          right.collectedAt.localeCompare(left.collectedAt),
-        )
-        .slice(0, MAX_FAVORITES);
-    } catch {
-      return [];
-    }
-  }
-
-  private async writeFavorites(favorites: FavoriteRecord[]) {
-    await this.systemConfigService.setConfig(
-      FAVORITES_CONFIG_KEY,
-      JSON.stringify(favorites),
-    );
+    const rows = await this.favoriteRepo.find({
+      order: { collectedAt: 'DESC' },
+      take: MAX_FAVORITES,
+    });
+    return rows.map((row) => this.rowToFavoriteRecord(row));
   }
 
   private async readFavoriteNoteDocuments(): Promise<FavoriteNoteDocument[]> {
-    const raw = await this.systemConfigService.getConfig(
-      FAVORITE_NOTE_DOCUMENTS_CONFIG_KEY,
-    );
-    if (!raw) {
-      return [];
-    }
-
-    try {
-      const parsed = JSON.parse(raw) as FavoriteNoteDocument[];
-      if (!Array.isArray(parsed)) {
-        return [];
-      }
-
-      return parsed
-        .filter(isFavoriteNoteDocument)
-        .map((item) => normalizeFavoriteNoteDocument(item))
-        .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
-        .slice(0, MAX_FAVORITE_NOTES);
-    } catch {
-      return [];
-    }
+    const rows = await this.favoriteNoteRepo.find({
+      order: { updatedAt: 'DESC' },
+      take: MAX_FAVORITE_NOTES,
+    });
+    return rows.map((row) => this.rowToFavoriteNoteDocument(row));
   }
 
-  private async writeFavoriteNoteDocuments(notes: FavoriteNoteDocument[]) {
-    await this.systemConfigService.setConfig(
-      FAVORITE_NOTE_DOCUMENTS_CONFIG_KEY,
-      JSON.stringify(notes),
-    );
+  private rowToFavoriteRecord(row: FavoriteEntity): FavoriteRecord {
+    return {
+      id: row.recordId,
+      sourceId: row.sourceId,
+      category: row.category as FavoriteRecord['category'],
+      title: row.title,
+      description: row.description,
+      meta: row.meta,
+      to: row.to,
+      badge: row.badge,
+      avatarName: row.avatarName ?? undefined,
+      avatarSrc: row.avatarSrc ?? undefined,
+      collectedAt: row.collectedAt,
+    };
+  }
+
+  private rowToFavoriteNoteDocument(
+    row: FavoriteNoteEntity,
+  ): FavoriteNoteDocument {
+    // 跑一遍 normalize 以兜底旧数据里可能不规范的 tag/asset 形状
+    return normalizeFavoriteNoteDocument({
+      id: row.id,
+      title: row.title,
+      excerpt: row.excerpt,
+      contentHtml: row.contentHtml,
+      contentText: row.contentText,
+      tags: Array.isArray(row.tags) ? row.tags : [],
+      assets: Array.isArray(row.assets) ? (row.assets as FavoriteNoteAsset[]) : [],
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    });
+  }
+
+  private async trimFavoritesIfNeeded(): Promise<void> {
+    const total = await this.favoriteRepo.count();
+    if (total <= MAX_FAVORITES) return;
+    // SQLite 不支持 DELETE … ORDER BY … LIMIT，先取要保留的 sourceId，再 NOT IN
+    const keep = await this.favoriteRepo.find({
+      select: ['sourceId'],
+      order: { collectedAt: 'DESC' },
+      take: MAX_FAVORITES,
+    });
+    const keepIds = keep.map((row) => row.sourceId);
+    if (keepIds.length === 0) return;
+    await this.favoriteRepo
+      .createQueryBuilder()
+      .delete()
+      .where('sourceId NOT IN (:...keepIds)', { keepIds })
+      .execute();
+  }
+
+  private async trimFavoriteNotesIfNeeded(): Promise<void> {
+    const total = await this.favoriteNoteRepo.count();
+    if (total <= MAX_FAVORITE_NOTES) return;
+    const keep = await this.favoriteNoteRepo.find({
+      select: ['id'],
+      order: { updatedAt: 'DESC' },
+      take: MAX_FAVORITE_NOTES,
+    });
+    const keepIds = keep.map((row) => row.id);
+    if (keepIds.length === 0) return;
+    await this.favoriteNoteRepo
+      .createQueryBuilder()
+      .delete()
+      .where('id NOT IN (:...keepIds)', { keepIds })
+      .execute();
   }
 
   private async captureFavoriteAction(

@@ -60,6 +60,8 @@ import { MinimaxQuotaEntity } from './modules/minimax/minimax-quota.entity';
 import { MinimaxJobEntity } from './modules/minimax/minimax-job.entity';
 import { MediaInsightJobEntity } from './modules/chat/media-insight-job.entity';
 import { ChatCustomStickerEntity } from './modules/chat/custom-sticker.entity';
+import { FavoriteEntity } from './modules/chat/favorite.entity';
+import { FavoriteNoteEntity } from './modules/chat/favorite-note.entity';
 import { FeedPostEntity } from './modules/feed/feed-post.entity';
 import { FeedCommentEntity } from './modules/feed/feed-comment.entity';
 import { FeedPostLikeEntity } from './modules/feed/feed-post-like.entity';
@@ -175,6 +177,8 @@ import {
           MinimaxJobEntity,
           MediaInsightJobEntity,
           ChatCustomStickerEntity,
+          FavoriteEntity,
+          FavoriteNoteEntity,
           FeedPostEntity,
           FeedCommentEntity,
           FeedPostLikeEntity,
