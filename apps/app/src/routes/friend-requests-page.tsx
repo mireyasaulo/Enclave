@@ -292,7 +292,9 @@ function MobileFriendRequestsPage() {
 
         {(requestsQuery.data ?? []).length ? (
           <section className="mt-1 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
-            {(requestsQuery.data ?? []).map((request, index) => (
+            {(requestsQuery.data ?? []).map((request, index) => {
+              const expired = isFriendRequestExpired(request.expiresAt);
+              return (
               <div
                 key={request.id}
                 className={cn(
@@ -306,7 +308,10 @@ function MobileFriendRequestsPage() {
                   <button
                     type="button"
                     onClick={() => openCharacterProfile(request.characterId)}
-                    className="shrink-0 rounded-[8px] active:opacity-70"
+                    className={cn(
+                      "shrink-0 rounded-[8px] active:opacity-70",
+                      expired ? "opacity-70" : undefined,
+                    )}
                     aria-label={t(msg`查看 ${request.characterName} 的资料`)}
                   >
                     <AvatarChip
@@ -323,11 +328,23 @@ function MobileFriendRequestsPage() {
                       aria-label={t(msg`查看 ${request.characterName} 的资料`)}
                     >
                       <div className="min-w-0">
-                        <div className="truncate text-[14px] text-[color:var(--text-primary)]">
+                        <div
+                          className={cn(
+                            "truncate text-[14px] text-[color:var(--text-primary)]",
+                            expired ? "opacity-70" : undefined,
+                          )}
+                        >
                           {request.characterName}
                         </div>
-                        <div className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
-                          {t(getFriendRequestSourceLabel(request.triggerScene))}
+                        <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-[color:var(--text-muted)]">
+                          <span className={expired ? "opacity-70" : undefined}>
+                            {t(getFriendRequestSourceLabel(request.triggerScene))}
+                          </span>
+                          {expired ? (
+                            <span className="inline-flex h-[14px] items-center rounded-full bg-[rgba(245,158,11,0.12)] px-1.5 text-[9px] font-medium leading-none tracking-[0.04em] text-[color:var(--state-warning-text)]">
+                              {t(msg`已过期`)}
+                            </span>
+                          ) : null}
                         </div>
                       </div>
                       <div className="shrink-0 text-[10px] text-[color:var(--text-dim)]">
@@ -335,7 +352,12 @@ function MobileFriendRequestsPage() {
                       </div>
                     </button>
 
-                    <div className="mt-2 rounded-[12px] bg-[color:var(--surface-card-hover)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]">
+                    <div
+                      className={cn(
+                        "mt-2 rounded-[12px] bg-[color:var(--surface-card-hover)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]",
+                        expired ? "opacity-70" : undefined,
+                      )}
+                    >
                       {request.greeting || t(msg`想认识你。`)}
                     </div>
 
@@ -352,11 +374,15 @@ function MobileFriendRequestsPage() {
                         {declineMutation.isPending &&
                         declineMutation.variables === request.id
                           ? t(msg`处理中...`)
-                          : t(msg`拒绝`)}
+                          : expired
+                            ? t(msg`清除`)
+                            : t(msg`拒绝`)}
                       </Button>
                       <Button
                         disabled={
-                          acceptMutation.isPending || declineMutation.isPending
+                          acceptMutation.isPending ||
+                          declineMutation.isPending ||
+                          expired
                         }
                         onClick={() => acceptMutation.mutate(request.id)}
                         variant="primary"
@@ -372,7 +398,8 @@ function MobileFriendRequestsPage() {
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </section>
         ) : null}
 
@@ -480,6 +507,17 @@ function MobileFriendRequestsPage() {
       </div>
     </AppPage>
   );
+}
+
+function isFriendRequestExpired(expiresAt?: string | null) {
+  if (!expiresAt) {
+    return false;
+  }
+  const date = new Date(expiresAt);
+  if (Number.isNaN(date.getTime())) {
+    return false;
+  }
+  return date.getTime() <= Date.now();
 }
 
 function formatFriendRequestDate(t: Translator, createdAt: string) {
