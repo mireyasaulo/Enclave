@@ -1829,7 +1829,7 @@ export function ChatMessageList({
       }
 
       const nextFavorites = upsertDesktopFavorite(
-        buildMessageFavoriteRecord(t, message, groupMode),
+        buildMessageFavoriteRecord(t, message, groupMode, threadContext),
       );
       setFavoriteSourceIds(nextFavorites.map((item) => item.sourceId));
       setActionNotice({
@@ -2466,7 +2466,7 @@ export function ChatMessageList({
         let nextFavorites = readDesktopFavorites();
         for (const message of messagesToFavorite) {
           nextFavorites = upsertDesktopFavorite(
-            buildMessageFavoriteRecord(t, message, groupMode),
+            buildMessageFavoriteRecord(t, message, groupMode, threadContext),
           );
         }
 
@@ -4423,13 +4423,21 @@ function buildMessageFavoriteRecord(
   t: Translator,
   message: ChatRenderableMessage,
   groupMode: boolean,
+  threadContext: ChatMessageListProps["threadContext"],
 ) {
   const senderName = buildClipboardSender(t, message);
   const description = buildClipboardText(t, message);
-  const currentPath =
-    typeof window === "undefined"
-      ? "/tabs/chat"
-      : `${window.location.pathname}${window.location.search}#chat-message-${message.id}`;
+  // 之前用 window.location.pathname 拼乐观 to——桌面端 pathname 永远是
+  // /tabs/chat（conversationId 在 hash 里），结果乐观记录的 to 长成
+  // /tabs/chat?...#chat-message-XXX，没有会话标识。搜索结果点击 → 跳到
+  // /tabs/chat 但 conversationId 解析不出来 → 工作区选不出会话。
+  // 后端返回的 to 走的是 mobile 风格 /chat/<id>#chat-message-<id>，
+  // 搜索导航解析器会把它转换成桌面端 hash，这里跟齐就行。
+  const threadPath = threadContext?.id
+    ? threadContext.type === "group"
+      ? `/group/${threadContext.id}#chat-message-${message.id}`
+      : `/chat/${threadContext.id}#chat-message-${message.id}`
+    : `#chat-message-${message.id}`;
 
   return {
     id: `favorite-${buildFavoriteSourceId(message.id)}`,
@@ -4438,7 +4446,7 @@ function buildMessageFavoriteRecord(
     title: senderName,
     description,
     meta: formatMessageTimestamp(message.createdAt),
-    to: currentPath,
+    to: threadPath,
     badge: groupMode ? t(msg`群聊消息`) : t(msg`聊天消息`),
     avatarName: senderName,
   };
