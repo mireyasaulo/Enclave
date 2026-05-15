@@ -43,7 +43,10 @@ import { AvatarChip } from "../../../components/avatar-chip";
 import { AudioCard } from "../../../components/audio-card";
 import { ChannelsForwardPicker } from "../../../components/channels-forward-picker";
 import { EmptyState } from "../../../components/empty-state";
-import { getChannelsSectionBadge } from "../../channels/channels-section-badge";
+import {
+  getChannelsEmptyState,
+  getChannelsSectionBadge,
+} from "../../channels/channels-section-badge";
 import { stripToolCallSyntax } from "../../moments/moment-content";
 import { formatTimestamp } from "../../../lib/format";
 import { resolveAppMediaUrl } from "../../../lib/media-url";
@@ -382,10 +385,17 @@ export function DesktopChannelsWorkspace({
 
         {!isLoading && !posts.length ? (
           <div className="flex h-full items-center justify-center">
-            <EmptyState
-              title={t(msg`视频号还没有内容`)}
-              description={t(msg`暂时还没有可看的内容。`)}
-            />
+            {(() => {
+              // 按当前 tab 给"为什么空"的具体原因——尤其 关注 / 直播 这种
+              // 经常空的 tab，通用文案没有信息量。
+              const empty = getChannelsEmptyState(activeSection, t);
+              return (
+                <EmptyState
+                  title={empty.title}
+                  description={empty.description}
+                />
+              );
+            })()}
           </div>
         ) : null}
 

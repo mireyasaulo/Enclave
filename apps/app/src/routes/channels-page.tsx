@@ -304,6 +304,51 @@ export function ChannelsPage() {
       input.following
         ? unfollowChannelAuthor(input.authorId, baseUrl)
         : followChannelAuthor(input.authorId, baseUrl),
+    // optimistic：在关注 tab 上点 "已关注" → 应该立刻看到按钮翻成 +关注 状态。
+    // 没有这层，关注 tab 上要等 invalidate → 重拉 home → 重渲，按钮在 300+ms
+    // 里都还停在 "已关注"，比 点赞 慢得多。把同作者所有 post 的 ownerState
+    // 一起翻——既覆盖 关注 tab，也覆盖 推荐 / 朋友 tab 上同一作者的 post。
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      const snapshots = queryClient.getQueriesData<FeedChannelHomeResponse>({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) return;
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...data,
+          posts: data.posts.map((post) =>
+            post.authorId === input.authorId
+              ? {
+                  ...post,
+                  ownerState: {
+                    ...(post.ownerState ?? {
+                      hasLiked: false,
+                      hasFavorited: false,
+                      isFollowingAuthor: false,
+                      isNotInterested: false,
+                      hasViewed: false,
+                      hasShared: false,
+                      lastViewedAt: null,
+                      watchProgressSeconds: null,
+                      completed: false,
+                    }),
+                    isFollowingAuthor: !input.following,
+                  },
+                }
+              : post,
+          ),
+        });
+      });
+      return { snapshots };
+    },
+    onError: (_error, _input, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
     onSuccess: async (_, input) => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
