@@ -384,34 +384,32 @@ export function MobileFavoritesPage({
         ) : null}
 
         {!favoritesQuery.isLoading && !filteredFavorites.length ? (
-          <div className="rounded-[14px] border border-dashed border-[color:var(--border-faint)] bg-white/80 px-4 py-6">
-            <EmptyState
-              title={
-                normalizedSearchText
-                  ? t(msg`没有匹配的收藏`)
-                  : activeFilter === "notes"
-                    ? // 笔记 tab 描述早就引导"点 + 新建笔记"，标题再说"还没有
-                      // 收藏内容"就和描述对不上（"内容"模糊，描述只谈笔记）。
-                      // 不论整体收藏多少，笔记 tab 空态都用"还没有笔记"，跟
-                      // 描述里的 CTA 对齐。
-                      t(msg`还没有笔记`)
-                    : favorites.length && activeFilter !== "all"
-                      ? // 用户已有别的分类收藏，但当前 filter 命中 0 项——别再说
-                        // "还没有收藏内容"误导，引导切到其他分类。
-                        t(msg`该分类下还没有收藏`)
-                      : t(msg`还没有收藏内容`)
-              }
-              description={
-                normalizedSearchText
-                  ? t(msg`换个关键词，或者切回其他分类继续查看。`)
-                  : activeFilter === "notes"
-                    ? t(msg`点击右上角"新建笔记"，把第一条收藏笔记写下来。`)
-                    : favorites.length && activeFilter !== "all"
-                      ? t(msg`切到其他分类继续查看，或去对应入口把内容加入收藏。`)
-                      : t(msg`先到聊天、内容流或公众号里把重要内容加入收藏。`)
-              }
-            />
-          </div>
+          <EmptyState
+            title={
+              normalizedSearchText
+                ? t(msg`没有匹配的收藏`)
+                : activeFilter === "notes"
+                  ? // 笔记 tab 描述早就引导"点 + 新建笔记"，标题再说"还没有
+                    // 收藏内容"就和描述对不上（"内容"模糊，描述只谈笔记）。
+                    // 不论整体收藏多少，笔记 tab 空态都用"还没有笔记"，跟
+                    // 描述里的 CTA 对齐。
+                    t(msg`还没有笔记`)
+                  : favorites.length && activeFilter !== "all"
+                    ? // 用户已有别的分类收藏，但当前 filter 命中 0 项——别再说
+                      // "还没有收藏内容"误导，引导切到其他分类。
+                      t(msg`该分类下还没有收藏`)
+                    : t(msg`还没有收藏内容`)
+            }
+            description={
+              normalizedSearchText
+                ? t(msg`换个关键词，或者切回其他分类继续查看。`)
+                : activeFilter === "notes"
+                  ? t(msg`点击右上角"新建笔记"，把第一条收藏笔记写下来。`)
+                  : favorites.length && activeFilter !== "all"
+                    ? t(msg`切到其他分类继续查看，或去对应入口把内容加入收藏。`)
+                    : t(msg`先到聊天、内容流或公众号里把重要内容加入收藏。`)
+            }
+          />
         ) : null}
 
         {filteredFavorites.length ? (
