@@ -461,7 +461,18 @@ export function MobileSearchWorkspace({
                 {getCategoryTitle(activeCategory)} · {visibleResults.length}{" "}
                 {t(msg`条`)}
               </div>
-              <div className="relative space-y-1.5">
+              {/* miniPrograms 命中 0 时下面 visibleResults 是空数组，relative
+                  容器没高度，absolute inset-0 的 overlay 退化到 0×0 浮在角落
+                  上——给一个 min-height 让 overlay 有地方撑开居中。其它分类
+                  正常走 result 行的高度，不需要 min-height。 */}
+              <div
+                className={cn(
+                  "relative space-y-1.5",
+                  activeCategory === "miniPrograms" && !visibleResults.length
+                    ? "min-h-[180px]"
+                    : undefined,
+                )}
+              >
                 {visibleResults.map((item) => (
                   <SearchResultCard
                     key={item.id}
