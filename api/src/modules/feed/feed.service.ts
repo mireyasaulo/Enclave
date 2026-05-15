@@ -191,16 +191,27 @@ export class FeedService implements OnModuleInit {
         ON feed_post_likes(postId, authorId)
       `);
 
-      // 2. 去重 user_feed_interactions：每组 (userId, postId, type) 只保留最早一行
+      // 2. 去重 user_feed_interactions：toggle 类型（like / favorite / view /
+      //    not_interested）每组 (userId, postId, type) 只保留最早一行；event 类型
+      //    （share / forward_to_chat / comment_like）允许多行——同一篇帖子可以多次
+      //    分享、转发到不同好友、点赞不同评论。
       await queryRunner.query(`
         DELETE FROM user_feed_interactions
-        WHERE id NOT IN (
-          SELECT MIN(id) FROM user_feed_interactions GROUP BY userId, postId, type
-        )
+        WHERE type IN ('like', 'favorite', 'view', 'not_interested')
+          AND id NOT IN (
+            SELECT MIN(id) FROM user_feed_interactions
+            WHERE type IN ('like', 'favorite', 'view', 'not_interested')
+            GROUP BY userId, postId, type
+          )
+      `);
+      // 历史上建过非 partial 的 unique 索引，先 drop 掉再换成 partial 版本。
+      await queryRunner.query(`
+        DROP INDEX IF EXISTS uniq_user_feed_interactions_owner_post_type
       `);
       await queryRunner.query(`
-        CREATE UNIQUE INDEX IF NOT EXISTS uniq_user_feed_interactions_owner_post_type
+        CREATE UNIQUE INDEX IF NOT EXISTS uniq_user_feed_interactions_toggle
         ON user_feed_interactions(userId, postId, type)
+        WHERE type IN ('like', 'favorite', 'view', 'not_interested')
       `);
 
       // 3. 用 like 表实际行数重算 likeCount；同理用 type='favorite' 重算 favoriteCount
