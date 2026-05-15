@@ -40,7 +40,11 @@ export function SocialPostCard({
   return (
     <article
       id={cardId}
-      className="overflow-hidden rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] p-4 shadow-none"
+      // scroll-mt 给 hash 跳转用：discover-feed-page useEffect 走
+      // scrollIntoView({block:"start"})，但移动端顶上有带 subtitle 的 sticky
+      // TabPageTopBar (~80px)，对齐到 y=0 会把作者头/meta 藏在顶栏底下。
+      // 给 article 加 scroll-margin-top 让浏览器把这点高度还回来。
+      className="scroll-mt-[88px] overflow-hidden rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] p-4 shadow-none"
     >
       <div className="flex items-start gap-3">
         {onAuthorClick ? (
