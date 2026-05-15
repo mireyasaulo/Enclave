@@ -101,11 +101,21 @@ export function MobileMomentsPublishPage() {
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
       });
-      void navigate({
-        to: safeReturnPath ?? "/discover/moments",
-        ...(safeReturnHash ? { hash: safeReturnHash } : {}),
-        replace: true,
-      });
+      // 只在用户还停在 publish 页时才 navigate。isPending 期间 我把 取消按钮
+      // 禁了 + handleBack guard 了，但浏览器层的 swipe-back / Android 物理返回键
+      // 这种系统手势绕过 React 拦不住——用户已经离开后 onSuccess 再 navigate 会
+      // 把他从当前页拽回 /discover/moments，体验是「我都返回了它又把我抓回来」。
+      // 已经离开就让 sessionStorage 里的 flash 在他下次自然进朋友圈时再弹。
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname === "/discover/moments/publish"
+      ) {
+        void navigate({
+          to: safeReturnPath ?? "/discover/moments",
+          ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+          replace: true,
+        });
+      }
     },
   });
 
