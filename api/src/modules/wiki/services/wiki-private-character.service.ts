@@ -82,12 +82,6 @@ export function stripRejectedRecipeFields(
   return clone as unknown as CharacterBlueprintRecipeValue;
 }
 
-export type AiRelationshipSeed = {
-  characterId: string;
-  relationshipType: string;
-  strength: number;
-};
-
 export type PrivateCharacterDto = {
   name: string;
   avatar?: string;
@@ -99,12 +93,11 @@ export type PrivateCharacterDto = {
   recipe?: CharacterBlueprintRecipeValue | null;
   profile?: PersonalityProfile | null;
   // —— 2026-05-15 起对齐 admin character editor 的字段（不含 isOnline /
-  // isTemplate / sourceType / sourceKey / deletionPolicy / 生活策略整组 ——
-  // 都是 admin-only，wiki 写入路径不接受） ——
+  // isTemplate / sourceType / sourceKey / deletionPolicy / 生活策略整组 /
+  // aiRelationships —— 都是 admin-only，wiki 写入路径不接受） ——
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
-  aiRelationships?: AiRelationshipSeed[] | null;
 };
 
 export type PrivateCharacterExportBundle = {
@@ -122,7 +115,6 @@ export type PrivateCharacterExportBundle = {
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
-  aiRelationships?: AiRelationshipSeed[] | null;
   meta: {
     exportedAt: string;
     exportedBy: string;
@@ -304,11 +296,10 @@ export class WikiPrivateCharacterService {
       profile: record.profile ?? null,
       // admin-only 字段（isOnline / isTemplate / sourceType / sourceKey /
       // deletionPolicy / 生活策略整组：onlineMode / activityMode / currentActivity /
-      // triggerScenes）不进 bundle —— wiki 用户既改不到也不应导出。
+      // triggerScenes / aiRelationships）不进 bundle —— wiki 用户既改不到也不应导出。
       socialOpenness: record.socialOpenness,
       proactiveBrowseChance: record.proactiveBrowseChance,
       intimacyLevel: record.intimacyLevel,
-      aiRelationships: record.aiRelationships ?? null,
       meta: {
         exportedAt: new Date().toISOString(),
         exportedBy,
@@ -375,9 +366,6 @@ export class WikiPrivateCharacterService {
           : undefined,
       intimacyLevel:
         typeof p.intimacyLevel === 'number' ? p.intimacyLevel : undefined,
-      aiRelationships: Array.isArray(p.aiRelationships)
-        ? sanitizeAiRelationships(p.aiRelationships)
-        : undefined,
     };
   }
 
@@ -430,37 +418,7 @@ export class WikiPrivateCharacterService {
     if (typeof dto.intimacyLevel === 'number') {
       target.intimacyLevel = dto.intimacyLevel;
     }
-    if (dto.aiRelationships !== undefined) {
-      target.aiRelationships = Array.isArray(dto.aiRelationships)
-        ? sanitizeAiRelationships(dto.aiRelationships)
-        : null;
-    }
+    // aiRelationships 已于 2026-05-15 从 wiki 编辑路径下线（admin-only）；
+    // 即便 PUT body 强塞也直接忽略。
   }
-}
-
-// 尽量宽松地清洗 aiRelationships 数组：跳过不合规则的项；保留合法项的最小子集。
-// strength 钳到 [0,1]，characterId 必须非空字符串。
-function sanitizeAiRelationships(input: unknown): AiRelationshipSeed[] {
-  if (!Array.isArray(input)) return [];
-  const out: AiRelationshipSeed[] = [];
-  for (const item of input) {
-    if (!item || typeof item !== 'object') continue;
-    const it = item as Record<string, unknown>;
-    const characterId =
-      typeof it.characterId === 'string' ? it.characterId.trim() : '';
-    if (!characterId) continue;
-    const relationshipType =
-      typeof it.relationshipType === 'string' ? it.relationshipType.trim() : '';
-    const strengthRaw = it.strength;
-    const strength =
-      typeof strengthRaw === 'number' && Number.isFinite(strengthRaw)
-        ? Math.max(0, Math.min(1, strengthRaw))
-        : 0.5;
-    out.push({
-      characterId,
-      relationshipType: relationshipType || 'friend',
-      strength,
-    });
-  }
-  return out;
 }

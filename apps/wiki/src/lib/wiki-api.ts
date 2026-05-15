@@ -985,12 +985,6 @@ export const wikiApi = {
   },
 };
 
-export type PrivateCharacterAiRelationship = {
-  characterId: string;
-  relationshipType: string;
-  strength: number;
-};
-
 export type PrivateCharacterRecord = {
   id: string;
   ownerUserId: string;
@@ -1016,7 +1010,6 @@ export type PrivateCharacterRecord = {
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
-  aiRelationships?: PrivateCharacterAiRelationship[] | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -1032,11 +1025,11 @@ export type PrivateCharacterDto = {
   recipe?: CharacterBlueprintRecipe | null;
   profile?: unknown | null;
   // —— admin 对齐字段（不含 isOnline / isTemplate / sourceType / sourceKey /
-  // deletionPolicy / 生活策略整组 —— 这些都是 admin-only，wiki 不接受写入） ——
+  // deletionPolicy / 生活策略整组 / aiRelationships —— 这些都是 admin-only，
+  // wiki 不接受写入） ——
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
-  aiRelationships?: PrivateCharacterAiRelationship[] | null;
 };
 
 /**

@@ -25,14 +25,13 @@ export type WikiContentField = (typeof WIKI_CONTENT_FIELDS)[number];
  * - 5 个 admin-only 系统字段：isOnline / isTemplate / sourceType / sourceKey /
  *   deletionPolicy（2026-05-15 短暂放开过，验收时确认仍是 admin-only）
  * - 3 个生活策略调度字段：onlineMode / activityMode / currentActivity
- *   （2026-05-15 整组「生活策略」从 wiki 下线，admin / preset 才该管这块；
- *    activityFrequency / momentsFrequency / feedFrequency / activeHoursStart /
- *    activeHoursEnd 在 recipe.lifeStrategy 子树里，wiki 也不再读写它们）
+ *   （2026-05-15 整组「生活策略」从 wiki 下线，admin / preset 才该管这块）
+ * - aiRelationships：wiki 用户没有便利的"挑别的角色"入口，2026-05-15 验收时
+ *   也确认从 wiki 编辑页移除；character-friendship 服务自己 seed 即可
  * - 2 个真正的纯运行时态：currentStatus / lastActiveAt 由 world 内部 tick 更新
  *
- * 注：socialOpenness / proactiveBrowseChance / intimacyLevel / aiRelationships
- * 这 4 个字段 wiki 私有角色编辑页可以填，对应 admin character editor 的
- * 「社交参数」tab。
+ * 注：socialOpenness / proactiveBrowseChance / intimacyLevel 这 3 个字段
+ * wiki 私有角色编辑页可以填，对应 admin character editor 的「社交参数」tab。
  */
 export const WIKI_REJECTED_FIELDS = [
   'currentStatus',
@@ -45,6 +44,7 @@ export const WIKI_REJECTED_FIELDS = [
   'onlineMode',
   'activityMode',
   'currentActivity',
+  'aiRelationships',
   'modelRoutingMode',
   'inferenceProviderAccountId',
   'inferenceModelId',

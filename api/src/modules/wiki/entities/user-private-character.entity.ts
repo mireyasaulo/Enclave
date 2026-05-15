@@ -55,10 +55,10 @@ export class UserPrivateCharacterEntity {
   profile?: PersonalityProfile | null;
 
   // —— 2026-05-15 起：以下字段对齐隐界后台 character editor ——
-  // wiki 编辑页只暴露其中的 onlineMode / activityMode / currentActivity /
-  // socialOpenness / proactiveBrowseChance / intimacyLevel / aiRelationships 这 7 个；
-  // isOnline / isTemplate / sourceType / sourceKey / deletionPolicy 这 5 个仍是
-  // admin-only，DB 列在这里保留只是给 admin/cleanup 流程留口子。
+  // wiki 编辑页只暴露 socialOpenness / proactiveBrowseChance / intimacyLevel
+  // 这 3 个（社交参数 tab）；其余列（isOnline / isTemplate / sourceType /
+  // sourceKey / deletionPolicy / onlineMode / activityMode / currentActivity /
+  // aiRelationships）都是 admin-only，DB 列保留只是给 admin/cleanup 留口子。
   // model routing 字段在 WIKI_REJECTED_FIELDS 中由后端拦下，从来不入这张表。
 
   @Column({ type: 'boolean', default: false })
