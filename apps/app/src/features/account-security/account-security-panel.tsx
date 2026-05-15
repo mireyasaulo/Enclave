@@ -3,6 +3,7 @@ import { msg } from "@lingui/macro";
 import { useMutation } from "@tanstack/react-query";
 import {
   changeCloudPassword,
+  isApiRequestError,
   sendCloudChangePasswordCode,
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -12,6 +13,22 @@ import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../../store/cloud-session-store";
 
 const RESEND_COOLDOWN_SECONDS = 60;
+
+// 后端 429 走两条文案：
+//   1) "验证码发送过于频繁，请在 {n} 秒后重试。"（60 秒滑窗）
+//   2) "该邮箱验证码请求次数过多，请稍后再试。"（小时窗口超 5 条上限）
+// 第一条里能 parse 出真实 retryAfter；第二条只能给个保守冷却，避免按钮回弹后再来一发又被打回。
+function resolveRateLimitCooldown(message: string | undefined): number {
+  if (!message) return RESEND_COOLDOWN_SECONDS;
+  const match = /(\d+)\s*秒/.exec(message);
+  if (match) {
+    const seconds = Number.parseInt(match[1], 10);
+    if (Number.isFinite(seconds) && seconds > 0) {
+      return Math.min(seconds, 600);
+    }
+  }
+  return RESEND_COOLDOWN_SECONDS;
+}
 
 function normalizeBaseUrl(value: string | undefined | null) {
   return (value ?? "").trim().replace(/\/+$/, "");
@@ -63,10 +80,15 @@ export function AccountSecurityPanel() {
       setResendCountdown(RESEND_COOLDOWN_SECONDS);
     },
     onError: (error) => {
-      setFeedback({
-        tone: "danger",
-        message: describeRequestError(error, t(msg`发送验证码失败，请稍后重试。`)),
-      });
+      const description = describeRequestError(
+        error,
+        t(msg`发送验证码失败，请稍后重试。`),
+      );
+      setFeedback({ tone: "danger", message: description });
+      // 429 时把按钮 lock 住，否则用户读完报错连点 → 又一条 429，反复打到后端节流。
+      if (isApiRequestError(error) && error.statusCode === 429) {
+        setResendCountdown(resolveRateLimitCooldown(error.message));
+      }
     },
   });
 
@@ -148,7 +170,14 @@ export function AccountSecurityPanel() {
         )}
       </InlineNotice>
 
-      <div className="space-y-3 rounded-2xl border border-[color:var(--border-faint)] bg-white p-4">
+      <form
+        className="space-y-3 rounded-2xl border border-[color:var(--border-faint)] bg-white p-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (submitDisabled) return;
+          handleSubmit();
+        }}
+      >
         <label className="block space-y-2">
           <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
             {t(msg`邮箱验证码`)}
@@ -228,7 +257,7 @@ export function AccountSecurityPanel() {
         </label>
 
         <Button
-          onClick={handleSubmit}
+          type="submit"
           disabled={submitDisabled}
           size="lg"
           className="w-full rounded-2xl"
@@ -237,7 +266,7 @@ export function AccountSecurityPanel() {
             ? t(msg`提交中...`)
             : t(msg`更新密码`)}
         </Button>
-      </div>
+      </form>
 
       {feedback ? (
         <InlineNotice tone={feedback.tone}>{feedback.message}</InlineNotice>
