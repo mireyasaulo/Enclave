@@ -107,9 +107,14 @@ function MobileFriendRequestsPage() {
   });
 
   const declineMutation = useMutation({
-    mutationFn: (requestId: string) => declineFriendRequest(requestId, baseUrl),
-    onSuccess: async () => {
-      setSuccessNotice(t(msg`已忽略好友申请。`));
+    mutationFn: ({ requestId }: { requestId: string; expired: boolean }) =>
+      declineFriendRequest(requestId, baseUrl),
+    onSuccess: async (_data, variables) => {
+      setSuccessNotice(
+        variables.expired
+          ? t(msg`已清除过期请求。`)
+          : t(msg`已忽略好友申请。`),
+      );
       await queryClient.invalidateQueries({
         queryKey: ["app-friend-requests", baseUrl],
       });
@@ -302,7 +307,7 @@ function MobileFriendRequestsPage() {
                   : null;
               const declineErrorForRow =
                 declineMutation.isError &&
-                declineMutation.variables === request.id &&
+                declineMutation.variables?.requestId === request.id &&
                 declineMutation.error instanceof Error
                   ? declineMutation.error
                   : null;
@@ -401,13 +406,18 @@ function MobileFriendRequestsPage() {
                         disabled={
                           acceptMutation.isPending || declineMutation.isPending
                         }
-                        onClick={() => declineMutation.mutate(request.id)}
+                        onClick={() =>
+                          declineMutation.mutate({
+                            requestId: request.id,
+                            expired,
+                          })
+                        }
                         variant="secondary"
                         size="sm"
-                        className="h-8 rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 text-[12px] shadow-none hover:bg-[#f5f7f7]"
+                        className="h-8 min-w-[3.5rem] rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 text-[12px] shadow-none hover:bg-[#f5f7f7]"
                       >
                         {declineMutation.isPending &&
-                        declineMutation.variables === request.id
+                        declineMutation.variables?.requestId === request.id
                           ? expired
                             ? t(msg`清除中...`)
                             : t(msg`拒绝中...`)
@@ -415,22 +425,23 @@ function MobileFriendRequestsPage() {
                             ? t(msg`清除`)
                             : t(msg`拒绝`)}
                       </Button>
-                      <Button
-                        disabled={
-                          acceptMutation.isPending ||
-                          declineMutation.isPending ||
-                          expired
-                        }
-                        onClick={() => acceptMutation.mutate(request.id)}
-                        variant="primary"
-                        size="sm"
-                        className="h-8 rounded-[10px] bg-[#07c160] px-3 text-[12px] text-white shadow-none hover:bg-[#06ad56]"
-                      >
-                        {acceptMutation.isPending &&
-                        acceptMutation.variables === request.id
-                          ? t(msg`接受中...`)
-                          : t(msg`接受`)}
-                      </Button>
+                      {!expired ? (
+                        <Button
+                          disabled={
+                            acceptMutation.isPending ||
+                            declineMutation.isPending
+                          }
+                          onClick={() => acceptMutation.mutate(request.id)}
+                          variant="primary"
+                          size="sm"
+                          className="h-8 min-w-[3.5rem] rounded-[10px] bg-[#07c160] px-3 text-[12px] text-white shadow-none hover:bg-[#06ad56]"
+                        >
+                          {acceptMutation.isPending &&
+                          acceptMutation.variables === request.id
+                            ? t(msg`接受中...`)
+                            : t(msg`接受`)}
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 </div>

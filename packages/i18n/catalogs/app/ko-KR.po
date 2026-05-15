@@ -2859,8 +2859,8 @@ msgstr "도구 공유"
 #: apps/app/src/routes/discover-feed-page.tsx:1366
 #: apps/app/src/routes/discover-scene-page.tsx:401
 #: apps/app/src/routes/friend-moments-page.tsx:487
-#: apps/app/src/routes/friend-requests-page.tsx:274
-#: apps/app/src/routes/friend-requests-page.tsx:460
+#: apps/app/src/routes/friend-requests-page.tsx:279
+#: apps/app/src/routes/friend-requests-page.tsx:471
 #: apps/app/src/routes/games-page.tsx:520
 #: apps/app/src/routes/group-announcement-page.tsx:330
 #: apps/app/src/routes/group-announcement-page.tsx:365
@@ -3405,7 +3405,7 @@ msgstr "글 출처: {0}"
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1253
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:180
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:305
-#: apps/app/src/routes/friend-requests-page.tsx:495
+#: apps/app/src/routes/friend-requests-page.tsx:506
 msgid "今天"
 msgstr "오늘"
 
@@ -4084,7 +4084,7 @@ msgstr "전체 멤버"
 #: apps/app/src/routes/contacts-page.tsx:2323
 #: apps/app/src/routes/create-group-page.tsx:433
 #: apps/app/src/routes/discover-feed-page.tsx:1067
-#: apps/app/src/routes/friend-requests-page.tsx:241
+#: apps/app/src/routes/friend-requests-page.tsx:246
 #: apps/app/src/routes/group-announcement-page.tsx:300
 #: apps/app/src/routes/group-chat-background-page.tsx:333
 #: apps/app/src/routes/group-chat-details-page.tsx:587
@@ -4139,7 +4139,7 @@ msgstr "채팅 기록을 일시적으로 사용할 수 없습니다"
 #: apps/app/src/routes/discover-feed-page.tsx:1056
 #: apps/app/src/routes/discover-feed-page.tsx:1087
 #: apps/app/src/routes/discover-feed-page.tsx:1095
-#: apps/app/src/routes/friend-requests-page.tsx:264
+#: apps/app/src/routes/friend-requests-page.tsx:269
 #: apps/app/src/routes/group-announcement-page.tsx:322
 #: apps/app/src/routes/group-announcement-page.tsx:424
 #: apps/app/src/routes/group-chat-background-page.tsx:357
@@ -8990,7 +8990,7 @@ msgid "最近 30 天"
 msgstr "최근 30일"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:478
-#: apps/app/src/routes/friend-requests-page.tsx:415
+#: apps/app/src/routes/friend-requests-page.tsx:425
 msgid "清除"
 msgstr "지우기"
 
@@ -10606,8 +10606,8 @@ msgstr "Yinjie ID, 캐릭터 이름 또는 프로필 키워드로 월드 캐릭�
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:40
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:77
 #: apps/app/src/routes/contacts-page.tsx:1359
-#: apps/app/src/routes/friend-requests-page.tsx:199
-#: apps/app/src/routes/friend-requests-page.tsx:448
+#: apps/app/src/routes/friend-requests-page.tsx:204
+#: apps/app/src/routes/friend-requests-page.tsx:459
 #: apps/app/src/routes/mobile-add-friend-page.tsx:377
 msgid "新的朋友"
 msgstr "새 친구"
@@ -10785,34 +10785,34 @@ msgstr "무시됨"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:119
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:204
-#: apps/app/src/routes/friend-requests-page.tsx:373
+#: apps/app/src/routes/friend-requests-page.tsx:378
 msgid "想认识你。"
 msgstr "당신과 친해지고 싶어합니다."
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:132
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:218
 #: apps/app/src/i18n/static-dom-seed.ts:776
-#: apps/app/src/routes/friend-requests-page.tsx:416
+#: apps/app/src/routes/friend-requests-page.tsx:426
 msgid "拒绝"
 msgstr "거절"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:142
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:230
-#: apps/app/src/routes/friend-requests-page.tsx:431
+#: apps/app/src/routes/friend-requests-page.tsx:441
 msgid "接受中..."
 msgstr "수락 중..."
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:143
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:230
 #: apps/app/src/i18n/static-dom-seed.ts:777
-#: apps/app/src/routes/friend-requests-page.tsx:432
+#: apps/app/src/routes/friend-requests-page.tsx:442
 msgid "接受"
 msgstr "수락"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:155
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:242
 #: apps/app/src/i18n/static-dom-seed.ts:1030
-#: apps/app/src/routes/friend-requests-page.tsx:449
+#: apps/app/src/routes/friend-requests-page.tsx:460
 msgid "暂时没有新的好友请求"
 msgstr "새 친구 요청이 없습니다"
 
@@ -11176,8 +11176,8 @@ msgstr "주민에게 공개되는 게시물을 먼저 올리거나, 세계 주�
 #. placeholder {0}: post.authorName
 #. placeholder {0}: request.characterName
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:166
-#: apps/app/src/routes/friend-requests-page.tsx:327
-#: apps/app/src/routes/friend-requests-page.tsx:340
+#: apps/app/src/routes/friend-requests-page.tsx:332
+#: apps/app/src/routes/friend-requests-page.tsx:345
 msgid "查看 {0} 的资料"
 msgstr ""
 
@@ -12203,7 +12203,7 @@ msgstr "잠시만요, 이 구독 기사를 준비하고 있습니다."
 #: apps/app/src/routes/chat-list-page.tsx:917
 #: apps/app/src/routes/create-group-page.tsx:443
 #: apps/app/src/routes/discover-feed-page.tsx:1075
-#: apps/app/src/routes/friend-requests-page.tsx:251
+#: apps/app/src/routes/friend-requests-page.tsx:256
 #: apps/app/src/routes/group-chat-background-page.tsx:345
 #: apps/app/src/routes/group-chat-background-page.tsx:377
 #: apps/app/src/routes/group-chat-edit-page.tsx:258
@@ -12804,16 +12804,16 @@ msgid "买了种子"
 msgstr "씨앗 구매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
-msgid "卖了"
-msgstr "판매 완료"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
 msgid "作物"
 msgstr "작물"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
+msgid "卖了"
+msgstr "판매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -14191,17 +14191,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "본진을 지키고 적 탱크 20대를 격파하라."
 
 #: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "2P"
+
+#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "픽셀"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "액션"
-
-#: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "2P"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -18604,7 +18604,7 @@ msgid "生效中"
 msgstr "활성"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:487
-#: apps/app/src/routes/friend-requests-page.tsx:357
+#: apps/app/src/routes/friend-requests-page.tsx:362
 #: apps/app/src/routes/profile-subscription-page.tsx:495
 msgid "已过期"
 msgstr "만료됨"
@@ -23253,9 +23253,9 @@ msgid "清空搜索"
 msgstr "검색 지우기"
 
 #: apps/app/src/routes/contacts-page.tsx:1721
-#: apps/app/src/routes/friend-requests-page.tsx:230
-#: apps/app/src/routes/friend-requests-page.tsx:275
-#: apps/app/src/routes/friend-requests-page.tsx:461
+#: apps/app/src/routes/friend-requests-page.tsx:235
+#: apps/app/src/routes/friend-requests-page.tsx:280
+#: apps/app/src/routes/friend-requests-page.tsx:472
 msgid "浏览世界角色"
 msgstr "세계 캐릭터 둘러보기"
 
@@ -25011,40 +25011,44 @@ msgstr "데스크톱 주소록 워크스페이스의 친구 요청 보기로 이
 msgid "切换桌面好友请求..."
 msgstr "데스크톱 친구 요청으로 전환 중..."
 
-#: apps/app/src/routes/friend-requests-page.tsx:112
+#: apps/app/src/routes/friend-requests-page.tsx:115
+msgid "已清除过期请求。"
+msgstr ""
+
+#: apps/app/src/routes/friend-requests-page.tsx:116
 msgid "已忽略好友申请。"
 msgstr ""
 
-#: apps/app/src/routes/friend-requests-page.tsx:242
+#: apps/app/src/routes/friend-requests-page.tsx:247
 msgid "正在读取好友请求"
 msgstr "친구 요청 읽는 중"
 
-#: apps/app/src/routes/friend-requests-page.tsx:243
+#: apps/app/src/routes/friend-requests-page.tsx:248
 msgid "稍等一下，正在同步新的好友申请。"
 msgstr "잠시만 기다려 주세요. 새 친구 신청을 동기화 중입니다."
 
-#: apps/app/src/routes/friend-requests-page.tsx:252
+#: apps/app/src/routes/friend-requests-page.tsx:257
 msgid "新的朋友暂时不可用"
 msgstr "새 친구를 일시적으로 사용할 수 없습니다"
 
-#: apps/app/src/routes/friend-requests-page.tsx:392
+#: apps/app/src/routes/friend-requests-page.tsx:397
 msgid "重试通过"
 msgstr "수락 재시도"
 
-#: apps/app/src/routes/friend-requests-page.tsx:393
+#: apps/app/src/routes/friend-requests-page.tsx:398
 msgid "重试拒绝"
 msgstr "거절 재시도"
 
-#: apps/app/src/routes/friend-requests-page.tsx:412
+#: apps/app/src/routes/friend-requests-page.tsx:422
 #: apps/app/src/routes/profile-settings-page.tsx:571
 msgid "清除中..."
 msgstr "지우는 중..."
 
-#: apps/app/src/routes/friend-requests-page.tsx:413
+#: apps/app/src/routes/friend-requests-page.tsx:423
 msgid "拒绝中..."
 msgstr ""
 
-#: apps/app/src/routes/friend-requests-page.tsx:450
+#: apps/app/src/routes/friend-requests-page.tsx:461
 msgid "去发现页摇一摇，或等待场景触发新的相遇。"
 msgstr "발견 페이지에서 흔들거나 장면이 새로운 만남을 트리거하길 기다리세요."
 

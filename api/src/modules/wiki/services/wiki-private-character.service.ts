@@ -236,7 +236,10 @@ export class WikiPrivateCharacterService {
     }
     const existing = await this.getById(ownerUserId, id);
     const trimmedName = (dto.name ?? existing.name).trim();
-    if (!trimmedName) {
+    // 视觉为空（纯 ZWS / 空白）也拒，与 createStrict / upsertByName 对齐。
+    // 否则用户能在编辑器把 name 改成 '​‌‍' 这种 trim 后非空但显示一行
+    // 空白的"幽灵名"，列表卡片直接不可点。
+    if (!trimmedName || isVisuallyEmpty(trimmedName)) {
       throw new BadRequestException('角色名不能为空');
     }
     assertPrivateCharacterFieldLimits({ ...dto, name: trimmedName });
@@ -328,7 +331,9 @@ export class WikiPrivateCharacterService {
    * 这样 round-trip 后 bundle 里没写的字段不会把已存在私有角色的字段清空。
    */
   parseImportBundle(payload: unknown): PrivateCharacterDto {
-    if (!payload || typeof payload !== 'object') {
+    // Array.isArray 单独挡：typeof [] === 'object' 会让数组 payload 漏过去，
+    // 然后下游报"没有 name 字段"——对用户来说是"我明明传了 JSON 啊"的迷惑提示。
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
       throw new BadRequestException('文件内容不是合法的角色 JSON');
     }
     const p = payload as Record<string, unknown>;

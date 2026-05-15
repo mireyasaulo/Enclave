@@ -1,4 +1,4 @@
-import { ConflictException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { WikiPrivateCharacterService } from './wiki-private-character.service';
 
 // 关注三件事：
@@ -115,5 +115,39 @@ describe('WikiPrivateCharacterService.createStrict', () => {
     await expect(
       svc.createStrict('u1', { name: 'il 测试', intimacyLevel: -5 }),
     ).rejects.toThrow(/intimacyLevel/);
+  });
+});
+
+describe('WikiPrivateCharacterService.update', () => {
+  // 走查 2026-05-15 发现：update 只检查 trim，不检查 isVisuallyEmpty，
+  // 导致 PUT 能把已有角色改名成 ZWS-only "幽灵名"，列表里出现一行空白卡片。
+  // createStrict / upsertByName 都已 reject，这里把 update 拉齐。
+  it('rejects renaming to zero-width-only name', async () => {
+    const existing = {
+      id: 'r1',
+      ownerUserId: 'u1',
+      name: '原名',
+      bio: '',
+      avatar: '',
+    } as Row;
+    const svc = makeService({ recordById: existing, byOwnerName: null });
+    await expect(
+      svc.update('u1', 'r1', { name: '​‌‍' }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+});
+
+describe('WikiPrivateCharacterService.parseImportBundle', () => {
+  // 走查 2026-05-15 发现：typeof [] === 'object'，导致 array payload 漏过去后
+  // 才在"没有 name 字段"那道反馈出来，用户看不懂自己错在哪。明确 reject 数组。
+  it('rejects array payload with a clear "not a valid character JSON" message', () => {
+    const svc = makeService();
+    expect(() => svc.parseImportBundle([1, 2, 3])).toThrow(/合法的角色 JSON/);
+  });
+
+  it('accepts a minimal valid bundle', () => {
+    const svc = makeService();
+    const dto = svc.parseImportBundle({ name: '导入测试' });
+    expect(dto.name).toBe('导入测试');
   });
 });
