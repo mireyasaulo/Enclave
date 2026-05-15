@@ -15,6 +15,7 @@ import {
   likeFeedPost,
   shake,
   triggerSceneFriendRequest,
+  unlikeFeedPost,
   type FeedComment,
   type FeedListResponse,
 } from "@yinjie/contracts";
@@ -384,7 +385,17 @@ function DesktopDiscoverWorkspace() {
   });
 
   const likeFeedMutation = useMutation({
-    mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
+    // toggle：见 discover-feed-page 同名 mutation 注释——按住「已赞」按钮再点
+    // 必须真能取消，否则旧 POST-only 路径下后端 INSERT OR IGNORE 静默吞掉。
+    mutationFn: (postId: string) => {
+      const current = (feedQuery.data?.posts ?? []).find(
+        (post) => post.id === postId,
+      );
+      const alreadyLiked = current?.ownerState?.hasLiked ?? false;
+      return alreadyLiked
+        ? unlikeFeedPost(postId, baseUrl)
+        : likeFeedPost(postId, baseUrl);
+    },
     onMutate: async (postId) => {
       await queryClient.cancelQueries({ queryKey: ["app-feed", baseUrl] });
       const snapshots = queryClient.getQueriesData<FeedListResponse>({
@@ -396,28 +407,31 @@ function DesktopDiscoverWorkspace() {
         }
         queryClient.setQueryData<FeedListResponse>(key, {
           ...data,
-          posts: data.posts.map((post) =>
-            post.id === postId && !post.ownerState?.hasLiked
-              ? {
-                  ...post,
-                  likeCount: post.likeCount + 1,
-                  ownerState: {
-                    ...(post.ownerState ?? {
-                      hasLiked: false,
-                      hasFavorited: false,
-                      isFollowingAuthor: false,
-                      isNotInterested: false,
-                      hasViewed: false,
-                      hasShared: false,
-                      lastViewedAt: null,
-                      watchProgressSeconds: null,
-                      completed: false,
-                    }),
-                    hasLiked: true,
-                  },
-                }
-              : post,
-          ),
+          posts: data.posts.map((post) => {
+            if (post.id !== postId) return post;
+            const alreadyLiked = post.ownerState?.hasLiked ?? false;
+            return {
+              ...post,
+              likeCount: Math.max(
+                0,
+                post.likeCount + (alreadyLiked ? -1 : 1),
+              ),
+              ownerState: {
+                ...(post.ownerState ?? {
+                  hasLiked: false,
+                  hasFavorited: false,
+                  isFollowingAuthor: false,
+                  isNotInterested: false,
+                  hasViewed: false,
+                  hasShared: false,
+                  lastViewedAt: null,
+                  watchProgressSeconds: null,
+                  completed: false,
+                }),
+                hasLiked: !alreadyLiked,
+              },
+            };
+          }),
         });
       });
       return { snapshots };

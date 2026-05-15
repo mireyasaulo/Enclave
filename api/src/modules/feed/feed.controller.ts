@@ -106,6 +106,11 @@ export class FeedController {
     return this.feedService.likeOwnerPost(postId);
   }
 
+  @Delete(':id/like')
+  unlikePost(@Param('id') postId: string) {
+    return this.feedService.unlikeOwnerPost(postId);
+  }
+
   @Post(':id/favorite')
   favoritePost(@Param('id') postId: string) {
     return this.feedService.favoriteOwnerPost(postId);

@@ -461,9 +461,9 @@ export class FeedService implements OnModuleInit {
       topicTags?: string[];
       surface?: FeedSurface;
     },
-  ): Promise<FeedPostEntity> {
+  ): Promise<ReturnType<FeedService['serializePost']>> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
-    return this.createPost({
+    const post = await this.createPost({
       authorAvatar: owner.avatar ?? '',
       authorId: owner.id,
       authorName: owner.username?.trim() || 'You',
@@ -480,6 +480,16 @@ export class FeedService implements OnModuleInit {
       surface: options?.surface,
       text: text ?? '',
     });
+    // 必须串行化成 DTO 再返回：前端 createFeedPost 把响应直接 prepend 到广场
+    // 缓存里做 optimistic insert，需要 media[] / canInteract / ownerState 这些
+    // 字段。返回原始 entity 会让刚发布的卡片缺动作菜单和媒体，要等 invalidate
+    // 重新拉 list 才能愈合。
+    const avatarContext = await this.buildFeedAvatarContext({
+      ownerId: owner.id,
+      ownerAvatar: owner.avatar,
+    });
+    const ownerStateMap = await this.buildOwnerStateMap([post], owner.id);
+    return this.serializePost(post, ownerStateMap.get(post.id), avatarContext);
   }
 
   async createPost(input: {
@@ -757,6 +767,22 @@ export class FeedService implements OnModuleInit {
       type: 'like',
       incrementColumn: 'likeCount',
     });
+  }
+
+  async unlikeOwnerPost(postId: string): Promise<void> {
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const existing = await this.interactionRepo.findOneBy({
+      ownerId: owner.id,
+      postId,
+      type: 'like',
+    });
+
+    if (!existing) {
+      return;
+    }
+
+    await this.interactionRepo.delete(existing.id);
+    await this.decrementPostCounter(postId, 'likeCount');
   }
 
   async favoriteOwnerPost(postId: string): Promise<void> {

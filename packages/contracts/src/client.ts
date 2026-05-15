@@ -3460,6 +3460,16 @@ export function likeFeedPost(id: string, baseUrl?: string) {
   );
 }
 
+export function unlikeFeedPost(id: string, baseUrl?: string) {
+  return requestLegacyApi<void>(
+    `/feed/${id}/like`,
+    {
+      method: "DELETE",
+    },
+    baseUrl,
+  );
+}
+
 export function favoriteFeedPost(id: string, baseUrl?: string) {
   return requestLegacyApi<void>(
     `/feed/${id}/favorite`,

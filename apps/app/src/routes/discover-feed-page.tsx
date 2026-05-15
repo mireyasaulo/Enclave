@@ -29,6 +29,7 @@ import {
   getFeed,
   likeFeedPost,
   replyFeedComment,
+  unlikeFeedPost,
   type FeedAuthorType,
   type FeedComment,
   type FeedListResponse,
@@ -296,7 +297,17 @@ export function DiscoverFeedPage() {
   });
 
   const likeMutation = useMutation({
-    mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
+    // 微信样式气泡的「赞 / 取消」必须真双向：原本只 POST /feed/:id/like，
+    // bubble 上「取消」按下后没有 unlike 端点 → 后端 INSERT OR IGNORE 静默忽略，
+    // 用户看到 toast 成功但红心和计数没变。改成根据当前 hasLiked 状态走
+    // POST 或 DELETE。
+    mutationFn: (postId: string) => {
+      const currentPost = feedPosts.find((post) => post.id === postId);
+      const alreadyLiked = currentPost?.ownerState?.hasLiked ?? false;
+      return alreadyLiked
+        ? unlikeFeedPost(postId, baseUrl)
+        : likeFeedPost(postId, baseUrl);
+    },
     onMutate: async (postId) => {
       await queryClient.cancelQueries({ queryKey: ["app-feed-paged", baseUrl] });
       const snapshots = queryClient.getQueriesData<
@@ -312,28 +323,31 @@ export function DiscoverFeedPage() {
           ...data,
           pages: data.pages.map((page) => ({
             ...page,
-            posts: page.posts.map((post) =>
-              post.id === postId && !post.ownerState?.hasLiked
-                ? {
-                    ...post,
-                    likeCount: post.likeCount + 1,
-                    ownerState: {
-                      ...(post.ownerState ?? {
-                        hasLiked: false,
-                        hasFavorited: false,
-                        isFollowingAuthor: false,
-                        isNotInterested: false,
-                        hasViewed: false,
-                        hasShared: false,
-                        lastViewedAt: null,
-                        watchProgressSeconds: null,
-                        completed: false,
-                      }),
-                      hasLiked: true,
-                    },
-                  }
-                : post,
-            ),
+            posts: page.posts.map((post) => {
+              if (post.id !== postId) return post;
+              const alreadyLiked = post.ownerState?.hasLiked ?? false;
+              return {
+                ...post,
+                likeCount: Math.max(
+                  0,
+                  post.likeCount + (alreadyLiked ? -1 : 1),
+                ),
+                ownerState: {
+                  ...(post.ownerState ?? {
+                    hasLiked: false,
+                    hasFavorited: false,
+                    isFollowingAuthor: false,
+                    isNotInterested: false,
+                    hasViewed: false,
+                    hasShared: false,
+                    lastViewedAt: null,
+                    watchProgressSeconds: null,
+                    completed: false,
+                  }),
+                  hasLiked: !alreadyLiked,
+                },
+              };
+            }),
           })),
         });
       });
