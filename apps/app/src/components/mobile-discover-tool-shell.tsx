@@ -137,6 +137,7 @@ export function MobileDiscoverToolShell({
             variant="ghost"
             size="icon"
             className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] hover:bg-black/5"
+            aria-label={t(msg`返回`)}
           >
             <ArrowLeft size={18} />
           </Button>
