@@ -49,6 +49,13 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
   const stageClearHandledAt = useRef<number | null>(null);
   const gameOverSavedRef = useRef(false);
 
+  // 调用方每次 render 都会传新的 `getSprites: () => spritesRef.current` 字面量，
+  // 如果 RAF effect deps 直接读 opts.getSprites，每个 setHud (120ms) 都会
+  // cancel + restart RAF，frame 卡顿且 lastTs 漂移。把 opts 缓在 ref 里，RAF
+  // effect 走空 deps 只跑一次。
+  const optsRef = useRef(opts);
+  optsRef.current = opts;
+
   const [hud, setHud] = useState<HudSnapshot>(() =>
     snapshot(worldRef.current, persistRef.current),
   );
@@ -70,7 +77,7 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
     const loop = (ts: number) => {
       lastTs = ts;
       const world = worldRef.current;
-      const sheet = opts.getSprites();
+      const sheet = optsRef.current.getSprites();
       // tick when playing
       tick(world, inputRef.current, sfxRef.current);
 
@@ -108,7 +115,7 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
         gameOverSavedRef.current = false;
       }
 
-      const canvas = opts.canvasRef.current;
+      const canvas = optsRef.current.canvasRef.current;
       if (canvas && sheet) {
         const ctx = canvas.getContext("2d", { alpha: false });
         if (ctx) {
@@ -127,7 +134,7 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
       }
     };
     void lastTs;
-  }, [opts.canvasRef, opts.getSprites]);
+  }, []);
 
   // HUD 投影 — 每 120ms 拍一次快照
   useEffect(() => {
