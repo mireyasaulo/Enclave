@@ -284,7 +284,10 @@ export function GamesPage() {
   const myGames =
     recentGames.length > 0 ? recentGames : featuredGames.slice(0, 6);
   const bannerGame = featuredGames[0] ?? selectedGame;
-  const featuredRest = featuredGames.slice(1);
+  // 当「我的游戏」改用 recents 接管时，featured[0]（隐界农场）也得在「精选小游戏」里露面，
+  // 否则它会从整张移动端列表上消失。
+  const featuredRest =
+    recentGames.length > 0 ? featuredGames : featuredGames.slice(1);
 
   function handleLaunchGame(gameId: string) {
     const game = getGameCenterGame(gameId);

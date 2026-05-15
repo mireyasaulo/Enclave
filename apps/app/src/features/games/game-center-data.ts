@@ -368,21 +368,31 @@ export const gameCenterHotRankings: GameCenterRankingEntry[] = [
     gameId: "pixel-arena",
     note: t(msg`双人同屏模式让社交传播继续放大。`),
   },
+  {
+    rank: 4,
+    gameId: "cloud-farm",
+    note: t(msg`花圃联营开放后回访稳定增长。`),
+  },
 ];
 
 export const gameCenterNewRankings: GameCenterRankingEntry[] = [
   {
     rank: 1,
+    gameId: "tank-war",
+    note: t(msg`FC 经典 35 关像素级完整复刻，桌面双人键位首发。`),
+  },
+  {
+    rank: 2,
     gameId: "cat-inn",
     note: t(msg`治愈感和布置玩法带动收藏率。`),
   },
   {
-    rank: 2,
+    rank: 3,
     gameId: "forest-train",
     note: t(msg`支线站点更新后回访率提升。`),
   },
   {
-    rank: 3,
+    rank: 4,
     gameId: "island-concert",
     note: t(msg`周末派对活动带来新一轮曝光。`),
   },

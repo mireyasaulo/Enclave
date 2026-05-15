@@ -73,7 +73,10 @@ export function DesktopGamesWorkspace({
   const recentGames = resolveGames(recentGameIds);
   const myGames =
     recentGames.length > 0 ? recentGames : featuredGames.slice(0, 6);
-  const featuredRest = featuredGames.slice(1);
+  // 当「我的游戏」用 recents 接管时，featured[0]（隐界农场）不再出现在「我的游戏」里，
+  // 此时「精选小游戏」需要把整份 featured 都展出来，否则 featured[0] 会从侧栏整段消失。
+  const featuredRest =
+    recentGames.length > 0 ? featuredGames : featuredGames.slice(1);
   const detailFriends = gameCenterFriendActivities.filter(
     (activity) => activity.gameId === selectedGame.id,
   );
