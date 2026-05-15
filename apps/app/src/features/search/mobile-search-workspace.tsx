@@ -360,6 +360,11 @@ export function MobileSearchWorkspace({
                 <Sparkles size={15} className="text-[#15803d]" />
                 <span>{t(msg`当前可搜索范围`)}</span>
               </div>
+              {/* 小程序 chip 命中是 ComingSoonOverlay「功能开发中」，但这里之前
+                  还把 scopeCounts.miniPrograms（已索引的小程序条目数）当
+                  「可搜索」给挂出来——一边写"可搜索范围"一边显示 10 条，跟
+                  overlay 矛盾。索性从可搜索范围里拿掉；剩下 6 项 2×3 grid 也
+                  能整齐填满，不会再出现"广场动态"独占最后一行的视觉断尾。 */}
               <div className="mt-2.5 grid grid-cols-2 gap-2.5 text-[11px] text-[color:var(--text-secondary)]">
                 <ScopeStat
                   label={t(msg`会话`)}
@@ -370,10 +375,6 @@ export function MobileSearchWorkspace({
                 <ScopeStat
                   label={t(msg`公众号`)}
                   value={`${scopeCounts.officialAccounts}`}
-                />
-                <ScopeStat
-                  label={t(msg`小程序`)}
-                  value={`${scopeCounts.miniPrograms}`}
                 />
                 <ScopeStat label={t(msg`朋友圈`)} value={`${scopeCounts.moments}`} />
                 <ScopeStat label={t(msg`广场动态`)} value={`${scopeCounts.feed}`} />
