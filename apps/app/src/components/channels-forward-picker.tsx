@@ -3,6 +3,7 @@ import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  SELF_CHARACTER_ID,
   forwardFeedPostToChat,
   getFriends,
   type FriendListItem,
@@ -80,11 +81,15 @@ export function ChannelsForwardPicker({
 
   const friendList: FriendListItem[] = useMemo(() => {
     const rows = friendsQuery.data ?? [];
-    return [...rows].sort((a, b) => {
-      const aAt = a.friendship.lastInteractedAt ?? a.friendship.createdAt;
-      const bAt = b.friendship.lastInteractedAt ?? b.friendship.createdAt;
-      return new Date(bAt).getTime() - new Date(aAt).getTime();
-    });
+    return [...rows]
+      // 「我自己」是用户的代理角色，转发视频号到「与自己的私聊」语义上没意义，
+      // 而且会污染该 conversation。按 SELF_CHARACTER_ID 过掉。
+      .filter((row) => row.character.id !== SELF_CHARACTER_ID)
+      .sort((a, b) => {
+        const aAt = a.friendship.lastInteractedAt ?? a.friendship.createdAt;
+        const bAt = b.friendship.lastInteractedAt ?? b.friendship.createdAt;
+        return new Date(bAt).getTime() - new Date(aAt).getTime();
+      });
   }, [friendsQuery.data]);
 
   async function handlePick(target: FriendListItem) {

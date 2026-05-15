@@ -536,6 +536,7 @@ function ForwardNotice({
 
 function ChannelActionButton({
   active = false,
+  ariaLabel,
   icon,
   label,
   pending = false,
@@ -543,6 +544,9 @@ function ChannelActionButton({
   onClick,
 }: {
   active?: boolean;
+  // 可视 label 只是计数数字（"17"、"29"），屏读出来就一个数字毫无上下文。
+  // 调用方传 ariaLabel 才能让屏读读出"点赞，当前 17 赞"这种完整意图。
+  ariaLabel?: string;
   icon: ReactNode;
   label: string;
   pending?: boolean;
@@ -554,6 +558,7 @@ function ChannelActionButton({
     <button
       type="button"
       aria-pressed={active}
+      aria-label={ariaLabel}
       disabled={pending}
       onClick={onClick}
       className={cn(
@@ -897,6 +902,11 @@ function ChannelFeedSlide({
             surface="dark"
             icon={<ThumbsUp size={18} />}
             label={`${post.likeCount}`}
+            ariaLabel={
+              post.ownerState?.hasLiked
+                ? t(msg`已点赞，当前 ${post.likeCount} 赞`)
+                : t(msg`点赞，当前 ${post.likeCount} 赞`)
+            }
             active={Boolean(post.ownerState?.hasLiked)}
             pending={likePending}
             onClick={onLike}
@@ -905,6 +915,7 @@ function ChannelFeedSlide({
             surface="dark"
             icon={<MessageCircleMore size={18} />}
             label={`${post.commentCount}`}
+            ariaLabel={t(msg`打开评论，当前 ${post.commentCount} 条`)}
             onClick={onToggleCommentDrawer}
           />
           <ChannelActionButton
@@ -1208,14 +1219,9 @@ function DesktopChannelAuthorPanel({
                 {profile.isFollowing ? t(msg`已关注`) : t(msg`+关注`)}
               </Button>
             ) : null}
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={!selectedPostId}
-              onClick={onClose}
-            >
-              {t(msg`当前内容`)}
-            </Button>
+            {/* 原来这里还有一个 "当前内容" 按钮 onClick={onClose}，跟头部的
+                "回到内容" 完全是同一件事——只是 disabled 多挡了 selectedPostId
+                null 这条边界。两个按钮跳同一个 close 操作没意义，删一个。 */}
           </div>
 
           <div className="mt-5">
@@ -1248,9 +1254,21 @@ function DesktopChannelAuthorPanel({
                             : t(msg`动态`)}
                       </span>
                     </div>
-                    <div className="mt-2 line-clamp-2 text-xs leading-6 text-[color:var(--text-secondary)]">
-                      {post.text}
-                    </div>
+                    {(() => {
+                      // audio post 后端常把 title 和 text 都填成 "X·音乐"，
+                      // recent posts list 里 title 已经在上面渲染了一遍，再渲染
+                      // 一遍 text 就是重复——和 slide overlay / mobile card 那两处
+                      // 一样处理。
+                      const cleanText = stripToolCallSyntax(post.text ?? "");
+                      if (!cleanText || cleanText === post.title) {
+                        return null;
+                      }
+                      return (
+                        <div className="mt-2 line-clamp-2 text-xs leading-6 text-[color:var(--text-secondary)]">
+                          {cleanText}
+                        </div>
+                      );
+                    })()}
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
                       <span>{formatTimestamp(post.createdAt)}</span>
                       <span>·</span>
@@ -1335,6 +1353,15 @@ function DesktopChannelCommentsPanel({
 }) {
   const t = useRuntimeTranslator();
   const selectedPostId = selectedPost?.id ?? null;
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  // 打开评论抽屉 / 点 "回复 X" 时，把焦点送到 input——和移动端 sheet 的处理
+  // 一致（commit 2090+），用户开了抽屉就能直接敲字。
+  useEffect(() => {
+    if (!selectedPostId) return;
+    window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }, [selectedPostId, replyTarget?.commentId]);
   const commentAuthorNameMap = useMemo(() => {
     const map = new Map<string, string>();
     comments.forEach((comment) => {
@@ -1567,8 +1594,24 @@ function DesktopChannelCommentsPanel({
         ) : null}
         <div className="flex items-center gap-2">
           <TextField
+            ref={inputRef}
             value={draft}
             onChange={(event) => onDraftChange(event.target.value)}
+            // Enter 直接发——评论 input 是单行 TextField，不存在多行换行，没必要
+            // 强迫用户手离开键盘去点"发送"。IME composing 时回车是确认候选词，
+            // 别误判成发送。
+            onKeyDown={(event) => {
+              if (event.key !== "Enter") return;
+              if (event.shiftKey) return;
+              if (
+                (event.nativeEvent as { isComposing?: boolean }).isComposing
+              ) {
+                return;
+              }
+              if (!selectedPost || !draft.trim() || submitPending) return;
+              event.preventDefault();
+              onSubmit();
+            }}
             placeholder={
               replyTarget
                 ? t(msg`回复 ${replyTarget.authorName}...`)

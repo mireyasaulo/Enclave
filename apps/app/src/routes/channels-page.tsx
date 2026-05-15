@@ -296,6 +296,53 @@ export function ChannelsPage() {
       input.favorited
         ? unfavoriteFeedPost(input.postId, baseUrl)
         : favoriteFeedPost(input.postId, baseUrl),
+    // optimistic：和点赞 / 关注的处理同一套路。本地 favorites 入口（toggleFavorite
+    // 里调的 upsertDesktopFavorite）原来已经立刻反映，但 slide 上的收藏按钮要等
+    // home 重拉才翻状态，看着像是"按钮没响应"。
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      const snapshots = queryClient.getQueriesData<FeedChannelHomeResponse>({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) return;
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...data,
+          posts: data.posts.map((post) =>
+            post.id === input.postId
+              ? {
+                  ...post,
+                  favoriteCount: input.favorited
+                    ? Math.max(0, post.favoriteCount - 1)
+                    : post.favoriteCount + 1,
+                  ownerState: {
+                    ...(post.ownerState ?? {
+                      hasLiked: false,
+                      hasFavorited: false,
+                      isFollowingAuthor: false,
+                      isNotInterested: false,
+                      hasViewed: false,
+                      hasShared: false,
+                      lastViewedAt: null,
+                      watchProgressSeconds: null,
+                      completed: false,
+                    }),
+                    hasFavorited: !input.favorited,
+                  },
+                }
+              : post,
+          ),
+        });
+      });
+      return { snapshots };
+    },
+    onError: (_error, _input, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
     onSuccess: async (_, input) => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
