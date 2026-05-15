@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { ArrowLeft, Check, ChevronRight } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, Languages, ShieldCheck } from "lucide-react";
 import {
   clearWorldOwnerApiKey,
   getWorldOwner,
@@ -333,6 +333,9 @@ export function ProfileSettingsPage() {
             }
             className="flex w-full items-center gap-2.5 px-4 py-2.75 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] active:bg-black/[0.04]"
           >
+            <div className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-[9px] bg-[rgba(56,189,248,0.12)] text-[#0891b2]">
+              <Languages size={15} />
+            </div>
             <div className="min-w-0 flex-1 text-[14px] text-[color:var(--text-primary)]">
               {t(msg`多语言`)}
             </div>
@@ -355,6 +358,9 @@ export function ProfileSettingsPage() {
               }
               className="flex w-full items-center gap-2.5 border-t border-[color:var(--border-faint)] px-4 py-2.75 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] active:bg-black/[0.04]"
             >
+              <div className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-[9px] bg-[rgba(64,169,255,0.12)] text-[#1677ff]">
+                <ShieldCheck size={15} />
+              </div>
               <div className="min-w-0 flex-1 text-[14px] text-[color:var(--text-primary)]">
                 {t(msg`账号安全`)}
               </div>

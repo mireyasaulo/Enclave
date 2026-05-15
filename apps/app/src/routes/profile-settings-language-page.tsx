@@ -85,7 +85,11 @@ export function ProfileSettingsLanguagePage() {
         <div className="px-4 pt-2 text-[11px] leading-5 text-[color:var(--text-muted)]">
           <Trans>正在切换语言...</Trans>
         </div>
-      ) : null}
+      ) : (
+        <div className="px-4 pt-3 text-[11px] leading-5 text-[color:var(--text-muted)]">
+          {t(msg`语言偏好保存在当前设备并立即生效，同时决定好友回复使用的语言。`)}
+        </div>
+      )}
     </AppPage>
   );
 }

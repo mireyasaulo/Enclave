@@ -195,7 +195,7 @@ export function AccountSecurityPanel() {
                   setCode(next);
                   setFeedback(null);
                 }}
-                placeholder={t(msg`请输入邮箱收到的 6 位验证码`)}
+                placeholder={t(msg`6 位数字`)}
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 maxLength={6}
