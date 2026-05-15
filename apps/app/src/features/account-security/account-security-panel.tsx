@@ -179,7 +179,7 @@ export function AccountSecurityPanel() {
         }}
       >
         <label className="block space-y-2">
-          <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+          <span className="text-[12px] font-medium text-[color:var(--text-secondary)]">
             {t(msg`邮箱验证码`)}
           </span>
           <div className="flex items-center gap-3">
@@ -223,7 +223,7 @@ export function AccountSecurityPanel() {
         </label>
 
         <label className="block space-y-2">
-          <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+          <span className="text-[12px] font-medium text-[color:var(--text-secondary)]">
             {t(msg`新密码`)}
           </span>
           <TextField
@@ -240,7 +240,7 @@ export function AccountSecurityPanel() {
         </label>
 
         <label className="block space-y-2">
-          <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+          <span className="text-[12px] font-medium text-[color:var(--text-secondary)]">
             {t(msg`确认新密码`)}
           </span>
           <TextField
