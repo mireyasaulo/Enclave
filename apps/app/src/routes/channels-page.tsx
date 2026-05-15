@@ -290,6 +290,19 @@ export function ChannelsPage() {
         queryKey: ["app-channels-home", baseUrl],
       });
     },
+    onError: (err) => {
+      // 网络/服务端错误不要冒到顶层的 errorMessage——那会让整个 home
+      // 切到 "视频号暂时不可用" 状态卡，但实际推荐流仍然能拉到。改成
+      // info 风格的轻量通知，2.4s 自动消失。
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNoticeTone("info");
+      setNotice(
+        err instanceof Error
+          ? t(msg`换一批失败：${err.message}`)
+          : t(msg`换一批失败，请稍后重试。`),
+      );
+    },
   });
   const favoriteMutation = useMutation({
     mutationFn: (input: { postId: string; favorited: boolean }) =>
@@ -554,9 +567,9 @@ export function ChannelsPage() {
     notInterestedMutation.error instanceof Error
       ? notInterestedMutation.error.message
       : null) ??
-    (generateMutation.isError && generateMutation.error instanceof Error
-      ? generateMutation.error.message
-      : null) ??
+    // 注意：generateMutation.isError 不要进这里——它会让"视频号暂时不可用"
+    // 大状态卡冒出来盖住下面的推荐流（home 数据其实拉到了）。换一批
+    // 自己的失败已经在 generateMutation.onError 里走 setNotice 轻量提示。
     (desktopMissingRoutePostId &&
     desktopMissingRoutePostQuery.isError &&
     desktopMissingRoutePostQuery.error instanceof Error
@@ -1159,7 +1172,9 @@ export function ChannelsPage() {
             className="rounded-[11px] px-2.5 py-1.5 text-[11px] leading-[1.35rem] shadow-none"
             tone={noticeTone}
           >
-            {noticeTone === "info" ? (
+            {noticeTone === "info" &&
+            (Boolean(noticeAction && noticeActionLabel) ||
+              Boolean(safeReturnPath)) ? (
               <div className="flex items-center justify-between gap-2">
                 <span className="min-w-0 flex-1">{notice}</span>
                 <div className="flex items-center gap-1.5">
@@ -1172,13 +1187,19 @@ export function ChannelsPage() {
                       {noticeActionLabel}
                     </button>
                   ) : null}
-                  <button
-                    type="button"
-                    onClick={handleStatusBack}
-                    className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
-                  >
-                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
-                  </button>
+                  {safeReturnPath ? (
+                    // 只在确实有"上一页"可返回时显示这个按钮；之前一律 fallback 到
+                    // "重试读取" 调 handleStatusBack（refetch home），但对像
+                    // "视频号生成额度今日已用完" 这种 info 通知毫无意义——重读
+                    // home 也不会让额度回来，反而让用户以为可以"再试一次"。
+                    <button
+                      type="button"
+                      onClick={handleStatusBack}
+                      className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
+                    >
+                      {t(msg`返回上一页`)}
+                    </button>
+                  ) : null}
                 </div>
               </div>
             ) : (
