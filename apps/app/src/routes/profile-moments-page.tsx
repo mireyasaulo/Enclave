@@ -42,6 +42,7 @@ import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
+import { consumeMomentPublishFlash } from "../features/moments/moment-publish-flash";
 import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { buildMobileMomentsPublishRouteHash } from "../features/moments/mobile-moments-publish-route-state";
 import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
@@ -301,6 +302,18 @@ export function ProfileMomentsPage() {
     const timer = window.setTimeout(() => setNotice(null), 2400);
     return () => window.clearTimeout(timer);
   }, [notice]);
+
+  // 从 /discover/moments/publish 走 returnPath=/profile/moments 回到本页时，
+  // 发布页只往 sessionStorage 塞 flash 不会自己跳 toast。本页之前不消费——
+  // 用户在「我的朋友圈」点相机发完一条，落地这里既看不到「朋友圈已发布」
+  // 提示，sessionStorage 里这条 flash 也会留到下次进 /discover/moments 才被
+  // 错位消费（用户那时候并没刚发，反而冒出来很突兀）。
+  useEffect(() => {
+    const flash = consumeMomentPublishFlash();
+    if (flash) {
+      setNotice({ tone: "success", message: flash });
+    }
+  }, [baseUrl]);
 
   useEffect(() => {
     if (!isDesktopLayout) return;
