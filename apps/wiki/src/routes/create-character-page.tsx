@@ -4,7 +4,10 @@ import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
+import {
+  isCustomRelationshipType,
+  type CharacterBlueprintRecipe,
+} from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppSection,
@@ -42,7 +45,8 @@ export function CreateCharacterPage() {
   const [relationship, setRelationship] = useState(() =>
     t(msg`世界角色`),
   );
-  const [relationshipType, setRelationshipType] = useState("custom");
+  const [relationshipType, setRelationshipType] = useState("friend");
+  const relationshipTypeIsCustom = isCustomRelationshipType(relationshipType);
   const [bio, setBio] = useState("");
   const [personality, setPersonality] = useState("");
   const [expertDomains, setExpertDomains] = useState("general");
@@ -96,6 +100,8 @@ export function CreateCharacterPage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // 防御：选了自定义但没填字符串（绕过 HTML required）→ 拒绝提交
+    if (relationshipTypeIsCustom && !relationshipType.trim()) return;
     createMut.mutate();
   }
 
@@ -153,16 +159,11 @@ export function CreateCharacterPage() {
             <FormRow label={t(msg`关系类型`)} required>
               <SelectField
                 required
-                value={
-                  RELATIONSHIP_TYPE_OPTIONS.some(
-                    (o) => o.value === relationshipType,
-                  )
-                    ? relationshipType
-                    : "custom"
-                }
-                onChange={(event) =>
-                  setRelationshipType(event.target.value)
-                }
+                value={relationshipTypeIsCustom ? "custom" : relationshipType}
+                onChange={(event) => {
+                  const next = event.target.value;
+                  setRelationshipType(next === "custom" ? "" : next);
+                }}
               >
                 {RELATIONSHIP_TYPE_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -170,6 +171,16 @@ export function CreateCharacterPage() {
                   </option>
                 ))}
               </SelectField>
+              {relationshipTypeIsCustom && (
+                <TextField
+                  required
+                  maxLength={15}
+                  placeholder={t(msg`填一个具体的关系，例如 师傅 / 房东 / 邻居`)}
+                  value={relationshipType}
+                  onChange={(event) => setRelationshipType(event.target.value)}
+                  className="mt-2"
+                />
+              )}
             </FormRow>
           </div>
           <FormRow label={t(msg`角色简介`)} required>

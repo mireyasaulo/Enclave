@@ -11,7 +11,22 @@ export type RelationshipType =
   | "expert"
   | "mentor"
   | "custom"
-  | "self";
+  | "self"
+  | (string & {});
+
+// 关系类型预设：固定的几个枚举值。任何不在这里且不等于 "self" 的字符串都是
+// 用户在「自定义」输入框里填写的（如 "师傅" / "房东" / "邻居"），存表时直接
+// 落到 relationshipType 字段。"custom" 是 UI 上的哨兵值，不应作为最终存储值。
+export const RELATIONSHIP_TYPE_PRESETS = [
+  "friend",
+  "family",
+  "mentor",
+  "expert",
+] as const;
+export function isCustomRelationshipType(value: string): boolean {
+  if (value === "self") return false;
+  return !(RELATIONSHIP_TYPE_PRESETS as readonly string[]).includes(value);
+}
 export type CharacterSourceType =
   | "default_seed"
   | "preset_catalog"

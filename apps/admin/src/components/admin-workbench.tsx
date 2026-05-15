@@ -956,6 +956,7 @@ export function AdminTextField({
   type = "text",
   min,
   max,
+  maxLength,
   list,
   disabled,
   className,
@@ -967,6 +968,7 @@ export function AdminTextField({
   type?: string;
   min?: number;
   max?: number;
+  maxLength?: number;
   list?: string;
   disabled?: boolean;
   className?: string;
@@ -983,6 +985,7 @@ export function AdminTextField({
         type={type}
         min={min}
         max={max}
+        maxLength={maxLength}
         list={list}
         disabled={disabled}
       />

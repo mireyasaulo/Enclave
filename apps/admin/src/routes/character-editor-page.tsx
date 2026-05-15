@@ -6,6 +6,7 @@ import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   createCharacter,
   getCharacter,
+  isCustomRelationshipType,
   updateCharacter,
   type Character,
   type CharacterDraft,
@@ -564,26 +565,54 @@ export function CharacterEditorPage() {
                 setDraft((current) => ({ ...current, relationship: value }))
               }
             />
-            <SelectField
-              label={t(msg`关系类型`)}
-              value={draft.relationshipType ?? "expert"}
-              onChange={(value) =>
-                setDraft((current) => ({
-                  ...current,
-                  relationshipType: value as Character["relationshipType"],
-                }))
-              }
-              options={[
-                ...(draft.relationshipType === "self"
-                  ? [{ value: "self", label: t(msg`自己`) }]
-                  : []),
-                { value: "family", label: t(msg`家人`) },
-                { value: "friend", label: t(msg`朋友`) },
-                { value: "expert", label: t(msg`专家`) },
-                { value: "mentor", label: t(msg`导师`) },
-                { value: "custom", label: t(msg`自定义`) },
-              ]}
-            />
+            <div className="space-y-2">
+              <SelectField
+                label={t(msg`关系类型`)}
+                value={
+                  isCustomRelationshipType(draft.relationshipType ?? "expert")
+                    ? "custom"
+                    : draft.relationshipType ?? "expert"
+                }
+                onChange={(value) =>
+                  setDraft((current) => ({
+                    ...current,
+                    // 选「自定义」清空 relationshipType，等用户在下方输入框填具体值
+                    relationshipType:
+                      value === "custom"
+                        ? ("" as Character["relationshipType"])
+                        : (value as Character["relationshipType"]),
+                  }))
+                }
+                options={[
+                  ...(draft.relationshipType === "self"
+                    ? [{ value: "self", label: t(msg`自己`) }]
+                    : []),
+                  { value: "family", label: t(msg`家人`) },
+                  { value: "friend", label: t(msg`朋友`) },
+                  { value: "expert", label: t(msg`专家`) },
+                  { value: "mentor", label: t(msg`导师`) },
+                  { value: "custom", label: t(msg`自定义`) },
+                ]}
+              />
+              {isCustomRelationshipType(draft.relationshipType ?? "") && (
+                <Field
+                  label={t(msg`自定义关系类型`)}
+                  placeholder={t(msg`例如 师傅 / 房东 / 邻居`)}
+                  maxLength={15}
+                  value={
+                    draft.relationshipType === "custom"
+                      ? ""
+                      : draft.relationshipType ?? ""
+                  }
+                  onChange={(value) =>
+                    setDraft((current) => ({
+                      ...current,
+                      relationshipType: value as Character["relationshipType"],
+                    }))
+                  }
+                />
+              )}
+            </div>
             <Field
               label={t(msg`擅长领域`)}
               value={listToCsv(draft.expertDomains)}

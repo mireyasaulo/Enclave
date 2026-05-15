@@ -7,7 +7,7 @@ import type {
   CharacterBlueprintRevision,
   CharacterFactorySnapshot,
 } from "@yinjie/contracts";
-import { getSystemStatus } from "@yinjie/contracts";
+import { getSystemStatus, isCustomRelationshipType } from "@yinjie/contracts";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
@@ -508,27 +508,55 @@ export function CharacterFactoryPage() {
                     }))
                   }
                 />
-                <SelectFieldBlock
-                  label={t(msg`关系类型`)}
-                  value={draft.identity.relationshipType}
-                  onChange={(value) =>
-                    patchDraft((current) => ({
-                      ...current,
-                      identity: {
-                        ...current.identity,
-                        relationshipType: value,
-                      },
-                    }))
-                  }
-                  options={[
-                    { value: "family", label: t(msg`家人`) },
-                    { value: "friend", label: t(msg`朋友`) },
-                    { value: "expert", label: t(msg`专家`) },
-                    { value: "mentor", label: t(msg`导师`) },
-                    { value: "custom", label: t(msg`自定义`) },
-                    { value: "self", label: t(msg`自己`) },
-                  ]}
-                />
+                <div className="space-y-2">
+                  <SelectFieldBlock
+                    label={t(msg`关系类型`)}
+                    value={
+                      isCustomRelationshipType(draft.identity.relationshipType)
+                        ? "custom"
+                        : draft.identity.relationshipType
+                    }
+                    onChange={(value) =>
+                      patchDraft((current) => ({
+                        ...current,
+                        identity: {
+                          ...current.identity,
+                          // 选「自定义」清空 relationshipType，等待用户在下方输入框填具体值
+                          relationshipType: value === "custom" ? "" : value,
+                        },
+                      }))
+                    }
+                    options={[
+                      { value: "family", label: t(msg`家人`) },
+                      { value: "friend", label: t(msg`朋友`) },
+                      { value: "expert", label: t(msg`专家`) },
+                      { value: "mentor", label: t(msg`导师`) },
+                      { value: "custom", label: t(msg`自定义`) },
+                      { value: "self", label: t(msg`自己`) },
+                    ]}
+                  />
+                  {isCustomRelationshipType(draft.identity.relationshipType) && (
+                    <FieldBlock
+                      label={t(msg`自定义关系类型`)}
+                      placeholder={t(msg`例如 师傅 / 房东 / 邻居`)}
+                      maxLength={15}
+                      value={
+                        draft.identity.relationshipType === "custom"
+                          ? ""
+                          : draft.identity.relationshipType
+                      }
+                      onChange={(value) =>
+                        patchDraft((current) => ({
+                          ...current,
+                          identity: {
+                            ...current.identity,
+                            relationshipType: value,
+                          },
+                        }))
+                      }
+                    />
+                  )}
+                </div>
                 <FieldBlock
                   label={t(msg`头像`)}
                   value={draft.identity.avatar}
