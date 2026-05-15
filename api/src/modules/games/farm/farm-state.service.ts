@@ -142,7 +142,12 @@ export class FarmStateService {
         legacyMessage: '田块不存在',
       });
     }
-    if (plot.stage !== 'empty' && plot.stage !== 'rotten') {
+    // refresh plot stage based on current time before deciding plantability.
+    // 持久化的 stage 只会在 plant 时写入（一般是 'seed'），后续靠 toPlayerView 时
+    // 调 refreshPlotStage 计算成 ripe/rotten。如果直接拿 plotsPayload.stage 比对，
+    // 一块早已腐烂的田会停留在 'seed'，导致前端能看到「已腐烂」按钮但服务端拒绝重新种植。
+    const refreshed = refreshPlotStage(plot, Date.now());
+    if (refreshed.stage !== 'empty' && refreshed.stage !== 'rotten') {
       throw new AppError('FARM_PLOT_NOT_PLANTABLE', {
         legacyMessage: '该田块当前不能种植',
       });
