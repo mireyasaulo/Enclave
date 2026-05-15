@@ -304,7 +304,7 @@ export function GamesPage() {
     setNoticeTone("success");
     const launchedName = game?.name ?? t(msg`该游戏`);
     setSuccessNotice(
-      t(msg`${launchedName} 已加入最近玩过。首期先以游戏中心内容工作区承接，后续再接小游戏容器。`),
+      t(msg`${launchedName} 已加入最近玩过，正在准备入口。`),
     );
   }
 
