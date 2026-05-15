@@ -212,6 +212,23 @@ export function DesktopSearchWorkspace({
   const normalizedCommittedKeyword = trimmedCommittedKeyword.toLowerCase();
   const normalizedKeyword = normalizedCommittedKeyword;
   const searchPending = normalizedInputKeyword !== normalizedCommittedKeyword;
+  // 桌面端把 miniPrograms / officialAccounts 这两个分区藏起来（landing scope
+  // cards / 分类 chip / 全部视图分区都过滤）；这里把过滤后的 grouped / visible
+  // 作为单一来源，否则 sticky context bar 的分区 chip、"全部"chip 计数、键盘
+  // 导航、auto-select 都会引到不渲染的隐藏分区，体感是「点了没反应 / 计数对不
+  // 上 / 焦点静默消失」。
+  const desktopGroupedResults = useMemo(
+    () =>
+      groupedResults.filter((section) => !isDesktopHiddenCategory(section.category)),
+    [groupedResults],
+  );
+  const desktopVisibleResults = useMemo(
+    () =>
+      activeCategory === "all"
+        ? visibleResults.filter((item) => !isDesktopHiddenCategory(item.category))
+        : visibleResults,
+    [activeCategory, visibleResults],
+  );
   const groupedMessageHeaderIds = useMemo(
     () => new Set(messageGroups.map((item) => item.header.id)),
     [messageGroups],
@@ -243,7 +260,7 @@ export function DesktopSearchWorkspace({
   );
   const allResultPreviewSections = useMemo(
     () =>
-      groupedResults.map((section) => {
+      desktopGroupedResults.map((section) => {
         const previewContentResults = isDesktopContentCategory(section.category)
           ? section.results.slice(0, 4)
           : [];
@@ -298,7 +315,7 @@ export function DesktopSearchWorkspace({
         };
       }),
     [
-      groupedResults,
+      desktopGroupedResults,
       messageConversationOnlyResults,
       messageGroups,
       officialAccountGroups,
@@ -413,7 +430,7 @@ export function DesktopSearchWorkspace({
 
     if (activeCategory === "all") {
       const preferredSectionCategory =
-        activeAllResultsSection ?? groupedResults[0]?.category ?? null;
+        activeAllResultsSection ?? desktopGroupedResults[0]?.category ?? null;
       const preferredEntry = preferredSectionCategory
         ? allResultPreviewSections.find(
             (entry) => entry.section.category === preferredSectionCategory,
@@ -450,7 +467,7 @@ export function DesktopSearchWorkspace({
     activeAllResultsSection,
     activeCategory,
     allResultPreviewSections,
-    groupedResults,
+    desktopGroupedResults,
     hasKeyword,
     keyboardNavigableResults,
     messageConversationOnlyResults,
@@ -582,15 +599,15 @@ export function DesktopSearchWorkspace({
     }
 
     const viewport = scrollViewportRef.current;
-    if (!viewport || !groupedResults.length) {
+    if (!viewport || !desktopGroupedResults.length) {
       return;
     }
 
     const viewportRect = viewport.getBoundingClientRect();
     const anchorTop = viewportRect.top + 220;
-    let nextCategory = groupedResults[0]?.category ?? null;
+    let nextCategory = desktopGroupedResults[0]?.category ?? null;
 
-    for (const section of groupedResults) {
+    for (const section of desktopGroupedResults) {
       const panel = allResultSectionRefs.current[section.category];
       if (!panel) {
         continue;
@@ -619,7 +636,7 @@ export function DesktopSearchWorkspace({
     }
 
     if (category === "all") {
-      return groupedResults[0]?.category ?? null;
+      return desktopGroupedResults[0]?.category ?? null;
     }
 
     return category;
@@ -757,16 +774,23 @@ export function DesktopSearchWorkspace({
   });
   const handleMoveCategoryChip = useEffectEvent(
     (category: SearchCategory, direction: -1 | 1) => {
-      const index = searchCategoryLabelDescriptors.findIndex((item) => item.id === category);
+      // 仅在桌面端可见的 chip 集合里循环移动，否则 arrow→ 会把焦点送到
+      // miniPrograms/officialAccounts 这种没渲染的 chip，下一帧失焦消失，
+      // 但 activeCategory 已经被切到隐藏分类、workspace 切到 drilldown
+      // 视图，体感是「箭头键随机跳页」。
+      const navigableChips = searchCategoryLabelDescriptors.filter(
+        (item) => !isDesktopHiddenCategory(item.id),
+      );
+      const index = navigableChips.findIndex((item) => item.id === category);
       if (index === -1) {
         return;
       }
 
       const nextIndex = Math.min(
         Math.max(index + direction, 0),
-        searchCategoryLabelDescriptors.length - 1,
+        navigableChips.length - 1,
       );
-      const nextCategory = searchCategoryLabelDescriptors[nextIndex]?.id;
+      const nextCategory = navigableChips[nextIndex]?.id;
       if (!nextCategory) {
         return;
       }
@@ -875,8 +899,10 @@ export function DesktopSearchWorkspace({
 
         if (event.key === "End") {
           event.preventDefault();
-          const lastCategory =
-            searchCategoryLabelDescriptors[searchCategoryLabelDescriptors.length - 1]?.id;
+          const navigableChips = searchCategoryLabelDescriptors.filter(
+            (item) => !isDesktopHiddenCategory(item.id),
+          );
+          const lastCategory = navigableChips[navigableChips.length - 1]?.id;
           if (!lastCategory) {
             return;
           }
@@ -997,10 +1023,10 @@ export function DesktopSearchWorkspace({
       return;
     }
 
-    setActiveAllResultsSection(groupedResults[0]?.category ?? null);
+    setActiveAllResultsSection(desktopGroupedResults[0]?.category ?? null);
   }, [
     activeCategory,
-    groupedResults,
+    desktopGroupedResults,
     hasKeyword,
     scrollAllResultsSectionIntoView,
     showPanelSpotlight,
@@ -1025,7 +1051,7 @@ export function DesktopSearchWorkspace({
     return () => {
       viewport.removeEventListener("scroll", handleScroll);
     };
-  }, [activeCategory, groupedResults, hasKeyword, syncActiveAllResultsSection]);
+  }, [activeCategory, desktopGroupedResults, hasKeyword, syncActiveAllResultsSection]);
 
   useEffect(() => {
     autoSelectResultRef.current = hasKeyword;
@@ -1142,15 +1168,12 @@ export function DesktopSearchWorkspace({
             )}
           >
             {searchCategoryLabelDescriptors
-              .filter(
-                (item) =>
-                  item.id !== "miniPrograms" && item.id !== "officialAccounts",
-              )
+              .filter((item) => !isDesktopHiddenCategory(item.id))
               .map((item) => {
               const countLabel = !hasKeyword
                 ? null
                 : item.id === "all"
-                  ? `${visibleResults.length}`
+                  ? `${desktopVisibleResults.length}`
                   : `${matchedCounts[item.id]}`;
 
               return (
@@ -1241,7 +1264,7 @@ export function DesktopSearchWorkspace({
             <DesktopSearchContextBar
               activeCategory={activeCategory}
               categoryTitle={contextCategoryTitle}
-              count={visibleResults.length}
+              count={desktopVisibleResults.length}
               keyword={keywordLabel}
               onBackToAll={
                 activeCategory === "all"
@@ -1257,7 +1280,7 @@ export function DesktopSearchWorkspace({
               }
               sectionItems={
                 activeCategory === "all"
-                  ? groupedResults.map((section) => ({
+                  ? desktopGroupedResults.map((section) => ({
                       category: section.category,
                       count: section.results.length,
                       label: getCategoryTitle(section.category),
@@ -1272,11 +1295,7 @@ export function DesktopSearchWorkspace({
             <div className="space-y-3">
               <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
                 {landingScopeCards
-                  .filter(
-                    (item) =>
-                      item.id !== "miniPrograms" &&
-                      item.id !== "officialAccounts",
-                  )
+                  .filter((item) => !isDesktopHiddenCategory(item.id))
                   .map((item) => {
                     const Icon = item.icon;
                     const count = getDesktopSearchScopeCount(
@@ -1341,7 +1360,7 @@ export function DesktopSearchWorkspace({
             </div>
           ) : null}
 
-          {!loading && !error && hasKeyword && !visibleResults.length ? (
+          {!loading && !error && hasKeyword && !desktopVisibleResults.length ? (
             <DesktopSearchStatusCard
               action={
                 <DesktopSearchActionButton
@@ -1360,13 +1379,7 @@ export function DesktopSearchWorkspace({
           {!loading && !error && hasKeyword ? (
             activeCategory === "all" ? (
               <div className="space-y-6">
-                {allResultPreviewSections
-                  .filter(
-                    (entry) =>
-                      entry.section.category !== "miniPrograms" &&
-                      entry.section.category !== "officialAccounts",
-                  )
-                  .map((entry) => {
+                {allResultPreviewSections.map((entry) => {
                     const { section } = entry;
                     return (
                       <DesktopSearchResultsPanel
@@ -2748,6 +2761,17 @@ function isDesktopContentCategory(
   category: SearchCategory | SearchResultCategory,
 ) {
   return category === "moments" || category === "feed";
+}
+
+// 桌面端目前把 miniPrograms / officialAccounts 这两个分类的入口藏起来（landing
+// scope cards / 顶部分类 chip / 全部视图分区都过滤），但 useSearchIndex 仍会
+// 算出对应结果。在 workspace 里凡是用来驱动「用户可见 / 可导航」的 derived
+// state（context bar、键盘导航、auto-select、空态判断、chip 计数）都要走过这
+// 个 helper，否则就会出现「点击没反应 / 焦点静默消失 / 计数对不上 / 全空白页」。
+function isDesktopHiddenCategory(
+  category: SearchCategory | SearchResultCategory,
+) {
+  return category === "miniPrograms" || category === "officialAccounts";
 }
 
 function isDesktopFeatureCardCategory(
