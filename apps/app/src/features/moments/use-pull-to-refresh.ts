@@ -41,7 +41,10 @@ type UsePullToRefreshResult = {
 // 直接读 ref 的 scrollTop 永远是 0 → handleTouchStart 的「我在不在顶」判定恒真
 // → 用户在列表中段下拉想上滑回顶时，pull-to-refresh 误判成「下拉刷新」，
 // touchmove preventDefault 把整段滚动锁死。
-// 这里向上找最近一个真正可滚动的祖先并把监听挂到它上面，scrollTop 也读它的。
+// 这里向上找最近一个真正可滚动的祖先，scrollTop 读它的就对了；监听仍挂在
+// containerRef 上，把生效范围限制在朋友圈内容区——避免 TabPageTopBar 上
+// 的轻微下拽手势误触发下拉动画（passive:false 的 touchmove 即使挂在
+// containerRef 上，preventDefault 一样会阻止祖先 scroller 的原生滚动）。
 function resolveScrollContainer(node: HTMLElement): HTMLElement {
   let candidate: HTMLElement | null = node.parentElement;
   while (candidate) {
@@ -195,17 +198,16 @@ export function usePullToRefresh({
   useEffect(() => {
     const node = containerRef.current;
     if (!node || !enabled) return;
-    const scroller = resolveScrollContainer(node);
-    scrollerRef.current = scroller;
-    scroller.addEventListener("touchstart", handleTouchStart, { passive: true });
-    scroller.addEventListener("touchmove", handleTouchMove, { passive: false });
-    scroller.addEventListener("touchend", handleTouchEnd);
-    scroller.addEventListener("touchcancel", handleTouchEnd);
+    scrollerRef.current = resolveScrollContainer(node);
+    node.addEventListener("touchstart", handleTouchStart, { passive: true });
+    node.addEventListener("touchmove", handleTouchMove, { passive: false });
+    node.addEventListener("touchend", handleTouchEnd);
+    node.addEventListener("touchcancel", handleTouchEnd);
     return () => {
-      scroller.removeEventListener("touchstart", handleTouchStart);
-      scroller.removeEventListener("touchmove", handleTouchMove);
-      scroller.removeEventListener("touchend", handleTouchEnd);
-      scroller.removeEventListener("touchcancel", handleTouchEnd);
+      node.removeEventListener("touchstart", handleTouchStart);
+      node.removeEventListener("touchmove", handleTouchMove);
+      node.removeEventListener("touchend", handleTouchEnd);
+      node.removeEventListener("touchcancel", handleTouchEnd);
       scrollerRef.current = null;
     };
   }, [enabled, handleTouchEnd, handleTouchMove, handleTouchStart]);
