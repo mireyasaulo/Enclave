@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import {
   type InfiniteData,
@@ -49,9 +49,21 @@ export function MobileMomentsPublishPage() {
   const resetComposeDraft = composeDraft.reset;
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [toast, setToast] = useState<string>("");
+
+  // textarea 高度跟内容长——原来 rows={4} 是死高，写长一点的朋友圈就只能在 4 行
+  // 的小框里内部滚动（手指在 textarea 里另起一个滚动事件，体感跟微信完全不一样）。
+  // 让它跟着 scrollHeight 长，最低 4 行（≈104px），最高 320px 后转内部滚动避免占满屏。
+  useLayoutEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    const next = Math.min(ta.scrollHeight, 320);
+    ta.style.height = `${next}px`;
+  }, [composeDraft.text]);
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -269,11 +281,13 @@ export function MobileMomentsPublishPage() {
 
         <section className="bg-white px-4 pt-4">
           <textarea
+            ref={textareaRef}
             value={composeDraft.text}
             onChange={(event) => composeDraft.setText(event.target.value)}
             placeholder={t(msg`这一刻的想法...`)}
             rows={4}
             className="block w-full resize-none border-0 bg-transparent text-[17px] leading-[26px] text-[#1A1A1A] outline-none placeholder:text-[#B0B0B0]"
+            style={{ minHeight: "104px" }}
             autoFocus
           />
 
