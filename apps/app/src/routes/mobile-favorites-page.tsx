@@ -108,11 +108,13 @@ export function MobileFavoritesPage({
     select: (state) => state.location.pathname,
   });
 
+  // contacts 暂未在 UI 任何位置接入 upsertDesktopFavorite，永远 0；
+  // 先不在筛选条里暴露，跟 desktop favorites-page 对齐（同样不展示）。
+  // FavoriteCategory.contacts 类型保留以便日后接入"收藏联系人"。
   const filters: Array<{ id: FilterId; label: string }> = [
     { id: "all", label: t(msg`全部`) },
     { id: "messages", label: t(msg`消息`) },
     { id: "notes", label: t(msg`笔记`) },
-    { id: "contacts", label: t(msg`联系人`) },
     { id: "officialAccounts", label: t(msg`公众号`) },
     { id: "moments", label: t(msg`朋友圈`) },
     { id: "feed", label: t(msg`广场动态`) },
