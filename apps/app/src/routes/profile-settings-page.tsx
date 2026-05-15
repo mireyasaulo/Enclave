@@ -607,24 +607,35 @@ export function ProfileSettingsPage() {
       {activeTab === "legal" ? (
         <SettingsSection
           title={t(msg`协议与规范`)}
-          description={t(msg`桌面端保留当前文档切换和独立打开入口。`)}
+          description={t(
+            msg`查看本世界的隐私政策、用户协议与社区规范，选中后可打开完整文档。`,
+          )}
         >
-          <div className="flex gap-1 rounded-[12px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-1">
-            {legalTabs.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveLegalTab(tab.id)}
-                className={cn(
-                  "flex-1 rounded-[10px] py-2 text-[12px] font-medium transition-all duration-[var(--motion-fast)]",
-                  activeLegalTab === tab.id
-                    ? "bg-white text-[color:var(--text-primary)] shadow-sm"
-                    : "text-[color:var(--text-muted)] hover:bg-white/70",
-                )}
-              >
-                {t(tab.label)}
-              </button>
-            ))}
+          <div
+            role="radiogroup"
+            aria-label={t(msg`协议与规范文档`)}
+            className="flex gap-1 rounded-[12px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-1"
+          >
+            {legalTabs.map((tab) => {
+              const selected = activeLegalTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => setActiveLegalTab(tab.id)}
+                  className={cn(
+                    "flex-1 rounded-[10px] py-2 text-[12px] font-medium transition-all duration-[var(--motion-fast)]",
+                    selected
+                      ? "bg-white text-[color:var(--text-primary)] shadow-sm"
+                      : "text-[color:var(--text-muted)] hover:bg-white/70",
+                  )}
+                >
+                  {t(tab.label)}
+                </button>
+              );
+            })}
           </div>
 
           <div className="space-y-3">
@@ -641,7 +652,11 @@ export function ProfileSettingsPage() {
                 })
               }
             >
-              {t(msg`打开当前文档`)}
+              {activeLegalTab === "privacy"
+                ? t(msg`打开隐私政策`)
+                : activeLegalTab === "terms"
+                  ? t(msg`打开用户协议`)
+                  : t(msg`打开社区规范`)}
             </Button>
             <InlineNotice tone="muted">
               {activeLegalTab === "privacy"
