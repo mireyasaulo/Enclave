@@ -4,6 +4,8 @@ type FormRowProps = {
   label: ReactNode;
   hint?: ReactNode;
   badge?: ReactNode;
+  /** 该字段对 AI 行为的影响（渲染在输入下方，独立一行）。可选。 */
+  effect?: ReactNode;
   required?: boolean;
   children: ReactNode;
   className?: string;
@@ -13,6 +15,7 @@ export function FormRow({
   label,
   hint,
   badge,
+  effect,
   required,
   children,
   className,
@@ -36,6 +39,11 @@ export function FormRow({
         )}
       </span>
       {children}
+      {effect && (
+        <span className="mt-1 block text-[11px] leading-relaxed text-[color:var(--text-secondary)]">
+          {effect}
+        </span>
+      )}
     </label>
   );
 }
