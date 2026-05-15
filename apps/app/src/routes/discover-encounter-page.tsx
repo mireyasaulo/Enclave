@@ -60,6 +60,7 @@ function MobileDiscoverEncounterPage() {
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const [message, setMessage] = useState("");
+  const [tone, setTone] = useState<"info" | "success" | "warning">("info");
   const routeState = useMemo(
     () => parseMobileDiscoverToolRouteState(hash),
     [hash],
@@ -77,14 +78,16 @@ function MobileDiscoverEncounterPage() {
     },
     onSuccess: (result) => {
       if (!result) {
+        setTone("warning");
         setMessage(t(msg`附近暂时没有新的相遇。`));
         return;
       }
 
+      const characterName = result.character.name ?? t(msg`世界角色`);
+      const greeting = result.greeting ?? t(msg`刚刚和你打了招呼。`);
+      setTone("success");
       setMessage(
-        t(
-          msg`${result.character.name ?? ""} 已加入通讯录：${result.greeting ?? ""}`,
-        ),
+        t(msg`${characterName} 已加入通讯录：${greeting}`),
       );
       void Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-friend-requests", baseUrl] }),
@@ -139,6 +142,7 @@ function MobileDiscoverEncounterPage() {
 
   useEffect(() => {
     setMessage(""); // i18n-ignore-line: clearing state
+    setTone("info");
   }, [baseUrl]);
 
   function navigateToRouteStateReturn() {
@@ -186,7 +190,7 @@ function MobileDiscoverEncounterPage() {
         message ? (
           <InlineNotice
             className="rounded-[11px] px-2.5 py-1.5 text-[11px] leading-[1.35rem] shadow-none"
-            tone={message.includes(t(msg`好友申请`)) ? "success" : "info"}
+            tone={tone}
           >
             {message}
           </InlineNotice>

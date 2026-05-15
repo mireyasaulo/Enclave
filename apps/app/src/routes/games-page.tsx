@@ -482,7 +482,7 @@ export function GamesPage() {
   if (!selectedGame) {
     return (
       <AppPage className="space-y-0 px-0 pb-0 pt-0">
-        {/* 暂时隐藏「功能开发中」蒙板 */} // i18n-ignore-line
+        {/* 暂时隐藏「功能开发中」蒙板 i18n-ignore-line */}
       </AppPage>
     );
   }
@@ -714,10 +714,13 @@ function SectionHeader({
   trailing?: string;
   onTrailingClick?: () => void;
 }) {
+  // 只有同时给了 trailing 文案 + onTrailingClick 才渲染「更多」按钮，
+  // 避免页面上有看上去可点的「更多」实则点了没反应的死按钮。
+  const showTrailingAction = Boolean(trailing && onTrailingClick);
   return (
     <div className="flex items-center justify-between px-4 pb-2 pt-4 text-[14px] font-medium text-[color:var(--text-primary)]">
       <span>{title}</span>
-      {trailing ? (
+      {showTrailingAction ? (
         <button
           type="button"
           onClick={onTrailingClick}
