@@ -487,13 +487,13 @@ export function ConversationThreadPanel({
                     key: "voice-call",
                     icon: Phone,
                     label: t(msg`语音通话`),
-                    onClick: () => handleDesktopCallAction("voice"),
+                    onClick: () => startDirectCall("voice"),
                   },
                   {
                     key: "video-call",
                     icon: Video,
                     label: t(msg`视频通话`),
-                    onClick: () => handleDesktopCallAction("video"),
+                    onClick: () => startDirectCall("video"),
                   },
                 ]
               : undefined
