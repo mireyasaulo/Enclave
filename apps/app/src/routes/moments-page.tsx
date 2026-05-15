@@ -671,9 +671,9 @@ export function MomentsPage() {
     normalizedPathname === desktopMomentsPath ||
     normalizedPathname === "/moments" ||
     normalizedPathname === "/discover/moments";
-  const interactionActionLabel = safeReturnPath
-    ? t(msg`返回上一页`)
-    : t(msg`重试读取`);
+  // InlineNotice secondary 按钮只在有 returnPath 时才展示（见 action 行渲染），
+  // 因此固定走「返回上一页」语义；没有 returnPath 时该按钮整行都不渲染。
+  const interactionActionLabel = t(msg`返回上一页`);
 
   function openMobileMomentsPublishPage() {
     void navigate({
@@ -1490,7 +1490,14 @@ function MobileMomentsView({
               <MobileMomentsInlineNotice
                 tone={noticeTone}
                 action={
-                  noticeTone === "info" ? (
+                  // 只在能产生不同动作的按钮存在时才挂 action 行：
+                  // - 有「重试操作」按钮（点赞/删除失败） → 显示
+                  // - 有 returnPath（用户从别处过来） → 显示「返回上一页」
+                  // 否则（如评论失败 且 没有 returnPath），secondary 「重试读取」
+                  // 跟主重试按钮重复 / 跟用户当下操作（commentBar 已重开）无关，
+                  // 整行 action 不渲染，避免 toast 里冒一个误导的孤儿按钮。
+                  noticeTone === "info" &&
+                  ((noticeAction && noticeActionLabel) || hasReturnPath) ? (
                     <div className="flex items-center gap-1.5">
                       {noticeAction && noticeActionLabel ? (
                         <Button
@@ -1503,15 +1510,17 @@ function MobileMomentsView({
                           {noticeActionLabel}
                         </Button>
                       ) : null}
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="h-7 shrink-0 rounded-full border-[#E5E5E5] bg-white px-3 text-[11px]"
-                        onClick={onNoticeBack}
-                      >
-                        {interactionActionLabel}
-                      </Button>
+                      {hasReturnPath ? (
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="h-7 shrink-0 rounded-full border-[#E5E5E5] bg-white px-3 text-[11px]"
+                          onClick={onNoticeBack}
+                        >
+                          {interactionActionLabel}
+                        </Button>
+                      ) : null}
                     </div>
                   ) : undefined
                 }
@@ -1544,14 +1553,16 @@ function MobileMomentsView({
                 >
                   {t(msg`重试读取`)}
                 </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="h-8 rounded-full border-[#E5E5E5] bg-white px-3.5 text-[11px]"
-                  onClick={onNoticeBack}
-                >
-                  {hasReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
-                </Button>
+                {hasReturnPath ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 rounded-full border-[#E5E5E5] bg-white px-3.5 text-[11px]"
+                    onClick={onNoticeBack}
+                  >
+                    {t(msg`返回上一页`)}
+                  </Button>
+                ) : null}
               </div>
             </div>
           ) : null}
