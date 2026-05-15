@@ -65,7 +65,17 @@ export class CharactersController {
         params: { id },
         legacyMessage: `Character ${id} not found`,
       });
-    const updated = { ...existing, ...body, id } as CharacterEntity;
+    // 后台不允许改变历史角色的 sourceType——不同 sourceType 走的运行时分支不同
+    // （wechat_import/preset_catalog 等强绑定 import 流程），改错会让删除策略、
+    // 校验、迁移路径全部错位。
+    const sanitized = { ...body };
+    if (
+      sanitized.sourceType != null &&
+      sanitized.sourceType !== existing.sourceType
+    ) {
+      delete sanitized.sourceType;
+    }
+    const updated = { ...existing, ...sanitized, id } as CharacterEntity;
     await this.charactersService.upsert(updated);
     return updated;
   }

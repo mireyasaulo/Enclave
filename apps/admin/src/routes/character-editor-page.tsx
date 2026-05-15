@@ -262,6 +262,16 @@ function clampInt(
   return max == null ? lower : Math.min(max, lower);
 }
 
+function clampFloat(
+  value: number | null | undefined,
+  fallback: number,
+  min: number,
+  max: number,
+) {
+  const n = Number.isFinite(value) ? (value as number) : fallback;
+  return Math.max(min, Math.min(max, n));
+}
+
 function formatSourceType(
   value: CharacterDraft["sourceType"] | undefined,
   t: typeof translateRuntimeMessage,
@@ -1244,32 +1254,34 @@ export function CharacterEditorPage() {
               ]}
             />
             <Field
-              label={t(msg`主动浏览概率`)}
+              label={t(msg`主动浏览概率 (0–1)`)}
+              type="number"
+              min={0}
+              max={1}
+              step={0.05}
               placeholder="0.3"
               value={String(draft.proactiveBrowseChance ?? 0.3)}
-              onChange={(value) => {
-                const parsed = Number.parseFloat(value);
-                if (!Number.isFinite(parsed)) return;
-                const clamped = Math.max(0, Math.min(1, parsed));
+              onChange={(value) =>
                 setDraft((current) => ({
                   ...current,
-                  proactiveBrowseChance: clamped,
-                }));
-              }}
+                  proactiveBrowseChance: Number(value) || 0,
+                }))
+              }
             />
             <Field
-              label={t(msg`亲密度种子（0–100）`)}
+              label={t(msg`亲密度种子 (0–100)`)}
+              type="number"
+              min={0}
+              max={100}
+              step={1}
               placeholder="0"
               value={String(draft.intimacyLevel ?? 0)}
-              onChange={(value) => {
-                const parsed = Number.parseInt(value, 10);
-                if (!Number.isFinite(parsed)) return;
-                const clamped = Math.max(0, Math.min(100, parsed));
+              onChange={(value) =>
                 setDraft((current) => ({
                   ...current,
-                  intimacyLevel: clamped,
-                }));
-              }}
+                  intimacyLevel: Number(value) || 0,
+                }))
+              }
             />
           </div>
           <InlineNotice className="mt-4" tone="warning">
@@ -1314,19 +1326,23 @@ export function CharacterEditorPage() {
                     }
                   />
                   <Field
-                    label={t(msg`强度 0–1`)}
+                    label={t(msg`强度 (0–1)`)}
+                    type="number"
+                    min={0}
+                    max={1}
+                    step={0.05}
                     placeholder="0.5"
                     value={String(rel.strength)}
-                    onChange={(value) => {
-                      const parsed = Number.parseFloat(value);
-                      if (!Number.isFinite(parsed)) return;
-                      const clamped = Math.max(0, Math.min(1, parsed));
+                    onChange={(value) =>
                       setDraft((current) => {
                         const list = [...(current.aiRelationships ?? [])];
-                        list[index] = { ...list[index], strength: clamped };
+                        list[index] = {
+                          ...list[index],
+                          strength: Number(value) || 0,
+                        };
                         return { ...current, aiRelationships: list };
-                      });
-                    }}
+                      })
+                    }
                   />
                   <div className="flex items-end">
                     <Button
@@ -1484,6 +1500,16 @@ function normalizeDraft(
     feedFrequency: clampInt(draft.feedFrequency, 1, 0),
     activeHoursStart,
     activeHoursEnd,
+    intimacyLevel: clampInt(draft.intimacyLevel, 0, 0, 100),
+    socialOpenness: draft.socialOpenness ?? "normal",
+    proactiveBrowseChance: clampFloat(draft.proactiveBrowseChance, 0.3, 0, 1),
+    aiRelationships: (draft.aiRelationships ?? [])
+      .map((rel) => ({
+        characterId: rel.characterId?.trim() ?? "",
+        relationshipType: rel.relationshipType?.trim() || "friend",
+        strength: clampFloat(rel.strength, 0.5, 0, 1),
+      }))
+      .filter((rel) => rel.characterId.length > 0),
     modelRoutingMode: draft.modelRoutingMode ?? "inherit_default",
     inferenceProviderAccountId:
       draft.inferenceProviderAccountId?.trim() || null,
