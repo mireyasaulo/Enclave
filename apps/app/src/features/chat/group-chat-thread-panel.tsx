@@ -388,6 +388,13 @@ export function GroupChatThreadPanel({
         });
       }
       setMessages((current) => upsertIncomingGroupMessage(current, payload));
+      // 标已读：用户正活跃在群聊页面，收到新消息时主动同步
+      // 后端读位。要是不调，会话列表的未读会一直涨——本地 messages 在 socket
+      // 推送时长，但 messagesQuery.data 不变，下方"messages 长度变化时标已读"
+      // 的 effect 不会因 socket 增量触发。这里和单聊
+      // use-conversation-thread.ts#onChatMessage 的 markActiveConversationRead
+      // 对齐。自己发的消息也调 → 服务端 no-op，无副作用。
+      void markGroupRead(groupId, baseUrl);
       void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
