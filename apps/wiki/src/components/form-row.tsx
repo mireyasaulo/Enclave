@@ -6,7 +6,7 @@ type FormRowProps = {
   label: ReactNode;
   hint?: ReactNode;
   badge?: ReactNode;
-  /** 该字段对 AI 行为的影响（渲染在输入下方，独立一行）。可选。 */
+  /** 该字段对 AI 行为的影响。原本渲染在输入下方，现合并进 ? 气泡的"影响"块。 */
   effect?: ReactNode;
   required?: boolean;
   children: ReactNode;
@@ -22,6 +22,7 @@ export function FormRow({
   children,
   className,
 }: FormRowProps) {
+  const t = translateRuntimeMessage;
   return (
     <label className={`block space-y-1.5 ${className ?? ""}`}>
       <span className="flex flex-wrap items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
@@ -34,14 +35,19 @@ export function FormRow({
           )}
         </span>
         {badge}
-        {hint && <HintTooltip>{hint}</HintTooltip>}
+        {(hint || effect) && (
+          <HintTooltip>
+            {hint && <span className="block">{hint}</span>}
+            {effect && (
+              <span className="mt-1 block text-[color:var(--text-secondary)]">
+                <span className="font-semibold">{t(msg`影响：`)}</span>
+                {effect}
+              </span>
+            )}
+          </HintTooltip>
+        )}
       </span>
       {children}
-      {effect && (
-        <span className="mt-1 block text-[11px] leading-relaxed text-[color:var(--text-secondary)]">
-          {effect}
-        </span>
-      )}
     </label>
   );
 }
@@ -50,7 +56,6 @@ function HintTooltip({ children }: { children: ReactNode }) {
   const t = translateRuntimeMessage;
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLSpanElement | null>(null);
-  const titleText = typeof children === "string" ? children : undefined;
 
   useEffect(() => {
     if (!open) return;
@@ -77,7 +82,6 @@ function HintTooltip({ children }: { children: ReactNode }) {
         type="button"
         aria-label={t(msg`说明`)}
         aria-expanded={open}
-        title={titleText}
         onPointerEnter={(event) => {
           if (event.pointerType === "mouse") setOpen(true);
         }}
