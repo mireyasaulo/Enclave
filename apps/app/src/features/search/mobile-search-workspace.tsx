@@ -10,11 +10,14 @@ import type { MessageDescriptor } from "@lingui/core";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   ArrowLeft,
+  Bookmark,
   ChevronRight,
   Clock3,
+  Megaphone,
   Newspaper,
   Search,
   Sparkles,
+  Sprout,
   UsersRound,
 } from "lucide-react";
 import { InlineNotice, cn } from "@yinjie/ui";
@@ -30,9 +33,6 @@ import {
   type SearchResultSection,
   type SearchScopeCounts,
 } from "./search-types";
-import { translateRuntimeMessage } from "@yinjie/i18n";
-
-const t = translateRuntimeMessage;
 
 type MobileSearchWorkspaceProps = {
   activeCategory: SearchCategory;
@@ -58,6 +58,9 @@ type MobileSearchWorkspaceProps = {
   visibleResults: SearchResultItem[];
 };
 
+// 顺序与 allViewCategories 对齐——「全部」视图里展示的分组顺序一致，
+// chip / 卡片 / 「查看更多」之间不会出现"卡片说有内容、chip 里看不到"
+// 的错位。miniPrograms 当前是 ComingSoonOverlay，不进 quickScopeCards。
 const quickScopeCards: Array<{
   key: SearchCategory;
   title: MessageDescriptor;
@@ -80,9 +83,30 @@ const quickScopeCards: Array<{
     iconClassName: "bg-[rgba(59,130,246,0.12)] text-[#2563eb]",
   },
   {
+    key: "officialAccounts",
+    title: msg`公众号`,
+    description: msg`搜账号资料和文章`,
+    icon: Megaphone,
+    iconClassName: "bg-[rgba(234,179,8,0.14)] text-[#9a6b12]",
+  },
+  {
+    key: "favorites",
+    title: msg`收藏`,
+    description: msg`搜笔记、消息和内容收藏`,
+    icon: Bookmark,
+    iconClassName: "bg-[rgba(234,179,8,0.10)] text-[#9a6b12]",
+  },
+  {
+    key: "moments",
+    title: msg`朋友圈`,
+    description: msg`搜好友动态、评论和点赞`,
+    icon: Sprout,
+    iconClassName: "bg-[rgba(34,197,94,0.12)] text-[#15803d]",
+  },
+  {
     key: "feed",
-    title: msg`内容流`,
-    description: msg`搜朋友圈、广场动态和公众号`,
+    title: msg`广场动态`,
+    description: msg`搜广场里公开发布的内容`,
     icon: Newspaper,
     iconClassName: "bg-[rgba(15,23,42,0.08)] text-[color:var(--text-primary)]",
   },
@@ -169,7 +193,7 @@ export function MobileSearchWorkspace({
               type="search"
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              placeholder={t(msg`搜索聊天记录、联系人、收藏、公众号和小程序`)}
+              placeholder={t(msg`搜索聊天、联系人、公众号、朋友圈和广场`)}
               className="h-9 w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] pl-9 pr-11 text-[13px] text-[color:var(--text-primary)] outline-none transition-[background-color,border-color] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.18)] focus:bg-white"
             />
             {searchText ? (
