@@ -137,7 +137,7 @@ msgstr "转发到聊天"
 #: apps/app/src/routes/mobile-add-friend-page.tsx:434
 #: apps/app/src/routes/mobile-add-friend-page.tsx:812
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:267
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:621
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:624
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1275
 msgid "取消"
 msgstr "取消"
@@ -2232,6 +2232,20 @@ msgid "人"
 msgstr "人"
 
 #: apps/app/src/components/chat-message-list.tsx:6167
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
+#: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:495
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1102
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:371
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1134
+#: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
+#: apps/app/src/routes/character-detail-page.tsx:952
+#: apps/app/src/routes/desktop-mobile-page.tsx:359
+msgid "视频通话"
+msgstr "视频通话"
+
+#: apps/app/src/components/chat-message-list.tsx:6167
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:489
@@ -2245,20 +2259,6 @@ msgstr "人"
 #: apps/app/src/routes/desktop-mobile-page.tsx:360
 msgid "语音通话"
 msgstr "语音通话"
-
-#: apps/app/src/components/chat-message-list.tsx:6167
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
-#: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
-#: apps/app/src/features/chat/conversation-thread-panel.tsx:495
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1102
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:371
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1134
-#: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
-#: apps/app/src/routes/character-detail-page.tsx:952
-#: apps/app/src/routes/desktop-mobile-page.tsx:359
-msgid "视频通话"
-msgstr "视频通话"
 
 #: apps/app/src/components/chat-message-list.tsx:6202
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:472
@@ -2518,7 +2518,7 @@ msgstr "关闭弹窗"
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1067
 #: apps/app/src/routes/live-companion-page.tsx:873
 #: apps/app/src/routes/mobile-add-friend-page.tsx:795
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:595
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:598
 msgid "关闭"
 msgstr "关闭"
 
@@ -2542,7 +2542,7 @@ msgstr "我知道了"
 
 #: apps/app/src/components/feature-unavailable-dialog.tsx:49
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:341
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:480
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:483
 msgid "关闭提示"
 msgstr "关闭提示"
 
@@ -2860,7 +2860,7 @@ msgstr "分享工具"
 #: apps/app/src/routes/discover-scene-page.tsx:401
 #: apps/app/src/routes/friend-moments-page.tsx:487
 #: apps/app/src/routes/friend-requests-page.tsx:274
-#: apps/app/src/routes/friend-requests-page.tsx:458
+#: apps/app/src/routes/friend-requests-page.tsx:460
 #: apps/app/src/routes/games-page.tsx:520
 #: apps/app/src/routes/group-announcement-page.tsx:330
 #: apps/app/src/routes/group-announcement-page.tsx:365
@@ -3405,7 +3405,7 @@ msgstr "文章来源于 {0}"
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1253
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:180
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:305
-#: apps/app/src/routes/friend-requests-page.tsx:493
+#: apps/app/src/routes/friend-requests-page.tsx:495
 msgid "今天"
 msgstr "今天"
 
@@ -7928,7 +7928,6 @@ msgstr "被加入黑名单的联系人会出现在这里。"
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:497
 #: apps/app/src/routes/channel-author-page.tsx:442
 #: apps/app/src/routes/discover-page.tsx:1006
-#: apps/app/src/routes/friend-requests-page.tsx:411
 #: apps/app/src/routes/official-account-detail-page.tsx:509
 msgid "处理中..."
 msgstr "处理中..."
@@ -8991,7 +8990,7 @@ msgid "最近 30 天"
 msgstr "最近 30 天"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:478
-#: apps/app/src/routes/friend-requests-page.tsx:413
+#: apps/app/src/routes/friend-requests-page.tsx:415
 msgid "清除"
 msgstr "清除"
 
@@ -10608,7 +10607,7 @@ msgstr "通过隐界号、角色名或资料关键词查找世界角色"
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:77
 #: apps/app/src/routes/contacts-page.tsx:1359
 #: apps/app/src/routes/friend-requests-page.tsx:199
-#: apps/app/src/routes/friend-requests-page.tsx:446
+#: apps/app/src/routes/friend-requests-page.tsx:448
 #: apps/app/src/routes/mobile-add-friend-page.tsx:377
 msgid "新的朋友"
 msgstr "新的朋友"
@@ -10793,27 +10792,27 @@ msgstr "想认识你。"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:132
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:218
 #: apps/app/src/i18n/static-dom-seed.ts:776
-#: apps/app/src/routes/friend-requests-page.tsx:414
+#: apps/app/src/routes/friend-requests-page.tsx:416
 msgid "拒绝"
 msgstr "拒绝"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:142
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:230
-#: apps/app/src/routes/friend-requests-page.tsx:429
+#: apps/app/src/routes/friend-requests-page.tsx:431
 msgid "接受中..."
 msgstr "接受中..."
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:143
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:230
 #: apps/app/src/i18n/static-dom-seed.ts:777
-#: apps/app/src/routes/friend-requests-page.tsx:430
+#: apps/app/src/routes/friend-requests-page.tsx:432
 msgid "接受"
 msgstr "接受"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:155
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:242
 #: apps/app/src/i18n/static-dom-seed.ts:1030
-#: apps/app/src/routes/friend-requests-page.tsx:447
+#: apps/app/src/routes/friend-requests-page.tsx:449
 msgid "暂时没有新的好友请求"
 msgstr "暂时没有新的好友请求"
 
@@ -11125,8 +11124,8 @@ msgstr "写点想让世界居民都能看到的内容..."
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:147
 #: apps/app/src/routes/discover-page.tsx:863
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:300
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:394
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:408
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:397
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:411
 msgid "添加图片"
 msgstr "添加图片"
 
@@ -11650,9 +11649,9 @@ msgstr "功能开发中"
 #: apps/app/src/features/search/mobile-search-workspace.tsx:601
 #: apps/app/src/routes/desktop-mobile-page.tsx:2017
 #: apps/app/src/routes/live-companion-page.tsx:793
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:422
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:427
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:432
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:425
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:430
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:435
 #: apps/app/src/routes/official-accounts-page.tsx:370
 #: apps/app/src/routes/profile-info-page.tsx:91
 #: apps/app/src/routes/profile-info-page.tsx:104
@@ -11669,18 +11668,18 @@ msgstr "打开"
 
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
+#: apps/app/src/i18n/static-dom-seed.ts:195
+msgid "移出常用"
+msgstr "移出常用"
+
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:278
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
 #: apps/app/src/i18n/static-dom-seed.ts:197
 msgid "加入常用"
 msgstr "加入常用"
-
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
-#: apps/app/src/i18n/static-dom-seed.ts:195
-msgid "移出常用"
-msgstr "移出常用"
 
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:802
@@ -13049,13 +13048,13 @@ msgid "h 成熟"
 msgstr "h 成熟"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ 包，售价"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ 个"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ 包，售价"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -16624,14 +16623,14 @@ msgid "地点"
 msgstr "地点"
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:173
-msgid "地图"
-msgstr "地图"
-
-#: apps/app/src/features/mini-programs/mini-programs-data.ts:173
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:241
 #: apps/app/src/i18n/static-dom-seed.ts:202
 msgid "活动"
 msgstr "活动"
+
+#: apps/app/src/features/mini-programs/mini-programs-data.ts:173
+msgid "地图"
+msgstr "地图"
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:177
 #: apps/app/src/i18n/static-dom-seed.ts:207
@@ -19322,7 +19321,7 @@ msgstr "会同步到朋友圈时间线，适合发日常照片、短视频和临
 
 #: apps/app/src/i18n/static-dom-seed.ts:436
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:321
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:430
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:433
 msgid "谁可以看"
 msgstr "谁可以看"
 
@@ -19332,7 +19331,7 @@ msgstr "当前发布到朋友圈"
 
 #: apps/app/src/i18n/static-dom-seed.ts:438
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:332
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:438
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:441
 msgid "图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。"
 msgstr "图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。"
 
@@ -23131,7 +23130,6 @@ msgid "已通过好友申请。"
 msgstr "已通过好友申请。"
 
 #: apps/app/src/routes/contacts-page.tsx:823
-#: apps/app/src/routes/friend-requests-page.tsx:112
 msgid "好友请求已处理。"
 msgstr "好友请求已处理。"
 
@@ -23258,7 +23256,7 @@ msgstr "清空搜索"
 #: apps/app/src/routes/contacts-page.tsx:1721
 #: apps/app/src/routes/friend-requests-page.tsx:230
 #: apps/app/src/routes/friend-requests-page.tsx:275
-#: apps/app/src/routes/friend-requests-page.tsx:459
+#: apps/app/src/routes/friend-requests-page.tsx:461
 msgid "浏览世界角色"
 msgstr "浏览世界角色"
 
@@ -24619,7 +24617,7 @@ msgid "场景相遇"
 msgstr "场景相遇"
 
 #: apps/app/src/routes/discover-page.tsx:158
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:431
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:434
 msgid "公开"
 msgstr "公开"
 
@@ -25014,6 +25012,10 @@ msgstr "正在跳转到桌面通讯录工作区中的好友请求视图。"
 msgid "切换桌面好友请求..."
 msgstr "切换桌面好友请求..."
 
+#: apps/app/src/routes/friend-requests-page.tsx:112
+msgid "已忽略好友申请。"
+msgstr "已忽略好友申请。"
+
 #: apps/app/src/routes/friend-requests-page.tsx:242
 msgid "正在读取好友请求"
 msgstr "正在读取好友请求"
@@ -25034,7 +25036,16 @@ msgstr "重试通过"
 msgid "重试拒绝"
 msgstr "重试拒绝"
 
-#: apps/app/src/routes/friend-requests-page.tsx:448
+#: apps/app/src/routes/friend-requests-page.tsx:412
+#: apps/app/src/routes/profile-settings-page.tsx:571
+msgid "清除中..."
+msgstr "清除中..."
+
+#: apps/app/src/routes/friend-requests-page.tsx:413
+msgid "拒绝中..."
+msgstr "拒绝中..."
+
+#: apps/app/src/routes/friend-requests-page.tsx:450
 msgid "去发现页摇一摇，或等待场景触发新的相遇。"
 msgstr "去发现页摇一摇，或等待场景触发新的相遇。"
 
@@ -26685,23 +26696,23 @@ msgid "公开可见"
 msgstr "公开可见"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:348
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:490
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:493
 msgid "放弃发表"
 msgstr "放弃发表"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:351
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:496
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:499
 msgid "返回会丢失已编辑的文字与媒体，确定不发布吗？"
 msgstr "返回会丢失已编辑的文字与媒体，确定不发布吗？"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:360
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:505
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:508
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1341
 msgid "继续编辑"
 msgstr "继续编辑"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:367
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:512
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:515
 msgid "放弃"
 msgstr "放弃"
 
@@ -26763,31 +26774,31 @@ msgstr "正在打开朋友圈..."
 msgid "移除图片"
 msgstr "移除图片"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:377
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:380
 msgid "移除视频"
 msgstr "移除视频"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:420
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:423
 msgid "所在位置"
 msgstr "所在位置"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:421
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:424
 msgid "不显示位置"
 msgstr "不显示位置"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:425
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:428
 msgid "提醒谁看"
 msgstr "提醒谁看"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:588
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:591
 msgid "选择媒体"
 msgstr "选择媒体"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:603
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:606
 msgid "从相册选择图片"
 msgstr "从相册选择图片"
 
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:614
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:617
 msgid "选择视频"
 msgstr "选择视频"
 
@@ -27464,10 +27475,6 @@ msgstr "可选，例如 https://api.openai.com/v1"
 #: apps/app/src/routes/profile-settings-page.tsx:562
 msgid "保存专属 API Key"
 msgstr "保存专属 API Key"
-
-#: apps/app/src/routes/profile-settings-page.tsx:571
-msgid "清除中..."
-msgstr "清除中..."
 
 #: apps/app/src/routes/profile-settings-page.tsx:572
 msgid "清除专属 API Key"

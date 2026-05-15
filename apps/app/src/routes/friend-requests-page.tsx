@@ -109,7 +109,7 @@ function MobileFriendRequestsPage() {
   const declineMutation = useMutation({
     mutationFn: (requestId: string) => declineFriendRequest(requestId, baseUrl),
     onSuccess: async () => {
-      setSuccessNotice(t(msg`好友请求已处理。`));
+      setSuccessNotice(t(msg`已忽略好友申请。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-friend-requests", baseUrl],
       });
@@ -408,7 +408,9 @@ function MobileFriendRequestsPage() {
                       >
                         {declineMutation.isPending &&
                         declineMutation.variables === request.id
-                          ? t(msg`处理中...`)
+                          ? expired
+                            ? t(msg`清除中...`)
+                            : t(msg`拒绝中...`)
                           : expired
                             ? t(msg`清除`)
                             : t(msg`拒绝`)}
