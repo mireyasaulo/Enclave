@@ -366,7 +366,7 @@ function MobileFriendRequestsPage() {
 
                     <div
                       className={cn(
-                        "mt-2 rounded-[12px] bg-[color:var(--surface-card-hover)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]",
+                        "mt-2 whitespace-pre-line break-words rounded-[12px] bg-[color:var(--surface-card-hover)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]",
                         expired ? "opacity-70" : undefined,
                       )}
                     >
@@ -493,7 +493,11 @@ function formatFriendRequestDate(t: Translator, createdAt: string) {
     return t(msg`今天`);
   }
 
+  // 跨年的请求只显示 MM-DD 会让 "12-25" 看上去像今年 12-25 ——
+  // 但其实是去年的 (好友请求最长可挂到一周后过期，但 UI 里偶尔
+  // 也会出现状态 stuck 的旧记录)。同一年只显示 MM-DD，跨年加 YYYY-。
   const formatter = new Intl.DateTimeFormat(getActiveLocale(), {
+    ...(sameYear ? {} : { year: "numeric" }),
     month: "2-digit",
     day: "2-digit",
   });
