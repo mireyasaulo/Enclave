@@ -132,17 +132,24 @@ export function ContactsBulkActionBar({
           desktop ? "" : "sticky bottom-0 pb-[env(safe-area-inset-bottom,0px)]",
         )}
       >
-        <div className="flex items-center gap-2 px-3 py-2">
+        {/* desktop 时这条 bar 嵌在 320px 宽的左栏底部，4 个按钮（全选 / 打标签 /
+            设星标 / 删除）+ 图标 + gap + 内边距加起来超过 320px，浏览器原本会把文字
+            折行成「打标 / 签」「删 / 除」。强制 whitespace-nowrap + shrink-0 +
+            desktop 收紧 padding/gap 后，4 颗按钮正好能塞进 320px。 */}
+        <div className="flex items-center gap-1.5 px-2.5 py-2">
           <button
             type="button"
             onClick={allSelected ? onClearSelection : onSelectAll}
             disabled={!totalIds.length}
-            className="flex h-9 items-center gap-1.5 rounded-full border border-[color:var(--border-subtle)] bg-white px-3 text-[12px] text-[color:var(--text-secondary)] disabled:opacity-50"
+            className={cn(
+              "flex h-9 shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-[color:var(--border-subtle)] bg-white text-[12px] text-[color:var(--text-secondary)] disabled:opacity-50",
+              desktop ? "px-2.5" : "px-3",
+            )}
           >
             <CheckCheck size={13} />
             {allSelected ? t(msg`取消全选`) : t(msg`全选`)}
           </button>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1.5">
             {buttons.map((btn) => {
               const Icon = btn.icon;
               return (
@@ -152,7 +159,8 @@ export function ContactsBulkActionBar({
                   onClick={btn.onClick}
                   disabled={!hasSelection || bulk.isPending}
                   className={cn(
-                    "flex h-9 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium",
+                    "flex h-9 shrink-0 items-center gap-1 whitespace-nowrap rounded-full text-[12px] font-medium",
+                    desktop ? "px-2.5" : "px-3",
                     btn.danger
                       ? "bg-[#fef2f2] text-[#d74b45] disabled:opacity-50"
                       : "bg-[#07c160] text-white disabled:opacity-50",
