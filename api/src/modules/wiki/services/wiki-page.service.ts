@@ -263,10 +263,35 @@ export class WikiPageService {
     return rows.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hans-CN'));
   }
 
+  /**
+   * 验词条存在：要么 characters 表里有，要么 wiki page 有（被 wiki 创建出来的而非 world 同步过来的词条
+   * 在 characters 表里可能没有对应行，但有 page）。任一存在即视为有效。
+   */
+  private async assertCharacterIdExists(characterId: string): Promise<void> {
+    if (!characterId) {
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '词条不存在',
+      });
+    }
+    const [hasCharacter, hasPage] = await Promise.all([
+      this.characterRepo.count({ where: { id: characterId } }),
+      this.pageRepo.count({ where: { characterId } }),
+    ]);
+    if (hasCharacter === 0 && hasPage === 0) {
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: `角色 ${characterId} 不存在`,
+      });
+    }
+  }
+
   async getHistory(
     characterId: string,
     limit = 50,
   ): Promise<CharacterRevisionEntity[]> {
+    // 词条不存在直接 404，否则 `[]` 让前端"以为这只是没历史"，掩盖 typo 之类的拼错 id。
+    await this.assertCharacterIdExists(characterId);
     return this.revisionRepo.find({
       where: { characterId },
       order: { version: 'DESC' },
@@ -315,6 +340,7 @@ export class WikiPageService {
   }
 
   async getPending(characterId: string): Promise<CharacterRevisionEntity[]> {
+    await this.assertCharacterIdExists(characterId);
     return this.revisionRepo.find({
       where: { characterId, status: 'pending' },
       order: { createdAt: 'DESC' },
@@ -323,6 +349,14 @@ export class WikiPageService {
   }
 
   async getDiff(characterId: string, fromId: string, toId: string) {
+    // 没传 from/to → getRevisionOrThrow('') 进了 typeorm 的 where:{id:''} 又被解释成"无 where"，
+    // 命中表里第一行 revision 返回 200，让人误以为是合法 diff。直接 400 截断。
+    if (!fromId || !toId) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: 'diff 需要 from 和 to 两个 revisionId' },
+        legacyMessage: 'diff 需要 from 和 to 两个 revisionId',
+      });
+    }
     const [from, to] = await Promise.all([
       this.getRevisionOrThrow(fromId),
       this.getRevisionOrThrow(toId),
