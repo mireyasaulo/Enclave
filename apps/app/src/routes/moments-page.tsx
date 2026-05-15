@@ -1265,23 +1265,36 @@ export function MomentsPage() {
         //    + IntersectionObserver 串行一页一页 fetchNextPage 把内容堆回来，体感很慢；
         // 2) 顶部新发布的内容若把老 page 2 起点往下挤，由 momentsData 的 id 去重 useMemo 兜底重复。
         const key = ["app-moments-paged", baseUrl];
-        await Promise.all([
-          getMomentsPage({ page: 1, limit: 20 }, baseUrl).then((freshFirstPage) => {
-            queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
-              key,
-              (current) => {
-                if (!current || current.pages.length === 0) {
-                  return { pages: [freshFirstPage], pageParams: [1] };
-                }
-                return {
-                  pages: [freshFirstPage, ...current.pages.slice(1)],
-                  pageParams: current.pageParams,
-                };
-              },
-            );
-          }),
-          ownerId ? blockedQuery.refetch() : Promise.resolve(null),
-        ]);
+        try {
+          await Promise.all([
+            getMomentsPage({ page: 1, limit: 20 }, baseUrl).then((freshFirstPage) => {
+              queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
+                key,
+                (current) => {
+                  if (!current || current.pages.length === 0) {
+                    return { pages: [freshFirstPage], pageParams: [1] };
+                  }
+                  return {
+                    pages: [freshFirstPage, ...current.pages.slice(1)],
+                    pageParams: current.pageParams,
+                  };
+                },
+              );
+            }),
+            ownerId ? blockedQuery.refetch() : Promise.resolve(null),
+          ]);
+        } catch (error) {
+          // 下拉刷新失败之前完全沉默——指示器走完一遍消失，但用户根本不知道
+          // 列表没换。冒到 notice 通道 2.4s 自动收，跟点赞/删除失败一致。
+          setNoticeTone("info");
+          setNoticeActionLabel(null);
+          setNoticeAction(null);
+          setNotice(
+            error instanceof Error
+              ? t(msg`刷新失败：${error.message}`)
+              : t(msg`刷新失败，请稍后重试。`),
+          );
+        }
       }}
       hasNextPage={Boolean(momentsQuery.hasNextPage)}
       isFetchingNextPage={momentsQuery.isFetchingNextPage}
