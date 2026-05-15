@@ -103,6 +103,19 @@ const FEED_DEAD_MEDIA_HOSTS = new Set<string>([
   'commondatastorage.googleapis.com',
 ]);
 
+// 广场评论的服务端硬上限。前端 WeChatCommentBar 有 maxLength=500 的软约束，
+// 但 curl / 第三方端可以绕过，会在 commentsPreview / 全量评论里写出空字符串
+// 或超长字符串。和 moments.service.ts 的 MOMENT_COMMENT_TOO_LONG 对齐。
+const MAX_FEED_COMMENT_TEXT_LENGTH = 500;
+
+// 视觉为空：trim 后去掉零宽字符（U+200B–U+200D / U+FEFF / U+2060）和内部空白。
+// 防止"w：（空白）"这种 footer 仍在但正文空的鬼影评论。和 moments 一致。
+function isFeedCommentTextVisuallyEmpty(raw: string): boolean {
+  const trimmed = raw.trim();
+  if (!trimmed) return true;
+  return trimmed.replace(/[​-‍﻿⁠\s]/g, '').length === 0;
+}
+
 // 角色主动转发时附带短评的清洗：去掉换行 / 引号 / 末尾省略号，强制 ≤ 24 字。
 function sanitizeForwardQuip(raw: string | undefined | null): string {
   if (!raw) return '';
@@ -438,14 +451,31 @@ export class FeedService implements OnModuleInit {
       comments.map((comment) => comment.id),
       owner.id,
     );
+    const replyAuthorNameMap = this.buildReplyAuthorNameMap(comments);
 
     return comments.map((comment) =>
       this.serializeComment(
         comment,
         likedCommentIds.has(comment.id),
         resolvedAvatarContext,
+        replyAuthorNameMap,
       ),
     );
+  }
+
+  // commentId → authorName 反查表，给 serializeComment 注入 replyToAuthorName。
+  // 用全量评论数组构建（commentsPreview 也是先 fetch 全量再 slice(-3)，所以
+  // 这里能覆盖到 preview 截掉的那部分根评论）。
+  private buildReplyAuthorNameMap(
+    comments: FeedCommentEntity[],
+  ): Map<string, string> {
+    const map = new Map<string, string>();
+    for (const comment of comments) {
+      if (comment.authorName) {
+        map.set(comment.id, comment.authorName);
+      }
+    }
+    return map;
   }
 
   async createOwnerPost(
@@ -628,6 +658,7 @@ export class FeedService implements OnModuleInit {
     text: string,
   ): Promise<ReturnType<FeedService['serializeComment']>> {
     await this.assertOwnerCanInteractWithPost(postId);
+    const trimmedText = this.assertCommentText(text);
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const comment = await this.addComment({
       postId,
@@ -635,9 +666,31 @@ export class FeedService implements OnModuleInit {
       authorName: owner.username?.trim() || 'You',
       authorAvatar: owner.avatar ?? '',
       authorType: 'user',
-      text,
+      text: trimmedText,
     });
     return this.serializeComment(comment, false);
+  }
+
+  // 服务端兜底校验：拒绝空 / 视觉为空 / 超长评论。前端 WeChatCommentBar 已经卡了，
+  // 但 curl/第三方端能绕过；同时 AI 生成路径也通过这里走，万一 LLM 吐出空串
+  // 就别让它落库变 "w：" 鬼影评论。统一返回 trim 过的安全文本。
+  private assertCommentText(raw: unknown): string {
+    const text = typeof raw === 'string' ? raw : '';
+    const trimmed = text.trim();
+    if (!trimmed || isFeedCommentTextVisuallyEmpty(trimmed)) {
+      throw new AppError('FEED_COMMENT_EMPTY', {
+        legacyMessage: '评论内容不能为空。',
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+    if (trimmed.length > MAX_FEED_COMMENT_TEXT_LENGTH) {
+      throw new AppError('FEED_COMMENT_TOO_LONG', {
+        params: { max: MAX_FEED_COMMENT_TEXT_LENGTH },
+        legacyMessage: `评论最多 ${MAX_FEED_COMMENT_TEXT_LENGTH} 字。`,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+    return trimmed;
   }
 
   async addComment(input: {
@@ -742,6 +795,7 @@ export class FeedService implements OnModuleInit {
     }
 
     await this.assertOwnerCanInteractWithPost(parentComment.postId);
+    const trimmedText = this.assertCommentText(text);
 
     const reply = await this.addComment({
       postId: parentComment.postId,
@@ -749,13 +803,18 @@ export class FeedService implements OnModuleInit {
       authorName: owner.username?.trim() || 'You',
       authorAvatar: owner.avatar ?? '',
       authorType: 'user',
-      text,
+      text: trimmedText,
       parentCommentId: parentComment.parentCommentId ?? parentComment.id,
       replyToCommentId: parentComment.id,
       replyToAuthorId: parentComment.authorId,
     });
 
-    return this.serializeComment(reply, false);
+    // 单条 reply 的反查表只需要 parent 一行就够了，让返回的 DTO 带上 replyToAuthorName。
+    const replyAuthorNameMap = new Map<string, string>();
+    if (parentComment.authorName) {
+      replyAuthorNameMap.set(parentComment.id, parentComment.authorName);
+    }
+    return this.serializeComment(reply, false, undefined, replyAuthorNameMap);
   }
 
   async likeOwnerPost(postId: string): Promise<void> {
@@ -2425,6 +2484,9 @@ export class FeedService implements OnModuleInit {
       comments.map((comment) => comment.id),
       ownerId,
     );
+    // 用整张评论表（含 preview 截掉的根评论）建反查表，保证 reply 子评论
+    // 进 preview 时还能拿到被回复评论的 authorName 渲出"回复 X"。
+    const replyAuthorNameMap = this.buildReplyAuthorNameMap(comments);
     const commentMap = new Map<
       string,
       ReturnType<FeedService['serializeComment']>[]
@@ -2437,6 +2499,7 @@ export class FeedService implements OnModuleInit {
           comment,
           likedCommentIds.has(comment.id),
           avatarContext,
+          replyAuthorNameMap,
         ),
       );
       commentMap.set(comment.postId, currentComments.slice(-3));
@@ -3429,7 +3492,24 @@ export class FeedService implements OnModuleInit {
     comment: FeedCommentEntity,
     likedByOwner: boolean,
     avatarContext?: FeedAvatarContext,
+    // commentId → authorName 反查表。commentsPreview / 全量评论列表批量序列化时
+    // 把整个 post 的评论传进来，单条 reply 创建后也可以临时灌一项。让"回复 X"
+    // 在 preview 只截了最后 3 条、被回复的根评论已超出窗口时仍能渲出来。
+    replyAuthorNameMap?: Map<string, string>,
   ) {
+    const replyToAuthorName =
+      comment.replyToCommentId &&
+      replyAuthorNameMap?.get(comment.replyToCommentId)
+        ? this.remarkResolver.applyCharacterRemark(
+            // 回复目标可能是 user 也可能是 character，但 remark 只对 character 生效；
+            // 这里把 'character' 传进去对 user 名字是 no-op，所以可以无脑过一遍。
+            'character',
+            comment.replyToAuthorId ?? '',
+            replyAuthorNameMap.get(comment.replyToCommentId)!,
+            avatarContext?.remarkMap,
+          )
+        : null;
+
     return {
       id: comment.id,
       postId: comment.postId,
@@ -3454,6 +3534,7 @@ export class FeedService implements OnModuleInit {
       parentCommentId: comment.parentCommentId ?? null,
       replyToCommentId: comment.replyToCommentId ?? null,
       replyToAuthorId: comment.replyToAuthorId ?? null,
+      replyToAuthorName,
       likeCount: comment.likeCount,
       status: comment.status as 'published' | 'hidden' | 'deleted',
       likedByOwner,

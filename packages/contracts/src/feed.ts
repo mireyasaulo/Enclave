@@ -81,6 +81,10 @@ export interface FeedComment {
   parentCommentId?: string | null;
   replyToCommentId?: string | null;
   replyToAuthorId?: string | null;
+  // 当评论是另一条评论的回复时，附带该被回复评论作者的显示名。
+  // 让 UI 在 commentsPreview 只截最后 3 条、被回复的根评论已超出 preview 窗口
+  // 时，仍能渲出"回复 X：..."的上下文（否则原本是 lookup-by-id 漏 → 静默吞掉）。
+  replyToAuthorName?: string | null;
   likeCount: number;
   status?: "published" | "hidden" | "deleted";
   likedByOwner?: boolean;

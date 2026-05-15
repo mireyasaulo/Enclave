@@ -517,6 +517,12 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`视频号作者不存在。`);
     case "FEED_COMMENT_NOT_FOUND":
       return translateRuntimeMessage(msg`评论不存在。`);
+    case "FEED_COMMENT_EMPTY":
+      return translateRuntimeMessage(msg`评论内容不能为空。`);
+    case "FEED_COMMENT_TOO_LONG":
+      return translateRuntimeMessage(
+        msg`评论最多 ${String(params.max ?? 500)} 字。`,
+      );
     case "FEED_EMPTY":
       return translateRuntimeMessage(msg`动态内容和媒体不能同时为空。`);
     case "FEED_TEXT_NO_MEDIA":

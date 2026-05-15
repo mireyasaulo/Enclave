@@ -1267,7 +1267,11 @@ const pendingLikePostId = likeMutation.isPending
                 }
                 secondary={(() => {
                   const expandedComments = fullCommentsByPostId[post.id] ?? null;
-                  const renderedComments = expandedComments ?? post.commentsPreview;
+                  // 历史 DB 里可能残留 text="" 的鬼影评论（后端校验之前 curl 直发的）。
+                  // 渲染层兜底过滤，否则会渲出 "w：" 这种只剩冒号的空评论占位。
+                  const renderedComments = (
+                    expandedComments ?? post.commentsPreview
+                  ).filter((comment) => comment.text.trim().length > 0);
                   if (renderedComments.length === 0) return null;
                   return (
                     <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">
@@ -1278,7 +1282,13 @@ const pendingLikePostId = likeMutation.isPending
                                 (item) => item.id === comment.replyToCommentId,
                               ) ?? null
                             : null;
-                          const replyToName = replyToComment?.authorName ?? null;
+                          // commentsPreview 只截最后 3 条；当前评论的被回复评论可能不在 preview 里。
+                          // 优先用 renderedComments 里找到的（自带 authorType，能渲成可点按钮），
+                          // 退化时用 server 注入的 replyToAuthorName（纯文本，无 authorType）。
+                          const replyToName =
+                            replyToComment?.authorName ??
+                            comment.replyToAuthorName ??
+                            null;
                           const cleanCommentText = stripToolCallSyntax(comment.text);
                           const openReply = () => {
                             if (!post.canInteract) return;
