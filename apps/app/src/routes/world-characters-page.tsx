@@ -10,7 +10,7 @@ import {
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { ArrowLeft, Search, UserPlus } from "lucide-react";
+import { ArrowLeft, Search, UserPlus, X } from "lucide-react";
 import { getFriends, listCharacters } from "@yinjie/contracts";
 import {
   translateRuntimeMessage,
@@ -309,13 +309,16 @@ function MobileWorldCharactersPage() {
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-primary)] active:bg-black/[0.05]"
             onClick={() =>
-              navigateBackOrFallback(() => {
-                if (navigateToRouteStateReturn()) {
-                  return;
-                }
+              navigateBackOrFallback(
+                () => {
+                  if (navigateToRouteStateReturn()) {
+                    return;
+                  }
 
-                void navigate({ to: "/tabs/contacts" });
-              })
+                  void navigate({ to: "/tabs/contacts" });
+                },
+                safeReturnPath ?? "/tabs/contacts",
+              )
             }
             aria-label={t(msg`返回通讯录`)}
           >
@@ -345,6 +348,16 @@ function MobileWorldCharactersPage() {
               placeholder={t(msg`搜索世界角色`)}
               className="min-w-0 flex-1 bg-transparent text-[12px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
+            {searchText ? (
+              <button
+                type="button"
+                onClick={() => setSearchText("")}
+                className="-mr-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[color:var(--text-dim)] active:bg-black/5"
+                aria-label={t(msg`清空搜索`)}
+              >
+                <X size={13} />
+              </button>
+            ) : null}
           </label>
         </div>
       </TabPageTopBar>
@@ -444,15 +457,27 @@ function MobileWorldCharactersPage() {
                   : t(msg`稍后再回来看看，或者先去新的朋友里处理申请。`)
               }
               action={
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
-                  onClick={handleStatusBack}
-                >
-                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`查看新的朋友`)}
-                </Button>
+                normalizedSearchText ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
+                    onClick={() => setSearchText("")}
+                  >
+                    {t(msg`清空搜索`)}
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
+                    onClick={handleStatusBack}
+                  >
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`查看新的朋友`)}
+                  </Button>
+                )
               }
             />
           </div>
