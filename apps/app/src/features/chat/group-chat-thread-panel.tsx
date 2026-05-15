@@ -1079,13 +1079,29 @@ export function GroupChatThreadPanel({
               key: "voice-call",
               icon: Phone,
               label: t(msg`语音通话`),
-              onClick: () => handleDesktopCallAction("voice"),
+              onClick: () => {
+                void navigate({
+                  to: "/group/$groupId/voice-call",
+                  params: { groupId },
+                  ...(currentMobileGroupRouteHash
+                    ? { hash: currentMobileGroupRouteHash }
+                    : {}),
+                });
+              },
             },
             {
               key: "video-call",
               icon: Video,
               label: t(msg`视频通话`),
-              onClick: () => handleDesktopCallAction("video"),
+              onClick: () => {
+                void navigate({
+                  to: "/group/$groupId/video-call",
+                  params: { groupId },
+                  ...(currentMobileGroupRouteHash
+                    ? { hash: currentMobileGroupRouteHash }
+                    : {}),
+                });
+              },
             },
           ]}
           onMore={() => {
