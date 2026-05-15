@@ -27,9 +27,32 @@ import {
 import { useCloudSessionStore } from "../../store/cloud-session-store";
 import { CheckoutContactDialog } from "./checkout-contact-dialog";
 
+// 与 profile-subscription-page (移动端会员中心) 的 formatPrice 对齐——之前桌面
+// 端只回退到 "CNY 49.9" 这种纯货币代码形式，移动端早就有符号映射；同一个套餐
+// 在两端展示不一样会让人怀疑价格。
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  CNY: "¥", // i18n-ignore-line
+  USD: "$", // i18n-ignore-line
+  EUR: "€", // i18n-ignore-line
+  GBP: "£", // i18n-ignore-line
+  JPY: "¥", // i18n-ignore-line
+  HKD: "HK$", // i18n-ignore-line
+  TWD: "NT$", // i18n-ignore-line
+};
+
 function formatPrice(priceCents: number, currency: string) {
   const amount = (priceCents / 100).toFixed(1);
-  return `${currency.toUpperCase()} ${amount}`;
+  const upper = currency.toUpperCase();
+  const symbol = CURRENCY_SYMBOLS[upper];
+  return symbol ? `${symbol}${amount}` : `${upper} ${amount}`;
+}
+
+// email 用户走 synthesizePhoneFromEmail（apps/cloud-api/.../email-auth.service.ts）
+// 落到一个固定形如 "9" + 13 位数字的合成号码，把它当真实手机号展示给用户毫无意义且
+// 会让人以为绑过一个奇怪的国际号。移动端 profile-subscription-page 已经靠这个特征
+// 拦住，这里桌面端同步走一遍。
+function isSynthesizedEmailPhone(phone?: string | null) {
+  return Boolean(phone && /^9\d{13}$/.test(phone));
 }
 
 function formatDateTime(value: string | null | undefined, locale: string) {
@@ -485,8 +508,21 @@ export function SubscriptionPanel({
               {t(msg`会员中心`)}
             </h2>
             <p className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">
-              {t(msg`手机号`)}: {profile.phone || phone || "-"}
-              <br />
+              {isSynthesizedEmailPhone(profile.phone || phone) ? (
+                // 邮箱注册的用户没真手机号，挂上一个 "9xxxxxxxxxxxxx" 合成号
+                // 不如直接展示昵称（cloud_users.displayName，比如 yuanzui0728
+                // 的 "吴港钧"），实在没有再 fallback 到通用 label。
+                <>
+                  {t(msg`账号`)}:{" "}
+                  {profile.displayName?.trim() || t(msg`邮箱账号`)}
+                  <br />
+                </>
+              ) : (
+                <>
+                  {t(msg`手机号`)}: {profile.phone || phone || "-"}
+                  <br />
+                </>
+              )}
               {t(msg`状态`)}: {subscriptionStatusLabel}
               <br />
               {t(msg`当前套餐`)}:{" "}
