@@ -409,7 +409,13 @@ function MobileAddFriend() {
               <button
                 type="button"
                 onClick={() => {
+                  // X 同时清掉 searchText 和 submittedKeyword——之前只清
+                  // searchText，结果输入框已经空了、底下还在显示上一个 keyword
+                  // 的结果，看着像「点 X 没反应」。submittedKeyword 一起清才会
+                  // 回到 welcome 态，跟「取消」按钮一致。
                   setSearchText("");
+                  setSubmittedKeyword("");
+                  setNotice(null);
                   inputRef.current?.focus();
                 }}
                 className="-mr-1 flex h-5 w-5 items-center justify-center rounded-full text-[color:var(--text-dim)] active:bg-black/5"
@@ -530,7 +536,16 @@ function MobileAddFriendWelcomeState({
   onQuickSearch: (keyword: string) => void;
 }) {
   const t = useRuntimeTranslator();
-  const examples = [t(msg`角色名`), t(msg`隐界号`), t(msg`关系描述`)];
+  // chip 必须是「真能搜的字符串」而不是描述用法的标签。原来用 ["角色名",
+  // "隐界号", "关系描述"]——点击就把这些 label 作为 keyword 提交，几乎永远
+  // 命中不到东西。对齐桌面 DesktopAddFriendWelcomeState 的示例：1 个隐界号
+  // 前缀格式（教用户隐界号长什么样）+ 几个角色名/资料关键词示例。
+  const examples = [
+    "yinjie_1234abcd",
+    t(msg`白石`),
+    t(msg`数字人`),
+    t(msg`治愈系`),
+  ];
 
   return (
     <div className="flex flex-col items-center px-6 pt-12 text-center">
