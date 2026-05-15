@@ -72,6 +72,12 @@ const NAV_GROUPS: NavGroup[] = [
         show: (u) => !!u,
       },
       {
+        to: "/my-drafts",
+        label: msg`我的草稿`,
+        icon: "📋",
+        show: (u) => !!u,
+      },
+      {
         to: "/watchlist",
         label: msg`我的观察列表`,
         icon: "👁",

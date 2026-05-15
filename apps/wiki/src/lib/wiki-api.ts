@@ -870,6 +870,12 @@ export const wikiApi = {
      * 仅前端确认弹窗后才传 true；默认 false 维持旧"只填空"语义。
      */
     optimize?: boolean;
+    /**
+     * 仅在「新建」场景传 true：后端在 section='all' AI 生成完成后会把
+     * 用户已填 + AI 输出 merge 写入 character_drafts。即便用户在生成中
+     * 关 tab，后端也会落库，下次进 /my-drafts 仍能看到。
+     */
+    persistAsDraft?: boolean;
   }) {
     return request<AiGeneratedDraft>("/wiki/my-characters/ai-generate", {
       method: "POST",
@@ -887,11 +893,31 @@ export const wikiApi = {
     section: AiGenerateSection;
     currentDraft: PrivateCharacterDto;
     optimize?: boolean;
+    /**
+     * 仅在「新建」场景传 true。同 generateMyCharacterFields 的 persistAsDraft，
+     * 但落库 kind='world'。
+     */
+    persistAsDraft?: boolean;
   }) {
     return request<AiGeneratedDraft>("/wiki/ai-generate-character-fields", {
       method: "POST",
       body: JSON.stringify(input),
     });
+  },
+  /** 列出当前用户的所有草稿，按 updatedAt 倒序。 */
+  listMyDrafts() {
+    return request<MyDraftSummary[]>("/wiki/my-drafts");
+  },
+  /** 取一份完整草稿（含 payload）用于恢复表单。 */
+  getDraft(id: string) {
+    return request<MyDraftDetail>(`/wiki/my-drafts/${encodeURIComponent(id)}`);
+  },
+  /** 删除一份草稿；他人 / 不存在的 id 返回 404。 */
+  async deleteDraft(id: string): Promise<void> {
+    await request<{ success: true }>(
+      `/wiki/my-drafts/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
   },
   /** 触发浏览器下载 export bundle 文件。 */
   async exportMyCharacter(id: string, fallbackName: string): Promise<void> {
@@ -1079,6 +1105,22 @@ export type AiGenerateSection =
   | "scenes"
   | "memory"
   | "all";
+
+/** 我的草稿：character_drafts 表的列表项（不含 payload，列表轻量）。 */
+export type MyDraftSummary = {
+  id: string;
+  kind: "private" | "world";
+  /** 草稿当时的角色 name；未填时为空字符串，列表用 fallback "未命名草稿"。 */
+  name: string;
+  source: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** 单份草稿详情，含 payload —— 用于跳回创建页 hydrate 表单。 */
+export type MyDraftDetail = MyDraftSummary & {
+  payload: PrivateCharacterDto;
+};
 
 /** AI 生成返回的 partial draft；只包含**当前为空**字段的建议。 */
 export type AiGeneratedDraft = {

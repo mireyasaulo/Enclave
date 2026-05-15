@@ -31,6 +31,11 @@ const CharacterDiffPage = lazy(async () => {
   return { default: mod.CharacterDiffPage };
 });
 
+const WorldCharacterEditPage = lazy(async () => {
+  const mod = await import("./routes/world-character-edit-page");
+  return { default: mod.WorldCharacterEditPage };
+});
+
 const CreateCharacterPage = lazy(async () => {
   const mod = await import("./routes/create-character-page");
   return { default: mod.CreateCharacterPage };
@@ -113,6 +118,11 @@ const AccountPage = lazy(async () => {
   return { default: mod.AccountPage };
 });
 
+const MyDraftsPage = lazy(async () => {
+  const mod = await import("./routes/my-drafts-page");
+  return { default: mod.MyDraftsPage };
+});
+
 const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
@@ -155,9 +165,19 @@ const characterDiffRoute = createRoute({
   component: CharacterDiffPage,
 });
 
+const worldCharacterEditRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/character/$characterId/edit",
+  component: WorldCharacterEditPage,
+});
+
 const createCharacterRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/create",
+  validateSearch: (search: Record<string, unknown>): { draftId?: string } =>
+    typeof search.draftId === "string" && search.draftId.length > 0
+      ? { draftId: search.draftId }
+      : {},
   component: CreateCharacterPage,
 });
 
@@ -170,6 +190,10 @@ const myCharactersRoute = createRoute({
 const myCharacterCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/my-characters/new",
+  validateSearch: (search: Record<string, unknown>): { draftId?: string } =>
+    typeof search.draftId === "string" && search.draftId.length > 0
+      ? { draftId: search.draftId }
+      : {},
   component: MyCharacterCreatePage,
 });
 
@@ -236,6 +260,12 @@ const accountRoute = createRoute({
   component: AccountPage,
 });
 
+const myDraftsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/my-drafts",
+  component: MyDraftsPage,
+});
+
 const adminReportsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/admin/reports",
@@ -260,6 +290,7 @@ const routeTree = rootRoute.addChildren([
   registerRoute,
   characterRoute,
   characterDiffRoute,
+  worldCharacterEditRoute,
   createCharacterRoute,
   myCharactersRoute,
   myCharacterCreateRoute,
@@ -277,6 +308,7 @@ const routeTree = rootRoute.addChildren([
   watchlistRoute,
   searchRoute,
   accountRoute,
+  myDraftsRoute,
 ]);
 
 export const router = createRouter({ routeTree });
