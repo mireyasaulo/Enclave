@@ -7621,7 +7621,7 @@ msgstr "Pin chat"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:391
 #: apps/app/src/routes/character-detail-page.tsx:1822
 msgid "默认用语音回复"
-msgstr ""
+msgstr "Reply with voice by default"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:402
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:466
@@ -7677,15 +7677,15 @@ msgstr "Remove from contacts"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:462
 msgid "确定加入黑名单？"
-msgstr ""
+msgstr "Block this contact?"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:464
 msgid "将不再收到 {displayName} 的互动；TA 会从通讯录消失，可在「通讯录管理 → 黑名单」恢复。"
-msgstr ""
+msgstr "You'll no longer receive interactions from {displayName}; they'll disappear from Contacts. Restore them under Contacts management → Blocklist."
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:478
 msgid "确定从通讯录删除 {displayName}？"
-msgstr ""
+msgstr "Delete {displayName} from Contacts?"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:479
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:238
@@ -7761,7 +7761,7 @@ msgstr "Saving..."
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:22
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:70
 msgid "来自相遇"
-msgstr ""
+msgstr "From an encounter"
 
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:28
 msgid "来自摇一摇"
@@ -7774,11 +7774,11 @@ msgstr "Added from search"
 
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:33
 msgid "来自智能推荐"
-msgstr ""
+msgstr "From smart recommendation"
 
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:35
 msgid "来自智能跟进"
-msgstr ""
+msgstr "From smart follow-up"
 
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:38
 msgid "来自咖啡馆"
@@ -11179,7 +11179,7 @@ msgstr "Post something visible to residents, or wait for residents to speak firs
 #: apps/app/src/routes/friend-requests-page.tsx:332
 #: apps/app/src/routes/friend-requests-page.tsx:345
 msgid "查看 {0} 的资料"
-msgstr ""
+msgstr "View {0}'s profile"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:220
 #: apps/app/src/routes/discover-feed-page.tsx:1155
@@ -22548,11 +22548,11 @@ msgstr "Added to contacts."
 
 #: apps/app/src/routes/character-detail-page.tsx:586
 msgid "已开启默认语音回复（消耗 token plan 配额）。"
-msgstr ""
+msgstr "Default voice reply enabled (consumes token plan quota)."
 
 #: apps/app/src/routes/character-detail-page.tsx:587
 msgid "已关闭默认语音回复。"
-msgstr ""
+msgstr "Default voice reply disabled."
 
 #: apps/app/src/routes/character-detail-page.tsx:642
 msgid "朋友资料已更新。"
@@ -25013,11 +25013,11 @@ msgstr "Switching desktop friend requests..."
 
 #: apps/app/src/routes/friend-requests-page.tsx:115
 msgid "已清除过期请求。"
-msgstr ""
+msgstr "Expired requests cleared."
 
 #: apps/app/src/routes/friend-requests-page.tsx:116
 msgid "已忽略好友申请。"
-msgstr ""
+msgstr "Friend request ignored."
 
 #: apps/app/src/routes/friend-requests-page.tsx:247
 msgid "正在读取好友请求"
@@ -25046,7 +25046,7 @@ msgstr "Clearing..."
 
 #: apps/app/src/routes/friend-requests-page.tsx:423
 msgid "拒绝中..."
-msgstr ""
+msgstr "Declining..."
 
 #: apps/app/src/routes/friend-requests-page.tsx:461
 msgid "去发现页摇一摇，或等待场景触发新的相遇。"

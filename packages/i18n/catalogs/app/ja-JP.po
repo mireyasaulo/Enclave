@@ -7621,7 +7621,7 @@ msgstr "チャットをピン留め"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:391
 #: apps/app/src/routes/character-detail-page.tsx:1822
 msgid "默认用语音回复"
-msgstr ""
+msgstr "デフォルトで音声で返信"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:402
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:466
@@ -7677,15 +7677,15 @@ msgstr "連絡先から削除"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:462
 msgid "确定加入黑名单？"
-msgstr ""
+msgstr "ブロックしますか？"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:464
 msgid "将不再收到 {displayName} 的互动；TA 会从通讯录消失，可在「通讯录管理 → 黑名单」恢复。"
-msgstr ""
+msgstr "{displayName} とのやり取りを受け取らなくなり、連絡先からも非表示になります。「連絡先管理 → ブロックリスト」から復元できます。"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:478
 msgid "确定从通讯录删除 {displayName}？"
-msgstr ""
+msgstr "{displayName} を連絡先から削除しますか？"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:479
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:238
@@ -7761,7 +7761,7 @@ msgstr "保存中..."
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:22
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:70
 msgid "来自相遇"
-msgstr ""
+msgstr "出会いから"
 
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:28
 msgid "来自摇一摇"
@@ -7774,11 +7774,11 @@ msgstr "検索から追加"
 
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:33
 msgid "来自智能推荐"
-msgstr ""
+msgstr "スマートおすすめから"
 
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:35
 msgid "来自智能跟进"
-msgstr ""
+msgstr "スマートフォローアップから"
 
 #: apps/app/src/features/contacts/friend-request-scene-label.ts:38
 msgid "来自咖啡馆"
@@ -11179,7 +11179,7 @@ msgstr "住民に公開される投稿を先に出すか、世界の住民が話
 #: apps/app/src/routes/friend-requests-page.tsx:332
 #: apps/app/src/routes/friend-requests-page.tsx:345
 msgid "查看 {0} 的资料"
-msgstr ""
+msgstr "{0} のプロフィールを見る"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:220
 #: apps/app/src/routes/discover-feed-page.tsx:1155
@@ -22548,11 +22548,11 @@ msgstr "連絡先に追加しました。"
 
 #: apps/app/src/routes/character-detail-page.tsx:586
 msgid "已开启默认语音回复（消耗 token plan 配额）。"
-msgstr ""
+msgstr "デフォルト音声返信を有効化しました（token plan クォータを消費します）。"
 
 #: apps/app/src/routes/character-detail-page.tsx:587
 msgid "已关闭默认语音回复。"
-msgstr ""
+msgstr "デフォルト音声返信を無効化しました。"
 
 #: apps/app/src/routes/character-detail-page.tsx:642
 msgid "朋友资料已更新。"
@@ -25013,11 +25013,11 @@ msgstr "デスクトップの友だちリクエストに切り替え中..."
 
 #: apps/app/src/routes/friend-requests-page.tsx:115
 msgid "已清除过期请求。"
-msgstr ""
+msgstr "期限切れのリクエストをクリアしました。"
 
 #: apps/app/src/routes/friend-requests-page.tsx:116
 msgid "已忽略好友申请。"
-msgstr ""
+msgstr "友達申請を無視しました。"
 
 #: apps/app/src/routes/friend-requests-page.tsx:247
 msgid "正在读取好友请求"
@@ -25046,7 +25046,7 @@ msgstr "削除中..."
 
 #: apps/app/src/routes/friend-requests-page.tsx:423
 msgid "拒绝中..."
-msgstr ""
+msgstr "拒否中..."
 
 #: apps/app/src/routes/friend-requests-page.tsx:461
 msgid "去发现页摇一摇，或等待场景触发新的相遇。"
