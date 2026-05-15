@@ -1026,19 +1026,19 @@ msgstr "Retry copying"
 
 #: apps/app/src/components/chat-message-list.tsx:1137
 msgid "此消息没有可朗读的文本。"
-msgstr ""
+msgstr "This message has no readable text."
 
 #: apps/app/src/components/chat-message-list.tsx:1186
 msgid "语音播放失败，请稍后再试。"
-msgstr ""
+msgstr "Voice playback failed, please try again later."
 
 #: apps/app/src/components/chat-message-list.tsx:1209
 msgid "今日语音合成额度已用完，请稍后再试。"
-msgstr ""
+msgstr "Today's speech synthesis quota is used up. Please try again later."
 
 #: apps/app/src/components/chat-message-list.tsx:1210
 msgid "生成语音失败，请稍后再试。"
-msgstr ""
+msgstr "Failed to generate voice. Please try again later."
 
 #: apps/app/src/components/chat-message-list.tsx:1212
 #: apps/app/src/components/chat-message-list.tsx:3335
@@ -1668,14 +1668,14 @@ msgstr "Sender name copied."
 #: apps/app/src/components/chat-message-list.tsx:3542
 #: apps/app/src/components/chat-message-list.tsx:3690
 msgid "停止朗读"
-msgstr ""
+msgstr "Stop reading"
 
 #: apps/app/src/components/chat-message-list.tsx:3543
 #: apps/app/src/components/chat-message-list.tsx:3691
 #: apps/app/src/features/chat/group-message-context-menu.tsx:69
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:59
 msgid "朗读"
-msgstr ""
+msgstr "Read aloud"
 
 #: apps/app/src/components/chat-message-list.tsx:3566
 msgid "我的消息"
@@ -1780,7 +1780,7 @@ msgstr "{actor} recalled a message"
 
 #: apps/app/src/components/chat-message-list.tsx:4217
 msgid "明晚 20:00"
-msgstr ""
+msgstr "Tomorrow 8:00 PM"
 
 #: apps/app/src/components/chat-message-list.tsx:4218
 msgid "今晚 20:00"
@@ -2206,12 +2206,12 @@ msgstr "Current status"
 #: apps/app/src/components/chat-message-list.tsx:5996
 #: apps/app/src/components/chat-message-list.tsx:6211
 msgid "结束于"
-msgstr ""
+msgstr "Ended at"
 
 #: apps/app/src/components/chat-message-list.tsx:5997
 #: apps/app/src/components/chat-message-list.tsx:6212
 msgid "发起于"
-msgstr ""
+msgstr "Started at"
 
 #: apps/app/src/components/chat-message-list.tsx:6019
 #: apps/app/src/i18n/static-dom-seed.ts:993
@@ -2434,7 +2434,7 @@ msgstr "Close action menu"
 
 #: apps/app/src/components/chat-message-list.tsx:6889
 msgid "编辑笔记"
-msgstr ""
+msgstr "Edit note"
 
 #: apps/app/src/components/chat-message-list.tsx:6937
 msgid " 的隐界名片"
@@ -2490,11 +2490,11 @@ msgstr "Dismiss"
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:90
 msgid "已复制微信号，去微信粘贴添加好友吧～"
-msgstr ""
+msgstr "WeChat ID copied — paste it in WeChat to add as a friend."
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:91
 msgid "复制失败，请长按微信号手动复制。"
-msgstr ""
+msgstr "Copy failed. Long-press the WeChat ID to copy it manually."
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:116
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:145
@@ -2538,15 +2538,15 @@ msgstr "Close"
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:146
 msgid "微信号（点一下选中，也可直接复制）"
-msgstr ""
+msgstr "WeChat ID (tap to select, or copy directly)"
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:171
 msgid "一键复制"
-msgstr ""
+msgstr "Copy"
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:177
 msgid "加好友时备注「拉群」，运营会拉你进体验群，第一时间通知功能上线～"
-msgstr ""
+msgstr "Mention \"join group\" when adding as a friend; we'll add you to the early-access group and let you know about new features first."
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:195
 #: apps/app/src/components/feature-unavailable-dialog.tsx:23
@@ -3218,7 +3218,7 @@ msgstr "Live"
 
 #: apps/app/src/components/moment-media-gallery.tsx:652
 msgid "播放视频"
-msgstr ""
+msgstr "Play video"
 
 #: apps/app/src/components/moment-post-card.tsx:126
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:490
@@ -3237,7 +3237,7 @@ msgstr "Share my Moments"
 
 #: apps/app/src/components/moment-share-card-modal.tsx:47
 msgid "分享朋友圈"
-msgstr ""
+msgstr "Share to Moments"
 
 #: apps/app/src/components/moment-share-card-modal.tsx:49
 msgid "{ownerDisplayName} 的 AI 朋友圈"
@@ -3603,7 +3603,7 @@ msgstr "New password must be 8–32 characters."
 
 #: apps/app/src/features/account-security/account-security-panel.tsx:143
 msgid "新密码不能包含空格。"
-msgstr ""
+msgstr "New password cannot contain spaces."
 
 #: apps/app/src/features/account-security/account-security-panel.tsx:150
 msgid "两次输入的密码不一致。"
@@ -3653,15 +3653,15 @@ msgstr "Update password"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:12
 msgid "朋友视频号"
-msgstr ""
+msgstr "Friends' Channels"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:14
 msgid "关注视频号"
-msgstr ""
+msgstr "Followed Channels"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:16
 msgid "视频号直播"
-msgstr ""
+msgstr "Channels Live"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:19
 #: apps/app/src/i18n/static-dom-seed.ts:346
@@ -3670,27 +3670,27 @@ msgstr "Channels recommendations"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:32
 msgid "朋友们还没有发视频号"
-msgstr ""
+msgstr "No friends have posted to Channels yet"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:33
 msgid "等几位朋友发新视频号后，这里就有内容了。"
-msgstr ""
+msgstr "Once a few friends post new Channels, you'll see them here."
 
 #: apps/app/src/features/channels/channels-section-badge.ts:37
 msgid "你还没有关注的视频号作者"
-msgstr ""
+msgstr "You don't follow any Channels creators yet"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:38
 msgid "先去推荐流里点 +关注 喜欢的作者，他们发新内容就会出现在这里。"
-msgstr ""
+msgstr "Head to the recommendations and tap +Follow on creators you like — their new posts will show up here."
 
 #: apps/app/src/features/channels/channels-section-badge.ts:42
 msgid "现在没有正在直播的内容"
-msgstr ""
+msgstr "No live broadcasts right now"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:43
 msgid "等有人开播或者剪出直播回放，这里会自动更新。"
-msgstr ""
+msgstr "When someone goes live or posts a replay, it'll show up here automatically."
 
 #: apps/app/src/features/channels/channels-section-badge.ts:48
 #: apps/app/src/i18n/static-dom-seed.ts:60
@@ -3699,7 +3699,7 @@ msgstr "No Channels content yet"
 
 #: apps/app/src/features/channels/channels-section-badge.ts:49
 msgid "点右上的「换一批」生成一条新内容，或等角色自动发布。"
-msgstr ""
+msgstr "Tap \"Refresh\" in the top right to generate a new post, or wait for characters to publish automatically."
 
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:37
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:38
@@ -8049,19 +8049,19 @@ msgstr "+ Follow"
 #. placeholder {0}: post.likeCount
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:907
 msgid "已点赞，当前 {0} 赞"
-msgstr ""
+msgstr "Liked, currently {0} likes"
 
 #. placeholder {0}: post.likeCount
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:908
 #: apps/app/src/routes/channels-page.tsx:2186
 msgid "点赞，当前 {0} 赞"
-msgstr ""
+msgstr "Like, currently {0} likes"
 
 #. placeholder {0}: post.commentCount
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:918
 #: apps/app/src/routes/channels-page.tsx:2199
 msgid "打开评论，当前 {0} 条"
-msgstr ""
+msgstr "Open comments, currently {0}"
 
 #. placeholder {0}: selectedPost.commentCount
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:983
@@ -10315,7 +10315,7 @@ msgstr "Attachment upload failed. Try again later."
 
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:743
 msgid "先写点内容或加个附件再保存。"
-msgstr ""
+msgstr "Write something or add an attachment before saving."
 
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:859
 #: apps/app/src/routes/mobile-note-editor-page.tsx:856
@@ -10441,7 +10441,7 @@ msgstr "Saved drafts"
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1126
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1068
 msgid "加载笔记中…"
-msgstr ""
+msgstr "Loading note…"
 
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1127
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1069
@@ -10890,11 +10890,11 @@ msgstr "{statusLabel} · Do not disturb on"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-groups-pane.tsx:268
 msgid "{memberCount} 人 · 最近活跃 {lastActivityLabel}"
-msgstr ""
+msgstr "{memberCount} members · Last active {lastActivityLabel}"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-groups-pane.tsx:269
 msgid "最近活跃 {lastActivityLabel}"
-msgstr ""
+msgstr "Last active {lastActivityLabel}"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-groups-pane.tsx:319
 msgid "进入群聊"
@@ -10911,7 +10911,7 @@ msgstr "Group details"
 #. placeholder {0}: friends.length
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:119
 msgid "{0} 位星标朋友"
-msgstr ""
+msgstr "{0} starred friends"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:128
 #: apps/app/src/i18n/static-dom-seed.ts:406
@@ -11217,7 +11217,7 @@ msgstr "No interactions yet"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:250
 msgid "你已经为这条动态点过赞"
-msgstr ""
+msgstr "You've already liked this post"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:262
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:353
@@ -12755,7 +12755,7 @@ msgstr "帮邻居浇了一次水（+{NEIGHBOR_HELP_REWARD} 花圃币）。"
 #. placeholder {0}: state.experience
 #: apps/app/src/features/games/farm/components/coin-display.tsx:47
 msgid "经验 {0}（已满级）"
-msgstr ""
+msgstr "XP {0} (max level)"
 
 #. placeholder {0}: state.plotCount
 #: apps/app/src/features/games/farm/components/coin-display.tsx:52
@@ -14051,7 +14051,7 @@ msgstr "Hour-paced farm"
 
 #: apps/app/src/features/games/game-center-data.ts:262
 msgid "NPC 自治在场"
-msgstr ""
+msgstr "NPC autonomy active"
 
 #: apps/app/src/features/games/game-center-data.ts:263
 msgid "全员 NPC"
@@ -14324,11 +14324,11 @@ msgstr "Two-player same-screen mode keeps amplifying social spread."
 
 #: apps/app/src/features/games/game-center-data.ts:378
 msgid "花圃联营开放后回访稳定增长。"
-msgstr ""
+msgstr "Return visits grew steadily after the garden joint program opened."
 
 #: apps/app/src/features/games/game-center-data.ts:386
 msgid "FC 经典 35 关像素级完整复刻，桌面双人键位首发。"
-msgstr ""
+msgstr "Pixel-perfect remake of the classic 35-level FC original; debuting two-player desktop controls."
 
 #: apps/app/src/features/games/game-center-data.ts:391
 #: apps/app/src/i18n/static-dom-seed.ts:232
@@ -16082,7 +16082,7 @@ msgstr "回到选赛道"
 
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:99
 msgid "暂停游戏"
-msgstr ""
+msgstr "Pause game"
 
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:111
 msgid "已静音"
@@ -18029,23 +18029,23 @@ msgstr "Search friends, nicknames, and world characters"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:88
 msgid "搜账号资料和文章"
-msgstr ""
+msgstr "Search profiles and articles"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:95
 msgid "搜笔记、消息和内容收藏"
-msgstr ""
+msgstr "Search notes, messages and saved items"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:102
 msgid "搜好友动态、评论和点赞"
-msgstr ""
+msgstr "Search friends' posts, comments and likes"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:109
 msgid "搜广场里公开发布的内容"
-msgstr ""
+msgstr "Search public posts in Square"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:222
 msgid "搜索聊天、联系人、公众号、朋友圈和广场"
-msgstr ""
+msgstr "Search chats, contacts, Official Accounts, Moments and Square"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:306
 msgid "正在准备搜一搜"
@@ -18138,7 +18138,7 @@ msgstr "{0}: {1}"
 #. placeholder {0}: character.name
 #: apps/app/src/features/search/use-search-index.ts:347
 msgid "昵称：{0} · {contentSnippet}"
-msgstr ""
+msgstr "Nickname: {0} · {contentSnippet}"
 
 #: apps/app/src/features/search/use-search-index.ts:349
 msgid "查看联系人资料与聊天入口。"
@@ -21826,7 +21826,7 @@ msgstr "World owner not found."
 
 #: apps/app/src/lib/error-translate.ts:491
 msgid "世界主人昵称至少 {minLength} 个字。"
-msgstr ""
+msgstr "The world owner's nickname must be at least {minLength} characters."
 
 #: apps/app/src/lib/error-translate.ts:495
 msgid "公众号关注关系不存在。"
@@ -22273,20 +22273,20 @@ msgstr "Channels comment sent."
 
 #: apps/app/src/routes/channels-page.tsx:281
 msgid "视频号生成额度今日已用完，明天再试。"
-msgstr ""
+msgstr "Today's Channels generation quota is used up — try again tomorrow."
 
 #: apps/app/src/routes/channels-page.tsx:288
 msgid "新视频号正在生成中，几分钟后刷新看看。"
-msgstr ""
+msgstr "A new Channels post is being generated — refresh in a few minutes."
 
 #. placeholder {0}: err.message
 #: apps/app/src/routes/channels-page.tsx:302
 msgid "换一批失败：{0}"
-msgstr ""
+msgstr "Refresh failed: {0}"
 
 #: apps/app/src/routes/channels-page.tsx:303
 msgid "换一批失败，请稍后重试。"
-msgstr ""
+msgstr "Refresh failed, please try again later."
 
 #: apps/app/src/routes/channels-page.tsx:365
 msgid "已取消收藏。"
@@ -22354,36 +22354,36 @@ msgstr "Hold on — syncing the recommendation feed and interactions."
 
 #: apps/app/src/routes/channels-page.tsx:1254
 msgid "还没关注任何视频号"
-msgstr ""
+msgstr "You haven't followed any Channels yet"
 
 #: apps/app/src/routes/channels-page.tsx:1256
 msgid "朋友还没有视频号动态"
-msgstr ""
+msgstr "No Channels posts from friends yet"
 
 #: apps/app/src/routes/channels-page.tsx:1258
 msgid "暂无正在直播"
-msgstr ""
+msgstr "No live broadcasts right now"
 
 #: apps/app/src/routes/channels-page.tsx:1264
 msgid "去推荐 tab 找一找感兴趣的作者，点 +关注 把他们留下来，新内容会在这里聚合显示。"
-msgstr ""
+msgstr "Browse the Recommendations tab, find creators you like, and tap +Follow — their new posts will appear here."
 
 #: apps/app/src/routes/channels-page.tsx:1268
 msgid "等通讯录里的角色发新视频号动态，这里就会聚合显示。"
-msgstr ""
+msgstr "When characters in your contacts post new Channels content, you'll see it gathered here."
 
 #: apps/app/src/routes/channels-page.tsx:1271
 msgid "稍后再来看看，可能有角色开播。"
-msgstr ""
+msgstr "Check back later — characters may go live."
 
 #: apps/app/src/routes/channels-page.tsx:1289
 msgid "去推荐看看"
-msgstr ""
+msgstr "Browse recommendations"
 
 #. placeholder {0}: post.likeCount
 #: apps/app/src/routes/channels-page.tsx:2185
 msgid "取消点赞，当前 {0} 赞"
-msgstr ""
+msgstr "Unlike, currently {0} likes"
 
 #. placeholder {0}: formatTimestamp(post.createdAt)
 #: apps/app/src/routes/channels-page.tsx:2246
@@ -22396,7 +22396,7 @@ msgstr "Recent comments"
 
 #: apps/app/src/routes/channels-page.tsx:2341
 msgid "图集"
-msgstr ""
+msgstr "Photo gallery"
 
 #: apps/app/src/routes/channels-page.tsx:2476
 msgid "关闭评论面板"
@@ -23483,7 +23483,7 @@ msgstr "View, expand, and clean recent chat history by chat"
 
 #: apps/app/src/routes/desktop-chat-history-page.tsx:285
 msgid "已刷新当前会话最近的记录。"
-msgstr ""
+msgstr "Refreshed the latest records for this conversation."
 
 #: apps/app/src/routes/desktop-chat-history-page.tsx:308
 msgid "加载更早消息"
@@ -23691,7 +23691,7 @@ msgstr "Feedback category: {0}"
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:711
 msgid "优先级：{priorityRawLabel}"
-msgstr ""
+msgstr "Priority: {priorityRawLabel}"
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:712
 #: apps/app/src/routes/desktop-feedback-page.tsx:713
@@ -24799,7 +24799,7 @@ msgstr "Visible posts"
 
 #: apps/app/src/routes/discover-page.tsx:1160
 msgid "朋友圈、广场、相遇、视频号、游戏和小程序都从这里继续打开。"
-msgstr ""
+msgstr "Moments, Square, Encounters, Channels, games and mini-programs all open from here."
 
 #: apps/app/src/routes/discover-page.tsx:1165
 msgid "社交与动态"
@@ -24926,7 +24926,7 @@ msgstr "{0} items added to desktop Favorites"
 
 #: apps/app/src/routes/favorites-page.tsx:493
 msgid "消息与笔记"
-msgstr ""
+msgstr "Messages & Notes"
 
 #: apps/app/src/routes/favorites-page.tsx:550
 msgid "内容摘要"
@@ -25094,7 +25094,7 @@ msgstr "This game"
 
 #: apps/app/src/routes/games-page.tsx:307
 msgid "{launchedName} 已加入最近玩过，正在准备入口。"
-msgstr ""
+msgstr "{launchedName} has been added to Recently Played; the entry point is being prepared."
 
 #: apps/app/src/routes/games-page.tsx:328
 msgid "已再次邀请 {inviteFriendName} 一起玩{inviteGameName}。"
@@ -26842,7 +26842,7 @@ msgstr "Notify to view"
 
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:619
 msgid "选择媒体"
-msgstr ""
+msgstr "Choose media"
 
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:634
 msgid "从相册选择图片"
@@ -26910,12 +26910,12 @@ msgstr "Draft · Updated {0}"
 
 #: apps/app/src/routes/moments-page.tsx:355
 msgid "重试点赞"
-msgstr ""
+msgstr "Retry like"
 
 #. placeholder {0}: error.message
 #: apps/app/src/routes/moments-page.tsx:359
 msgid "点赞失败：{0}"
-msgstr ""
+msgstr "Like failed: {0}"
 
 #: apps/app/src/routes/moments-page.tsx:360
 #: apps/app/src/routes/profile-moments-page.tsx:150
@@ -26925,7 +26925,7 @@ msgstr "Failed to like. Please try again later."
 #. placeholder {0}: err.message
 #: apps/app/src/routes/moments-page.tsx:546
 msgid "评论失败：{0}"
-msgstr ""
+msgstr "Comment failed: {0}"
 
 #: apps/app/src/routes/moments-page.tsx:547
 #: apps/app/src/routes/profile-moments-page.tsx:215
@@ -26934,12 +26934,12 @@ msgstr "Failed to comment. Please try again later."
 
 #: apps/app/src/routes/moments-page.tsx:620
 msgid "重试删除"
-msgstr ""
+msgstr "Retry delete"
 
 #. placeholder {0}: error.message
 #: apps/app/src/routes/moments-page.tsx:624
 msgid "删除失败：{0}"
-msgstr ""
+msgstr "Delete failed: {0}"
 
 #: apps/app/src/routes/moments-page.tsx:625
 #: apps/app/src/routes/profile-moments-page.tsx:274
@@ -26983,11 +26983,11 @@ msgstr "Delete this post?"
 #. placeholder {0}: error.message
 #: apps/app/src/routes/moments-page.tsx:1302
 msgid "刷新失败：{0}"
-msgstr ""
+msgstr "Refresh failed: {0}"
 
 #: apps/app/src/routes/moments-page.tsx:1303
 msgid "刷新失败，请稍后重试。"
-msgstr ""
+msgstr "Refresh failed, please try again later."
 
 #: apps/app/src/routes/moments-page.tsx:1582
 msgid "正在刷新朋友圈"
@@ -26996,11 +26996,11 @@ msgstr "Refreshing Moments"
 #. placeholder {0}: fetchNextPageError.message
 #: apps/app/src/routes/moments-page.tsx:1667
 msgid "加载更多失败：{0}"
-msgstr ""
+msgstr "Load more failed: {0}"
 
 #: apps/app/src/routes/moments-page.tsx:1668
 msgid "加载更多失败，请稍后重试。"
-msgstr ""
+msgstr "Load more failed, please try again later."
 
 #: apps/app/src/routes/moments-page.tsx:1711
 msgid "你先发一条动态，或者等世界里的角色们先开口。"
@@ -27865,7 +27865,7 @@ msgstr "Enter the World Owner's name."
 
 #: apps/app/src/routes/welcome-page.tsx:975
 msgid "名字至少 {MIN_OWNER_NAME_LENGTH} 个字，请取一个真正的昵称。"
-msgstr ""
+msgstr "Your name must be at least {MIN_OWNER_NAME_LENGTH} characters — please pick a real nickname."
 
 #: apps/app/src/routes/welcome-page.tsx:981
 msgid "请先连接世界，再设置世界主人名称。"
@@ -27992,11 +27992,11 @@ msgstr "Name the World Owner"
 
 #: apps/app/src/routes/welcome-page.tsx:1422
 msgid "输入你希望被怎么称呼（至少 {MIN_OWNER_NAME_LENGTH} 个字）"
-msgstr ""
+msgstr "Enter what you want to be called (at least {MIN_OWNER_NAME_LENGTH} characters)"
 
 #: apps/app/src/routes/welcome-page.tsx:1428
 msgid "这是世界里所有 AI 朋友对你的称呼，名字至少 {MIN_OWNER_NAME_LENGTH} 个字。"
-msgstr ""
+msgstr "This is what all AI friends in the world will call you; the name must be at least {MIN_OWNER_NAME_LENGTH} characters."
 
 #: apps/app/src/routes/welcome-page.tsx:1446
 msgid "返回上一步"
