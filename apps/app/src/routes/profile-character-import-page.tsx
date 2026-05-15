@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -18,6 +19,7 @@ import { AppPage, Button, cn } from "@yinjie/ui";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
+import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 type Result =
   | {
@@ -40,6 +42,8 @@ type FilePreview = {
 export function ProfileCharacterImportPage() {
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const baseUrl = useAppRuntimeConfig().apiBaseUrl;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
@@ -105,6 +109,15 @@ export function ProfileCharacterImportPage() {
       });
       return;
     }
+    // 纯零宽字符名字 trim 后非空但渲染为空白，导入后通讯录会出现点不开的空标签。
+    // 与后端 isPrivateImportNameVisuallyEmpty / wiki 写入路径同语义先在 UI 拒。
+    if (p.name.trim().replace(/[​-‍﻿⁠]/g, "").length === 0) {
+      setResult({
+        kind: "danger",
+        message: t(msg`name 不能是仅零宽字符的空白文本，请编辑文件后再试。`),
+      });
+      return;
+    }
     setPreview({
       fileName: file.name,
       fileSize: file.size,
@@ -150,6 +163,14 @@ export function ProfileCharacterImportPage() {
         overwrote: res.overwrote,
       });
       setPreview(null);
+      // 通讯录 / 角色列表用 react-query 缓存，staleTime 10-60s 内不会重新拉。
+      // 不显式 invalidate，用户立刻点"去通讯录"可能看不到新导入的角色。
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["app-friends", baseUrl] }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-characters", baseUrl],
+        }),
+      ]);
     } catch (err) {
       setResult({
         kind: "danger",

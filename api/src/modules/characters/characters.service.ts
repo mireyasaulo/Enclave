@@ -477,6 +477,14 @@ export class CharactersService implements OnModuleInit {
         legacyMessage: '导入文件缺少 name 字段。',
       });
     }
+    // 纯零宽字符 / BOM 名字 trim 后非空但"视觉为空"，会在好友列表/对话列表
+    // 渲染出无法点击的空标签。和 wiki 私有角色写入路径 / 朋友圈正文一致拒绝。
+    if (isPrivateImportNameVisuallyEmpty(trimmedName)) {
+      throw new AppError('PRIVATE_IMPORT_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'name 不能是仅零宽字符的空白文本。',
+      });
+    }
     // 防御性长度校验：DB 是 text 列没硬限，但用户填的 bio/persona 直接拼到
     // AI prompt 里，过长会撑爆 context cost；同时 60+KB 的 recipe/profile JSON
     // 几乎一定是误传。在这里挡一道，比上线后被 prompt cost 烧出 P0 强。
@@ -806,6 +814,15 @@ export class CharactersService implements OnModuleInit {
     });
     return new Set(friendships.map((item) => item.characterId));
   }
+}
+
+// trim 后再剥零宽字符（U+200B-U+200D / U+FEFF / U+2060），用来判定"视觉为空"。
+// 和 wiki-private-character.service.ts 的 isVisuallyEmpty 同语义，避免纯 ZWS 名字
+// 被 trim() 漏过、导入后在通讯录里出现一行点不开的空标签。
+function isPrivateImportNameVisuallyEmpty(raw: string): boolean {
+  const trimmed = raw.trim();
+  if (!trimmed) return true;
+  return trimmed.replace(/[​-‍﻿⁠]/g, '').length === 0;
 }
 
 // 字段长度上限。后端 entity 是 text/json 列没硬限，但用户填的内容直接进
