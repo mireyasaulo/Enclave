@@ -31,6 +31,10 @@ import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { sanitizeAiText } from '../ai/ai-text-sanitizer';
 import { MomentPostEntity } from '../moments/moment-post.entity';
 import { FeedPostEntity } from '../feed/feed-post.entity';
+import {
+  FriendRemarkResolver,
+  type FriendRemarkMap,
+} from '../social/friend-remark-resolver.service';
 import { SchedulerTelemetryService } from '../scheduler/scheduler-telemetry.service';
 import type { SchedulerJobId } from '../scheduler/scheduler-telemetry.types';
 import type { GroupReplyPlannerCandidateDiagnostic } from '../chat/group-reply.types';
@@ -115,7 +119,25 @@ export class ReplyLogicAdminService {
     private readonly replyLogicRules: ReplyLogicRulesService,
     private readonly groupReplyTaskService: GroupReplyTaskService,
     private readonly schedulerTelemetry: SchedulerTelemetryService,
+    private readonly friendRemarkResolver: FriendRemarkResolver,
   ) {}
+
+  private computeSenderRemark(
+    senderType: string | null | undefined,
+    senderId: string | null | undefined,
+    originalName: string,
+    remarkMap: FriendRemarkMap | null | undefined,
+  ): { from: string; to: string } | null {
+    if (!remarkMap || !senderId || senderType !== 'character') return null;
+    const mapped = this.friendRemarkResolver.applyCharacterRemark(
+      senderType,
+      senderId,
+      originalName,
+      remarkMap,
+    );
+    if (mapped === originalName) return null;
+    return { from: originalName, to: mapped };
+  }
 
   async getOverview(): Promise<ReplyLogicOverview> {
     const owner = await this.getOwnerOrThrow();
@@ -196,12 +218,16 @@ export class ReplyLogicAdminService {
     const visibleMessages = primaryConversation
       ? await this.loadConversationMessages(primaryConversation)
       : [];
+    const remarkMap = await this.friendRemarkResolver.getOwnerRemarkMap(
+      owner.id,
+    );
     const actor = await this.buildActorSnapshot({
       character,
       isGroupChat: false,
       visibleMessages,
       lastChatAt: this.findLastUserMessageAt(visibleMessages),
       includeStateGate: true,
+      remarkMap,
     });
 
     return {
@@ -241,8 +267,16 @@ export class ReplyLogicAdminService {
         this.getStoredConversationParticipantIds(storedConversation);
       const visibleMessages =
         await this.loadConversationMessages(storedConversation);
+      const remarkMap = await this.friendRemarkResolver.getOwnerRemarkMap(
+        owner.id,
+      );
       const visibleHistory = visibleMessages.map((message) =>
-        this.toHistoryItemFromConversationMessage(message, false, runtimeRules),
+        this.toHistoryItemFromConversationMessage(
+          message,
+          false,
+          runtimeRules,
+          remarkMap,
+        ),
       );
       const characters = (
         await this.characterRepo.find({
@@ -260,6 +294,7 @@ export class ReplyLogicAdminService {
             visibleMessages,
             lastChatAt: this.findLastUserMessageAt(visibleMessages),
             includeStateGate: true,
+            remarkMap,
           }),
         ),
       );
@@ -336,6 +371,9 @@ export class ReplyLogicAdminService {
       (left, right) =>
         characterIds.indexOf(left.id) - characterIds.indexOf(right.id),
     );
+    const remarkMap = await this.friendRemarkResolver.getOwnerRemarkMap(
+      owner.id,
+    );
     const actors = await Promise.all(
       characters.map((character) =>
         this.buildActorSnapshot({
@@ -343,6 +381,7 @@ export class ReplyLogicAdminService {
           isGroupChat: true,
           visibleMessages: messages,
           includeStateGate: false,
+          remarkMap,
         }),
       ),
     );
@@ -361,6 +400,7 @@ export class ReplyLogicAdminService {
           actors[0]?.windowMessages.some((item) => item.id === message.id) ??
             false,
           runtimeRules,
+          remarkMap,
         ),
       ),
       actors,
@@ -404,6 +444,9 @@ export class ReplyLogicAdminService {
     const visibleMessages = primaryConversation
       ? await this.loadConversationMessages(primaryConversation)
       : [];
+    const remarkMap = await this.friendRemarkResolver.getOwnerRemarkMap(
+      owner.id,
+    );
     const actor = await this.buildActorSnapshot({
       character,
       isGroupChat: false,
@@ -411,6 +454,7 @@ export class ReplyLogicAdminService {
       lastChatAt: this.findLastUserMessageAt(visibleMessages),
       includeStateGate: true,
       previewUserMessage: userMessage,
+      remarkMap,
     });
     const runtimeRules = await this.replyLogicRules.getRules();
 
@@ -465,6 +509,9 @@ export class ReplyLogicAdminService {
         });
       }
 
+      const remarkMap = await this.friendRemarkResolver.getOwnerRemarkMap(
+        owner.id,
+      );
       const actor = await this.buildActorSnapshot({
         character: selectedCharacter,
         isGroupChat: false,
@@ -472,6 +519,7 @@ export class ReplyLogicAdminService {
         lastChatAt: this.findLastUserMessageAt(visibleMessages),
         includeStateGate: true,
         previewUserMessage: userMessage,
+        remarkMap,
       });
 
       return {
@@ -535,6 +583,9 @@ export class ReplyLogicAdminService {
       });
     }
 
+    const remarkMap = await this.friendRemarkResolver.getOwnerRemarkMap(
+      owner.id,
+    );
     const actor = await this.buildActorSnapshot({
       character: selectedCharacter,
       isGroupChat: true,
@@ -542,6 +593,7 @@ export class ReplyLogicAdminService {
       lastChatAt: this.findLastUserMessageAt(messages),
       includeStateGate: false,
       previewUserMessage: userMessage,
+      remarkMap,
     });
 
     return {
@@ -896,6 +948,7 @@ export class ReplyLogicAdminService {
     lastChatAt?: Date;
     includeStateGate: boolean;
     previewUserMessage?: string;
+    remarkMap?: FriendRemarkMap | null;
   }): Promise<ReplyLogicActorSnapshot> {
     const character = input.character;
     const runtimeRules = await this.replyLogicRules.getRules();
@@ -951,7 +1004,9 @@ export class ReplyLogicAdminService {
       visibleHistoryCount: input.visibleMessages.length,
       windowMessages: input.visibleMessages
         .slice(-inspection.historyWindow)
-        .map((message) => this.toHistoryItem(message, true, runtimeRules)),
+        .map((message) =>
+          this.toHistoryItem(message, true, runtimeRules, input.remarkMap),
+        ),
       requestMessages: inspection.requestMessages,
       promptSections,
       effectivePrompt: inspection.systemPrompt,
@@ -1038,12 +1093,14 @@ export class ReplyLogicAdminService {
     message: MessageEntity | GroupMessageEntity,
     includedInWindow: boolean,
     runtimeRules: Awaited<ReturnType<ReplyLogicRulesService['getRules']>>,
+    remarkMap?: FriendRemarkMap | null,
   ): ReplyLogicHistoryItem {
     if ('conversationId' in message) {
       return this.toHistoryItemFromConversationMessage(
         message,
         includedInWindow,
         runtimeRules,
+        remarkMap,
       );
     }
 
@@ -1051,6 +1108,7 @@ export class ReplyLogicAdminService {
       message,
       includedInWindow,
       runtimeRules,
+      remarkMap,
     );
   }
 
@@ -1058,12 +1116,20 @@ export class ReplyLogicAdminService {
     message: MessageEntity,
     includedInWindow: boolean,
     runtimeRules: Awaited<ReturnType<ReplyLogicRulesService['getRules']>>,
+    remarkMap?: FriendRemarkMap | null,
   ): ReplyLogicHistoryItem {
+    const senderRemark = this.computeSenderRemark(
+      message.senderType,
+      message.senderId,
+      message.senderName,
+      remarkMap,
+    );
     return {
       id: message.id,
       senderType: message.senderType as 'user' | 'character' | 'system',
       senderId: message.senderId,
-      senderName: message.senderName,
+      senderName: senderRemark?.to ?? message.senderName,
+      senderRemark,
       type: message.type,
       text:
         message.senderType === 'character'
@@ -1082,12 +1148,20 @@ export class ReplyLogicAdminService {
     message: GroupMessageEntity,
     includedInWindow: boolean,
     runtimeRules: Awaited<ReturnType<ReplyLogicRulesService['getRules']>>,
+    remarkMap?: FriendRemarkMap | null,
   ): ReplyLogicHistoryItem {
+    const senderRemark = this.computeSenderRemark(
+      message.senderType,
+      message.senderId,
+      message.senderName,
+      remarkMap,
+    );
     return {
       id: message.id,
       senderType: message.senderType as 'user' | 'character' | 'system',
       senderId: message.senderId,
-      senderName: message.senderName,
+      senderName: senderRemark?.to ?? message.senderName,
+      senderRemark,
       type: message.type,
       text:
         message.senderType === 'character'

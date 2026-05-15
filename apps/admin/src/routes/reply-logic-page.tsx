@@ -2744,6 +2744,11 @@ function HistoryList({
                 <StatusPill tone="muted">
                   {formatMessageType(item.type)}
                 </StatusPill>
+                {item.senderRemark ? (
+                  <StatusPill tone="muted">
+                    {t(msg`备注`)} ← {item.senderRemark.from}
+                  </StatusPill>
+                ) : null}
                 {item.attachmentKind ? (
                   <StatusPill tone="warning">
                     {formatAttachmentKind(item.attachmentKind)}
