@@ -156,7 +156,13 @@ export function MobileMomentsPublishPage() {
   }
 
   function handleBack() {
-    if (composeDraft.hasContent && !createMutation.isPending) {
+    // 正在上传/发表中：禁止返回——TanStack mutation 没接 AbortSignal，悄悄走人也
+    // 拦不下来这次发表（用户以为放弃了，但 onSuccess 仍会触发 flash + 跳回朋友圈
+    // 看到自己刚才说"放弃"的那条已经在列表里）。强制等 isPending 翻到 false。
+    if (createMutation.isPending) {
+      return;
+    }
+    if (composeDraft.hasContent) {
       setDiscardConfirmOpen(true);
       return;
     }
@@ -221,7 +227,13 @@ export function MobileMomentsPublishPage() {
           <button
             type="button"
             onClick={handleBack}
-            className="h-9 px-2 text-[15px] text-[#1A1A1A] active:opacity-70"
+            disabled={createMutation.isPending}
+            className={cn(
+              "h-9 px-2 text-[15px] active:opacity-70",
+              createMutation.isPending
+                ? "text-[#B0B0B0]"
+                : "text-[#1A1A1A]",
+            )}
           >
             {t(msg`取消`)}
           </button>
@@ -265,7 +277,9 @@ export function MobileMomentsPublishPage() {
             autoFocus
           />
 
-          {showImageGrid || showVideoSlot || showAddTile ? (
+          {showImageGrid || showVideoSlot ? (
+            // 已经有图片/视频：进入 3 列 grid 布局，把媒体格子和"再加一张"小 +
+            // 放一起，体感与微信发朋友圈一致。
             <div
               className="mt-3 grid"
               style={{
@@ -348,7 +362,9 @@ export function MobileMomentsPublishPage() {
                 </button>
               ) : null}
             </div>
-          ) : (
+          ) : showAddTile ? (
+            // 还没选媒体：留一个大点的入口，按一下走 picker sheet 决定走图片还是
+            // 视频；和微信发朋友圈的初始空态一致。
             <div className="mt-3">
               <button
                 type="button"
@@ -359,7 +375,7 @@ export function MobileMomentsPublishPage() {
                 <Plus size={32} strokeWidth={1.4} />
               </button>
             </div>
-          )}
+          ) : null}
 
           <div className="h-3" />
         </section>
