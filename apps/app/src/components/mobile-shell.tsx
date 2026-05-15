@@ -2,9 +2,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
   type PropsWithChildren,
-  type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
@@ -51,17 +49,8 @@ export function MobileShell({ children }: PropsWithChildren) {
   const activeKeepAlivePath = KEEP_ALIVE_TAB_PATHS.has(pathname)
     ? pathname
     : null;
-  // 同一 Tab 内 search/hash 切换时，强制刷新缓存的 React 子树
-  const activeKeepAliveCacheKey = activeKeepAlivePath
-    ? `${activeKeepAlivePath}${search}${hash}`
-    : null;
   const runtimeConfig = useAppRuntimeConfig();
   const { reminders } = useMessageReminders();
-  const [cachedTabPages, setCachedTabPages] = useState<
-    Partial<
-      Record<(typeof tabs)[number]["to"], { cacheKey: string; node: ReactNode }>
-    >
-  >({});
 
   const { data: conversations } = useQuery({
     queryKey: ["app-conversations", runtimeConfig.apiBaseUrl],
@@ -110,49 +99,32 @@ export function MobileShell({ children }: PropsWithChildren) {
     };
   }, []);
 
-  useEffect(() => {
-    if (!activeKeepAlivePath || !activeKeepAliveCacheKey) {
-      return;
-    }
-
-    setCachedTabPages((current) => {
-      const existing = current[activeKeepAlivePath];
-      if (existing && existing.cacheKey === activeKeepAliveCacheKey) {
-        return current;
-      }
-
-      return {
-        ...current,
-        [activeKeepAlivePath]: {
-          cacheKey: activeKeepAliveCacheKey,
-          node: children,
-        },
-      };
-    });
-  }, [activeKeepAlivePath, activeKeepAliveCacheKey, children]);
-
   return (
     <div className="yj-mobile-shell relative h-dvh min-h-dvh overflow-hidden bg-[color:var(--bg-canvas)] text-[color:var(--text-primary)]">
       <MobileReminderToastHost />
       <div className="flex h-full min-h-0 flex-col">
         <div className="relative min-h-0 flex-1">
-          {tabs.map(({ to }) => {
-            const cached = cachedTabPages[to];
-            const isActive = activeKeepAlivePath === to;
-            const page = isActive ? cached?.node ?? children : cached?.node;
-            if (!page) {
-              return null;
-            }
+          {/*
+            原 keep-alive 设计想把切走的 tab 内容留在 DOM 里做"切回即出现"，
+            实现是把 children（含 <Outlet/>）缓存进 cachedTabPages 然后渲染
+            多个 pane。但 Outlet 永远按当前 router context 渲染，缓存里的
+            元素引用复用进新 pane 后渲染的还是当前 URL 的路由组件——结果
+            就是切到 /tabs/contacts 时 /tabs/chat 那个 hidden pane 也渲染
+            ContactsPage，整页出现重复的 id=contact-section-a 等，
+            document.getElementById 命中的是 hidden pane 里的元素（height=0），
+            字母索引点击 scrollIntoView 失效。
 
-            return (
-              <MobileViewportPane key={to} active={isActive}>
-                {page}
-              </MobileViewportPane>
-            );
-          })}
-          {activeKeepAlivePath ? null : (
-            <MobileViewportPane active safeBottom>{children}</MobileViewportPane>
-          )}
+            keep-alive 既然真没在保存任何东西，干脆只渲染当前 active pane，
+            DOM 里只剩一份元素，scrollIntoView / focus / 其它 ID 查询都正常。
+            tab 间状态本来就走不到这一层（已走 React Query / zustand 存储）。
+          */}
+          <MobileViewportPane
+            key={activeKeepAlivePath ?? "non-tab"}
+            active
+            safeBottom={!activeKeepAlivePath}
+          >
+            {children}
+          </MobileViewportPane>
         </div>
         {showTabs ? (
           <nav
