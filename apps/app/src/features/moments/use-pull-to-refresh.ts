@@ -34,11 +34,32 @@ type UsePullToRefreshResult = {
   state: PullState;
 };
 
+// 朋友圈页 / Moments 页 / 角色 Profile 朋友圈页 都把 ref 挂在
+// `<div className="flex-1 overflow-y-auto">` 上，但这个 div 的父级（AppPage）
+// 不是 flex 容器，`flex-1 overflow-y-auto` 完全失效——真正在滚的是 MobileShell
+// 的 MobileViewportPane（absolute inset-0 overflow-y-auto）。
+// 直接读 ref 的 scrollTop 永远是 0 → handleTouchStart 的「我在不在顶」判定恒真
+// → 用户在列表中段下拉想上滑回顶时，pull-to-refresh 误判成「下拉刷新」，
+// touchmove preventDefault 把整段滚动锁死。
+// 这里向上找最近一个真正可滚动的祖先并把监听挂到它上面，scrollTop 也读它的。
+function resolveScrollContainer(node: HTMLElement): HTMLElement {
+  let candidate: HTMLElement | null = node.parentElement;
+  while (candidate) {
+    const overflowY = window.getComputedStyle(candidate).overflowY;
+    if (overflowY === "auto" || overflowY === "scroll" || overflowY === "overlay") {
+      return candidate;
+    }
+    candidate = candidate.parentElement;
+  }
+  return (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
+}
+
 export function usePullToRefresh({
   onRefresh,
   enabled = true,
 }: UsePullToRefreshOptions): UsePullToRefreshResult {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const scrollerRef = useRef<HTMLElement | null>(null);
   const startYRef = useRef<number | null>(null);
   const activePullRef = useRef(false);
   // 用 ref 跟 state 同步 refreshing 状态——handler 是 useCallback 锁住的闭包，
@@ -78,10 +99,10 @@ export function usePullToRefresh({
       if (!enabled) return;
       // 正在刷新：完全让位给原生滚动，让用户能上滑查看列表。
       if (refreshingRef.current) return;
-      const node = containerRef.current;
-      if (!node) return;
+      const scroller = scrollerRef.current;
+      if (!scroller) return;
       // Only start tracking when scroll is at top.
-      if (node.scrollTop > 0) return;
+      if (scroller.scrollTop > 0) return;
       startYRef.current = event.touches[0]?.clientY ?? null;
     },
     [enabled],
@@ -93,8 +114,8 @@ export function usePullToRefresh({
       // 刷新进行中绝不 preventDefault，否则 iOS 会把整段手势锁成"非滚动"，
       // 之后用户上滑也不会触发原生滚动。
       if (refreshingRef.current) return;
-      const node = containerRef.current;
-      if (!node) return;
+      const scroller = scrollerRef.current;
+      if (!scroller) return;
       const startY = startYRef.current;
       if (startY === null) return;
 
@@ -174,15 +195,18 @@ export function usePullToRefresh({
   useEffect(() => {
     const node = containerRef.current;
     if (!node || !enabled) return;
-    node.addEventListener("touchstart", handleTouchStart, { passive: true });
-    node.addEventListener("touchmove", handleTouchMove, { passive: false });
-    node.addEventListener("touchend", handleTouchEnd);
-    node.addEventListener("touchcancel", handleTouchEnd);
+    const scroller = resolveScrollContainer(node);
+    scrollerRef.current = scroller;
+    scroller.addEventListener("touchstart", handleTouchStart, { passive: true });
+    scroller.addEventListener("touchmove", handleTouchMove, { passive: false });
+    scroller.addEventListener("touchend", handleTouchEnd);
+    scroller.addEventListener("touchcancel", handleTouchEnd);
     return () => {
-      node.removeEventListener("touchstart", handleTouchStart);
-      node.removeEventListener("touchmove", handleTouchMove);
-      node.removeEventListener("touchend", handleTouchEnd);
-      node.removeEventListener("touchcancel", handleTouchEnd);
+      scroller.removeEventListener("touchstart", handleTouchStart);
+      scroller.removeEventListener("touchmove", handleTouchMove);
+      scroller.removeEventListener("touchend", handleTouchEnd);
+      scroller.removeEventListener("touchcancel", handleTouchEnd);
+      scrollerRef.current = null;
     };
   }, [enabled, handleTouchEnd, handleTouchMove, handleTouchStart]);
 
