@@ -38,10 +38,13 @@ export function useUsernameMap(rawIds: Array<string | null | undefined>) {
     }
     return {
       map,
-      // 未命中时给 caller 一个稳定的回落（截前 8 位的 UUID 比整串好认）。
+      // 未命中（用户被删 / 外部账号 / 系统操作）时回落到短哈希形式 #abcd1234，
+      // 让 UI 永远不会漏出 36 字符的整串 UUID。
       resolve(id: string | null | undefined): string {
         if (!id) return "";
-        return map.get(id) ?? id;
+        const hit = map.get(id);
+        if (hit) return hit;
+        return `#${id.slice(0, 8)}`;
       },
     };
   }, [q.data]);
