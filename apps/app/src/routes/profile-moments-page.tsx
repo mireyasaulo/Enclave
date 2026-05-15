@@ -623,7 +623,22 @@ export function ProfileMomentsPage() {
 
           {momentsQuery.isError && momentsQuery.error ? (
             <div className="px-4 pt-10">
-              <ErrorBlock message={describeRequestError(momentsQuery.error)} />
+              <ErrorBlock message={describeRequestError(momentsQuery.error)}>
+                <div className="mt-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 rounded-full border-[#E5E5E5] bg-white px-3.5 text-[12px]"
+                    onClick={() => {
+                      void momentsQuery.refetch();
+                    }}
+                    disabled={momentsQuery.isFetching}
+                  >
+                    {momentsQuery.isFetching ? t(msg`重新加载中...`) : t(msg`重试`)}
+                  </Button>
+                </div>
+              </ErrorBlock>
             </div>
           ) : null}
 
