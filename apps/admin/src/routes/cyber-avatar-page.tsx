@@ -538,7 +538,11 @@ export function CyberAvatarPage() {
     pendingSignalCount: profile.pendingSignalCount,
     missingSurfaces: profile.sourceCoverage.missingSurfaces,
     hasLatestBrief: Boolean(realWorld.latestBrief),
-    realWorldEnabled: Boolean(parsedRules?.interaction.realWorldSyncEnabled),
+    // 用服务端已生效的 rules 而非 parsedRules——后者在 JSON 解析失败时为 null，
+    // 会让"draft 解析失败"误报成"服务端关闭了真实世界回流"。
+    realWorldEnabled: Boolean(
+      overview.rules.interaction?.realWorldSyncEnabled,
+    ),
     isRulesDirty,
   });
 
