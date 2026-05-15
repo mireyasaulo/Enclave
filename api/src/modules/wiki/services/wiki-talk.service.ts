@@ -4,6 +4,7 @@ import { AppError } from '../../../common/app-error.exception';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
+import { CharacterPageEntity } from '../entities/character-page.entity';
 import { WikiTalkPostEntity } from '../entities/wiki-talk-post.entity';
 import { WikiTalkThreadEntity } from '../entities/wiki-talk-thread.entity';
 import { rankOf } from '../guards/wiki-role.guard';
@@ -18,6 +19,8 @@ export class WikiTalkService {
     private readonly threadRepo: Repository<WikiTalkThreadEntity>,
     @InjectRepository(WikiTalkPostEntity)
     private readonly postRepo: Repository<WikiTalkPostEntity>,
+    @InjectRepository(CharacterPageEntity)
+    private readonly pageRepo: Repository<CharacterPageEntity>,
     private readonly blocks: WikiBlockService,
   ) {}
 
@@ -51,6 +54,16 @@ export class WikiTalkService {
     user: AuthenticatedUser,
     input: { title: string; body: string },
   ): Promise<{ thread: WikiTalkThreadEntity; firstPost: WikiTalkPostEntity }> {
+    // 词条必须存在再允许开讨论；否则任何字符串都能作为 characterId 开 thread，
+    // 列表渲染出无法点击的孤儿 thread（2026-05-16 R2 走查发现，和 wiki_watchlist
+    // 同类问题）。
+    const page = await this.pageRepo.findOne({ where: { characterId } });
+    if (!page) {
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: `角色 ${characterId} 不存在`,
+      });
+    }
     await this.assertCanTalk(user, characterId);
     const title = (input.title ?? '').trim();
     const body = (input.body ?? '').trim();
