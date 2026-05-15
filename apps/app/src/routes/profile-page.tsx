@@ -19,6 +19,7 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../components/avatar-chip";
 import { FeatureComingSoonDialog } from "../components/feature-coming-soon-dialog";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { DesktopChatConfirmDialog } from "../features/desktop/chat/desktop-chat-confirm-dialog";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import {
   clearCloudRuntimeSession,
@@ -43,6 +44,7 @@ export function ProfilePage() {
     select: (state) => state.location.hash,
   });
   const [importComingSoonOpen, setImportComingSoonOpen] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const username = useWorldOwnerStore((state) => state.username);
   const ownerId = useWorldOwnerStore((state) => state.id);
   const avatar = useWorldOwnerStore((state) => state.avatar);
@@ -161,13 +163,11 @@ export function ProfilePage() {
         </ProfileEntryGroup>
 
         <ProfileEntryGroup className="mt-3">
-          <ProfileActionEntry
+          <ProfileEntry
             icon={Camera}
             iconClassName="bg-[rgba(168,85,247,0.12)] text-[#7e22ce]"
             label={t(msg`朋友圈`)}
-            onClick={() => {
-              void navigate({ to: "/profile/moments" });
-            }}
+            to="/profile/moments"
           />
         </ProfileEntryGroup>
 
@@ -224,10 +224,7 @@ export function ProfilePage() {
               icon={LogOut}
               iconClassName="bg-[rgba(220,38,38,0.10)] text-[#b42318]"
               label={t(msg`退出登录`)}
-              onClick={() => {
-                clearCloudRuntimeSession();
-                void navigate({ to: "/welcome", replace: true });
-              }}
+              onClick={() => setLogoutConfirmOpen(true)}
             />
           </ProfileEntryGroup>
         ) : null}
@@ -241,6 +238,22 @@ export function ProfilePage() {
         )}
         wechatId="yuanzui0120"
         onClose={() => setImportComingSoonOpen(false)}
+      />
+
+      <DesktopChatConfirmDialog
+        open={logoutConfirmOpen}
+        title={t(msg`确认退出登录？`)}
+        description={t(
+          msg`退出后会回到世界入口，下次需要重新登录云账号。`,
+        )}
+        confirmLabel={t(msg`退出登录`)}
+        danger
+        onClose={() => setLogoutConfirmOpen(false)}
+        onConfirm={() => {
+          setLogoutConfirmOpen(false);
+          clearCloudRuntimeSession();
+          void navigate({ to: "/welcome", replace: true });
+        }}
       />
     </AppPage>
   );
