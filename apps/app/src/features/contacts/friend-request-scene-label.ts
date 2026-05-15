@@ -11,13 +11,15 @@ import type { MessageDescriptor } from "@lingui/core";
 //   - manual_add（用户主动添加且 autoAccept=true 时写入）
 //   - need_discovery_daily / need_discovery_short_interval（need-discovery 写入）
 //   - followup_runtime（followup-runtime 写入）
-// 未知 id 一律降级到「新的朋友」，绝不把原始英文 id 直出给用户。
+// 未知 id 一律降级到「来自相遇」，绝不把原始英文 id 直出给用户。
+// 不用「新的朋友」，那是页面标题；放在 row 内当来源 label 看起来像同义重复，
+// 用户读到时本能会反问"难道有不是新的朋友的好友请求？"。
 export function getFriendRequestSourceLabel(
   triggerScene?: string | null,
 ): MessageDescriptor {
   const scene = triggerScene?.trim();
   if (!scene) {
-    return msg`新的朋友`;
+    return msg`来自相遇`;
   }
 
   switch (scene) {
@@ -65,6 +67,6 @@ export function getFriendRequestSourceLabel(
     case "home":
       return msg`来自居家场景`;
     default:
-      return msg`新的朋友`;
+      return msg`来自相遇`;
   }
 }
