@@ -3,6 +3,13 @@ const INTERNAL_REASONING_BLOCK_PATTERN =
   /<internal_reasoning\b[^>]*>[\s\S]*?<\/internal_reasoning>/gi;
 // MiniMax / DeepSeek-R1 / Qwen-QvQ 等推理模型会把思考过程包在 <think>...</think> 中。
 const THINK_BLOCK_PATTERN = /<think\b[^>]*>[\s\S]*?<\/think>/gi;
+// 模型 max_tokens 被 thinking 吃光、没来得及输出 </think> 闭合时的兜底：
+// 把第一个 <think 起到末尾全部丢弃（包括没闭合的 thought / internal_reasoning）。
+// 不加这个的话，<think> 里偶尔出现的 { ... } 会被后续 firstBrace/lastBrace
+// 兜底当成 JSON 候选，JSON.parse 失败回退到 {}，调用方拿到空 result 完全看不出
+// 是「AI 把 thinking 没说完就被截断」还是「真没结果」。
+const UNCLOSED_REASONING_TAIL_PATTERN =
+  /<(?:think|thought|internal_reasoning)\b[^>]*>[\s\S]*$/i;
 const THOUGHT_TAG_PATTERN = /<\/?thought\b[^>]*>/gi;
 const INTERNAL_REASONING_TAG_PATTERN = /<\/?internal_reasoning\b[^>]*>/gi;
 const THINK_TAG_PATTERN = /<\/?think\b[^>]*>/gi;
@@ -13,6 +20,7 @@ export function sanitizeAiText(text: string): string {
     .replace(INTERNAL_REASONING_BLOCK_PATTERN, '')
     .replace(THOUGHT_BLOCK_PATTERN, '')
     .replace(THINK_BLOCK_PATTERN, '')
+    .replace(UNCLOSED_REASONING_TAIL_PATTERN, '')
     .replace(INTERNAL_REASONING_TAG_PATTERN, '')
     .replace(THOUGHT_TAG_PATTERN, '')
     .replace(THINK_TAG_PATTERN, '')

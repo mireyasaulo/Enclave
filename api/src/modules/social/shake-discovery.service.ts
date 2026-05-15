@@ -202,18 +202,32 @@ export class ShakeDiscoveryService {
         isDirectionAllowed(item, config),
       );
       if (!viableDirections.length) {
+        // 区分两种 0 directions 情况：
+        // - planning.directions 本身就是 0  → AI 把 thinking 吃光 / response_format 失效
+        //   等导致 JSON 解析空（generateJsonObject 拿到 {} 回退），属于硬错误，
+        //   抛 AppError 让前端展示具体提示，避免和"没有合适方向"混在一起。
+        // - planning.directions > 0 但都被 medical/legal/finance 等限制过滤掉
+        //   → 真的"没找到合适方向"，按 null 走"附近暂时没有新的相遇"。
+        const aiPlanningEmpty = planning.directions.length === 0;
         const failedSession = buildFailedSession({
           id: sessionId,
           ownerId: owner.id,
           createdAt: now,
           planningPrompt,
           planningResult: planning,
-          failureReason: '没有找到合适的摇一摇方向。',
+          failureReason: aiPlanningEmpty
+            ? 'AI 没有返回可用的摇一摇方向（推理模型 thinking 未闭合或被截断）。'
+            : '没有找到合适的摇一摇方向。',
           signalSummary: signalTexts.join('\n'),
           cyberAvatarSummary: buildCyberAvatarSummary(cyberAvatarProfile),
         });
         sessions.unshift(failedSession);
         await this.writeSessions(owner.id, sessions);
+        if (aiPlanningEmpty) {
+          throw new AppError('SHAKE_AI_PLANNING_FAILED', {
+            legacyMessage: '摇一摇生成失败，请稍后重试。',
+          });
+        }
         return null;
       }
 
