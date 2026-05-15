@@ -383,7 +383,7 @@ msgstr "Expand input box"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1082
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1128
 #: apps/app/src/lib/message-attachment-semantic.ts:255
-#: apps/app/src/routes/desktop-chat-history-page.tsx:588
+#: apps/app/src/routes/desktop-chat-history-page.tsx:626
 msgid "表情"
 msgstr "Sticker"
 
@@ -438,7 +438,7 @@ msgstr "Favorites"
 #: apps/app/src/lib/message-attachment-semantic.ts:219
 #: apps/app/src/routes/desktop-chat-files-page.tsx:508
 #: apps/app/src/routes/desktop-chat-files-page.tsx:920
-#: apps/app/src/routes/desktop-chat-history-page.tsx:568
+#: apps/app/src/routes/desktop-chat-history-page.tsx:598
 #: apps/app/src/runtime/file-runtime-i18n.ts:19
 msgid "图片"
 msgstr "Image"
@@ -460,7 +460,7 @@ msgstr "Image"
 #: apps/app/src/lib/message-attachment-semantic.ts:227
 #: apps/app/src/routes/desktop-chat-files-page.tsx:508
 #: apps/app/src/routes/desktop-chat-files-page.tsx:945
-#: apps/app/src/routes/desktop-chat-history-page.tsx:572
+#: apps/app/src/routes/desktop-chat-history-page.tsx:602
 #: apps/app/src/runtime/file-runtime-i18n.ts:14
 #: apps/app/src/runtime/file-runtime-i18n.ts:20
 msgid "文件"
@@ -1416,7 +1416,7 @@ msgid "继续撤回所选消息"
 msgstr "Continue recalling selected messages"
 
 #: apps/app/src/components/chat-message-list.tsx:2757
-#: apps/app/src/routes/desktop-chat-history-page.tsx:522
+#: apps/app/src/routes/desktop-chat-history-page.tsx:525
 msgid "正在加载更早消息..."
 msgstr "Loading earlier messages..."
 
@@ -1516,7 +1516,7 @@ msgstr "Deselect all"
 #: apps/app/src/features/search/search-types.ts:90
 #: apps/app/src/features/search/search-types.ts:104
 #: apps/app/src/features/search/search-types.ts:117
-#: apps/app/src/features/search/use-search-index.ts:373
+#: apps/app/src/features/search/use-search-index.ts:382
 #: apps/app/src/i18n/static-dom-seed.ts:64
 #: apps/app/src/routes/character-detail-page.tsx:274
 #: apps/app/src/routes/chat-details-page.tsx:318
@@ -1546,7 +1546,7 @@ msgstr "View {0}'s profile"
 #: apps/app/src/i18n/static-dom-seed.ts:63
 #: apps/app/src/routes/chat-details-page.tsx:953
 #: apps/app/src/routes/chat-message-search-page.tsx:74
-#: apps/app/src/routes/desktop-chat-history-page.tsx:268
+#: apps/app/src/routes/desktop-chat-history-page.tsx:271
 msgid "聊天记录"
 msgstr "Chat history"
 
@@ -1830,7 +1830,7 @@ msgstr "Group members"
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1140
 #: apps/app/src/lib/character-i18n.ts:10
 #: apps/app/src/lib/message-attachment-semantic.ts:234
-#: apps/app/src/routes/desktop-chat-history-page.tsx:576
+#: apps/app/src/routes/desktop-chat-history-page.tsx:606
 msgid "语音"
 msgstr "Voice"
 
@@ -1841,7 +1841,7 @@ msgstr "Voice"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1074
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1144
 #: apps/app/src/lib/message-attachment-semantic.ts:238
-#: apps/app/src/routes/desktop-chat-history-page.tsx:580
+#: apps/app/src/routes/desktop-chat-history-page.tsx:610
 msgid "名片"
 msgstr "Contact card"
 
@@ -1854,7 +1854,7 @@ msgstr "Contact card"
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1151
 #: apps/app/src/i18n/static-dom-seed.ts:751
 #: apps/app/src/lib/message-attachment-semantic.ts:242
-#: apps/app/src/routes/desktop-chat-history-page.tsx:584
+#: apps/app/src/routes/desktop-chat-history-page.tsx:614
 msgid "位置"
 msgstr "Location"
 
@@ -1869,6 +1869,7 @@ msgstr "Location"
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:190
 #: apps/app/src/features/search/search-quick-links.ts:45
 #: apps/app/src/lib/message-attachment-semantic.ts:246
+#: apps/app/src/routes/desktop-chat-history-page.tsx:618
 #: apps/app/src/routes/favorites-page.tsx:72
 #: apps/app/src/routes/mobile-favorites-page.tsx:117
 msgid "笔记"
@@ -2071,6 +2072,7 @@ msgid "视频号"
 msgstr "Channels"
 
 #: apps/app/src/components/chat-message-list.tsx:5344
+#: apps/app/src/routes/desktop-chat-history-page.tsx:622
 msgid "视频号动态"
 msgstr "Channels post"
 
@@ -3248,8 +3250,8 @@ msgstr "Save it to your photos, then post to X / RedNote / Weibo so friends can 
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:246
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:736
 #: apps/app/src/features/search/desktop-search-launcher.tsx:604
-#: apps/app/src/features/search/use-search-index.ts:390
-#: apps/app/src/features/search/use-search-index.ts:406
+#: apps/app/src/features/search/use-search-index.ts:399
+#: apps/app/src/features/search/use-search-index.ts:415
 #: apps/app/src/i18n/static-dom-seed.ts:415
 #: apps/app/src/routes/official-account-detail-page.tsx:159
 #: apps/app/src/routes/official-account-detail-page.tsx:209
@@ -3267,8 +3269,8 @@ msgstr "Service account"
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:418
 #: apps/app/src/features/favorites/official-account-favorite-records.ts:28
 #: apps/app/src/features/search/desktop-search-launcher.tsx:604
-#: apps/app/src/features/search/use-search-index.ts:390
-#: apps/app/src/features/search/use-search-index.ts:406
+#: apps/app/src/features/search/use-search-index.ts:399
+#: apps/app/src/features/search/use-search-index.ts:415
 #: apps/app/src/i18n/static-dom-seed.ts:412
 #: apps/app/src/routes/official-account-detail-page.tsx:159
 #: apps/app/src/routes/official-account-detail-page.tsx:209
@@ -3892,7 +3894,7 @@ msgstr "All types"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:103
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1011
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1089
-#: apps/app/src/routes/desktop-chat-history-page.tsx:595
+#: apps/app/src/routes/desktop-chat-history-page.tsx:633
 msgid "文本"
 msgstr "Text"
 
@@ -3900,7 +3902,7 @@ msgstr "Text"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1008
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1086
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1124
-#: apps/app/src/routes/desktop-chat-history-page.tsx:592
+#: apps/app/src/routes/desktop-chat-history-page.tsx:630
 msgid "系统"
 msgstr "System"
 
@@ -4265,7 +4267,7 @@ msgstr "Clear time filter"
 
 #. placeholder {0}: formatMessageTimestamp(item.reminderAt)
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:830
-#: apps/app/src/routes/desktop-chat-history-page.tsx:472
+#: apps/app/src/routes/desktop-chat-history-page.tsx:475
 msgid "提醒 · {0}"
 msgstr "Reminder · {0}"
 
@@ -4473,7 +4475,7 @@ msgstr "They are replying..."
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:682
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1576
 #: apps/app/src/routes/desktop-chat-files-page.tsx:515
-#: apps/app/src/routes/desktop-chat-history-page.tsx:333
+#: apps/app/src/routes/desktop-chat-history-page.tsx:336
 #: apps/app/src/routes/desktop-mobile-page.tsx:1263
 msgid "正在读取会话..."
 msgstr "Loading conversations..."
@@ -5566,7 +5568,7 @@ msgstr "This standalone route is reserved for mobile call flows. On desktop, the
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1179
 #: apps/app/src/i18n/static-dom-seed.ts:498
-#: apps/app/src/routes/desktop-chat-history-page.tsx:386
+#: apps/app/src/routes/desktop-chat-history-page.tsx:389
 msgid "当前会话"
 msgstr "Current conversation"
 
@@ -7321,7 +7323,7 @@ msgstr "Contact profile updated."
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:196
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:377
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1407
-#: apps/app/src/features/search/use-search-index.ts:343
+#: apps/app/src/features/search/use-search-index.ts:352
 #: apps/app/src/routes/character-detail-page.tsx:1501
 #: apps/app/src/routes/chat-details-page.tsx:296
 #: apps/app/src/routes/contacts-page.tsx:2522
@@ -7500,7 +7502,7 @@ msgstr "Social and Content"
 #: apps/app/src/features/search/search-types.ts:94
 #: apps/app/src/features/search/search-types.ts:108
 #: apps/app/src/features/search/search-types.ts:121
-#: apps/app/src/features/search/use-search-index.ts:476
+#: apps/app/src/features/search/use-search-index.ts:485
 #: apps/app/src/features/shell/desktop-nav-matching.ts:71
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
 #: apps/app/src/features/shell/desktop-shell.tsx:977
@@ -8409,6 +8411,7 @@ msgstr "After deletion, this chat will be removed from the message list and will
 #: apps/app/src/routes/chat-details-page.tsx:700
 #: apps/app/src/routes/chat-details-page.tsx:703
 #: apps/app/src/routes/chat-details-page.tsx:1186
+#: apps/app/src/routes/desktop-chat-history-page.tsx:534
 #: apps/app/src/routes/group-chat-details-page.tsx:511
 #: apps/app/src/routes/group-chat-details-page.tsx:515
 #: apps/app/src/routes/group-chat-details-page.tsx:870
@@ -8421,13 +8424,15 @@ msgstr "Clear this chat history? This only affects the current conversation view
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:537
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1065
-#: apps/app/src/routes/desktop-chat-history-page.tsx:315
+#: apps/app/src/routes/desktop-chat-history-page.tsx:318
+#: apps/app/src/routes/desktop-chat-history-page.tsx:540
 msgid "清空记录"
 msgstr "Clear history"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:538
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1452
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1066
+#: apps/app/src/routes/desktop-chat-history-page.tsx:541
 msgid "正在清空..."
 msgstr "Clearing..."
 
@@ -8925,7 +8930,7 @@ msgstr "Add members"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2434
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:294
-#: apps/app/src/features/search/use-search-index.ts:373
+#: apps/app/src/features/search/use-search-index.ts:382
 msgid "角色"
 msgstr "Character"
 
@@ -9044,15 +9049,15 @@ msgstr "Search failed"
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:308
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:424
 #: apps/app/src/routes/channels-page.tsx:2490
-#: apps/app/src/routes/desktop-chat-history-page.tsx:405
 #: apps/app/src/routes/desktop-chat-history-page.tsx:408
+#: apps/app/src/routes/desktop-chat-history-page.tsx:411
 #: apps/app/src/routes/desktop-mobile-page.tsx:943
 #: apps/app/src/routes/desktop-mobile-page.tsx:1958
 msgid "{0} 条"
 msgstr "{0} items"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:673
-#: apps/app/src/routes/desktop-chat-history-page.tsx:303
+#: apps/app/src/routes/desktop-chat-history-page.tsx:306
 msgid "正在加载..."
 msgstr "Loading..."
 
@@ -9258,10 +9263,12 @@ msgid "正在隐藏..."
 msgstr "Hiding..."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1063
+#: apps/app/src/routes/desktop-chat-history-page.tsx:537
 msgid "确认清空这个群聊的聊天记录吗？"
 msgstr "Clear this group chat's history?"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1064
+#: apps/app/src/routes/desktop-chat-history-page.tsx:538
 msgid "确认清空这段聊天记录吗？"
 msgstr "Clear this chat history?"
 
@@ -10222,7 +10229,7 @@ msgid "先去消息列表里建立一些聊天线程，再回来发送笔记。"
 msgstr "Create a few chat threads in the message list first, then come back to send the note."
 
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:196
-#: apps/app/src/routes/desktop-chat-history-page.tsx:400
+#: apps/app/src/routes/desktop-chat-history-page.tsx:403
 msgid "最近活跃"
 msgstr "Recently active"
 
@@ -11272,7 +11279,7 @@ msgstr ": "
 #: apps/app/src/features/search/search-types.ts:95
 #: apps/app/src/features/search/search-types.ts:109
 #: apps/app/src/features/search/search-types.ts:122
-#: apps/app/src/features/search/use-search-index.ts:503
+#: apps/app/src/features/search/use-search-index.ts:530
 #: apps/app/src/features/shell/desktop-nav-matching.ts:85
 #: apps/app/src/i18n/static-dom-seed.ts:67
 #: apps/app/src/routes/discover-feed-page.tsx:457
@@ -12118,7 +12125,7 @@ msgstr "Articles"
 #: apps/app/src/features/desktop/official-accounts/desktop-official-article-window-route-state.ts:86
 #: apps/app/src/features/favorites/official-account-favorite-records.ts:52
 #: apps/app/src/features/search/desktop-search-launcher.tsx:626
-#: apps/app/src/features/search/use-search-index.ts:433
+#: apps/app/src/features/search/use-search-index.ts:442
 #: apps/app/src/routes/desktop-mobile-page.tsx:592
 #: apps/app/src/routes/desktop-official-article-window-page.tsx:337
 #: apps/app/src/routes/official-account-article-page.tsx:297
@@ -12276,7 +12283,7 @@ msgid "{month}月{day}日 {hours}:{minutes}"
 msgstr "{month}/{day} {hours}:{minutes}"
 
 #: apps/app/src/features/favorites/official-account-favorite-records.ts:25
-#: apps/app/src/features/search/use-search-index.ts:389
+#: apps/app/src/features/search/use-search-index.ts:398
 msgid "查看公众号资料与最近文章。"
 msgstr "View Official Account profile and recent articles."
 
@@ -13029,13 +13036,13 @@ msgid "h 成熟"
 msgstr "h to ripen"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
+msgid "/ 包，售价"
+msgstr "/ pack, price"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:81
 msgid "/ 个"
 msgstr "/ each"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
-msgid "/ 包，售价"
-msgstr "/ pack, price"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:77
 msgid "已存"
@@ -17445,7 +17452,7 @@ msgstr "Close service account menu"
 
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:424
 #: apps/app/src/routes/desktop-chat-files-page.tsx:457
-#: apps/app/src/routes/desktop-chat-history-page.tsx:260
+#: apps/app/src/routes/desktop-chat-history-page.tsx:263
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
 #: apps/app/src/routes/profile-settings-page.tsx:253
 msgid "返回消息"
@@ -17538,24 +17545,24 @@ msgid "{0} · {1} 位参与者"
 msgstr "{0} · {1} participants"
 
 #: apps/app/src/features/search/desktop-search-launcher.tsx:480
-#: apps/app/src/features/search/use-search-index.ts:189
-#: apps/app/src/features/search/use-search-index.ts:285
+#: apps/app/src/features/search/use-search-index.ts:198
+#: apps/app/src/features/search/use-search-index.ts:294
 msgid "这条消息没有可展示文本。"
 msgstr "This message has no text to display."
 
 #: apps/app/src/features/search/desktop-search-launcher.tsx:546
-#: apps/app/src/features/search/use-search-index.ts:309
+#: apps/app/src/features/search/use-search-index.ts:318
 msgid "群聊记录"
 msgstr "Group chat history"
 
 #: apps/app/src/features/search/desktop-search-launcher.tsx:546
-#: apps/app/src/features/search/use-search-index.ts:310
+#: apps/app/src/features/search/use-search-index.ts:319
 msgid "单聊记录"
 msgstr "1-on-1 chat history"
 
 #. placeholder {0}: formatMessageTimestamp(message.createdAt)
 #: apps/app/src/features/search/desktop-search-launcher.tsx:552
-#: apps/app/src/features/search/use-search-index.ts:288
+#: apps/app/src/features/search/use-search-index.ts:297
 msgid "聊天记录 · {0}"
 msgstr "Chat history · {0}"
 
@@ -18080,74 +18087,82 @@ msgstr "Mini Program · {0}"
 
 #. placeholder {0}: message.senderName
 #. placeholder {1}: buildSearchPreview( message.text || t(msg`这条消息没有可展示文本。`), normalizedSearchText, )
-#: apps/app/src/features/search/use-search-index.ts:284
+#: apps/app/src/features/search/use-search-index.ts:293
 msgid "{0}：{1}"
 msgstr "{0}: {1}"
 
 #. placeholder {0}: character.name
-#: apps/app/src/features/search/use-search-index.ts:342
+#: apps/app/src/features/search/use-search-index.ts:351
 msgid "昵称：{0} · {contentSnippet}"
 msgstr ""
 
-#: apps/app/src/features/search/use-search-index.ts:344
+#: apps/app/src/features/search/use-search-index.ts:353
 msgid "查看联系人资料与聊天入口。"
 msgstr "View contact profile and chat entry."
 
 #. placeholder {0}: character.relationship
-#: apps/app/src/features/search/use-search-index.ts:352
+#: apps/app/src/features/search/use-search-index.ts:361
 msgid "通讯录联系人 · {0}"
 msgstr "Contact · {0}"
 
 #. placeholder {0}: character.relationship
-#: apps/app/src/features/search/use-search-index.ts:353
+#: apps/app/src/features/search/use-search-index.ts:362
 msgid "世界角色 · {0}"
 msgstr "World character · {0}"
 
 #. placeholder {0}: account.name
-#: apps/app/src/features/search/use-search-index.ts:418
+#: apps/app/src/features/search/use-search-index.ts:427
 msgid "来自 {0} 的公众号文章"
 msgstr "Official Account article from {0}"
 
 #. placeholder {0}: account.name
 #. placeholder {1}: formatTimestamp(article.publishedAt)
-#: apps/app/src/features/search/use-search-index.ts:419
+#: apps/app/src/features/search/use-search-index.ts:428
 msgid "公众号文章 · {0} · {1}"
 msgstr "Official Account article · {0} · {1}"
 
 #. placeholder {0}: moment.location.trim()
-#: apps/app/src/features/search/use-search-index.ts:445
+#: apps/app/src/features/search/use-search-index.ts:454
 msgid "📍 {0}"
 msgstr "📍 {0}"
 
-#: apps/app/src/features/search/use-search-index.ts:447
+#: apps/app/src/features/search/use-search-index.ts:456
+#: apps/app/src/features/search/use-search-index.ts:503
 msgid "[视频动态]"
 msgstr "[Video post]"
 
-#: apps/app/src/features/search/use-search-index.ts:449
+#: apps/app/src/features/search/use-search-index.ts:458
+#: apps/app/src/features/search/use-search-index.ts:505
 msgid "[音乐动态]"
 msgstr "[Audio post]"
 
-#: apps/app/src/features/search/use-search-index.ts:451
+#: apps/app/src/features/search/use-search-index.ts:460
 msgid "[实况照片]"
 msgstr "[Live photo]"
 
 #. placeholder {0}: moment.media.length
-#: apps/app/src/features/search/use-search-index.ts:453
+#. placeholder {0}: post.media.length
+#: apps/app/src/features/search/use-search-index.ts:462
+#: apps/app/src/features/search/use-search-index.ts:507
 msgid "[{0} 张图片]"
 msgstr "[{0} photo(s)]"
 
-#: apps/app/src/features/search/use-search-index.ts:454
+#: apps/app/src/features/search/use-search-index.ts:463
 msgid "查看这条朋友圈动态。"
 msgstr "View this moment."
 
 #. placeholder {0}: formatTimestamp(moment.postedAt)
-#: apps/app/src/features/search/use-search-index.ts:460
+#: apps/app/src/features/search/use-search-index.ts:469
 #: apps/app/src/routes/friend-moments-page.tsx:642
 msgid "朋友圈 · {0}"
 msgstr "Moments · {0}"
 
+#: apps/app/src/features/search/use-search-index.ts:508
+msgid "查看这条广场动态。"
+msgstr "View this feed post."
+
 #. placeholder {0}: formatTimestamp(post.createdAt)
-#: apps/app/src/features/search/use-search-index.ts:490
+#: apps/app/src/features/search/use-search-index.ts:514
 msgid "广场动态 · {0}"
 msgstr "Feed post · {0}"
 
@@ -18296,13 +18311,13 @@ msgid "端口占用：{portOccupiedLabel}"
 msgstr "Port occupied: {portOccupiedLabel}"
 
 #: apps/app/src/features/shell/desktop-runtime-guard.tsx:258
-msgid "请稍候..."
-msgstr "Please wait..."
-
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:258
 #: apps/app/src/i18n/static-dom-seed.ts:11
 msgid "再试一次"
 msgstr "Try again"
+
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:258
+msgid "请稍候..."
+msgstr "Please wait..."
 
 #: apps/app/src/features/shell/desktop-shell.tsx:378
 msgid "口令不正确，请重新输入。"
@@ -19425,7 +19440,7 @@ msgstr "Images and files"
 
 #: apps/app/src/i18n/static-dom-seed.ts:486
 #: apps/app/src/routes/desktop-chat-files-page.tsx:737
-#: apps/app/src/routes/desktop-chat-history-page.tsx:489
+#: apps/app/src/routes/desktop-chat-history-page.tsx:492
 msgid "定位到原消息"
 msgstr "Go to original message"
 
@@ -19441,7 +19456,7 @@ msgstr "This message has no extra body text."
 
 #: apps/app/src/i18n/static-dom-seed.ts:490
 #: apps/app/src/routes/desktop-chat-files-page.tsx:597
-#: apps/app/src/routes/desktop-chat-history-page.tsx:396
+#: apps/app/src/routes/desktop-chat-history-page.tsx:399
 msgid "会话类型"
 msgstr "Conversation type"
 
@@ -19461,52 +19476,52 @@ msgid "搜索文件名或消息内容"
 msgstr "Search file names or message content"
 
 #: apps/app/src/i18n/static-dom-seed.ts:494
-#: apps/app/src/routes/desktop-chat-history-page.tsx:324
+#: apps/app/src/routes/desktop-chat-history-page.tsx:327
 msgid "会话列表"
 msgstr "Conversation list"
 
 #: apps/app/src/i18n/static-dom-seed.ts:495
-#: apps/app/src/routes/desktop-chat-history-page.tsx:327
+#: apps/app/src/routes/desktop-chat-history-page.tsx:330
 msgid "选择一个会话后再查看历史消息。"
 msgstr "Select a conversation before viewing message history."
 
 #: apps/app/src/i18n/static-dom-seed.ts:496
-#: apps/app/src/routes/desktop-chat-history-page.tsx:286
+#: apps/app/src/routes/desktop-chat-history-page.tsx:289
 msgid "刷新记录"
 msgstr "Refresh records"
 
 #: apps/app/src/i18n/static-dom-seed.ts:497
-#: apps/app/src/routes/desktop-chat-history-page.tsx:306
+#: apps/app/src/routes/desktop-chat-history-page.tsx:309
 msgid "历史已全部加载"
 msgstr "All history loaded"
 
 #: apps/app/src/i18n/static-dom-seed.ts:499
-#: apps/app/src/routes/desktop-chat-history-page.tsx:389
+#: apps/app/src/routes/desktop-chat-history-page.tsx:392
 msgid "辅助查看当前加载窗口与提醒数量。"
 msgstr "Helps inspect the current loaded window and reminder count."
 
 #: apps/app/src/i18n/static-dom-seed.ts:500
-#: apps/app/src/routes/desktop-chat-history-page.tsx:405
+#: apps/app/src/routes/desktop-chat-history-page.tsx:408
 msgid "已加载"
 msgstr "Loaded"
 
 #: apps/app/src/i18n/static-dom-seed.ts:501
-#: apps/app/src/routes/desktop-chat-history-page.tsx:407
+#: apps/app/src/routes/desktop-chat-history-page.tsx:410
 msgid "本机提醒"
 msgstr "Local reminders"
 
 #: apps/app/src/i18n/static-dom-seed.ts:502
-#: apps/app/src/routes/desktop-chat-history-page.tsx:410
+#: apps/app/src/routes/desktop-chat-history-page.tsx:413
 msgid "加载窗口"
 msgstr "Load window"
 
 #: apps/app/src/i18n/static-dom-seed.ts:503
-#: apps/app/src/routes/desktop-chat-history-page.tsx:412
+#: apps/app/src/routes/desktop-chat-history-page.tsx:415
 msgid "更早消息"
 msgstr "Earlier messages"
 
 #: apps/app/src/i18n/static-dom-seed.ts:504
-#: apps/app/src/routes/desktop-chat-history-page.tsx:413
+#: apps/app/src/routes/desktop-chat-history-page.tsx:416
 msgid "已全部加载"
 msgstr "All loaded"
 
@@ -20758,12 +20773,12 @@ msgid "标签页在桌面布局里并入了通讯录工作区，这里会自动�
 msgstr "In desktop layout, Tags is part of Contacts. This will open the tag view automatically."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1087
-#: apps/app/src/routes/desktop-chat-history-page.tsx:293
+#: apps/app/src/routes/desktop-chat-history-page.tsx:296
 msgid "当前会话的聊天记录已经全部加载。"
 msgstr "All chat history for this conversation has been loaded."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1088
-#: apps/app/src/routes/desktop-chat-history-page.tsx:501
+#: apps/app/src/routes/desktop-chat-history-page.tsx:504
 msgid "当前会话还没有可管理的记录"
 msgstr "This conversation has no manageable records yet"
 
@@ -23009,7 +23024,7 @@ msgid "打开桌面聊天记录..."
 msgstr "Opening desktop chat history..."
 
 #: apps/app/src/routes/chat-message-search-page.tsx:114
-#: apps/app/src/routes/desktop-chat-history-page.tsx:433
+#: apps/app/src/routes/desktop-chat-history-page.tsx:436
 msgid "正在读取聊天记录..."
 msgstr "Loading chat history..."
 
@@ -23392,74 +23407,73 @@ msgid "仅文件"
 msgstr "Files only"
 
 #. placeholder {0}: conversation.title
-#: apps/app/src/routes/desktop-chat-history-page.tsx:194
+#: apps/app/src/routes/desktop-chat-history-page.tsx:195
 msgid "{0} 的聊天记录已清空。"
 msgstr "Chat history with {0} cleared."
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:258
+#: apps/app/src/routes/desktop-chat-history-page.tsx:261
 msgid "聊天记录当前仅提供桌面布局"
 msgstr "Chat History is currently desktop-only"
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:259
+#: apps/app/src/routes/desktop-chat-history-page.tsx:262
 msgid "聊天记录工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续查看会话。"
 msgstr "The Chat History workspace is only enabled in the web desktop layout and desktop shell. On mobile, return to Messages to continue viewing chats."
 
 #. placeholder {0}: selectedConversation.title
 #. placeholder {1}: historyRows.length
-#: apps/app/src/routes/desktop-chat-history-page.tsx:271
+#: apps/app/src/routes/desktop-chat-history-page.tsx:274
 msgid "{0} · 已加载 {1} 条"
 msgstr "{0} · {1} loaded"
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:272
+#: apps/app/src/routes/desktop-chat-history-page.tsx:275
 msgid "按会话查看、展开和清理最近聊天记录"
 msgstr "View, expand, and clean recent chat history by chat"
 
-#. placeholder {0}: historyRows.length
-#: apps/app/src/routes/desktop-chat-history-page.tsx:282
-msgid "已刷新当前会话最近 {0} 条记录。"
-msgstr "Refreshed the latest {0} messages of this chat."
+#: apps/app/src/routes/desktop-chat-history-page.tsx:285
+msgid "已刷新当前会话最近的记录。"
+msgstr ""
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:305
+#: apps/app/src/routes/desktop-chat-history-page.tsx:308
 msgid "加载更早消息"
 msgstr "Load earlier messages"
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:315
+#: apps/app/src/routes/desktop-chat-history-page.tsx:318
 msgid "清空中..."
 msgstr "Clearing..."
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:410
+#: apps/app/src/routes/desktop-chat-history-page.tsx:413
 msgid "最近 {historyLimit} 条"
 msgstr "Latest {historyLimit}"
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:413
+#: apps/app/src/routes/desktop-chat-history-page.tsx:416
 msgid "还可继续展开"
 msgstr "More to expand"
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:421
+#: apps/app/src/routes/desktop-chat-history-page.tsx:424
 msgid "先选会话"
 msgstr "Pick a chat first"
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:422
+#: apps/app/src/routes/desktop-chat-history-page.tsx:425
 msgid "右侧会显示当前会话的加载与提醒摘要。"
 msgstr "The right side shows the loading state and reminder summary for the current chat."
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:445
+#: apps/app/src/routes/desktop-chat-history-page.tsx:448
 msgid "先从左侧选择一个会话"
 msgstr "Pick a chat from the left first"
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:446
+#: apps/app/src/routes/desktop-chat-history-page.tsx:449
 msgid "聊天记录管理会优先按会话承接查看和清理操作。"
 msgstr "Chat history management prioritizes per-chat viewing and cleanup."
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:502
+#: apps/app/src/routes/desktop-chat-history-page.tsx:505
 msgid "可能刚刚清空过，或者这个会话目前还没有任何消息。"
 msgstr "Maybe it was just cleared, or this chat doesn't have any messages yet."
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:523
+#: apps/app/src/routes/desktop-chat-history-page.tsx:526
 msgid "继续加载更早消息"
 msgstr "Keep loading earlier messages"
 
-#: apps/app/src/routes/desktop-chat-history-page.tsx:559
+#: apps/app/src/routes/desktop-chat-history-page.tsx:589
 msgid "这条消息没有文本内容。"
 msgstr "This message has no text content."
 

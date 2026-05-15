@@ -119,8 +119,13 @@ export function useSearchIndex(
     queryFn: () => getMoments(baseUrl),
   });
   const feedQuery = useQuery({
+    // 原来搜索这边只 getFeed(1, 20)——其它分类索引都拉全量
+    // (getMoments / getFriends 等)，唯独广场动态被切到 20，老帖永远
+    // 搜不到。这里跟 discover-page 共用同一份 200 条缓存（同 queryKey
+    // + 同 queryFn），既补全索引，又不多发一次 HTTP。发帖 / 点赞 /
+    // 评论各处的 invalidateQueries 会顺势刷新这份缓存。
     queryKey: ["app-feed", baseUrl],
-    queryFn: () => getFeed(1, 20, baseUrl),
+    queryFn: () => getFeed(1, 200, baseUrl),
   });
 
   const conversations = useMemo(
@@ -482,29 +487,48 @@ export function useSearchIndex(
     );
 
     const feedResults: SearchResultItem[] = (feedQuery.data?.posts ?? []).map(
-      (post) => ({
-        id: `feed-${post.id}`,
-        category: "feed",
-        title: post.authorName,
-        description: post.text,
-        meta: t(msg`广场动态 · ${formatTimestamp(post.createdAt)}`),
-        keywords: [
-          post.authorName,
-          post.text,
-          ...post.commentsPreview.map(
-            (item) => `${item.authorName} ${item.text}`,
-          ),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase(),
-        to: isDesktopLayout ? "/tabs/feed" : "/discover/feed",
-        hash: buildSearchFeedHash(post.id),
-        badge: t(msg`广场动态`),
-        avatarName: post.authorName,
-        avatarSrc: post.authorAvatar,
-        sortTime: parseTimestamp(post.createdAt) ?? 0,
-      }),
+      (post) => {
+        const postTitle = post.title?.trim();
+        const postText = post.text.trim();
+        // 同朋友圈：纯媒体动态 text 为空，搜出来卡片内容区一片空白。
+        // 优先用 post.title（文章风格 feed 帖子的标题），再退到媒体类型
+        // 提示。仅影响显示，keywords 自己覆盖完整。
+        const descriptionFallback = postTitle
+          ? postTitle
+          : post.mediaType === "video"
+            ? t(msg`[视频动态]`)
+            : post.mediaType === "audio"
+              ? t(msg`[音乐动态]`)
+              : post.media.length
+                ? t(msg`[${post.media.length} 张图片]`)
+                : t(msg`查看这条广场动态。`);
+        return ({
+          id: `feed-${post.id}`,
+          category: "feed",
+          title: post.authorName,
+          description: postText || descriptionFallback,
+          meta: t(msg`广场动态 · ${formatTimestamp(post.createdAt)}`),
+          keywords: [
+            post.authorName,
+            postTitle,
+            post.text,
+            // 话题标签——按 # 标签搜要能命中
+            post.topicTags?.join(" "),
+            ...post.commentsPreview.map(
+              (item) => `${item.authorName} ${item.text}`,
+            ),
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase(),
+          to: isDesktopLayout ? "/tabs/feed" : "/discover/feed",
+          hash: buildSearchFeedHash(post.id),
+          badge: t(msg`广场动态`),
+          avatarName: post.authorName,
+          avatarSrc: post.authorAvatar,
+          sortTime: parseTimestamp(post.createdAt) ?? 0,
+        });
+      },
     );
 
     return [
