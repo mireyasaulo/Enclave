@@ -66,4 +66,54 @@ describe('WikiPrivateCharacterService.createStrict', () => {
       /不能为空/,
     );
   });
+
+  it('rejects zero-width-only name (visually empty)', async () => {
+    const svc = makeService({ byOwnerName: null });
+    // 走查 v2 发现：'​​' trim() 后非空但视觉为空，列表里出现幽灵行。
+    await expect(svc.createStrict('u1', { name: '​​' })).rejects.toThrow(
+      /不能为空/,
+    );
+  });
+
+  it('trims and dedups expertDomains + trims string fields', async () => {
+    const svc = makeService({ byOwnerName: null });
+    const out = await svc.createStrict('u1', {
+      name: '清洗测试',
+      avatar: '  🦊  ',
+      bio: '  hi  ',
+      relationship: '  友人  ',
+      expertDomains: ['  编程  ', '编程', '音乐 ', '', '  '],
+    });
+    expect(out.avatar).toBe('🦊');
+    expect(out.bio).toBe('hi');
+    expect(out.relationship).toBe('友人');
+    expect(out.expertDomains).toEqual(['编程', '音乐']);
+  });
+
+  it('rejects unsafe avatar scheme (javascript:/data:/file:)', async () => {
+    const svc = makeService({ byOwnerName: null });
+    // 与前端 isSafeAvatarValue 严格对齐：curl 直传应被服务层 reject。
+    await expect(
+      svc.createStrict('u1', { name: '安全测试', avatar: 'javascript:alert(1)' }),
+    ).rejects.toThrow(/avatar/);
+    await expect(
+      svc.createStrict('u1', {
+        name: '安全测试 2',
+        avatar: 'data:image/svg+xml;base64,xxx',
+      }),
+    ).rejects.toThrow(/avatar/);
+  });
+
+  it('rejects invalid socialOpenness / out-of-range social params', async () => {
+    const svc = makeService({ byOwnerName: null });
+    await expect(
+      svc.createStrict('u1', { name: 'so 测试', socialOpenness: 'lolwat' }),
+    ).rejects.toThrow(/socialOpenness/);
+    await expect(
+      svc.createStrict('u1', { name: 'pbc 测试', proactiveBrowseChance: 99 }),
+    ).rejects.toThrow(/proactiveBrowseChance/);
+    await expect(
+      svc.createStrict('u1', { name: 'il 测试', intimacyLevel: -5 }),
+    ).rejects.toThrow(/intimacyLevel/);
+  });
 });

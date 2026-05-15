@@ -16,6 +16,20 @@ export const PRIVATE_CHARACTER_EXPORT_SCHEMA =
   'yinjie-private-character/v1' as const;
 
 /**
+ * trim 后再剥掉零宽字符（U+200B-U+200D / U+FEFF / U+2060）和孤立 BOM。
+ * 用来判定 name 是不是"视觉上为空"——纯 ZWS 名字会让列表里出现一行空标签
+ * 且无法点击编辑（前端走 name 显示），是 UX 黑洞。
+ *
+ * 不强行 strip 进 DB，保留用户原文（万一 ZWS 是有意夹在中间的格式）；只在
+ * 视觉为空时拒。
+ */
+function isVisuallyEmpty(raw: string): boolean {
+  const trimmed = raw.trim();
+  if (!trimmed) return true;
+  return trimmed.replace(/[​-‍﻿⁠]/g, '').length === 0;
+}
+
+/**
  * Recipe 里 wiki UI 已砍掉、admin character-editor-page 也不暴露的字段。
  * 2026-05-15 起所有写入 user_private_characters 的 recipe 都会通过本函数
  * 剥离这些字段，确保 DB 里 JSON 不残留 occupation / tone 子树 / memorySummary 等。
@@ -195,7 +209,7 @@ export class WikiPrivateCharacterService {
       throw new BadRequestException('请求体格式不正确');
     }
     const trimmedName = (dto.name ?? '').trim();
-    if (!trimmedName) {
+    if (!trimmedName || isVisuallyEmpty(trimmedName)) {
       throw new BadRequestException('角色名不能为空');
     }
     assertPrivateCharacterFieldLimits({ ...dto, name: trimmedName });
@@ -258,7 +272,7 @@ export class WikiPrivateCharacterService {
       throw new BadRequestException('请求体格式不正确');
     }
     const trimmedName = (dto.name ?? '').trim();
-    if (!trimmedName) {
+    if (!trimmedName || isVisuallyEmpty(trimmedName)) {
       throw new BadRequestException('角色名不能为空');
     }
     assertPrivateCharacterFieldLimits({ ...dto, name: trimmedName });
@@ -374,20 +388,37 @@ export class WikiPrivateCharacterService {
     dto: PrivateCharacterDto,
   ): void {
     if (!dto || typeof dto !== 'object') return;
+    // 所有字符串字段统一 trim：和前端 buildDto() 一致，避免 curl 直传 "  bio  "
+    // 这种把空白带进 DB → AI prompt 里多出空行 / 列表显示对不齐。
     if (typeof dto.name === 'string') target.name = dto.name.trim();
-    if (typeof dto.avatar === 'string') target.avatar = dto.avatar;
-    if (typeof dto.bio === 'string') target.bio = dto.bio;
+    if (typeof dto.avatar === 'string') target.avatar = dto.avatar.trim();
+    if (typeof dto.bio === 'string') target.bio = dto.bio.trim();
     if (dto.personality !== undefined) {
-      target.personality = dto.personality ?? null;
+      target.personality =
+        typeof dto.personality === 'string'
+          ? dto.personality.trim() || null
+          : (dto.personality ?? null);
     }
     if (typeof dto.relationship === 'string') {
-      target.relationship = dto.relationship;
+      target.relationship = dto.relationship.trim();
     }
     if (typeof dto.relationshipType === 'string') {
-      target.relationshipType = dto.relationshipType;
+      target.relationshipType = dto.relationshipType.trim();
     }
     if (Array.isArray(dto.expertDomains)) {
-      target.expertDomains = dto.expertDomains;
+      // trim + 去空 + 去重；和前端 splitCommaList() 行为对齐，否则同一用户在 UI
+      // 看到的是 ["编程","音乐"]，curl 直传 ["  编程  ","编程","音乐 "," "] 会
+      // 静默存成 4 个元素，下次回 wiki 看会看到 3 重「编程」。
+      const seen = new Set<string>();
+      const cleaned: string[] = [];
+      for (const item of dto.expertDomains) {
+        if (typeof item !== 'string') continue;
+        const t = item.trim();
+        if (!t || seen.has(t)) continue;
+        seen.add(t);
+        cleaned.push(t);
+      }
+      target.expertDomains = cleaned;
     }
     // 同样防 PUT body 把 recipe/profile 传成 array 或非 object：
     // 入库前再用 stripRejectedRecipeFields 剥去 wiki 已砍掉的子字段（identity.occupation
