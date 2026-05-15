@@ -259,6 +259,36 @@ function clampInt(
   return max == null ? lower : Math.min(max, lower);
 }
 
+function formatSourceType(
+  value: CharacterDraft["sourceType"] | undefined,
+  t: typeof translateRuntimeMessage,
+): string {
+  switch (value) {
+    case "default_seed":
+      return t(msg`默认种子`);
+    case "preset_catalog":
+      return t(msg`预设目录`);
+    case "manual_admin":
+      return t(msg`后台手建`);
+    case "need_generated":
+      return t(msg`需求生成`);
+    case "shake_generated":
+      return t(msg`摇一摇生成`);
+    case "ai_generated":
+      return t(msg`AI 生成`);
+    case "wiki_contributed":
+      return t(msg`Wiki 投稿`);
+    case "wechat_import":
+      return t(msg`微信导入`);
+    case "model_persona":
+      return t(msg`模型人设`);
+    case "private_import":
+      return t(msg`私有导入`);
+    default:
+      return value ?? t(msg`未知`);
+  }
+}
+
 export function CharacterEditorPage() {
   const t = translateRuntimeMessage;
   const TABS = [
@@ -660,6 +690,47 @@ export function CharacterEditorPage() {
               }
             />
           </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <div className="text-xs text-[color:var(--text-secondary)]">
+                {t(msg`源类型 (只读)`)}
+              </div>
+              <div className="rounded-md border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-2 text-sm text-[color:var(--text-secondary)]">
+                {formatSourceType(draft.sourceType, t)}
+              </div>
+            </div>
+            <Field
+              label={t(msg`源标识 sourceKey`)}
+              placeholder={t(msg`如 preset_companion_an_he（可空）`)}
+              value={draft.sourceKey ?? ""}
+              onChange={(value) =>
+                setDraft((current) => ({
+                  ...current,
+                  sourceKey: value.trim() || null,
+                }))
+              }
+            />
+            <SelectField
+              label={t(msg`删除策略`)}
+              value={draft.deletionPolicy ?? "archive_allowed"}
+              onChange={(value) =>
+                setDraft((current) => ({
+                  ...current,
+                  deletionPolicy:
+                    value as NonNullable<CharacterDraft["deletionPolicy"]>,
+                }))
+              }
+              options={[
+                { value: "archive_allowed", label: t(msg`可归档`) },
+                { value: "protected", label: t(msg`受保护`) },
+              ]}
+            />
+          </div>
+          {draft.deletionPolicy === "protected" ? (
+            <InlineNotice className="mt-3" tone="warning">
+              {t(msg`「受保护」角色无法经 admin 删除接口删除，需直接操作数据库。请确认这是你想要的行为。`)}
+            </InlineNotice>
+          ) : null}
         </Card>
       ) : null}
 
