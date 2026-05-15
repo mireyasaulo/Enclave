@@ -195,11 +195,11 @@ export class MailService {
           transporter: this.overseasTransporter,
           route: 'overseas',
           fromAddress:
-            this.config.get<string>('MAIL_OVERSEAS_FROM_ADDRESS') ??
-            this.config.get<string>('MAIL_FROM_ADDRESS'),
+            this.readEnv('MAIL_OVERSEAS_FROM_ADDRESS') ??
+            this.readEnv('MAIL_FROM_ADDRESS'),
           fromName:
-            this.config.get<string>('MAIL_OVERSEAS_FROM_NAME') ??
-            this.config.get<string>('MAIL_FROM_NAME') ??
+            this.readEnv('MAIL_OVERSEAS_FROM_NAME') ??
+            this.readEnv('MAIL_FROM_NAME') ??
             '隐界 Yinjie',
         };
       }
@@ -218,23 +218,31 @@ export class MailService {
     return {
       transporter: this.domesticTransporter,
       route: 'domestic',
-      fromAddress: this.config.get<string>('MAIL_FROM_ADDRESS'),
-      fromName: this.config.get<string>('MAIL_FROM_NAME') ?? '隐界 Yinjie',
+      fromAddress: this.readEnv('MAIL_FROM_ADDRESS'),
+      fromName: this.readEnv('MAIL_FROM_NAME') ?? '隐界 Yinjie',
     };
   }
 
+  // 把空字符串和未配置都当作"未配置"，避免 env 里写 `MAIL_FROM_NAME=`
+  // 导致 ?? fallback 不触发、from 头变成 " <addr>" 的尴尬。
+  private readEnv(key: string): string | undefined {
+    const raw = this.config.get<string>(key);
+    if (raw === undefined || raw === null) return undefined;
+    const trimmed = raw.trim();
+    return trimmed.length === 0 ? undefined : trimmed;
+  }
+
   private buildTransporter(prefix: string): Transporter | null {
-    const host = this.config.get<string>(`SMTP_${prefix}HOST`);
+    const host = this.readEnv(`SMTP_${prefix}HOST`);
     if (!host) return null;
-    const port = Number(
-      this.config.get<string>(`SMTP_${prefix}PORT`) ?? '465',
-    );
-    const secureRaw =
-      this.config.get<string>(`SMTP_${prefix}SECURE`) ?? 'true';
+    const portRaw = this.readEnv(`SMTP_${prefix}PORT`);
+    const port = portRaw ? Number(portRaw) : 465;
+    const secureRaw = this.readEnv(`SMTP_${prefix}SECURE`);
+    // 默认 secure=true（465 端口），仅当显式写 "false" 才关。
     const secure = secureRaw !== 'false';
-    const user = this.config.get<string>(`SMTP_${prefix}USER`);
-    const pass = this.config.get<string>(`SMTP_${prefix}PASS`);
-    const proxy = this.config.get<string>(`SMTP_${prefix}PROXY`);
+    const user = this.readEnv(`SMTP_${prefix}USER`);
+    const pass = this.readEnv(`SMTP_${prefix}PASS`);
+    const proxy = this.readEnv(`SMTP_${prefix}PROXY`);
 
     const transporter = nodemailer.createTransport({
       host,
