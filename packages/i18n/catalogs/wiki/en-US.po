@@ -15,15 +15,15 @@ msgstr ""
 #: apps/wiki/src/components/conflict-resolver.tsx:10
 #: apps/wiki/src/components/snapshot-diff.tsx:16
 #: apps/wiki/src/routes/character-page.tsx:614
-#: apps/wiki/src/routes/create-character-page.tsx:133
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1198
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2299
+#: apps/wiki/src/routes/create-character-page.tsx:139
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1312
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2444
 msgid "名称"
 msgstr "Name"
 
 #: apps/wiki/src/components/conflict-resolver.tsx:11
 #: apps/wiki/src/components/snapshot-diff.tsx:17
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1208
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1322
 msgid "头像"
 msgstr "Avatar"
 
@@ -42,33 +42,33 @@ msgstr "Personality"
 #: apps/wiki/src/components/conflict-resolver.tsx:14
 #: apps/wiki/src/components/snapshot-diff.tsx:20
 #: apps/wiki/src/routes/character-page.tsx:328
-#: apps/wiki/src/routes/create-character-page.tsx:191
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1413
+#: apps/wiki/src/routes/create-character-page.tsx:202
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1538
 msgid "专长领域"
 msgstr "Expert domains"
 
 #: apps/wiki/src/components/conflict-resolver.tsx:15
 #: apps/wiki/src/components/snapshot-diff.tsx:21
 #: apps/wiki/src/routes/character-page.tsx:337
-#: apps/wiki/src/routes/create-character-page.tsx:197
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2035
+#: apps/wiki/src/routes/create-character-page.tsx:208
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2160
 msgid "触发场景"
 msgstr "Trigger scenes"
 
 #: apps/wiki/src/components/conflict-resolver.tsx:16
 #: apps/wiki/src/components/snapshot-diff.tsx:22
 #: apps/wiki/src/routes/character-page.tsx:628
-#: apps/wiki/src/routes/create-character-page.tsx:146
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1221
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2300
+#: apps/wiki/src/routes/create-character-page.tsx:152
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1335
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2445
 msgid "关系描述"
 msgstr "Relationship"
 
 #: apps/wiki/src/components/conflict-resolver.tsx:17
 #: apps/wiki/src/components/snapshot-diff.tsx:23
 #: apps/wiki/src/routes/character-page.tsx:636
-#: apps/wiki/src/routes/create-character-page.tsx:153
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1233
+#: apps/wiki/src/routes/create-character-page.tsx:159
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1347
 msgid "关系类型"
 msgstr "Relationship type"
 
@@ -100,11 +100,11 @@ msgstr "Apply selection and resubmit"
 msgid "取消"
 msgstr "Cancel"
 
-#: apps/wiki/src/components/form-row.tsx:43
+#: apps/wiki/src/components/form-row.tsx:49
 msgid "影响："
 msgstr ""
 
-#: apps/wiki/src/components/form-row.tsx:83
+#: apps/wiki/src/components/form-row.tsx:113
 msgid "说明"
 msgstr "Notes"
 
@@ -125,11 +125,12 @@ msgid "已提交，管理员将处理。"
 msgstr "Submitted; admins will handle it."
 
 #: apps/wiki/src/components/report-button.tsx:88
+#: apps/wiki/src/routes/account-page.tsx:312
 #: apps/wiki/src/routes/admin-abuse-filters-page.tsx:440
 #: apps/wiki/src/routes/admin-blocks-page.tsx:163
 #: apps/wiki/src/routes/character-page.tsx:197
 #: apps/wiki/src/routes/character-page.tsx:766
-#: apps/wiki/src/routes/create-character-page.tsx:266
+#: apps/wiki/src/routes/create-character-page.tsx:277
 msgid "提交中..."
 msgstr "Submitting..."
 
@@ -190,8 +191,8 @@ msgstr "Search"
 
 #: apps/wiki/src/components/root-layout.tsx:59
 #: apps/wiki/src/routes/character-page.tsx:85
-#: apps/wiki/src/routes/create-character-page.tsx:104
-#: apps/wiki/src/routes/create-character-page.tsx:114
+#: apps/wiki/src/routes/create-character-page.tsx:110
+#: apps/wiki/src/routes/create-character-page.tsx:120
 #: apps/wiki/src/routes/pending-reviews-page.tsx:97
 #: apps/wiki/src/routes/watchlist-page.tsx:132
 msgid "编辑"
@@ -289,35 +290,41 @@ msgstr "Hidden World Wiki"
 msgid "搜索角色词条…（回车）"
 msgstr "Search entries… (enter)"
 
-#: apps/wiki/src/components/root-layout.tsx:229
-msgid "退出"
-msgstr "Sign out"
-
-#: apps/wiki/src/components/root-layout.tsx:239
+#: apps/wiki/src/components/root-layout.tsx:220
 #: apps/wiki/src/routes/login-page.tsx:41
 #: apps/wiki/src/routes/login-page.tsx:134
 #: apps/wiki/src/routes/register-page.tsx:112
 msgid "登录"
 msgstr "Sign in"
 
-#: apps/wiki/src/components/root-layout.tsx:246
+#: apps/wiki/src/components/root-layout.tsx:227
 #: apps/wiki/src/routes/admin-users-page.tsx:77
 #: apps/wiki/src/routes/register-page.tsx:52
 #: apps/wiki/src/routes/register-page.tsx:103
 msgid "注册"
 msgstr "Register"
 
-#: apps/wiki/src/components/root-layout.tsx:263
+#: apps/wiki/src/components/root-layout.tsx:244
 msgid "搜索词条…"
 msgstr "Search entries…"
 
-#: apps/wiki/src/components/root-layout.tsx:275
+#: apps/wiki/src/components/root-layout.tsx:256
 msgid "关闭导航"
 msgstr "Close navigation"
 
-#: apps/wiki/src/components/root-layout.tsx:297
+#: apps/wiki/src/components/root-layout.tsx:278
 msgid "隐界世界角色管理平台 · 任何登录用户都可以提交角色创建、编辑和生命周期变更，由巡查员审核生效"
 msgstr "Hidden World Character Management · Any signed-in user can submit character creation, edits, and lifecycle changes; patrollers review and approve."
+
+#: apps/wiki/src/components/root-layout.tsx:356
+#: apps/wiki/src/routes/account-page.tsx:45
+#: apps/wiki/src/routes/account-page.tsx:54
+msgid "账户设置"
+msgstr ""
+
+#: apps/wiki/src/components/root-layout.tsx:368
+msgid "退出"
+msgstr "Sign out"
 
 #: apps/wiki/src/components/scene-prompt-preview.tsx:12
 msgid "聊天"
@@ -511,13 +518,119 @@ msgstr "☆ Watch"
 msgid "请求失败 ({0})"
 msgstr "Request failed ({0})"
 
-#: apps/wiki/src/lib/wiki-api.ts:582
+#: apps/wiki/src/lib/wiki-api.ts:604
 msgid "管理员直接删除词条"
 msgstr "Admin directly deleted the entry"
 
-#: apps/wiki/src/lib/wiki-api.ts:593
+#: apps/wiki/src/lib/wiki-api.ts:615
 msgid "管理员直接恢复词条"
 msgstr "Admin directly restored the entry"
+
+#: apps/wiki/src/routes/account-page.tsx:47
+msgid "请先登录后再访问账户设置。"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:54
+#: apps/wiki/src/routes/login-page.tsx:41
+#: apps/wiki/src/routes/register-page.tsx:51
+msgid "账号"
+msgstr "Account"
+
+#: apps/wiki/src/routes/account-page.tsx:76
+msgid "该模块尚未开放，后续版本上线。"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:95
+msgid "修改密码"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:96
+msgid "个人资料"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:97
+#: apps/wiki/src/routes/login-page.tsx:208
+msgid "邮箱"
+msgstr "Email"
+
+#: apps/wiki/src/routes/account-page.tsx:120
+msgid "即将推出"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:167
+msgid "当前账号尚未绑定邮箱，无法通过邮箱验证码修改密码。请联系管理员绑定邮箱后再试。"
+msgstr ""
+
+#. placeholder {0}: result.debugCode
+#: apps/wiki/src/routes/account-page.tsx:199
+#: apps/wiki/src/routes/login-page.tsx:181
+msgid "开发模式：验证码已打印到服务端日志（debug={0}）"
+msgstr "Dev mode: code printed to server log (debug={0})"
+
+#: apps/wiki/src/routes/account-page.tsx:201
+msgid "验证码已发送到 {maskedEmail}，请查收邮箱（含垃圾邮件箱）。"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:221
+msgid "密码已修改成功，下次登录请使用新密码。"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:235
+msgid "账户邮箱：<0>{maskedEmail}</0>。验证码将发送到此邮箱。"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:240
+msgid "你尚未设置过登录密码——完成本次流程后，即可使用用户名 + 密码登录。账户邮箱：<0>{maskedEmail}</0>。"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:249
+#: apps/wiki/src/routes/login-page.tsx:58
+msgid "邮箱验证码"
+msgstr "Email code"
+
+#: apps/wiki/src/routes/account-page.tsx:249
+#: apps/wiki/src/routes/login-page.tsx:219
+msgid "6 位数字，10 分钟内有效"
+msgstr "6 digits, valid for 10 minutes"
+
+#: apps/wiki/src/routes/account-page.tsx:268
+#: apps/wiki/src/routes/login-page.tsx:237
+msgid "{cooldown}s 后重发"
+msgstr "Resend in {cooldown}s"
+
+#: apps/wiki/src/routes/account-page.tsx:270
+#: apps/wiki/src/routes/login-page.tsx:239
+msgid "发送中..."
+msgstr "Sending..."
+
+#: apps/wiki/src/routes/account-page.tsx:271
+#: apps/wiki/src/routes/login-page.tsx:240
+msgid "发送验证码"
+msgstr "Send code"
+
+#: apps/wiki/src/routes/account-page.tsx:276
+msgid "新密码"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:276
+msgid "至少 6 位"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:287
+msgid "确认新密码"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:299
+msgid "两次输入的新密码不一致。"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:314
+msgid "确认修改密码"
+msgstr ""
+
+#: apps/wiki/src/routes/account-page.tsx:315
+msgid "确认设置密码"
+msgstr ""
 
 #: apps/wiki/src/routes/admin-abuse-filters-page.tsx:61
 msgid "每次 wiki 写入都会按规则匹配；命中后可触发记录、警告、强制人工审核或直接拦截。"
@@ -1216,7 +1329,7 @@ msgid "加载最新覆盖草稿"
 msgstr "Load latest override draft"
 
 #: apps/wiki/src/routes/character-page.tsx:620
-#: apps/wiki/src/routes/create-character-page.tsx:140
+#: apps/wiki/src/routes/create-character-page.tsx:146
 msgid "头像 URL"
 msgstr "Avatar URL"
 
@@ -1273,12 +1386,12 @@ msgid "角色的基础信息：职业、背景、动机、世界观。"
 msgstr "Character basics: occupation, background, motivation, worldview."
 
 #: apps/wiki/src/routes/character-page.tsx:857
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1254
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1379
 msgid "职业 / 身份"
 msgstr "Occupation / identity"
 
 #: apps/wiki/src/routes/character-page.tsx:871
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1963
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2088
 msgid "活动频率"
 msgstr "Activity frequency"
 
@@ -1307,7 +1420,7 @@ msgid "专长说明"
 msgstr "Expertise description"
 
 #: apps/wiki/src/routes/character-page.tsx:951
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1440
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1565
 msgid "知识边界"
 msgstr "Knowledge limits"
 
@@ -1332,7 +1445,7 @@ msgid "兴趣主题（逗号分隔）"
 msgstr "Topics of interest (comma-separated)"
 
 #: apps/wiki/src/routes/character-page.tsx:1018
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1520
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1645
 msgid "回复长度"
 msgstr "Response length"
 
@@ -1353,22 +1466,22 @@ msgid "不使用"
 msgstr "None"
 
 #: apps/wiki/src/routes/character-page.tsx:1054
-#: apps/wiki/src/routes/my-character-edit-page.tsx:69
+#: apps/wiki/src/routes/my-character-edit-page.tsx:80
 msgid "偶尔"
 msgstr "Occasional"
 
 #: apps/wiki/src/routes/character-page.tsx:1055
-#: apps/wiki/src/routes/my-character-edit-page.tsx:71
+#: apps/wiki/src/routes/my-character-edit-page.tsx:82
 msgid "频繁"
 msgstr "Frequent"
 
 #: apps/wiki/src/routes/character-page.tsx:1058
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1548
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1673
 msgid "工作风格"
 msgstr "Work style"
 
 #: apps/wiki/src/routes/character-page.tsx:1070
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1559
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1684
 msgid "社交风格"
 msgstr "Social style"
 
@@ -1425,17 +1538,17 @@ msgid "记忆摘要、核心记忆、近期摘要 prompt 与遗忘曲线。"
 msgstr "Memory summary, core memory, recent-summary prompt, and forgetting curve."
 
 #: apps/wiki/src/routes/character-page.tsx:1302
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1836
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1961
 msgid "记忆摘要"
 msgstr "Memory summary"
 
 #: apps/wiki/src/routes/character-page.tsx:1318
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1847
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1972
 msgid "核心记忆"
 msgstr "Core memory"
 
 #: apps/wiki/src/routes/character-page.tsx:1343
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1859
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1984
 msgid "近期摘要种子"
 msgstr "Recent summary seed"
 
@@ -1472,12 +1585,12 @@ msgid "启用 CoT"
 msgstr "Enable CoT"
 
 #: apps/wiki/src/routes/character-page.tsx:1527
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1920
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2045
 msgid "启用反思"
 msgstr "Enable reflection"
 
 #: apps/wiki/src/routes/character-page.tsx:1543
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1926
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2051
 msgid "启用路由"
 msgstr "Enable routing"
 
@@ -1641,114 +1754,119 @@ msgstr "Syncing..."
 msgid "纳入 wiki 历史"
 msgstr "Record in wiki history"
 
-#: apps/wiki/src/routes/create-character-page.tsx:26
+#: apps/wiki/src/routes/create-character-page.tsx:29
 #: apps/wiki/src/routes/my-character-edit-page.tsx:49
 msgid "朋友"
 msgstr "Friend"
 
-#: apps/wiki/src/routes/create-character-page.tsx:27
+#: apps/wiki/src/routes/create-character-page.tsx:30
 #: apps/wiki/src/routes/my-character-edit-page.tsx:50
 msgid "家人"
 msgstr "Family"
 
-#: apps/wiki/src/routes/create-character-page.tsx:28
+#: apps/wiki/src/routes/create-character-page.tsx:31
 #: apps/wiki/src/routes/my-character-edit-page.tsx:51
 msgid "导师"
 msgstr "Mentor"
 
-#: apps/wiki/src/routes/create-character-page.tsx:29
+#: apps/wiki/src/routes/create-character-page.tsx:32
 #: apps/wiki/src/routes/my-character-edit-page.tsx:52
 msgid "专家"
 msgstr "Expert"
 
-#: apps/wiki/src/routes/create-character-page.tsx:30
+#: apps/wiki/src/routes/create-character-page.tsx:33
 #: apps/wiki/src/routes/my-character-edit-page.tsx:53
 msgid "自定义"
 msgstr "Custom"
 
-#: apps/wiki/src/routes/create-character-page.tsx:43
+#: apps/wiki/src/routes/create-character-page.tsx:46
 msgid "世界角色"
 msgstr "World character"
 
-#: apps/wiki/src/routes/create-character-page.tsx:85
+#: apps/wiki/src/routes/create-character-page.tsx:89
 msgid "由当前贡献者初始化创建的角色词条"
 msgstr "Character entry initialized by the current contributor"
 
-#: apps/wiki/src/routes/create-character-page.tsx:104
-#: apps/wiki/src/routes/create-character-page.tsx:115
+#: apps/wiki/src/routes/create-character-page.tsx:110
+#: apps/wiki/src/routes/create-character-page.tsx:121
 msgid "创建世界角色"
 msgstr "Create world character"
 
-#: apps/wiki/src/routes/create-character-page.tsx:106
+#: apps/wiki/src/routes/create-character-page.tsx:112
 msgid "请先登录后再创建角色。"
 msgstr "Please sign in to create a character."
 
-#: apps/wiki/src/routes/create-character-page.tsx:117
+#: apps/wiki/src/routes/create-character-page.tsx:123
 msgid "新角色会先进入待创建队列；巡查员通过后才会发布到运行时角色注册表。"
 msgstr "New characters land in the pending-creation queue; once a patroller approves, they ship to the runtime character registry."
 
-#: apps/wiki/src/routes/create-character-page.tsx:123
+#: apps/wiki/src/routes/create-character-page.tsx:129
 msgid "基础信息"
 msgstr "Basic info"
 
-#: apps/wiki/src/routes/create-character-page.tsx:126
+#: apps/wiki/src/routes/create-character-page.tsx:132
 msgid "角色 ID"
 msgstr "Character ID"
 
-#: apps/wiki/src/routes/create-character-page.tsx:126
+#: apps/wiki/src/routes/create-character-page.tsx:132
 msgid "可选；留空由系统生成"
 msgstr "Optional; leave empty for an auto-generated id"
 
-#: apps/wiki/src/routes/create-character-page.tsx:130
+#: apps/wiki/src/routes/create-character-page.tsx:136
 msgid "例如 night-archivist"
 msgstr "e.g. night-archivist"
 
-#: apps/wiki/src/routes/create-character-page.tsx:175
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1316
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2301
+#: apps/wiki/src/routes/create-character-page.tsx:178
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1371
+msgid "填一个具体的关系，例如 师傅 / 房东 / 邻居"
+msgstr ""
+
+#: apps/wiki/src/routes/create-character-page.tsx:186
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1441
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2446
 msgid "角色简介"
 msgstr "Character bio"
 
-#: apps/wiki/src/routes/create-character-page.tsx:183
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1332
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2302
+#: apps/wiki/src/routes/create-character-page.tsx:194
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1457
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2447
 msgid "性格 / 语气"
 msgstr "Personality / tone"
 
-#: apps/wiki/src/routes/create-character-page.tsx:191
-#: apps/wiki/src/routes/create-character-page.tsx:197
+#: apps/wiki/src/routes/create-character-page.tsx:202
+#: apps/wiki/src/routes/create-character-page.tsx:208
 msgid "逗号分隔"
 msgstr "Comma-separated"
 
-#: apps/wiki/src/routes/create-character-page.tsx:205
+#: apps/wiki/src/routes/create-character-page.tsx:216
 msgid "创建摘要"
 msgstr "Creation summary"
 
-#: apps/wiki/src/routes/create-character-page.tsx:207
+#: apps/wiki/src/routes/create-character-page.tsx:218
 msgid "≥10 字。说明这个角色为什么值得加入"
 msgstr "≥10 chars. Explain why this character belongs here"
 
-#: apps/wiki/src/routes/create-character-page.tsx:218
+#: apps/wiki/src/routes/create-character-page.tsx:229
 msgid "至少需要 10 字"
 msgstr "At least 10 characters required"
 
-#: apps/wiki/src/routes/create-character-page.tsx:229
+#: apps/wiki/src/routes/create-character-page.tsx:240
 msgid "高级：直接贴 recipe JSON（可选）"
 msgstr "Advanced: paste recipe JSON directly (optional)"
 
-#: apps/wiki/src/routes/create-character-page.tsx:232
+#: apps/wiki/src/routes/create-character-page.tsx:243
 msgid "填写后会忽略上方分节字段，直接用此 JSON 提交。留空则按上方字段生成默认逻辑。"
 msgstr "If filled in, the section fields above are ignored and this JSON is submitted directly. Leave empty to generate default logic from the fields above."
 
-#: apps/wiki/src/routes/create-character-page.tsx:240
+#: apps/wiki/src/routes/create-character-page.tsx:251
 msgid "留空则按上方档案字段生成默认角色逻辑"
 msgstr "Leave empty to generate default character logic from the profile fields above"
 
-#: apps/wiki/src/routes/create-character-page.tsx:244
+#: apps/wiki/src/routes/create-character-page.tsx:255
 msgid "高级 recipe JSON 格式无效："
 msgstr "Advanced recipe JSON is invalid:"
 
-#: apps/wiki/src/routes/create-character-page.tsx:266
+#: apps/wiki/src/routes/create-character-page.tsx:277
 msgid "✨ 提交创建"
 msgstr "✨ Submit creation"
 
@@ -1761,7 +1879,7 @@ msgid "按维基百科模式管理世界角色：任何登录用户都能创建�
 msgstr "Manage world characters in a Wikipedia-style flow: any signed-in user can create characters, edit their profile and runtime logic, and request deletion or restoration; high-risk changes enter the patrol queue and only ship to the character runtime once approved."
 
 #: apps/wiki/src/routes/home-page.tsx:42
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2097
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2222
 msgid "✨ 创建角色"
 msgstr "✨ Create character"
 
@@ -1793,18 +1911,9 @@ msgstr "Community-created"
 msgid "（暂无简介）"
 msgstr "(No bio yet)"
 
-#: apps/wiki/src/routes/login-page.tsx:41
-#: apps/wiki/src/routes/register-page.tsx:51
-msgid "账号"
-msgstr "Account"
-
 #: apps/wiki/src/routes/login-page.tsx:50
 msgid "用户名密码"
 msgstr "Username & password"
-
-#: apps/wiki/src/routes/login-page.tsx:58
-msgid "邮箱验证码"
-msgstr "Email code"
 
 #: apps/wiki/src/routes/login-page.tsx:69
 msgid "还没有账号？"
@@ -1833,937 +1942,912 @@ msgstr "Password"
 msgid "登录中..."
 msgstr "Signing in..."
 
-#. placeholder {0}: result.debugCode
-#: apps/wiki/src/routes/login-page.tsx:181
-msgid "开发模式：验证码已打印到服务端日志（debug={0}）"
-msgstr "Dev mode: code printed to server log (debug={0})"
-
 #: apps/wiki/src/routes/login-page.tsx:182
 msgid "验证码已发送，请查收邮箱（含垃圾邮件箱）。"
 msgstr "Verification code sent. Check your email (including spam)."
-
-#: apps/wiki/src/routes/login-page.tsx:208
-msgid "邮箱"
-msgstr "Email"
 
 #: apps/wiki/src/routes/login-page.tsx:219
 msgid "验证码"
 msgstr "Code"
 
-#: apps/wiki/src/routes/login-page.tsx:219
-msgid "6 位数字，10 分钟内有效"
-msgstr "6 digits, valid for 10 minutes"
-
-#: apps/wiki/src/routes/login-page.tsx:237
-msgid "{cooldown}s 后重发"
-msgstr "Resend in {cooldown}s"
-
-#: apps/wiki/src/routes/login-page.tsx:239
-msgid "发送中..."
-msgstr "Sending..."
-
-#: apps/wiki/src/routes/login-page.tsx:240
-msgid "发送验证码"
-msgstr "Send code"
-
 #: apps/wiki/src/routes/login-page.tsx:252
 msgid "登录 / 注册"
 msgstr "Sign in / register"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:57
+#: apps/wiki/src/routes/my-character-edit-page.tsx:68
 msgid "不用"
 msgstr "None"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:58
+#: apps/wiki/src/routes/my-character-edit-page.tsx:69
 msgid "偶尔用"
 msgstr "Occasional"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:59
+#: apps/wiki/src/routes/my-character-edit-page.tsx:70
 msgid "经常用"
 msgstr "Frequent"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:63
+#: apps/wiki/src/routes/my-character-edit-page.tsx:74
 msgid "简短"
 msgstr "Short"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:64
+#: apps/wiki/src/routes/my-character-edit-page.tsx:75
 msgid "中等"
 msgstr "Medium"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:65
+#: apps/wiki/src/routes/my-character-edit-page.tsx:76
 msgid "较长"
 msgstr "Long"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:70
+#: apps/wiki/src/routes/my-character-edit-page.tsx:81
 msgid "正常"
 msgstr "Normal"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:80
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1176
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2180
+#: apps/wiki/src/routes/my-character-edit-page.tsx:91
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1290
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2325
 msgid "基础身份"
 msgstr "Basic identity"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:81
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1294
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2182
+#: apps/wiki/src/routes/my-character-edit-page.tsx:92
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1419
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2327
 msgid "简介 & 性格"
 msgstr "Bio & personality"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:82
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1391
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2184
+#: apps/wiki/src/routes/my-character-edit-page.tsx:93
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1516
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2329
 msgid "专业 & 知识边界"
 msgstr "Expertise & knowledge limits"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:83
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1479
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2186
+#: apps/wiki/src/routes/my-character-edit-page.tsx:94
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1604
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2331
 msgid "说话风格"
 msgstr "Speech style"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:84
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1639
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2188
+#: apps/wiki/src/routes/my-character-edit-page.tsx:95
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1764
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2333
 msgid "底层逻辑 & 场景行为"
 msgstr "Core logic & scene behavior"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:85
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1815
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2190
+#: apps/wiki/src/routes/my-character-edit-page.tsx:96
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1940
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2335
 msgid "记忆 & 推理"
 msgstr "Memory & reasoning"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:86
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1938
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2192
+#: apps/wiki/src/routes/my-character-edit-page.tsx:97
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2063
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2337
 msgid "节奏 & 触发"
 msgstr "Rhythm & triggers"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:488
+#: apps/wiki/src/routes/my-character-edit-page.tsx:510
 msgid "头像只能填 emoji、http(s) URL 或 / 开头的站内路径"
 msgstr "Avatar must be an emoji, an http(s) URL, or a path starting with /"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1005
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1114
 msgid "AI 生成额度用完，每小时上限 15 次，请稍后再试。"
 msgstr "AI generation quota exhausted (15/hour limit). Please try again later."
 
 #. placeholder {0}: gen.message
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1007
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1116
 msgid "AI 生成失败：{0}"
 msgstr "AI generation failed: {0}"
 
 #. placeholder {0}: recordQ.data.name
 #. placeholder {0}: row.name
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1027
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1141
 #: apps/wiki/src/routes/my-characters-page.tsx:217
 msgid "确认删除「{0}」？此操作无法撤销。"
 msgstr "Delete \"{0}\"? This action cannot be undone."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1036
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1046
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1053
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1113
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1150
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1160
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1167
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1227
 #: apps/wiki/src/routes/my-characters-page.tsx:97
 #: apps/wiki/src/routes/my-characters-page.tsx:118
 msgid "我的"
 msgstr "Mine"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1036
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1046
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1053
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1150
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1160
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1167
 msgid "私有角色"
 msgstr "Private characters"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1038
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1152
 #: apps/wiki/src/routes/pending-reviews-page.tsx:61
 #: apps/wiki/src/routes/watchlist-page.tsx:40
 msgid "请先登录。"
 msgstr "Please sign in first."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1067
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1181
 msgid "← 返回列表"
 msgstr "← Back to list"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1084
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1198
 #: apps/wiki/src/routes/my-characters-page.tsx:298
 msgid "导出中…"
 msgstr "Exporting…"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1086
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1200
 msgid "📤 导出 JSON"
 msgstr "📤 Export JSON"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1096
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1210
 #: apps/wiki/src/routes/my-characters-page.tsx:307
 msgid "🗑 删除"
 msgstr "🗑 Delete"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1114
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1228
 msgid "新建私有角色"
 msgstr "New private character"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1114
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1228
 msgid "编辑私有角色"
 msgstr "Edit private character"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1116
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1230
 msgid "这里保存的内容仅你可见。同名再导入会覆盖。点击「导出」下载 JSON，可在 app 端导入到你的世界。"
 msgstr "Content saved here is visible only to you. Re-importing with the same name will overwrite. Click \"Export\" to download JSON, which you can import into your world from the app."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1178
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1292
 msgid "角色的名字与基本身份；只有「名称」是必填。"
 msgstr "The character's name and basic identity; only \"Name\" is required."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1188
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1302
 msgid "✨ AI 正在生成基础身份（含头像 emoji），完成前本节字段已锁定。"
 msgstr "✨ AI is generating basic identity (incl. avatar emoji). Fields in this section are locked until done."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1204
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1318
 msgid "例如 苏然"
 msgstr "e.g. Su Ran"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1210
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1324
 msgid "emoji（🦊）或图片 URL；空则用首字母占位（AI 生成基础身份时会自动补一个 emoji）"
 msgstr "Emoji (🦊) or image URL. If empty, the first letter is used as placeholder (AI fills an emoji when generating basic identity)."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1212
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1326
 msgid "在角色卡片和列表里展示，不直接进 AI 提示词"
 msgstr "Shown on the character card and lists; doesn't enter the AI prompt directly"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1222
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1336
 msgid "这个角色相对于你的身份"
 msgstr "This character's role relative to you"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1223
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1337
 msgid "AI 自我介绍时会用这句来定位你"
 msgstr "AI will use this line to position you when introducing itself"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1229
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1343
 msgid "例如 大学室友"
 msgstr "e.g. College roommate"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1234
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1348
 msgid "在角色卡和列表里展示，不直接进 AI 提示词"
 msgstr "Shown on character cards and lists; doesn't enter the AI prompt directly"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1255
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1317
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1333
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1349
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1364
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1414
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1455
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1503
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1584
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1661
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1848
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1380
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1442
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1458
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1474
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1489
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1539
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1580
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1628
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1709
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1786
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1973
 msgid "推荐"
 msgstr "Recommended"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1256
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1381
 msgid "一句话说清角色\"在干什么\""
 msgstr "One sentence on what the character \"is doing\""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1257
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1382
 msgid "AI 自我介绍 / 被问到工作时会引用这段"
 msgstr "AI will quote this when introducing itself or answering questions about its work"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1262
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1387
 msgid "例如 临床心理咨询师"
 msgstr "e.g. Clinical psychologist"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1266
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1391
 msgid "背景 / 经历"
 msgstr "Background & history"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1267
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1392
 msgid "从哪里来、关键经历、形成现在性格的事件"
 msgstr "Where they're from, key experiences, events that shaped today's personality"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1268
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1393
 msgid "AI 被问到过去与经历时会按这段回答"
 msgstr "AI will answer questions about its past and history along these lines"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1275
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1400
 msgid "例如 北京长大，伦敦读硕，回国后开了一家独立咨询工作室。"
 msgstr "e.g. Grew up in Beijing, studied for a master's in London, opened an independent counseling practice after returning home."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1296
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1421
 msgid "bio 和 personality 主要面向其他用户；动机和世界观会进 AI 推理。"
 msgstr "Bio and personality are mainly shown to other users; motivation and worldview feed into AI reasoning."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1308
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1433
 msgid "✨ AI 正在生成简介 & 性格，完成前本节字段已锁定。"
 msgstr "✨ AI is generating bio & personality. Fields in this section are locked until done."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1318
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1443
 msgid "一段话介绍角色背景与人设；其他用户可以读到"
 msgstr "A short paragraph about the character's background and persona; visible to other users"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1319
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1444
 msgid "在角色卡片和搜索结果里展示给其他人，不直接进 AI 提示词"
 msgstr "Displayed to others on the character card and in search results; doesn't enter the AI prompt directly"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1327
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1452
 msgid "例如：心理学背景，慢热而锋利。喜欢半夜读书，习惯先观察再回应。"
 msgstr "e.g. Psychology background, slow to warm up but sharp. Reads late at night, observes before responding."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1334
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1459
 msgid "用一两句话描述说话风格"
 msgstr "Describe the speech style in one or two sentences"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1335
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1460
 msgid "在角色卡和列表里展示，不直接进 AI 提示词（用下面的\"说话风格\"细化）"
 msgstr "Shown on character cards and lists; doesn't enter the AI prompt directly (use \"Speech style\" below to refine)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1343
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1468
 msgid "例如：直接但温和。不爱用感叹号，喜欢用反问引导思考。"
 msgstr "e.g. Direct but gentle. Avoids exclamation marks, prefers rhetorical questions to guide thinking."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1348
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1473
 msgid "核心动机"
 msgstr "Core motivation"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1350
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1475
 msgid "角色每天起床想做什么、回避什么"
 msgstr "What the character wants to do each day and what they avoid"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1351
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1476
 msgid "AI 做选择和判断时会参考这段动机"
 msgstr "AI will reference this motivation when making choices and judgments"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1358
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1483
 msgid "例如：想让来访者发现自己其实早就知道答案；害怕被当成权威。"
 msgstr "e.g. Wants clients to realize they already had the answer; afraid of being treated as an authority."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1363
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1488
 msgid "世界观 / 价值观"
 msgstr "Worldview & values"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1365
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1490
 msgid "角色看世界的基本立场"
 msgstr "The character's basic stance toward the world"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1366
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1491
 msgid "AI 表达立场和价值判断时会按这段"
 msgstr "AI will follow this when expressing positions and value judgments"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1373
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1498
 msgid "例如：相信复杂问题不靠\"想通\"，靠\"试着活下去\"。"
 msgstr "e.g. Believes complex problems aren't solved by \"figuring them out\" but by \"trying to keep living.\""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1393
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1518
 msgid "让 AI 知道这个角色擅长什么、对哪些领域要谦虚，避免装内行。"
 msgstr "Tells the AI what this character is good at and where they should stay humble — so they don't fake expertise."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1405
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1530
 msgid "✨ AI 正在生成专业 & 知识边界，完成前本节字段已锁定。"
 msgstr "✨ AI is generating expertise & knowledge limits. Fields in this section are locked until done."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1415
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1540
 msgid "逗号分隔；用于检索、推荐与触发对话"
 msgstr "Comma-separated; used for search, recommendations, and conversation triggers"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1416
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1541
 msgid "AI 会优先接这些领域的话题"
 msgstr "AI will preferentially pick up conversations in these areas"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1421
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1546
 msgid "编程, 音乐, 心理学"
 msgstr "coding, music, psychology"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1426
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1551
 msgid "专业描述"
 msgstr "Expertise description"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1427
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1552
 msgid "描述专长的具体深度，比标签更细"
 msgstr "Describe expertise depth in detail, beyond the tags"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1428
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1553
 msgid "AI 解释自己专长时会用这段"
 msgstr "AI will use this when explaining its own expertise"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1435
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1560
 msgid "例如：擅长 CBT 与情绪聚焦，不做精神科诊断也不开药。"
 msgstr "e.g. Strong in CBT and emotion-focused therapy; does not make psychiatric diagnoses or prescribe medication."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1441
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1566
 msgid "角色不会的事；让 AI 不要硬撑"
 msgstr "What the character doesn't know; keeps the AI from bluffing"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1442
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1567
 msgid "AI 谦虚承认不懂某事时会按这段"
 msgstr "AI will follow this when humbly admitting it doesn't know something"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1449
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1574
 msgid "例如：不懂数理、量化交易，被问到会坦白说不熟。"
 msgstr "e.g. Not familiar with math or quant trading; will openly say so when asked."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1454
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1579
 msgid "拒绝风格"
 msgstr "Refusal style"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1456
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1581
 msgid "遇到不会/不能答的问题，怎么\"软拒绝\""
 msgstr "How to \"softly decline\" questions the character can't or won't answer"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1457
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1582
 msgid "AI 软拒绝回答时的具体语气"
 msgstr "The specific tone AI uses when softly declining a question"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1462
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1587
 msgid "例如：先承认不擅长，再问对方想解决什么"
 msgstr "e.g. First acknowledge unfamiliarity, then ask what the person actually wants to solve"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1481
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1606
 msgid "决定 AI 生成的具体语感——长度、表情、口头禅、禁忌。"
 msgstr "Controls the AI's concrete voice — length, emoji, catchphrases, taboos."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1493
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1618
 msgid "✨ AI 正在生成说话风格，完成前本节字段已锁定。"
 msgstr "✨ AI is generating speech style. Fields in this section are locked until done."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1502
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1627
 msgid "表情使用"
 msgstr "Emoji usage"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1504
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1629
 msgid "AI 回复里使用表情的密度"
 msgstr "How densely the AI sprinkles emojis into replies"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1521
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1646
 msgid "AI 回复的长度偏好"
 msgstr "AI's preferred reply length"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1537
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1662
 msgid "情感基调"
 msgstr "Emotional tone"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1538
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1663
 msgid "一两个词描述角色情绪底色"
 msgstr "One or two words for the character's emotional baseline"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1539
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1664
 msgid "AI 说话的情感底色"
 msgstr "The emotional baseline of how the AI speaks"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1544
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1669
 msgid "例如 冷静、温和、戏谑"
 msgstr "e.g. calm, gentle, playful"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1549
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1674
 msgid "处理事情/任务时的方式"
 msgstr "How they handle tasks"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1550
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1675
 msgid "AI 谈处理事情时的表达方式"
 msgstr "How the AI talks about handling tasks"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1555
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1680
 msgid "例如 先拆问题再动手"
 msgstr "e.g. Decomposes the problem before acting"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1560
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1685
 msgid "和人相处时的距离感"
 msgstr "How they relate to others, what distance they keep"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1561
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1686
 msgid "AI 在社交场景下的距离感"
 msgstr "The distance the AI keeps in social settings"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1566
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1691
 msgid "例如 慢热、不主动加戏"
 msgstr "e.g. Warms up slowly, doesn't dramatize"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1571
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1696
 msgid "说话模式"
 msgstr "Speech patterns"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1572
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1697
 msgid "逗号分隔；典型句式或结构"
 msgstr "Comma-separated; typical phrasings or structures"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1573
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1698
 msgid "AI 平时使用的句式和说话习惯"
 msgstr "Sentence patterns and speech habits the AI uses regularly"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1578
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1703
 msgid "例如 用反问开头, 喜欢举例子"
 msgstr "e.g. Opens with rhetorical questions, likes giving examples"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1583
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1708
 msgid "口头禅"
 msgstr "Catchphrases"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1585
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1710
 msgid "逗号分隔；角色常说的短句"
 msgstr "Comma-separated; short phrases the character often uses"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1586
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1711
 msgid "AI 会经常脱口而出的口头禅"
 msgstr "Catchphrases the AI will blurt out often"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1591
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1716
 msgid "例如 \"先停一下\", \"我想多听一点\""
 msgstr "e.g. \"Let's pause for a moment\", \"I'd like to hear more\""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1596
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1721
 msgid "兴趣话题"
 msgstr "Topics of interest"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1597
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1722
 msgid "逗号分隔；角色乐意聊的事"
 msgstr "Comma-separated; things the character is happy to discuss"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1598
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1723
 msgid "AI 容易主动谈起的话题"
 msgstr "Topics the AI tends to bring up on its own"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1603
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1728
 msgid "例如 心理学, 电影, 长跑"
 msgstr "e.g. psychology, movies, long-distance running"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1608
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1733
 msgid "禁忌话题"
 msgstr "Taboo topics"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1609
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1734
 msgid "逗号分隔；角色会回避或转移的话题"
 msgstr "Comma-separated; topics the character avoids or redirects"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1610
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1735
 msgid "AI 会主动避开或转移的话题"
 msgstr "Topics the AI will actively avoid or redirect"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1615
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1740
 msgid "例如 家庭隐私, 政治站队"
 msgstr "e.g. family privacy, political alignment"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1620
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1745
 msgid "怪癖"
 msgstr "Quirks"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1621
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1746
 msgid "逗号分隔；让角色更鲜活的小习惯"
 msgstr "Comma-separated; small habits that make the character feel alive"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1622
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1747
 msgid "让 AI 显得更鲜活的小习惯"
 msgstr "Small habits that make the AI feel more alive"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1627
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1752
 msgid "例如 句号都打完整, 不爱用感叹号"
 msgstr "e.g. Always writes full sentences, dislikes exclamation marks"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1641
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1766
 msgid "不填会用默认推断；填了会作为对应场景的系统提示词追加。"
 msgstr "Leave blank to use defaults; anything you fill in is appended as the system prompt for that scene."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1654
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1779
 msgid "✨ AI 正在生成底层逻辑 & 场景行为，完成前本节字段已锁定。"
 msgstr "✨ AI is generating core logic & scene behavior. Fields in this section are locked until done."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1660
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1785
 msgid "底层逻辑"
 msgstr "Core logic"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1662
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1787
 msgid "贯穿所有场景的\"心法\"；优先级高于场景 prompt"
 msgstr "The \"guiding principle\" that runs through every scene; takes priority over per-scene prompts"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1663
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1788
 msgid "AI 在所有场景里都会遵循这段（最高优先级）"
 msgstr "AI will follow this in every scene (highest priority)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1670
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1795
 msgid "例如：永远先确认对方的状态再回应；不要替对方下结论。"
 msgstr "e.g. Always confirm the other person's state before responding; never draw conclusions for them."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1673
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1798
 msgid "永远先确认对方在问什么，再用一句反问引导他说更多。不替对方下结论。"
 msgstr "Always confirm what the other person is asking before using a single rhetorical question to invite them to say more. Don't draw conclusions for them."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1675
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1691
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1713
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1728
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1743
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1758
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1773
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1788
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1803
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1800
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1816
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1838
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1853
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1868
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1883
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1898
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1913
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1928
 msgid "📋 查看示例"
 msgstr "📋 See example"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1676
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1692
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1714
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1729
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1744
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1759
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1774
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1789
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1804
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1801
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1817
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1839
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1854
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1869
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1884
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1899
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1914
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1929
 msgid "收起示例"
 msgstr "Hide example"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1680
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1805
 msgid "聊天 prompt"
 msgstr "Chat prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1681
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1806
 msgid "私聊 / 群聊场景的具体行为"
 msgstr "Specific behavior in private and group chats"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1682
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1807
 msgid "AI 在私聊和群聊场景下的具体表现"
 msgstr "How the AI behaves in private and group chat scenarios"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1689
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1814
 msgid "短句优先，能反问就别陈述。被夸时低调反弹回去。"
 msgstr "Short sentences first. Use rhetorical questions over statements when possible. Deflect compliments humbly."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1699
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1824
 msgid "+ 自定义其他场景行为"
 msgstr "+ Customize other scene behaviors"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1700
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1825
 msgid "收起其他场景"
 msgstr "Hide other scenes"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1703
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1828
 msgid "朋友圈发布 prompt"
 msgstr "Moments post prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1704
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1829
 msgid "AI 发朋友圈时的内容风格"
 msgstr "Content style when the AI posts on Moments"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1711
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1836
 msgid "最近遇到一个小事 + 一句感受，不超过两句话。"
 msgstr "A small recent incident + one sentence of feeling. No more than two sentences."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1718
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1843
 msgid "朋友圈评论 prompt"
 msgstr "Moments comment prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1719
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1844
 msgid "AI 在朋友圈下评论时的风格"
 msgstr "Style when the AI comments under Moments posts"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1726
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1851
 msgid "先回应朋友的情绪，再问一个具体的细节。"
 msgstr "First acknowledge the friend's emotion, then ask one specific detail."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1733
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1858
 msgid "Feed 发布 prompt"
 msgstr "Feed post prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1734
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1859
 msgid "AI 发 Feed 贴文时的内容风格"
 msgstr "Content style when the AI posts on Feed"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1741
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1866
 msgid "写一段最近的观察 + 一个开放问题，给读者留余地。"
 msgstr "Write a recent observation + one open question, leaving room for the reader."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1748
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1873
 msgid "视频号发布 prompt"
 msgstr "Channels post prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1749
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1874
 msgid "AI 发视频号 / 频道内容时的风格"
 msgstr "Style when the AI posts on Channels / video"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1756
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1881
 msgid "30 秒内能讲完的小见解 + 一句反差结尾。"
 msgstr "A small insight you can deliver in under 30 seconds + one contrasting closing line."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1763
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1888
 msgid "Feed 评论 prompt"
 msgstr "Feed comment prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1764
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1889
 msgid "AI 在 Feed 评论区的回应风格"
 msgstr "Style when the AI replies in Feed comments"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1771
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1896
 msgid "针对 OP 的某一句具体回应，不抢话也不空夸。"
 msgstr "Respond to one specific line from the OP — no overshadowing and no empty praise."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1778
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1903
 msgid "招呼 / 加好友 prompt"
 msgstr "Greeting / friend-request prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1779
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1904
 msgid "AI 加好友 / 打招呼时的开场措辞"
 msgstr "Opening line the AI uses for friend requests / greetings"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1786
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1911
 msgid "先报上身份和我们怎么认识，问对方最近忙什么。"
 msgstr "Identify yourself and how we know each other first, then ask what they've been up to."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1793
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1918
 msgid "主动外联 prompt"
 msgstr "Proactive outreach prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1794
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1919
 msgid "AI 主动外联用户时的开场措辞"
 msgstr "Opening line the AI uses when proactively reaching out"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1801
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1926
 msgid "不打扰式开场：\"刚想起 xxx，想问你一句\"。不索取注意力。"
 msgstr "Non-intrusive opening: \"Just thought of xxx, wanted to ask you something.\" Don't demand attention."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1817
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1942
 msgid "角色记什么、忘多快、要不要走链路推理。不填则用默认值。"
 msgstr "What the character remembers, how fast they forget, whether to use chain-of-thought. Leave blank for defaults."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1830
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1955
 msgid "✨ AI 正在生成记忆 & 推理（含 CoT / 反思 / 路由开关），完成前本节字段已锁定。"
 msgstr "✨ AI is generating memory & reasoning (incl. CoT / reflection / routing toggles). Fields in this section are locked until done."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1837
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1962
 msgid "角色对自己过往的一段总结；会作为长期记忆种子"
 msgstr "The character's summary of their own past; seeds long-term memory"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1838
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1963
 msgid "作为 AI 长期记忆的种子摘要"
 msgstr "Seed summary that becomes part of the AI's long-term memory"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1849
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1974
 msgid "角色一定不会忘的事；放最稳定的人设根基"
 msgstr "Things the character will never forget; the most stable foundation of the persona"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1850
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1975
 msgid "AI 永远记得的核心事实（最高优先级）"
 msgstr "Core facts the AI will never forget (highest priority)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1860
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1872
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1886
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1897
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1964
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1980
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1994
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2008
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1985
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1997
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2011
 #: apps/wiki/src/routes/my-character-edit-page.tsx:2022
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2036
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2089
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2105
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2119
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2133
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2147
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2161
 msgid "进阶"
 msgstr "Advanced"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1861
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1986
 msgid "初始的近期记忆；会被对话逐渐覆盖"
 msgstr "Initial short-term memory; gradually overwritten by conversation"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1862
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1987
 msgid "AI 对你\"近期互动\"的初始印象，对话会逐渐覆盖"
 msgstr "AI's initial impression of \"recent interactions\" with you; gradually overwritten by conversation"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1871
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1996
 msgid "遗忘曲线（0-100，默认 70）"
 msgstr "Forgetting curve (0-100, default 70)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1873
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1998
 msgid "数值越高记得越牢；建议 50-80"
 msgstr "Higher values mean stickier memory; 50-80 recommended"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1874
+#: apps/wiki/src/routes/my-character-edit-page.tsx:1999
 msgid "AI 记忆衰减速度，越大越牢"
 msgstr "How fast the AI forgets — higher = stickier memory"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1885
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2010
 msgid "近期摘要 prompt"
 msgstr "Recent-summary prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1887
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2012
 msgid "AI 整理近期记忆时使用的指示模板"
 msgstr "Instruction template the AI uses when consolidating recent memory"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1896
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2021
 msgid "核心记忆 prompt"
 msgstr "Core-memory prompt"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1898
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2023
 msgid "AI 提炼核心记忆时使用的指示模板"
 msgstr "Instruction template the AI uses when extracting core memories"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1908
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2033
 msgid "推理开关 — 影响 AI 思考方式"
 msgstr "Reasoning toggles — affect how the AI thinks"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1914
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2039
 msgid "启用链路推理（CoT）"
 msgstr "Enable chain-of-thought (CoT)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1915
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2040
 msgid "开启后 AI 用思维链推理（更慢但更深思）"
 msgstr "When on, AI reasons step by step (slower but more thoughtful)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1921
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2046
 msgid "开启后 AI 会回头反思自己的回答"
 msgstr "When on, AI reflects back on its own answers"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1927
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2052
 msgid "开启后 AI 必要时会寻求其他角色协助"
 msgstr "When on, AI seeks help from other characters when needed"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1940
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2065
 msgid "以下设置只控制 AI 多久 / 在什么场景出现，不改变它说什么。"
 msgstr "These settings only control how often / in which scenes the AI appears — they don't change what it says."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1953
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2078
 msgid "✨ AI 正在生成节奏 & 触发（含活跃时段、触发场景），完成前本节字段已锁定。"
 msgstr "✨ AI is generating rhythm & triggers (incl. active hours, trigger scenes). Fields in this section are locked until done."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1959
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2084
 msgid "这一组只影响调度（频率、活跃时段、触发场景），不影响 AI 的说话风格与内容。"
 msgstr "This group only affects scheduling (frequency, active hours, trigger scenes); it does not affect the AI's speaking style or content."
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1965
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2090
 msgid "调度：AI 总体活跃程度"
 msgstr "Scheduling: the AI's overall activity level"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1979
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2104
 msgid "朋友圈频率（次/天）"
 msgstr "Moments frequency (per day)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1981
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2106
 msgid "0 表示不主动发"
 msgstr "0 means never post on their own"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1982
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2107
 msgid "调度：AI 每天主动发朋友圈的次数"
 msgstr "Scheduling: how many Moments posts the AI proactively makes per day"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1993
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2118
 msgid "视频号 / Feed 频率（次/周）"
 msgstr "Channels / Feed frequency (per week)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:1995
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2120
 msgid "调度：AI 每周主动发 Feed / 视频号的次数"
 msgstr "Scheduling: how many Feed / Channel posts the AI proactively makes per week"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2007
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2132
 msgid "活跃开始时段（0-23 小时）"
 msgstr "Active hours start (0-23)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2009
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2134
 msgid "空 = 全天活跃"
 msgstr "Empty = active all day"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2010
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2135
 msgid "调度：AI 主动行为的开始时段"
 msgstr "Scheduling: hour the AI starts proactive behavior"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2021
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2146
 msgid "活跃结束时段（0-23 小时）"
 msgstr "Active hours end (0-23)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2023
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2148
 msgid "调度：AI 主动行为的结束时段"
 msgstr "Scheduling: hour the AI stops proactive behavior"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2037
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2162
 msgid "逗号分隔；例如 coffee_shop, gym, library"
 msgstr "Comma-separated; e.g. coffee_shop, gym, library"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2038
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2163
 msgid "调度：哪些情境下系统会优先想到这个角色"
 msgstr "Scheduling: which scenarios make the system surface this character first"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2064
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2189
 msgid "已保存 ✓"
 msgstr "Saved ✓"
 
 #. placeholder {0}: getSectionLabel(aiFlash.section, t)
 #. placeholder {1}: aiFlash.count
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2073
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2198
 msgid "✨ 已为「{0}」补全 {1} 个字段"
 msgstr "✨ Filled {1} fields in \"{0}\""
 
 #. placeholder {0}: getSectionLabel(aiFlash.section, t)
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2077
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2202
 msgid "✨ 「{0}」没有空字段需要补全"
 msgstr "✨ No empty fields to fill in \"{0}\""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2095
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2220
 msgid "保存中…"
 msgstr "Saving…"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2099
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2224
 msgid "💾 保存修改"
 msgstr "💾 Save changes"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2104
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2229
 msgid "请填写「名称」才能保存"
 msgstr "Fill in \"Name\" before saving"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2106
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2231
 msgid "同名再导入会覆盖此角色"
 msgstr "Re-importing with the same name will overwrite this character"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2108
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2233
 msgid "保存后会跳到编辑页继续完善"
 msgstr "After saving, you'll be taken to the edit page to keep refining"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2194
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2339
 msgid "整个角色"
 msgstr "the whole character"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2260
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2405
 msgid "请先填写名称"
 msgstr "Fill in \"Name\" first"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2270
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2313
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2415
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2458
 msgid "生成中…"
 msgstr "Generating…"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2270
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2415
 msgid "✨ AI 生成本节"
 msgstr "✨ AI fill section"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2315
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2460
 msgid "✨ AI 一键生成全部"
 msgstr "✨ AI fill everything"
 
 #. placeholder {0}: missing.join("、")
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2320
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2465
 msgid "还需填写：{0}（点上方按钮可跳到第一个未填）"
 msgstr "Missing: {0} (click the button to jump to the first one)"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2358
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2503
 msgid "把右侧字段填上，这里会同步展示 AI 看到的你的角色"
 msgstr "Fill in the fields and you'll see here exactly how the AI views your character"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2362
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2507
 msgid "AI 眼里的你的角色 ↑"
 msgstr "How the AI sees your character ↑"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2375
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2520
 msgid "章节"
 msgstr "Sections"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2401
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2546
 msgid "↓ 跳到保存"
 msgstr "↓ Jump to save"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2455
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2600
 msgid "收起 ▴"
 msgstr "Collapse ▴"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2455
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2600
 msgid "展开 ▾"
 msgstr "Expand ▾"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2681
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2826
 msgid "AI 正在生成「{sectionLabel}」…"
 msgstr "AI is generating \"{sectionLabel}\"…"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:2687
+#: apps/wiki/src/routes/my-character-edit-page.tsx:2832
 msgid "表单已锁定。可以返回列表，回来后结果会自动填好。"
 msgstr "Form is locked. You can return to the list — results will auto-fill when you come back."
 

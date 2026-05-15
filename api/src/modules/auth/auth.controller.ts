@@ -40,6 +40,21 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   me(@CurrentUser() user: AuthenticatedUser) {
-    return user;
+    return this.auth.getProfile(user.id);
+  }
+
+  @Post('password/send-code')
+  @UseGuards(JwtAuthGuard)
+  sendChangePasswordCode(@CurrentUser() user: AuthenticatedUser) {
+    return this.auth.sendChangePasswordCode(user.id);
+  }
+
+  @Post('password/change')
+  @UseGuards(JwtAuthGuard)
+  changePassword(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() body: { code: string; newPassword: string },
+  ) {
+    return this.auth.changePassword(user.id, body?.code, body?.newPassword);
   }
 }

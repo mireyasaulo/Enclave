@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { EmailAuthService } from './email-auth.service';
 import { UserEntity } from './user.entity';
 import { WelcomeMessageService } from './welcome-message.service';
 
@@ -27,6 +28,19 @@ export type AuthSession = {
   };
 };
 
+export type AuthProfile = {
+  id: string;
+  username: string;
+  role: string;
+  userType: string;
+  avatar?: string;
+  email: string | null;
+  emailVerifiedAt: string | null;
+  hasPassword: boolean;
+};
+
+const MIN_PASSWORD_LENGTH = 6;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -35,6 +49,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly welcomeMessageService: WelcomeMessageService,
+    private readonly emailAuth: EmailAuthService,
   ) {}
 
   async register(username: string, password: string): Promise<AuthSession> {
@@ -104,6 +119,60 @@ export class AuthService {
     return this.userRepo.findOne({ where: { id } });
   }
 
+  async getProfile(userId: string): Promise<AuthProfile> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new AppError('AUTH_USER_NOT_FOUND', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '用户不存在',
+      });
+    }
+    return {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      userType: user.userType,
+      avatar: user.avatar,
+      email: user.email ?? null,
+      emailVerifiedAt: user.emailVerifiedAt
+        ? user.emailVerifiedAt.toISOString()
+        : null,
+      hasPassword: Boolean(user.passwordHash),
+    };
+  }
+
+  async sendChangePasswordCode(userId: string) {
+    const user = await this.requireUserWithEmail(userId);
+    return this.emailAuth.sendCode(user.email!, 'change_password');
+  }
+
+  async changePassword(
+    userId: string,
+    code: string,
+    newPassword: string,
+  ): Promise<{ ok: true }> {
+    const user = await this.requireUserWithEmail(userId);
+    const password = (newPassword ?? '').trim();
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      throw new AppError('AUTH_PASSWORD_TOO_SHORT', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { min: MIN_PASSWORD_LENGTH },
+        legacyMessage: `新密码至少 ${MIN_PASSWORD_LENGTH} 位。`,
+      });
+    }
+
+    const session = await this.emailAuth.verifyCodeForPurpose(
+      user.email!,
+      code,
+      'change_password',
+    );
+
+    user.passwordHash = await bcrypt.hash(password, 10);
+    await this.userRepo.save(user);
+    await this.emailAuth.markCodeUsed(session.id);
+    return { ok: true };
+  }
+
   async verifyToken(token: string): Promise<AuthUserPayload> {
     return this.jwt.verifyAsync<AuthUserPayload>(token, {
       secret: this.resolveSecret(),
@@ -119,6 +188,23 @@ export class AuthService {
       });
     }
     return secret;
+  }
+
+  private async requireUserWithEmail(userId: string): Promise<UserEntity> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new AppError('AUTH_USER_NOT_FOUND', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '用户不存在',
+      });
+    }
+    if (!user.email) {
+      throw new AppError('AUTH_NO_EMAIL_BOUND', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '当前账号尚未绑定邮箱，无法通过邮箱验证码修改密码。',
+      });
+    }
+    return user;
   }
 
   private async buildSession(user: UserEntity): Promise<AuthSession> {

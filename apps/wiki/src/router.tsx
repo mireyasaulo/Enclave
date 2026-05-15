@@ -108,6 +108,11 @@ const AdminStatsPage = lazy(async () => {
   return { default: mod.AdminStatsPage };
 });
 
+const AccountPage = lazy(async () => {
+  const mod = await import("./routes/account-page");
+  return { default: mod.AccountPage };
+});
+
 const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
@@ -225,6 +230,12 @@ const searchRoute = createRoute({
   component: SearchPage,
 });
 
+const accountRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/account",
+  component: AccountPage,
+});
+
 const adminReportsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
   path: "/admin/reports",
@@ -265,6 +276,7 @@ const routeTree = rootRoute.addChildren([
   ]),
   watchlistRoute,
   searchRoute,
+  accountRoute,
 ]);
 
 export const router = createRouter({ routeTree });

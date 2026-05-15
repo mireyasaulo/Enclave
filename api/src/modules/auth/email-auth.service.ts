@@ -14,6 +14,8 @@ import { WelcomeMessageService } from './welcome-message.service';
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export type EmailCodePurpose = 'login' | 'change_password';
+
 export type SendEmailCodeResult = {
   email: string;
   expiresAt: string;
@@ -33,9 +35,12 @@ export class EmailAuthService {
     private readonly welcomeMessageService: WelcomeMessageService,
   ) {}
 
-  async sendCode(email: string): Promise<SendEmailCodeResult> {
+  async sendCode(
+    email: string,
+    purpose: EmailCodePurpose = 'login',
+  ): Promise<SendEmailCodeResult> {
     const normalized = this.normalizeEmail(email);
-    await this.enforceSendCodeRateLimit(normalized);
+    await this.enforceSendCodeRateLimit(normalized, purpose);
 
     const existing = await this.userRepo.findOne({
       where: { email: normalized },
@@ -46,8 +51,9 @@ export class EmailAuthService {
     // 内仍能通过 verifyCode（按 email+code 精确匹配，命中即放行），泄漏一次 = 攻击窗口 10 分钟。
     // 不能 delete：enforceSendCodeRateLimit 的 cooldown 要靠最近一条 session.createdAt 算，
     // delete 掉历史就能被无限重发绕过。改 expiresAt 既作废 code，又保留 cooldown 历史。
+    // 按 purpose 隔离，避免改密码流程把刚发的登录码作废（或反过来）。
     await this.sessionRepo.update(
-      { email: normalized, verifiedAt: IsNull() },
+      { email: normalized, purpose, verifiedAt: IsNull() },
       { expiresAt: new Date(Date.now() - 1) },
     );
 
@@ -56,7 +62,7 @@ export class EmailAuthService {
     const session = this.sessionRepo.create({
       email: normalized,
       code,
-      purpose: 'login',
+      purpose,
       expiresAt,
       verifiedAt: null,
     });
@@ -79,15 +85,44 @@ export class EmailAuthService {
 
   async verifyCode(email: string, code: string): Promise<AuthSession> {
     const normalized = this.normalizeEmail(email);
+    const session = await this.lookupActiveSession(normalized, code, 'login');
+    session.verifiedAt = new Date();
+    await this.sessionRepo.save(session);
+
+    const user = await this.findOrCreateUserByEmail(normalized);
+    return this.buildSession(user);
+  }
+
+  /**
+   * 校验一条 purpose 对应的验证码但**不**立即标记 verifiedAt——留给业务层在最终动作
+   * （如真正写入新密码）成功后再调 markCodeUsed，避免"码已验但业务失败"导致码白用。
+   */
+  async verifyCodeForPurpose(
+    email: string,
+    code: string,
+    purpose: EmailCodePurpose,
+  ): Promise<EmailVerificationSessionEntity> {
+    const normalized = this.normalizeEmail(email);
+    return this.lookupActiveSession(normalized, code, purpose);
+  }
+
+  async markCodeUsed(sessionId: string): Promise<void> {
+    await this.sessionRepo.update({ id: sessionId }, { verifiedAt: new Date() });
+  }
+
+  private async lookupActiveSession(
+    email: string,
+    code: string,
+    purpose: EmailCodePurpose,
+  ): Promise<EmailVerificationSessionEntity> {
     const trimmedCode = (code ?? '').trim();
     if (!trimmedCode) {
       throw new AppError('AUTH_CODE_REQUIRED', {
         legacyMessage: '验证码不能为空。',
       });
     }
-
     const session = await this.sessionRepo.findOne({
-      where: { email: normalized, code: trimmedCode },
+      where: { email, code: trimmedCode, purpose },
       order: { createdAt: 'DESC' },
     });
     if (!session) {
@@ -108,12 +143,7 @@ export class EmailAuthService {
         legacyMessage: '验证码已过期。',
       });
     }
-
-    session.verifiedAt = new Date();
-    await this.sessionRepo.save(session);
-
-    const user = await this.findOrCreateUserByEmail(normalized);
-    return this.buildSession(user);
+    return session;
   }
 
   private async findOrCreateUserByEmail(email: string): Promise<UserEntity> {
@@ -202,7 +232,10 @@ export class EmailAuthService {
     return secret;
   }
 
-  private async enforceSendCodeRateLimit(email: string): Promise<void> {
+  private async enforceSendCodeRateLimit(
+    email: string,
+    purpose: EmailCodePurpose,
+  ): Promise<void> {
     const cooldown = this.parsePositiveInteger(
       this.config.get<string>('EMAIL_CODE_RESEND_COOLDOWN_SECONDS'),
       60,
@@ -216,8 +249,9 @@ export class EmailAuthService {
       5,
     );
 
+    // 限频按 (email, purpose) 分别计算 —— 改密码和登录的码不互相挤占额度。
     const latest = await this.sessionRepo.findOne({
-      where: { email },
+      where: { email, purpose },
       order: { createdAt: 'DESC' },
     });
     if (latest) {
@@ -234,7 +268,7 @@ export class EmailAuthService {
 
     const since = new Date(Date.now() - window * 1000);
     const count = await this.sessionRepo.count({
-      where: { email, createdAt: MoreThan(since) },
+      where: { email, purpose, createdAt: MoreThan(since) },
     });
     if (count >= max) {
       throw new AppError('AUTH_CODE_TOO_MANY', {

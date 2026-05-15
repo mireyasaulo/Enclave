@@ -4,13 +4,13 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { LanguageSwitcher, translateRuntimeMessage } from "@yinjie/i18n";
 import { Button, LoadingBlock } from "@yinjie/ui";
-import { clearSession, hasRole, useRoleLabel } from "../lib/auth-store";
+import { clearSession, hasRole, useRoleLabel, type WikiUser } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 
 type NavItem = {
@@ -209,26 +209,7 @@ export function RootLayout() {
           <div className="ml-auto flex items-center gap-2 md:ml-4">
             <LanguageSwitcher variant="compact" description={null} />
             {user ? (
-              <>
-                <div className="hidden text-right text-xs leading-tight md:block">
-                  <div className="font-medium text-[color:var(--text-primary)]">
-                    {user.username}
-                  </div>
-                  <div className="text-[color:var(--text-muted)]">
-                    {roleLabel(user.role)}
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    clearSession();
-                    window.location.href = "/login";
-                  }}
-                >
-                  <Trans>退出</Trans>
-                </Button>
-              </>
+              <UserMenu user={user} roleLabel={roleLabel} />
             ) : (
               <>
                 <Button
@@ -299,6 +280,95 @@ export function RootLayout() {
           任何登录用户都可以提交角色创建、编辑和生命周期变更，由巡查员审核生效
         </Trans>
       </footer>
+    </div>
+  );
+}
+
+function UserMenu({
+  user,
+  roleLabel,
+}: {
+  user: WikiUser;
+  roleLabel: (role: string) => string;
+}) {
+  const t = translateRuntimeMessage;
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (event: PointerEvent) => {
+      const node = wrapRef.current;
+      if (!node || !(event.target instanceof Node)) return;
+      if (node.contains(event.target)) return;
+      setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-white px-3 py-1.5 text-left text-xs leading-tight transition-colors hover:bg-[color:var(--surface-card-hover)]"
+      >
+        <span className="hidden md:block">
+          <div className="font-medium text-[color:var(--text-primary)]">
+            {user.username}
+          </div>
+          <div className="text-[color:var(--text-muted)]">
+            {roleLabel(user.role)}
+          </div>
+        </span>
+        <span className="md:hidden font-medium text-[color:var(--text-primary)]">
+          {user.username}
+        </span>
+        <span aria-hidden className="text-[10px] text-[color:var(--text-muted)]">
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-40 mt-2 w-44 overflow-hidden rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-overlay)] shadow-lg"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            className="block w-full px-4 py-2 text-left text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-card-hover)]"
+            onClick={() => {
+              setOpen(false);
+              void navigate({ to: "/account" });
+            }}
+          >
+            {t(msg`账户设置`)}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="block w-full border-t border-[color:var(--border-subtle)] px-4 py-2 text-left text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-card-hover)]"
+            onClick={() => {
+              setOpen(false);
+              clearSession();
+              window.location.href = "/login";
+            }}
+          >
+            {t(msg`退出`)}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

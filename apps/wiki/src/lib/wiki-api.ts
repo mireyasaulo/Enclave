@@ -72,6 +72,17 @@ export type AuthSession = {
   };
 };
 
+export type AuthProfile = {
+  id: string;
+  username: string;
+  role: string;
+  userType: string;
+  avatar?: string;
+  email: string | null;
+  emailVerifiedAt: string | null;
+  hasPassword: boolean;
+};
+
 export type WikiContentSnapshot = {
   name: string;
   avatar: string;
@@ -300,12 +311,23 @@ export const wikiApi = {
     });
   },
   me() {
+    return request<AuthProfile>("/auth/me");
+  },
+  sendChangePasswordCode() {
     return request<{
-      id: string;
-      username: string;
-      role: string;
-      userType: string;
-    }>("/auth/me");
+      email: string;
+      expiresAt: string;
+      debugCode?: string | null;
+    }>("/auth/password/send-code", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  },
+  changePassword(code: string, newPassword: string) {
+    return request<{ ok: true }>("/auth/password/change", {
+      method: "POST",
+      body: JSON.stringify({ code, newPassword }),
+    });
   },
   listCharacters() {
     return request<CharacterListItem[]>("/wiki/pages", { auth: false });
@@ -830,6 +852,12 @@ export const wikiApi = {
   generateMyCharacterFields(input: {
     section: AiGenerateSection;
     currentDraft: PrivateCharacterDto;
+    /**
+     * 优化模式：true 时后端 normalizer 解锁"目标为空才填"，让 AI 覆盖整节
+     * （sacred 字段 bio/personality/relationship 后端仍会兜底保留）。
+     * 仅前端确认弹窗后才传 true；默认 false 维持旧"只填空"语义。
+     */
+    optimize?: boolean;
   }) {
     return request<AiGeneratedDraft>("/wiki/my-characters/ai-generate", {
       method: "POST",
