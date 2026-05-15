@@ -119,6 +119,20 @@ export function MobileFeedPublishPage() {
     });
   }, [isDesktopLayout, navigate]);
 
+  // ESC 关闭「放弃发表」确认弹窗（和 farm 的 sheet/modal 处理对齐）。
+  useEffect(() => {
+    if (!discardConfirmOpen) {
+      return;
+    }
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDiscardConfirmOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [discardConfirmOpen]);
+
   function performBack() {
     navigateBackOrFallback(
       () => {

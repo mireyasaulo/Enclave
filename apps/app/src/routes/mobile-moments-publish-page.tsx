@@ -120,6 +120,25 @@ export function MobileMomentsPublishPage() {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
+  // ESC 关闭「放弃发表」确认弹窗 / 媒体选择器（和 farm 的 sheet/modal 处理对齐）。
+  useEffect(() => {
+    if (!discardConfirmOpen && !mediaPickerOpen) {
+      return;
+    }
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (discardConfirmOpen) {
+        setDiscardConfirmOpen(false);
+        return;
+      }
+      if (mediaPickerOpen) {
+        setMediaPickerOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [discardConfirmOpen, mediaPickerOpen]);
+
   function performBack() {
     navigateBackOrFallback(
       () => {
