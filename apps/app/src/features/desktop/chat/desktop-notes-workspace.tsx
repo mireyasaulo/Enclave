@@ -704,7 +704,9 @@ export function DesktopNotesWorkspace({
   }
 
   function handleTagCommit() {
-    const normalizedTag = tagInput.trim().replace(/^#/, "");
+    // 用户可能误打 ## 或 ###，把所有前导 # 都剥掉，否则只剥一个会留 "#"，
+    // 显示成 "##xxx" 看着像 bug。
+    const normalizedTag = tagInput.trim().replace(/^#+/, "");
     if (!normalizedTag) {
       setTagInput("");
       return;
@@ -788,8 +790,16 @@ export function DesktopNotesWorkspace({
       return;
     }
 
+    // 跟 mobile-note-editor-page 73367df0 对齐：点"新建笔记"进编辑器
+    // openInlineNoteEditor 已经 createDesktopNoteDraft() 占了一份 draftId；
+    // 用户没编辑就 ← 返回时这里清掉空草稿，否则 localStorage 一直攒。
+    // 已保存（有 noteId）的草稿当缓存留下，下次还能恢复。
+    if (!noteId && activeDraftId && isNoteContentEmpty(editorState)) {
+      clearDesktopNoteDraft(activeDraftId);
+    }
+
     void handleClose();
-  }, [handleClose, isDirty]);
+  }, [activeDraftId, editorState, handleClose, isDirty, noteId]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -924,7 +934,7 @@ export function DesktopNotesWorkspace({
             {!standaloneWindow ? (
               <button
                 type="button"
-                onClick={() => void handleClose()}
+                onClick={requestClose}
                 className="flex h-8 w-8 items-center justify-center rounded-[10px] text-[color:var(--text-secondary)] transition hover:bg-white hover:text-[color:var(--text-primary)]"
                 aria-label={t(msg`返回收藏`)}
               >
