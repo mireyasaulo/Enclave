@@ -93,6 +93,9 @@ export function DesktopChatFilesPage() {
   const baseUrl = runtimeConfig.apiBaseUrl ?? "";
   const nativeDesktopFavorites = runtimeConfig.appPlatform === "desktop";
   const hash = useRouterState({ select: (state) => state.location.hash });
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
   const routeState = parseDesktopChatFilesRouteState(hash);
   const [selectedConversationId, setSelectedConversationId] = useState<
     string | null
@@ -236,6 +239,12 @@ export function DesktopChatFilesPage() {
     if (!isDesktopLayout) {
       return;
     }
+    // 在 "/desktop/chat-files" 外不要回写 hash —— 否则用户点「定位到原消息」
+    // 跳 /tabs/chat#... 的瞬间这个 effect 会把路径 replace 回 /desktop/chat-files
+    // 把跳转吞掉（与 profile-settings 同款坑）。
+    if (!pathname.startsWith("/desktop/chat-files")) {
+      return;
+    }
 
     const nextHash = buildDesktopChatFilesRouteHash(selectedConversationId);
     const normalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
@@ -253,6 +262,7 @@ export function DesktopChatFilesPage() {
     hash,
     isDesktopLayout,
     navigate,
+    pathname,
     selectedConversationId,
   ]);
 
