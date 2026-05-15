@@ -222,6 +222,10 @@ Schema：
   "triggerScenes": "string[], 2-4 个触发场景的英文 tag。例：['coffee_shop', 'gym', 'library', 'late_night']。"
 }`;
 
+// 注意：不要在 ALL 模板里写完整的 JSON 示例骨架。reasoning 模型（GLM 系列）会把
+// 示例当作"reference"输出在 <think>...</think> 块里，导致 extractJsonFromModelOutput
+// 的"first { 到 last }"启发式抓到 <think> 里那段示例 + 真正的 JSON 合并成无法解析
+// 的字符串。改成只用文字描述结构，把 schema 引用各 section 的规范。
 const ALL_TEMPLATE = `当前角色信息（4 个 sacred 字段已填）：
 - 姓名：{{name}}
 - 简介：{{bio}}
@@ -233,17 +237,53 @@ const ALL_TEMPLATE = `当前角色信息（4 个 sacred 字段已填）：
 
 请为这个角色一次性生成 6 个 section 的所有空白字段。section 内部要保持自洽（例：catchphrases 与 personality 的口吻一致；scenePrompts 引用 coreLogic 的精神）。
 
-输出一个嵌套 JSON 对象，6 个顶层键：identity / expertise / tone / prompting / memory / rhythm。**每个子对象的 schema 与单独 section 调用时完全一致**，不重复列出，沿用前述每节的字段规范、长度上限、枚举值。
+输出一个嵌套 JSON 对象，**只能有 6 个顶层键**：identity / expertise / tone / prompting / memory / rhythm。
 
-整体输出示例骨架：
-{
-  "identity": { "occupation": "...", "background": "...", "relationship": "...", "relationshipType": "friend" },
-  "expertise": { "expertDomains": [...], "expertiseDescription": "...", "knowledgeLimits": "...", "refusalStyle": "..." },
-  "tone": { "emojiUsage": "occasional", "responseLength": "medium", "emotionalTone": "...", "workStyle": "...", "socialStyle": "...", "speechPatterns": [...], "catchphrases": [...], "topicsOfInterest": [...], "taboos": [...], "quirks": [...] },
-  "prompting": { "coreLogic": "...", "scenePrompts": { "chat": "...", "moments_post": "...", "moments_comment": "...", "feed_post": "...", "channel_post": "...", "feed_comment": "...", "greeting": "...", "proactive": "..." } },
-  "memory": { "memorySummary": "...", "coreMemory": "...", "recentSummarySeed": "...", "recommendedReasoningToggles": { "enableCoT": true, "enableReflection": false, "enableRouting": false } },
-  "rhythm": { "activityFrequency": "normal", "momentsFrequency": 1, "feedFrequency": 1, "activeHoursStart": null, "activeHoursEnd": null, "triggerScenes": [...] }
-}`;
+各子对象的字段规范（每个字段的类型、长度、枚举值都要严格遵守）：
+
+[identity]
+- occupation: string, ≤ 25 字，具体可视化的职业（不要 freelancer/consultant）
+- background: string, 2-3 句，来历 + 1-2 个塑造性格的小事
+- relationship: string, ≤ 15 字
+- relationshipType: 枚举 "friend" | "family" | "mentor" | "expert" | "custom"
+
+[expertise]
+- expertDomains: string[], 3-5 个，每个 ≤ 6 字
+- expertiseDescription: string, 1-2 句，专长的具体深度
+- knowledgeLimits: string, 1-2 句，明确不擅长的事
+- refusalStyle: string, ≤ 30 字，软拒绝风格
+
+[tone]
+- emojiUsage: 枚举 "none" | "occasional" | "frequent"
+- responseLength: 枚举 "short" | "medium" | "long"
+- emotionalTone: string, ≤ 8 字
+- workStyle: string, ≤ 15 字
+- socialStyle: string, ≤ 15 字
+- speechPatterns: string[], 2-3 个典型句式
+- catchphrases: string[], 2-4 句口头禅（短，像真人说话）
+- topicsOfInterest: string[], 3-5 个易聊话题
+- taboos: string[], 1-3 个回避话题
+- quirks: string[], 1-3 个小习惯
+
+[prompting]
+- coreLogic: string, 3-5 句，全场景通用的行为准则（可执行）
+- scenePrompts: 一个嵌套对象，包含 8 个键：chat / moments_post / moments_comment / feed_post / channel_post / feed_comment / greeting / proactive，每个值是 1-3 句的字符串
+
+[memory]
+- memorySummary: string, 2-3 句
+- coreMemory: string, 1-2 句，最稳定的人设根基
+- recentSummarySeed: string, 1-2 句
+- recommendedReasoningToggles: 一个对象，包含 3 个 boolean 键：enableCoT / enableReflection / enableRouting
+
+[rhythm]
+- activityFrequency: 枚举 "occasional" | "normal" | "frequent"
+- momentsFrequency: int, 0-5
+- feedFrequency: int, 0-3
+- activeHoursStart: int 0-23 或 null
+- activeHoursEnd: int 0-23 或 null
+- triggerScenes: string[], 2-4 个英文 tag
+
+再次提醒：**不要在你的回复中输出任何 JSON 示例代码、不要解释、不要 markdown 代码块、不要写"我会..."这种开场白**。第一个字符就是 \`{\`，最后一个字符就是 \`}\`。`;
 
 // ─────────────────────────────────────────────────────────────
 

@@ -2,6 +2,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { CharacterBlueprintRecipeValue as CharacterBlueprintRecipe } from '../../characters/character-blueprint.types';
 import { AiOrchestratorService } from '../../ai/ai-orchestrator.service';
+import type { AiUsageContext } from '../../ai/ai.types';
 import type { PrivateCharacterDto } from './wiki-private-character.service';
 import {
   SECTION_PROMPTS,
@@ -63,23 +64,71 @@ export class WikiPrivateCharacterAiService {
     const userPrompt = renderPromptTemplate(template.userPromptTemplate, vars);
     const combinedPrompt = `${template.systemPrompt}\n\n---\n\n${userPrompt}`;
 
-    const raw = await this.orchestrator.generateJsonObject({
+    const usageContext: AiUsageContext = {
+      // 'wiki' 不在 AiUsageSurface 枚举里；私有角色 AI 生成是用户从 wiki UI 触发，
+      // 用 'app' 最贴近（用户主动行为，非 cron 任务）。
+      surface: 'app',
+      scene: `wiki_private_character_generate_${input.section}`,
+      scopeType: 'character',
+      scopeLabel: input.currentDraft.name?.trim() || 'wiki-private-character',
+      ownerId: input.ownerId,
+    };
+
+    let raw = await this.orchestrator.generateJsonObject({
       prompt: combinedPrompt,
-      usageContext: {
-        // 'wiki' 不在 AiUsageSurface 枚举里；私有角色 AI 生成是用户从 wiki UI 触发，
-        // 用 'app' 最贴近（用户主动行为，非 cron 任务）。
-        surface: 'app',
-        scene: `wiki_private_character_generate_${input.section}`,
-        scopeType: 'character',
-        scopeLabel: input.currentDraft.name?.trim() || 'wiki-private-character',
-        ownerId: input.ownerId,
-      },
+      usageContext,
       temperature: template.temperature,
       maxTokens: template.maxTokens,
       fallback: template.fallback,
     });
 
+    // 兜底：generateJsonObject 内部的 extractJsonFromModelOutput 用"first { 到
+    // last }"启发式抓 JSON。reasoning 模型（GLM 系列）会输出 <think>...</think>
+    // 块，里面可能包含 { 字符（举例、复述 schema），让抓取的范围错误，最终
+    // JSON.parse 失败返回 fallback {}。
+    //
+    // 这里检测到 raw 几乎为空时，改用 generatePlainText 自己处理：strip <think>
+    // 后再 extract JSON。
+    if (!raw || Object.keys(raw).length === 0) {
+      this.logger.warn(
+        `generateJsonObject returned empty for section=${input.section}; retrying via plain text + manual extraction`,
+      );
+      const text = await this.orchestrator.generatePlainText({
+        prompt: combinedPrompt,
+        usageContext,
+        temperature: template.temperature,
+        maxTokens: template.maxTokens,
+        fallback: '',
+      });
+      const parsed = parseJsonAfterThink(text);
+      if (parsed) raw = parsed;
+    }
+
     return normalizeAiOutput(input.section, raw, input.currentDraft);
+  }
+}
+
+/**
+ * 把模型输出里 `<think>...</think>` reasoning 块剥掉，然后从剩余文本里抓
+ * 第一个 `{` 到最后一个 `}` 的 JSON 对象。专门处理 reasoning 模型把
+ * 思考写在 content 里挤掉/弄乱 JSON 的情况。
+ */
+function parseJsonAfterThink(text: string): Record<string, unknown> | null {
+  if (!text) return null;
+  // 移除任意数量的 <think>...</think> 块（贪婪到对应 </think>）。
+  const stripped = text.replace(/<think>[\s\S]*?<\/think>/g, '');
+  // 也支持没闭合的情况：从最后一个 </think> 之后取
+  const lastThinkEnd = stripped.lastIndexOf('</think>');
+  const body =
+    lastThinkEnd >= 0 ? stripped.slice(lastThinkEnd + 8) : stripped;
+  const firstBrace = body.indexOf('{');
+  const lastBrace = body.lastIndexOf('}');
+  if (firstBrace < 0 || lastBrace <= firstBrace) return null;
+  const candidate = body.slice(firstBrace, lastBrace + 1);
+  try {
+    return JSON.parse(candidate) as Record<string, unknown>;
+  } catch {
+    return null;
   }
 }
 
