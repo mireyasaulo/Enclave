@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { HintTooltip } from "./hint-tooltip";
 
 type FormRowProps = {
   label: ReactNode;
@@ -32,11 +33,7 @@ export function FormRow({
           )}
         </span>
         {badge}
-        {hint && (
-          <span className="text-xs font-normal text-[color:var(--text-muted)]">
-            {hint}
-          </span>
-        )}
+        {hint && <HintTooltip>{hint}</HintTooltip>}
       </span>
       {children}
       {effect && (

@@ -283,16 +283,42 @@ export function DesktopContactsTagsPane() {
   );
 
   useEffect(() => {
+    // 这条 effect 只用来响应「外部把路由改了」（比如浏览器后退）→ 把状态拉到
+    // 路由值。两种情况要主动跳过、把决定权交给后面的 auto-fill effect，否则
+    // 两边来回拉锯炸 "Maximum update depth exceeded"：
+    //  (a) 路由里 tag 为空 —— auto-fill 想选第一个，强行回填 null 会抹掉它。
+    //  (b) 路由里 tag 当前已经不在 tagGroups（搜索把它过滤掉了 / 标签被删了）
+    //      —— auto-fill 想换一个 fallback，强行回填会立刻又把状态拽回 stale
+    //      路由值。
+    if (!routeSelectedTag) {
+      return;
+    }
+    if (!tagGroups.some((group) => group.tag === routeSelectedTag)) {
+      return;
+    }
     setSelectedTag((current) =>
       current === routeSelectedTag ? current : routeSelectedTag,
     );
-  }, [routeSelectedTag]);
+  }, [routeSelectedTag, tagGroups]);
 
   useEffect(() => {
+    // 同上：路由里 characterId 为空、或不在任何当前 tagGroup 里，都不回填。
+    if (!routeSelectedCharacterId) {
+      return;
+    }
+    if (
+      !tagGroups.some((group) =>
+        group.items.some(
+          (item) => item.character.id === routeSelectedCharacterId,
+        ),
+      )
+    ) {
+      return;
+    }
     setSelectedCharacterId((current) =>
       current === routeSelectedCharacterId ? current : routeSelectedCharacterId,
     );
-  }, [routeSelectedCharacterId]);
+  }, [routeSelectedCharacterId, tagGroups]);
 
   useEffect(() => {
     if (
