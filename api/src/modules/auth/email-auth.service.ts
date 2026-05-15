@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes } from 'node:crypto';
-import { MoreThan, Repository } from 'typeorm';
+import { IsNull, MoreThan, Repository } from 'typeorm';
 import { MailService } from '../mail/mail.service';
 import type { AuthSession, AuthUserPayload } from './auth.service';
 import { EmailVerificationSessionEntity } from './email-verification-session.entity';
@@ -41,6 +41,15 @@ export class EmailAuthService {
       where: { email: normalized },
     });
     const isNewUser = !existing;
+
+    // 同一邮箱发新码时，把所有未使用的旧码立刻 expire 掉 —— 否则旧 code 在 TTL（默认 10 分钟）
+    // 内仍能通过 verifyCode（按 email+code 精确匹配，命中即放行），泄漏一次 = 攻击窗口 10 分钟。
+    // 不能 delete：enforceSendCodeRateLimit 的 cooldown 要靠最近一条 session.createdAt 算，
+    // delete 掉历史就能被无限重发绕过。改 expiresAt 既作废 code，又保留 cooldown 历史。
+    await this.sessionRepo.update(
+      { email: normalized, verifiedAt: IsNull() },
+      { expiresAt: new Date(Date.now() - 1) },
+    );
 
     const code = this.generateCode();
     const expiresAt = new Date(Date.now() + this.getCodeTtlSeconds() * 1000);
