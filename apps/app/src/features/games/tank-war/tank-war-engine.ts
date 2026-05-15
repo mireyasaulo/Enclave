@@ -989,9 +989,39 @@ export function togglePause(world: GameWorld, audio: AudioHook | null): void {
       audio.setMoveActive(false);
     }
   } else if (world.status === "paused") {
+    // 引擎里所有定时器都用 performance.now() 当 absolute timestamp（shield、
+    // reload、enemy freeze、powerup expires、shovel restore、nextSpawn 等）；
+    // 暂停期间 wall clock 照常推进，恢复时一查全过期。把所有时间戳往后挪一个
+    // 暂停时长，相当于 FC 的"暂停冻结"。visibility 自动暂停切回 tab 时这条路
+    // 径尤其重要：用户可能离开 30s+。
+    const delta = performance.now() - world.pausedAt;
+    if (delta > 0) shiftTimersBy(world, delta);
     world.status = "playing";
     if (audio) audio.play("pause");
   }
+}
+
+function shiftTimersBy(world: GameWorld, delta: number): void {
+  for (const t of world.tanks) {
+    t.shieldUntilMs += delta;
+    t.spawnAnimUntilMs += delta;
+    t.reloadAtMs += delta;
+    if (t.freezeUntilMs) t.freezeUntilMs += delta;
+    t.nextDecideAt += delta;
+    t.nextFireAt += delta;
+  }
+  for (const pu of world.powerUps) {
+    pu.spawnedAt += delta;
+    pu.expiresAt += delta;
+  }
+  for (const ex of world.explosions) ex.startedAt += delta;
+  for (const f of world.floats) f.startedAt += delta;
+  if (world.shovelRestoreAt) world.shovelRestoreAt += delta;
+  if (world.freezeUntilMs) world.freezeUntilMs += delta;
+  world.nextSpawnAt += delta;
+  if (world.transitionUntilMs) world.transitionUntilMs += delta;
+  // stageStartedAt 没人读；stageClearAt / pausedAt 不挪：前者只在 stage-clear /
+  // game-over 状态用到，那时根本不会走暂停；后者下次进入 pause 时会被重置。
 }
 
 export function setMuted(world: GameWorld, audio: AudioHook | null, b: boolean): void {
