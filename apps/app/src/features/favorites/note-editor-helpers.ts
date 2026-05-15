@@ -122,16 +122,24 @@ export function extractNoteTextFromHtml(value: string) {
     return "";
   }
 
-  if (typeof document === "undefined") {
-    return value
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-
-  const container = document.createElement("div");
-  container.innerHTML = value;
-  return container.innerText.replace(/\r\n/g, "\n").trim();
+  // 之前用 detached <div>.innerText 抽文本：浏览器对游离节点不算 block 布局，
+  // <p>/<div>/<br> 全部塌成同一行，contentText 多行内容塌成一行；resolveNoteTitle
+  // 取"第一行"实际取到全文连起来。改用纯字符串：块级标签的开 / 闭都映成 \n，
+  // 跟后端 favorites.service.ts stripHtmlTags 一套规则。
+  const blockOpenPattern = /<(p|div|li|h[1-6])(\s[^>]*)?>/gi;
+  const blockClosePattern = /<\/(p|div|li|h[1-6])>/gi;
+  return value
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(blockOpenPattern, "\n")
+    .replace(blockClosePattern, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/ /g, " ")
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]+/g, " ")
+    .trim();
 }
 
 export function filterAssetsByHtml(html: string, assets: FavoriteNoteAsset[]) {
