@@ -2114,7 +2114,7 @@ msgid "例如 苏然"
 msgstr "e.g. Su Ran"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:1517
-msgid "emoji（🦊）、图片 URL，或点\"上传图片\"传一张本地图（≤4 MB）。空则用首字母占位（AI 生成基础身份时会自动补一个 emoji）"
+msgid "emoji（🦊）、图片 URL，或点\"上传图片\"传一张本地图（PNG/JPG/WebP/GIF，≤4 MB）。空则用首字母占位（AI 生成基础身份时会自动补一个 emoji）"
 msgstr ""
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:1519
@@ -2893,31 +2893,31 @@ msgstr "Expand ▾"
 msgid "图片太大（{0} MB），上限 4 MB。"
 msgstr ""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:3103
-msgid "只支持图片文件（png/jpg/webp/gif）。"
+#: apps/wiki/src/routes/my-character-edit-page.tsx:3108
+msgid "只支持 PNG / JPG / WebP / GIF。"
 msgstr ""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:3112
+#: apps/wiki/src/routes/my-character-edit-page.tsx:3117
 msgid "头像上传失败，请稍后再试"
 msgstr ""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:3149
+#: apps/wiki/src/routes/my-character-edit-page.tsx:3154
 msgid "上传中…"
 msgstr ""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:3151
+#: apps/wiki/src/routes/my-character-edit-page.tsx:3156
 msgid "上传图片"
 msgstr ""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:3162
+#: apps/wiki/src/routes/my-character-edit-page.tsx:3167
 msgid "清除"
 msgstr ""
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:3233
+#: apps/wiki/src/routes/my-character-edit-page.tsx:3238
 msgid "AI 正在生成「{sectionLabel}」…"
 msgstr "AI is generating \"{sectionLabel}\"…"
 
-#: apps/wiki/src/routes/my-character-edit-page.tsx:3239
+#: apps/wiki/src/routes/my-character-edit-page.tsx:3244
 msgid "表单已锁定。可以返回列表，回来后结果会自动填好。"
 msgstr "Form is locked. You can return to the list — results will auto-fill when you come back."
 
