@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
@@ -56,25 +62,49 @@ function HintTooltip({ children }: { children: ReactNode }) {
   const t = translateRuntimeMessage;
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLSpanElement | null>(null);
+  const tipRef = useRef<HTMLSpanElement | null>(null);
 
+  // 外部点击 / Escape → 关闭（主要服务触屏 tap 的关闭路径）
   useEffect(() => {
     if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
+    const onDown = (event: PointerEvent) => {
       const node = wrapRef.current;
-      if (!node) return;
-      if (event.target instanceof Node && node.contains(event.target)) return;
+      if (!node || !(event.target instanceof Node)) return;
+      if (node.contains(event.target)) return;
       setOpen(false);
     };
-    const onKeyDown = (event: KeyboardEvent) => {
+    const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
-    document.addEventListener("pointerdown", onPointerDown, true);
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onDown, true);
+    document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("pointerdown", onPointerDown, true);
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  // 自适应位置：fixed 定位，默认 ? 右下；若超视口右边则向左推到刚好贴右边距
+  useLayoutEffect(() => {
+    if (!open) return;
+    const tip = tipRef.current;
+    const wrap = wrapRef.current;
+    if (!tip || !wrap) return;
+    const wr = wrap.getBoundingClientRect();
+    const margin = 8;
+    tip.style.position = "fixed";
+    tip.style.top = `${wr.bottom + 4}px`;
+    tip.style.left = `${wr.right + 4}px`;
+    tip.style.right = "auto";
+    const tr = tip.getBoundingClientRect();
+    if (tr.right > window.innerWidth - margin) {
+      tip.style.left = `${Math.max(margin, window.innerWidth - margin - tr.width)}px`;
+    }
+  }, [open]);
+
+  const isHoverDevice = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(hover: hover)").matches;
 
   return (
     <span ref={wrapRef} className="relative inline-flex">
@@ -82,27 +112,26 @@ function HintTooltip({ children }: { children: ReactNode }) {
         type="button"
         aria-label={t(msg`说明`)}
         aria-expanded={open}
-        onPointerEnter={(event) => {
-          if (event.pointerType === "mouse") setOpen(true);
+        onMouseEnter={() => {
+          if (isHoverDevice()) setOpen(true);
         }}
-        onPointerLeave={(event) => {
-          if (event.pointerType === "mouse") setOpen(false);
+        onMouseLeave={() => {
+          if (isHoverDevice()) setOpen(false);
         }}
         onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();
-          setOpen((v) => !v);
+          setOpen(true);
         }}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
         className="inline-flex h-[14px] w-[14px] items-center justify-center rounded-full border border-[color:var(--text-muted)]/40 text-[10px] font-semibold leading-none text-[color:var(--text-muted)] transition hover:border-[color:var(--text-secondary)] hover:text-[color:var(--text-secondary)]"
       >
         ?
       </button>
       {open && (
         <span
+          ref={tipRef}
           role="tooltip"
-          className="pointer-events-none absolute left-5 top-full z-20 mt-1 w-max max-w-[240px] whitespace-normal rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--surface-overlay)] px-2.5 py-1.5 text-xs font-normal leading-relaxed text-[color:var(--text-primary)] shadow-md"
+          className="pointer-events-none z-20 w-max max-w-[min(280px,calc(100vw-1rem))] whitespace-normal rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--surface-overlay)] px-2.5 py-1.5 text-xs font-normal leading-relaxed text-[color:var(--text-primary)] shadow-md"
         >
           {children}
         </span>
