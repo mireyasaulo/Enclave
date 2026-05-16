@@ -801,8 +801,13 @@ export function ChannelsPage() {
               onClick: () => {
                 const variables = commentMutation.variables;
                 if (!variables) return;
-                const currentDraft =
-                  commentDrafts[variables.postId] ?? variables.text;
+                // 用户失败后把草稿改回空再点重试——别替换 variables.text 让
+                // mutationFn 抛 "请先输入评论内容"，把同一条红条又翻一遍。
+                // 草稿空就退回到最初发送的那一份文本继续重试。
+                const rawDraft = commentDrafts[variables.postId];
+                const currentDraft = rawDraft?.trim()
+                  ? rawDraft
+                  : variables.text;
                 commentMutation.mutate({
                   ...variables,
                   text: currentDraft,
