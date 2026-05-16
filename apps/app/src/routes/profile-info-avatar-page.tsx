@@ -126,8 +126,17 @@ export function ProfileInfoAvatarPage() {
     },
   });
 
+  // 防 race：用户连点「从相册选择」两次时，FileReader 是各自独立的，且
+  // 不保证 readAsDataURL 完成顺序——大文件 A 先开始读、小文件 B 后开始
+  // 读但更快完成，会出现 B 的 onload 先 setPickedLocal(B)、A 的 onload
+  // 再 setPickedLocal(A)，最终用户看到 A（实际想要 B）。用一个自增 id 给
+  // 每次 pick 编号，onload 时校验是不是最新那次，不是就丢弃。
+  const latestPickIdRef = useRef(0);
+
   async function handlePickAvatar() {
+    const pickId = ++latestPickIdRef.current;
     const files = await pickImageFiles({ multiple: false });
+    if (pickId !== latestPickIdRef.current) return;
     const file = files[0];
     if (!file) {
       return;
@@ -139,9 +148,11 @@ export function ProfileInfoAvatarPage() {
     setLocalError(null);
     const reader = new FileReader();
     reader.onerror = () => {
+      if (pickId !== latestPickIdRef.current) return;
       setLocalError(t(msg`读取图片失败，请换一张试试。`));
     };
     reader.onload = () => {
+      if (pickId !== latestPickIdRef.current) return;
       const result = reader.result;
       if (typeof result === "string") {
         userTouchedRef.current = true;
