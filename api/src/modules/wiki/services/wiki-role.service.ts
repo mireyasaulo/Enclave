@@ -101,7 +101,9 @@ export class WikiRoleService {
     }
     // reason 会拼到 user.roleGrantedBy 落库展示，必须有长度上限 —— 否则
     // 任何 admin 都能用 5KB+ 字符串撑爆这一列，admin-users 列表里渲染会卡。
-    const trimmedReason = (input.reason ?? '').trim();
+    // typeof 守一下：客户端传 {} / [] 时直接当空字符串，不要走到 .trim() 抛 500。
+    const trimmedReason =
+      typeof input.reason === 'string' ? input.reason.trim() : '';
     if (trimmedReason.length > MAX_REASON_LENGTH) {
       throw new AppError('WIKI_VALIDATION_FAILED', {
         status: HttpStatus.BAD_REQUEST,
