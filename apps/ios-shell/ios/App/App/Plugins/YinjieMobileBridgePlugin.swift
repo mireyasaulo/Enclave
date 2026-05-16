@@ -628,10 +628,46 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             }
         }
 
-        group.notify(queue: .main) {
+        // 真机走查 R1：用户选中的图里只要有一张是 iCloud-only 原片（PHPicker 给
+        // 出 itemProvider 时 iOS 还没把原片下回本机；常见于 cellular + 低数据
+        // 模式 / Wi-Fi 抖断 / 刚拍完还在传 iCloud），loadFileRepresentation 会
+        // 卡在等 iCloud stream 数据 —— 网络一直不行就一直 hang，completion 长
+        // 时间不返回，group.leave 不调用，group.notify 永远不 fire。JS 那边
+        // await pickImages() 同样等不到 resolve：PHPicker 已经 dismiss 回到 app
+        // 主界面，composer + 按钮看上去没反应，选中的图一张都没贴进草稿，没有
+        // spinner / 没有错误提示，用户只能 force-quit。
+        //
+        // 兜个 30s timeout：到点把已经拿到的 asset 都 resolve 出去，没拿到的
+        // 槽位 compactMap 掉。loadFileRepresentation 在后台继续跑也不碍事，
+        // 落到 tmp/yinjie-picker/ 的副本会随下次冷启 purgeOwnedTemporarySubdirectories
+        // 一并回收。finish 用 NSLock + Bool 互斥，保证 timeout 路径和 group.notify
+        // 路径只 fire 一次 resolve。
+        var finished = false
+        let finishLock = NSLock()
+        let finish: () -> Void = {
+            finishLock.lock()
+            if finished {
+                finishLock.unlock()
+                return
+            }
+            finished = true
+            finishLock.unlock()
+
+            lock.lock()
+            let assets = assetsOrdered.compactMap { $0 }
+            lock.unlock()
+
             call.resolve([
-                "assets": assetsOrdered.compactMap { $0 }
+                "assets": assets
             ])
+        }
+
+        let timeoutItem = DispatchWorkItem(block: finish)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: timeoutItem)
+
+        group.notify(queue: .main) {
+            timeoutItem.cancel()
+            finish()
         }
     }
 
