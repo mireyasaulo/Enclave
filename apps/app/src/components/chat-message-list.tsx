@@ -1067,24 +1067,27 @@ export function ChatMessageList({
       }
 
       clearTransientMessageState(message.id);
+      // perf：和姊妹 recallMutation.onSuccess 对齐——updateXxxMessageQueries
+      // 已经用 setQueriesData 把这条消息从 cache 里 filter 掉，再追加
+      // invalidate(["app-group-messages" / "app-conversation-messages"]) 等于
+      // 强制 GET /messages?limit=60 把刚 filter 完的 cache 拉回来重渲染一次
+      // （公网隧道 ~600ms RTT × N 条消息体）。recall 路径只 invalidate
+      // conversations 让 chat-list 同步 lastMessage 即可；删除走完全一样的
+      // 后端 emitGroupConversationUpdated → socket 路径，messages cache
+      // 本地 filter 已经是 canonical 形态。同 group-chat-thread-panel.tsx
+      // sendMutation R3 / sendCallInviteMutation R1 同款修法。
       if (result.threadType === "group") {
         updateGroupMessageQueries(
           threadContext.id,
           (current) =>
             current?.filter((item) => item.id !== message.id) ?? current,
         );
-        await queryClient.invalidateQueries({
-          queryKey: ["app-group-messages", baseUrl, threadContext.id],
-        });
       } else {
         updateConversationMessageQueries(
           threadContext.id,
           (current) =>
             current?.filter((item) => item.id !== message.id) ?? current,
         );
-        await queryClient.invalidateQueries({
-          queryKey: ["app-conversation-messages", baseUrl, threadContext.id],
-        });
       }
 
       setActionNotice({
@@ -2724,6 +2727,14 @@ export function ChatMessageList({
           setRecalledMessageIds(nextLocalState.recalledMessageIds);
         }
 
+        // perf：和 deleteMutation / 姊妹 handleRecallSelectedMessages 对齐
+        // —— updateXxxMessageQueries 已经把要删的消息从 cache 里 filter 掉，
+        // 再走一次 invalidate(["app-group-messages" / "app-conversation-messages"])
+        // 会强制 GET /messages?limit=N 把刚刚 filter 完的 cache 拉回来重渲染
+        // 一次（多选删除一次能命中几十条 → 几十次 RTT 上没价值的 N 条 payload）。
+        // recall 路径只 invalidate conversations 让 chat-list 同步 lastMessage 即可；
+        // 删除走完全一样的后端 emit 路径，messages cache 本地 filter 已经是
+        // canonical 形态。同 group-chat-thread-panel sendMutation R3 同款修法。
         if (deletedMessageIdSet.size > 0 && threadContext.type === "group") {
           updateGroupMessageQueries(
             threadContext.id,
@@ -2731,9 +2742,6 @@ export function ChatMessageList({
               current?.filter((item) => !deletedMessageIdSet.has(item.id)) ??
               current,
           );
-          await queryClient.invalidateQueries({
-            queryKey: ["app-group-messages", baseUrl, threadContext.id],
-          });
         } else if (deletedMessageIdSet.size > 0) {
           updateConversationMessageQueries(
             threadContext.id,
@@ -2741,9 +2749,6 @@ export function ChatMessageList({
               current?.filter((item) => !deletedMessageIdSet.has(item.id)) ??
               current,
           );
-          await queryClient.invalidateQueries({
-            queryKey: ["app-conversation-messages", baseUrl, threadContext.id],
-          });
         }
 
         if (deletedMessageIdSet.size > 0) {
