@@ -5,7 +5,7 @@ import {
   isDesktopRuntimeAvailable,
   setDesktopLocale,
 } from "@yinjie/ui";
-import { isNativeAndroidRuntime } from "./native-runtime";
+import { isNativeMobileRuntime } from "./native-runtime";
 
 export type NativeLocaleSource = "app" | "storage" | "system" | "default";
 
@@ -40,7 +40,7 @@ function normalizeNativeLocaleSource(
 }
 
 export async function readNativeLocalePreference(): Promise<NativeLocalePreference | null> {
-  if (!isNativeAndroidRuntime()) {
+  if (!isNativeMobileRuntime()) {
     return null;
   }
 
@@ -85,7 +85,7 @@ export async function readDesktopLocalePreference(): Promise<NativeLocalePrefere
 export async function syncNativeLocalePreference(locale: SupportedLocale) {
   let synced = false;
 
-  if (!isNativeAndroidRuntime()) {
+  if (!isNativeMobileRuntime()) {
     return syncDesktopLocalePreference(locale);
   }
 

@@ -6,8 +6,16 @@ public class YinjieRuntimePlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "YinjieRuntimePlugin"
     public let jsName = "YinjieRuntime"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "getConfig", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "getConfig", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getLocale", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setLocale", returnType: CAPPluginReturnPromise)
     ]
+
+    private static let defaultLocale = "zh-CN"
+    private static let localeStorageKey = "YinjieAppLocale"
+    private static let localeSourceApp = "app"
+    private static let localeSourceSystem = "system"
+    private static let localeSourceDefault = "default"
 
     @objc func getConfig(_ call: CAPPluginCall) {
         let info = Bundle.main.infoDictionary ?? [:]
@@ -61,6 +69,25 @@ public class YinjieRuntimePlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve(result)
     }
 
+    @objc func getLocale(_ call: CAPPluginCall) {
+        call.resolve(readLocalePayload())
+    }
+
+    @objc func setLocale(_ call: CAPPluginCall) {
+        guard let locale = resolveSupportedLocale(call.getString("locale")) else {
+            call.reject("unsupported locale")
+            return
+        }
+
+        UserDefaults.standard.set(locale, forKey: Self.localeStorageKey)
+        UserDefaults.standard.set([locale], forKey: "AppleLanguages")
+
+        call.resolve([
+            "locale": locale,
+            "source": Self.localeSourceApp
+        ])
+    }
+
     private func readBundledRuntimeConfig() -> [String: Any] {
         guard let url = Bundle.main.url(forResource: "runtime-config", withExtension: "json"),
               let data = try? Data(contentsOf: url),
@@ -84,5 +111,59 @@ public class YinjieRuntimePlugin: CAPPlugin, CAPBridgedPlugin {
             let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines)
             return normalized.isEmpty ? nil : normalized
         }
+    }
+
+    private func readLocalePayload() -> [String: Any] {
+        if let stored = nonEmptyString(UserDefaults.standard.string(forKey: Self.localeStorageKey)),
+           let resolved = resolveSupportedLocale(stored) {
+            return [
+                "locale": resolved,
+                "source": Self.localeSourceApp
+            ]
+        }
+
+        for candidate in Locale.preferredLanguages {
+            if let resolved = resolveSupportedLocale(candidate) {
+                return [
+                    "locale": resolved,
+                    "source": Self.localeSourceSystem
+                ]
+            }
+        }
+
+        return [
+            "locale": Self.defaultLocale,
+            "source": Self.localeSourceDefault
+        ]
+    }
+
+    private func resolveSupportedLocale(_ value: String?) -> String? {
+        guard let raw = value?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
+            return nil
+        }
+
+        let normalized = raw.replacingOccurrences(of: "_", with: "-").lowercased()
+
+        if normalized == "zh" ||
+            normalized == "zh-cn" ||
+            normalized == "zh-hans" ||
+            normalized.hasPrefix("zh-hans-") ||
+            normalized.hasPrefix("zh-cn-") {
+            return "zh-CN"
+        }
+
+        if normalized == "en" || normalized.hasPrefix("en-") {
+            return "en-US"
+        }
+
+        if normalized == "ja" || normalized.hasPrefix("ja-") {
+            return "ja-JP"
+        }
+
+        if normalized == "ko" || normalized.hasPrefix("ko-") {
+            return "ko-KR"
+        }
+
+        return nil
     }
 }
