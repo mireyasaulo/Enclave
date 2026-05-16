@@ -62,6 +62,7 @@ import {
 import { getChannelsSectionBadge } from "../features/channels/channels-section-badge";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import {
+  readDesktopFavorites,
   removeDesktopFavorite,
   upsertDesktopFavorite,
 } from "../features/favorites/favorites-storage";
@@ -302,7 +303,17 @@ export function ChannelsPage() {
       );
     },
     onSuccess: (_, input) => {
-      setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
+      // 走查 R1：原来无条件把 commentDrafts[postId] 清空——但 textarea 在 mutation
+      // 飞行期没 disabled，用户提交完会接着打下一条评论。RTT 落地时 onSuccess 把
+      // 「正在打的下一条」也一起抹掉，用户辛苦敲的内容凭空消失。只在当前草稿仍
+      // 等于刚发出去的文本（用户没继续输入）时才清空；否则保留草稿。
+      const sentText = input.text;
+      setCommentDrafts((current) => {
+        if ((current[input.postId] ?? "") !== sentText) {
+          return current;
+        }
+        return { ...current, [input.postId]: "" };
+      });
       setMobileReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
@@ -1189,6 +1200,14 @@ export function ChannelsPage() {
       section: activeSection,
     });
     const alreadyFavorited = Boolean(post.ownerState?.hasFavorited);
+    // 走查 R1：toggleFavorite 同时改 React Query 缓存 + 本地 desktop-favorites
+    // localStorage。favoriteMutation.onError 只回滚缓存里的 hasFavorited / count，
+    // 不动 localStorage 那份。若 POST/DELETE 失败，server 上 favorite 状态没变，
+    // 卡片 UI 翻回原状，但「我 → 收藏」里却多了 / 少了这条，长期堆出脏记录。
+    // 这里记下取消前的原记录 + 在 mutate 的 per-call onError 里逆向回滚。
+    const previousFavoriteRecord = alreadyFavorited
+      ? (readDesktopFavorites().find((item) => item.sourceId === sourceId) ?? null)
+      : null;
     if (alreadyFavorited) {
       removeDesktopFavorite(sourceId);
     } else {
@@ -1206,10 +1225,28 @@ export function ChannelsPage() {
       });
     }
 
-    favoriteMutation.mutate({
-      postId: post.id,
-      favorited: alreadyFavorited,
-    });
+    favoriteMutation.mutate(
+      {
+        postId: post.id,
+        favorited: alreadyFavorited,
+      },
+      {
+        onError: () => {
+          if (alreadyFavorited) {
+            // 之前是「已收藏 → 取消收藏」分支，刚把记录删了，要把原记录加回去
+            if (previousFavoriteRecord) {
+              const { collectedAt: _unused, ...restored } =
+                previousFavoriteRecord;
+              void _unused;
+              upsertDesktopFavorite(restored);
+            }
+          } else {
+            // 之前是「未收藏 → 收藏」分支，刚 upsert 了一条，删掉
+            removeDesktopFavorite(sourceId);
+          }
+        },
+      },
+    );
   }
 
   function toggleFollowAuthor(post: (typeof visiblePosts)[number]) {
