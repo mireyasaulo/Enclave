@@ -1721,20 +1721,22 @@ export class FeedService implements OnModuleInit {
         return { liked: false };
       }
 
-      const insert = await likeRepo
+      // R1 走查：上面的 `existing` 预检已经吃掉了双击/重试 ——
+      // 走到这里只可能是 (postId, authorId) 真的没行。orIgnore 仅兜并发 race
+      // （两个 toggleLike 同时通过预检都尝试 insert），race 命中时 unique 索引会
+      // 静默 drop 掉 loser 的行。旧代码因为 TypeORM `identifiers` 在 IGNORE 被
+      // 跳过时仍回填 client-side uuid 让 `inserted` 永真，loser 还是 +1 likeCount。
+      // better-sqlite3 的 `result.raw` 实测也拿不到 changes，没法靠它判定。
+      // 简化路径：预检过了就直接 increment；并发 race 残留的瞬时偏移由下次
+      // ensureFeedUniqueIndexes 按 like 表实际行数把 likeCount 重算回真值兜底。
+      await likeRepo
         .createQueryBuilder()
         .insert()
         .into(FeedPostLikeEntity)
         .values({ postId, authorId, authorName, authorAvatar, authorType })
         .orIgnore()
         .execute();
-      const inserted =
-        Array.isArray(insert.identifiers) && insert.identifiers.length > 0
-          ? insert.identifiers[0]?.id != null
-          : false;
-      if (inserted) {
-        await postRepo.increment({ id: postId }, 'likeCount', 1);
-      }
+      await postRepo.increment({ id: postId }, 'likeCount', 1);
       return { liked: true };
     });
   }
@@ -3784,12 +3786,25 @@ export class FeedService implements OnModuleInit {
     // `identifiers[0].id` 返回 —— 旧代码 `didInsert` 永远为 true，导致客户端 retry
     // 同一次 POST /feed/:id/like、或网络抖动让请求重发时，DB 行数仍然只 1 行
     // 但 likeCount 每次都 +1。复现：fresh post 连发 3 次 POST /like → DB 1 行 /
-    // likeCount=3。改用 SQLite 驱动返回的 `result.raw.changes`（0=被 IGNORE 跳过，
-    // 1=真插入），非 SQLite 驱动保守按 false（宁可漏一次 increment，下次
-    // ensureFeedUniqueIndexes 重启会按实际行数把计数拉正）。
+    // likeCount=3。better-sqlite3 的 `result.raw` 也不稳定（实测同样回包 changes
+    // 不可靠）。改成预查一次：toggle 类（like / favorite）本就语义上是「已存在
+    // 就别再加」，提前 findOneBy 后已存在就直接 no-op，counter 完全不动。
+    // 仅剩的并发 race（两个 transaction 同时通过预查，都尝试 insert）会留下
+    // 「DB 行数 1 / counter +2」的瞬时偏移，由下次 ensureFeedUniqueIndexes 启动时
+    // 按 like 表实际行数把 likeCount/favoriteCount 重算回真值兜底。
     const inserted = await this.dataSource.transaction(async (manager) => {
       const interactionRepo = manager.getRepository(UserFeedInteractionEntity);
       const postRepo = manager.getRepository(FeedPostEntity);
+
+      const existing = await interactionRepo.findOneBy({
+        ownerId: input.ownerId,
+        postId: input.postId,
+        type: input.type,
+      });
+      if (existing) {
+        return false;
+      }
+
       const entity = interactionRepo.create({
         ownerId: input.ownerId,
         postId: input.postId,
@@ -3797,24 +3812,21 @@ export class FeedService implements OnModuleInit {
         payload: input.payload ?? null,
       });
       // values 拒绝把 simple-json 的 Record 当成嵌套 entity；用 as any 绕过该校验。
-      const result = await interactionRepo
+      await interactionRepo
         .createQueryBuilder()
         .insert()
         .into(UserFeedInteractionEntity)
         .values(entity as never)
         .orIgnore()
         .execute();
-      const rawChanges = (result.raw as { changes?: number } | undefined)
-        ?.changes;
-      const didInsert = typeof rawChanges === 'number' ? rawChanges > 0 : false;
-      if (didInsert && input.incrementColumn) {
+      if (input.incrementColumn) {
         await postRepo.increment(
           { id: input.postId },
           input.incrementColumn,
           1,
         );
       }
-      return didInsert;
+      return true;
     });
 
     if (!inserted) {
