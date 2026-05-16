@@ -2517,10 +2517,17 @@ function ChannelVideoSurface({
   // 走查 R3（本轮）：同 ChannelAudioPictorial 的 unmount-pause 兜底——用户在
   // 视频卡上"减少推荐"立刻把 active 卡 unmount，<video> 从 DOM 摘掉后
   // Chromium 不会自动 pause；音轨会继续 loop 直到刷新。
+  //
+  // 走查 R3（新一轮）：原来 mount 期 `const video = videoRef.current` 把第一个
+  // <video> 元素 capture 进闭包，但 <video key={videoUrl}> 在 videoUrl 变化时
+  // 会强制 remount，videoRef.current 切到新元素而闭包里 video 仍指老元素。等
+  // ChannelVideoSurface 整体 unmount 时 pause 的是已经被 React 摘掉的老元素，
+  // 真正还在播的新元素得不到 pause —— 浏览器不会自动 pause detached video，
+  // 视频号继续 loop。改成 cleanup 时现读 videoRef.current（React unmount 顺序：
+  // 先跑 effect cleanup 再 unmount 子树，此时 ref 仍指向最新元素）。
   useEffect(() => {
-    const video = videoRef.current;
     return () => {
-      video?.pause();
+      videoRef.current?.pause();
     };
   }, []);
 
