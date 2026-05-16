@@ -372,6 +372,18 @@ function MobileAddFriend() {
       openChatMutation.mutate(result.character.id);
       return;
     }
+
+    // inbound pending（对方发来的、还在等用户决定）：按钮不再 disabled，点击
+    // 跳到 /friend-requests 让用户去通过 / 拒绝。outbound pending（用户已发）
+    // 按钮还是 disabled，handler 不会触发。
+    if (
+      result.status === "pending" &&
+      result.pendingRequest &&
+      !result.pendingRequest.acceptAt
+    ) {
+      openFriendRequests();
+      return;
+    }
   }
 
   function handleResultOpenProfile(result: AddFriendSearchResult) {
@@ -668,7 +680,11 @@ function MobileAddFriendResultRow({
 }: MobileAddFriendResultRowProps) {
   const t = useRuntimeTranslator();
   const displayName = getSearchResultDisplayName(item);
-  const meta = getMobileResultStatusMeta(item.status, actionPending);
+  const meta = getMobileResultStatusMeta(
+    item.status,
+    actionPending,
+    item.pendingRequest,
+  );
   const PrimaryIcon = meta.icon;
   const matchReasonText = t(item.matchReason);
   const subtitle =
@@ -754,6 +770,7 @@ type ResultStatusMeta = {
 function getMobileResultStatusMeta(
   status: AddFriendRelationshipState,
   actionPending: boolean,
+  pendingRequest?: AddFriendSearchResult["pendingRequest"],
 ): ResultStatusMeta {
   if (status === "friend") {
     return {
@@ -764,6 +781,18 @@ function getMobileResultStatusMeta(
   }
 
   if (status === "pending") {
+    // acceptAt=null 表示对方（角色）主动发来的、还在等用户决定的 inbound 请求；
+    // acceptAt=set 表示用户自己发出去、等角色 auto-accept 的 outbound。原来一律
+    // 显示成"已发送"会让用户以为是自己发的（实际可能是摇一摇 / 相遇 inbound），
+    // 而且没有任何指引去 /friend-requests 处理。inbound 改成"待处理"并可点击。
+    const isInbound = !pendingRequest?.acceptAt;
+    if (isInbound) {
+      return {
+        label: msg`待处理`,
+        icon: UserPlus,
+        disabled: false,
+      };
+    }
     return {
       label: msg`已发送`,
       icon: CheckCircle2,

@@ -46,16 +46,6 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
   );
   const [chatOnly, setChatOnly] = useState(Boolean(friendship?.chatOnly));
 
-  useEffect(() => {
-    setHideTheir(Boolean(friendship?.momentsHiddenFromMe));
-    setHideMine(Boolean(friendship?.momentsHiddenFromThem));
-    setChatOnly(Boolean(friendship?.chatOnly));
-  }, [
-    friendship?.momentsHiddenFromMe,
-    friendship?.momentsHiddenFromThem,
-    friendship?.chatOnly,
-  ]);
-
   const mutation = useMutation({
     mutationFn: (payload: {
       momentsHiddenFromMe?: boolean;
@@ -68,6 +58,25 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
       });
     },
   });
+
+  // mutation.isPending 守护：用户快速切换 2 个开关时，A 完成会触发 invalidate
+  // → friendsQuery 重拉，此时服务端只反映 A 不反映 B，旧 friendship.chatOnly
+  // 还是 false，sync 会把 B 的乐观状态（true）盖回 false。等 B 完成再 invalidate
+  // 一次才回 true，肉眼上看到 B 开关闪了一下。在任何 mutation 在飞时跳过
+  // server→local 同步，等用户最后一次操作真正落库后再同步。
+  useEffect(() => {
+    if (mutation.isPending) {
+      return;
+    }
+    setHideTheir(Boolean(friendship?.momentsHiddenFromMe));
+    setHideMine(Boolean(friendship?.momentsHiddenFromThem));
+    setChatOnly(Boolean(friendship?.chatOnly));
+  }, [
+    friendship?.momentsHiddenFromMe,
+    friendship?.momentsHiddenFromThem,
+    friendship?.chatOnly,
+    mutation.isPending,
+  ]);
 
   const apply = (
     next: { hideTheir?: boolean; hideMine?: boolean; chatOnly?: boolean },
