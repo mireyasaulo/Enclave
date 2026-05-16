@@ -441,7 +441,12 @@ export function DiscoverFeedPage() {
         queryKey: ["app-feed-paged", baseUrl],
       });
       void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
-      void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
+      // 走查新 Round 4：旧版还顺手 invalidate(["app-feed-post", baseUrl])，但
+      // 「新发了一条 post」这件事对任何 *已存在* post 的 detail 都没影响——
+      // 新 post 自己根本没 detail cache entry。这条 invalidate 只会逼桌面端
+      // 当前选中的「查看全部 N 条评论」detailQuery 做一次毫无意义的 refetch
+      // （慢链路上 200-500ms 一发），用户视感是发完帖子后正在阅读的另一条
+      // 评论列表突然 loading 一下。
     },
   });
 
