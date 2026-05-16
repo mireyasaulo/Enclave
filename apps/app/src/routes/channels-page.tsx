@@ -1137,6 +1137,11 @@ export function ChannelsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(""); // i18n-ignore-line
+      // 走查 R1（本轮）：原来 baseUrl 切换没清 forwardPickerPost。用户在 A 账号
+      // 打开转发面板挑好友时切到 B 账号，picker 不关、postId 还是 A 世界的 uuid；
+      // 点好友后 forwardFeedPostToChat 拿 A 的 postId 去 B 世界 API 打，立刻
+      // 404 FEED_POST_NOT_FOUND，picker 弹一行没头没脑的"转发失败"。同步关掉。
+      setForwardPickerPost(null);
     }
 
     setDesktopSelectedPostId(routeSelectedPostId);
@@ -3410,6 +3415,14 @@ function MobileChannelCommentsSheet({
   //  - 用户在 sheet 里发了新评论（commentCount 变大）→ 也跟着滚到底，体感对齐"发送即看到"
   // 用 scrollTop = scrollHeight 而不是 scrollIntoView 末条，避免在 sheet 容器
   // 之外（外层 body）产生连带滚动。
+  //
+  // 走查 R1（本轮）：原来 growth 一律 scroll-to-bottom——但 maybeScheduleChannelsCommentReplies
+  // 调度的 AI 角色回复在用户评论后 1-5 分钟才到位（feed.service.ts L2027），
+  // 那时用户可能正滑到 sheet 顶部读 5 天前的老评论 / 别人的回复链。新评论数 +1
+  // 直接 scrollTop=scrollHeight 把他甩到底，老回复链丢失阅读位置，体感像"评论面板
+  // 自己在跳"。改成：只有当前已经贴在底部（80px 阈值，覆盖"用户自己刚发完字"的
+  // 微妙偏离）才跟随；用户主动滚上去阅读时尊重位置。首次打开（hasAutoScrolledRef=false）
+  // 仍无条件落到底，对齐 WeChat 视频号默认体验。
   useEffect(() => {
     if (!open || isLoading) {
       return;
@@ -3424,7 +3437,11 @@ function MobileChannelCommentsSheet({
 
     const previousCount = previousCommentCountRef.current;
     const growth = comments.length > previousCount;
-    if (!hasAutoScrolledRef.current || growth) {
+    const isNearBottom =
+      node.scrollHeight - node.scrollTop - node.clientHeight < 80;
+    const shouldAutoScroll =
+      !hasAutoScrolledRef.current || (growth && isNearBottom);
+    if (shouldAutoScroll) {
       hasAutoScrolledRef.current = true;
       previousCommentCountRef.current = comments.length;
       // RAF 一次：确保 list 已经 layout，scrollHeight 取到稳定值
