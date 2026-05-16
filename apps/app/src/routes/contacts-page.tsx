@@ -2085,14 +2085,23 @@ export function ContactsPage() {
                     : null
                 }
                 actionError={(() => {
-                  // startChatMutation / setStarredMutation 在 friend / world /
-                  // tags / starred 四个 pane 之间共用一个 mutation 实例：用户在
-                  // friend pane 给 Alice 点「发消息」失败后切到 starred pane，
-                  // mutation.error 还挂着，actionError 会把那条 Alice 的错误
-                  // 翻在这里——但 Alice 可能根本不在星标列表里，提示和操作
-                  // 完全对不上。按 variables.characterId 过滤：只显示当前
-                  // 还是星标朋友的那条错误，其它（已删除 / 已取消星标 /
-                  // 来自别的 pane）当作脏状态忽略。
+                  // startChatMutation / setStarredMutation / pinMutation /
+                  // muteMutation / blockMutation / deleteFriendMutation 在
+                  // friend / world / tags / starred 四个 pane 之间共用同一份
+                  // mutation 实例：用户在 friend pane 给 Alice 点「发消息」失败
+                  // 后切到 starred pane，mutation.error 还挂着，actionError 会把
+                  // 那条 Alice 的错误翻在这里——但 Alice 可能根本不在星标列表
+                  // 里，提示和操作完全对不上。按 variables.characterId 过滤：
+                  // 只显示当前还是星标朋友的那条错误，其它（已删除 / 已取消
+                  // 星标 / 来自别的 pane）当作脏状态忽略。
+                  //
+                  // 走查 Round 1：原先只翻 startChat / setStarred 两条错。但
+                  // 右栏 ContactDetailPane 上「置顶聊天 / 消息免打扰 / 加入
+                  // 黑名单 / 删除联系人」都在这个 pane 里直接触发；当 pin /
+                  // mute / block / delete 失败时，对应错误只能在最左侧的
+                  // workspace errors 区显示——用户刚在最右栏点过按钮，根本
+                  // 不会回头去最左栏找。把这四条 mutation 也纳入过滤，让错误
+                  // 出现在用户实际操作的 pane 中。
                   const isInStarred = (characterId: string | undefined) =>
                     !!characterId &&
                     starredFriends.some(
@@ -2109,6 +2118,30 @@ export function ContactsPage() {
                     isInStarred(setStarredMutation.variables?.characterId)
                   ) {
                     return setStarredMutation.error.message;
+                  }
+                  if (
+                    pinMutation.error instanceof Error &&
+                    isInStarred(pinMutation.variables?.characterId)
+                  ) {
+                    return pinMutation.error.message;
+                  }
+                  if (
+                    muteMutation.error instanceof Error &&
+                    isInStarred(muteMutation.variables?.characterId)
+                  ) {
+                    return muteMutation.error.message;
+                  }
+                  if (
+                    blockMutation.error instanceof Error &&
+                    isInStarred(blockMutation.variables?.characterId)
+                  ) {
+                    return blockMutation.error.message;
+                  }
+                  if (
+                    deleteFriendMutation.error instanceof Error &&
+                    isInStarred(deleteFriendMutation.variables)
+                  ) {
+                    return deleteFriendMutation.error.message;
                   }
                   return null;
                 })()}
