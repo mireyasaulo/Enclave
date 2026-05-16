@@ -181,6 +181,9 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             return
         }
 
+        if let stalePending = pendingImagePickerCall {
+            stalePending.resolve(["assets": []])
+        }
         pendingImagePickerCall = call
 
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
@@ -206,6 +209,9 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             return
         }
 
+        if let stalePending = pendingCameraCaptureCall {
+            stalePending.resolve(["asset": NSNull()])
+        }
         pendingCameraCaptureCall = call
 
         DispatchQueue.main.async {
@@ -224,6 +230,9 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             return
         }
 
+        if let stalePending = pendingFilePickerCall {
+            stalePending.resolve(["asset": NSNull()])
+        }
         pendingFilePickerCall = call
 
         DispatchQueue.main.async {
