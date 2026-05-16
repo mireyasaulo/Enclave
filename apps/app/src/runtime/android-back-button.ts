@@ -233,17 +233,23 @@ async function handleBackPressed(
     return;
   }
 
-  // 5. 兜底：minimize app
+  // 5. canSafelyNavigateBack 不严格判 webview 历史（看的是
+  //    app-level sessionStorage chain）；webview canGoBack 通常更宽，
+  //    在子页面（如 /friend-moments/xxx）也是 true。直接走 webview 后退，
+  //    避免还能往回退却被报"不能"然后 minimize。
+  if (data.canGoBack) {
+    window.history.back();
+    return;
+  }
+
+  // 6. 真的退无可退 → minimize app
   try {
     if (app.minimizeApp) {
       await app.minimizeApp();
       return;
     }
   } catch {
-    // fall through
-  }
-  if (data.canGoBack) {
-    window.history.back();
+    // ignore
   }
 }
 
