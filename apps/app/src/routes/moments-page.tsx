@@ -1224,6 +1224,53 @@ export function MomentsPage() {
     mobileScrollSnappedRouteIdRef.current = routeSelectedMomentId;
   }, [isDesktopLayout, routeSelectedMomentId, visibleMoments]);
 
+  // 用户从分享卡 / 收藏 / 站内跳转走 /discover/moments#moment=<id> 进来但目标
+  // 不在首屏 20 条里时，上面的 snap useEffect 只在 visibleMoments 里 some()
+  // 命中才 scrollIntoView —— 找不到就静默回退到顶部，用户看到普通朋友圈列表，
+  // 完全不知道点进来要看的那条在哪。和 discover-feed-page 的 hash auto-load
+  // 同思路：目标未加载且还有下一页时主动 fetchNextPage，IntersectionObserver
+  // 触底兜底之上再多一层"跟着 hash 翻页"。
+  //
+  // 几个早返路径要小心：
+  //   1) 已经在 visibleMoments 里 → snap 那条 effect 会处理；
+  //   2) 已经在 momentsData 里但被 blockedCharacterIds 过滤掉 → 用户主动屏蔽
+  //      了该角色，分享链接绕回来不要硬翻一路找永远不会出现的目标；
+  //   3) 没下一页 / 正在 fetch / 上一次 fetch 出错 → 让位给底部错误条 + 用户
+  //      重试，避免死循环。和 feed page Round 5/19 加的这两条等价。
+  useEffect(() => {
+    if (isDesktopLayout || !routeSelectedMomentId) {
+      return;
+    }
+    const targetVisible = visibleMoments.some(
+      (moment) => moment.id === routeSelectedMomentId,
+    );
+    if (targetVisible) {
+      return;
+    }
+    const targetLoadedButBlocked = momentsData.some(
+      (moment) => moment.id === routeSelectedMomentId,
+    );
+    if (targetLoadedButBlocked) {
+      return;
+    }
+    if (!momentsHasNextPage || momentsIsFetchingNextPage) {
+      return;
+    }
+    if (momentsIsFetchNextPageError) {
+      return;
+    }
+    void momentsFetchNextPage();
+  }, [
+    isDesktopLayout,
+    routeSelectedMomentId,
+    visibleMoments,
+    momentsData,
+    momentsHasNextPage,
+    momentsIsFetchingNextPage,
+    momentsIsFetchNextPageError,
+    momentsFetchNextPage,
+  ]);
+
   if (isDesktopLayout) {
     if (syncedRouteSelectedAuthorId) {
       return (
