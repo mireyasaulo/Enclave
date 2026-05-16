@@ -526,8 +526,12 @@ function MobileAddFriend() {
                 key={result.character.id}
                 item={result}
                 actionPending={
+                  // capped pending（500ms）只用来兜 sheet 自动关闭，row 上的
+                  // 按钮要锁到真正的 mutation 完成为止，不然慢网下：发送 → 弹层
+                  // 自动收 → row 又变回"添加" → 用户再点一次就触发第二条发送，
+                  // 后端最终收到两条 friend request。这里看真实的 isPending。
                   (result.status === "available" &&
-                    sendRequestDisplayedPending &&
+                    sendRequestMutation.isPending &&
                     sendRequestMutation.variables?.characterId ===
                       result.character.id) ||
                   (result.status === "friend" &&
@@ -794,17 +798,29 @@ function MobileAddFriendSendSheet({
     setGreeting(t(msg`你好，我是${owner}，想把你添加到通讯录里。`));
   }, [open, ownerName, targetCharacterId, t]);
 
+  // 把 "首次聚焦/把光标移到末尾" 和 "Escape 监听" 拆成两条 effect：
+  // 原写法把 onClose（父组件每次 render 都是新箭头函数）放进 deps，导致父端
+  // 任何 re-render（如 friendRequestsQuery 后台 refetch）都会把这条 effect 重跑
+  // → cleanup + 重新 setTimeout(80ms)。用户正在编辑 greeting 时光标会被强制
+  // 跳到文本末尾。focus 只在 open 翻转那一次跑一次就行。
   useEffect(() => {
     if (!open) {
       return;
     }
-
     const timer = window.setTimeout(() => {
       textareaRef.current?.focus();
       const length = textareaRef.current?.value.length ?? 0;
       textareaRef.current?.setSelectionRange(length, length);
     }, 80);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [open]);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !pending) {
         event.preventDefault();
@@ -812,9 +828,7 @@ function MobileAddFriendSendSheet({
       }
     };
     window.addEventListener("keydown", handleKeyDown);
-
     return () => {
-      window.clearTimeout(timer);
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose, open, pending]);
