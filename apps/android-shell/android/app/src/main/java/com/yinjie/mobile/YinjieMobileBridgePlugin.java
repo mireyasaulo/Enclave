@@ -573,6 +573,21 @@ public class YinjieMobileBridgePlugin extends Plugin {
 
         pendingCameraCaptureUri = captureUri;
         intent.putExtra(MediaStore.EXTRA_OUTPUT, captureUri);
+        // Round 33：FLAG_GRANT_READ/WRITE_URI_PERMISSION 按 Android 文档只对
+        // intent.getData() 那条 URI 生效，**不会**自动传递给 extras 里的
+        // EXTRA_OUTPUT URI。Pixel / AOSP 上的 AOSP Camera 因为 FileProvider
+        // 设了 grantUriPermissions=true 还能宽松放行，但 Xiaomi MIUI /
+        // Huawei EMUI / OnePlus OxygenOS / 红米 / Vivo OriginOS 这几家的
+        // 自带相机在 ContentResolver.openOutputStream(EXTRA_OUTPUT URI) 时
+        // 拿 SecurityException（"Permission Denial: writing FileProvider"），
+        // 相机界面看着拍完了，回 captureImageResult RESULT_OK，但 captureUri
+        // 文件是 0 byte 空文件 / 根本没创建。buildAsset 跟着把空 webPath
+        // 喂给前端，朋友圈 / 头像上传一张白图、聊天图框转圈最后空缩略图。
+        // 修法：把 captureUri 也塞进 ClipData，grant flag 走 ClipData 这条
+        // path 就能落到 EXTRA_OUTPUT URI 上（Android 5+ 起的标准做法）。
+        intent.setClipData(
+            ClipData.newUri(getContext().getContentResolver(), "yinjie-camera", captureUri)
+        );
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
