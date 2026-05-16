@@ -849,7 +849,12 @@ const pendingLikePostId = likeMutation.isPending
       document
         .getElementById(`feed-post-${routeSelectedPostId}`)
         ?.scrollIntoView({
-          behavior: "smooth",
+          // behavior: "smooth" 在 hash auto-load 的多 page chain 拉过来期间
+          // 反复触发 scrollIntoView，动画被打断 + IntersectionObserver 又触底拉
+          // 下一页，最终 scrollTop 偏过 target ~650px（实测肉眼能看到的是错位
+          // ~2 张卡片的距离）。改 auto / instant，每次 length 变化都 hard-snap
+          // 到 target，新 page 加载不影响已经定位好的 scrollTop。
+          behavior: "auto",
           block: "start",
         });
     });
