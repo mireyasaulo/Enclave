@@ -167,16 +167,31 @@ export function FriendMomentsPage() {
       // 立刻 prepend 到共享 flat / paged / mine 三套 cache：本页按好友 characterId 过滤
       // 不显示用户自己的动态，但用户随手切到 /tabs/moments、/profile/moments 时应该
       // 能直接看到刚发的内容。
-      // 之前只同步 flat + paged，漏了 mine —— /profile/moments 该页 source-of-truth
-      // 是 ["app-moments-mine"]，从这个 friend-moments 页发完跳过去要等下次 refetch
-      // 才能看到新帖（profile-moments-page createMutation 早就 prepend mine 了，
-      // 这条对齐过来）。
+      // 走查 Round 1：paged 之前只走 invalidate —— /tabs/moments 没挂载时只是把
+      // cache 标 stale，用户下次跳过去仍要付一次 RTT refetch 才能看到新帖。改用
+      // setQueryData 在 page 1 头部 prepend，命中 momentsData useMemo 的 id 去重
+      // 兜底不会出现重复条；跟 moments-page.tsx createMutation 模板对齐。
       queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
         current ? [newMoment, ...current] : current,
       );
       queryClient.setQueryData<Moment[]>(
         ["app-moments-mine", baseUrl],
         (current) => (current ? [newMoment, ...current] : current),
+      );
+      queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
+        ["app-moments-paged", baseUrl],
+        (current) =>
+          current && current.pages.length > 0
+            ? {
+                pages: [
+                  {
+                    ...current.pages[0]!,
+                    items: [newMoment, ...current.pages[0]!.items],
+                  },
+                ],
+                pageParams: current.pageParams.slice(0, 1),
+              }
+            : current,
       );
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({

@@ -171,11 +171,20 @@ export function ProfileMomentsPage() {
     },
   });
 
+  // 走查 Round 1：跟 friend-moments-page / moments-page Round 1 模板对齐：
+  // ref 捕获 args + onMutate 4-cache optimistic 插入 + onError 回滚。
+  // 之前评论提交后输入框 ~600ms 不消失 + 列表里看不到自己刚发的评论，体感"卡住"。
+  const commentSubmitArgsRef = useRef<
+    Record<
+      string,
+      { text: string; target: { commentId: string; authorId: string } | null }
+    >
+  >({});
   const commentMutation = useMutation({
-    mutationFn: (momentId: string) => {
+    onMutate: async (momentId: string) => {
       const text = commentDrafts[momentId]?.trim();
-      if (!text) {
-        throw new Error(t(msg`请先输入评论内容。`));
+      if (!text || !ownerId) {
+        return { skipped: true as const };
       }
 
       const desktopTarget =
@@ -191,40 +200,196 @@ export function ProfileMomentsPage() {
           }
         : mobileTarget;
 
-      return addMomentComment(
-        momentId,
-        {
-          text,
-          replyToCommentId: target?.commentId,
-          replyToAuthorId: target?.authorId,
-        },
-        baseUrl,
-      );
-    },
-    onSuccess: (_, momentId) => {
+      commentSubmitArgsRef.current[momentId] = { text, target };
+
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-paged", baseUrl],
+        }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-mine", baseUrl],
+        }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-character", baseUrl],
+        }),
+      ]);
+
+      const flatSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      const pagedSnapshots = queryClient.getQueriesData<
+        InfiniteData<MomentsPageResponse>
+      >({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
+      const mineSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-mine", baseUrl],
+      });
+      const characterSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-character", baseUrl],
+      });
+
+      const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
+      const tempComment: MomentComment = {
+        id: tempId,
+        postId: momentId,
+        authorId: ownerId,
+        authorName: ownerName ?? t(msg`我`),
+        authorAvatar: ownerAvatar ?? "",
+        authorType: "user",
+        text,
+        replyToCommentId: target?.commentId ?? null,
+        replyToAuthorId: target?.authorId ?? null,
+        createdAt: new Date().toISOString(),
+      };
+
+      const appendComment = (moment: Moment): Moment =>
+        moment.id !== momentId
+          ? moment
+          : {
+              ...moment,
+              comments: [...moment.comments, tempComment],
+              commentCount: moment.commentCount + 1,
+            };
+
+      flatSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+      pagedSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(key, {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            items: page.items.map(appendComment),
+          })),
+        });
+      });
+      mineSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+      characterSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+
+      const savedDraft = commentDrafts[momentId] ?? "";
+      const savedDesktopReply =
+        desktopReplyTarget?.postId === momentId ? desktopReplyTarget : null;
+
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setCommentBarTarget(null);
       setDesktopReplyTarget((current) =>
         current?.postId === momentId ? null : current,
       );
+
+      return {
+        skipped: false as const,
+        flatSnapshots,
+        pagedSnapshots,
+        mineSnapshots,
+        characterSnapshots,
+        momentId,
+        tempId,
+        savedDraft,
+        savedDesktopReply,
+      };
+    },
+    mutationFn: (momentId: string) => {
+      const args = commentSubmitArgsRef.current[momentId];
+      if (!args?.text) {
+        throw new Error(t(msg`请先输入评论内容。`));
+      }
+
+      return addMomentComment(
+        momentId,
+        {
+          text: args.text,
+          replyToCommentId: args.target?.commentId,
+          replyToAuthorId: args.target?.authorId,
+        },
+        baseUrl,
+      );
+    },
+    onSuccess: (realComment, momentId, context) => {
+      delete commentSubmitArgsRef.current[momentId];
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      // fire-and-forget：await 会让"发表"按钮一直 disabled，公网隧道下卡几秒。
-      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
-      });
-      // 本页 source-of-truth 是 mine 这把 key——别忘了刷新它，否则评论数
-      // 在「我的朋友圈」要等下一次 refetch 才更新。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-mine", baseUrl],
-      });
+      // 把 optimistic temp 原地换成 server 真实评论 —— 跟 moments-page / friend-moments-page
+      // Round 1 一样**完全省掉** invalidate 触发的 mine / paged refetch。
+      if (context && !context.skipped) {
+        const { tempId } = context;
+        const replaceComment = (moment: Moment): Moment =>
+          moment.id !== momentId
+            ? moment
+            : {
+                ...moment,
+                comments: moment.comments.map((c) =>
+                  c.id === tempId ? realComment : c,
+                ),
+              };
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+        queryClient.setQueriesData<InfiniteData<MomentsPageResponse>>(
+          { queryKey: ["app-moments-paged", baseUrl] },
+          (data) =>
+            data
+              ? {
+                  ...data,
+                  pages: data.pages.map((page) => ({
+                    ...page,
+                    items: page.items.map(replaceComment),
+                  })),
+                }
+              : data,
+        );
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments-mine", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments-character", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+      }
     },
-    onError: (error) => {
-      // 评论失败：先把 sheet 关掉（草稿留在 commentDrafts 里，下次打开还在），
-      // 再让 danger toast 在 backdrop 关掉后能被看见。
+    onError: (error, momentId, context) => {
+      delete commentSubmitArgsRef.current[momentId];
+      if (!context || context.skipped) {
+        setCommentBarTarget(null);
+        setNotice({
+          tone: "danger",
+          message: describeRequestError(error, t(msg`评论失败，请稍后重试。`)),
+        });
+        return;
+      }
+      context.flatSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.pagedSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.mineSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.characterSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      // 恢复 desktop drafts / reply target；mobile sheet 继续按原逻辑关闭 + 红条
+      setCommentDrafts((current) => ({
+        ...current,
+        [context.momentId]: context.savedDraft,
+      }));
+      if (context.savedDesktopReply) {
+        setDesktopReplyTarget(context.savedDesktopReply);
+      }
       setCommentBarTarget(null);
       setNotice({
         tone: "danger",
@@ -250,12 +415,31 @@ export function ProfileMomentsPage() {
       });
       // 立刻 prepend 到 flat cache + mine cache，本页直接绑 mine，必须把
       // mine 同步 prepend 否则用户发完看不到（要等 invalidate refetch）。
+      // 走查 Round 1：paged 也得同步 prepend —— 之前只 invalidate，/tabs/moments
+      // 没挂载时只是标 stale，用户从「我的朋友圈」发完跳回 /tabs/moments 要
+      // 等一次 RTT refetch 才能看到新帖。跟 moments-page.tsx / friend-moments-page
+      // Round 1 createMutation 模板对齐；momentsData useMemo 的 id 去重兜底。
       queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
         current ? [newMoment, ...current] : current,
       );
       queryClient.setQueryData<Moment[]>(
         ["app-moments-mine", baseUrl],
         (current) => (current ? [newMoment, ...current] : current),
+      );
+      queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
+        ["app-moments-paged", baseUrl],
+        (current) =>
+          current && current.pages.length > 0
+            ? {
+                pages: [
+                  {
+                    ...current.pages[0]!,
+                    items: [newMoment, ...current.pages[0]!.items],
+                  },
+                ],
+                pageParams: current.pageParams.slice(0, 1),
+              }
+            : current,
       );
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
