@@ -920,13 +920,14 @@ export function GroupQrPage() {
       return;
     }
 
-    if (
-      typeof navigator === "undefined" ||
-      !navigator.clipboard ||
-      typeof navigator.clipboard.writeText !== "function"
-    ) {
+    // 走查 Round 4：原版回退直接调 navigator.clipboard.writeText，但 iOS
+     // WKWebView 经常因为 user-gesture/permission 写不进，结果"已复制群邀请
+     // 文案"弹了但剪贴板是空的。换成 writeClipboardText —— 内部先走 iOS/Android
+     // shell 原生 UIPasteboard 桥，再 Clipboard API，再 execCommand 兜底。
+     // 同 copyText / sendToMobile 路径已经走这个 helper。
+    if (!(await writeClipboardText(inviteText))) {
       showRetryNotice(
-        t(msg`当前设备暂时无法打开系统分享，请稍后重试。`),
+        t(msg`系统分享暂时不可用，请稍后重试。`),
         t(msg`重试分享`),
         () => {
           void shareInvite();
@@ -934,19 +935,7 @@ export function GroupQrPage() {
       );
       return;
     }
-
-    try {
-      await navigator.clipboard.writeText(inviteText);
-      showNotice(t(msg`系统分享暂时不可用，已复制群邀请文案。`));
-    } catch {
-      showRetryNotice(
-        t(msg`系统分享失败，请稍后重试。`),
-        t(msg`重试分享`),
-        () => {
-          void shareInvite();
-        },
-      );
-    }
+    showNotice(t(msg`系统分享暂时不可用，已复制群邀请文案。`));
   }
 
   async function shareInviteLink() {

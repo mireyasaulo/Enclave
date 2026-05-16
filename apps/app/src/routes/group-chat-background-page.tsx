@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -96,15 +97,31 @@ export function GroupChatBackgroundPage() {
   });
   const backgroundQuery = useGroupBackground(groupId);
 
+  // 走查 Round 4：原版每次 backgroundQuery.data 变化都把 draft 三连冲掉。
+  // useGroupBackground 在 window-focus / 切换前后台时会 refetch；用户上传完
+  // 还没点保存就切到后台/最小化再回来，refetch 命中老服务器 data，effect 把
+  // 用户的上传 draft 覆盖回旧值——白上传一次。同 edit/announcement 页路数：
+  // 只在第一次拿到服务端值时 seed，之后用户控制 draft；如果用户点了
+  // saveDefault/saveGroup/clearDefault/clearGroup 把服务端值改写了，
+  // 那些 onSuccess 里手动 setDefault/setGroup 也会显式 reset 这个 ref。
+  const draftInitializedRef = useRef(false);
   useEffect(() => {
     if (!backgroundQuery.data) {
       return;
     }
-
+    if (draftInitializedRef.current) {
+      return;
+    }
+    draftInitializedRef.current = true;
     setDefaultDraft(backgroundQuery.data.defaultBackground ?? null);
     setGroupMode(backgroundQuery.data.mode);
     setGroupDraft(backgroundQuery.data.conversationBackground ?? null);
   }, [backgroundQuery.data]);
+  // groupId 切换（同账号切到另一群）必须强制 re-seed，否则下一群的 draft
+  // 还是上一群的；和上面那条 effect 配对。
+  useEffect(() => {
+    draftInitializedRef.current = false;
+  }, [baseUrl, groupId]);
 
   useEffect(() => {
     setNotice(null);
