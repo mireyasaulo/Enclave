@@ -1025,6 +1025,23 @@ if (command === "doctor") {
       ),
     ]);
 
+    // Round 24：缺 default_notification_icon meta-data，FCM SDK 在 app 处于
+    // background 直接走系统通知栏时，smallIcon 默认取 launcher。彩色 launcher
+    // PNG 在 Android 5+ 会被 mask 成纯白方块，没有任何品牌识别度。这两条
+    // meta-data 必须指到 alpha-only 的 ic_stat_notification + 品牌 accent color。
+    checks.push([
+      "manifest fcm default icon = ic_stat_notification",
+      /com\.google\.firebase\.messaging\.default_notification_icon[\s\S]*?android:resource="@drawable\/ic_stat_notification"/.test(
+        androidManifest,
+      ),
+    ]);
+    checks.push([
+      "manifest fcm default color = notification_accent",
+      /com\.google\.firebase\.messaging\.default_notification_color[\s\S]*?android:resource="@color\/notification_accent"/.test(
+        androidManifest,
+      ),
+    ]);
+
     // Hardening: manifest cleartext must be a build-variant placeholder, not
     // a hardcoded literal that can drift in tracked git history.
     checks.push([

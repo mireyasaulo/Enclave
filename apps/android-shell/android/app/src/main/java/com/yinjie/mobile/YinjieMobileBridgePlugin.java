@@ -499,7 +499,10 @@ public class YinjieMobileBridgePlugin extends Plugin {
         );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            // 跟 YinjieFirebaseMessagingService Round 24 对齐：launcher PNG 当
+            // smallIcon 在 Android 5+ 会被 mask 成白方块，必须给 alpha-only 矢量。
+            .setSmallIcon(R.drawable.ic_stat_notification)
+            .setColor(ContextCompat.getColor(getContext(), R.color.notification_accent))
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(new NotificationCompat.BigTextStyle().bigText(body))

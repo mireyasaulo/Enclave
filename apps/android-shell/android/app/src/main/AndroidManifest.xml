@@ -35,6 +35,22 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="yinjie_messages" />
 
+        <!--
+            Round 24：FCM SDK 在 app 处于 background 直接走系统通知栏时，
+            smallIcon 默认取 launcher icon (mipmap/ic_launcher)。它是彩色 RGBA
+            全不透明的 PNG，被 Android 5+ 状态栏强制 mask 成纯白方块，没有
+            任何品牌可识别度。这里把 default_notification_icon 指到
+            res/drawable/ic_stat_notification（alpha-only 的 Y 字形矢量），
+            default_notification_color 用 brand 橙色，跟前台 / 本地推送的
+            setSmallIcon + setColor 拉齐，statusBar 上才能看见 Yinjie 的 Y。
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_accent" />
+
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
             android:name=".MainActivity"

@@ -81,7 +81,12 @@ public class YinjieFirebaseMessagingService extends FirebaseMessagingService {
         );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            // 不能用 R.mipmap.ic_launcher：那是彩色 launcher PNG，Android 5+ 把
+            // 状态栏小图标全部 mask 成只看 alpha 的纯白 silhouette，launcher 整张
+            // 不透明会被剥成毫无形状的白方块。ic_stat_notification 是 alpha-only
+            // 的 Y 字形矢量，mask 之后仍然能看到 Yinjie 的 logo 轮廓。
+            .setSmallIcon(R.drawable.ic_stat_notification)
+            .setColor(ContextCompat.getColor(this, R.color.notification_accent))
             .setContentTitle(title)
             .setContentText(body)
             // showLocalNotification 给本地推送加了 BigTextStyle，FCM 走的这条
