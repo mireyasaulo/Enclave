@@ -39,18 +39,10 @@
       var map = { zh: "zh-CN", en: "en-US", ja: "ja-JP", ko: "ko-KR" };
       return map[prefix] || null;
     }
-    // 1) URL ?lang=  2) localStorage (yinjie-i18n-locale-*)  3) navigator.language
+    // 1) URL ?lang=  2) localStorage yinjie-i18n-locale:wiki  3) navigator.language
     var fromQuery = (location.search.match(/[?&]lang=([^&]+)/) || [])[1];
     var fromStorage = null;
-    try {
-      for (var i = 0; i < localStorage.length; i++) {
-        var k = localStorage.key(i);
-        if (k && k.indexOf("yinjie-i18n-locale") === 0) {
-          fromStorage = localStorage.getItem(k);
-          break;
-        }
-      }
-    } catch (e) {}
+    try { fromStorage = localStorage.getItem("yinjie-i18n-locale:wiki"); } catch (e) {}
     var match = pick(fromQuery) || pick(fromStorage) || pick(navigator.language) || "zh-CN";
     location.replace("tutorial-" + match + ".html");
   })();
