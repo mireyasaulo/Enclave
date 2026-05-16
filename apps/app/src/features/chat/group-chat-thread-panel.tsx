@@ -314,9 +314,19 @@ export function GroupChatThreadPanel({
   }, [baseUrl, groupId]);
 
   useEffect(() => {
-    setMessages((current) =>
-      mergeGroupMessageWindow(current, messagesQuery.data ?? []),
-    );
+    if (!messagesQuery.data) {
+      return;
+    }
+    // 同 use-conversation-thread 对单聊的修法：mergeGroupMessageWindow 只追
+    // 加不删除，群里"清空 / 撤回 / 删除"后 cache 缩水时，本地 messages 还
+    // 留着已经被清掉的消息——用户在已清空的群聊里继续看到旧消息。改成保留
+    // 还没 echo 的 local_* 乐观消息，server 消息整体跟 cache 走。
+    setMessages((current) => {
+      const pendingLocal = current.filter((message) =>
+        message.id.startsWith("local_"),
+      );
+      return mergeGroupMessageWindow(pendingLocal, messagesQuery.data!);
+    });
   }, [messagesQuery.data]);
 
   // 群不存在时，本来 thread 页就是个死页：retry 也是同款 404，用户除了

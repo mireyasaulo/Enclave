@@ -178,9 +178,21 @@ export function useConversationThread(conversationId: string) {
   );
 
   useEffect(() => {
-    setMessages((current) =>
-      mergeDirectMessageWindow(current, messagesQuery.data ?? []),
-    );
+    if (!messagesQuery.data) {
+      return;
+    }
+    // cache 是 server messages 的 source of truth。mergeDirectMessageWindow
+    // 只追加不删除，会让"清空聊天记录 / 撤回 / 删除消息"后 cache 缩水时，
+    // 本地 messages 还留着已经被清掉的消息 —— 用户在已清空的会话里继续看到
+    // 旧消息，直到切走再回来。这里改成：保留还没被服务端 echo 过的乐观消息
+    // (local_* id)，server 消息整体跟 cache 走；isMatchingOptimisticEcho
+    // 仍然能在 echo 到来时把 local_* 替换成 server 真消息。
+    setMessages((current) => {
+      const pendingLocal = current.filter((message) =>
+        message.id.startsWith("local_"),
+      );
+      return mergeDirectMessageWindow(pendingLocal, messagesQuery.data!);
+    });
   }, [messagesQuery.data]);
 
   // messages 里还活着的乐观消息（local_* id）才需要留在 store 里；被服务端
