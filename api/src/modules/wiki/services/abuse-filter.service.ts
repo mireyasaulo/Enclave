@@ -398,7 +398,9 @@ export class AbuseFilterService implements OnModuleInit {
   ): void {
     const { partial } = opts;
     if (!partial) {
-      const name = (input.name ?? '').trim();
+      // typeof 守：客户端传 {"name":{"a":1}} 时 (x ?? '').trim() 抛 TypeError → 500。
+      const name =
+        typeof input.name === 'string' ? input.name.trim() : '';
       if (!name) {
         throw new AppError('WIKI_VALIDATION_FAILED', {
           status: HttpStatus.BAD_REQUEST,

@@ -101,9 +101,15 @@ export class WikiFieldProtectionService implements OnModuleInit {
     // 2026-05-16 R2 走查发现：缺 minRoleToEdit 时入库直接 500（SQLite NOT NULL），
     // 缺 fieldPath 或非法 characterId（不是 '*' 也不是真词条）时静默写入"幽灵"策略。
     // 这里把校验前置，让前端拿到 400 而不是 500，并禁止指向不存在的词条。
-    const characterId = (input.characterId ?? '').trim();
-    const fieldPath = (input.fieldPath ?? '').trim();
-    const minRoleToEdit = (input.minRoleToEdit ?? '').trim();
+    //
+    // typeof 守：客户端传 {"characterId":{"a":1}} 时 (x ?? '').trim() 抛
+    // TypeError → 500 漏 stack。非字符串当空字符串处理。
+    const characterId =
+      typeof input.characterId === 'string' ? input.characterId.trim() : '';
+    const fieldPath =
+      typeof input.fieldPath === 'string' ? input.fieldPath.trim() : '';
+    const minRoleToEdit =
+      typeof input.minRoleToEdit === 'string' ? input.minRoleToEdit.trim() : '';
     if (!characterId) {
       throw new AppError('WIKI_VALIDATION_FAILED', {
         status: HttpStatus.BAD_REQUEST,

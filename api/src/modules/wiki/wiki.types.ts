@@ -593,7 +593,10 @@ export function assertWikiEditSummary(input: {
     input.riskLevel === 'high' ||
     input.revisionKind === 'lifecycle';
   if (!required) return;
-  const trimmed = (input.summary ?? '').trim();
+  // typeof 守：客户端传 {"editSummary":{"a":1}} / [...] 时 (x ?? '').trim()
+  // 直接抛 TypeError → 500 漏出 stack ((input.summary ?? "").trim is not a function)。
+  // 非字符串当空字符串处理，下面的"至少 10 字"会接住。
+  const trimmed = typeof input.summary === 'string' ? input.summary.trim() : '';
   if (trimmed.length < 10) {
     throw new AppError('WIKI_VALIDATION_FAILED', {
         params: { detail: '该编辑需提供至少 10 字编辑摘要' },
