@@ -294,26 +294,92 @@ export class ChatService {
       lastMessage?: Message;
       unreadCount: number;
     })[] = [];
-    for (const rawConversation of convs) {
-      const conv =
-        await this.normalizeLegacyConversationEntity(rawConversation);
-      const cutoff = this.getVisibleMessageCutoff(conv);
-      const lastMsgEntity = await this.msgRepo.findOne({
-        where: this.buildMessageWhere(conv.id, cutoff),
-        order: { createdAt: 'DESC' },
-      });
+
+    const convDetails = await Promise.all(
+      convs.map(async (rawConversation) => {
+        const conv =
+          await this.normalizeLegacyConversationEntity(rawConversation);
+        const cutoff = this.getVisibleMessageCutoff(conv);
+        const unreadCutoff = this.getUnreadCutoff(conv);
+        const [lastMsgEntity, unreadCount] = await Promise.all([
+          this.msgRepo.findOne({
+            where: this.buildMessageWhere(conv.id, cutoff),
+            order: { createdAt: 'DESC' },
+          }),
+          this.msgRepo.count({
+            where: this.buildMessageWhere(conv.id, unreadCutoff, {
+              senderType: 'character',
+            }),
+          }),
+        ]);
+        return { conv, lastMsgEntity, unreadCount };
+      }),
+    );
+
+    const groupMemberships = await this.groupMemberRepo.find({
+      where: {
+        memberId: owner.id,
+        memberType: 'user',
+      },
+    });
+    const groupIds = [...new Set(groupMemberships.map((item) => item.groupId))];
+    const groups = groupIds.length
+      ? await this.groupRepo.find({
+          where: { id: In(groupIds), isHidden: false },
+        })
+      : [];
+
+    const groupDetails = await Promise.all(
+      groups.map(async (group) => {
+        const unreadCutoff = this.getGroupUnreadCutoff(group);
+        const [members, lastGroupMessage, unreadCount] = await Promise.all([
+          this.groupMemberRepo.find({
+            where: { groupId: group.id },
+            order: { joinedAt: 'ASC' },
+          }),
+          this.groupMessageRepo.findOne({
+            where: group.lastClearedAt
+              ? {
+                  groupId: group.id,
+                  createdAt: MoreThan(group.lastClearedAt),
+                }
+              : { groupId: group.id },
+            order: { createdAt: 'DESC' },
+          }),
+          this.groupMessageRepo.count({
+            where: this.buildGroupMessageWhere(group.id, unreadCutoff, {
+              senderType: 'character',
+            }),
+          }),
+        ]);
+        return { group, members, lastGroupMessage, unreadCount };
+      }),
+    );
+
+    const characterIdsForAvatars: string[] = [];
+    for (const { conv, lastMsgEntity } of convDetails) {
+      const directCharId = conv.participants?.[0]?.trim();
+      if (directCharId) characterIdsForAvatars.push(directCharId);
+      if (lastMsgEntity?.senderType === 'character' && lastMsgEntity.senderId) {
+        characterIdsForAvatars.push(lastMsgEntity.senderId);
+      }
+    }
+    const avatarMap =
+      await this.resolveCharacterAvatarMap(characterIdsForAvatars);
+
+    for (const { conv, lastMsgEntity, unreadCount } of convDetails) {
       const lastMessage = lastMsgEntity
-        ? await this.serializeMessage(lastMsgEntity, remarkMap)
+        ? this.serializeMessageWithAvatarMap(
+            lastMsgEntity,
+            remarkMap,
+            avatarMap,
+          )
         : undefined;
-
-      const unreadCutoff = this.getUnreadCutoff(conv);
-      const unreadCount = await this.msgRepo.count({
-        where: this.buildMessageWhere(conv.id, unreadCutoff, {
-          senderType: 'character',
-        }),
-      });
-
-      const serialized = await this.serializeConversation(conv, remarkMap);
+      const serialized = this.serializeConversationWithAvatarMap(
+        conv,
+        remarkMap,
+        avatarMap,
+      );
       const directCharacterId =
         serialized.type === 'direct'
           ? serialized.participants?.[0]
@@ -330,40 +396,7 @@ export class ChatService {
       });
     }
 
-    const groupMemberships = await this.groupMemberRepo.find({
-      where: {
-        memberId: owner.id,
-        memberType: 'user',
-      },
-    });
-    const groupIds = [...new Set(groupMemberships.map((item) => item.groupId))];
-    const groups = groupIds.length
-      ? await this.groupRepo.find({
-          where: { id: In(groupIds), isHidden: false },
-        })
-      : [];
-
-    for (const group of groups) {
-      const members = await this.groupMemberRepo.find({
-        where: { groupId: group.id },
-        order: { joinedAt: 'ASC' },
-      });
-      const lastGroupMessage = await this.groupMessageRepo.findOne({
-        where: group.lastClearedAt
-          ? {
-              groupId: group.id,
-              createdAt: MoreThan(group.lastClearedAt),
-            }
-          : { groupId: group.id },
-        order: { createdAt: 'DESC' },
-      });
-      const unreadCutoff = this.getGroupUnreadCutoff(group);
-      const unreadCount = await this.groupMessageRepo.count({
-        where: this.buildGroupMessageWhere(group.id, unreadCutoff, {
-          senderType: 'character',
-        }),
-      });
-
+    for (const { group, members, lastGroupMessage, unreadCount } of groupDetails) {
       result.push({
         ...this.groupToConversation(
           group,
@@ -665,11 +698,6 @@ export class ChatService {
     );
 
     return searchVisibleMessages(messages, query);
-  }
-
-  async getCharacterActivity(charId: string): Promise<string | undefined> {
-    const char = await this.characters.findById(charId);
-    return char?.currentActivity;
   }
 
   async saveUploadedAttachment(
@@ -1906,14 +1934,41 @@ export class ChatService {
     };
   }
 
+  private serializeConversationWithAvatarMap(
+    entity: ConversationEntity,
+    remarkMap: FriendRemarkMap,
+    avatarMap: Map<string, string>,
+  ): Conversation {
+    const conversation = this._entityToConversation(entity, remarkMap);
+    const characterId = conversation.participants[0]?.trim();
+    if (!characterId) return conversation;
+    const avatar = avatarMap.get(characterId);
+    return avatar ? { ...conversation, avatar } : conversation;
+  }
+
+  private serializeMessageWithAvatarMap(
+    entity: MessageEntity,
+    remarkMap: FriendRemarkMap,
+    avatarMap: Map<string, string>,
+  ): Message {
+    const message = this._entityToMessage(entity, remarkMap);
+    if (message.senderType !== 'character') return message;
+    const avatar = avatarMap.get(message.senderId?.trim() ?? '');
+    return avatar ? { ...message, senderAvatar: avatar } : message;
+  }
+
   private async serializeMessages(
     entities: MessageEntity[],
     remarkMap?: FriendRemarkMap,
   ): Promise<Message[]> {
     const effectiveMap =
       remarkMap ?? (await this.getRemarkMapForCurrentOwner());
-    return Promise.all(
-      entities.map((entity) => this.serializeMessage(entity, effectiveMap)),
+    const characterIds = entities
+      .filter((entity) => entity.senderType === 'character')
+      .map((entity) => entity.senderId);
+    const avatarMap = await this.resolveCharacterAvatarMap(characterIds);
+    return entities.map((entity) =>
+      this.serializeMessageWithAvatarMap(entity, effectiveMap, avatarMap),
     );
   }
 
@@ -1947,6 +2002,20 @@ export class ChatService {
 
     const character = await this.characters.findById(normalizedCharacterId);
     return character?.avatar?.trim() || undefined;
+  }
+
+  private async resolveCharacterAvatarMap(
+    characterIds: (string | null | undefined)[],
+  ): Promise<Map<string, string>> {
+    const characters = await this.characters.findManyByIds(
+      characterIds.filter((id): id is string => !!id?.trim()),
+    );
+    const map = new Map<string, string>();
+    for (const character of characters) {
+      const avatar = character.avatar?.trim();
+      if (avatar) map.set(character.id, avatar);
+    }
+    return map;
   }
 
   private resolveStrongReminderDurationHours(durationHours?: number) {

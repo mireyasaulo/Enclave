@@ -80,6 +80,15 @@ export class CharactersService implements OnModuleInit {
     return this.normalizeCharacterAvatar(character);
   }
 
+  async findManyByIds(ids: string[]): Promise<CharacterEntity[]> {
+    const unique = Array.from(
+      new Set(ids.map((id) => id?.trim()).filter((id): id is string => !!id)),
+    );
+    if (!unique.length) return [];
+    const characters = await this.repo.findBy({ id: In(unique) });
+    return this.normalizeCharacterAvatars(characters);
+  }
+
   async findAllVisibleToOwner(ownerId?: string): Promise<CharacterEntity[]> {
     const characters = await this.findAll();
     return this.filterNeedGeneratedVisibility(characters, ownerId);
@@ -825,9 +834,7 @@ export class CharactersService implements OnModuleInit {
       return mappedBySourceKey;
     }
 
-    const builtInPreset = BUILT_IN_CHARACTER_PRESETS.find(
-      (preset) => preset.id === character.id,
-    );
+    const builtInPreset = getBuiltInPresetById(character.id);
     const mappedByBuiltInPreset = maybeGetCharacterAvatarBySourceKey(
       builtInPreset?.character?.sourceKey ?? builtInPreset?.presetKey,
     );
@@ -835,9 +842,7 @@ export class CharactersService implements OnModuleInit {
       return mappedByBuiltInPreset;
     }
 
-    const defaultCharacter = buildDefaultCharacters().find(
-      (item) => item.id === character.id,
-    );
+    const defaultCharacter = getDefaultCharacterById(character.id);
     return (
       maybeGetCharacterAvatarBySourceKey(defaultCharacter?.sourceKey) ??
       builtInPreset?.character?.avatar?.trim() ??
@@ -1168,3 +1173,28 @@ export function assertPrivateCharacterFieldLimits(input: {
   }
 }
 // i18n-ignore-end
+
+let builtInPresetByIdCache:
+  | Map<string, (typeof BUILT_IN_CHARACTER_PRESETS)[number]>
+  | null = null;
+function getBuiltInPresetById(id: string) {
+  if (!builtInPresetByIdCache) {
+    builtInPresetByIdCache = new Map(
+      BUILT_IN_CHARACTER_PRESETS.map((preset) => [preset.id, preset]),
+    );
+  }
+  return builtInPresetByIdCache.get(id);
+}
+
+let defaultCharacterByIdCache: Map<string, Partial<CharacterEntity>> | null =
+  null;
+function getDefaultCharacterById(id: string) {
+  if (!defaultCharacterByIdCache) {
+    defaultCharacterByIdCache = new Map(
+      buildDefaultCharacters()
+        .filter((c): c is Partial<CharacterEntity> & { id: string } => !!c.id)
+        .map((c) => [c.id, c]),
+    );
+  }
+  return defaultCharacterByIdCache.get(id);
+}

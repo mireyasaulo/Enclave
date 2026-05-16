@@ -2,6 +2,7 @@ import { Entity, PrimaryColumn, Column, CreateDateColumn, Index } from 'typeorm'
 
 @Entity('messages')
 @Index(['senderType', 'createdAt'])
+@Index(['conversationId', 'createdAt'])
 export class MessageEntity {
   @PrimaryColumn()
   id: string;

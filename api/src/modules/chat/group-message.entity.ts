@@ -8,6 +8,7 @@ import {
 
 @Entity('group_messages')
 @Index(['senderType', 'createdAt'])
+@Index(['groupId', 'createdAt'])
 export class GroupMessageEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
