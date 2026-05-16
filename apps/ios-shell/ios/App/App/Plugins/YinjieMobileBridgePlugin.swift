@@ -102,10 +102,17 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         let text = call.getString("text")?.trimmingCharacters(in: .whitespacesAndNewlines)
         let urlString = call.getString("url")?.trimmingCharacters(in: .whitespacesAndNewlines)
 
+        // title 是 navigator.share 语义里的 subject / 标题，不应该塞进 activityItems
+        // 当正文用 —— UIActivityViewController 把 items[0] 当 body 的首段：
+        //   - 分享到 Mail：title 变成 body 第一行（subject 反而空）
+        //   - 分享到 Messages / WhatsApp / Line：拼成 "title text https://url"
+        //     连发出去，正文里 title 又出现一次（caller 通常已经把 title 拼进 text
+        //     了，比如「accountName\narticleTitle」），用户看到标题重复一遍。
+        // shareFile 已经走 setValue(title, forKey: "subject") 把 title 当邮件
+        // subject，share 这边没对齐，跟它统一：title 走 subject，items 只放
+        // text + url。这是 UIActivityViewController 配 navigator.share-like
+        // payload 的标准做法。
         var items: [Any] = []
-        if let title, !title.isEmpty {
-            items.append(title)
-        }
         if let text, !text.isEmpty {
             items.append(text)
         }
@@ -120,6 +127,9 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
 
         DispatchQueue.main.async {
             let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+            if let title, !title.isEmpty {
+                controller.setValue(title, forKey: "subject")
+            }
             if let presenter = self.bridge?.viewController {
                 self.configurePopoverPresentation(for: controller, presenter: presenter)
                 // 不要在 present completion 里 resolve —— 那个回调只表示「sheet
