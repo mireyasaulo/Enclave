@@ -80,6 +80,7 @@ import {
   isChatMentionPrefixBoundary,
   isChatMentionTokenCharacter,
 } from "../lib/chat-text";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 
 type ChatComposerProps = {
   value: string;
@@ -896,6 +897,22 @@ export function ChatComposer({
     window.addEventListener("pointerdown", handlePointerDown);
     return () => window.removeEventListener("pointerdown", handlePointerDown);
   }, [isDesktop, stickerPanelOpen]);
+
+  // 原生壳硬件 Back：移动端 sticker / plus 面板展开时按 BACK 应当先收起面
+  // 板（returnMobileComposerToText 把模式切回 "text"），而不是直接
+  // history.back 退出聊天页。mobile-speech-input-sheet 自带 BACK 拦截，
+  // mobileMentionPickerSheet 也已经接过，这里只覆盖 sticker / plus。
+  useEffect(() => {
+    if (isDesktop || (!stickerPanelOpen && !plusPanelOpen)) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      returnMobileComposerToText({ focusInput: false });
+      return true;
+    });
+    return unregister;
+  }, [isDesktop, plusPanelOpen, returnMobileComposerToText, stickerPanelOpen]);
 
   useEffect(() => {
     if (!isDesktop || !nativeDesktopRecentStickers) {
