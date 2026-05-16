@@ -72,7 +72,7 @@ export class WikiAvatarService {
     if (!existsSync(candidate)) {
       throw new AppError('WIKI_AVATAR_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Avatar not found',
+        legacyMessage: '头像文件不存在',
       });
     }
     return candidate;
@@ -91,7 +91,7 @@ export class WikiAvatarService {
     ) {
       throw new AppError('WIKI_AVATAR_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Avatar not found',
+        legacyMessage: '头像文件不存在',
       });
     }
     return normalized;

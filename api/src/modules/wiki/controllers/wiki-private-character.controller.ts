@@ -136,12 +136,12 @@ export class WikiPrivateCharacterController {
     const section = body?.section as SectionKey | undefined;
     if (!section || !SECTION_KEYS.includes(section)) {
       throw new BadRequestException(
-        `section must be one of: ${SECTION_KEYS.join(', ')}`,
+        `section 必须是以下之一：${SECTION_KEYS.join(' / ')}`,
       );
     }
     const draft = body?.currentDraft;
     if (!draft || typeof draft !== 'object') {
-      throw new BadRequestException('currentDraft required');
+      throw new BadRequestException('请提供当前草稿内容（currentDraft）');
     }
     // typeof 守：客户端传 {"currentDraft":{"name":{"a":1}}} 时 ?.trim() 抛
     // TypeError → 500 把原始 stack 漏出去。非字符串当空字符串处理。

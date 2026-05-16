@@ -50,12 +50,12 @@ export class WikiAiGenerateController {
     const section = body?.section as SectionKey | undefined;
     if (!section || !SECTION_KEYS.includes(section)) {
       throw new BadRequestException(
-        `section must be one of: ${SECTION_KEYS.join(', ')}`,
+        `section 必须是以下之一：${SECTION_KEYS.join(' / ')}`,
       );
     }
     const draft = body?.currentDraft;
     if (!draft || typeof draft !== 'object') {
-      throw new BadRequestException('currentDraft required');
+      throw new BadRequestException('请提供当前草稿内容（currentDraft）');
     }
     // typeof 守，避免 ?.trim() 在非字符串上抛 TypeError → 500（同 R7 套路）。
     const draftName =

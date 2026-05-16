@@ -99,6 +99,15 @@ export class AuthService {
         legacyMessage: `密码过长（最多 ${MAX_PASSWORD_BYTES} 字节，中文等多字节字符按字节计）。`,
       });
     }
+    // 跟 changeUsername 同样的字符约束：login 用是否含 @ 来判邮箱 vs 用户名，
+    // 注册时不挡的话用户能注册成 "foo@bar"，之后用任何方式都登不上
+    // （永远走 email 分支查不到自己），只能找 admin 改库。
+    if (trimmed.includes('@')) {
+      throw new AppError('AUTH_USERNAME_INVALID_CHAR', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '用户名不能包含 @ 字符',
+      });
+    }
     const exists = await this.userRepo.findOne({ where: { username: trimmed } });
     if (exists) {
       throw new AppError('AUTH_USERNAME_TAKEN', {

@@ -54,13 +54,13 @@ export class CharacterDraftService {
 
   async getById(ownerUserId: string, id: string): Promise<DraftDetail> {
     const row = await this.repo.findOne({ where: { id, ownerUserId } });
-    if (!row) throw new NotFoundException('draft not found');
+    if (!row) throw new NotFoundException('草稿不存在');
     return this.toDetail(row);
   }
 
   async delete(ownerUserId: string, id: string): Promise<void> {
     const result = await this.repo.delete({ id, ownerUserId });
-    if (!result.affected) throw new NotFoundException('draft not found');
+    if (!result.affected) throw new NotFoundException('草稿不存在或已被删除');
   }
 
   private parsePayload(raw: string): PrivateCharacterDto {
