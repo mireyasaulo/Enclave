@@ -682,10 +682,16 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
     ) {
         let call = pendingCameraCaptureCall
         pendingCameraCaptureCall = nil
+        let image = info[.originalImage] as? UIImage
 
         DispatchQueue.main.async {
             picker.dismiss(animated: true) {
                 guard let call else {
+                    return
+                }
+
+                guard let image else {
+                    call.resolve(["asset": NSNull()])
                     return
                 }
 
@@ -694,18 +700,27 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                 // Android / Web / 旧 iOS 解不开（详见 Round 7 picker 同款问题）。
                 // 统一走 originalImage → jpegData(0.92)，强制输出 JPEG。
                 // 顺带去掉了 EXIF 里的 GPS / 设备信息，发出去之前先脱敏一遍。
-                guard let image = info[.originalImage] as? UIImage,
-                      let imageData = image.jpegData(compressionQuality: 0.92),
-                      let asset = self.writeCapturedCameraImage(data: imageData) else {
-                    call.resolve([
-                        "asset": NSNull()
-                    ])
-                    return
-                }
+                //
+                // jpegData(compressionQuality:) + 后续写盘不能跑在主线程：
+                // iPhone 15 Pro Max 24MP 原片 = 6048×8064×4 ≈ 195MB raw 像素，
+                // 同步再编一遍 JPEG 把主线程卡 200-500ms，iPhone 8/SE-1 这种
+                // 2GB RAM 老机型还会撞 iOS 单 app 内存上限直接被 jetsam 杀。
+                // 跟 Round 23 pickFile 同款挪到 userInitiated 后台跑，结果回
+                // 主线程 resolve。UIImage / jpegData 都是 thread-safe 的，
+                // dispatch 出去合规。
+                DispatchQueue.global(qos: .userInitiated).async {
+                    guard let imageData = image.jpegData(compressionQuality: 0.92),
+                          let asset = self.writeCapturedCameraImage(data: imageData) else {
+                        DispatchQueue.main.async {
+                            call.resolve(["asset": NSNull()])
+                        }
+                        return
+                    }
 
-                call.resolve([
-                    "asset": asset
-                ])
+                    DispatchQueue.main.async {
+                        call.resolve(["asset": asset])
+                    }
+                }
             }
         }
     }
