@@ -1825,6 +1825,12 @@ export function ChatMessageList({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        // 不 preventDefault 的话 desktop-chat-workspace 的 window keydown
+        // microtask 兜底会接着跑 dismissSidePanel —— 用户开着「聊天信息」/
+        // 「查找记录」侧栏然后点开消息里的图片预览，按 Esc 会同时把图片查
+        // 看器和背后的侧栏一起关掉。和 Round 5/6/7 给 popover / confirm /
+        // text-edit dialog 补的 preventDefault 同款修法。
+        event.preventDefault();
         setViewerMessageId(null);
         return;
       }
