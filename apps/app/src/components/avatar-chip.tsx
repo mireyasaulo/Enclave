@@ -87,6 +87,12 @@ export function AvatarChip({
 }
 
 const EMOJI_PICTOGRAPHIC = /\p{Extended_Pictographic}/u;
+// 数学/字母变体（𝕏 / 𝓜 / 𝟙 等）的 Unicode 一般类别其实是 Lu/Ll/Nd，不是 Symbol，
+// 所以 \p{S} / Extended_Pictographic 都 catch 不到。但它们都落在 SMP plane
+// (U+10000 - U+10FFFF)，单 codepoint 拿来做角色头像 logo 是常见用法（xAI 用 "𝕏"）。
+// 旧 isEmojiAvatar 判 false → 一律 fallback 默认渐变头像，xAI 的 logo 认不出。
+// 补一条：单 codepoint 且落在 SMP 以上 → 也按 glyph 渲染。
+const SMP_OR_HIGHER_GLYPH = /^[\u{10000}-\u{10FFFF}]$/u;
 
 function isEmojiAvatar(value: string) {
   if (!value) {
@@ -98,7 +104,16 @@ function isEmojiAvatar(value: string) {
   if (value.length > 12) {
     return false;
   }
-  return EMOJI_PICTOGRAPHIC.test(value);
+  if (EMOJI_PICTOGRAPHIC.test(value)) {
+    return true;
+  }
+  // 单 codepoint && SMP+ → glyph。Array.from 按 codepoint 拆分（避免 surrogate
+  // pair 被算成 2 个 length 误判成 "A𝕏" 这种组合）。
+  const codepoints = Array.from(value);
+  if (codepoints.length === 1 && SMP_OR_HIGHER_GLYPH.test(codepoints[0]!)) {
+    return true;
+  }
+  return false;
 }
 
 function isLikelyImageSource(value: string) {
