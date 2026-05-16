@@ -910,7 +910,7 @@ export function ChatComposer({
         setStickerPanelOpen(false);
       }
     };
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         setStickerPanelOpen(false);
       }
@@ -995,7 +995,7 @@ export function ChatComposer({
         setDesktopPlusMenuOpen(false);
       }
     };
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         setDesktopPlusMenuOpen(false);
       }

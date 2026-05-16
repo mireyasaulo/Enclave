@@ -1,8 +1,10 @@
 package com.yinjie.mobile;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.view.ActionMode;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.getcapacitor.BridgeActivity;
@@ -21,6 +23,18 @@ public class MainActivity extends BridgeActivity {
         // MessageActionSheet 重叠。这里整体禁掉 WebView 的 ActionMode；
         // 前端 sheet 里已经提供 Copy/Forward/Quote 等动作，没有功能损失。
         WebView webView = getBridge() == null ? null : getBridge().getWebView();
+        if (webView != null) {
+            // Capacitor 把 webview origin 设为 https://localhost，但 debug 包配的
+            // apiBaseUrl 是 http://10.0.2.2:3000（本机 dev API 没 TLS）。
+            // Chrome WebView 默认会 block mixed-content，所有 HTTP fetch 静默失败。
+            // debug 包放开 mixed content 模式；release 包始终保持默认 (STRICT)。
+            boolean isDebuggable =
+                (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+            if (isDebuggable) {
+                webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+                WebView.setWebContentsDebuggingEnabled(true);
+            }
+        }
         if (webView != null) {
             ActionMode.Callback blockSelection =
                 new ActionMode.Callback() {
