@@ -53,17 +53,24 @@ public class YinjieFirebaseMessagingService extends FirebaseMessagingService {
         String title = remoteMessage.getNotification() != null ? remoteMessage.getNotification().getTitle() : null;
         String body = remoteMessage.getNotification() != null ? remoteMessage.getNotification().getBody() : null;
 
+        // Round 35：不能用 Map.getOrDefault —— 这条是 Java 8 default 方法，
+        // Android API 24 (N) 才把它加到平台 Map / HashMap 上。minSdk=23
+        // 包括 Android 6.0 Marshmallow，那一档系统的 Map / HashMap 都没这
+        // 个方法，bytecode 跑到这里会抛 NoSuchMethodError，FCM service 进程
+        // 直接崩，Android 6.0 用户**整个 FCM 通道死锁**，任何推送都不弹。
+        // 没启 coreLibraryDesugaring 也救不回（项目 build.gradle 没配）。
+        // 手写「get → null/empty 检查 → fallback」，全 API level 安全。
         if (title == null || title.trim().isEmpty()) {
-            title = remoteMessage.getData().getOrDefault(
-                "title",
-                getString(R.string.notification_default_title)
-            );
+            String dataTitle = remoteMessage.getData().get("title");
+            title = (dataTitle == null || dataTitle.trim().isEmpty())
+                ? getString(R.string.notification_default_title)
+                : dataTitle;
         }
         if (body == null || body.trim().isEmpty()) {
-            body = remoteMessage.getData().getOrDefault(
-                "body",
-                getString(R.string.notification_default_body)
-            );
+            String dataBody = remoteMessage.getData().get("body");
+            body = (dataBody == null || dataBody.trim().isEmpty())
+                ? getString(R.string.notification_default_body)
+                : dataBody;
         }
 
         Intent launchIntent = new Intent(this, MainActivity.class);
