@@ -332,7 +332,22 @@ export function useConversationThread(conversationId: string) {
       }
 
       setConversationTitle(payload.title);
-      setParticipants(payload.participants.slice(0, 1));
+      // 和上方 activeConversation 那个 effect (line 210-219) 同款 dedup ——
+      // socket 的 conversation_updated 在活跃聊天里频繁触发（每条新消息后端都
+      // 会 emit 一次更新 lastMessage/unreadCount），payload.participants.slice
+      // 每次都是新数组引用；不 dedup 会把整个 ConversationThreadPanel +
+      // ChatMessageList + ChatComposer re-render 链白跑一遍。单聊里
+      // participants[0] 角色 ID 永远不变，应该直接复用旧引用跳过 re-render。
+      setParticipants((current) => {
+        const next = payload.participants.slice(0, 1);
+        if (
+          current.length === next.length &&
+          current.every((id, index) => id === next[index])
+        ) {
+          return current;
+        }
+        return next;
+      });
       void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
