@@ -229,11 +229,13 @@ export function MobileChatPlusPanel({
   const activeRootPageRef = useRef(0);
 
   const friendsQuery = useQuery({
-    queryKey: ["app-chat-plus-friends", baseUrl],
+    // 用全局通用 key ["app-friends", baseUrl]——contacts-page / character-detail-page /
+    // create-group-page 等都吃这条；统一后好友 mutate（拉黑/解除/改备注）的
+    // invalidateQueries 会自动把这里的列表也刷掉，否则关掉黑名单后 + 面板里那位
+    // 还在，用户能继续给已黑联系人发名片。staleTime 也跟着复用全局缓存。
+    queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
     enabled: open && activeView === "contacts",
-    // 同一个会话里反复开合 + 面板，好友列表 30s 内不变就别重抓——getFriends
-    // 在大账号上可能拉几百条，每次都打一遍后端没意义。
     staleTime: 30_000,
   });
   const favoritesQuery = useQuery({
