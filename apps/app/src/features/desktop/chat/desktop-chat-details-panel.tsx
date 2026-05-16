@@ -344,17 +344,11 @@ function DirectChatDetailsPanel({
         queryKey: ["app-friends", baseUrl],
       });
     },
-    // 没有 onError 时，updateFriendProfile 网络失败/FRIEND_NOT_FOUND 都被
-    // 静默吞掉：用户在「设置备注/标签」弹层点保存，看不到任何反馈，下面
-    // handleProfileSave 的 mutateAsync 又会 reject 一路冒到
-    // `void currentEditDialog.onConfirm(value)` 落 window.unhandledrejection。
-    onError: (error) => {
-      setNotice(
-        error instanceof Error && error.message !== "FRIEND_NOT_FOUND"
-          ? error.message
-          : t(msg`联系人资料更新失败，请稍后再试。`),
-      );
-    },
+    // 错误反馈本身已经走面板顶部那张 updateProfileMutation.isError ErrorBlock，
+    // 不要再走 setNotice：notice 上面是 InlineNotice tone="success"（绿色调，
+    // 文案库里都是「已更新/已置顶」），把网络失败塞进去会出现"绿色成功条上
+    // 写着‘FRIEND_NOT_FOUND’"的怪 UX。真正要修的只是 handleProfileSave
+    // 那条 await mutateAsync 漏 catch（详见下方）。
   });
 
   const clearMutation = useMutation({

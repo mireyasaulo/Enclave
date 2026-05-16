@@ -430,6 +430,15 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
         groupMembersQuery.error instanceof Error ? (
           <ErrorBlock message={groupMembersQuery.error.message} />
         ) : null}
+        {/* 点「发消息」→ getOrCreateConversation 失败时，原来 mutation 没
+            onError、JSX 里也没渲染 startChatMutation.error，按钮短暂 pending
+            后又恢复 enabled，用户完全不知道刚才那一下失败了，会反复点。
+            把这条 error 也挂到现有 ErrorBlock 列表里。 */}
+        {!isOwner &&
+        startChatMutation.isError &&
+        startChatMutation.error instanceof Error ? (
+          <ErrorBlock message={startChatMutation.error.message} />
+        ) : null}
 
         {!isOwner && !characterQuery.isError && characterQuery.isLoading ? (
           <div className="rounded-[14px] bg-[rgba(247,247,247,0.9)] px-3 py-2 text-[12px] text-[color:var(--text-muted)]">
