@@ -386,6 +386,16 @@ export function ChatComposer({
   ] = useState(false);
   const [attachmentBusy, setAttachmentBusy] = useState(false);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
+  // 同步防双击锁——下面 4 条 send 链路（handleSendAttachment / handleSendDraftAttachment
+  // / sendRecordedVoice / handleSendPresetText / handleSendSticker）都用
+  // setAttachmentBusy(true) 当 disabled 兜底，但 attachmentBusy 是 React state，
+  // 同帧连点 2 次任意一个发送按钮都能同时通过 disabled=false → 双倍上传 + 双倍
+  // 发送。最严重的是 MobileChatAttachmentPreview「发送图片」连点 2 次：
+  // handleSendDraftAttachment 的 for-loop 持同一份 currentDraft.items，
+  // 一份 9 张图被上传 18 次、发送 18 次到群里。和 Round 1-4 同款修法：ref
+  // 同步赋值不走 React render，第一次 click 把它翻 true 之后同帧后续 click
+  // 都被早返；onSettled / finally 解锁。
+  const sendBusyRef = useRef(false);
   const [mobilePlusNotice, setMobilePlusNotice] =
     useState<MobilePlusNoticeState | null>(null);
   const [activeStickerPackId, setActiveStickerPackId] = useState("featured");
@@ -1313,7 +1323,14 @@ export function ChatComposer({
     if (!onSendSticker) {
       return;
     }
+    // sticker panel 不在 send 链路上 dim/禁用 sticker tile，连点同一个 sticker
+    // 2 次会走 2 次 onSendSticker → 群里冒出 2 张一样的 sticker 消息（不同
+    // id 不被 dedup）。同帧后续 click 走 sendBusyRef 早返。
+    if (sendBusyRef.current) {
+      return;
+    }
 
+    sendBusyRef.current = true;
     setAttachmentError(null);
     // parent onSendSticker 走 sendStickerMessage → 在 resolveTargetCharacterId
     // 拿不到 char id（角色被删 / participants 还没回，conversationId 也不是
@@ -1329,6 +1346,8 @@ export function ChatComposer({
           : t(msg`表情发送失败，请稍后再试。`),
       );
       return;
+    } finally {
+      sendBusyRef.current = false;
     }
     setRecentStickers(
       pushRecentSticker({
@@ -2687,7 +2706,11 @@ export function ChatComposer({
     if (!onSendAttachment) {
       return false;
     }
+    if (sendBusyRef.current) {
+      return false;
+    }
 
+    sendBusyRef.current = true;
     setAttachmentBusy(true);
     setAttachmentError(null);
     setMobilePlusNotice(null);
@@ -2710,6 +2733,7 @@ export function ChatComposer({
       );
       return false;
     } finally {
+      sendBusyRef.current = false;
       setAttachmentBusy(false);
     }
   };
@@ -2718,9 +2742,13 @@ export function ChatComposer({
     if (!attachmentDraft || !onSendAttachment) {
       return;
     }
+    if (sendBusyRef.current) {
+      return;
+    }
 
     const currentDraft = attachmentDraft;
     if (currentDraft.kind === "images") {
+      sendBusyRef.current = true;
       setAttachmentBusy(true);
       setAttachmentError(null);
       let sentCount = 0;
@@ -2752,6 +2780,7 @@ export function ChatComposer({
             : t(msg`图片发送失败，请稍后再试。`),
         );
       } finally {
+        sendBusyRef.current = false;
         setAttachmentBusy(false);
       }
 
@@ -2780,7 +2809,11 @@ export function ChatComposer({
     if (!normalized) {
       return false;
     }
+    if (sendBusyRef.current) {
+      return false;
+    }
 
+    sendBusyRef.current = true;
     setAttachmentBusy(true);
     setAttachmentError(null);
     setMobilePlusNotice(null);
@@ -2801,6 +2834,7 @@ export function ChatComposer({
       );
       return false;
     } finally {
+      sendBusyRef.current = false;
       setAttachmentBusy(false);
     }
   };

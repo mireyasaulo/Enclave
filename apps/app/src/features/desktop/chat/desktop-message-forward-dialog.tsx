@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Search, X } from "lucide-react";
 import { type ConversationListItem } from "@yinjie/contracts";
@@ -56,6 +56,23 @@ export function DesktopMessageForwardDialog({
     useState<DesktopMessageForwardMode>("separate");
   const [isCompactViewport, setIsCompactViewport] = useState(false);
   const isMobile = variant ? variant === "mobile" : isCompactViewport;
+  // 同步防双击锁——下面会话行 button 用 `disabled={pending}` 兜底，pending 是
+  // 父组件的 forwardMutation.isPending 经 React commit 才更新。同帧连点同一行
+  // 2 次会同时通过 disabled=false → 两次 onForward(conv, mode) → 父组件的
+  // forwardMutation.mutate 飞 2 次，目标群里收 2 条一模一样的转发消息。ref
+  // 同步赋值挡掉同帧第二次 click；pending 翻 true 后 disabled 接管常规 click，
+  // pending 翻回 false（mutation 完成 / 失败）时通过下方 useEffect 复位 ref。
+  const forwardSubmittingRef = useRef(false);
+  useEffect(() => {
+    if (!pending) {
+      forwardSubmittingRef.current = false;
+    }
+  }, [pending]);
+  const handleForwardRowClick = (conversation: ConversationListItem) => {
+    if (forwardSubmittingRef.current || pending) return;
+    forwardSubmittingRef.current = true;
+    onForward(conversation, forwardMode);
+  };
 
   useEffect(() => {
     if (!open) {
@@ -344,7 +361,7 @@ export function DesktopMessageForwardDialog({
                     key={conversation.id}
                     type="button"
                     disabled={pending}
-                    onClick={() => onForward(conversation, forwardMode)}
+                    onClick={() => handleForwardRowClick(conversation)}
                     className={cn(
                       "flex w-full items-center justify-between gap-3 text-left disabled:cursor-not-allowed disabled:opacity-60",
                       isMobile
