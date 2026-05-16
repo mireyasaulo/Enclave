@@ -12,6 +12,7 @@ type DesktopContactsFriendRequestsPaneProps = {
   loading: boolean;
   error?: string | null;
   actionError?: string | null;
+  actionSuccess?: string | null;
   acceptPendingId?: string | null;
   declinePendingId?: string | null;
   onAccept: (requestId: string) => void;
@@ -23,14 +24,19 @@ export function DesktopContactsFriendRequestsPane({
   loading,
   error = null,
   actionError = null,
+  actionSuccess = null,
   acceptPendingId = null,
   declinePendingId = null,
   onAccept,
   onDecline,
 }: DesktopContactsFriendRequestsPaneProps) {
   const t = useRuntimeTranslator();
+  // 后端 /social/friend-requests 只返回 status='pending'，但 expiresAt 过期后请求
+  // 不会从列表里自动消失。展示用的 pendingCount 应当只数还没过期的，否则侧栏
+  // shortcut 的"x 条待处理"会包含用户其实点不动的旧请求。
   const pendingCount = requests.filter(
-    (item) => item.status === "pending",
+    (item) =>
+      item.status === "pending" && !isFriendRequestExpired(item.expiresAt),
   ).length;
 
   return (
@@ -53,6 +59,10 @@ export function DesktopContactsFriendRequestsPane({
           <div className="mb-4">
             <InlineNotice tone="danger">{actionError}</InlineNotice>
           </div>
+        ) : actionSuccess ? (
+          <div className="mb-4">
+            <InlineNotice tone="success">{actionSuccess}</InlineNotice>
+          </div>
         ) : null}
 
         {loading ? (
@@ -64,6 +74,7 @@ export function DesktopContactsFriendRequestsPane({
         ) : requests.length ? (
           <div className="space-y-3">
             {requests.map((request) => {
+              const expired = isFriendRequestExpired(request.expiresAt);
               const disabled =
                 request.status !== "pending" ||
                 Boolean(acceptPendingId || declinePendingId);
@@ -82,40 +93,39 @@ export function DesktopContactsFriendRequestsPane({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
-                          <div className="truncate text-[16px] font-medium text-[color:var(--text-primary)]">
+                          <div
+                            className={cn(
+                              "truncate text-[16px] font-medium text-[color:var(--text-primary)]",
+                              expired ? "opacity-70" : undefined,
+                            )}
+                          >
                             {request.characterName}
                           </div>
                           <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[color:var(--text-muted)]">
-                            <span>
+                            <span className={expired ? "opacity-70" : undefined}>
                               {t(getFriendRequestSourceLabel(
                                 request.triggerScene,
                               ))}
                             </span>
-                            <span>·</span>
-                            <span>
+                            <span className={expired ? "opacity-70" : undefined}>·</span>
+                            <span className={expired ? "opacity-70" : undefined}>
                               {formatFriendRequestDate(request.createdAt, t)}
                             </span>
                           </div>
                         </div>
-                        <div
-                          className={cn(
-                            "rounded-full px-2.5 py-1 text-[11px]",
-                            request.status === "pending"
-                              ? "bg-[rgba(250,204,21,0.10)] text-[#a16207]"
-                              : request.status === "accepted"
-                                ? "bg-[rgba(22,163,74,0.08)] text-[#15803d]"
-                                : "bg-[rgba(226,232,240,0.88)] text-[color:var(--text-muted)]",
-                          )}
-                        >
-                          {request.status === "pending"
-                            ? t(msg`待处理`)
-                            : request.status === "accepted"
-                              ? t(msg`已通过`)
-                              : t(msg`已忽略`)}
-                        </div>
+                        {expired ? (
+                          <div className="shrink-0 rounded-full bg-[rgba(245,158,11,0.12)] px-2.5 py-1 text-[11px] font-medium text-[color:var(--state-warning-text)]">
+                            {t(msg`已过期`)}
+                          </div>
+                        ) : null}
                       </div>
 
-                      <div className="mt-4 rounded-[16px] bg-[rgba(245,247,247,0.92)] px-4 py-3 text-[14px] leading-7 text-[color:var(--text-secondary)]">
+                      <div
+                        className={cn(
+                          "mt-4 rounded-[16px] bg-[rgba(245,247,247,0.92)] px-4 py-3 text-[14px] leading-7 text-[color:var(--text-secondary)]",
+                          expired ? "opacity-70" : undefined,
+                        )}
+                      >
                         {request.greeting || t(msg`想认识你。`)}
                       </div>
 
@@ -128,20 +138,26 @@ export function DesktopContactsFriendRequestsPane({
                           className="rounded-[12px] border-[color:var(--border-faint)] bg-white px-5 shadow-none hover:bg-[color:var(--surface-console)]"
                         >
                           {declinePendingId === request.id
-                            ? t(msg`处理中...`)
-                            : t(msg`拒绝`)}
+                            ? expired
+                              ? t(msg`清除中...`)
+                              : t(msg`处理中...`)
+                            : expired
+                              ? t(msg`清除`)
+                              : t(msg`拒绝`)}
                         </Button>
-                        <Button
-                          variant="primary"
-                          size="lg"
-                          disabled={disabled}
-                          onClick={() => onAccept(request.id)}
-                          className="rounded-[12px] bg-[#07c160] px-5 text-white shadow-none hover:bg-[#06ad56]"
-                        >
-                          {acceptPendingId === request.id
-                            ? t(msg`接受中...`)
-                            : t(msg`接受`)}
-                        </Button>
+                        {expired ? null : (
+                          <Button
+                            variant="primary"
+                            size="lg"
+                            disabled={disabled}
+                            onClick={() => onAccept(request.id)}
+                            className="rounded-[12px] bg-[#07c160] px-5 text-white shadow-none hover:bg-[#06ad56]"
+                          >
+                            {acceptPendingId === request.id
+                              ? t(msg`接受中...`)
+                              : t(msg`接受`)}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -160,6 +176,17 @@ export function DesktopContactsFriendRequestsPane({
       </div>
     </div>
   );
+}
+
+function isFriendRequestExpired(expiresAt?: string | null) {
+  if (!expiresAt) {
+    return false;
+  }
+  const date = new Date(expiresAt);
+  if (Number.isNaN(date.getTime())) {
+    return false;
+  }
+  return date.getTime() <= Date.now();
 }
 
 // 复用同一份 formatter 实例，避免每条请求渲染时都新建一次 Intl.DateTimeFormat
