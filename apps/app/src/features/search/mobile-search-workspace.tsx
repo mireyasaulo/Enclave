@@ -212,6 +212,13 @@ export function MobileSearchWorkspace({
       return section && section.results.length ? [section] : [];
     },
   );
+  // 走查 R7：原本两处 SearchResultCard 的 prop 都是
+  // `keyword={highlightKeyword.trim().toLowerCase()}` ——写在 .map 里，
+  // 「全部」视图 ≈ 7 段 × 3 张卡 = 21 次 trim+toLowerCase / 渲染，单分类视图按
+  // visibleResults.length 走（联系人 / 角色搜热门姓时常 50+）。highlightKeyword
+  // 是组件外面 useDeferredValue 出来的字符串，trim/lowercase 结果在一次渲染内
+  // 是常量，提到 map 外面一次性算。
+  const normalizedHighlightKeyword = highlightKeyword.trim().toLowerCase();
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-[color:var(--bg-canvas)]">
@@ -572,7 +579,7 @@ export function MobileSearchWorkspace({
                         <SearchResultCard
                           key={item.id}
                           item={item}
-                          keyword={highlightKeyword.trim().toLowerCase()}
+                          keyword={normalizedHighlightKeyword}
                           layout="mobile"
                           onOpen={onOpenResult}
                         />
@@ -630,7 +637,7 @@ export function MobileSearchWorkspace({
                   <SearchResultCard
                     key={item.id}
                     item={item}
-                    keyword={highlightKeyword.trim().toLowerCase()}
+                    keyword={normalizedHighlightKeyword}
                     layout="mobile"
                     onOpen={onOpenResult}
                   />
