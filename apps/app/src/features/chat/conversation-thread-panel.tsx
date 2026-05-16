@@ -870,6 +870,9 @@ export function ConversationThreadPanel({
                   : {}),
               });
             }}
+            contactPickerExcludeIds={
+              participants[0] ? [participants[0]] : undefined
+            }
             replyPreview={replyPreview}
             onCancelReply={() => setReplyDraft(null)}
             onSubmit={() => void handleSubmit()}

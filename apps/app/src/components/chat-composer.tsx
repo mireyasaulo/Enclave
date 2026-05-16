@@ -120,6 +120,10 @@ type ChatComposerProps = {
   onMobileShortcutHandled?: () => void;
   onStartVoiceCall?: () => void;
   onStartVideoCall?: () => void;
+  // 当前会话里不该出现在"+面板/选择名片"里的 character id 集合。单聊里至少要排
+  // 掉对方自己（包括"我自己"自聊场景下的 self-character），不然用户会看到"把对方
+  // 的名片再发给对方"这种没意义的入口。
+  contactPickerExcludeIds?: readonly string[];
   onCancelReply?: () => void;
   onChange: (value: string) => void;
   onSubmit: () => void;
@@ -316,6 +320,7 @@ export function ChatComposer({
   onMobileShortcutHandled,
   onStartVoiceCall,
   onStartVideoCall,
+  contactPickerExcludeIds,
   onCancelReply,
   onChange,
   onSubmit,
@@ -3521,6 +3526,7 @@ export function ChatComposer({
             unavailableBackActionLabel={errorActionLabel}
             onUnavailableBack={onErrorAction ?? undefined}
             onUnavailableFallback={handleUnavailableFallback}
+            excludeCharacterIds={contactPickerExcludeIds}
           />
         ) : null}
         {!isDesktop && mobileComposerStatus ? (

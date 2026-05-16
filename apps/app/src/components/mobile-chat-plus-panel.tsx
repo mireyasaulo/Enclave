@@ -63,6 +63,10 @@ type MobileChatPlusPanelProps = {
     action: RootActionFallbackAction,
     source: RootAction["key"],
   ) => void | Promise<void>;
+  // 当前会话的对方 character id 集合。在单聊里，不该把"对方的名片"再推回给对方
+  // （包括"我自己"自聊：getFriends 把 self-character 也带进了好友列表，
+  // 选中后 ContactCardMessage 会渲染成"把你自己的名片发给你自己"，毫无意义）。
+  excludeCharacterIds?: readonly string[];
 };
 
 type PanelView = "root" | "favorites" | "contacts" | "locations";
@@ -208,6 +212,7 @@ export function MobileChatPlusPanel({
   unavailableBackActionLabel,
   onUnavailableBack,
   onUnavailableFallback,
+  excludeCharacterIds,
 }: MobileChatPlusPanelProps) {
   const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
@@ -227,11 +232,16 @@ export function MobileChatPlusPanel({
     queryKey: ["app-chat-plus-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
     enabled: open && activeView === "contacts",
+    // 同一个会话里反复开合 + 面板，好友列表 30s 内不变就别重抓——getFriends
+    // 在大账号上可能拉几百条，每次都打一遍后端没意义。
+    staleTime: 30_000,
   });
   const favoritesQuery = useQuery({
     queryKey: ["app-favorites", baseUrl],
     queryFn: () => getFavorites(baseUrl),
     enabled: open && activeView === "favorites",
+    // 同上：收藏在 + 面板里只读，频繁开合不必每次都重抓。
+    staleTime: 30_000,
   });
 
   useEffect(() => {
@@ -297,7 +307,15 @@ export function MobileChatPlusPanel({
   const UnavailableIcon = unavailableAction?.icon;
   const unavailableFallbackAction = unavailableAction?.fallbackAction;
   const unavailableFallbackLabel = unavailableAction?.fallbackLabel;
-  const friends = friendsQuery.data ?? [];
+  const excludeIdSet =
+    excludeCharacterIds && excludeCharacterIds.length
+      ? new Set(excludeCharacterIds)
+      : null;
+  const friends = excludeIdSet
+    ? (friendsQuery.data ?? []).filter(
+        ({ character }) => !excludeIdSet.has(character.id),
+      )
+    : (friendsQuery.data ?? []);
   const showFriendsError = friendsQuery.isError && friends.length === 0;
   const showFavoritesError =
     favoritesQuery.isError && favoriteRecords.length === 0;
