@@ -165,6 +165,26 @@ function DesktopFavoritesPage() {
       (favoriteNotesQuery.data ?? []).map((item) => [item.id, item] as const),
     );
   }, [favoriteNotesQuery.data]);
+  // 之前 filteredFavorites 每次按 keystroke 跑：500 收藏 × 4 个 toLowerCase
+  // = 2000 字符串新建 / 拷贝，搜索关键词后 includes 又把这 4 个新串扫一遍。
+  // favorites / noteSummaryMap 没变期间这堆 lowercase 完全可以预先算好，
+  // 改成 Map<sourceId, haystack>，filter 只剩一次 indexOf。
+  // 跟同文件 favorites.length === 0 / 单次 reduce 计 counts 同套思路，
+  // 都是按"700 项"用户场景在压。
+  const favoriteSearchHaystackMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const item of favorites) {
+      const noteSearchText = resolveFavoriteNoteSearchText(
+        item,
+        favoriteNoteSummaryMap,
+      );
+      map.set(
+        item.sourceId,
+        `${item.title.toLowerCase()} ${item.description.toLowerCase()} ${item.meta.toLowerCase()} ${noteSearchText}`,
+      );
+    }
+    return map;
+  }, [favorites, favoriteNoteSummaryMap]);
 
   useEffect(() => {
     // useState 初始化已经 merge 过一遍 local-only，TanStack 还没出数据
@@ -398,16 +418,17 @@ function DesktopFavoritesPage() {
         return true;
       }
 
-      return (
-        item.title.toLowerCase().includes(normalizedSearchText) ||
-        item.description.toLowerCase().includes(normalizedSearchText) ||
-        item.meta.toLowerCase().includes(normalizedSearchText) ||
-        resolveFavoriteNoteSearchText(item, favoriteNoteSummaryMap).includes(
-          normalizedSearchText,
-        )
-      );
+      const haystack = favoriteSearchHaystackMap.get(item.sourceId);
+      // 理论上 favoriteSearchHaystackMap 跟 favorites 同源；保底兜一下
+      // map miss（比如 favorites 还没 commit 完成）：直接当作不匹配。
+      return Boolean(haystack && haystack.includes(normalizedSearchText));
     });
-  }, [activeCategory, favoriteNoteSummaryMap, favorites, normalizedSearchText]);
+  }, [
+    activeCategory,
+    favorites,
+    favoriteSearchHaystackMap,
+    normalizedSearchText,
+  ]);
 
   // 之前是 useEffect + setSelectedFavoriteSourceId 兜底"当前选中已被过滤掉就
   // 顺到第一条"，导致切分类时一帧里：路由 sync effect 先按旧 selectedId 写 hash、

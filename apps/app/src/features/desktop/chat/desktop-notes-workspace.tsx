@@ -1123,7 +1123,12 @@ export function DesktopNotesWorkspace({
             <span>{noteId ? t(msg`已保存文稿`) : t(msg`未保存草稿`)}</span>
           </div>
           <div className="relative">
-            {!editorState.contentText.trim() ? (
+            {!editorState.contentText.trim() && !editorState.assets.length ? (
+              // 之前只挡 contentText.trim() 为空，但 extractNoteTextFromHtml
+              // 对"只有图片/附件"的 HTML 抽出来的文本就是 ""，结果用户插了图
+              // 还没写字时，"写点什么。支持富文本…" 占位符仍旧浮在编辑器左上
+              // 角，跟刚插的图叠在一起视觉很脏。补一刀 assets.length，凡是
+              // 编辑器里已经有附件就别再显示空状态文案了。
               <div className="pointer-events-none absolute left-0 top-0 text-[15px] leading-8 text-[color:var(--text-dim)]">
                 {noteQuery.isLoading
                   ? t(msg`加载笔记中…`)
