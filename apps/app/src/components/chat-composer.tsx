@@ -1301,7 +1301,21 @@ export function ChatComposer({
     }
 
     setAttachmentError(null);
-    await onSendSticker(sticker);
+    // parent onSendSticker 走 sendStickerMessage → 在 resolveTargetCharacterId
+    // 拿不到 char id（角色被删 / participants 还没回，conversationId 也不是
+    // direct_ 前缀）会 throw；caller 是 handleStickerPanelSelect 里
+    // void handleSendSticker(...) 形态 → 漏 catch 直接落 unhandledrejection。
+    // 和 handleSendAttachment 的 try/catch + setAttachmentError 对齐。
+    try {
+      await onSendSticker(sticker);
+    } catch (stickerError) {
+      setAttachmentError(
+        stickerError instanceof Error
+          ? stickerError.message
+          : t(msg`表情发送失败，请稍后再试。`),
+      );
+      return;
+    }
     setRecentStickers(
       pushRecentSticker({
         sourceType: sticker.sourceType,
