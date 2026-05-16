@@ -148,11 +148,33 @@ export function ProfileInfoSignaturePage() {
           autoCorrect="off"
           onChange={(event) => {
             userTouchedRef.current = true;
-            setDraft(event.target.value);
+            // 用 1:1 替换（不用 +），保持 length 不变 → 浏览器原生 cursor 位置不跳。
+            // 把 \r \n \t 立即变成 space 后 textarea 永远不出现换行：用户敲 Enter
+            // 看到光标后多一格空格而不是一行新行，跟 profile-page / profile-info-page
+            // 的单行 truncate 展示自然对齐；不然敲完保存看到 "line1 line2" 一行回放
+            // 时还反复想要再加换行。
+            const normalized = event.target.value.replace(/[\r\n\t]/g, " ");
+            setDraft(normalized);
             // 用户已经动手敲新的签名，意味着上一次保存失败翻篇了，把红字
             // banner 清掉，免得新尝试还挂着旧 attempt 的失败说明。
             saveMutation.reset();
           }}
+          onKeyDown={(event) => {
+            // IME 选词阶段按回车「确认拼音」也会触发 keydown，这时不能 submit——
+            // 跟 name 页同款 gate。
+            if (event.nativeEvent.isComposing) {
+              return;
+            }
+            if (event.key === "Enter") {
+              // textarea 默认 Enter 插入 \n，但单行字段不要换行。挡掉 → onChange
+              // 也不会拿到 \n。如果 dirty 且 not pending，按 Enter 直接 submit。
+              event.preventDefault();
+              if (dirty && !saveMutation.isPending) {
+                saveMutation.mutate();
+              }
+            }
+          }}
+          enterKeyHint="done"
           maxLength={SIGNATURE_MAX_LENGTH}
           placeholder={t(msg`写一句此刻想说的话`)}
           // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
@@ -172,6 +194,16 @@ export function ProfileInfoSignaturePage() {
           {sanitized.length}/{SIGNATURE_MAX_LENGTH}
         </div>
       </div>
+
+      {/* sanitized.length < draft.length：用户粘了 "a   b" 之类含多连空白的文本，
+          实际保存会被压成 "a b"。counter 已经显示更小的数字，但用户看着 textarea
+          里仍然是 raw 形态会困惑「打了 5 个字怎么算 3 个」。加一行短 hint 把口径
+          统一。draft 为空时不显示，避免空页面下出现一个永远 false 的位置浪费版面。*/}
+      {draft.length > 0 && sanitized.length < draft.length ? (
+        <div className="px-4 pt-2 text-[11px] leading-5 text-[color:var(--text-muted)]">
+          {t(msg`签名按单行保存：换行和多余空白会被折叠为一个空格。`)}
+        </div>
+      ) : null}
 
       {errorMessage ? (
         <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(220,38,38,0.18)] bg-[rgba(254,242,242,0.96)] px-3 py-2 text-[12px] leading-5 text-[color:var(--state-danger-text)]">
