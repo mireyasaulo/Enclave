@@ -643,14 +643,22 @@ export function GroupChatThreadPanel({
       setMessages((current) =>
         replaceGroupLocalMessage(current, result.localMessageId, result.message),
       );
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["app-group-messages", baseUrl, groupId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        }),
-      ]);
+      // perf：以前 invalidate(["app-group-messages", ...]) 每发一条群消息
+      // 都会触发整个群消息列表 GET 重拉（公网隧道 ~600ms RTT × N=60 条），
+      // 但服务端响应里的 result.message 已经是 canonical 形态，跟 socket
+      // onChatMessage echo 走的是同一个 upsertServerMessageInCache。改用
+      // setQueriesData 直接把新消息合并进所有 messageLimit cache 变体，省
+      // 一次 GET；socket echo 到时也是同样的 upsert，幂等。
+      queryClient.setQueriesData<GroupMessage[]>(
+        { queryKey: ["app-group-messages", baseUrl, groupId] },
+        (current) => upsertServerMessageInCache(current, result.message),
+      );
+      // 保留 conversations invalidate：群消息会改 lastMessage / lastActivityAt
+      // / 在 socket echo 没到时仍要让消息列表 badge 即时同步。chat-list-page
+      // 的 onChatMessage 也会触发同样的 invalidate，重复一次幂等。
+      await queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
     },
     onError: (_error, input) => {
       setMessages((current) =>

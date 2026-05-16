@@ -10,7 +10,12 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
-import { getGroup, getGroupMembers, sendGroupMessage } from "@yinjie/contracts";
+import {
+  getGroup,
+  getGroupMembers,
+  sendGroupMessage,
+  type GroupMessage,
+} from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import {
@@ -37,6 +42,7 @@ import {
   buildMobileGroupRouteHash,
   parseMobileGroupRouteState,
 } from "./mobile-group-route-state";
+import { upsertServerMessageInCache } from "./chat-message-delivery";
 import { buildGroupCallInviteMessage } from "./group-call-message";
 import {
   buildGroupCallWorkspaceSummaryLines,
@@ -275,16 +281,26 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     });
   }, [members]);
 
-  const invalidateCallQueries = useCallback(async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: ["app-group-messages", baseUrl, resolvedGroupId],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["app-conversations", baseUrl],
-      }),
-    ]);
-  }, [baseUrl, queryClient, resolvedGroupId]);
+  // perf：以前同时 invalidate app-group-messages 和 app-conversations，每次
+  // sync / end 群通话状态都触发整个群消息列表 GET 重拉（公网隧道 ~600ms RTT
+  // × N=60 条）。改用 setQueriesData 把刚发出去的群通话状态消息直接合并
+  // 进 cache（跟 socket onChatMessage echo 走同一个 upsertServerMessageInCache）
+  // 省一次 GET；conversations cache 仍要 invalidate 让消息列表的最近会话
+  // lastMessage / lastActivityAt 同步。
+  const mergeCallMessageIntoCache = useCallback(
+    (message: GroupMessage) => {
+      queryClient.setQueriesData<GroupMessage[]>(
+        { queryKey: ["app-group-messages", baseUrl, resolvedGroupId] },
+        (current) => upsertServerMessageInCache(current, message),
+      );
+    },
+    [baseUrl, queryClient, resolvedGroupId],
+  );
+  const invalidateConversationsCache = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ["app-conversations", baseUrl],
+    });
+  }, [baseUrl, queryClient]);
 
   const syncStatusMutation = useMutation({
     mutationFn: (counts: { activeCount: number; totalCount: number }) =>
@@ -302,9 +318,10 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
         },
         baseUrl,
       ),
-    onSuccess: async (_, counts) => {
+    onSuccess: async (message, counts) => {
       setLastPublishedCounts(counts);
-      await invalidateCallQueries();
+      mergeCallMessageIntoCache(message);
+      await invalidateConversationsCache();
     },
   });
 
@@ -332,9 +349,10 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
         },
         baseUrl,
       ),
-    onSuccess: async () => {
+    onSuccess: async (message) => {
       setLastPublishedCounts(null);
-      await invalidateCallQueries();
+      mergeCallMessageIntoCache(message);
+      await invalidateConversationsCache();
     },
   });
 
