@@ -949,6 +949,17 @@ export function DesktopNotesWorkspace({
       const withCommand = event.metaKey || event.ctrlKey;
       if (withCommand && event.key.toLowerCase() === "s") {
         event.preventDefault();
+        // 弹层（"未保存关闭" / "删除"）是 z-50 modal，开着的时候 Ctrl+S 走到 handleSave，
+        // 后端真的被打 → 成功/失败的 notice 都写到编辑器主区，被弹层完整盖住，用户
+        // 看不到任何反馈。最坑的一条：用户在"未保存关闭"弹层里手抖按了 Ctrl+S，
+        // backend 已经把新笔记建好（state/cache 都更新了），但他没看到"已保存"通知 →
+        // 接着点"不保存"想丢草稿 → handleDiscardAndClose 只 clearDesktopNoteDraft 把
+        // 本地草稿删了，已经落地的笔记还在收藏列表里，用户回到列表看到这条笔记
+        // "我明明没保存怎么还在"。弹层开着时直接吃掉 Ctrl+S，让用户用弹层里的
+        // "保存并关闭"按钮显式触发，反馈也走 handleSaveAndClose 那条路径。
+        if (closeDialogOpen || deleteDialogOpen) {
+          return;
+        }
         void handleSaveRef.current();
         return;
       }
