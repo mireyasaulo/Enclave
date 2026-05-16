@@ -40,7 +40,11 @@ export function DesktopChatConfirmDialog({
         return;
       }
 
+      // 弹窗是 modal 层，Esc 关掉自己就够了；不 stopPropagation 的话
+      // workspace 那条 dismissSidePanel 的 window keydown 会接着跑，
+      // 一下 Esc 既把确认弹窗关了又把背后的详情侧栏一起关了。
       event.preventDefault();
+      event.stopPropagation();
       onClose();
     };
 

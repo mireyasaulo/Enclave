@@ -54,7 +54,10 @@ export function DesktopChatTextEditDialog({
         return;
       }
 
+      // 与 desktop-chat-confirm-dialog 同：Esc 关弹窗就够了，再让它冒泡到
+      // workspace 的 dismissSidePanel 会同时关掉背后的详情侧栏。
       event.preventDefault();
+      event.stopPropagation();
       onClose();
     };
 
