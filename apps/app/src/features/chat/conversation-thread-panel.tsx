@@ -720,23 +720,12 @@ export function ConversationThreadPanel({
                 </InlineNotice>
               )
             ) : null}
-            {sendMutation.isError && sendMutation.error instanceof Error ? (
-              isDesktop ? (
-                <ErrorBlock message={sendMutation.error.message} />
-              ) : (
-                <InlineNotice
-                  tone="danger"
-                  className="rounded-[14px] border border-[color:var(--border-danger)] bg-[linear-gradient(180deg,rgba(255,245,245,0.96),rgba(254,242,242,0.94))] px-3 py-2 text-[11px] leading-[1.45] shadow-none"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 flex-1">
-                      {sendMutation.error.message}
-                    </span>
-                    {renderStatusBackAction()}
-                  </div>
-                </InlineNotice>
-              )
-            ) : null}
+            {/* sendMutation.error 由 ChatComposer 的 error prop（→ MobileComposerStatusRail
+                / desktopComposerStatus）渲染在 composer 上方紧贴输入框那一栏，
+                这里再叠一张同样文案、同样 tone="danger" 的 InlineNotice 在消息列表
+                顶部纯属重复——同一个错误用户会同时在屏幕两端看到，且消息列表那张
+                没有「重试发送」按钮，反而像个孤立的错误条。删掉，composer 内置的
+                那个能跟着输入框走、还能挂"返回上一页"action。 */}
 
             <ChatMessageList
               messages={renderedMessages}
