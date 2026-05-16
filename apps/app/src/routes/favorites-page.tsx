@@ -217,6 +217,16 @@ function DesktopFavoritesPage() {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
+  // DesktopNotesWorkspace 是 lazy chunk。用户进收藏页有非常高概率会点
+  // "新建笔记"或某条 notes 行的"打开笔记"——这两个入口都触发同一份
+  // chunk。第一次点击时 Suspense fallback (RouteRedirectState) 会闪一下，
+  // 跟 contacts-page 4e710fd9 同款思路：挂载就 warm，到点击瞬间命中
+  // module cache，详情区一帧切到编辑器。chunk 不大（笔记编辑相关一束
+  // helper），eager 一次成本可忽略。
+  useEffect(() => {
+    void import("../features/desktop/chat/desktop-notes-workspace");
+  }, []);
+
   // 一旦在桌面布局下落到 /tabs/favorites 就锁定；之后用户从这里 navigate 到
   // /character/$id 等兄弟路由时，TanStack 会先把 location.pathname 切走、
   // 再 unmount 旧 page，期间这里的 useEffect 不能再 replace 回 /tabs/favorites
