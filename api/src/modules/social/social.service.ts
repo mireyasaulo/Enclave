@@ -1,7 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
+import { AppError } from '../../common/app-error.exception';
 import { FriendshipEntity } from './friendship.entity';
 import { FriendRequestEntity } from './friend-request.entity';
 import { AIRelationshipEntity } from './ai-relationship.entity';
@@ -91,7 +92,11 @@ export class SocialService {
       id: requestId,
       ownerId,
     });
-    if (!req) throw new Error('Request not found');
+    if (!req)
+      throw new AppError('SOCIAL_FRIEND_REQUEST_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Request not found',
+      });
 
     const shouldNotifyConversation = req.status !== 'accepted';
     if (shouldNotifyConversation) {
@@ -152,7 +157,10 @@ export class SocialService {
       ownerId: owner.id,
     });
     if (!request) {
-      throw new Error('Request not found');
+      throw new AppError('SOCIAL_FRIEND_REQUEST_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Request not found',
+      });
     }
 
     const shouldEmit = request.status !== 'declined';
@@ -219,7 +227,10 @@ export class SocialService {
       friendship.status === 'blocked' ||
       friendship.status === 'removed'
     ) {
-      throw new Error('Friend not found');
+      throw new AppError('SOCIAL_FRIEND_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Friend not found',
+      });
     }
 
     friendship.isStarred = starred;
@@ -264,7 +275,10 @@ export class SocialService {
       friendship.status === 'blocked' ||
       friendship.status === 'removed'
     ) {
-      throw new Error('Friend not found');
+      throw new AppError('SOCIAL_FRIEND_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Friend not found',
+      });
     }
 
     friendship.remarkName = normalizeOptionalText(payload.remarkName);
@@ -574,7 +588,11 @@ export class SocialService {
       (await this.charactersService.ensurePresetCharacterInstalled(
         characterId,
       )) ?? (await this.characterRepo.findOneBy({ id: characterId }));
-    if (!char) throw new Error('Character not found');
+    if (!char)
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Character not found',
+      });
 
     const initiator =
       options?.initiator === 'character'
@@ -1004,7 +1022,10 @@ ${personaSummary || '（暂无更多信息）'}
       friendship.status === 'blocked' ||
       friendship.status === 'removed'
     ) {
-      throw new Error('Friend not found');
+      throw new AppError('SOCIAL_FRIEND_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Friend not found',
+      });
     }
 
     if (typeof payload.momentsHiddenFromMe === 'boolean') {
@@ -1046,14 +1067,21 @@ ${personaSummary || '（暂无更多信息）'}
             break;
           case 'add-tag': {
             const tag = payload.tag?.trim();
-            if (!tag) throw new Error('tag required');
+            if (!tag)
+              throw new AppError('SOCIAL_TAG_REQUIRED', {
+                status: HttpStatus.BAD_REQUEST,
+                legacyMessage: 'tag required',
+              });
             const owner = await this.worldOwnerService.getOwnerOrThrow();
             const fs = await this.friendshipRepo.findOneBy({
               ownerId: owner.id,
               characterId,
             });
             if (!fs || fs.status === 'blocked' || fs.status === 'removed') {
-              throw new Error('Friend not found');
+              throw new AppError('SOCIAL_FRIEND_NOT_FOUND', {
+                status: HttpStatus.NOT_FOUND,
+                legacyMessage: 'Friend not found',
+              });
             }
             const next = normalizeTags([...(fs.tags ?? []), tag]);
             await this.updateFriendProfile(characterId, {
@@ -1064,14 +1092,21 @@ ${personaSummary || '（暂无更多信息）'}
           }
           case 'remove-tag': {
             const tag = payload.tag?.trim();
-            if (!tag) throw new Error('tag required');
+            if (!tag)
+              throw new AppError('SOCIAL_TAG_REQUIRED', {
+                status: HttpStatus.BAD_REQUEST,
+                legacyMessage: 'tag required',
+              });
             const owner = await this.worldOwnerService.getOwnerOrThrow();
             const fs = await this.friendshipRepo.findOneBy({
               ownerId: owner.id,
               characterId,
             });
             if (!fs || fs.status === 'blocked' || fs.status === 'removed') {
-              throw new Error('Friend not found');
+              throw new AppError('SOCIAL_FRIEND_NOT_FOUND', {
+                status: HttpStatus.NOT_FOUND,
+                legacyMessage: 'Friend not found',
+              });
             }
             const next = normalizeTags(
               (fs.tags ?? []).filter((t) => t !== tag),
@@ -1083,7 +1118,11 @@ ${personaSummary || '（暂无更多信息）'}
             break;
           }
           default:
-            throw new Error(`Unknown action: ${payload.action as string}`);
+            throw new AppError('SOCIAL_TAG_BATCH_UNKNOWN_ACTION', {
+              status: HttpStatus.BAD_REQUEST,
+              params: { action: String(payload.action) },
+              legacyMessage: `Unknown action: ${payload.action as string}`,
+            });
         }
         updated += 1;
       } catch (error) {

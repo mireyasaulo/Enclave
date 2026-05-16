@@ -2297,8 +2297,15 @@ function MobileChannelsCard({
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 px-3.5 pb-3.5">
-          <div className="max-w-[calc(100%-4.25rem)]">
+        {/*
+          外层 inset-x-0 是 100% 宽，pointer-events 默认会接管整条底部带状区域；
+          但内层只用了 max-w-[calc(100%-4.25rem)] 来视觉避让右侧 action rail，
+          留出的 68px 右侧空白条仍然在外层 hit 范围里 —— 它会盖到 action rail
+          底部两颗按钮（分享 / 减少推荐）的点击区，导致用户怎么点都点不到。
+          外层 pointer-events-none + 内层 auto，让"无内容的空白条"不挡事件。
+        */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-3.5 pb-3.5">
+          <div className="pointer-events-auto max-w-[calc(100%-4.25rem)]">
             <div className="flex items-center gap-2">
               <button
                 type="button"
