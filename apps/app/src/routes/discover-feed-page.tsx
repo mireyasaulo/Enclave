@@ -1075,6 +1075,13 @@ export function DiscoverFeedPage() {
     setShareCardPostId(null);
     setCommentInflightPostIds((current) => (current.size > 0 ? new Set() : current));
     setLikeInflightPostIds((current) => (current.size > 0 ? new Set() : current));
+    // 跟 moments-page 走查 R1 (a8165645) 同坑：A 账户 #post=X1 mobile snap
+    // 后 ref 钉住 X1；切到 B 账户 URL hash 还是 #post=X1 时，若 X1 凑巧也存
+    // 在 B 的 feedPosts 里（共享 wiki 角色发的同一条 post / 用户两个账号互
+    // 跟），下方 snap effect 见 ref===routeSelectedPostId 直接 return，用户
+    // 进 B 落到列表顶端而不是被滚到深链目标卡。本文件 R1 当年只补了 moments
+    // 那边，feed 这边的 ref 漏了一直没清。
+    mobileScrollSnappedRouteIdRef.current = null;
     // 走查新 Round 11：3 条 mutation 的 isError 状态跨账户残留。账号 A 评论 /
     // 点赞 / 发布失败 → mutation.isError=true → toolbar 顶部 commentErrorMessage
     // / likeErrorMessage / composeErrorMessage 三条错误条挂着；切到 B 时 reset

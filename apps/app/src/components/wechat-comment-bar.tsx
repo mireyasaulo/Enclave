@@ -69,6 +69,19 @@ export function WeChatCommentBar({
     });
   }, [open]);
 
+  // mutation 失败时 bar 通常保持 open（父组件在 onSuccess 才关 bar；onError
+  // 路径下 commentBarTarget 留着让用户能直接改文案重发）。pending 跟着翻回
+  // false，看着可以重发，但 submittingRef 只在 open 转 true 时才清——bar 没
+  // 关掉之前同步锁一直挂着，handleSubmit 早返。用户改完文案点"发送"完全
+  // 没反应（点一次→等几秒→什么都没发生），只能先点空白关 bar 再重开才能
+  // 发出去。盯 pending 的下沿，settle 后释放锁，bar 不需要 remount 也能继
+  // 续发。
+  useEffect(() => {
+    if (!pending) {
+      submittingRef.current = false;
+    }
+  }, [pending]);
+
   // Adjust for soft keyboard via VisualViewport.
   useEffect(() => {
     if (!open || typeof window === "undefined") return;
