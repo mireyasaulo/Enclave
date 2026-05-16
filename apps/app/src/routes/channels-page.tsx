@@ -2210,6 +2210,20 @@ function ChannelAudioPictorial({
     if (!active) setImageIndex(0);
   }, [active]);
 
+  // 走查 R3（本轮）：组件 unmount 时主动 pause —— 现实场景是用户在 active 卡上
+  // 点了"减少推荐"，hidePost → notInterestedMutation.onMutate 把这条 post 直接从
+  // visiblePosts filter 掉，对应的 MobileChannelsCard 立刻 unmount。但是 React
+  // 把 <audio> 从 DOM 摘掉后 Chromium / Firefox 是不会自动 pause 的（webkit
+  // 实测会），audio 在内存里继续 loop 直到用户离开整个 channels 页或刷新——
+  // 用户听到自己刚刚说"不感兴趣"的那条音乐还在响，体感比不静音更怪。
+  // 单独一个空依赖的 effect 兜 unmount。
+  useEffect(() => {
+    const audio = audioRef.current;
+    return () => {
+      audio?.pause();
+    };
+  }, []);
+
   // tab 切到后台时主动 pause，回前台时按"切走前是否在播"决定是否 resume——
   // desktop Chrome 默认背景标签里 HTML5 audio 不会自动暂停，视频号 BGM 会
   // 一直跟着用户去别的标签里响，电池/数据/隐私都不友好。
@@ -2487,6 +2501,16 @@ function ChannelVideoSurface({
     const video = videoRef.current;
     if (video) video.muted = !userUnmuted;
   }, [userUnmuted]);
+
+  // 走查 R3（本轮）：同 ChannelAudioPictorial 的 unmount-pause 兜底——用户在
+  // 视频卡上"减少推荐"立刻把 active 卡 unmount，<video> 从 DOM 摘掉后
+  // Chromium 不会自动 pause；音轨会继续 loop 直到刷新。
+  useEffect(() => {
+    const video = videoRef.current;
+    return () => {
+      video?.pause();
+    };
+  }, []);
 
   // 同 audio：tab 切到后台时主动 pause，回前台按切走前状态恢复。
   useEffect(() => {
