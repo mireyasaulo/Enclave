@@ -538,8 +538,13 @@ export function GamesPage() {
   }
 
   const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : null;
-  const isEmbeddedActive =
-    activeGameId === selectedGame.id && hasEmbeddedGame(activeGameId);
+  // 移动端不像 desktop 有 preview pane——embedded slot 是 inline 的"正在玩"
+  // 区块，跟 selectedGameId（被点选 / 被预览的那个游戏）无关。原来要求
+  // activeGameId === selectedGame.id 会让用户点另一行列表行的"卡片本体"
+  // （onSelect）触发 setSelectedGameId 后，正在玩的 embedded 游戏被悄悄
+  // unmount——本轮进度（也会触发 R2 修过的 unmount 持久化）但视觉上游戏
+  // 突然消失，体验是 bug。改成只要 activeGameId 是 embedded 游戏就显示。
+  const isEmbeddedActive = hasEmbeddedGame(activeGameId);
   // gameCenterFriendActivities 是模块常量，过滤结果也是常量。
   const friendActivities = useMemo(
     () =>
