@@ -49,6 +49,7 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 
 import { AvatarChip } from "../components/avatar-chip";
+import { GroupAvatarChip } from "../components/group-avatar-chip";
 import { OfficialServiceConversationCard } from "../components/official-service-conversation-card";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { SparkBadge } from "../components/spark-badge";
@@ -1653,11 +1654,25 @@ function ConversationListItemLinkImpl({
         isPinned ? "bg-[#f5f5f5]" : "bg-[color:var(--bg-canvas-elevated)]",
       )}
     >
-      <AvatarChip
-        name={conversation.title}
-        src={conversation.avatar}
-        size="wechat"
-      />
+      {/* 群聊和单聊用不同的头像组件——群聊后端没维护 avatar 字段（只有
+          setGroupAvatar 这条没人调用的私有 API），AvatarChip 拿不到 src 就
+          fallback 成"群名首字"单格占位（"林"），跟 /contacts/groups + 通讯录
+          页用的 GroupAvatarChip 2×2 马赛克对不上——同一群在两处入口看见的
+          icon 完全不一样。统一到 GroupAvatarChip，传 participants 让它按
+          memberId 哈希出 4 格马赛克。 */}
+      {isGroupConversation ? (
+        <GroupAvatarChip
+          name={conversation.title}
+          members={conversation.participants}
+          size="wechat"
+        />
+      ) : (
+        <AvatarChip
+          name={conversation.title}
+          src={conversation.avatar}
+          size="wechat"
+        />
+      )}
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2.5">
           <div className="min-w-0 flex-1">
