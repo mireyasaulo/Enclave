@@ -293,7 +293,11 @@ export function RootLayout() {
                 <Trans>教程</Trans>
               </span>
             </Button>
-            <LanguageSwitcher variant="compact" description={null} />
+            {/* LanguageSwitcher 在 ≤sm 屏挤不下（"界面语言" 标签 + 4 语种 select
+                能占 ~110px）。<sm 改藏到移动端抽屉底部；≥sm 仍放在 header 右侧。 */}
+            <div className="hidden sm:block">
+              <LanguageSwitcher variant="compact" description={null} />
+            </div>
             {user ? (
               <UserMenu user={user} roleLabel={roleLabel} />
             ) : (
@@ -373,6 +377,11 @@ export function RootLayout() {
           </button>
           <div className="lg:sticky lg:top-[88px]">
             <NavList groups={visibleGroups} pathname={pathname} />
+            {/* 抽屉底部塞一个 LanguageSwitcher，给移动端用户用（顶栏 <sm 隐藏掉了）。
+                ≥lg 桌面同样保留，便于一致性。 */}
+            <div className="mt-5 lg:mt-6">
+              <LanguageSwitcher variant="compact" description={null} />
+            </div>
           </div>
         </aside>
         <main className="min-w-0 flex-1">
