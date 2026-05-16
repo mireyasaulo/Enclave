@@ -760,9 +760,26 @@ export function DiscoverFeedPage() {
         }
         return { ...current, [input.postId]: "" };
       });
-      setDesktopReplyTarget((current) =>
-        current?.postId === input.postId ? null : current,
-      );
+      // 走查新一轮 Round 6：原本 `current?.postId === input.postId ? null : current`
+      // 只看 postId。但用户在 RTT (~500ms+) 期间完全可能切到同一条 post 上的
+      // 另一条 comment 去回复——desktopReplyTarget 从 {postId:X, commentId:A}
+      // 翻成 {postId:X, commentId:B}，正在 row 头部显示 "正在回复 B"。原 A 的
+      // mutate 成功回来直接抹平整个 reply state，B 这条回复对话框消失，用户视
+      // 感是"刚切到 B 的回复模式怎么自己关了"。仅在仍停在 input 那条 commentId
+      // 上才 wipe。input.replyTarget=null（用户当时是直接回 post 不是回 comment）
+      // 时 desktopReplyTarget 本来就不是这条 mutate 的归属，留着不动。
+      setDesktopReplyTarget((current) => {
+        if (!input.replyTarget) {
+          return current;
+        }
+        if (
+          current?.postId === input.replyTarget.postId &&
+          current?.commentId === input.replyTarget.commentId
+        ) {
+          return null;
+        }
+        return current;
+      });
       setCommentBarTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
