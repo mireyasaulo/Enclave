@@ -1079,7 +1079,11 @@ function normalizeFavoriteNoteAssets(value: FavoriteNoteAsset[] | undefined) {
       id: asset.id,
       kind: asset.kind,
       fileName: asset.fileName.trim(),
-      url: asset.url.trim(),
+      // 走查 R1 抓到 asset.url 接受 "javascript:..."。笔记发到聊天里
+      // chat-message-list 把 asset.url 直接喂 <a href> / <img src>，对方点
+      // 链接就 XSS。这里凡命中危险协议整条 asset 丢掉（下方 fileName/url
+      // 截断兜底），合法 http(s)/相对路径不受影响。
+      url: sanitizeFavoriteAssetUrl(asset.url.trim()),
       mimeType: asset.mimeType?.trim() || undefined,
       sizeBytes:
         typeof asset.sizeBytes === 'number' && Number.isFinite(asset.sizeBytes)
@@ -1095,6 +1099,13 @@ function normalizeFavoriteNoteAssets(value: FavoriteNoteAsset[] | undefined) {
           : undefined,
     }))
     .filter((asset) => asset.fileName && asset.url);
+}
+
+function sanitizeFavoriteAssetUrl(value: string) {
+  if (DANGEROUS_URL_PROTOCOL.test(value)) {
+    return '';
+  }
+  return value;
 }
 
 function isFavoriteRecord(value: unknown): value is FavoriteRecord {
