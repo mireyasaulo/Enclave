@@ -351,13 +351,17 @@ export class MomentsService implements OnModuleInit {
     // 正文区是空——视觉跟空评论一样，但走 "empty" 校验是通过的。
     const trimmedText = typeof text === 'string' ? text.trim() : '';
     if (!trimmedText || isMomentTextVisuallyEmpty(trimmedText)) {
-      throw new AppError('MOMENT_COMMENT_EMPTY', {
+      // 用复数前缀 MOMENTS_* 跟 contracts errors.ts 白名单 + error-translate.ts
+      // i18n 字典对齐——单数前缀 MOMENT_* 不在 contracts AppErrorCode union 里，
+      // 前端 i18n 字典查不到只能 fall through 到 legacyMessage（永远是中文），
+      // 非 zh-CN locale 用户拿不到本地化错误。
+      throw new AppError('MOMENTS_COMMENT_EMPTY', {
         legacyMessage: '评论内容不能为空。',
         status: HttpStatus.BAD_REQUEST,
       });
     }
     if (trimmedText.length > MAX_COMMENT_TEXT_LENGTH) {
-      throw new AppError('MOMENT_COMMENT_TOO_LONG', {
+      throw new AppError('MOMENTS_COMMENT_TOO_LONG', {
         params: { max: MAX_COMMENT_TEXT_LENGTH },
         legacyMessage: `评论最多 ${MAX_COMMENT_TEXT_LENGTH} 字。`,
         status: HttpStatus.BAD_REQUEST,
@@ -369,7 +373,7 @@ export class MomentsService implements OnModuleInit {
     if (replyToCommentId) {
       const target = await this.commentRepo.findOneBy({ id: replyToCommentId });
       if (!target || target.postId !== postId) {
-        throw new AppError('MOMENT_COMMENT_REPLY_TARGET_INVALID', {
+        throw new AppError('MOMENTS_COMMENT_REPLY_TARGET_INVALID', {
           legacyMessage: '被回复的评论不存在或已被删除。',
           status: HttpStatus.BAD_REQUEST,
         });
@@ -472,13 +476,14 @@ export class MomentsService implements OnModuleInit {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post) {
-      throw new AppError('MOMENT_NOT_FOUND', {
+      // 同上：复数前缀对齐 contracts errors.ts + i18n 字典；单数前缀走不进 i18n。
+      throw new AppError('MOMENTS_NOT_FOUND', {
         legacyMessage: '该朋友圈不存在或已被删除。',
         status: HttpStatus.NOT_FOUND,
       });
     }
     if (post.authorType !== 'user' || post.authorId !== owner.id) {
-      throw new AppError('MOMENT_DELETE_FORBIDDEN', {
+      throw new AppError('MOMENTS_DELETE_FORBIDDEN', {
         legacyMessage: '只能删除自己发布的朋友圈。',
         status: HttpStatus.FORBIDDEN,
       });
