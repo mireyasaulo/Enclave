@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -27,6 +28,14 @@ type WeChatCommentBarProps = {
   value: string;
   onChange: (value: string) => void;
   pending?: boolean;
+  /**
+   * 走查新一轮 Round 6：mutation 失败时父组件在 feed 列表里渲染一条
+   * InlineNotice，但 commentBar 的全屏 overlay 走 z=1000，notice 在
+   * z=auto 的列表内容里完全被盖住，用户视感是「点了发送，按钮蹦回
+   * 『发送』，啥反应没有」继续重试触发同一个错。把错误信息透传进 bar
+   * 内显示在 textarea 上方，z 走 1001 跟着 drawer 一起浮起来。
+   */
+  errorMessage?: string | null;
   onSubmit: () => void;
   onClose: () => void;
 };
@@ -37,6 +46,7 @@ export function WeChatCommentBar({
   value,
   onChange,
   pending = false,
+  errorMessage,
   onSubmit,
   onClose,
 }: WeChatCommentBarProps) {
@@ -104,6 +114,17 @@ export function WeChatCommentBar({
     };
   }, [open]);
 
+  // 走查 R1：父组件每次传新的 inline `onClose={() => setX(null)}` 进来 —
+  // 用户每敲一下字（discover-feed-page 的 setCommentDrafts 触发整页重渲）
+  // 都会换 onClose 身份，下面两条 useEffect 把 keydown listener + Android
+  // back interceptor remove → re-add 一遍。bar 一打开后每键 +4 次副作用，
+  // 跟 Round 2 use-keyboard-inset 是同一种 cleanup-storm 模式。
+  // useEffectEvent 给 onClose 套个稳定身份，effect deps 只挂 [open]，
+  // bar 打开/关闭时各做一次 add/remove。
+  const handleCloseEvent = useEffectEvent(() => {
+    onClose();
+  });
+
   // Close on Escape.
   // 走查 R1：之前 ESC handler 不看 IME composing —— 中文 / 日文用户在 textarea
   // 打字开候选窗时按 ESC 想关候选窗（系统行为），keydown 一样冒出来命中这条
@@ -115,11 +136,11 @@ export function WeChatCommentBar({
     const handleKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       if (event.isComposing || event.keyCode === 229) return;
-      onClose();
+      handleCloseEvent();
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [open, onClose]);
+  }, [open]);
 
   // Android 硬件 Back：bar 打开时按 Back 应该收 bar 而不是退掉整页。
   // 跟 chat 系列 (38a65fa5) / mobile-feed-publish discardConfirm / MomentMediaGallery
@@ -128,10 +149,10 @@ export function WeChatCommentBar({
     if (!open) return;
     return registerAndroidBackInterceptor((event) => {
       event.preventDefault();
-      onClose();
+      handleCloseEvent();
       return true;
     });
-  }, [open, onClose]);
+  }, [open]);
 
   // Auto-grow textarea up to 5 lines.
   useLayoutEffect(() => {
@@ -179,6 +200,16 @@ export function WeChatCommentBar({
           transition: "transform 120ms ease-out",
         }}
       >
+        {errorMessage ? (
+          // Round 6：mutation 失败的错误信息原本在父组件 feed 列表里走
+          // InlineNotice 显示，但 bar 的全屏 overlay 是 z=1000 把列表整张盖
+          // 住，用户什么都看不到。直接在 bar 内 textarea 上方渲一行：颜色
+          // 跟 wechat 错误条对齐 (#fa5151)，限制 2 行 + 截断防超长 server
+          // 错把整条 bar 撑开（比如评论太长 server 把上限值都塞进 message）。
+          <div className="mx-3 mt-2 rounded-[4px] bg-[rgba(250,81,81,0.08)] px-2.5 py-1.5 text-[12px] leading-[18px] text-[#fa5151]">
+            <div className="line-clamp-2">{errorMessage}</div>
+          </div>
+        ) : null}
         <div className="flex items-end gap-2 px-3 py-2.5">
           <div className="min-w-0 flex-1 rounded-[6px] border border-[#E5E5E5] bg-white px-3 py-2 text-[15px] text-[#1A1A1A]">
             <textarea

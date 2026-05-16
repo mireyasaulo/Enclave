@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
 import { Heart, MessageCircle, Share2, Star } from "lucide-react";
@@ -50,6 +56,17 @@ export function WeChatActionBubble({
     setMounted(true);
   }, []);
 
+  // 走查 R1：父组件传 inline `onClose={() => setActionBubble(null)}` 进来 —
+  // discover-feed-page 任何 setState 都会换 onClose 身份，气泡 open 时
+  // 下面两条 useEffect 把 pointerdown/scroll/resize/keydown 4 条 listener
+  // + Android back interceptor 一齐 remove → re-add 一遍。父组件随便
+  // 抖一下（like mutate optimistic 写 cache 触发重渲、commentDrafts 改）
+  // 就让气泡的 effect 重跑，纯白烧。useEffectEvent 套稳 onClose 身份，
+  // effect deps 只挂 [open]。
+  const handleCloseEvent = useEffectEvent(() => {
+    onClose();
+  });
+
   // Close on outside tap, scroll, resize, or Escape.
   useEffect(() => {
     if (!open) return;
@@ -59,11 +76,11 @@ export function WeChatActionBubble({
       if (target && bubbleRef.current?.contains(target)) {
         return;
       }
-      onClose();
+      handleCloseEvent();
     };
-    const handleScroll = () => onClose();
+    const handleScroll = () => handleCloseEvent();
     const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") handleCloseEvent();
     };
 
     window.addEventListener("pointerdown", handlePointerDown, true);
@@ -76,7 +93,7 @@ export function WeChatActionBubble({
       window.removeEventListener("resize", handleScroll);
       window.removeEventListener("keydown", handleKey);
     };
-  }, [open, onClose]);
+  }, [open]);
 
   // Android 硬件 Back：气泡打开时按 Back 应该收气泡而不是退整页。pointerdown /
   // scroll / resize / ESC 四条都覆盖了，但 Android Back 自成一路（capacitor 桥
@@ -85,10 +102,10 @@ export function WeChatActionBubble({
     if (!open) return;
     return registerAndroidBackInterceptor((event) => {
       event.preventDefault();
-      onClose();
+      handleCloseEvent();
       return true;
     });
-  }, [open, onClose]);
+  }, [open]);
 
   useLayoutEffect(() => {
     if (!open || !anchorRect || !bubbleRef.current) return;
