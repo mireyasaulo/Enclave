@@ -1971,7 +1971,11 @@ export function StickerPanel({
               onKeyDown={handleSearchInputKeyDown}
               placeholder={searchInputPlaceholder}
               title={searchInputTitle}
-              className="w-full border-none bg-transparent text-[13px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)]"
+              // mobile: text-[16px] 防 iOS Safari focus 时 viewport zoom-in；
+              // desktop 沿用 13px 紧凑布局。
+              className={`w-full border-none bg-transparent text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] ${
+                isMobile ? "text-[16px]" : "text-[13px]"
+              }`}
             />
             {trimmedKeyword.length > 0 ? (
               <button
