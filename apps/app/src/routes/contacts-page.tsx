@@ -884,13 +884,29 @@ export function ContactsPage() {
   });
   const declineFriendRequestMutation = useMutation({
     mutationFn: (requestId: string) => declineFriendRequest(requestId, baseUrl),
-    onMutate: () => {
+    onMutate: (requestId: string) => {
       acceptFriendRequestMutation.reset();
       setFriendRequestSuccessState(null);
+      // 桌面端「清除」/「拒绝」都走同一个 declineFriendRequest endpoint，但
+      // success 文案要区分：过期请求点的是「清除」，反馈应该是「已清除过期
+      // 请求。」；活跃请求点的是「拒绝」，反馈是「已忽略好友申请。」。请求是否
+      // 过期得在点击瞬间从当前 list 里拍下来，onSuccess 那时数据已经被
+      // invalidate 重拉、本条已经不在里面了。
+      const target = (friendRequestsQuery.data ?? []).find(
+        (item) => item.id === requestId,
+      );
+      const expired =
+        target?.expiresAt != null &&
+        !Number.isNaN(new Date(target.expiresAt).getTime()) &&
+        new Date(target.expiresAt).getTime() <= Date.now();
+      return { expired };
     },
-    onSuccess: async () => {
-      setNotice(t(msg`已忽略好友申请。`));
-      setFriendRequestSuccess(t(msg`已忽略好友申请。`));
+    onSuccess: async (_data, _requestId, context) => {
+      const message = context?.expired
+        ? t(msg`已清除过期请求。`)
+        : t(msg`已忽略好友申请。`);
+      setNotice(message);
+      setFriendRequestSuccess(message);
       await queryClient.invalidateQueries({
         queryKey: ["app-friend-requests", baseUrl],
       });
