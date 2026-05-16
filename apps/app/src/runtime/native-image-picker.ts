@@ -14,11 +14,18 @@ import {
 export async function pickImageFiles(options?: {
   multiple?: boolean;
   accept?: string;
+  // 业务侧的多选上限。原生壳里 PHPicker / PickVisualMedia 拿到这个值会在
+  // UI 上限制可勾选数量；不传时原生默认 9（apps/app 三条多选入口的
+  // MAX_ALBUM_IMAGE_COUNT / MAX_IMAGE_COUNT 公值）。多选场景下务必显式传，
+  // 避免用户勾远超上限的图触发原生层 N× 不必要的 disk write。
+  limit?: number;
 }): Promise<File[]> {
   const multiple = options?.multiple ?? false;
 
   if (isNativeMobileBridgeAvailable()) {
-    const assets = await pickImagesWithNativeShell(multiple);
+    const assets = await pickImagesWithNativeShell(multiple, {
+      limit: options?.limit,
+    });
     if (!assets.length) {
       return [];
     }

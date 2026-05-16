@@ -294,7 +294,26 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         // 要 PHAsset，所以这条参数完全是负累。
         var configuration = PHPickerConfiguration()
         configuration.filter = .images
-        configuration.selectionLimit = call.getBool("multiple", false) ? 0 : 1
+        // 选择数上限 plumbing：apps/app 在 chat-composer / mobile-feed-publish /
+        // mobile-moments-publish 这三条多选入口里都有自己的 MAX_ALBUM_IMAGE_COUNT /
+        // MAX_IMAGE_COUNT = 9 上限，拿到 PHPicker 结果之后 slice(0, 9) 把多余的全
+        // 丢掉。旧实现 selectionLimit = 0（PHPicker 文档定义 = 不限）让用户在 UI
+        // 里能勾 1000 张 → didFinishPicking 里 results.count = 1000 → 我们 Swift
+        // 端 loadFileRepresentation 全跑一遍把每张都 HEIC→JPEG 转码 + 写
+        // tmp/yinjie-picker/ 副本（一张 iPhone 15 Pro 24MP HEIC 转 JPEG ≈ 8-15MB
+        // disk write，1000 张就是 8-15GB tmp 数据）→ 回到 JS 那边 slice(0, 9) 把
+        // 991 张副本悄无声息地丢在 tmp 里等 purgeOwnedTemporarySubdirectories 下
+        // 次冷启动才清。用户感受为「我没拍多少，怎么相机胶卷过完一会儿手机就提
+        // 示存储空间不足」。
+        //
+        // 改成读 JS 显式传的 limit；没传时默认 9 跟 apps/app 端 MAX_*_COUNT
+        // 对齐。PHPicker UI 接到上限后会在用户勾到第 N 张时禁用 Add 按钮 +
+        // 显示「9 张已选」计数器，UX 也比「能选 1000 但只生效 9」好得多。
+        let multiple = call.getBool("multiple", false)
+        let requestedLimit = call.getInt("limit")
+        configuration.selectionLimit = multiple
+            ? max(requestedLimit ?? 9, 1)
+            : 1
         // Round 7 想用 loadFileRepresentation(public.jpeg) 拉 PhotoKit 自动
         // 转 HEIC→JPEG，但下面 loadImageAsset 的判断逻辑用
         // provider.hasItemConformingToTypeIdentifier("public.jpeg") 先 gate：

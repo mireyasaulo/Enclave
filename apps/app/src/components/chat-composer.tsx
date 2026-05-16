@@ -1426,7 +1426,12 @@ export function ChatComposer({
   });
 
   const pickAlbumWithNativeShell = useEffectEvent(async () => {
-    const assets = await pickImagesWithNativeShell(true);
+    // 把 MAX_ALBUM_IMAGE_COUNT 透给原生层：PHPicker UI 直接禁掉第 10 张的勾选，
+    // 而不是让用户能勾 N 张然后 Swift 全部 HEIC→JPEG 转码写 tmp 再被 slice(0, 9)
+    // 丢掉 N-9 张副本，导致 tmp 暴涨。Swift 端 limit 缺失会兜底 9，但显式传更稳。
+    const assets = await pickImagesWithNativeShell(true, {
+      limit: MAX_ALBUM_IMAGE_COUNT,
+    });
     if (!assets.length) {
       return;
     }

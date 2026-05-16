@@ -76,6 +76,7 @@ type MobileBridgePlugin = {
   }): Promise<void>;
   pickImages(options?: {
     multiple?: boolean;
+    limit?: number;
   }): Promise<{ assets: MobileBridgeImageAsset[] }>;
   pickFile(): Promise<{ asset: MobileBridgeFileAsset | null }>;
   captureImage(): Promise<{ asset: MobileBridgeImageAsset | null }>;
@@ -233,13 +234,23 @@ export async function openFileWithNativeShell(
   }
 }
 
-export async function pickImagesWithNativeShell(multiple = false) {
+export async function pickImagesWithNativeShell(
+  multiple = false,
+  options?: { limit?: number },
+) {
   if (!isNativeMobileBridgeAvailable()) {
     return [];
   }
 
   try {
-    const result = await mobileBridge.pickImages({ multiple });
+    const result = await mobileBridge.pickImages({
+      multiple,
+      // iOS PHPicker selectionLimit + Android PickVisualMedia 用同一字段。
+      // 调用方传业务侧的 MAX_*_COUNT，避免用户能勾远超上限的图触发原生层
+      // 大量冗余 disk write。Swift / Android 端 limit 缺失时默认 9，跟
+      // apps/app 端三条入口的 MAX_ALBUM_IMAGE_COUNT / MAX_IMAGE_COUNT 对齐。
+      limit: options?.limit,
+    });
     return result.assets ?? [];
   } catch {
     return [];
