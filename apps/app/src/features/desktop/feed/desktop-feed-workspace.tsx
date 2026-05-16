@@ -181,11 +181,19 @@ export function DesktopFeedWorkspace({
     if (posts.length === 0) {
       return;
     }
-
+    // 深链 /tabs/feed#post=X 落到第 5 页时：首页 20 条加载完→X 不在里面，
+    // 之前这里直接 setSelectedPostId(null)；但 page 层的 deep-link prefetch
+    // effect 还在分页拉后续页找 X。selection 被提前杀掉 → URL hash 被反向
+    // 同步擦掉 → page 层条件不再满足，prefetch effect 停止 → 用户的深链
+    // 彻底丢。还有 hasNextPage 时给 prefetch 留时间，hasNextPage=false 才认
+    // 输并清掉。
+    if (hasNextPage) {
+      return;
+    }
     if (!posts.some((post) => post.id === selectedPostId)) {
       setSelectedPostId(null);
     }
-  }, [posts, selectedPostId]);
+  }, [posts, selectedPostId, hasNextPage]);
 
   useEffect(() => {
     onSelectedPostChange?.(selectedPostId);
