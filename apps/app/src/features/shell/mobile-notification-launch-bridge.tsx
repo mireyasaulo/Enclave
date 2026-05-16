@@ -91,7 +91,15 @@ export function MobileNotificationLaunchBridge() {
       try {
         const target = await getPendingNativeLaunchTarget();
         const resolved = resolveNavigationTarget(target, navigate);
-        if (!active || !resolved) {
+        if (!active) {
+          return;
+        }
+        if (!resolved) {
+          // target 存在但解不到具体路由（旧版本格式、kind 不识别、字段缺失被
+          // normalize 干成 null 之类）时也必须把 UserDefaults 里的 pending
+          // 清掉，否则它会在每次 focus / visibilitychange 上反复触发本函数，
+          // 重启 app 也不会自然过期，相当于一条死信永远塞着。
+          await clearPendingNativeLaunchTarget();
           return;
         }
 
