@@ -432,11 +432,12 @@ function UserMenu({
         aria-expanded={open}
         aria-label={user.username}
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-white py-1.5 text-left text-xs leading-tight transition-colors hover:bg-[color:var(--surface-card-hover)] sm:px-3"
+        className="flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-white p-1 text-left text-xs leading-tight transition-colors hover:bg-[color:var(--surface-card-hover)] sm:px-3 sm:py-1.5"
       >
         {/* 移动端：只显示首字母 avatar 圆点（用户名挪到下拉菜单顶部）。
-            ≥sm 显示用户名 + 角色双行。这样窄屏 header 不会被长用户名顶出右边界。 */}
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-[image:var(--brand-gradient)] text-xs font-semibold text-[color:var(--text-on-brand)] sm:hidden">
+            ≥sm 显示用户名 + 角色双行。这样窄屏 header 不会被长用户名顶出右边界。
+            chip 总尺寸 ≥36×36 保证触控可达。 */}
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-[image:var(--brand-gradient)] text-sm font-semibold text-[color:var(--text-on-brand)] sm:hidden">
           {initial}
         </span>
         <div className="hidden md:block">

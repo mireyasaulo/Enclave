@@ -108,12 +108,16 @@ function PasswordForm({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <FormRow label={t(msg`用户名`)}>
+      <FormRow
+        label={t(msg`用户名或邮箱`)}
+        hint={t(msg`两者皆可登录；含 @ 视为邮箱`)}
+      >
         <TextField
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
           autoFocus
+          autoComplete="username"
         />
       </FormRow>
       <FormRow label={t(msg`密码`)}>

@@ -123,7 +123,7 @@ function HintTooltip({ children }: { children: ReactNode }) {
           event.stopPropagation();
           setOpen(true);
         }}
-        className="inline-flex h-[14px] w-[14px] items-center justify-center rounded-full border border-[color:var(--text-muted)]/40 text-[10px] font-semibold leading-none text-[color:var(--text-muted)] transition hover:border-[color:var(--text-secondary)] hover:text-[color:var(--text-secondary)]"
+        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-[color:var(--text-muted)]/40 text-[10px] font-semibold leading-none text-[color:var(--text-muted)] transition hover:border-[color:var(--text-secondary)] hover:text-[color:var(--text-secondary)] sm:h-[14px] sm:w-[14px]"
       >
         ?
       </button>
