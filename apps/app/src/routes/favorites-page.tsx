@@ -708,14 +708,26 @@ export function FavoritesPage() {
             <div className="rounded-[18px] border border-dashed border-[color:var(--border-faint)] bg-white/80 p-6">
               <EmptyState
                 title={
-                  normalizedSearchText ? t(msg`没有匹配的收藏`) : t(msg`还没有收藏内容`)
+                  normalizedSearchText
+                    ? t(msg`没有匹配的收藏`)
+                    : activeCategory === "notes"
+                      ? // 跟 mobile-favorites-page 对齐：笔记 tab 描述提到「新建笔记」，
+                        // 标题就别再说"还没有收藏内容"误导（内容 ≠ 笔记）。
+                        t(msg`还没有笔记`)
+                      : favorites.length && activeCategory !== "all"
+                        ? // 别的分类有收藏，但当前 filter 命中 0 项——不要说
+                          // "还没有收藏内容"，引导用户换分类看看。
+                          t(msg`该分类下还没有收藏`)
+                        : t(msg`还没有收藏内容`)
                 }
                 description={
                   normalizedSearchText
                     ? t(msg`换个关键词，或者切回其他分类继续查看。`)
                     : activeCategory === "notes"
                       ? t(msg`点击右上角“新建笔记”，把第一条收藏笔记写下来。`)
-                      : t(msg`先到聊天、内容流或公众号里把重要内容加入收藏。`)
+                      : favorites.length && activeCategory !== "all"
+                        ? t(msg`切到其他分类继续查看，或去对应入口把内容加入收藏。`)
+                        : t(msg`先到聊天、内容流或公众号里把重要内容加入收藏。`)
                 }
               />
             </div>

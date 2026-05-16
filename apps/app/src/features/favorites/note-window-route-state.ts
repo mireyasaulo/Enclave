@@ -45,6 +45,12 @@ export function parseDesktopNoteWindowRouteHash(hash: string) {
   } satisfies DesktopNoteWindowRouteState;
 }
 
+// 跟 favorites-route-state.ts 的 parseLegacyDesktopNoteEditorRouteState 保持一致：
+// 老链是 #<UUIDv4>。之前任何不含 "=" 的 hash 都当 noteId，结果 #foo 也会跑去拉
+// "foo" 笔记。严格匹配 UUID 才走 legacy。
+const LEGACY_DESKTOP_NOTE_HASH_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function parseDesktopNoteEditorRouteHash(hash: string) {
   const routeState = parseDesktopNoteWindowRouteHash(hash);
   if (routeState) {
@@ -52,7 +58,11 @@ export function parseDesktopNoteEditorRouteHash(hash: string) {
   }
 
   const normalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
-  if (!normalizedHash || normalizedHash.includes("=")) {
+  if (
+    !normalizedHash ||
+    normalizedHash.includes("=") ||
+    !LEGACY_DESKTOP_NOTE_HASH_PATTERN.test(normalizedHash)
+  ) {
     return null;
   }
 
