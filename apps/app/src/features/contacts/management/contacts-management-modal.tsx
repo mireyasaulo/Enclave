@@ -3,6 +3,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
   type ReactNode,
 } from "react";
 import { msg } from "@lingui/macro";
@@ -48,6 +49,14 @@ export function ContactsManagementModal({
   // 避免肉眼看到一帧"先在顶部、再瞬移到 M"）。
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const savedScrollByScreenRef = useRef<Map<string, number>>(new Map());
+  // permissions list 搜索框：state 提到 modal，list ↔ detail 切换不丢词。
+  // 模态关闭时一并清，下次重开从空白起始（跟 stack reset 节奏一致）。
+  const [permissionsSearch, setPermissionsSearch] = useState("");
+  useEffect(() => {
+    if (!open && permissionsSearch !== "") {
+      setPermissionsSearch("");
+    }
+  }, [open, permissionsSearch]);
   // 仅在打开 permissions-detail 时才查（弹窗未打开时 useQuery 不订阅）。
   const detailCharacterId =
     current.type === "permissions-detail" ? current.characterId : null;
@@ -175,6 +184,8 @@ export function ContactsManagementModal({
             onPickFriend={(characterId) =>
               push({ type: "permissions-detail", characterId })
             }
+            search={permissionsSearch}
+            onSearchChange={setPermissionsSearch}
           />
         );
       case "permissions-detail":

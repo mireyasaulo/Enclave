@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -239,6 +240,38 @@ export function DesktopFeedWorkspace({
     }
   }, [selectedPostId]);
 
+  // workspace 内部 callback 也要 stable —— Row 用 React.memo 跳过非自己条目的
+  // 重渲，但 workspace 每次 re-render（commentDrafts 变会触发）都新建内联箭头
+  // 当 onLoadFullComments 传下去，所有 row 的 prop identity 都换 → memo 失效。
+  // detailQuery.refetch 在 RQ 内 memoize；isError 是 primitive；selectedPostId
+  // 是本地 state；这一套 dep 在敲键码时不变。
+  const detailQueryRefetch = detailQuery.refetch;
+  const detailQueryIsError = detailQuery.isError;
+  const handleLoadFullComments = useCallback(
+    (postId: string) => {
+      // 已经选中同一条 post 时 setState 是 no-op：React 跳过更新 →
+      // useQuery 不会重跑。detailQuery 上一次失败、ErrorBlock 已经
+      // 渲染出来时，用户点「查看全部」想重试，过去只能刷新整个页面。
+      // 这里显式 refetch，让那条 button 真当"重试入口"用。
+      if (selectedPostId === postId && detailQueryIsError) {
+        void detailQueryRefetch();
+        return;
+      }
+      setSelectedPostId(postId);
+    },
+    [detailQueryIsError, detailQueryRefetch, selectedPostId],
+  );
+  const handleOpenCompose = useCallback(
+    () => setShowCompose(true),
+    [setShowCompose],
+  );
+  const handleBackToTop = useCallback(() => {
+    scrollViewportRef.current?.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
+
   return (
     <div className="relative flex h-full min-h-0 bg-[rgba(244,247,246,0.98)]">
       <section className="min-w-0 flex-1 bg-[rgba(245,248,247,0.96)]">
@@ -250,13 +283,8 @@ export function DesktopFeedWorkspace({
             successNotice={successNotice}
             loadedCount={posts.length}
             serverTotal={serverTotal}
-            onBackToTop={() => {
-              scrollViewportRef.current?.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
-            }}
-            onOpenCompose={() => setShowCompose(true)}
+            onBackToTop={handleBackToTop}
+            onOpenCompose={handleOpenCompose}
             onRefresh={onRefresh}
           />
 
@@ -284,19 +312,9 @@ export function DesktopFeedWorkspace({
                 onCancelCommentReply={onCancelCommentReply}
                 onCommentChange={onCommentChange}
                 onCommentSubmit={onCommentSubmit}
-                onLoadFullComments={(postId) => {
-                  // 已经选中同一条 post 时 setState 是 no-op：React 跳过更新 →
-                  // useQuery 不会重跑。detailQuery 上一次失败、ErrorBlock 已经
-                  // 渲染出来时，用户点「查看全部」想重试，过去只能刷新整个页面。
-                  // 这里显式 refetch，让那条 button 真当"重试入口"用。
-                  if (selectedPostId === postId && detailQuery.isError) {
-                    void detailQuery.refetch();
-                    return;
-                  }
-                  setSelectedPostId(postId);
-                }}
+                onLoadFullComments={handleLoadFullComments}
                 onLike={onLike}
-                onOpenCompose={() => setShowCompose(true)}
+                onOpenCompose={handleOpenCompose}
                 onShare={onShare}
                 onStartCommentReply={onStartCommentReply}
                 onSelectCommentAuthor={onSelectCommentAuthor}

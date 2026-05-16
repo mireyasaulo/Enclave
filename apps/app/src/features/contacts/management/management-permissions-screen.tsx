@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Search, X } from "lucide-react";
@@ -15,9 +15,18 @@ import {
 
 type Props = {
   onPickFriend: (characterId: string) => void;
+  // 搜索状态由 modal 那一层托管：本组件在用户进入 permissions-detail 时整体
+  // 卸载，本地 useState 会跟着丢；用户从详情返回时输入框会被重置成空，已经
+  // 筛掉的"Alice"得重新打一遍。把 search 提到模态体让两屏切换不失忆。
+  search: string;
+  onSearchChange: (next: string) => void;
 };
 
-export function ManagementPermissionsScreen({ onPickFriend }: Props) {
+export function ManagementPermissionsScreen({
+  onPickFriend,
+  search,
+  onSearchChange,
+}: Props) {
   const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
@@ -27,7 +36,6 @@ export function ManagementPermissionsScreen({ onPickFriend }: Props) {
     queryFn: () => getFriends(baseUrl),
   });
 
-  const [search, setSearch] = useState("");
   const trimmedSearch = search.trim();
   // matchesFriendSearch 默认 haystack 已 toLowerCase，needle 也得是 lowercase
   // 才能匹配上。直接传 trimmedSearch 会让用户输入 "Andrej" 找不到 "Andrej Karpathy"。
@@ -60,7 +68,7 @@ export function ManagementPermissionsScreen({ onPickFriend }: Props) {
           <input
             type="search"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t(msg`搜索好友`)}
             // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
             // zoom-in；管理 modal 弹起来就抖。
@@ -71,7 +79,7 @@ export function ManagementPermissionsScreen({ onPickFriend }: Props) {
             // 用户搜出"无匹配"后只能手动删除每个字符才能继续。
             <button
               type="button"
-              onClick={() => setSearch("")}
+              onClick={() => onSearchChange("")}
               className="-mr-1 flex h-5 w-5 items-center justify-center rounded-full text-[color:var(--text-dim)] active:bg-black/5"
               aria-label={t(msg`清空输入`)}
             >
