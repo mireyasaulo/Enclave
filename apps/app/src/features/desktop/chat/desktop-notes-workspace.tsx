@@ -166,7 +166,19 @@ export function DesktopNotesWorkspace({
     enabled: Boolean(sendDialogNote),
   });
 
-  const sessionKey = `${selectedNoteId ?? "new"}:${draftId ?? ""}`;
+  // sessionKey 用 draftId 单独标识初始化作用域：早先把 selectedNoteId 也拼进去
+  // 之后，每次"创建笔记"保存成功 → 父级 navigate(replace) 把 noteId 写回 hash
+  // → 这边 selectedNoteId 从 undefined 变成 savedNote.id → sessionKey 从
+  // "new:<draft>" 变成 "<id>:<draft>" → 初始化 effect 再触发一次 applyNoteSource
+  // → editorRef.current.innerHTML 被重写一遍，contentEditable 上的光标 / 选区被
+  // 重置，用户点完保存想接着打字得再点一下编辑器。
+  // 实际上 draftId 才是这一次"编辑会话"的唯一标识：同一份草稿无论 selectedNoteId
+  // 在保存前/后是 undefined 还是 savedNote.id，它指的都是同一段内容，没必要再
+  // 跑一次 init；保存的 onSuccess 已经同步把 editorState/savedSnapshot/innerHTML
+  // 都设到位了。切到另一条笔记一定会换 draftId（openInlineNoteEditor 会
+  // createDesktopNoteDraft 出新的 draftId），所以正常的"会话切换"仍然会让
+  // sessionKey 变、init effect 仍然重新跑。
+  const sessionKey = draftId?.trim() || activeDraftId || "";
   const missingSelectedNote =
     selectedNoteId && isFavoriteNoteMissingError(noteQuery.error);
 
