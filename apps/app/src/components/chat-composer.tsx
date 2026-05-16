@@ -498,6 +498,19 @@ export function ChatComposer({
 
     return normalized
       .sort((left, right) => {
+        // 走查 Round 1：原版只按 startsWith + locale 排，"mention-all"
+        // (所有人) 在中文 locale 下 sō < zhāng/lín 一类按拼音排会被压到列
+        // 表尾部，和 WeChat 习惯（@ 默认 "所有人" 置顶可一键选中）不一致。
+        // 空 query 时把 mention-all 强制顶端；有 query 时按 startsWith 命中
+        // 优先，命中相同再 locale。
+        if (!query) {
+          if (left.id === "mention-all" && right.id !== "mention-all") {
+            return -1;
+          }
+          if (right.id === "mention-all" && left.id !== "mention-all") {
+            return 1;
+          }
+        }
         const leftStartsWith = left.name.toLowerCase().startsWith(query);
         const rightStartsWith = right.name.toLowerCase().startsWith(query);
         if (leftStartsWith === rightStartsWith) {

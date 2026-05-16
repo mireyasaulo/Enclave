@@ -409,7 +409,15 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
       !totalCount ||
       syncStatusMutation.isPending ||
       syncStatusMutation.isError ||
-      hasSyncedStatus
+      hasSyncedStatus ||
+      // 走查 Round 1：handleEndCall 触发 endStatusMutation.onSuccess 会把
+      // lastPublishedCounts 置 null → hasSyncedStatus 翻成 false → 这条
+      // deferred sync effect 重新调度 1200ms 定时器。await invalidateQueries
+      // + navigate() 的等待 + 父级 chat-room 切回 group-thread 的 unmount
+      // 链路可能慢于 1200ms（数据库 wal 落盘 + conversations cache 重建），
+      // 导致定时器在 unmount 前 fire 一次 syncCurrentStatus，群里冒出
+      // 已结束/画面进行中 紧挨的两条系统消息。leavingScreen 真值时直接跳过。
+      leavingScreen
     ) {
       return;
     }
@@ -425,6 +433,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     activeCount,
     groupQuery.data,
     hasSyncedStatus,
+    leavingScreen,
     resolvedGroupId,
     syncCurrentStatus,
     syncStatusMutation.isError,
