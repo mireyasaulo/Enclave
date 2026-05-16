@@ -406,31 +406,127 @@
 <section id="private">
 <h2><span class="num">6</span>マイプライベートキャラクター <span class="audience"><span class="pill user">利用者</span></span></h2>
 
-<p>公開 Wiki 記事に加えて、各利用者には個人スペース<strong>「マイプライベートキャラクター」</strong>（<code>/my-characters</code>）があります。</p>
+<p>公開 Wiki 記事とは別に、ログインユーザーには<strong>本人のみ閲覧可能</strong>な専用スペース<strong>「マイプライベートキャラクター」</strong>（<code>/my-characters</code>）があります。自由に作成・実験・バックアップでき、すべての操作は即時反映されます。審査不要で、他人には見られず、検索 / キャラクター一覧 / 推薦リストにも表示されません。</p>
 
-<h3>Wiki 記事との違い</h3>
+<h3>6.1 Wiki 記事との違い</h3>
 <table>
   <thead><tr><th>特性</th><th>Wiki 記事</th><th>プライベートキャラ</th></tr></thead>
   <tbody>
     <tr><td>公開範囲</td><td>全員</td><td>本人のみ</td></tr>
     <tr><td>審査の要否</td><td>新規利用者は要審査</td><td>不要</td></tr>
-    <tr><td>履歴の保持</td><td>あり</td><td>なし</td></tr>
+    <tr><td>バージョン履歴</td><td>完全な履歴 + diff</td><td>なし（createdAt / updatedAt のみ）</td></tr>
+    <tr><td>巡回 / 差し戻し</td><td>あり</td><td>なし</td></tr>
+    <tr><td>ノートページ</td><td>あり</td><td>なし</td></tr>
+    <tr><td>削除</td><td>ソフト削除（復旧申請可）</td><td>ハード削除（取り消し不可）</td></tr>
+    <tr><td>フォーム項目</td><td>personality / editSummary / isMinor を含む</td><td>personality 等なし、より軽量</td></tr>
     <tr><td>用途</td><td>公共ライブラリ構築</td><td>個人創作 / 試行錯誤 / バックアップ</td></tr>
   </tbody>
 </table>
 
-<h3>主な操作</h3>
+<h3>6.2 入口</h3>
 <ul>
-  <li><strong>作成</strong>: <code>/my-characters/new</code>。フォームは Wiki 編集と同一だが送信即反映</li>
-  <li><strong>編集 / 削除</strong>: 一覧の各行にボタン</li>
-  <li><strong>JSON エクスポート</strong>: キャラクター全体（recipe 含む）を <code>.json</code> でダウンロード。バックアップや共有用</li>
-  <li><strong>JSON インポート</strong>: ファイルから読み込み。「新規作成」または「上書き」を選択可</li>
-  <li><strong>Wiki から同期</strong>: 任意の公開記事を自分のプライベート空間にコピーして引き続き編集可</li>
+  <li><strong>一覧</strong>: サイドバー → 「マイプライベートキャラクター」（<code>/my-characters</code>）</li>
+  <li><strong>新規作成</strong>: 一覧右上「✨ 新規作成」 → <code>/my-characters/new</code></li>
+  <li><strong>編集</strong>: 一覧で任意のカードをクリック → <code>/my-characters/:id</code></li>
+  <li><strong>インポート</strong>: 一覧右上「📥 ファイルをインポート」 → <code>.json</code> を選択</li>
+</ul>
+
+<h3>6.3 フォーム項目（6 セクション）</h3>
+<table>
+  <thead><tr><th>セクション</th><th>主な項目</th><th>必須？</th></tr></thead>
+  <tbody>
+    <tr><td><strong>① 基本情報</strong></td><td>名前、アバター（emoji / URL）、関係説明、関係タイプ、専門分野、紹介</td><td>名前 + 関係説明 必須</td></tr>
+    <tr><td><strong>② 対話返信</strong></td><td>対話シーンプロンプト</td><td>任意（推奨）</td></tr>
+    <tr><td><strong>③ コアロジック</strong></td><td>コアロジック、忘却曲線（0–100、既定 70、上級）</td><td>任意（推奨）</td></tr>
+    <tr><td><strong>④ シーンプロンプト</strong></td><td>モーメンツ投稿、広場投稿、動画チャンネル投稿、モーメンツコメント、広場コメント、フレンド申請 / シェイク挨拶、能動リマインド（計 7 種）</td><td>任意</td></tr>
+    <tr><td><strong>⑤ 記憶プロンプト</strong></td><td>近期記憶、長期記憶（上級）</td><td>任意</td></tr>
+    <tr><td><strong>⑥ ソーシャルパラメータ</strong></td><td>ソーシャル開放度（open / normal / private）、能動閲覧確率（0–1、既定 0.3）、親密度シード（0–100、既定 0）</td><td>既定値あり</td></tr>
+  </tbody>
+</table>
+
+<div class="callout tip">
+  <span class="label">💡 Wiki 編集フォームとの違い</span>
+  <p>プライベートキャラには <strong>personality / トリガーシーン / editSummary / isMinor</strong> の項目がなく、よりシンプル。バージョン履歴がないため <code>baseRevisionId</code> による競合検出もありません（「最終更新時刻」のみ）。</p>
+</div>
+
+<h3>6.4 文字数・件数の上限</h3>
+<table>
+  <thead><tr><th>項目</th><th>上限</th></tr></thead>
+  <tbody>
+    <tr><td>名前</td><td>80 文字</td></tr>
+    <tr><td>アバター（emoji / URL）</td><td>2000 文字</td></tr>
+    <tr><td>紹介</td><td>2000 文字</td></tr>
+    <tr><td>関係説明</td><td>200 文字</td></tr>
+    <tr><td>関係タイプ</td><td>80 文字</td></tr>
+    <tr><td>専門分野（1 件あたり）</td><td>80 文字</td></tr>
+    <tr><td>専門分野（合計件数）</td><td>50 件</td></tr>
+    <tr><td>recipe JSON / profile JSON</td><td>各 64 KB</td></tr>
+  </tbody>
+</table>
+
+<h3>6.5 AI ワンクリック生成</h3>
+<p>各セクション右上に <strong>✨ AI 生成</strong> ボタン、ページ上部に <strong>✨ AI ですべて生成</strong> ボタン。</p>
+<ul>
+  <li><strong>生成可能な 5 セクション</strong>: basics（アバター / 専門分野 / 関係タイプ）、core_logic（コアロジック / 忘却曲線）、chat、scenes（7 種のシーンプロンプト）、memory（近期 / 長期記憶）</li>
+  <li><strong>「すべて生成」の前提条件</strong>: <strong>name + bio + relationship</strong> の 3 つの sacred 項目を必ず先に入力。未入力ならバックエンドが 400 で拒否</li>
+  <li><strong>optimize モード</strong>: 既定では空欄のみ補完し、既存内容は上書きしない。すでに内容のあるセクションで AI 生成を押すと確認ダイアログが表示され、確定後に上書き</li>
+  <li><strong>生成中</strong>: 該当セクションの全項目が disabled 状態となり「✨ AI が生成中…」と表示</li>
+</ul>
+
+<div class="callout warn">
+  <span class="label">⚠️ レート制限</span>
+  <p>AI 生成は専用枠：<strong>利用者ごとに 1 時間 15 回</strong>（Wiki 記事編集と同じバケットを共有）。超過時は <code>WIKI_AI_RATE_LIMITED</code> を返し、「AI 生成枠を使い切りました：1 時間あたり 15 回まで、X 秒後に再試行」と表示。</p>
+  <p>CRUD（作成 / 更新 / 削除 / インポート）は別枠：<strong>利用者ごとに 1 時間 60 回</strong>。</p>
+</div>
+
+<h3>6.6 下書きシステム</h3>
+<p><strong>「新規ページ + すべて生成」</strong>のパス上でのみ、バックエンドが <code>character_drafts</code> に下書きを自動保存します：</p>
+<ul>
+  <li>ページやブラウザを閉じて戻ってきても <a href="/my-drafts"><code>/my-drafts</code></a> に残る</li>
+  <li>下書きをクリック → <code>?draftId=...</code> 付きで新規作成ページに復元</li>
+  <li>復元時にエディタに未保存の内容があると、上書き確認ダイアログが表示</li>
+</ul>
+
+<h3>6.7 JSON インポート / エクスポート</h3>
+<h4>エクスポート</h4>
+<ul>
+  <li>一覧の各カード「📤 エクスポート」 / 編集ページ右上「📤 JSON エクスポート」</li>
+  <li>ファイル名：キャラ名（不正文字を置換）+ <code>.json</code></li>
+  <li>スキーマ：<code>"$schema": "yinjie-private-character/v1"</code></li>
+  <li>含まれる項目：name / avatar / bio / relationship / relationshipType / expertDomains / recipe / profile / ソーシャルパラメータ + meta（exportedAt、exportedBy、version）</li>
+  <li><strong>含まれない</strong>：isOnline / isTemplate / sourceType / aiRelationships など管理者専用項目</li>
+</ul>
+
+<h4>インポート</h4>
+<ul>
+  <li>一覧右上「📥 ファイルをインポート」で <code>.json</code> を選択</li>
+  <li>ファイルサイズ上限：<strong>5 MB</strong></li>
+  <li><strong>キャラ名で upsert</strong>：既存キャラと同名 → 上書き、別名 → 新規作成</li>
+  <li>トーストで上書き / 新規を区別：「同名キャラを上書きしました：X」 vs 「新規キャラをインポートしました：X」</li>
+  <li>一括インポート不可（1 ファイル = 1 キャラ）</li>
+  <li>スキーマバージョン不一致 / 項目超過 → 400 で拒否</li>
+</ul>
+
+<h3>6.8 削除</h3>
+<div class="callout warn">
+  <span class="label">⚠️ ハード削除、復旧不可</span>
+  <p>プライベートキャラの削除は<strong>本物の削除</strong>（Wiki 記事のソフト削除と異なる）— 確定すると DB から完全に消え、「復旧申請」フローはありません。削除前に「『X』を削除しますか？この操作は取り消せません。」の確認ダイアログが表示されます。</p>
+  <p>長期保存したい場合は、先に「📤 JSON エクスポート」でローカル保存してから削除。</p>
+</div>
+
+<h3>6.9 現時点で未対応</h3>
+<p>プライベートキャラで現在<strong>できないこと</strong>を把握しておくと、入口探しで困りません：</p>
+<ul>
+  <li>❌ <strong>プライベートキャラと直接対話できない</strong>：これは「設定ファイル」に過ぎず、実際に AI に演じさせるには JSON エクスポート → app 側でインポート</li>
+  <li>❌ <strong>共有 / 共同編集ができない</strong>：他利用者にはログインしていてもアクセス不可</li>
+  <li>❌ <strong>「Wiki に一括公開」機能はない</strong>：プライベートキャラを公開記事にするには <a href="/create">/create</a> で手動再入力</li>
+  <li>❌ <strong>バージョン履歴がない</strong>：保存ごとに上書きされ、以前の版は見られない</li>
+  <li>❌ <strong>一括 / 並べ替え / フィルタ / 検索なし</strong>：一覧は時系列降順、多くなったらスクロールで探す</li>
 </ul>
 
 <div class="callout tip">
-  <span class="label">💡 ヒント</span>
-  <p>プライベートキャラ + AI 生成 = 最速の試行錯誤ループ。ある程度磨いてから「Wiki に同期」して公開ライブラリへ還元しましょう。</p>
+  <span class="label">💡 推奨ワークフロー</span>
+  <p>プライベートキャラはあなたの<strong>「下書き場」</strong>：審査を気にせず自由に試行でき、他人にも影響しません。気に入ったキャラができたら、主要項目（名前、紹介、関係、重要なプロンプト）を <a href="/create">「公開記事を作成」</a> に書き写して審査提出 — 現在のところ、これが私 → 公の唯一の経路です。</p>
 </div>
 </section>
 

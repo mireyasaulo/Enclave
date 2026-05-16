@@ -414,31 +414,127 @@
 <section id="private">
 <h2><span class="num">6</span>My private characters <span class="audience"><span class="pill user">User</span></span></h2>
 
-<p>In addition to public wiki entries, every user has a private workspace: <strong>"My private characters"</strong> at <code>/my-characters</code>.</p>
+<p>Alongside the public wiki, every signed-in user has a <strong>strictly private</strong> workspace: <strong>"My private characters"</strong> at <code>/my-characters</code>. You can freely create, experiment with, and back up characters here. Everything takes effect immediately — no review, no visibility to others, and they don't appear in search, character directory, or recommendations.</p>
 
-<h3>Differences vs wiki entries</h3>
+<h3>6.1 Differences vs wiki entries</h3>
 <table>
   <thead><tr><th>Feature</th><th>Wiki entry</th><th>Private character</th></tr></thead>
   <tbody>
     <tr><td>Visibility</td><td>Public</td><td>You only</td></tr>
-    <tr><td>Review needed?</td><td>Yes (for newcomers)</td><td>No</td></tr>
-    <tr><td>Version history?</td><td>Yes</td><td>No</td></tr>
+    <tr><td>Review needed</td><td>Yes (for newcomers)</td><td>No</td></tr>
+    <tr><td>Version history</td><td>Full history + diff</td><td>None (only createdAt / updatedAt timestamps)</td></tr>
+    <tr><td>Patrol / revert</td><td>Yes</td><td>No</td></tr>
+    <tr><td>Talk page</td><td>Yes</td><td>No</td></tr>
+    <tr><td>Delete</td><td>Soft delete (restorable on request)</td><td>Hard delete (irreversible)</td></tr>
+    <tr><td>Form fields</td><td>Includes personality / editSummary / isMinor</td><td>No personality etc., leaner form</td></tr>
     <tr><td>Use case</td><td>Building the public library</td><td>Personal creation / experimentation / backup</td></tr>
   </tbody>
 </table>
 
-<h3>Core actions</h3>
+<h3>6.2 Entry points</h3>
 <ul>
-  <li><strong>Create</strong>: <code>/my-characters/new</code>, identical form to wiki edit but submission is instant</li>
-  <li><strong>Edit / delete</strong>: button on each row in the list</li>
-  <li><strong>Export JSON</strong>: dump the whole character (including recipe) as <code>.json</code> for backup or sharing</li>
-  <li><strong>Import JSON</strong>: load from a file — choose "create new" or "overwrite existing"</li>
-  <li><strong>Sync from wiki</strong>: copy any public entry into your private workspace to continue iterating</li>
+  <li><strong>List</strong>: sidebar → "My private characters" (<code>/my-characters</code>)</li>
+  <li><strong>Create</strong>: top-right "✨ New character" → <code>/my-characters/new</code></li>
+  <li><strong>Edit</strong>: click any card in the list → <code>/my-characters/:id</code></li>
+  <li><strong>Import</strong>: top-right "📥 Import file" → pick a <code>.json</code></li>
+</ul>
+
+<h3>6.3 Form fields (6 sections)</h3>
+<table>
+  <thead><tr><th>Section</th><th>Key fields</th><th>Required?</th></tr></thead>
+  <tbody>
+    <tr><td><strong>① Basics</strong></td><td>Name, avatar (emoji / URL), relationship description, relationship type, expert domains, bio</td><td>Name + relationship description required</td></tr>
+    <tr><td><strong>② Chat replies</strong></td><td>Chat-scene prompt</td><td>No (recommended)</td></tr>
+    <tr><td><strong>③ Core logic</strong></td><td>Core logic, forgetting curve (0–100, default 70, advanced)</td><td>No (recommended)</td></tr>
+    <tr><td><strong>④ Scene prompts</strong></td><td>Moments post, plaza post, video-channel post, moments comment, plaza comment, friend request / shake greeting, proactive reminder (7 in total)</td><td>No</td></tr>
+    <tr><td><strong>⑤ Memory prompts</strong></td><td>Recent memory, long-term memory (advanced)</td><td>No</td></tr>
+    <tr><td><strong>⑥ Social params</strong></td><td>Social openness (open / normal / private), proactive browse chance (0–1, default 0.3), intimacy seed (0–100, default 0)</td><td>Have defaults</td></tr>
+  </tbody>
+</table>
+
+<div class="callout tip">
+  <span class="label">💡 Differences from the wiki edit form</span>
+  <p>Private characters have <strong>no personality / trigger scenes / editSummary / isMinor</strong> fields — leaner. There's also no <code>baseRevisionId</code> conflict detection (no version history, just a "last modified" timestamp).</p>
+</div>
+
+<h3>6.4 Field length limits</h3>
+<table>
+  <thead><tr><th>Field</th><th>Limit</th></tr></thead>
+  <tbody>
+    <tr><td>Name</td><td>80 chars</td></tr>
+    <tr><td>Avatar (emoji / URL)</td><td>2000 chars</td></tr>
+    <tr><td>Bio</td><td>2000 chars</td></tr>
+    <tr><td>Relationship description</td><td>200 chars</td></tr>
+    <tr><td>Relationship type</td><td>80 chars</td></tr>
+    <tr><td>Expert domain (each)</td><td>80 chars</td></tr>
+    <tr><td>Expert domain (total count)</td><td>50 items</td></tr>
+    <tr><td>recipe JSON / profile JSON</td><td>64 KB each</td></tr>
+  </tbody>
+</table>
+
+<h3>6.5 AI one-click generation</h3>
+<p>Each section has a <strong>✨ AI generate</strong> button at the top right; the page header also has <strong>✨ AI generate everything</strong>.</p>
+<ul>
+  <li><strong>5 sections you can generate</strong>: basics (avatar / expert domains / relationship type), core_logic (core logic / forgetting curve), chat, scenes (the 7 scene prompts), memory (recent / long-term)</li>
+  <li><strong>"Generate everything" precondition</strong>: <strong>name + bio + relationship</strong> — the three sacred fields — must be filled, or the backend rejects with 400</li>
+  <li><strong>Optimize mode</strong>: by default only fills empty fields, never overwrites; if a section already has content, clicking AI generate pops a confirmation dialog before overwriting</li>
+  <li><strong>While generating</strong>: that section's fields are disabled and show "✨ AI is generating…"</li>
+</ul>
+
+<div class="callout warn">
+  <span class="label">⚠️ Rate limits</span>
+  <p>AI generation has its own quota: <strong>15 calls per user per hour</strong> (shared with wiki-entry editing). Over the limit returns <code>WIKI_AI_RATE_LIMITED</code> with the message "AI generation quota exhausted: 15/hour cap, retry in X seconds."</p>
+  <p>CRUD (create / update / delete / import) has a separate quota: <strong>60 calls per user per hour</strong>.</p>
+</div>
+
+<h3>6.6 Drafts</h3>
+<p>Only on the path "<strong>New page + Generate everything</strong>" does the backend autosave a draft to <code>character_drafts</code>:</p>
+<ul>
+  <li>Close the page or browser, come back later — find it in <a href="/my-drafts"><code>/my-drafts</code></a></li>
+  <li>Click the draft → it loads into the new-character page via <code>?draftId=...</code></li>
+  <li>If your editor has unsaved content when restoring, a confirm dialog asks whether to overwrite</li>
+</ul>
+
+<h3>6.7 JSON import / export</h3>
+<h4>Export</h4>
+<ul>
+  <li>"📤 Export" button on each list card / "📤 Export JSON" top-right of the edit page</li>
+  <li>Filename: character name (sanitized) + <code>.json</code></li>
+  <li>Schema: <code>"$schema": "yinjie-private-character/v1"</code></li>
+  <li>Included fields: name / avatar / bio / relationship / relationshipType / expertDomains / recipe / profile / social params + meta (exportedAt, exportedBy, version)</li>
+  <li><strong>Excluded</strong>: isOnline / isTemplate / sourceType / aiRelationships and other admin-only fields</li>
+</ul>
+
+<h4>Import</h4>
+<ul>
+  <li>Top-right "📥 Import file" → pick a <code>.json</code></li>
+  <li>File size cap: <strong>5 MB</strong></li>
+  <li><strong>Upsert by character name</strong>: matches an existing character → overwrite; new name → create</li>
+  <li>Toast distinguishes overwrite vs new: "Overwrote existing character: X" vs "Imported new character: X"</li>
+  <li>No batch import (one file = one character)</li>
+  <li>Schema-version mismatch / oversize fields → rejected with 400</li>
+</ul>
+
+<h3>6.8 Delete</h3>
+<div class="callout warn">
+  <span class="label">⚠️ Hard delete, irreversible</span>
+  <p>Deleting a private character is a <strong>real delete</strong> (unlike the wiki's soft delete) — once confirmed, it's gone from the database; there's no "request restore" flow. A confirm dialog appears: "Delete 'X'? This cannot be undone."</p>
+  <p>Need to keep something long-term? Hit "📤 Export JSON" to save locally first, then delete.</p>
+</div>
+
+<h3>6.9 Currently not supported</h3>
+<p>Knowing what private characters <strong>can't do</strong> avoids hunting for nonexistent buttons:</p>
+<ul>
+  <li>❌ <strong>You can't chat with a private character directly</strong>: it's just a config — to actually have an AI roleplay it, export the JSON and import into the app side</li>
+  <li>❌ <strong>No sharing / collaboration</strong>: even logged-in, no other user can access your private characters' URLs</li>
+  <li>❌ <strong>No "publish to wiki" button</strong>: to promote a private character into a public entry, manually re-enter the key fields at <a href="/create">/create</a></li>
+  <li>❌ <strong>No version history</strong>: every save overwrites; you can't see what the previous version looked like</li>
+  <li>❌ <strong>No batch / sort / filter / search</strong>: list is reverse-chronological — many characters means scrolling</li>
 </ul>
 
 <div class="callout tip">
-  <span class="label">💡 Tip</span>
-  <p>Private characters + AI generation = the fastest "trial-and-error" loop. Polish privately, then push back to the public library when ready.</p>
+  <span class="label">💡 Recommended workflow</span>
+  <p>Private characters are your <strong>"draft sandbox"</strong>: experiment freely without review pressure or affecting others. Once a character is polished, copy the key fields (name, bio, relationship, the important prompts) into <a href="/create">"Create public entry"</a> and submit for review — that's currently the only path from private to public.</p>
 </div>
 </section>
 
