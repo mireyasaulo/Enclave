@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Search, X } from "lucide-react";
 import { getFriends } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../../components/avatar-chip";
@@ -65,6 +65,18 @@ export function ManagementPermissionsScreen({ onPickFriend }: Props) {
             // zoom-in；管理 modal 弹起来就抖。
             className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
           />
+          {search ? (
+            // 对齐 mobile-add-friend 的搜索框：有输入时显示 X 一键清空，避免
+            // 用户搜出"无匹配"后只能手动删除每个字符才能继续。
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="-mr-1 flex h-5 w-5 items-center justify-center rounded-full text-[color:var(--text-dim)] active:bg-black/5"
+              aria-label={t(msg`清空输入`)}
+            >
+              <X size={13} />
+            </button>
+          ) : null}
         </label>
       </div>
 

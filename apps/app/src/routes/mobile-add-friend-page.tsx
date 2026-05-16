@@ -746,9 +746,12 @@ function MobileAddFriendResultRow({
                 item.status === "available"
                   ? "bg-[#07c160] text-white hover:bg-[#06ad56]"
                   : "border-[color:var(--border-subtle)] bg-white text-[color:var(--text-secondary)]",
-                item.status === "pending" || item.status === "blocked"
-                  ? "opacity-70"
-                  : undefined,
+                // 按 meta.disabled 加 opacity-70 而不是按 status：Bug W 之后
+                // inbound pending（acceptAt=null）按钮其实是可点的（跳 /friend-requests），
+                // 旧 status==="pending" 一刀切的话会把 inbound 也变成 70% 透明，
+                // 看起来跟 disabled 一样让人不敢点。outbound pending / blocked
+                // 仍是真 disabled，由 meta.disabled 维持原样。
+                meta.disabled ? "opacity-70" : undefined,
               )}
             >
               <PrimaryIcon size={13} />
