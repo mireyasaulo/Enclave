@@ -123,7 +123,10 @@ export function GroupChatThreadPanel({
   onToggleDesktopHistory,
   onToggleDesktopDetails,
   onOpenDesktopAnnouncementDetails,
-  onDesktopCallAction,
+  // onDesktopCallAction: prop 由 desktop-chat-workspace 传进来（与 direct
+  // 版 conversation-thread-panel 对齐 type），但群聊版从来不会回调它——
+  // 群语音/视频走 FeatureUnavailableDialog，不真的转交给桌面 workspace。
+  // 留 type 给调用方编译通过，destructure 跳过避免 no-unused-vars。
   desktopCallRequest = null,
   onDesktopCallRequestHandled,
   highlightedMessageId,
@@ -904,7 +907,10 @@ export function GroupChatThreadPanel({
         // onError 已处理
       }
     },
-    [messages, sendMutation],
+    // t 必须进 deps：上方 throw new Error(t(msg`这条消息暂时无法重试...`))
+    // 用了 t；和 enqueueOutgoingGroupMessage 同理，locale 切换后旧 closure
+    // 会抛上个 locale 的报错文案。
+    [messages, sendMutation, t],
   );
 
   const loadOlderMessages = useCallback(async () => {
