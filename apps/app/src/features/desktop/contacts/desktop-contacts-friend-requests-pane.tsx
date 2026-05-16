@@ -162,13 +162,29 @@ export function DesktopContactsFriendRequestsPane({
   );
 }
 
+// 复用同一份 formatter 实例，避免每条请求渲染时都新建一次 Intl.DateTimeFormat
+// （Intl 对象构造比想象贵，10+ 条申请 * 每次输入框抖动都重建会被 React Profiler
+// 标红）。跨年时 createdAt 落到去年，应该把年份带出来——光是 "12-15" 在 2026-05
+// 看会让人误以为是当年 12 月 15 日。
+const sameYearFormatter = new Intl.DateTimeFormat(undefined, {
+  month: "2-digit",
+  day: "2-digit",
+});
+const crossYearFormatter = new Intl.DateTimeFormat(undefined, {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 function formatFriendRequestDate(
   createdAt: string,
   t: (descriptor: MessageDescriptor) => string,
 ) {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) {
-    return "";
+    // 后端偶发返回脏数据（空串 / 异常 ISO 串），不能让面板渲染出「来源 · 」这种
+    // 后面空一截的诡异 meta 行，至少给一个占位。
+    return t(msg`时间未知`);
   }
 
   const now = new Date();
@@ -180,9 +196,6 @@ function formatFriendRequestDate(
     return t(msg`今天`);
   }
 
-  const formatter = new Intl.DateTimeFormat(undefined, {
-    month: "2-digit",
-    day: "2-digit",
-  });
+  const formatter = sameYear ? sameYearFormatter : crossYearFormatter;
   return formatter.format(date).replace(/\//g, "-");
 }

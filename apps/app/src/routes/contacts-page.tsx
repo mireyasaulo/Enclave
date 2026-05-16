@@ -2448,18 +2448,8 @@ export function ContactsPage() {
         {bulkMode ? (
           <ContactsBulkActionBar
             selectedIds={Array.from(bulkSelectedIds)}
-            totalIds={friendSections.flatMap((section) =>
-              section.items.map((item) => item.character.id),
-            )}
-            onSelectAll={() =>
-              setBulkSelectedIds(
-                new Set(
-                  friendSections.flatMap((section) =>
-                    section.items.map((item) => item.character.id),
-                  ),
-                ),
-              )
-            }
+            totalIds={mobileBulkAllIds}
+            onSelectAll={() => setBulkSelectedIds(new Set(mobileBulkAllIds))}
             onClearSelection={() => setBulkSelectedIds(new Set())}
             onDone={exitBulkMode}
             setNotice={setNotice}
