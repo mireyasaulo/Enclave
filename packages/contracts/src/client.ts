@@ -909,24 +909,20 @@ function normalizeFeedPost<T extends FeedPost>(post: T, baseUrl?: string): T {
           baseUrl,
         )
       : undefined;
-  const normalizedCoverUrl =
+  // 音乐帖封面：MiniMax 给每首 audio 都附了一张 album-cover 图作为 posterUrl，
+  // 但原来这里没把 audio 走 posterUrl 这条 fallback —— channel-author-page 的
+  // ChannelPostCover 判 post.coverUrl truthy 渲缩略图，audio 全部 fall through
+  // 到灰色占位面板；视频号当前 18 条全是 audio，作者页缩略图全是占位灰板。
+  const primaryCoverCandidate =
     post.coverUrl?.trim() ||
-    (primaryMedia?.kind === "video"
+    (primaryMedia?.kind === "video" || primaryMedia?.kind === "audio"
       ? primaryMedia.posterUrl
       : primaryMedia?.kind === "image"
         ? primaryMedia.thumbnailUrl || primaryMedia.url
-        : undefined)
-      ? normalizeAttachmentAssetUrl(
-          post.coverUrl?.trim() ||
-            (primaryMedia?.kind === "video"
-              ? primaryMedia.posterUrl
-              : primaryMedia?.kind === "image"
-                ? primaryMedia.thumbnailUrl || primaryMedia.url
-                : undefined) ||
-            "",
-          baseUrl,
-        )
-      : null;
+        : undefined);
+  const normalizedCoverUrl = primaryCoverCandidate
+    ? normalizeAttachmentAssetUrl(primaryCoverCandidate, baseUrl)
+    : null;
 
   return {
     ...post,

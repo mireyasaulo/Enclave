@@ -834,9 +834,12 @@ export class FeedService implements OnModuleInit {
     const parentComment = await this.commentRepo.findOneBy({ id: commentId });
 
     if (!parentComment) {
+      // R1 走查：mobile 广场动态评论列表展开后用户点回复，那条评论刚好被
+      // 别的端 / AI 后续动作删掉时，旧 'Comment not found' 英文飘到前端
+      // InlineNotice。改成 moments-service replyToComment 同款中文。
       throw new AppError('FEED_COMMENT_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Comment not found',
+        legacyMessage: '评论不存在或已被删除。',
       });
     }
 
@@ -1023,6 +1026,8 @@ export class FeedService implements OnModuleInit {
     const conversationId = conv.id;
 
     const primaryUrl = this.resolvePrimaryFeedMediaUrl(post);
+    const posterUrl = this.resolvePrimaryFeedPosterUrl(post);
+    const durationMs = this.resolvePrimaryFeedDurationMs(post);
     const attachment: FeedPostCardAttachment = {
       kind: 'feed_post_card',
       postId: post.id,
@@ -1032,9 +1037,9 @@ export class FeedService implements OnModuleInit {
       title: post.title ?? undefined,
       excerpt: (post.text ?? '').slice(0, 160),
       mediaType: post.mediaType as FeedPostCardAttachment['mediaType'],
-      coverUrl: post.coverUrl ?? undefined,
+      coverUrl: posterUrl ?? undefined,
       primaryMediaUrl: primaryUrl ?? undefined,
-      durationMs: post.durationMs ?? undefined,
+      durationMs: durationMs ?? undefined,
       surface: 'channels',
     };
 
@@ -1141,6 +1146,58 @@ export class FeedService implements OnModuleInit {
       /* fallthrough */
     }
     return post.mediaUrl?.trim() || null;
+  }
+
+  // 视频/音频帖的 cover image 落在 mediaPayload[i].posterUrl 里，post.coverUrl
+  // 经常为 null（音乐帖更是 100% null，MiniMax 不回写 coverUrl 字段）。转发到聊天
+  // 时如果直接拿 post.coverUrl，feed_post_card 卡片就没有缩略图，对方看到一片
+  // 灰色「视频号·xxx」占位。serializePost 已经做了同样 fallback，这里独立解析
+  // 是因为 forwardChannelPostToChat 在 entity 层组装 attachment，没走 serializePost。
+  private resolvePrimaryFeedPosterUrl(post: FeedPostEntity): string | null {
+    if (post.coverUrl?.trim()) return post.coverUrl.trim();
+    try {
+      const arr = JSON.parse(post.mediaPayload ?? '[]') as Array<{
+        kind?: string;
+        posterUrl?: string;
+        thumbnailUrl?: string;
+        url?: string;
+      }>;
+      for (const a of Array.isArray(arr) ? arr : []) {
+        if (a?.kind === post.mediaType) {
+          const candidate =
+            a.posterUrl?.trim() ||
+            (a.kind === 'image' ? a.thumbnailUrl?.trim() || a.url?.trim() : '');
+          if (candidate) return candidate;
+        }
+      }
+    } catch {
+      /* fallthrough */
+    }
+    return null;
+  }
+
+  // 同 resolvePrimaryFeedPosterUrl：post.durationMs 在音乐帖里普遍为 null，
+  // 真实时长落在 mediaPayload[i].durationMs。转发卡 / 聊天预览要拿到才能渲染。
+  private resolvePrimaryFeedDurationMs(post: FeedPostEntity): number | null {
+    if (typeof post.durationMs === 'number') return post.durationMs;
+    try {
+      const arr = JSON.parse(post.mediaPayload ?? '[]') as Array<{
+        kind?: string;
+        durationMs?: number;
+      }>;
+      for (const a of Array.isArray(arr) ? arr : []) {
+        if (
+          a?.kind === post.mediaType &&
+          typeof a.durationMs === 'number' &&
+          Number.isFinite(a.durationMs)
+        ) {
+          return a.durationMs;
+        }
+      }
+    } catch {
+      /* fallthrough */
+    }
+    return null;
   }
 
   async viewOwnerPost(
@@ -3486,7 +3543,7 @@ export class FeedService implements OnModuleInit {
       mediaUrl: post.mediaUrl ?? primaryMedia?.url,
       coverUrl:
         post.coverUrl ??
-        (primaryMedia?.kind === 'video'
+        (primaryMedia?.kind === 'video' || primaryMedia?.kind === 'audio'
           ? (primaryMedia.posterUrl ?? null)
           : primaryMedia?.kind === 'image'
             ? (primaryMedia.thumbnailUrl ?? primaryMedia.url)
@@ -3721,6 +3778,15 @@ export class FeedService implements OnModuleInit {
 
     // 用 unique(userId, postId, type) + INSERT OR IGNORE 保证幂等：
     // 双击 / 多端同时点收藏，不会重复插行也不会让 favoriteCount 漂移。
+    //
+    // R1 走查：TypeORM 的 `result.identifiers` 在 SQLite INSERT OR IGNORE 命中
+    // unique 约束被静默跳过时，仍把 entity 自带的 client-side uuid 当成
+    // `identifiers[0].id` 返回 —— 旧代码 `didInsert` 永远为 true，导致客户端 retry
+    // 同一次 POST /feed/:id/like、或网络抖动让请求重发时，DB 行数仍然只 1 行
+    // 但 likeCount 每次都 +1。复现：fresh post 连发 3 次 POST /like → DB 1 行 /
+    // likeCount=3。改用 SQLite 驱动返回的 `result.raw.changes`（0=被 IGNORE 跳过，
+    // 1=真插入），非 SQLite 驱动保守按 false（宁可漏一次 increment，下次
+    // ensureFeedUniqueIndexes 重启会按实际行数把计数拉正）。
     const inserted = await this.dataSource.transaction(async (manager) => {
       const interactionRepo = manager.getRepository(UserFeedInteractionEntity);
       const postRepo = manager.getRepository(FeedPostEntity);
@@ -3738,10 +3804,9 @@ export class FeedService implements OnModuleInit {
         .values(entity as never)
         .orIgnore()
         .execute();
-      const didInsert =
-        Array.isArray(result.identifiers) && result.identifiers.length > 0
-          ? result.identifiers[0]?.id != null
-          : false;
+      const rawChanges = (result.raw as { changes?: number } | undefined)
+        ?.changes;
+      const didInsert = typeof rawChanges === 'number' ? rawChanges > 0 : false;
       if (didInsert && input.incrementColumn) {
         await postRepo.increment(
           { id: input.postId },
@@ -3775,9 +3840,14 @@ export class FeedService implements OnModuleInit {
   private async assertPostExists(postId: string) {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post || post.publishStatus === 'deleted') {
+      // R1 走查：assertPostExists 是 mobile 广场动态 like/comment/reply 全部
+      // 入口的兜底；旧 'Feed post not found' 英文文案在「角色发完帖立刻被
+      // 主人手动删 / moderation」这种小概率窗口里会原样飘到前端 InlineNotice。
+      // 前端走 error.message 兜底显示，i18n 字典 hit 不到的语言（中文 fallback
+      // 路径）就会看到英文，跟 moments-service 同款修法改成中文 legacyMessage。
       throw new AppError('FEED_POST_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Feed post not found',
+        legacyMessage: '该动态不存在或已被删除。',
       });
     }
     return post;
