@@ -562,13 +562,19 @@ export function DesktopNotesWorkspace({
     }
 
     const nextHtml = normalizeEditorHtml(editor.innerHTML);
-    const nextAssets = filterAssetsByHtml(nextHtml, editorState.assets);
-    setEditorState({
+    // 跟 handleAttachmentSelection 同样的隐患：之前 setEditorState({...tags:
+    // editorState.tags, assets: filterAssetsByHtml(_, editorState.assets)}) 拿的是
+    // 渲染期闭包的 tags / assets。onInput / execCommand 触发频率高，
+    // handleTagCommit / handleRemoveTag 的 setEditorState((current) => ...)
+    // 队列尚未 commit 时再来一发 onInput，stale tags 会把队列里那条
+    // 新加标签 / 刚移除的标签整个吞回去。改成 functional updater 从最新
+    // state 拼，从源头消除这个抖动。
+    setEditorState((current) => ({
       contentHtml: nextHtml,
       contentText: extractNoteTextFromHtml(nextHtml),
-      tags: editorState.tags,
-      assets: nextAssets,
-    });
+      tags: current.tags,
+      assets: filterAssetsByHtml(nextHtml, current.assets),
+    }));
   }
 
   function focusEditorAtEnd() {
@@ -677,16 +683,24 @@ export function DesktopNotesWorkspace({
         }
       }
 
-      const nextAssets = mergeNoteAssets(editorState.assets, createdAssets);
+      // 之前是 setEditorState({...tags: editorState.tags...})，editorState
+      // 是 handleAttachmentSelection 进入时的闭包快照——上传走 await（可能几
+      // 百 ms 到几秒），这期间用户在标签栏添加 / 删除标签（handleTagCommit /
+      // handleRemoveTag 都已经是 functional updater 正确更新 state），上传
+      // 完成后这一行把 tags 强行写回闭包旧值，用户在等上传时新加的标签直接
+      // 没了。改成 functional updater，从最新 state 拼出最终值。
       const editor = editorRef.current;
-      const nextHtml = normalizeEditorHtml(
-        editor?.innerHTML ?? editorState.contentHtml,
-      );
-      setEditorState({
-        contentHtml: nextHtml,
-        contentText: extractNoteTextFromHtml(nextHtml),
-        tags: editorState.tags,
-        assets: filterAssetsByHtml(nextHtml, nextAssets),
+      setEditorState((current) => {
+        const nextHtml = normalizeEditorHtml(
+          editor?.innerHTML ?? current.contentHtml,
+        );
+        const nextAssets = mergeNoteAssets(current.assets, createdAssets);
+        return {
+          contentHtml: nextHtml,
+          contentText: extractNoteTextFromHtml(nextHtml),
+          tags: current.tags,
+          assets: filterAssetsByHtml(nextHtml, nextAssets),
+        };
       });
       setNotice({
         tone: "success",
