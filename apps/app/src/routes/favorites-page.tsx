@@ -850,7 +850,16 @@ function DesktopFavoritesPage() {
             <LoadingBlock label={t(msg`正在读取收藏...`)} />
           ) : null}
 
-          {!favoritesQuery.isLoading && !filteredFavorites.length ? (
+          {/* favoritesQuery.isError 且 favorites 本地也是空（新设备 / 没
+             upsertDesktopFavorite 过）时，之前会同时画 ErrorBlock 和
+             "还没有收藏内容" EmptyState——用户看到错误条 + 空态会以为
+             收藏被服务端清掉了，其实只是 getFavorites 拉不下来。错误条已
+             经独立画在上面，这种 case 抑制 EmptyState，避免和 ErrorBlock
+             自相矛盾。注意只在没本地数据时抑制：本地有收藏但搜索/分类命中 0
+             条的情况，"没有匹配"这类提示仍然有价值，不应被网络错误吞掉。 */}
+          {!favoritesQuery.isLoading &&
+          !(favoritesQuery.isError && !favorites.length) &&
+          !filteredFavorites.length ? (
             <div className="rounded-[18px] border border-dashed border-[color:var(--border-faint)] bg-white/80 p-6">
               <EmptyState
                 title={
