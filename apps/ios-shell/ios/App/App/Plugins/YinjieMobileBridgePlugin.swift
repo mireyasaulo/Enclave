@@ -749,11 +749,37 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         let call = pendingCameraCaptureCall
         pendingCameraCaptureCall = nil
 
+        // captureImage 入口已经在 .denied / .restricted 时提前 reject 出 PERMISSION_DENIED
+        // 给 JS 端弹「去设置」引导。但 .notDetermined → present picker 的路径下，
+        // iOS 会用「inline 系统弹窗」原位询问权限：用户点 Don't Allow 后 picker
+        // 立刻被 iOS 自己 dismiss，回调直接走到这里。原实现拿不到任何错误信号，
+        // resolve null 让 JS 误判成「用户主动 cancel」(asset:null + error:null →
+        // 在 chat-composer 静默 return)，第一次拒绝的用户看到的是「按了相机按钮
+        // 什么都没发生」，毫无线索。只有第二次再点相机才会被 .denied 分支拦下来
+        // 弹出 notice。
+        //
+        // 这里在 didCancel 时再查一遍 AVCaptureDevice.authorizationStatus，区分:
+        //   - .authorized → 真的 user 主动 cancel（拍照页里按取消 / 用户授权过
+        //     之后这次只是不想拍），resolve null 保持原契约
+        //   - .denied / .restricted → 用户刚才在 inline 提示里拒了，跟 captureImage
+        //     入口的 .denied 分支同款 reject，JS 端 resolveNativeCameraCaptureNotice
+        //     会按 message 含 "permission" 走 PERMISSION_DENIED 走法，引导去设置
+        //   - .notDetermined（理论上 inline 之后不应该再是这个状态，但 iOS 偶发
+        //     在动画期间状态没刷过来）→ 当 cancel 处理，跟原有行为对齐
+        let cameraAuth = AVCaptureDevice.authorizationStatus(for: .video)
         DispatchQueue.main.async {
             picker.dismiss(animated: true) {
-                call?.resolve([
-                    "asset": NSNull()
-                ])
+                guard let call else {
+                    return
+                }
+                if cameraAuth == .denied || cameraAuth == .restricted {
+                    call.reject(
+                        "camera permission denied — open Settings to grant access",
+                        "PERMISSION_DENIED"
+                    )
+                    return
+                }
+                call.resolve(["asset": NSNull()])
             }
         }
     }
