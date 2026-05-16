@@ -666,41 +666,68 @@ export function ContactsPage() {
         .sort(compareStarredFriends),
     [friendsQuery.data],
   );
-  const starredCommonGroupsByCharacterId = useMemo(() => {
-    const map: Record<string, Array<{ id: string; name: string }>> = {};
-    const conversations = conversationsQuery.data ?? [];
-    for (const item of starredFriends) {
-      map[item.character.id] = conversations
-        .filter(
-          (conversation) =>
-            isPersistedGroupConversation(conversation) &&
-            conversation.participants.includes(item.character.id),
-        )
-        .map((conversation) => ({
-          id: conversation.id,
-          name: conversation.title,
-        }));
+  // 把「星标好友的共同群聊 + 直通会话」两份索引合并到一次 conversations
+  // 遍历里建好。原实现对每个 starred friend 都 .filter / .find 一遍整个
+  // conversations 数组：O(starred × conversations)；用户星标多 + 群聊多时
+  // 每次 conversationsQuery 变（来一条消息 / 切置顶都会变）这两条 useMemo
+  // 全量重算，2.4s notice 还没消主线程已经被刷了两遍。反过来 outer-loop
+  // conversations + inner-loop participants（群聊 ≤ 几十人 / 直通会话只有
+  // 2 人）配合 starredIdSet O(1) 命中，总开销 ≈ O(conversations) + O(starred)。
+  const { starredCommonGroupsByCharacterId, starredDirectConversationByCharacterId } = useMemo(() => {
+    const commonGroupsMap: Record<string, Array<{ id: string; name: string }>> = {};
+    const directConvMap: Record<
+      string,
+      { id: string; isPinned: boolean; isMuted: boolean }
+    > = {};
+    const starredIdSet = new Set(
+      starredFriends.map((item) => item.character.id),
+    );
+    if (!starredIdSet.size) {
+      return {
+        starredCommonGroupsByCharacterId: commonGroupsMap,
+        starredDirectConversationByCharacterId: directConvMap,
+      };
     }
-    return map;
-  }, [conversationsQuery.data, starredFriends]);
-  const starredDirectConversationByCharacterId = useMemo(() => {
-    const map: Record<string, { id: string; isPinned: boolean; isMuted: boolean }> = {};
+    // 预填 commonGroups 为 []：跟旧实现保持「starred 但 0 共同群聊」也有 entry，
+    // 避免下游 `?? []` 形态差异（虽然语义等价，单测里曾经按 key 个数断言过）。
+    for (const id of starredIdSet) {
+      commonGroupsMap[id] = [];
+    }
     const conversations = conversationsQuery.data ?? [];
-    for (const item of starredFriends) {
-      const conversation = conversations.find(
-        (entry) =>
-          !isPersistedGroupConversation(entry) &&
-          entry.participants.includes(item.character.id),
-      );
-      if (conversation) {
-        map[item.character.id] = {
+    for (const conversation of conversations) {
+      const isGroup = isPersistedGroupConversation(conversation);
+      if (isGroup) {
+        for (const participantId of conversation.participants) {
+          if (starredIdSet.has(participantId)) {
+            commonGroupsMap[participantId]!.push({
+              id: conversation.id,
+              name: conversation.title,
+            });
+          }
+        }
+        continue;
+      }
+      // 直通会话：找到 starred 对方那一位（参与者通常 2 人，包含 self；跳过 self
+      // 以免误把自己当对面 starred 友的直通会话）。已经命中过的不再覆写，沿用
+      // 旧 .find() 「第一条匹配」语义，避免后台并行返回多条直通时表现漂移。
+      for (const participantId of conversation.participants) {
+        if (!starredIdSet.has(participantId)) {
+          continue;
+        }
+        if (directConvMap[participantId]) {
+          continue;
+        }
+        directConvMap[participantId] = {
           id: conversation.id,
           isPinned: Boolean(conversation.isPinned),
           isMuted: Boolean(conversation.isMuted),
         };
       }
     }
-    return map;
+    return {
+      starredCommonGroupsByCharacterId: commonGroupsMap,
+      starredDirectConversationByCharacterId: directConvMap,
+    };
   }, [conversationsQuery.data, starredFriends]);
   const starredIsPinnedByCharacterId = useMemo(() => {
     const map: Record<string, boolean> = {};
