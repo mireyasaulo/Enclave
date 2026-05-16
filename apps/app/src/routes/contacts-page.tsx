@@ -1974,6 +1974,9 @@ export function ContactsPage() {
                   onDecline={(requestId) =>
                     declineFriendRequestMutation.mutate(requestId)
                   }
+                  onRetry={() => {
+                    void friendRequestsQuery.refetch();
+                  }}
                 />
               </Suspense>
             ) : desktopSelection?.kind === "starred-friends" ? (

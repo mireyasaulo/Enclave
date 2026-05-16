@@ -18,6 +18,9 @@ type DesktopContactsFriendRequestsPaneProps = {
   declinePendingId?: string | null;
   onAccept: (requestId: string) => void;
   onDecline: (requestId: string) => void;
+  // 初始加载失败兜底重试。无 retry 时整栏只能等用户手动切走再切回，跟移动端
+  // friend-requests-page 的"重试读取"按钮对齐。
+  onRetry?: () => void;
 };
 
 export function DesktopContactsFriendRequestsPane({
@@ -30,6 +33,7 @@ export function DesktopContactsFriendRequestsPane({
   declinePendingId = null,
   onAccept,
   onDecline,
+  onRetry,
 }: DesktopContactsFriendRequestsPaneProps) {
   const t = useRuntimeTranslator();
   // 后端 /social/friend-requests 只返回 status='pending'，但 expiresAt 过期后
@@ -100,7 +104,21 @@ export function DesktopContactsFriendRequestsPane({
           // 仅当没有数据时把 ErrorBlock 撑满；refetch 失败但 query 还留着前一次
           // 成功的 data 时，把列表保住，让用户接着处理手头那一批，错误以下面顶部
           // 的 actionError 提示。
-          <ErrorBlock message={error} />
+          <ErrorBlock message={error}>
+            {onRetry ? (
+              <div className="mt-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={onRetry}
+                  className="rounded-[10px]"
+                >
+                  {t(msg`重试读取`)}
+                </Button>
+              </div>
+            ) : null}
+          </ErrorBlock>
         ) : requests.length ? (
           // shrink-0：父容器是 flex-col，列表过长时 flex 默认会等比缩，反而把单行
           // 压扁。要走 parent.overflow-auto 的滚动条，列表自身得放弃 shrink。
