@@ -1002,6 +1002,15 @@ export function ContactsPage() {
     return () => window.clearTimeout(timer);
   }, [friendRequestSuccess]);
 
+  // 离开 new-friends 面板时清掉 success 提示。否则用户接受好友 → 切到其它
+  // 面板 → 2.4s 内切回来，pane 重新挂载读到上次的 friendRequestSuccess，
+  // 闪一遍旧确认条，看起来像新动作刚发生。
+  useEffect(() => {
+    if (desktopSelection?.kind !== "new-friends") {
+      setFriendRequestSuccessState(null);
+    }
+  }, [desktopSelection?.kind]);
+
   // 原生壳硬件 Back（仅移动布局生效）：
   // 1) + 快捷菜单打开时先收菜单
   // 2) 批量管理模式时先退多选
