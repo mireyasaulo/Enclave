@@ -2109,6 +2109,11 @@ function ChannelAudioPictorial({
   // 进入 active 时播放，离开时暂停 + 复位（保证全局只有一条 audio 在响）。
   // 注意：userUnmuted 不是这里的依赖——否则用户主动暂停后再切静音，会被
   // 重新强制 play()，违反暂停意图。muted 同步交给下方独立 effect。
+  //
+  // 走查 新一轮 R3：用 ref 缓存「最近一次 userUnmuted」给 catch 用——
+  // 不进 useEffect deps（避免 user 解锁瞬间整段 effect 重跑触发抢断 play）。
+  const userUnmutedRef = useRef(userUnmuted);
+  userUnmutedRef.current = userUnmuted;
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -2117,8 +2122,19 @@ function ChannelAudioPictorial({
       const promise = audio.play();
       if (promise && typeof promise.catch === "function") {
         promise.catch(() => {
-          audio.muted = true;
-          audio.play().catch(() => undefined);
+          // 走查 新一轮 R3：原 catch 一律 muted-retry——这是为了绕过浏览器
+          // autoplay policy（没用户手势前 unmuted play 直接拒）。但用户已经
+          // 解锁过音频（userUnmuted=true）后还失败的是 codec / 网络 / 媒体
+          // 格式问题，muted 重放无济于事；更糟的是 audio.muted=true 被卡死、
+          // 而 userUnmuted state 仍 true 不会触发下面 userUnmuted-effect 重置
+          // muted，结果用户看到 pictorial 渲好却永远静音、tap 也救不回（
+          // handleTap 因 userUnmuted=true 走 toggle 分支不动 muted）。
+          // 只在没解锁过的场景才走 muted 兜底；解锁过则让这次 play() 失败，
+          // 由 user tap → handleTap → audio.play() 自然重试。
+          if (!userUnmutedRef.current) {
+            audio.muted = true;
+            audio.play().catch(() => undefined);
+          }
         });
       }
     } else {
@@ -2380,6 +2396,10 @@ function ChannelVideoSurface({
   const [isPlaying, setIsPlaying] = useState(false);
 
   // 同 audio：userUnmuted 不当依赖，避免用户暂停后被强制 replay。
+  // 走查 新一轮 R3：跟 ChannelAudioPictorial 同坑——已解锁后 play() 失败
+  // 走 muted 重放会把 video.muted 卡死、user 永远没声音。ref 拿最新 userUnmuted。
+  const userUnmutedRef = useRef(userUnmuted);
+  userUnmutedRef.current = userUnmuted;
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -2388,8 +2408,10 @@ function ChannelVideoSurface({
       const promise = video.play();
       if (promise && typeof promise.catch === "function") {
         promise.catch(() => {
-          video.muted = true;
-          video.play().catch(() => undefined);
+          if (!userUnmutedRef.current) {
+            video.muted = true;
+            video.play().catch(() => undefined);
+          }
         });
       }
     } else {
