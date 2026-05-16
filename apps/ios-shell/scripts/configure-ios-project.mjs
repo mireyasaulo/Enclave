@@ -1151,10 +1151,22 @@ function applyEntitlementsFromEnv() {
     // 装机时会对每个 applinks: 拉一次 https://${domain}/.well-known/apple-
     // app-site-association，占位域名根本不解析 / 不返 AASA，平白浪费首装
     // 网络请求，安全审查也会问为什么列那么多没指向的域。
-    source = source.replace(
-      /(<key>com\.apple\.developer\.associated-domains<\/key>\s*<array>)[\s\S]*?(<\/array>)/m,
-      `$1\n    <string>${associatedDomain}</string>\n  $2`,
-    );
+    if (/<key>com\.apple\.developer\.associated-domains<\/key>/m.test(source)) {
+      source = source.replace(
+        /(<key>com\.apple\.developer\.associated-domains<\/key>\s*<array>)[\s\S]*?(<\/array>)/m,
+        `$1\n    <string>${associatedDomain}</string>\n  $2`,
+      );
+    } else {
+      // Round 22 把没用上的 applinks:app.example.yinjie.app 占位整条 entitlement
+      // 清掉了，导致 entitlements 里压根没 com.apple.developer.associated-
+      // domains 这个 key。这里如果光靠 replace，正则匹配不到任何东西 ——
+      // 用户之后再设 YINJIE_IOS_ASSOCIATED_DOMAIN 也加不回来，universal link
+      // 永远跑不通。key 不在时手动 insert 一条到 </dict> 前。
+      source = source.replace(
+        /(\s*)<\/dict>\s*<\/plist>/m,
+        `$1  <key>com.apple.developer.associated-domains</key>$1  <array>$1    <string>${associatedDomain}</string>$1  </array>$1</dict>\n</plist>`,
+      );
+    }
   } else {
     // associatedDomain 没配，但模板里那条 applinks:app.example.yinjie.app 占位
     // 不该跟着 release 包一起上 App Store / TestFlight。Round 9 修了「不要
