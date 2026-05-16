@@ -794,8 +794,22 @@ export function ChannelsPage() {
               label: commentMutation.variables.replyTarget
                 ? t(msg`重试回复评论`)
                 : t(msg`重试发送评论`),
+              // postId / replyTarget 用旧的（用户改的是文本不是回复对象），
+              // text 从 commentDrafts 现读现用——直接 mutate(variables) 会把
+              // 失败那一刻的旧 text 又发一遍，但评论过长 / 被风控驳回时用户
+              // 通常已经在草稿里缩短改写过，旧 text 会把刚改完的本意顶回去。
               onClick: () => {
-                commentMutation.mutate(commentMutation.variables);
+                const variables = commentMutation.variables;
+                if (!variables) {
+                  commentMutation.reset();
+                  return;
+                }
+                const currentDraft =
+                  commentDrafts[variables.postId] ?? variables.text;
+                commentMutation.mutate({
+                  ...variables,
+                  text: currentDraft,
+                });
               },
             }
           : null;
