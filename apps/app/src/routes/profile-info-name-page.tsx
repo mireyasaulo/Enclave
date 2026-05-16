@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -27,9 +27,16 @@ export function ProfileInfoNamePage() {
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
 
   const [draft, setDraft] = useState(username ?? "");
+  // 用户进页面时 store 可能还没 hydrate（cold start / 重置 cloud session），
+  // username 之后才被异步灌进来。这时候想让 draft 同步成"刚 hydrate 出来的
+  // username"。但如果用户已经在输入框里改过字了，再被外部 store 更新覆盖回
+  // 去就是吞输入。用 ref 记一下用户有没有动过输入框，动过就不再 auto-sync。
+  const userTouchedRef = useRef(false);
 
   useEffect(() => {
-    setDraft(username ?? "");
+    if (!userTouchedRef.current) {
+      setDraft(username ?? "");
+    }
   }, [username]);
 
   useEffect(() => {
@@ -104,7 +111,10 @@ export function ProfileInfoNamePage() {
         <TextField
           autoFocus
           value={draft}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => {
+            userTouchedRef.current = true;
+            setDraft(event.target.value);
+          }}
           maxLength={NAME_MAX_LENGTH}
           placeholder={t(msg`输入名字`)}
           // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -26,9 +26,14 @@ export function ProfileInfoSignaturePage() {
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
 
   const [draft, setDraft] = useState(signature);
+  // 见 profile-info-name-page 同名 ref：用户已经动过输入框时，不要被
+  // 后台 hydrate 把 draft 覆盖回 store 值。
+  const userTouchedRef = useRef(false);
 
   useEffect(() => {
-    setDraft(signature);
+    if (!userTouchedRef.current) {
+      setDraft(signature);
+    }
   }, [signature]);
 
   useEffect(() => {
@@ -102,7 +107,10 @@ export function ProfileInfoSignaturePage() {
         <TextAreaField
           autoFocus
           value={draft}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => {
+            userTouchedRef.current = true;
+            setDraft(event.target.value);
+          }}
           maxLength={SIGNATURE_MAX_LENGTH}
           placeholder={t(msg`写一句此刻想说的话`)}
           // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。

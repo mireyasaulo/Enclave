@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -60,10 +60,15 @@ export function ProfileInfoAvatarPage() {
     name: string;
   } | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+  // 用户已经在 URL 输入框里改过 / 已经从相册选过图时，不要被后台 hydrate
+  // 把这俩 draft 覆盖回 store 值——会吞用户输入。
+  const userTouchedRef = useRef(false);
 
   useEffect(() => {
-    setDraft(initialDraft);
-    setPickedLocal(null);
+    if (!userTouchedRef.current) {
+      setDraft(initialDraft);
+      setPickedLocal(null);
+    }
   }, [initialDraft]);
 
   useEffect(() => {
@@ -118,6 +123,7 @@ export function ProfileInfoAvatarPage() {
     reader.onload = () => {
       const result = reader.result;
       if (typeof result === "string") {
+        userTouchedRef.current = true;
         setPickedLocal({ dataUrl: result, size: file.size, name: file.name });
         // 选了本地图后，URL 输入框里的旧 URL 不再适用，先清掉
         setDraft("");
@@ -219,6 +225,7 @@ export function ProfileInfoAvatarPage() {
           <TextField
             value={draft}
             onChange={(event) => {
+              userTouchedRef.current = true;
               setDraft(event.target.value);
               setLocalError(null);
             }}
