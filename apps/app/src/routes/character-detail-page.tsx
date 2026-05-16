@@ -597,19 +597,19 @@ export function CharacterDetailPage() {
           ? t(msg`好友申请已发送。`)
           : t(msg`已添加到通讯录。`),
       });
-      // 走查 R1：app-friends-quick-start 全代码库无 useQuery 订阅，纯死 invalidate；
-      // app-group-friends 在 create-group-page 已经统一到 app-friends，这里同样无订阅。
-      // 都删掉，留下真正在用的三条。
+      // 走查 R10：autoAccept=true 时 backend 会立刻 activateFriendship + 写一条
+      // 系统消息进对话；同时 moments.service.canOwnerViewPost 用
+      // ownerFriendCharacterIds 决定可见性，新好友过去发过的 moments / feed post
+      // 这一刻起就该出现在用户的 feed 里。但原 onSuccess 只 invalidate
+      // app-friend-requests / app-friends / app-conversations，moments / feed
+      // 这一堆 surface 上加好友前的旧 post 要等 query 自然 stale 才补进来。改用
+      // invalidateFriendDisplayQueries 覆盖 friend / conversation / messages /
+      // moments / feed 全套；app-friend-requests 不在它里面，单独留一条。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-friend-requests", baseUrl],
         }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-friends", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        }),
+        invalidateFriendDisplayQueries(queryClient, baseUrl),
       ]);
     },
   });
