@@ -17,6 +17,11 @@ type Props = {
   onSelectAll: () => void;
   onClearSelection: () => void;
   onDone: () => void;
+  // 部分操作失败时把 bulk 模式保留下来，并把选区收敛成"失败那几个"，方便用户
+  // 一眼定位 + 直接重试。原写法 res.failed.length>0 也照样调 onDone() → bulk
+  // 退出 + 全清，用户只看到"部分操作失败"红字但不知道是哪几个，得 dance 出 dance
+  // 入再重新挑一遍。
+  onPartialFailure?: (failedIds: string[]) => void;
   setNotice?: (message: string | null) => void;
   // setNoticeError 走 danger tone（同一个 notice slot 上层渲染时切红字 + 长一点
   // 的自动消失时间），方便用户区分"批量删除完成"和"批量删除挂了"。
@@ -30,6 +35,7 @@ export function ContactsBulkActionBar({
   onSelectAll,
   onClearSelection,
   onDone,
+  onPartialFailure,
   setNotice,
   setNoticeError,
   desktop = false,
@@ -68,14 +74,35 @@ export function ContactsBulkActionBar({
     return unregister;
   }, [showTagDialog, showDeleteDialog, bulk.isPending]);
 
-  const flushNotice = (success: boolean, action: string) => {
+  const flushNotice = (success: boolean, action: string, failedCount = 0) => {
     // 部分失败也是错——走 danger tone 才能跟"操作成功"区分。这条以前 setNotice
     // 走 info tone，结果"部分操作失败"画成蓝条，跟"打标签：操作成功"长得一样。
     if (success) {
       setNotice?.(`${action}${t(msg`：操作成功`)}`);
       return;
     }
-    setNoticeError?.(t(msg`部分操作失败`));
+    // 把失败数量带进 notice：以前光说"部分操作失败"，但用户不知道是 1 个失败还是
+    // 半数失败；带计数 + 把选区收敛到失败那几条之后用户能直接看到红字 + 哪几个
+    // 还高亮着。
+    setNoticeError?.(
+      failedCount > 0
+        ? `${action}${t(msg`：${failedCount} 项操作失败`)}`
+        : t(msg`部分操作失败`),
+    );
+  };
+
+  // success 完成路径，partial 失败时把 bulk 模式留着、选区只剩失败那几个。
+  const handleResult = (
+    res: { failed: string[] },
+    action: string,
+  ) => {
+    const partial = res.failed.length > 0;
+    flushNotice(!partial, action, res.failed.length);
+    if (partial && onPartialFailure) {
+      onPartialFailure(res.failed);
+      return;
+    }
+    onDone();
   };
 
   // 整条 mutation 直接 reject（网络抖断 / 401 / 500）时之前没有 UI 反馈：bar 不
@@ -97,10 +124,7 @@ export function ContactsBulkActionBar({
         action: starred ? "star" : "unstar",
       },
       {
-        onSuccess: (res) => {
-          flushNotice(res.failed.length === 0, actionLabel);
-          onDone();
-        },
+        onSuccess: (res) => handleResult(res, actionLabel),
         onError: (error) => {
           flushError(actionLabel, error);
         },
@@ -122,10 +146,9 @@ export function ContactsBulkActionBar({
       },
       {
         onSuccess: (res) => {
-          flushNotice(res.failed.length === 0, t(msg`打标签`));
           setShowTagDialog(false);
           setTagDraft("");
-          onDone();
+          handleResult(res, t(msg`打标签`));
         },
         onError: (error) => {
           flushError(t(msg`打标签`), error);
@@ -144,9 +167,8 @@ export function ContactsBulkActionBar({
       },
       {
         onSuccess: (res) => {
-          flushNotice(res.failed.length === 0, t(msg`删除`));
           setShowDeleteDialog(false);
-          onDone();
+          handleResult(res, t(msg`删除`));
         },
         onError: (error) => {
           flushError(t(msg`删除`), error);

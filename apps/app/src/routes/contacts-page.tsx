@@ -340,6 +340,10 @@ export function ContactsPage() {
     setBulkMode(false);
     setBulkSelectedIds(new Set());
   }, []);
+  // 部分操作失败时收敛选区到失败那几条；bulk 模式保留，让用户继续重试。
+  const retainBulkFailures = useCallback((failedIds: string[]) => {
+    setBulkSelectedIds(new Set(failedIds));
+  }, []);
   const toggleBulkSelection = useCallback((characterId: string) => {
     setBulkSelectedIds((current) => {
       const next = new Set(current);
@@ -1807,6 +1811,7 @@ export function ContactsPage() {
                 }
                 onClearSelection={() => setBulkSelectedIds(new Set())}
                 onDone={exitBulkMode}
+                onPartialFailure={retainBulkFailures}
                 setNotice={setNotice}
                 setNoticeError={setNoticeError}
               />
@@ -2568,6 +2573,7 @@ export function ContactsPage() {
             onSelectAll={() => setBulkSelectedIds(new Set(mobileBulkAllIds))}
             onClearSelection={() => setBulkSelectedIds(new Set())}
             onDone={exitBulkMode}
+            onPartialFailure={retainBulkFailures}
             setNotice={setNotice}
             setNoticeError={setNoticeError}
           />
