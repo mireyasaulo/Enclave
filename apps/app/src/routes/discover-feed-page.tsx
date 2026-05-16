@@ -894,10 +894,9 @@ const pendingLikePostId = likeMutation.isPending
       postId: post.id,
     });
     const sharePath = `${pathname}${shareHash ? `#${shareHash}` : ""}`;
-    const shareUrl =
-      typeof window === "undefined"
-        ? sharePath
-        : `${window.location.origin}${sharePath}`;
+    // 用户在 vicp.fun 隧道 / localhost / 内网 IP 上点分享时，window.location.origin
+    // 会泄露这些非公网域名，分享给朋友打不开。统一用对外的官网域名 enclaveai.top。
+    const shareUrl = `https://enclaveai.top${sharePath}`;
     const postSummary = getFeedSummaryText(post);
     const summaryText = `${post.authorName}：${postSummary}\n${shareUrl}`;
 

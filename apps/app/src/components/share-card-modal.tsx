@@ -17,7 +17,7 @@ const t = translateRuntimeMessage;
 
 // 水印里的 QR 与文案都指向 site 主域名。
 // 不读 env，因为 app 客户端的 SITE_URL 没有现成常量，且这个值固定。
-const SITE_URL = "https://www.enclave.top";
+const SITE_URL = "https://enclaveai.top";
 
 // QR 是 site URL 编码出来的 data URL，整个 app 生命周期都不变。
 // 第一次生成后挂在模块作用域，后续 modal 打开直接读 — 不再每次重新生成。
@@ -349,7 +349,7 @@ export function ShareCardModal({
                 {watermarkSubtitle}
               </div>
               <div style={{ fontSize: 12, color: "#9A9A9A", marginTop: 2 }}>
-                {t(msg`enclave.top · 浏览器即开即用`)}
+                {t(msg`enclaveai.top · 浏览器即开即用`)}
               </div>
             </div>
           </div>
