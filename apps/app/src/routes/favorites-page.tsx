@@ -470,25 +470,33 @@ export function FavoritesPage() {
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto p-3">
-            <div className="space-y-1">
-              {getCategoryLabels().map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setActiveCategory(item.id)}
-                  className={cn(
-                    "flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-left text-sm transition",
-                    activeCategory === item.id
-                      ? "bg-[rgba(7,193,96,0.07)] text-[color:var(--text-primary)]"
-                      : "text-[color:var(--text-secondary)] hover:bg-white/80 hover:text-[color:var(--text-primary)]",
-                  )}
-                >
-                  <span>{item.label}</span>
-                  <span className="rounded-full bg-white/88 px-2 py-0.5 text-[11px] text-[color:var(--text-muted)]">
-                    {counts[item.id]}
-                  </span>
-                </button>
-              ))}
+            <div className="space-y-1" role="tablist" aria-label={t(msg`收藏分类`)}>
+              {getCategoryLabels().map((item) => {
+                const isActive = activeCategory === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => setActiveCategory(item.id)}
+                    className={cn(
+                      "flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-left text-sm transition",
+                      isActive
+                        ? "bg-[rgba(7,193,96,0.07)] text-[color:var(--text-primary)]"
+                        : "text-[color:var(--text-secondary)] hover:bg-white/80 hover:text-[color:var(--text-primary)]",
+                    )}
+                  >
+                    <span>{item.label}</span>
+                    <span
+                      className="rounded-full bg-white/88 px-2 py-0.5 text-[11px] text-[color:var(--text-muted)]"
+                      aria-label={t(msg`${counts[item.id]} 项`)}
+                    >
+                      {counts[item.id]}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="mt-4 rounded-[14px] border border-[color:var(--border-faint)] bg-white px-4 py-4">
@@ -734,11 +742,17 @@ export function FavoritesPage() {
           ) : null}
 
           {filteredFavorites.length ? (
-            <div className="space-y-2">
+            <div
+              className="space-y-2"
+              role="listbox"
+              aria-label={t(msg`收藏列表`)}
+            >
               {filteredFavorites.map((item) => (
                 <button
                   key={item.id}
                   type="button"
+                  role="option"
+                  aria-selected={item.sourceId === selectedFavoriteSourceId}
                   onClick={() => setSelectedFavoriteSourceId(item.sourceId)}
                   className={cn(
                     "flex w-full items-start gap-4 rounded-[14px] border px-4 py-4 text-left transition",
