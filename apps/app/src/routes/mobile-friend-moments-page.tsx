@@ -13,7 +13,7 @@ import {
   type MomentComment,
   type MomentLike,
 } from "@yinjie/contracts";
-import { getActiveLocale, translateRuntimeMessage } from "@yinjie/i18n";
+import { translateRuntimeMessage, useAppLocale } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -419,6 +419,26 @@ export function MobileFriendMomentsPage() {
         ),
     [blockedCharacterIds, momentsQuery.data],
   );
+  // 时间线左边那列「日 / 月」的预格式化。之前在 friendMoments.map 内联里每条
+  // moment 渲染时都 new 一个 Intl.DateTimeFormat —— 30 条 × 父组件每个 setState
+  // 都重渲一次 = 海量 ICU 实例化，输入评论草稿那种高频 re-render 直接吃掉
+  // 主线程几十 ms。把 formatter 抬出 map + 整批 useMemo 缓存。
+  const { locale: activeLocale } = useAppLocale();
+  const momentDateLabels = useMemo(() => {
+    const monthFormatter = new Intl.DateTimeFormat(activeLocale, {
+      month: "long",
+    });
+    return friendMoments.map((moment) => {
+      const date = new Date(moment.postedAt);
+      if (Number.isNaN(date.getTime())) {
+        return { dayLabel: "--", monthLabel: "--" };
+      }
+      return {
+        dayLabel: `${date.getDate()}`.padStart(2, "0"),
+        monthLabel: monthFormatter.format(date),
+      };
+    });
+  }, [activeLocale, friendMoments]);
   const relationshipLoading = friendsQuery.isLoading || blockedQuery.isLoading;
   const timelineLoading = momentsQuery.isLoading || relationshipLoading;
   const pendingCommentMomentId = commentMutation.isPending
@@ -808,13 +828,10 @@ export function MobileFriendMomentsPage() {
           !isBlocked &&
           friendMoments.length
             ? friendMoments.map((moment, index) => {
-                const date = new Date(moment.postedAt);
-                const dayLabel = Number.isNaN(date.getTime())
-                  ? "--"
-                  : `${date.getDate()}`.padStart(2, "0");
-                const monthLabel = Number.isNaN(date.getTime())
-                  ? "--"
-                  : new Intl.DateTimeFormat(getActiveLocale(), { month: "long" }).format(date);
+                const { dayLabel, monthLabel } = momentDateLabels[index] ?? {
+                  dayLabel: "--",
+                  monthLabel: "--",
+                };
                 return (
                   <div
                     key={moment.id}
