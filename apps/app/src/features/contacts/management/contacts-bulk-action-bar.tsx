@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import {
   CheckCheck,
@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
+import { registerAndroidBackInterceptor } from "../../../runtime/android-back-button";
 import { useBulkFriendshipMutation } from "./use-bulk-friendship-mutation";
 
 type Props = {
@@ -37,6 +38,31 @@ export function ContactsBulkActionBar({
   const hasSelection = selectedIds.length > 0;
 
   const bulk = useBulkFriendshipMutation();
+
+  // 二次确认 dialog 打开时硬件 Back 应先关 dialog；pending 中（正在写）不拦
+  // 避免打断本来就要完成的写入。注册晚于父页 bulkMode 那条 → 优先级更高。
+  useEffect(() => {
+    if (!showTagDialog && !showDeleteDialog) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      if (bulk.isPending) {
+        return false;
+      }
+      if (showTagDialog) {
+        event.preventDefault();
+        setShowTagDialog(false);
+        return true;
+      }
+      if (showDeleteDialog) {
+        event.preventDefault();
+        setShowDeleteDialog(false);
+        return true;
+      }
+      return false;
+    });
+    return unregister;
+  }, [showTagDialog, showDeleteDialog, bulk.isPending]);
 
   const flushNotice = (success: boolean, action: string) => {
     if (!setNotice) return;
@@ -255,7 +281,7 @@ export function ContactsBulkActionBar({
           <div className="relative w-full max-w-[380px] overflow-hidden rounded-[16px] bg-white shadow-[var(--shadow-overlay)]">
             <div className="px-5 py-5 text-center">
               <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
-                {t(msg`确定删除选中的 ${selectedIds.length} 个朋友吗?`)}
+                {t(msg`确定删除选中的 ${selectedIds.length} 个朋友？`)}
               </div>
               <p className="mt-2 text-[12px] leading-5 text-[color:var(--text-muted)]">
                 {t(msg`删除后将不会通知对方，可重新添加。`)}

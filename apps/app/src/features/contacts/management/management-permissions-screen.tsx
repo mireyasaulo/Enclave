@@ -32,13 +32,22 @@ export function ManagementPermissionsScreen({ onPickFriend }: Props) {
   // 才能匹配上。直接传 trimmedSearch 会让用户输入 "Andrej" 找不到 "Andrej Karpathy"。
   const normalizedSearch = trimmedSearch.toLowerCase();
 
+  // 拆 2 个 useMemo —— 原写法把 createFriendDirectoryItems（包含拼音 Collator
+  // 排序，O(n log n)）和 filter+buildContactSections 放在同一个 useMemo 里，依赖
+  // normalizedSearch，每个键都会让目录从零重排一次。对齐 contacts-page 的拆分
+  // 后，directoryItems 只随 friendsQuery.data 重算；输入框敲字时只跑 O(n) filter。
+  const directoryItems = useMemo(
+    () => createFriendDirectoryItems(friendsQuery.data ?? []),
+    [friendsQuery.data],
+  );
   const sections = useMemo(() => {
-    const items = createFriendDirectoryItems(friendsQuery.data ?? []);
     const filtered = normalizedSearch
-      ? items.filter((item) => matchesFriendSearch(item, normalizedSearch))
-      : items;
+      ? directoryItems.filter((item) =>
+          matchesFriendSearch(item, normalizedSearch),
+        )
+      : directoryItems;
     return buildContactSections(filtered);
-  }, [friendsQuery.data, normalizedSearch]);
+  }, [directoryItems, normalizedSearch]);
 
   const isLoading = friendsQuery.isLoading;
 

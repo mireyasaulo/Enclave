@@ -5,6 +5,7 @@ import { ArrowLeft, X } from "lucide-react";
 import { getFriends, listCharacters } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
+import { registerAndroidBackInterceptor } from "../../../runtime/android-back-button";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 import { useDesktopLayout } from "../../shell/use-desktop-layout";
 import { useManagementScreenStack } from "./contacts-management-state";
@@ -73,6 +74,24 @@ export function ContactsManagementModal({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, canGoBack, pop, onClose]);
+
+  // 原生壳硬件 Back：modal 打开时先消费 Back —— 能 pop 内屏就 pop，到根屏再
+  // 把 Back 当成关 modal，避免被默认的 history.back 直接弹出 /tabs/contacts。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      if (canGoBack) {
+        pop();
+      } else {
+        onClose();
+      }
+      return true;
+    });
+    return unregister;
   }, [open, canGoBack, pop, onClose]);
 
   if (!open) return null;

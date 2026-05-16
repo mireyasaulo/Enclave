@@ -88,6 +88,7 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isPersistedGroupConversation } from "../lib/conversation-route";
 import { buildCreateGroupRouteHash } from "../lib/create-group-route-state";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const DesktopContactsWorkspace = lazy(async () => {
@@ -673,6 +674,24 @@ export function ContactsPage() {
     () => buildContactTagGroups(friendsQuery.data ?? [], "").length,
     [friendsQuery.data],
   );
+  // 桌面 / 移动「批量管理」全选时需要把所有可见好友的 characterId 拍平成一个数组。
+  // 原来同样的 flatMap 在 JSX 里写了两遍（totalIds + onSelectAll 里），每渲染都新建
+  // 数组；这里抽出来共用，避免在 ContactsBulkActionBar 里也无谓地拿到不同的引用
+  // 触发 allSelected 的重比较。
+  const desktopBulkAllIds = useMemo(
+    () =>
+      desktopFriendSections.flatMap((section) =>
+        section.items.map((item) => item.character.id),
+      ),
+    [desktopFriendSections],
+  );
+  const mobileBulkAllIds = useMemo(
+    () =>
+      friendSections.flatMap((section) =>
+        section.items.map((item) => item.character.id),
+      ),
+    [friendSections],
+  );
 
   const commitDesktopRouteState = useCallback(
     (
@@ -920,6 +939,34 @@ export function ContactsPage() {
     previousBaseUrlRef.current = baseUrl;
     startChatResetRef.current();
   }, [baseUrl]);
+
+  // 原生壳硬件 Back（仅移动布局生效）：
+  // 1) + 快捷菜单打开时先收菜单
+  // 2) 批量管理模式时先退多选
+  // 不接的话 BACK 会落到 root-tab 双击退出分支，看着像菜单/多选丢了。
+  // 管理 modal 自己注册更晚 → 优先级更高，不会被这条吞掉。
+  useEffect(() => {
+    if (isDesktopLayout) {
+      return;
+    }
+    if (!isQuickMenuOpen && !bulkMode) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      if (isQuickMenuOpen) {
+        event.preventDefault();
+        setIsQuickMenuOpen(false);
+        return true;
+      }
+      if (bulkMode) {
+        event.preventDefault();
+        exitBulkMode();
+        return true;
+      }
+      return false;
+    });
+    return unregister;
+  }, [isDesktopLayout, isQuickMenuOpen, bulkMode, exitBulkMode]);
 
   useEffect(() => {
     if (normalizedSearchText || !friendSections.length) {
@@ -1658,17 +1705,9 @@ export function ContactsPage() {
               <ContactsBulkActionBar
                 desktop
                 selectedIds={Array.from(bulkSelectedIds)}
-                totalIds={desktopFriendSections.flatMap((section) =>
-                  section.items.map((item) => item.character.id),
-                )}
+                totalIds={desktopBulkAllIds}
                 onSelectAll={() =>
-                  setBulkSelectedIds(
-                    new Set(
-                      desktopFriendSections.flatMap((section) =>
-                        section.items.map((item) => item.character.id),
-                      ),
-                    ),
-                  )
+                  setBulkSelectedIds(new Set(desktopBulkAllIds))
                 }
                 onClearSelection={() => setBulkSelectedIds(new Set())}
                 onDone={exitBulkMode}
