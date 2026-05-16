@@ -7128,7 +7128,7 @@ msgstr "网络暂时连不上，消息已保存，点重试可重新发送。"
 #: apps/app/src/features/chat/use-conversation-thread.ts:547
 #: apps/app/src/features/chat/use-conversation-thread.ts:583
 msgid "The target character is not ready yet."
-msgstr "The target character is not ready yet."
+msgstr "对方角色还没准备好，请稍后再试。"
 
 #. placeholder {0}: sticker.label ?? sticker.stickerId
 #: apps/app/src/features/chat/use-conversation-thread.ts:556
