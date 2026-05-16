@@ -65,8 +65,11 @@ export class WikiTalkService {
       });
     }
     await this.assertCanTalk(user, characterId);
-    const title = (input.title ?? '').trim();
-    const body = (input.body ?? '').trim();
+    // typeof 守：客户端传 {"title":{"a":1}} 时 (x ?? '').trim() 会抛 TypeError → 500。
+    const title =
+      typeof input.title === 'string' ? input.title.trim() : '';
+    const body =
+      typeof input.body === 'string' ? input.body.trim() : '';
     if (!title) throw new AppError('WIKI_TALK_INVALID_STATE', {
         params: { detail: '标题不能为空' },
         legacyMessage: '标题不能为空',
@@ -118,7 +121,9 @@ export class WikiTalkService {
       });
     }
     await this.assertCanTalk(user, thread.characterId);
-    const body = (input.body ?? '').trim();
+    // typeof 守，避免非字符串 body 触发 (x ?? '').trim() → 500。
+    const body =
+      typeof input.body === 'string' ? input.body.trim() : '';
     if (!body) throw new AppError('WIKI_TALK_INVALID_STATE', {
         params: { detail: '回复内容不能为空' },
         legacyMessage: '回复内容不能为空',

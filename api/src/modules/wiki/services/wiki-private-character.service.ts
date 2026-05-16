@@ -208,7 +208,11 @@ export class WikiPrivateCharacterService {
     if (!dto || typeof dto !== 'object') {
       throw new BadRequestException('请求体格式不正确');
     }
-    const trimmedName = (dto.name ?? '').trim();
+    // typeof 守一下：客户端传 {"name":{"a":1}} / [...] 时 (x ?? '').trim() 会
+    // 抛 TypeError → 500，把原始 stack 漏出去。非字符串当空字符串处理，下面的
+    // "角色名不能为空" 会接住。
+    const trimmedName =
+      typeof dto.name === 'string' ? dto.name.trim() : '';
     if (!trimmedName || isVisuallyEmpty(trimmedName)) {
       throw new BadRequestException('角色名不能为空');
     }
@@ -235,7 +239,10 @@ export class WikiPrivateCharacterService {
       throw new BadRequestException('请求体格式不正确');
     }
     const existing = await this.getById(ownerUserId, id);
-    const trimmedName = (dto.name ?? existing.name).trim();
+    // 同 createStrict：非字符串 name 当 undefined，回退到 existing.name。
+    const incomingName =
+      typeof dto.name === 'string' ? dto.name : existing.name;
+    const trimmedName = incomingName.trim();
     // 视觉为空（纯 ZWS / 空白）也拒，与 createStrict / upsertByName 对齐。
     // 否则用户能在编辑器把 name 改成 '​‌‍' 这种 trim 后非空但显示一行
     // 空白的"幽灵名"，列表卡片直接不可点。
@@ -274,7 +281,9 @@ export class WikiPrivateCharacterService {
     if (!dto || typeof dto !== 'object') {
       throw new BadRequestException('请求体格式不正确');
     }
-    const trimmedName = (dto.name ?? '').trim();
+    // 同 createStrict：typeof 守，避免 (x ?? '').trim() 抛 TypeError。
+    const trimmedName =
+      typeof dto.name === 'string' ? dto.name.trim() : '';
     if (!trimmedName || isVisuallyEmpty(trimmedName)) {
       throw new BadRequestException('角色名不能为空');
     }
