@@ -99,6 +99,7 @@ import { buildMobileNoteEditorRouteHash } from "../features/notes/mobile-note-ed
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { buildDesktopChannelsRouteHash } from "../features/channels/channels-route-state";
 import { resolveAppMediaUrl } from "../lib/media-url";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import {
   extractChatReplyMetadata,
   sanitizeDisplayedChatText,
@@ -6412,6 +6413,20 @@ function ImageViewerOverlay({
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchDeltaXRef = useRef(0);
 
+  // 原生壳硬件 Back 键：图片查看器打开时 BACK 应当先关查看器，不要直接
+  // history.back 跳出聊天页。desktop 形态注册没副作用。
+  useEffect(() => {
+    if (isDesktop) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [isDesktop, onClose]);
+
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
     const touch = event.touches[0];
     if (!touch) {
@@ -6599,6 +6614,19 @@ function LocationViewerOverlay({
   const isDesktop = variant === "desktop";
   const nativeMobileShareSupported = !isDesktop && isNativeMobileShareSurface();
 
+  // 原生壳硬件 Back：位置查看器打开时 BACK 关查看器，不退聊天页。
+  useEffect(() => {
+    if (isDesktop) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [isDesktop, onClose]);
+
   return (
     <div className="fixed inset-0 z-50 bg-[rgba(5,10,20,0.88)] backdrop-blur-md">
       <button
@@ -6704,6 +6732,22 @@ function NoteViewerOverlay({
   const navigate = useNavigate();
   const nativeMobileShareSupported = isNativeMobileShareSurface();
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
+
+  // 原生壳硬件 Back：笔记卡片查看器打开时 BACK 优先关 action 子菜单 → 再
+  // 关查看器，最后再退聊天页。
+  useEffect(() => {
+    const unregister = registerAndroidBackInterceptor((event) => {
+      if (actionMenuOpen) {
+        event.preventDefault();
+        setActionMenuOpen(false);
+        return true;
+      }
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [actionMenuOpen, onClose]);
   const noteQuery = useQuery({
     queryKey: ["favorite-note", baseUrl, attachment.noteId],
     queryFn: () => getFavoriteNote(attachment.noteId, baseUrl),
