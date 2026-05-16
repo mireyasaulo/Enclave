@@ -682,11 +682,21 @@ public class YinjieMobileBridgePlugin extends Plugin {
     }
 
     private String readNotificationPermissionState() {
+        // areNotificationsEnabled 反映用户在系统设置 → 应用 → 通知里的总开关，
+        // 一旦用户主动关掉，就算 Android 13+ runtime permission 还停留在 GRANTED，
+        // showLocalNotification 也是静默丢掉不弹任何东西。pre-Tiramisu 没 runtime
+        // permission，全靠这条开关来定 granted/denied。
+        boolean notificationsEnabled =
+            NotificationManagerCompat.from(getContext()).areNotificationsEnabled();
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            return "granted";
+            return notificationsEnabled ? "granted" : "denied";
         }
 
         PermissionState permissionState = getPermissionState("notifications");
+        if (permissionState == PermissionState.GRANTED && !notificationsEnabled) {
+            return "denied";
+        }
         return permissionState != null ? permissionState.toString() : "unknown";
     }
 
