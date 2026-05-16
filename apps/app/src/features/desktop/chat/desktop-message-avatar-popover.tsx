@@ -8,7 +8,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
   getBlockedCharacters,
@@ -71,6 +71,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
   const { anchorElement, onClose } = props;
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const ownerName = useWorldOwnerStore((state) => state.username);
@@ -150,7 +151,14 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
 
       return getOrCreateConversation({ characterId }, baseUrl);
     },
-    onSuccess: (conversation) => {
+    onSuccess: async (conversation) => {
+      // 新会话刚由后端创建，conversations cache 里还没有它。直接 navigate
+      // 过去时 workspace 的 selectedConversationExists 判定为 false，会立刻
+      // navigateToChatWorkspace replace 把用户踢回 /tabs/chat 根路由。
+      // 等一次 invalidate 后再跳，新 conversation 已落进 cache。
+      await queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
       onClose();
       void navigate({
         to: buildDesktopChatThreadPath({
