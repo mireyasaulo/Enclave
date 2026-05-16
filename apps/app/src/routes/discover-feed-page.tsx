@@ -1113,12 +1113,30 @@ export function DiscoverFeedPage() {
     }
   }
 
+  // R4 走查：旧逻辑只看 visiblePosts.length 变化就 hard-snap 一次；hash auto-load
+  // 翻页期间的"反复 snap"是它的设计目的，但**目标已经在视口里、用户也已经手动
+  // 滚开**之后还在 snap，就把用户的阅读位置一并吞掉：用户继续向下滚，sentinel
+  // 触底自动 fetchNextPage → visiblePosts.length 又变 → 整张 feed 被弹回 X。
+  // 加一道"snapped 锁"：第一次目标真出现在 visiblePosts 后才 snap，snap 完锁住
+  // 当前 routeSelectedPostId；后续 length 变化（用户翻页 / 新 post prepend）不再
+  // 触发。routeSelectedPostId 真切到另一条时（站内跳到下一篇）锁里的 id 不匹配，
+  // 自然解锁再 snap。
+  const mobileScrollSnappedRouteIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (
       isDesktopLayout ||
       !routeSelectedPostId ||
       typeof document === "undefined"
     ) {
+      return;
+    }
+    if (mobileScrollSnappedRouteIdRef.current === routeSelectedPostId) {
+      return;
+    }
+    const targetLoaded = visiblePosts.some(
+      (post) => post.id === routeSelectedPostId,
+    );
+    if (!targetLoaded) {
       return;
     }
 
@@ -1129,13 +1147,13 @@ export function DiscoverFeedPage() {
           // behavior: "smooth" 在 hash auto-load 的多 page chain 拉过来期间
           // 反复触发 scrollIntoView，动画被打断 + IntersectionObserver 又触底拉
           // 下一页，最终 scrollTop 偏过 target ~650px（实测肉眼能看到的是错位
-          // ~2 张卡片的距离）。改 auto / instant，每次 length 变化都 hard-snap
-          // 到 target，新 page 加载不影响已经定位好的 scrollTop。
+          // ~2 张卡片的距离）。改 auto / instant，单次 hard-snap 一步到位。
           behavior: "auto",
           block: "start",
         });
     });
-  }, [isDesktopLayout, routeSelectedPostId, visiblePosts.length]);
+    mobileScrollSnappedRouteIdRef.current = routeSelectedPostId;
+  }, [isDesktopLayout, routeSelectedPostId, visiblePosts]);
 
   // 用户通过 #post=<id> 进来（分享链接 / 收藏 / 站内跳转）但目标 post 不在
   // 首屏 20 条里时，老逻辑只 scrollIntoView 找不到 → 静默失败，用户看到的

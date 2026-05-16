@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   Clapperboard,
   MessageCircleMore,
+  Music2,
   PlaySquare,
   RadioTower,
   Users,
@@ -41,7 +42,12 @@ import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-type ChannelAuthorCollectionTab = "all" | "videos" | "updates" | "live";
+type ChannelAuthorCollectionTab =
+  | "all"
+  | "videos"
+  | "audio"
+  | "updates"
+  | "live";
 const CHANNEL_AUTHOR_COLLECTION_STORAGE_KEY =
   "yinjie:channels:author-collections";
 
@@ -230,6 +236,10 @@ export function ChannelAuthorPage() {
         [
           { key: "all", label: t(msg`全部`) },
           { key: "videos", label: t(msg`视频`) },
+          // 音乐 tab：之前所有 audio 帖都被归到「动态」里，但「动态」语义跟
+          // 文字 / 图集 / 心情 post 重叠。视频号当前 100% audio，把音乐拆出来
+          // 让用户能直接定位作者的音乐合集。
+          { key: "audio", label: t(msg`音乐`) },
           { key: "updates", label: t(msg`动态`) },
           { key: "live", label: t(msg`直播回放`) },
         ] satisfies Array<{
@@ -726,7 +736,14 @@ function matchesChannelAuthorCollection(
     return post.mediaType === "video" && post.sourceKind !== "live_clip";
   }
 
-  return post.mediaType !== "video";
+  if (tab === "audio") {
+    // 音乐 tab：只放真正的 audio 帖，不含 live 回放（live_clip 已经在 直播回放
+    // tab 里独立呈现，不重复）。
+    return post.mediaType === "audio" && post.sourceKind !== "live_clip";
+  }
+
+  // updates 兜底：现在剔掉 video 和 audio，剩下图集 / 文本 / 其他更新。
+  return post.mediaType !== "video" && post.mediaType !== "audio";
 }
 
 function resolveChannelPostCoverPresentation(t: Translator, post: FeedPostListItem) {
@@ -761,6 +778,28 @@ function resolveChannelPostCoverPresentation(t: Translator, post: FeedPostListIt
           )
         : t(msg`${post.viewCount} 播放`),
       title: t(msg`视频号短片`),
+    };
+  }
+
+  // 音乐帖：之前直接 fall through 到下面"动态"分支，badge 打成"动态" + 绿色 +
+  // MessageCircleMore 评论图标，跟主 feed 卡 / formatChannelMeta 里"音乐"标签
+  // 完全对不上。视频号 18 条当前全是 audio，作者主页把每条 audio 都标"动态"
+  // 既误导分类又跟整套 audio 沉浸式播放 UI 不一致。给 audio 一套独立陈述。
+  if (post.mediaType === "audio") {
+    return {
+      badgeClassName: "bg-[rgba(255,255,255,0.18)] text-white",
+      icon: <Music2 size={14} />,
+      label: t(msg`音乐`),
+      overlayClassName:
+        "bg-[linear-gradient(180deg,rgba(67,32,87,0.78),rgba(67,32,87,0))]",
+      panelClassName:
+        "bg-[linear-gradient(180deg,#3b1d52,#1d1140)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
+      secondaryLabel: post.durationMs
+        ? t(
+            msg`${Math.max(1, Math.round(post.durationMs / 1000))} 秒 · ${post.viewCount} 播放`,
+          )
+        : t(msg`${post.viewCount} 播放`),
+      title: t(msg`视频号音乐`),
     };
   }
 
@@ -803,6 +842,22 @@ function resolveChannelPostCardStatus(t: Translator, post: FeedPostListItem) {
       secondaryLabel: post.durationMs
         ? t(msg`${Math.max(1, Math.round(post.durationMs / 1000))} 秒短片`)
         : t(msg`视频号短片`),
+    };
+  }
+
+  // 同 resolveChannelPostCoverPresentation：audio 帖独立分支，列表行的 primary
+  // badge 也走 "音乐"，避免列表头一行打"动态"和卡片缩略图 overlay 上"音乐"自相矛盾。
+  if (post.mediaType === "audio") {
+    return {
+      label: t(msg`音乐`),
+      metaLabel: t(msg`音乐更新`),
+      primaryBadgeClassName:
+        "border-[rgba(67,32,87,0.14)] bg-[rgba(67,32,87,0.08)] text-[#3b1d52]",
+      secondaryBadgeClassName:
+        "border-[rgba(67,32,87,0.1)] bg-[color:var(--surface-console)] text-[color:var(--text-secondary)]",
+      secondaryLabel: post.durationMs
+        ? t(msg`${Math.max(1, Math.round(post.durationMs / 1000))} 秒音乐`)
+        : t(msg`视频号音乐`),
     };
   }
 
