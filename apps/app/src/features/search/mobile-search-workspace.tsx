@@ -323,13 +323,31 @@ export function MobileSearchWorkspace({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-3">
-        {loading ? (
+        {/* 走查 R2 真机：用户从「通讯录」按搜索来时，friends/characters 已经被
+            contacts-page 缓存好；但 conversations/officialAccounts/moments/feed
+            这几条 contacts-page 移动端不发的 query，进 /tabs/search 后还要冷启
+            ~100-500ms。原 `{loading ? ...}` 不看 hasKeyword，用户已经在输入框
+            打字了照样挂「正在准备搜一搜」遮住整屏，本地分类（联系人等）现成的
+            结果也被一起遮掉。只在「还没输入关键词」时挡屏；用户已经开始查时
+            交给下面的 inline 加载横幅 + 结果区先渲染缓存命中。 */}
+        {loading && !hasKeyword ? (
           <MobileSearchStatusCard
             badge={t(msg`读取中`)}
             title={t(msg`正在准备搜一搜`)}
             description={t(msg`稍等一下，正在整理最近记录和可搜索范围。`)}
             tone="loading"
           />
+        ) : null}
+        {/* 走查 R2 真机：已输入关键词但部分索引（会话 / 公众号 / 朋友圈 / 广场）
+            还在冷启时挂一条 inline 提示——结果区已经能渲染缓存命中（联系人 /
+            收藏 / 小程序），新到的索引数据会继续接力进来。 */}
+        {!error && hasKeyword && loading ? (
+          <InlineNotice
+            className="mb-2 rounded-[11px] px-2.5 py-1.5 text-[11px] leading-[1.35rem] shadow-none"
+            tone="info"
+          >
+            {t(msg`正在补全搜索范围，结果会继续完善。`)}
+          </InlineNotice>
         ) : null}
         {error ? (
           <MobileSearchStatusCard
@@ -531,7 +549,11 @@ export function MobileSearchWorkspace({
           </div>
         ) : null}
 
-        {!loading && !error && hasKeyword ? (
+        {/* 走查 R2：去掉 !loading 门——结果区允许在「部分索引还在冷启」期间先
+            渲染已缓存命中（联系人 / 收藏 / 小程序 等本地索引），上面的「正在补全
+            搜索范围」 inline 横幅会提示用户其它分类的数据陆续进来。「无结果」
+            卡片下面仍然保留 !loading 守卫，避免空数据期间错误判定"没有相关内容"。 */}
+        {!error && hasKeyword ? (
           activeCategory === "all" ? (
             <div className="space-y-4">
               {orderedAllSections.map((section) => {
