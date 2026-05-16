@@ -72,6 +72,13 @@ export function MobileFeedPublishPage() {
       isMountedRef.current = false;
     };
   }, []);
+  // 走查再 Round 4：同步防双击锁——React 的 disabled 属性靠下一次 commit 才生效，
+  // 同帧里 closure 抓的 isPending 也是上一次 render 的常量值；用户连点 5 次「发
+  // 表」会同步通过 5 次（mobile-moments-publish-page 实测：5 个 POST 全飞，2 个
+  // 被服务端 429 砍掉，剩下 3 个真入库 → 广场出 3 条重复 post）。submittingRef
+  // 同步赋值，第一次 click 翻 true 后同帧的所有后续 click 都被早返兜住。跟
+  // mobile-moments-publish-page 的同步锁 (commit c0a87bbb 之前更早的 fix) 对齐。
+  const submittingRef = useRef(false);
 
   const createMutation = useMutation({
     // 再走查 R1：mutationFn 之前直接闭包读 composeDraft.* 字段，onSuccess 无脑
@@ -332,15 +339,25 @@ export function MobileFeedPublishPage() {
         rightActions={
           <button
             type="button"
-            onClick={() =>
-              createMutation.mutate({
-                // 把 mutate-time 的 draft snapshot 当 variables 传进去 ——
-                // 见上方 createMutation 注释。
-                text: composeDraft.text,
-                imageDrafts: composeDraft.imageDrafts,
-                videoDraft: composeDraft.videoDraft,
-              })
-            }
+            onClick={() => {
+              if (submittingRef.current) return;
+              if (!composeDraft.hasContent || createMutation.isPending) return;
+              submittingRef.current = true;
+              createMutation.mutate(
+                {
+                  // 把 mutate-time 的 draft snapshot 当 variables 传进去 ——
+                  // 见上方 createMutation 注释。
+                  text: composeDraft.text,
+                  imageDrafts: composeDraft.imageDrafts,
+                  videoDraft: composeDraft.videoDraft,
+                },
+                {
+                  onSettled: () => {
+                    submittingRef.current = false;
+                  },
+                },
+              );
+            }}
             disabled={!composeDraft.hasContent || createMutation.isPending}
             className={cn(
               "h-9 rounded-full px-3 text-[15px] font-medium transition",
