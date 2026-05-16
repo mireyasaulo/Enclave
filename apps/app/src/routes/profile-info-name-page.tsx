@@ -120,9 +120,9 @@ export function ProfileInfoNamePage() {
         )}
       </div>
 
-      {/* 用户已经动过输入框但还短于下限时，把 disabled 「完成」的原因明确告诉他；
-          只在 dirty 时才提示，避免一打开页面就跳出红字。 */}
-      {dirty && trimmed.length > 0 && trimmed.length < NAME_MIN_LENGTH ? (
+      {/* 名字短于下限时（legacy 1 字用户进入页面也是这种情况），把 disabled
+          「完成」的原因显式告诉用户；空串不提示，避免一进页面就跳红字。 */}
+      {trimmed.length > 0 && trimmed.length < NAME_MIN_LENGTH ? (
         <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
           {t(msg`名字太短啦，至少要 ${NAME_MIN_LENGTH} 个字符。`)}
         </div>
