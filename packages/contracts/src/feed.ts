@@ -168,6 +168,20 @@ export interface FeedChannelHomeResponse {
   total: number;
 }
 
+// 视频号首页"装饰位"——sections 计数、作者推荐位、直播位、评论预览。
+// 走第二个并行请求，不卡列表渲染（见 feed.service.ts getChannelHomeDecorations）。
+export interface FeedChannelHomeDecorationsResponse {
+  sections: Array<{
+    key: FeedChannelHomeSection;
+    label: string;
+    count: number;
+  }>;
+  activeSection: FeedChannelHomeSection;
+  authors: FeedChannelAuthorSummary[];
+  liveEntries: FeedChannelLiveEntry[];
+  commentsPreviewByPostId: Record<string, FeedComment[]>;
+}
+
 export interface FeedViewRequest {
   progressSeconds?: number;
   completed?: boolean;

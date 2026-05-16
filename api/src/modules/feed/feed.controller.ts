@@ -28,6 +28,20 @@ export class FeedController {
     });
   }
 
+  @Get('channels/home/decorations')
+  getChannelHomeDecorations(
+    @Query('section')
+    section: 'recommended' | 'friends' | 'following' | 'live' | undefined,
+    @Query('page') page = '1',
+    @Query('limit') limit = '20',
+  ) {
+    return this.feedService.getChannelHomeDecorations({
+      section,
+      page: Number(page),
+      limit: Number(limit),
+    });
+  }
+
   @Get('channels/authors/:authorId')
   getChannelAuthor(@Param('authorId') authorId: string) {
     return this.feedService.getChannelAuthorProfile(authorId);

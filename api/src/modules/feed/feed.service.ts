@@ -294,6 +294,8 @@ export class FeedService implements OnModuleInit {
     };
   }
 
+  // 首屏关键路径：只算 posts + ownerState，不算 authors/liveEntries/sectionCounts/commentsPreview。
+  // 后四样是"装饰"，通过 getChannelHomeDecorations 走第二个并行请求拿，不卡首条视频渲染。
   async getChannelHome(input?: {
     section?: FeedChannelHomeSection;
     page?: number;
@@ -302,6 +304,48 @@ export class FeedService implements OnModuleInit {
     await this.ensureChannelSeedData();
     await this.topUpChannelsIfNeeded();
 
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const avatarContext = await this.buildFeedAvatarContext({
+      ownerId: owner.id,
+      ownerAvatar: owner.avatar,
+    });
+    const section = input?.section ?? 'recommended';
+    const page = input?.page ?? 1;
+    const limit = input?.limit ?? 20;
+
+    const postsForSection = await this.getVisibleChannelPosts(
+      owner.id,
+      section,
+    );
+    const pagedPosts = paginate(postsForSection, page, limit);
+
+    const ownerStateMap = await this.buildOwnerStateMap(pagedPosts, owner.id);
+
+    return {
+      // 装饰位 sections.count 由 /decorations 接口回填；首屏先返回结构占位 0。
+      sections: (
+        Object.keys(CHANNEL_HOME_SECTION_LABELS) as FeedChannelHomeSection[]
+      ).map((key) => ({
+        key,
+        label: CHANNEL_HOME_SECTION_LABELS[key],
+        count: 0,
+      })),
+      activeSection: section,
+      posts: pagedPosts.map((post) => ({
+        ...this.serializePost(post, ownerStateMap.get(post.id), avatarContext),
+        commentsPreview: [],
+      })),
+      authors: [],
+      liveEntries: [],
+      total: postsForSection.length,
+    };
+  }
+
+  async getChannelHomeDecorations(input?: {
+    section?: FeedChannelHomeSection;
+    page?: number;
+    limit?: number;
+  }) {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const avatarContext = await this.buildFeedAvatarContext({
       ownerId: owner.id,
@@ -321,27 +365,21 @@ export class FeedService implements OnModuleInit {
         : await this.getVisibleChannelPosts(owner.id, section);
     const pagedPosts = paginate(postsForSection, page, limit);
 
-    const [
-      commentsPreviewMap,
-      ownerStateMap,
-      authors,
-      liveEntries,
-      sectionCounts,
-    ] = await Promise.all([
-      this.buildCommentsPreviewMap(
-        pagedPosts.map((post) => post.id),
-        owner.id,
-        avatarContext,
-      ),
-      this.buildOwnerStateMap(pagedPosts, owner.id),
-      this.buildChannelAuthorSummaries(
-        allVisiblePosts,
-        owner.id,
-        avatarContext,
-      ),
-      this.buildLiveEntries(allVisiblePosts, avatarContext),
-      this.buildChannelSectionCounts(allVisiblePosts, owner.id),
-    ]);
+    const [commentsPreviewMap, authors, liveEntries, sectionCounts] =
+      await Promise.all([
+        this.buildCommentsPreviewMap(
+          pagedPosts.map((post) => post.id),
+          owner.id,
+          avatarContext,
+        ),
+        this.buildChannelAuthorSummaries(
+          allVisiblePosts,
+          owner.id,
+          avatarContext,
+        ),
+        this.buildLiveEntries(allVisiblePosts, avatarContext),
+        this.buildChannelSectionCounts(allVisiblePosts, owner.id),
+      ]);
 
     return {
       sections: (
@@ -352,13 +390,10 @@ export class FeedService implements OnModuleInit {
         count: sectionCounts[key] ?? 0,
       })),
       activeSection: section,
-      posts: pagedPosts.map((post) => ({
-        ...this.serializePost(post, ownerStateMap.get(post.id), avatarContext),
-        commentsPreview: commentsPreviewMap.get(post.id) ?? [],
-      })),
       authors,
       liveEntries,
-      total: postsForSection.length,
+      // postId → 最近 3 条评论；前端按 postId 合并到 posts[].commentsPreview 上。
+      commentsPreviewByPostId: Object.fromEntries(commentsPreviewMap.entries()),
     };
   }
 

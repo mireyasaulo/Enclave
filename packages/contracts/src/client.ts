@@ -65,6 +65,7 @@ import type {
   FeedMediaAsset,
   CreateFeedPostRequest,
   FeedChannelAuthorProfile,
+  FeedChannelHomeDecorationsResponse,
   FeedChannelHomeResponse,
   FeedChannelHomeSection,
   FeedListResponse,
@@ -982,6 +983,21 @@ function normalizeFeedChannelHomeResponse(
   return {
     ...response,
     posts: response.posts.map((post) => normalizeFeedPost(post, baseUrl)),
+    liveEntries: response.liveEntries.map((entry) => ({
+      ...entry,
+      coverUrl: entry.coverUrl
+        ? normalizeAttachmentAssetUrl(entry.coverUrl, baseUrl)
+        : entry.coverUrl,
+    })),
+  };
+}
+
+function normalizeFeedChannelHomeDecorationsResponse(
+  response: FeedChannelHomeDecorationsResponse,
+  baseUrl?: string,
+): FeedChannelHomeDecorationsResponse {
+  return {
+    ...response,
     liveEntries: response.liveEntries.map((entry) => ({
       ...entry,
       coverUrl: entry.coverUrl
@@ -3379,6 +3395,38 @@ export function getChannelHome(
     baseUrl,
   ).then((response) =>
     normalizeFeedChannelHomeResponse(response, resolvedBaseUrl),
+  );
+}
+
+export function getChannelHomeDecorations(
+  baseUrl?: string,
+  options?: {
+    section?: FeedChannelHomeSection;
+    page?: number;
+    limit?: number;
+  },
+) {
+  const resolvedBaseUrl = resolveCoreApiBaseUrl(baseUrl, {
+    allowDefault: false,
+  });
+  const params = new URLSearchParams();
+
+  if (options?.section) {
+    params.set("section", options.section);
+  }
+  if (typeof options?.page === "number") {
+    params.set("page", String(options.page));
+  }
+  if (typeof options?.limit === "number") {
+    params.set("limit", String(options.limit));
+  }
+
+  return requestLegacyApi<FeedChannelHomeDecorationsResponse>(
+    `/feed/channels/home/decorations${params.size ? `?${params.toString()}` : ""}`,
+    undefined,
+    baseUrl,
+  ).then((response) =>
+    normalizeFeedChannelHomeDecorationsResponse(response, resolvedBaseUrl),
   );
 }
 

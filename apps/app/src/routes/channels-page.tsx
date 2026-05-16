@@ -31,6 +31,7 @@ import {
   generateChannelPost,
   getChannelAuthorProfile,
   getChannelHome,
+  getChannelHomeDecorations,
   getFeedPost,
   likeFeedPost,
   likeFeedComment,
@@ -152,6 +153,23 @@ export function ChannelsPage() {
         limit: CHANNELS_PAGE_LIMIT,
       }),
   });
+  // 装饰位（tab 计数 + 评论预览）走第二个并行请求，不卡首屏列表/首播。
+  // 拆分理由见 api/src/modules/feed/feed.service.ts getChannelHomeDecorations。
+  const decorationsQuery = useQuery({
+    queryKey: ["app-channels-home-decorations", baseUrl, activeSection],
+    queryFn: () =>
+      getChannelHomeDecorations(baseUrl, {
+        section: activeSection,
+        limit: CHANNELS_PAGE_LIMIT,
+      }),
+  });
+  const commentsPreviewByPostId =
+    decorationsQuery.data?.commentsPreviewByPostId;
+  const getCommentsPreview = useCallback(
+    (postId: string): FeedComment[] =>
+      commentsPreviewByPostId?.[postId] ?? [],
+    [commentsPreviewByPostId],
+  );
 
   const likeMutation = useMutation({
     mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
@@ -260,8 +278,12 @@ export function ChannelsPage() {
           : t(msg`视频号评论已发送。`),
       );
       // fire-and-forget：await 会让"发送"按钮一直 disabled。
+      // 主接口刷新 commentCount，decorations 刷新 commentsPreview 卡底"最近评论"。
       void queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-channels-home-decorations", baseUrl],
       });
       void queryClient.invalidateQueries({
         queryKey: ["app-feed-comments", baseUrl, input.postId],
@@ -432,6 +454,10 @@ export function ChannelsPage() {
       await queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
+      // 关注/取消关注影响 关注/朋友 tab 的 sections.count。
+      await queryClient.invalidateQueries({
+        queryKey: ["app-channels-home-decorations", baseUrl],
+      });
     },
   });
   const notInterestedMutation = useMutation({
@@ -444,6 +470,10 @@ export function ChannelsPage() {
       await queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
+      // 隐藏帖子影响 sections.count / 作者位 / 直播位。
+      await queryClient.invalidateQueries({
+        queryKey: ["app-channels-home-decorations", baseUrl],
+      });
     },
   });
   const likeCommentMutation = useMutation({
@@ -455,8 +485,9 @@ export function ChannelsPage() {
       setNoticeAction(null);
       setNotice(t(msg`评论互动已更新。`));
       // fire-and-forget：await 会让 like-comment 按钮一直 disabled。
+      // 评论点赞数嵌在 commentsPreview 里，要刷 decorations 才能让卡底"最近评论"翻新。
       void queryClient.invalidateQueries({
-        queryKey: ["app-channels-home", baseUrl],
+        queryKey: ["app-channels-home-decorations", baseUrl],
       });
       void queryClient.invalidateQueries({
         queryKey: ["app-feed-comments", baseUrl, input.postId],
@@ -544,13 +575,17 @@ export function ChannelsPage() {
     queryKey: ["app-feed-comments", baseUrl, mobileCommentSheetPostId],
     queryFn: () => listFeedComments(mobileCommentSheetPostId!, baseUrl),
     enabled: Boolean(mobileCommentSheetPostId),
-    placeholderData: mobileCommentSheetPost?.commentsPreview ?? [],
+    placeholderData: mobileCommentSheetPostId
+      ? getCommentsPreview(mobileCommentSheetPostId)
+      : [],
   });
   const desktopCommentsQuery = useQuery({
     queryKey: ["app-feed-comments", baseUrl, desktopSelectedPostId],
     queryFn: () => listFeedComments(desktopSelectedPostId!, baseUrl),
     enabled: Boolean(isDesktopLayout && desktopSelectedPostId),
-    placeholderData: desktopSelectedPost?.commentsPreview ?? [],
+    placeholderData: desktopSelectedPostId
+      ? getCommentsPreview(desktopSelectedPostId)
+      : [],
   });
   const desktopAuthorProfileQuery = useQuery({
     queryKey: ["app-channel-author", baseUrl, syncedRouteSelectedAuthorId],
@@ -561,13 +596,14 @@ export function ChannelsPage() {
     Array<{ key: FeedChannelHomeSection; label: string; count: number }>
   >(
     () =>
+      decorationsQuery.data?.sections ??
       channelsQuery.data?.sections ?? [
         { key: "recommended", label: t(msg`推荐`), count: 0 },
         { key: "friends", label: t(msg`朋友`), count: 0 },
         { key: "following", label: t(msg`关注`), count: 0 },
         { key: "live", label: t(msg`直播`), count: 0 },
       ],
-    [channelsQuery.data?.sections, t],
+    [decorationsQuery.data?.sections, channelsQuery.data?.sections, t],
   );
   const errorMessage =
     (channelsQuery.isError && channelsQuery.error instanceof Error
@@ -1324,6 +1360,7 @@ export function ChannelsPage() {
             activeSection={activeSection}
             likePendingPostId={pendingLikePostId}
             posts={visiblePosts}
+            commentsPreviewByPostId={commentsPreviewByPostId}
             routeSelectedPostId={routeSelectedPostId}
             onLike={(postId) => {
               if (!ensureCommentPostCanInteract(postId)) return;
@@ -2009,6 +2046,7 @@ type MobileChannelsViewportProps = {
   activeSection: FeedChannelHomeSection;
   likePendingPostId: string | null;
   posts: FeedPostListItem[];
+  commentsPreviewByPostId?: Record<string, FeedComment[]>;
   routeSelectedPostId: string | null;
   onLike: (postId: string) => void;
   onOpenAuthor: (post: FeedPostListItem) => void;
@@ -2024,6 +2062,7 @@ function MobileChannelsViewport({
   activeSection,
   likePendingPostId,
   posts,
+  commentsPreviewByPostId,
   routeSelectedPostId,
   onLike,
   onOpenAuthor,
@@ -2130,6 +2169,9 @@ function MobileChannelsViewport({
           favorite={Boolean(post.ownerState?.hasFavorited)}
           likePending={likePendingPostId === post.id}
           post={post}
+          commentsPreview={
+            commentsPreviewByPostId?.[post.id] ?? post.commentsPreview ?? []
+          }
           setCardRef={(node) => registerCardRef(post.id, node)}
           userUnmuted={userUnmuted}
           onUnlock={() => setUserUnmuted(true)}
@@ -2152,6 +2194,7 @@ type MobileChannelsCardProps = {
   favorite: boolean;
   likePending: boolean;
   post: FeedPostListItem;
+  commentsPreview: FeedComment[];
   setCardRef: (node: HTMLElement | null) => void;
   userUnmuted: boolean;
   onUnlock: () => void;
@@ -2170,6 +2213,7 @@ function MobileChannelsCard({
   favorite,
   likePending,
   post,
+  commentsPreview,
   setCardRef,
   userUnmuted,
   onUnlock,
@@ -2335,13 +2379,13 @@ function MobileChannelsCard({
               {formatChannelMeta(post, t)}
             </div>
             <div className="mt-2 rounded-[16px] bg-[rgba(255,255,255,0.12)] px-2.5 py-2 text-[10px] leading-4 text-white/86 backdrop-blur">
-              {post.commentsPreview.length ? (
+              {commentsPreview.length ? (
                 <>
                   <div className="mb-1 text-[9px] uppercase tracking-[0.03em] text-white/60">
                     {t(msg`最近评论`)}
                   </div>
                   <div className="space-y-1">
-                    {post.commentsPreview.slice(0, 2).map((comment) => (
+                    {commentsPreview.slice(0, 2).map((comment) => (
                       <div key={comment.id}>
                         <span className="font-medium">
                           {comment.authorName}
