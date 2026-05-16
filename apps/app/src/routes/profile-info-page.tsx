@@ -30,7 +30,10 @@ export function ProfileInfoPage() {
     return null;
   }
 
-  const ownerLabel = username ?? t(msg`世界主人`);
+  // 后端早期数据里有过 username = "" 的脏行，?? 只兜 null/undefined，会
+  // 让空串穿透下来 → AvatarChip alt / 名字行都渲染成空。用 || 把空串也
+  // 一起 fallback 到「世界主人」。
+  const ownerLabel = username?.trim() || t(msg`世界主人`);
   const trimmedSignature = signature?.trim() ?? "";
 
   return (

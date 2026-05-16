@@ -25,7 +25,6 @@ export function ProfileInfoNamePage() {
 
   const username = useWorldOwnerStore((state) => state.username);
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
-  const updateOwnerStore = useWorldOwnerStore((state) => state.updateOwner);
 
   const [draft, setDraft] = useState(username ?? "");
 
@@ -54,7 +53,6 @@ export function ProfileInfoNamePage() {
       const owner = await updateWorldOwner({ username: trimmed }, baseUrl);
       queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
-      updateOwnerStore({ username: owner.username });
     },
     onSuccess: () => {
       goBack();

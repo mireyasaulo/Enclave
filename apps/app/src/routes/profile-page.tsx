@@ -119,14 +119,14 @@ export function ProfilePage() {
           className="mt-1 flex items-center gap-2.5 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-3 transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)]"
         >
           <AvatarChip
-            name={username ?? t(msg`世界主人`)}
+            name={username?.trim() || t(msg`世界主人`)}
             src={avatar}
             size="lg"
           />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <div className="truncate text-[17px] font-medium text-[color:var(--text-primary)]">
-                {username ?? t(msg`世界主人`)}
+                {username?.trim() || t(msg`世界主人`)}
               </div>
               {username ? (
                 <div className="rounded-full bg-[rgba(7,193,96,0.08)] px-1.5 py-0.5 text-[10px] font-medium tracking-[0.04em] text-[#15803d]">

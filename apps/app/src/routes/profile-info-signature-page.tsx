@@ -24,7 +24,6 @@ export function ProfileInfoSignaturePage() {
 
   const signature = useWorldOwnerStore((state) => state.signature);
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
-  const updateOwnerStore = useWorldOwnerStore((state) => state.updateOwner);
 
   const [draft, setDraft] = useState(signature);
 
@@ -52,7 +51,6 @@ export function ProfileInfoSignaturePage() {
       const owner = await updateWorldOwner({ signature: trimmed }, baseUrl);
       queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
-      updateOwnerStore({ signature: owner.signature });
     },
     onSuccess: () => {
       goBack();
@@ -109,7 +107,10 @@ export function ProfileInfoSignaturePage() {
           placeholder={t(msg`写一句此刻想说的话`)}
           className="min-h-[5.5rem] resize-none rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[14px] leading-6 shadow-none focus:translate-y-0"
         />
-        <div className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]">
+        <div
+          className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]"
+          data-i18n-skip="true"
+        >
           {draft.length}/{SIGNATURE_MAX_LENGTH}
         </div>
       </div>
