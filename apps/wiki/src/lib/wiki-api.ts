@@ -15,6 +15,23 @@ export class WikiApiError extends Error {
   }
 }
 
+// 区分 "session/JWT 已失效" 的 401 和 "业务输入校验失败" 的 401。
+// 前者要清 token + 跳 /login；后者（如验证码错、登录密码错）保持当前页让组件自己渲染错误。
+// 不识别的 code 默认按 session 失效处理，向后兼容老路径（如 cloud-console 没显式 code 的 401）。
+const SESSION_EXPIRED_CODES = new Set([
+  "AUTH_TOKEN_MISSING",
+  "AUTH_TOKEN_INVALID",
+  "AUTH_USER_NOT_FOUND",
+  "AUTH_JWT_SECRET_MISSING",
+]);
+
+function shouldClearSessionForCode(payload: unknown): boolean {
+  if (!payload || typeof payload !== "object") return true;
+  const code = (payload as { code?: unknown }).code;
+  if (typeof code !== "string" || code.length === 0) return true;
+  return SESSION_EXPIRED_CODES.has(code);
+}
+
 async function request<T>(
   path: string,
   init: RequestInit & { auth?: boolean } = {},
@@ -29,7 +46,20 @@ async function request<T>(
     if (token) headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const res = await fetch(`${API_BASE}${path}`, { ...init, headers });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, { ...init, headers });
+  } catch (cause) {
+    // 离线 / DNS 解析挂掉 / dev server 没起 → fetch 直接抛 TypeError("Failed to fetch")，
+    // 浏览器各家文案还不一样（Chrome "Failed to fetch"、Firefox "NetworkError"、
+    // Safari "Load failed"）。直接抛上去，组件会把这串原文渲染到 InlineNotice，
+    // 用户看到一行英文不知道发生啥。包成一个本地化 WikiApiError，status=0 给调用方做区分。
+    throw new WikiApiError(
+      0,
+      null,
+      translateRuntimeMessage(msg`网络请求失败，请检查网络后重试。`),
+    );
+  }
   const text = await res.text();
   let payload: unknown = null;
   if (text) {
@@ -40,7 +70,7 @@ async function request<T>(
     }
   }
   if (!res.ok) {
-    if (res.status === 401) {
+    if (res.status === 401 && shouldClearSessionForCode(payload)) {
       clearSession();
       // 不在登录/注册流程上的页面，直接跳登录页避免假死。
       if (
@@ -52,10 +82,26 @@ async function request<T>(
         window.location.href = `/login?redirect=${encodeURIComponent(redirect)}`;
       }
     }
-    const message =
-      (payload && typeof payload === "object" && "message" in payload
-        ? String((payload as { message: unknown }).message)
-        : null) ?? translateRuntimeMessage(msg`请求失败 (${res.status})`);
+    // NestJS 默认 404 把 "Cannot POST /api/...路径..." 这种全英文路由 dump 直接放在
+    // message 里，前端原样渲染就一坨英文（典型场景：UI 加了新功能但 API 还没部署）。
+    // 用 code === LEGACY_ERROR + message 以 "Cannot " 开头来识别这类路由级 404，
+    // 替成本地化的"功能暂不可用，请稍后重试。"。
+    const isStaleRoute =
+      res.status === 404 &&
+      payload &&
+      typeof payload === "object" &&
+      (payload as { code?: unknown }).code === "LEGACY_ERROR" &&
+      typeof (payload as { message?: unknown }).message === "string" &&
+      /^Cannot\s+(GET|POST|PUT|PATCH|DELETE)\s+/.test(
+        (payload as { message: string }).message,
+      );
+    const message = isStaleRoute
+      ? translateRuntimeMessage(
+          msg`该功能暂未上线（路径 ${res.status}），请稍后重试或刷新页面。`,
+        )
+      : ((payload && typeof payload === "object" && "message" in payload
+          ? String((payload as { message: unknown }).message)
+          : null) ?? translateRuntimeMessage(msg`请求失败 (${res.status})`));
     throw new WikiApiError(res.status, payload, message);
   }
   return payload as T;
@@ -329,6 +375,12 @@ export const wikiApi = {
     return request<{ ok: true }>("/auth/password/change", {
       method: "POST",
       body: JSON.stringify({ code, newPassword }),
+    });
+  },
+  changeUsername(username: string) {
+    return request<AuthSession>("/auth/username/change", {
+      method: "POST",
+      body: JSON.stringify({ username }),
     });
   },
   listCharacters() {
@@ -941,7 +993,11 @@ export const wikiApi = {
           window.location.href = `/login?redirect=${encodeURIComponent(redirect)}`;
         }
       }
-      throw new WikiApiError(res.status, null, `导出失败 (${res.status})`);
+      throw new WikiApiError(
+        res.status,
+        null,
+        translateRuntimeMessage(msg`导出失败 (${res.status})`),
+      );
     }
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -1011,10 +1067,13 @@ export const wikiApi = {
     // 在 file.text() 之前 reject，避免把 GB 级内容读到浏览器内存把页面卡死。
     const MAX_BYTES = 5 * 1024 * 1024;
     if (file.size > MAX_BYTES) {
+      const sizeMb = (file.size / 1024 / 1024).toFixed(1);
       throw new WikiApiError(
         400,
         null,
-        `文件太大（${(file.size / 1024 / 1024).toFixed(1)} MB），上限 5 MB。确认是 .character.json 文件后再试。`,
+        translateRuntimeMessage(
+          msg`文件太大（${sizeMb} MB），上限 5 MB。确认是 .character.json 文件后再试。`,
+        ),
       );
     }
     const text = await file.text();
@@ -1022,10 +1081,11 @@ export const wikiApi = {
     try {
       payload = JSON.parse(text);
     } catch (err) {
+      const reason = (err as Error).message;
       throw new WikiApiError(
         400,
         null,
-        `JSON 解析失败：${(err as Error).message}`,
+        translateRuntimeMessage(msg`JSON 解析失败：${reason}`),
       );
     }
     return request<{ record: PrivateCharacterRecord; overwrote: boolean }>(

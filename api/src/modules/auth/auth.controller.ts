@@ -56,6 +56,15 @@ export class AuthController {
     return this.auth.getProfile(user.id);
   }
 
+  @Post('username/change')
+  @UseGuards(JwtAuthGuard)
+  changeUsername(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() body?: Record<string, unknown>,
+  ) {
+    return this.auth.changeUsername(user.id, asString(body?.username));
+  }
+
   @Post('password/send-code')
   @UseGuards(JwtAuthGuard)
   sendChangePasswordCode(@CurrentUser() user: AuthenticatedUser) {
