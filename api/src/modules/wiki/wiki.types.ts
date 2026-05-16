@@ -458,6 +458,56 @@ export function diffPaths(left: unknown, right: unknown, prefix = ''): string[] 
   return result;
 }
 
+/**
+ * "视觉为空"——把 undefined / null / "" / [] / {} 都当作"没填"。
+ * 走查发现 newcomer 通过编辑器只改 bio 时也会 403：因为旧 revision 的
+ * recipeSnapshot.memorySeed = {} 没有 coreMemory 这个 key（schema 后加的），
+ * 编辑器 hydrate 出来的 form 把所有 string field 兜底成 ""，diffPaths 把
+ * undefined → "" 当变更，结果触到 memorySeed.coreMemory 的字段保护 → 403。
+ * 用户没真正改这个字段，只是 schema drift 造成的"幽灵变更"。
+ */
+function isBlankRecipeValue(v: unknown): boolean {
+  if (v === undefined || v === null || v === '') return true;
+  if (Array.isArray(v) && v.length === 0) return true;
+  if (
+    typeof v === 'object' &&
+    v !== null &&
+    Object.keys(v as Record<string, unknown>).length === 0
+  )
+    return true;
+  return false;
+}
+
+function getPathFromObject(obj: unknown, path: string): unknown {
+  if (obj === null || typeof obj !== 'object') return undefined;
+  let cur: unknown = obj;
+  for (const seg of path.split('.')) {
+    if (cur === null || typeof cur !== 'object') return undefined;
+    cur = (cur as Record<string, unknown>)[seg];
+  }
+  return cur;
+}
+
+/**
+ * 过滤 diffPaths 出来的"幽灵变更"——before / after 在该 path 上都是 blank
+ * （undefined / null / "" / [] / {}）的视为没改。
+ * recipe schema 历史上加过 memorySeed.recentSummaryPrompt / coreMemoryPrompt /
+ * realityLink 等新字段，旧 revision 的 recipeSnapshot 不含这些 key；form 输出
+ * 时会把它们兜底成 ""，必须在 changed 里过滤掉，否则 newcomer 改个 bio 都过
+ * 不去 field-protection。
+ */
+export function filterPhantomBlankPaths(
+  before: unknown,
+  after: unknown,
+  paths: string[],
+): string[] {
+  return paths.filter((path) => {
+    const b = getPathFromObject(before, path);
+    const a = getPathFromObject(after, path);
+    return !(isBlankRecipeValue(b) && isBlankRecipeValue(a));
+  });
+}
+
 export function hasPathOverlap(left: string[], right: string[]): boolean {
   return left.some((leftPath) =>
     right.some(

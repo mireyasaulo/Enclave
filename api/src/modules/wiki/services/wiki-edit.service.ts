@@ -28,6 +28,7 @@ import {
   createDefaultWikiRecipe,
   diffFields,
   diffPaths,
+  filterPhantomBlankPaths,
   hasPathOverlap,
   isHighRiskRecipeChange,
   mergeContentSnapshot,
@@ -107,10 +108,17 @@ export class WikiEditService {
         legacyMessage: '角色不存在',
       });
 
-    const before: WikiContentSnapshot = page.currentRevisionId
-      ? (await this.revisionRepo.findOne({
+    // 历史上 page.currentRevisionId 指向被 soft-delete / 物理删除的 revision
+    // 时，`(await findOne(...))!.contentSnapshot` 会在 null 上读属性 → 500
+    // 把 stack 漏出去。findOne 返回 null 时回退到 character snapshot，与全新
+    // page（无 currentRevisionId）走同一条路径。
+    const currentRevision = page.currentRevisionId
+      ? await this.revisionRepo.findOne({
           where: { id: page.currentRevisionId },
-        }))!.contentSnapshot
+        })
+      : null;
+    const before: WikiContentSnapshot = currentRevision
+      ? currentRevision.contentSnapshot
       : snapshotFromCharacter(character as unknown as Record<string, unknown>);
 
     // Reject malformed bodies that would silently blank fields. Missing keys
@@ -871,7 +879,11 @@ export class WikiEditService {
     const beforeContent =
       currentRevision?.contentSnapshot ??
       snapshotFromCharacter(character as unknown as Record<string, unknown>);
-    let changed = diffPaths(beforeRecipe, afterRecipe);
+    let changed = filterPhantomBlankPaths(
+      beforeRecipe,
+      afterRecipe,
+      diffPaths(beforeRecipe, afterRecipe),
+    );
     let changeSource = 'edit';
 
     if (
@@ -892,8 +904,16 @@ export class WikiEditService {
         input.recipeSnapshot ?? {},
         baseRev.recipeSnapshot,
       );
-      const userChanged = diffPaths(baseRev.recipeSnapshot, submittedRecipe);
-      const concurrentChanged = diffPaths(baseRev.recipeSnapshot, beforeRecipe);
+      const userChanged = filterPhantomBlankPaths(
+        baseRev.recipeSnapshot,
+        submittedRecipe,
+        diffPaths(baseRev.recipeSnapshot, submittedRecipe),
+      );
+      const concurrentChanged = filterPhantomBlankPaths(
+        baseRev.recipeSnapshot,
+        beforeRecipe,
+        diffPaths(baseRev.recipeSnapshot, beforeRecipe),
+      );
       const overlap = userChanged.filter((path) =>
         hasPathOverlap([path], concurrentChanged),
       );
@@ -908,7 +928,11 @@ export class WikiEditService {
         });
       }
       afterRecipe = mergeValueByPaths(beforeRecipe, submittedRecipe, userChanged);
-      changed = diffPaths(beforeRecipe, afterRecipe);
+      changed = filterPhantomBlankPaths(
+        beforeRecipe,
+        afterRecipe,
+        diffPaths(beforeRecipe, afterRecipe),
+      );
       changeSource = 'merge';
     }
 
