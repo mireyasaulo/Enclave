@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
@@ -592,6 +592,12 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
             }
           : null;
 
+  // 同步防双击锁——下面 danger sheet「隐藏聊天 / 清空聊天记录 / 删除并退出」
+  // 确认按钮虽然 disabled={busy} 兜底但 busy = mutations.isPending 是 React
+  // state 经 commit 才生效。同帧双击 → 两个 mutate 同时飞，第二个的服务端
+  // 响应往往是 404 / 失败 → setNotice 显示"退出群聊失败"覆盖掉第一个成功
+  // 路径的"已退出群聊"，用户以为操作失败其实早就成功了。
+  const dangerActionBusyRef = useRef(false);
   const busy =
     pinMutation.isPending ||
     preferencesMutation.isPending ||
@@ -1120,8 +1126,21 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
                       danger: dangerSheetConfig.confirmDanger,
                       disabled: busy,
                       onClick: () => {
+                        if (dangerActionBusyRef.current || busy) {
+                          return;
+                        }
+                        dangerActionBusyRef.current = true;
                         setDangerSheetAction(null);
-                        dangerSheetConfig.onConfirm();
+                        try {
+                          dangerSheetConfig.onConfirm();
+                        } finally {
+                          // hide/clear/leave mutation 走完后 busy 会翻回 false
+                          // —— 用 setTimeout 0 把锁丢到下个 task，覆盖完同帧
+                          // 合成 click 后立刻解锁，不影响后续重试。
+                          window.setTimeout(() => {
+                            dangerActionBusyRef.current = false;
+                          }, 0);
+                        }
                       },
                     },
                   ]
