@@ -928,7 +928,13 @@ function readStoredChannelAuthorCollection(authorId: string) {
 
     const parsed = JSON.parse(rawValue) as Record<string, string>;
     const storedValue = parsed[authorId];
-    if (storedValue === "videos" || storedValue === "updates" || storedValue === "live") {
+    // R1 加了 "audio" tab 但这里 whitelist 没跟着改，用户选"音乐"刷新后掉回"全部"。
+    if (
+      storedValue === "videos" ||
+      storedValue === "audio" ||
+      storedValue === "updates" ||
+      storedValue === "live"
+    ) {
       return storedValue;
     }
   } catch {
