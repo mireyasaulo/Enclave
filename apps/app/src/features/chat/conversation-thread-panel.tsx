@@ -313,14 +313,30 @@ export function ConversationThreadPanel({
   };
 
   const handleSubmit = async () => {
-    await sendTextMessage(
-      replyDraft ? encodeChatReplyText(text, replyDraft) : undefined,
-    );
+    // onSubmit prop 上挂的是 `() => void handleSubmit()` 形态的 fire-and-forget。
+    // sendTextMessage 在 resolveTargetCharacterId 拿不到 char id（角色被删/
+    // participants 还没回 + conversationId 不是 direct_ 前缀）会同步 throw
+    // "目标角色还没准备好"——这条 throw 发生在 runSendMutation 之前，外层吞
+    // mutation error 的 try/catch 兜不到，rejection 一路冒到 window.unhandled
+    // rejection 污染 telemetry。
+    const submittedTextLength = text.length;
+    try {
+      await sendTextMessage(
+        replyDraft ? encodeChatReplyText(text, replyDraft) : undefined,
+      );
+    } catch (sendError) {
+      setSocketError(
+        sendError instanceof Error
+          ? sendError.message
+          : t(msg`发送失败，请稍后再试。`),
+      );
+      return;
+    }
     track("chat_message_sent", {
       conversationKind: "direct",
       kind: "text",
       hasReply: Boolean(replyDraft),
-      textLength: text.length,
+      textLength: submittedTextLength,
     });
     scrollToBottom("smooth");
     setReplyDraft(null);
