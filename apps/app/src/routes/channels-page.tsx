@@ -304,6 +304,42 @@ export function ChannelsPage() {
         baseUrl,
       );
     },
+    // 走查 新一轮 R5：原来 commentCount 要等 invalidate → refetch home 一圈
+    // 才更新，公网隧道 200-500ms 内卡片上「N 评论」的小角标 / 评论 sheet 头
+    // 「N 条」都不动，用户已经看到「评论已发送」notice 了却要继续等数字才跳，
+    // 体感是「发送了吗？」。这里 per-post 乐观 +1，跟 like/favorite 一样：
+    // - onMutate：snapshot 当前 commentCount，cache 里 +1；
+    // - onError：只回滚被改的那条 post 的 commentCount（per-post 避免冲掉
+    //   并发 like / favorite 的乐观），其它 post 沿用当前 cache；
+    // 注意 commentMutation.mutationFn 本身有 text.trim() 校验，空草稿直接 throw、
+    // 根本不会进 onMutate，所以这里不用预判空文本。
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      const previousEntries: Array<{
+        key: readonly unknown[];
+        previousPost: FeedPostListItem | null;
+      }> = [];
+      const snapshots = queryClient.getQueriesData<FeedChannelHomeResponse>({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) return;
+        const previousPost =
+          data.posts.find((post) => post.id === input.postId) ?? null;
+        previousEntries.push({ key, previousPost });
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...data,
+          posts: data.posts.map((post) =>
+            post.id === input.postId
+              ? { ...post, commentCount: post.commentCount + 1 }
+              : post,
+          ),
+        });
+      });
+      return { previousEntries };
+    },
     onSuccess: (_, input) => {
       // 走查 R1：原来无条件把 commentDrafts[postId] 清空——但 textarea 在 mutation
       // 飞行期没 disabled，用户提交完会接着打下一条评论。RTT 落地时 onSuccess 把
@@ -369,7 +405,21 @@ export function ChannelsPage() {
     // mutation 还在飞，最终失败时 sheet 已经关了，红条没人看到。用户以为"发送
     // 成功"了，因为既没 success notice 也没 error notice。这里加 page 级 notice
     // 兜底，info tone，2.4s 自动消失（同 like/favorite 的失败提示样式）。
-    onError: (error, input) => {
+    onError: (error, input, context) => {
+      // 走查 新一轮 R5：回滚 commentCount 乐观更新。per-post 维度——
+      // 别整张 setQueryData 老快照，否则会冲掉这期间发生的 like / favorite /
+      // not-interested 乐观更新（同 likeCommentMutation R4 修复同款问题）。
+      context?.previousEntries.forEach(({ key, previousPost }) => {
+        const current =
+          queryClient.getQueryData<FeedChannelHomeResponse>(key);
+        if (!current?.posts) return;
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...current,
+          posts: current.posts.map((post) =>
+            post.id === input.postId ? (previousPost ?? post) : post,
+          ),
+        });
+      });
       setNoticeTone("info");
       setNoticeActionLabel(null);
       setNoticeAction(null);
