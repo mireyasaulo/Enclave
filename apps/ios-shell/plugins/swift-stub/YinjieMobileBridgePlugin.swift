@@ -77,7 +77,24 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         // 也会在 cross-launch 清理 tmp，apps 也不该依赖 tmp 跨进程持久化 ——
         // 跟 Apple 「files in tmp/ should be deleted when no longer needed」的
         // 指引一致。
-        purgeOwnedTemporarySubdirectories()
+        //
+        // 真机走查 R1：CAPPlugin.load() 由 Capacitor 在 main thread 上同步调用，
+        // 早于 WebView 创建 / web bundle parse / 首屏 React mount。上面那条说
+        // 「JS 还没 mount，删什么都安全」是对的，但忽略了「同步删 = 卡 main =
+        // 卡 launch 关键路径」。日活用户跑 30 天没清过的 tmp（每条入口平均 5-15MB
+        // × N 次调用）能堆几百 MB 到 1GB+；冷启时 removeItem 在真机 NAND 上
+        // 走目录遍历 + 逐文件 unlink，单次 GB 级目录能阻 100ms-1.5s。卡的不是
+        // JS 跑代码，而是 splash 隐藏 → WebView 实际显第一帧之间的窗口被强行
+        // 拉长，用户体感「splash 转完了，黑屏一下才出内容」。
+        //
+        // 挪到 utility background queue 异步跑：plugin load 本身瞬间返回不卡
+        // launch；clean 完全在后台 NAND I/O，等 webview 跑起来时清理早已或正在
+        // 后台完成。utility QoS 不抢 main thread 的 CPU/IO 调度，但比 background
+        // 优先级高，能在合理时间内跑完。安全性论据不变（清的是上一次 run 留
+        // 下的孤儿文件，本次 run 还没人会去读）。
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            self?.purgeOwnedTemporarySubdirectories()
+        }
     }
 
     private func purgeOwnedTemporarySubdirectories() {
