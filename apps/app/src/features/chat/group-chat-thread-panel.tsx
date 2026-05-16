@@ -267,15 +267,20 @@ export function GroupChatThreadPanel({
       scrollToBottom("auto");
     }
   }, [isAtBottomRef, scrollToBottom]);
-  const handleDismissRouteContextNotice = () => {
-    // 见 conversation-thread-panel 同名函数：容器挂载后 useScrollAnchor 的
-    // useLayoutEffect 会同步把 scrollTop 顶到底，scroll 事件触发 onScrollCapture
-    // 就把刚出现的 routeContextNotice 立刻 dismiss 掉。isAtBottomRef.current
-    // 在 mount auto-scroll 里被 scrollToBottom 写 true 一直保留到用户真手势
-    // 拖出贴底窗口 — 用 it 作 user-vs-programmatic 区分。
+  // 见 conversation-thread-panel 同名函数：容器挂载后 useScrollAnchor 的
+  // useLayoutEffect 会同步把 scrollTop 顶到底，scroll 事件触发 onScrollCapture
+  // 就把刚出现的 routeContextNotice 立刻 dismiss 掉。isAtBottomRef.current
+  // 在 mount auto-scroll 里被 scrollToBottom 写 true 一直保留到用户真手势
+  // 拖出贴底窗口 — 用 it 作 user-vs-programmatic 区分。
+  const handleScrollDismissRouteContextNotice = () => {
     if (isAtBottomRef.current) {
       return;
     }
+    routeContextNotice?.onDismiss?.();
+  };
+  // composer onChange 走的是用户明确打字意图，不能套 scroll-guard——贴底
+  // 状态下 isAtBottomRef === true 会把 typing dismiss 也堵死。
+  const handleTypingDismissRouteContextNotice = () => {
     routeContextNotice?.onDismiss?.();
   };
 
@@ -1442,7 +1447,7 @@ export function GroupChatThreadPanel({
             className={`relative flex h-full flex-col overflow-auto ${
               isDesktop ? "px-7 py-5" : "overscroll-contain px-3 py-3.5"
             }`}
-            onScrollCapture={handleDismissRouteContextNotice}
+            onScrollCapture={handleScrollDismissRouteContextNotice}
           >
             {groupQuery.isError && groupQuery.error instanceof Error ? (
               isDesktop ? (
@@ -1609,7 +1614,7 @@ export function GroupChatThreadPanel({
             enabled: runtimeConfig.appPlatform !== "desktop",
           }}
           onChange={(value) => {
-            handleDismissRouteContextNotice();
+            handleTypingDismissRouteContextNotice();
             setText(value);
           }}
           onSendSticker={async (sticker) => {
