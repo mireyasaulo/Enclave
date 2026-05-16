@@ -827,6 +827,16 @@ export function ChannelsPage() {
   const pendingLikePostId = likeMutation.isPending
     ? (likeMutation.variables?.postId ?? null)
     : null;
+  // 同 like，收藏 toggle 也要锁住按钮直到 mutation 落地，避免 rapid click 串成多条
+  // 并发请求把最终状态打乱。
+  const pendingFavoritePostId = favoriteMutation.isPending
+    ? (favoriteMutation.variables?.postId ?? null)
+    : null;
+  // follow 是按 authorId 维度，"+关注"按钮在同作者的多条 post 上都显示，并发同样
+  // 会乱。锁住整个 authorId 维度。
+  const pendingFollowAuthorId = followMutation.isPending
+    ? (followMutation.variables?.authorId ?? null)
+    : null;
   const pendingCommentPostId = commentMutation.isPending
     ? (commentMutation.variables?.postId ?? null)
     : null;
@@ -1517,6 +1527,8 @@ export function ChannelsPage() {
           <MobileChannelsViewport
             activeSection={activeSection}
             likePendingPostId={pendingLikePostId}
+            favoritePendingPostId={pendingFavoritePostId}
+            followPendingAuthorId={pendingFollowAuthorId}
             posts={visiblePosts}
             commentsPreviewByPostId={commentsPreviewByPostId}
             routeSelectedPostId={routeSelectedPostId}
@@ -2246,6 +2258,8 @@ function createDesktopChannelRoutePost(
 type MobileChannelsViewportProps = {
   activeSection: FeedChannelHomeSection;
   likePendingPostId: string | null;
+  favoritePendingPostId: string | null;
+  followPendingAuthorId: string | null;
   posts: FeedPostListItem[];
   commentsPreviewByPostId?: Record<string, FeedComment[]>;
   routeSelectedPostId: string | null;
@@ -2262,6 +2276,8 @@ type MobileChannelsViewportProps = {
 function MobileChannelsViewport({
   activeSection,
   likePendingPostId,
+  favoritePendingPostId,
+  followPendingAuthorId,
   posts,
   commentsPreviewByPostId,
   routeSelectedPostId,
@@ -2429,6 +2445,8 @@ function MobileChannelsViewport({
           active={activePostId === post.id}
           favorite={Boolean(post.ownerState?.hasFavorited)}
           likePending={likePendingPostId === post.id}
+          favoritePending={favoritePendingPostId === post.id}
+          followPending={followPendingAuthorId === post.authorId}
           post={post}
           commentsPreview={
             commentsPreviewByPostId?.[post.id] ?? post.commentsPreview ?? []
@@ -2454,6 +2472,8 @@ type MobileChannelsCardProps = {
   active: boolean;
   favorite: boolean;
   likePending: boolean;
+  favoritePending: boolean;
+  followPending: boolean;
   post: FeedPostListItem;
   commentsPreview: FeedComment[];
   setCardRef: (node: HTMLElement | null) => void;
@@ -2473,6 +2493,8 @@ function MobileChannelsCard({
   active,
   favorite,
   likePending,
+  favoritePending,
+  followPending,
   post,
   commentsPreview,
   setCardRef,
@@ -2542,7 +2564,14 @@ function MobileChannelsCard({
             </ActionRailButton>
             <ActionRailButton
               active={favorite}
-              label={favorite ? t(msg`已收藏`) : t(msg`收藏`)}
+              label={
+                favoritePending
+                  ? t(msg`处理中`)
+                  : favorite
+                    ? t(msg`已收藏`)
+                    : t(msg`收藏`)
+              }
+              disabled={favoritePending}
               onClick={onToggleFavorite}
             >
               {favorite ? (
@@ -2602,16 +2631,21 @@ function MobileChannelsCard({
                 <button
                   type="button"
                   onClick={onToggleFollowAuthor}
+                  // rapid click 会让 follow / unfollow 同时在路上，状态可能跟最后一次
+                  // 点击意图对不上；锁到 mutation 落地。
+                  disabled={followPending}
                   className={cn(
-                    "rounded-full px-2.5 py-1 text-[10px] font-medium transition",
+                    "rounded-full px-2.5 py-1 text-[10px] font-medium transition disabled:cursor-not-allowed disabled:opacity-70",
                     post.ownerState?.isFollowingAuthor
                       ? "border border-white/20 bg-white/10 text-white/72"
                       : "bg-[#07c160] text-white",
                   )}
                 >
-                  {post.ownerState?.isFollowingAuthor
-                    ? t(msg`已关注`)
-                    : t(msg`+关注`)}
+                  {followPending
+                    ? t(msg`处理中...`)
+                    : post.ownerState?.isFollowingAuthor
+                      ? t(msg`已关注`)
+                      : t(msg`+关注`)}
                 </button>
               ) : null}
             </div>
