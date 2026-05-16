@@ -116,7 +116,11 @@ export function ContactDetailPane({
   useEffect(() => {
     setEditingField(null);
     setDangerConfirm(null);
-    setProfileNotice(null);
+    // 不在这里 reset profileNotice：updateProfileMutation.onSuccess 设了
+    // 「联系人资料已更新」之后会调 invalidateFriendDisplayQueries，friendship
+    // 数据 refetch 回来时 remarkName/tags 变了，这条 effect 立刻 fire 把刚
+    // 设的 notice 清掉，用户根本看不到反馈。切换联系人时由下方独立的 effect
+    // 清，并加 2.4s 自动消失定时器（跟全局 notice 一致）。
     setProfileForm({
       remarkName: friendship?.remarkName ?? "",
       tags: friendship?.tags?.join("，") ?? "",
@@ -127,6 +131,18 @@ export function ContactDetailPane({
     friendship?.remarkName,
     friendship?.tags,
   ]);
+
+  useEffect(() => {
+    setProfileNotice(null);
+  }, [character?.id]);
+
+  useEffect(() => {
+    if (!profileNotice) {
+      return;
+    }
+    const timer = window.setTimeout(() => setProfileNotice(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [profileNotice]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (payload: UpdateFriendProfileRequest) => {
