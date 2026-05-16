@@ -1071,7 +1071,15 @@ const pendingLikePostId = likeMutation.isPending
           isPostFavorite={(postId) =>
             favoriteSourceIds.includes(`feed-${postId}`)
           }
-          setShowCompose={setShowCompose}
+          setShowCompose={(next) => {
+            // 上一次发布失败 → 关闭面板 → 重开：composeErrorMessage 还会渲染
+            // 旧的 createMutation.error，用户没法分辨"这是上次失败"还是"这次
+            // 又失败"。开关之间显式 reset mutation，让面板每次开都是干净状态。
+            if (!next || (next && createMutation.isError)) {
+              createMutation.reset();
+            }
+            setShowCompose(next);
+          }}
           commentReplyTarget={desktopReplyTarget}
           onCancelCommentReply={() => setDesktopReplyTarget(null)}
           onCommentChange={(postId, value) =>
@@ -1081,7 +1089,16 @@ const pendingLikePostId = likeMutation.isPending
             }))
           }
           onCommentSubmit={(postId) =>
-            submitComment(postId, { replyTarget: desktopReplyTarget })
+            // desktopReplyTarget 是 page 级单值，绑在用户最后一次点击「回复某条
+            // 评论」的那条 post 上。如果用户随后切到另一条 post 的评论框直接
+            // 输入提交，replyTarget 是 stale 的，会让这条文本被错发为对前一条
+            // post 评论的回复。提交时按 postId 比对，跨 post 一律按普通评论走。
+            submitComment(postId, {
+              replyTarget:
+                desktopReplyTarget?.postId === postId
+                  ? desktopReplyTarget
+                  : null,
+            })
           }
           onStartCommentReply={(comment: FeedComment) =>
             setDesktopReplyTarget({
