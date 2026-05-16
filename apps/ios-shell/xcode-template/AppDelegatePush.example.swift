@@ -24,6 +24,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         cacheLaunchTarget(from: launchOptions?[.remoteNotification] as? [AnyHashable: Any], defaultSource: "push")
+        // Round 39: 已授权时每次冷启 re-register 一次，让 APNs 把可能轮换过
+        // 的新 device token 推下来（iCloud restore / iOS 大版本升级 / SIM
+        // 换卡 / 删 reinstall 等场景）。.notDetermined 不动，保留首次弹权限
+        // 走业务侧 requestNotificationPermission 的路径。
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            guard settings.authorizationStatus == .authorized ||
+                    settings.authorizationStatus == .provisional else {
+                return
+            }
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
         return true
     }
 

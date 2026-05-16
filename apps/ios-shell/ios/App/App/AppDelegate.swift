@@ -9,6 +9,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         cacheLaunchTarget(from: launchOptions?[.remoteNotification] as? [AnyHashable: Any], defaultSource: "push")
+
+        // 每次冷启用户先前已授权过的话，必须再调一次 registerForRemoteNotifications，
+        // 不然 APNs 不会主动把新 device token 推给我们 ——
+        //   - iCloud backup-restore 到新设备：新设备生成新 device token，APNs
+        //     旧 token 直接报 BadDeviceToken；
+        //   - iOS 大版本升级 / 用户更换 SIM / 删 reinstall 等场景同样会让旧
+        //     token 失效。
+        // Apple 文档明确建议 "calling registerForRemoteNotifications() at every
+        // launch is sufficient to ensure that you receive an up-to-date device
+        // token"。注意只在已授权情况下调（.authorized / .provisional），
+        // .notDetermined 时我们留给业务侧 requestNotificationPermission 那条
+        // 路径自然触发系统授权弹窗 + register，避免冷启就弹权限把用户吓走。
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            guard settings.authorizationStatus == .authorized ||
+                    settings.authorizationStatus == .provisional else {
+                return
+            }
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
         return true
     }
 
