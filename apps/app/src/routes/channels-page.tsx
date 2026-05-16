@@ -1505,8 +1505,13 @@ export function ChannelsPage() {
                 variant="primary"
                 size="sm"
                 className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
+                // 只有按钮实际行为是「换一批」时才跟 generateMutation.isPending 关：
+                // - safeReturnPath 在 → 按钮是「返回上一页」，generate pending 不应该挡返回；
+                // - following/friends/live → 按钮是「去推荐看看」，纯切 tab，也不挡。
                 disabled={
-                  activeSection === "recommended" && generateMutation.isPending
+                  !safeReturnPath &&
+                  activeSection === "recommended" &&
+                  generateMutation.isPending
                 }
                 onClick={handleEmptyStateAction}
               >
