@@ -69,9 +69,13 @@ public class YinjieFirebaseMessagingService extends FirebaseMessagingService {
         Intent launchIntent = new Intent(this, MainActivity.class);
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         applyLaunchTargetExtras(launchIntent, remoteMessage);
+        // 每条推送用不同的 requestCode：写死 1001 + FLAG_UPDATE_CURRENT 会让
+        // 通知栏里所有同包推送共享同一个 PendingIntent，后来的 extras 把先到的
+        // 那条 intent 覆盖掉，用户点旧通知会被路由到新会话。
+        int requestCode = buildPendingIntentRequestCode(remoteMessage);
         PendingIntent contentIntent = PendingIntent.getActivity(
             this,
-            1001,
+            requestCode,
             launchIntent,
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
@@ -84,7 +88,25 @@ public class YinjieFirebaseMessagingService extends FirebaseMessagingService {
             .setAutoCancel(true)
             .setContentIntent(contentIntent);
 
-        NotificationManagerCompat.from(this).notify((int) System.currentTimeMillis(), builder.build());
+        NotificationManagerCompat.from(this).notify(requestCode, builder.build());
+    }
+
+    private int buildPendingIntentRequestCode(RemoteMessage remoteMessage) {
+        if (remoteMessage != null && remoteMessage.getData() != null) {
+            String conversationId = normalize(remoteMessage.getData().get("conversationId"));
+            if (conversationId != null) {
+                return ("conversation:" + conversationId).hashCode();
+            }
+            String groupId = normalize(remoteMessage.getData().get("groupId"));
+            if (groupId != null) {
+                return ("group:" + groupId).hashCode();
+            }
+            String route = normalize(remoteMessage.getData().get("route"));
+            if (route != null) {
+                return ("route:" + route).hashCode();
+            }
+        }
+        return (int) System.currentTimeMillis();
     }
 
     private void applyLaunchTargetExtras(Intent intent, RemoteMessage remoteMessage) {
