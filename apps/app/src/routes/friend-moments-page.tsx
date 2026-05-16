@@ -236,16 +236,21 @@ export function FriendMomentsPage() {
   const pendingCommentMomentId = commentMutation.isPending
     ? commentMutation.variables
     : null;
-  const blockedCharacterIds = new Set(
-    (blockedQuery.data ?? []).map((item) => item.characterId),
+  // memo：之前每次 render 都 new Set + 两次 filter 把全表 N×3 跑一遍。
+  // composeDraft.text 每个字符都触发 re-render，247+ moments 时白浪费 CPU。
+  const blockedCharacterIds = useMemo(
+    () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
+    [blockedQuery.data],
   );
-  const visibleMoments = (momentsQuery.data ?? []).filter(
-    (moment) =>
-      moment.authorType !== "character" ||
-      !blockedCharacterIds.has(moment.authorId),
-  );
-  const friendMoments = visibleMoments.filter(
-    (moment) => moment.authorId === characterId,
+  const friendMoments = useMemo(
+    () =>
+      (momentsQuery.data ?? []).filter(
+        (moment) =>
+          moment.authorId === characterId &&
+          (moment.authorType !== "character" ||
+            !blockedCharacterIds.has(moment.authorId)),
+      ),
+    [momentsQuery.data, characterId, blockedCharacterIds],
   );
 
   useEffect(() => {

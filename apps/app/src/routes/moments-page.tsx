@@ -56,6 +56,7 @@ import {
   parseDesktopMomentsRouteState,
 } from "../features/moments/moments-route-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { consumeMomentPublishFlash } from "../features/moments/moment-publish-flash";
 import {
@@ -276,12 +277,20 @@ export function MomentsPage() {
       queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
         current ? [newMoment, ...current] : current,
       );
+      // "我的朋友圈"页绑 mine cache，发布同步过去否则跳过去要等下次 refetch。
+      queryClient.setQueryData<Moment[]>(
+        ["app-moments-mine", baseUrl],
+        (current) => (current ? [newMoment, ...current] : current),
+      );
       // 后台 invalidate 让其它共享 cache 的页面（profile/friend-moments-page、search-index 等）也同步
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
       });
       void queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", baseUrl],
       });
     },
   });
@@ -640,6 +649,10 @@ export function MomentsPage() {
       void queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
+      // "我的朋友圈"也得跟随删除——否则跳过去仍然能看到这条幽灵帖子。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", baseUrl],
+      });
     },
   });
   const pendingLikeMomentId = likeMutation.isPending
@@ -651,23 +664,42 @@ export function MomentsPage() {
   const pendingDeleteMomentId = deleteMutation.isPending
     ? deleteMutation.variables
     : null;
-  const blockedCharacterIds = new Set(
-    (blockedQuery.data ?? []).map((item) => item.characterId),
+  // 输入 compose 文本时父组件每个字符都 re-render；visibleMoments / blockedCharacterIds
+  // / routeSelectedMoment / routeSelectedAuthorMoment 之前每次都 new Set + filter +
+  // 两次 find，249+ 条 moment 下白白烧 CPU。memo 缓存 + 给 DesktopMomentRow.memo 当
+  // referential stability 来源——某条 moment 引用不变，row 就能跳过 re-render。
+  const blockedCharacterIds = useMemo(
+    () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
+    [blockedQuery.data],
   );
-  const visibleMoments = momentsData.filter(
-    (moment) =>
-      moment.authorType !== "character" ||
-      !blockedCharacterIds.has(moment.authorId),
+  const visibleMoments = useMemo(
+    () =>
+      momentsData.filter(
+        (moment) =>
+          moment.authorType !== "character" ||
+          !blockedCharacterIds.has(moment.authorId),
+      ),
+    [momentsData, blockedCharacterIds],
   );
-  const routeSelectedMoment = routeSelectedMomentId
-    ? visibleMoments.find((moment) => moment.id === routeSelectedMomentId) ?? null
-    : null;
-  const routeSelectedAuthorMoment = routeSelectedAuthorId
-    ? routeSelectedMoment?.authorId === routeSelectedAuthorId
-      ? routeSelectedMoment
-      : visibleMoments.find((moment) => moment.authorId === routeSelectedAuthorId) ??
-        null
-    : null;
+  const routeSelectedMoment = useMemo(
+    () =>
+      routeSelectedMomentId
+        ? visibleMoments.find((moment) => moment.id === routeSelectedMomentId) ??
+          null
+        : null,
+    [routeSelectedMomentId, visibleMoments],
+  );
+  const routeSelectedAuthorMoment = useMemo(
+    () =>
+      routeSelectedAuthorId
+        ? routeSelectedMoment?.authorId === routeSelectedAuthorId
+          ? routeSelectedMoment
+          : visibleMoments.find(
+              (moment) => moment.authorId === routeSelectedAuthorId,
+            ) ?? null
+        : null,
+    [routeSelectedAuthorId, routeSelectedMoment, visibleMoments],
+  );
   const syncedRouteSelectedAuthorId =
     routeSelectedAuthorId &&
     routeSelectedAuthorMoment?.authorType === "character"
@@ -1480,6 +1512,36 @@ function MobileMomentsView({
     ownerId &&
       shareMoment?.likes.some((like) => like.authorId === ownerId),
   );
+
+  // Android 硬件 Back：弹层打开时先收弹层（评论条 > 行动菜单 > 分享卡片），
+  // 不能直接 history.back() 把朋友圈页退掉。与 publish 页 (fa97a32c)、chat
+  // 系列 (38a65fa5 等) 最近的 Back 行为对齐——用户语义是「关弹窗」，
+  // 不是「离开页面」。优先级匹配 ESC 习惯：最新打开的先关。
+  useEffect(() => {
+    const hasOverlay = Boolean(
+      commentBarTarget || actionBubble || shareMomentId,
+    );
+    if (!hasOverlay) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      if (commentBarTarget) {
+        onCloseCommentBar();
+        return true;
+      }
+      if (actionBubble) {
+        onCloseActionMenu();
+        return true;
+      }
+      setShareMomentId(null);
+      return true;
+    });
+  }, [
+    actionBubble,
+    commentBarTarget,
+    shareMomentId,
+    onCloseActionMenu,
+    onCloseCommentBar,
+  ]);
 
   return (
     <AppPage className="relative space-y-0 bg-white px-0 pb-0 pt-0">

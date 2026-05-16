@@ -125,16 +125,24 @@ export function DesktopMomentsWorkspace({
   );
   const shareOwnerName = ownerUsername?.trim() || t(msg`世界主人`);
 
+  // 每个 scrollToMomentId 只滚一次：之前依赖 [moments, scrollToMomentId]，
+  // 用户每点一次赞/发一条评论 → optimistic 让 moments 数组换新 → effect 重跑
+  // smooth-scroll 把用户拉回到该 moment，体感像"被吸住"。改成 ref 记录已滚过
+  // 的 id，moments 后续变更不再触发滚动；用户切换到另一个 momentId（hash 变）
+  // 时再滚一次。
+  const lastScrolledIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (!scrollToMomentId || typeof document === "undefined") {
       return;
     }
-
-    const target = moments.find((moment) => moment.id === scrollToMomentId);
-    if (!target) {
+    if (lastScrolledIdRef.current === scrollToMomentId) {
       return;
     }
-
+    if (!moments.some((moment) => moment.id === scrollToMomentId)) {
+      // 目标还没出现在已加载分页里，等 moments 更新再尝试。
+      return;
+    }
+    lastScrolledIdRef.current = scrollToMomentId;
     const frame = window.requestAnimationFrame(() => {
       document
         .getElementById(`desktop-moment-post-${scrollToMomentId}`)
@@ -142,6 +150,11 @@ export function DesktopMomentsWorkspace({
     });
     return () => window.cancelAnimationFrame(frame);
   }, [moments, scrollToMomentId]);
+  useEffect(() => {
+    if (!scrollToMomentId) {
+      lastScrolledIdRef.current = null;
+    }
+  }, [scrollToMomentId]);
 
   return (
     <div className="relative flex h-full min-h-0 bg-[rgba(244,247,246,0.98)]">

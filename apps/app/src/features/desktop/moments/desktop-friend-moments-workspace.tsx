@@ -151,15 +151,20 @@ export function DesktopFriendMomentsWorkspace({
   );
   const latestMoment = sortedMoments[0] ?? null;
 
+  // 每个 scrollToMomentId 只滚一次。之前依赖 [scrollToMomentId, sortedMoments]，
+  // 点赞/评论时 sortedMoments 重算 → effect 重跑 → 用户被强制滚回该帖。
+  const lastScrolledIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (!scrollToMomentId || typeof document === "undefined") {
       return;
     }
-
+    if (lastScrolledIdRef.current === scrollToMomentId) {
+      return;
+    }
     if (!sortedMoments.some((moment) => moment.id === scrollToMomentId)) {
       return;
     }
-
+    lastScrolledIdRef.current = scrollToMomentId;
     const frame = window.requestAnimationFrame(() => {
       document
         .getElementById(`desktop-moment-post-${scrollToMomentId}`)
@@ -167,6 +172,11 @@ export function DesktopFriendMomentsWorkspace({
     });
     return () => window.cancelAnimationFrame(frame);
   }, [scrollToMomentId, sortedMoments]);
+  useEffect(() => {
+    if (!scrollToMomentId) {
+      lastScrolledIdRef.current = null;
+    }
+  }, [scrollToMomentId]);
 
   function openProfilePopover(
     anchorElement: HTMLButtonElement,

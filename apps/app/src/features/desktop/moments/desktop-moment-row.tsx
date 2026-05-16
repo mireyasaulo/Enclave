@@ -1,4 +1,5 @@
 import {
+  memo,
   useEffect,
   useMemo,
   useRef,
@@ -69,7 +70,7 @@ type DesktopMomentRowProps = {
   ) => void;
 };
 
-export function DesktopMomentRow({
+function DesktopMomentRowInner({
   authorActionAriaLabel,
   authorActionLabel,
   commentDraft,
@@ -536,6 +537,34 @@ export function DesktopMomentRow({
     </article>
   );
 }
+
+// 列表里通常一次只有 1 条 moment 真变（点赞/评论 optimistic patch 用
+// items.map 显式保留未改条目的原引用），剩下 200+ 条 prev.moment === next.moment。
+// 父组件的 inline callback 在重渲时换引用，但闭包里 bind 的还是同一个 moment.id，
+// 所以忽略 callback 引用差异是安全的：跳过这种没意义的重渲是巨大的体感提升
+// （之前在 compose 面板里打字每一个字符都让 249 行全跑一遍）。
+export const DesktopMomentRow = memo(DesktopMomentRowInner, (prev, next) => {
+  return (
+    prev.moment === next.moment &&
+    prev.ownerId === next.ownerId &&
+    prev.favorite === next.favorite &&
+    prev.commentDraft === next.commentDraft &&
+    prev.commentLoading === next.commentLoading &&
+    prev.likeLoading === next.likeLoading &&
+    prev.deleteLoading === next.deleteLoading &&
+    prev.commentReplyTarget === next.commentReplyTarget &&
+    prev.authorActionAriaLabel === next.authorActionAriaLabel &&
+    prev.authorActionLabel === next.authorActionLabel &&
+    // 「能否执行某动作」由父级是否传 callback 决定。callback 本身换引用不重要，
+    // 但有/无的状态切换必须让 row 重渲（比如解除拉黑后从只读切到可评论）。
+    Boolean(prev.onDelete) === Boolean(next.onDelete) &&
+    Boolean(prev.onShare) === Boolean(next.onShare) &&
+    Boolean(prev.onStartCommentReply) === Boolean(next.onStartCommentReply) &&
+    Boolean(prev.onSelectAuthor) === Boolean(next.onSelectAuthor) &&
+    Boolean(prev.onSelectLiker) === Boolean(next.onSelectLiker) &&
+    Boolean(prev.onAuthorAction) === Boolean(next.onAuthorAction)
+  );
+});
 
 function CommentLine({
   authorName,

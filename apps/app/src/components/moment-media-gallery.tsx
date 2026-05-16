@@ -13,6 +13,7 @@ import { cn } from "@yinjie/ui";
 import { formatMomentDurationLabel } from "../features/moments/moment-compose-media";
 import { AudioCard } from "./audio-card";
 import { resolveAppMediaUrl } from "../lib/media-url";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 
 const t = translateRuntimeMessage;
 
@@ -39,6 +40,11 @@ export function MomentMediaGallery({
   stopPropagation = false,
 }: MomentMediaGalleryProps) {
   const [viewerState, setViewerState] = useState<ViewerState | null>(null);
+
+  const imageCount = media.reduce(
+    (count, asset) => (asset.kind === "image" ? count + 1 : count),
+    0,
+  );
 
   useEffect(() => {
     if (!viewerState) {
@@ -74,10 +80,14 @@ export function MomentMediaGallery({
             return current;
           }
 
+          // image viewer 的 index 走 images（filter 后的图片数组），不能用
+          // media.length —— 如果一条 moment 同时混着 audio/video（理论上历史
+          // 数据可能存在），按 ArrowRight 会把 index 推到 images 之外，
+          // activeImage = images[index] = undefined，viewer 渲染崩塌。
           return {
             kind: "image",
             index:
-              current.index < media.length - 1 ? current.index + 1 : current.index,
+              current.index < imageCount - 1 ? current.index + 1 : current.index,
           };
         });
       }
@@ -85,7 +95,19 @@ export function MomentMediaGallery({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [media.length, viewerState]);
+  }, [imageCount, viewerState]);
+
+  // Android 硬件 Back：在朋友圈点开大图全屏 viewer 后按 Back，先收 viewer 而不是
+  // 退掉整个朋友圈页。和 chat 系列 (38a65fa5 "图片/位置/笔记 viewer 接 Android
+  // Back，关 viewer 不退聊天页") 的修法保持一致。
+  useEffect(() => {
+    if (!viewerState) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      setViewerState(null);
+      return true;
+    });
+  }, [viewerState]);
 
   if (!media.length) {
     return null;
