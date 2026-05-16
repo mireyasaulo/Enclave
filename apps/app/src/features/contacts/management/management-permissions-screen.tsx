@@ -61,7 +61,9 @@ export function ManagementPermissionsScreen({ onPickFriend }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t(msg`搜索好友`)}
-            className="min-w-0 flex-1 bg-transparent text-[13px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
+            // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
+            // zoom-in；管理 modal 弹起来就抖。
+            className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
           />
         </label>
       </div>

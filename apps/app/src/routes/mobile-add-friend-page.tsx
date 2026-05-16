@@ -113,21 +113,26 @@ function MobileAddFriend() {
       ? routeState.returnPath
       : undefined;
   const safeReturnHash = safeReturnPath ? routeState.returnHash : undefined;
+  const [searchText, setSearchText] = useState(routeState.keyword ?? "");
+  const [submittedKeyword, setSubmittedKeyword] = useState(
+    routeState.keyword ?? "",
+  );
+  // currentRouteHash 编码当前已提交的搜索词（不是初始 URL 里的 keyword）：用户
+  // 在 /add-friend 上敲 "Alice" 搜出来后点头像看资料 / 点右上"新的朋友"，
+  // 子页面带的 returnHash 要能让用户返回时看到 "Alice" 的结果，而不是落回
+  // welcome 状态。原写法 keyword 取 routeState.keyword（初始 URL），用户搜
+  // 完跳子页再返回，搜索词全丢。
   const currentRouteHash = useMemo(
     () =>
       buildMobileAddFriendRouteHash({
         returnPath: safeReturnPath,
         returnHash: safeReturnHash,
-        keyword: routeState.keyword,
+        keyword: submittedKeyword.trim() || undefined,
       }),
-    [routeState.keyword, safeReturnHash, safeReturnPath],
+    [submittedKeyword, safeReturnHash, safeReturnPath],
   );
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [searchText, setSearchText] = useState(routeState.keyword ?? "");
-  const [submittedKeyword, setSubmittedKeyword] = useState(
-    routeState.keyword ?? "",
-  );
   const [notice, setNotice] = useState<{
     message: string;
     tone: "info" | "success";
@@ -867,7 +872,13 @@ function MobileAddFriendSendSheet({
         className="absolute inset-0"
       />
 
-      <div className="relative flex w-full max-w-[460px] flex-col rounded-t-[18px] bg-white pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] shadow-[0_-12px_32px_rgba(15,23,42,0.18)] sm:rounded-[14px]">
+      <div
+        // pb 接 --keyboard-inset：iOS WKWebView 上软键盘弹起会盖住 fixed
+        // 元素，sheet 底部「取消 / 发送」按钮看不见。mobile-shell 把 keyboard
+        // 高度写进 --keyboard-inset CSS 变量，这里 max(safe-area, keyboard)
+        // 抬高 sheet 内容，保证按钮始终高于键盘。
+        className="relative flex w-full max-w-[460px] flex-col rounded-t-[18px] bg-white pb-[calc(max(env(safe-area-inset-bottom,0px),var(--keyboard-inset,0px))+0.75rem)] shadow-[0_-12px_32px_rgba(15,23,42,0.18)] sm:rounded-[14px]"
+      >
         <div className="flex items-center justify-between border-b border-[color:var(--border-faint)] px-4 py-3">
           <button
             type="button"

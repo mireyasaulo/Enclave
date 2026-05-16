@@ -25,6 +25,7 @@ import {
   shouldShowCloudAccountControls,
 } from "../lib/cloud-session";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../store/cloud-session-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
@@ -43,6 +44,19 @@ export function ProfilePage() {
     select: (state) => state.location.hash,
   });
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+
+  // 退出登录 confirm dialog 打开时 Back 键只关 dialog，不让默认 chain
+  // 走到根 tab 双击退出 toast（Me tab 是根 tab）。
+  useEffect(() => {
+    if (!logoutConfirmOpen) {
+      return;
+    }
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      setLogoutConfirmOpen(false);
+      return true;
+    });
+  }, [logoutConfirmOpen]);
   const username = useWorldOwnerStore((state) => state.username);
   const ownerId = useWorldOwnerStore((state) => state.id);
   const avatar = useWorldOwnerStore((state) => state.avatar);

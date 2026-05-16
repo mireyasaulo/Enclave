@@ -14,6 +14,12 @@ type MomentCommentComposerProps = {
   inputClassName?: string;
   buttonClassName?: string;
   inputRef?: Ref<HTMLTextAreaElement>;
+  /**
+   * 评论硬上限。默认 500 与服务端 MAX_COMMENT_TEXT_LENGTH 对齐 —— 之前桌面
+   * 端 composer 没卡，用户能打 1k 字按发送→服务端 400 反弹「评论最多 500 字」，
+   * 中间几百毫秒空窗用户以为是网络抽风。移动端 wechat-comment-bar 已经卡了。
+   */
+  maxLength?: number;
   submitLabel?: string;
   pendingLabel?: string;
   onChange: (value: string) => void;
@@ -29,6 +35,7 @@ export function MomentCommentComposer({
   inputClassName,
   buttonClassName,
   inputRef,
+  maxLength = 500,
   submitLabel = t(msg`发送`),
   pendingLabel = t(msg`发送中...`),
   onChange,
@@ -62,6 +69,7 @@ export function MomentCommentComposer({
         placeholder={placeholder}
         aria-label={t(msg`评论内容`)}
         disabled={disabled}
+        maxLength={maxLength}
         inputMode="text"
         enterKeyHint="send"
         autoComplete="off"
