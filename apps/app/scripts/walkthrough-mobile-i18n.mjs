@@ -210,14 +210,20 @@ async function visitRoute(page, baseUrl, route, locale, clickBudget) {
       leaks: [],
     };
   }
-  // Scroll to bottom and back to render off-screen lazy content.
-  await page.evaluate(async () => {
-    const main = document.scrollingElement || document.body;
-    main.scrollTo({ top: main.scrollHeight, behavior: "instant" });
-    await new Promise((r) => setTimeout(r, 200));
-    main.scrollTo({ top: 0, behavior: "instant" });
-    await new Promise((r) => setTimeout(r, 100));
-  });
+  // Scroll to bottom and back to render off-screen lazy content. Wrap in
+  // try/catch because the page can navigate mid-scroll (e.g. some routes
+  // auto-redirect after mount) which destroys the execution context.
+  try {
+    await page.evaluate(async () => {
+      const main = document.scrollingElement || document.body;
+      main.scrollTo({ top: main.scrollHeight, behavior: "instant" });
+      await new Promise((r) => setTimeout(r, 200));
+      main.scrollTo({ top: 0, behavior: "instant" });
+      await new Promise((r) => setTimeout(r, 100));
+    });
+  } catch {
+    // Navigation cancelled the eval; keep going with whatever rendered.
+  }
   const allItems = [];
   const seenTexts = new Set();
   const addItems = (items) => {
