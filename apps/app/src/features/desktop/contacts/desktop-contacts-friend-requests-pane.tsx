@@ -31,13 +31,14 @@ export function DesktopContactsFriendRequestsPane({
   onDecline,
 }: DesktopContactsFriendRequestsPaneProps) {
   const t = useRuntimeTranslator();
-  // 后端 /social/friend-requests 只返回 status='pending'，但 expiresAt 过期后请求
-  // 不会从列表里自动消失。展示用的 pendingCount 应当只数还没过期的，否则侧栏
-  // shortcut 的"x 条待处理"会包含用户其实点不动的旧请求。
-  const pendingCount = requests.filter(
-    (item) =>
-      item.status === "pending" && !isFriendRequestExpired(item.expiresAt),
+  // 后端 /social/friend-requests 只返回 status='pending'，但 expiresAt 过期后
+  // 请求不会从列表里自动消失。这里把过期/非过期分开计数：侧栏 shortcut 拿到
+  // 的 pendingRequestCount 是 requests.length（含过期），面板顶端用同一份口径
+  // 显示总数 + 单独点出过期条数，避免侧栏说"5 条待处理"而面板里只数 3 条。
+  const expiredCount = requests.filter((item) =>
+    isFriendRequestExpired(item.expiresAt),
   ).length;
+  const pendingCount = requests.length;
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-auto bg-[rgba(245,247,247,0.96)]">
@@ -48,7 +49,11 @@ export function DesktopContactsFriendRequestsPane({
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
             {pendingCount > 0
-              ? t(msg`当前有 ${pendingCount} 条待处理好友申请`)
+              ? expiredCount > 0
+                ? t(
+                    msg`当前有 ${pendingCount} 条待处理好友申请（${expiredCount} 条已过期，可清除）`,
+                  )
+                : t(msg`当前有 ${pendingCount} 条待处理好友申请`)
               : t(msg`查看收到的好友申请和处理结果。`)}
           </div>
         </div>

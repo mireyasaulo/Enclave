@@ -809,6 +809,11 @@ export function ContactsPage() {
   });
   const acceptFriendRequestMutation = useMutation({
     mutationFn: (requestId: string) => acceptFriendRequest(requestId, baseUrl),
+    // mutate 开新一轮前先把对面 mutation 的错误清掉，否则用户点接受失败 → 改点
+    // 拒绝成功，actionError 里那条旧的"接受失败"红字还会卡在面板顶端。
+    onMutate: () => {
+      declineFriendRequestMutation.reset();
+    },
     onSuccess: async (_, requestId) => {
       const acceptedRequest =
         (friendRequestsQuery.data ?? []).find(
@@ -849,6 +854,9 @@ export function ContactsPage() {
   });
   const declineFriendRequestMutation = useMutation({
     mutationFn: (requestId: string) => declineFriendRequest(requestId, baseUrl),
+    onMutate: () => {
+      acceptFriendRequestMutation.reset();
+    },
     onSuccess: async () => {
       setNotice(t(msg`已忽略好友申请。`));
       setFriendRequestSuccess(t(msg`已忽略好友申请。`));
