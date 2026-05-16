@@ -411,6 +411,14 @@ export class FavoritesService implements OnModuleInit {
       updatedAt: timestamp,
       input,
     });
+    // FE handleSave 已经挡了空保存（contentText.trim() && assets.length 都为
+    // 空 → 弹"先写点内容"），但直接调 API 还能塞 contentHtml="<p></p>" 的
+    // 空笔记，污染 chat_favorite_notes。跟 FE 同标准：正文或附件至少要有一个。
+    if (!isFavoriteNoteSubstantive(note)) {
+      throw new AppError('CHAT_NOTE_CONTENT_REQUIRED', {
+        legacyMessage: '笔记内容不能为空。',
+      });
+    }
     await this.favoriteNoteRepo.insert({
       id: note.id,
       title: note.title,
@@ -470,6 +478,12 @@ export class FavoritesService implements OnModuleInit {
       updatedAt: new Date().toISOString(),
       input,
     });
+    // 跟 createFavoriteNote 对齐：用 update 把整条笔记清空也算"空笔记"，拒收。
+    if (!isFavoriteNoteSubstantive(nextNote)) {
+      throw new AppError('CHAT_NOTE_CONTENT_REQUIRED', {
+        legacyMessage: '笔记内容不能为空。',
+      });
+    }
     await this.favoriteNoteRepo.update(
       { id: normalizedId },
       {
@@ -1123,6 +1137,11 @@ function clampNonNegativeNumber(value: unknown): number | undefined {
   if (value < 0) return undefined;
   if (value > Number.MAX_SAFE_INTEGER) return undefined;
   return value;
+}
+
+// 跟 FE handleSave 的 hasContent 同标准：只看正文或附件，标签单独不能成笔记。
+function isFavoriteNoteSubstantive(note: FavoriteNoteDocument): boolean {
+  return Boolean(note.contentText.trim()) || note.assets.length > 0;
 }
 
 function isFavoriteRecord(value: unknown): value is FavoriteRecord {
