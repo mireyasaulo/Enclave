@@ -620,9 +620,21 @@ export function DesktopNotesWorkspace({
 
     setAttachmentPending(true);
 
-    try {
-      const createdAssets: FavoriteNoteAsset[] = [];
+    // createdAssets / errorMessage 移到 try 外面：批量上传到第 K 张图突然
+    // 失败时，前 K-1 张已经 await uploadChatAttachment 拿到 URL 并
+    // execCommand insertHTML 进了 DOM。如果还是只在 try 末尾才
+    // setEditorState({assets}), 一抛错就直接跳到 catch → 那 K-1 张
+    // 图记录在 createdAssets 里、也写在 DOM 里，但 state.assets 完全没
+    // 收到——下一次保存 buildNoteMutationPayload → filterAssetsByHtml(html,
+    // state.assets)，因为 state.assets 里没有这几张图的 id，会被 filter
+    // 全部丢弃，后端拿到的笔记 HTML 引用着图，但 asset 列表是空。
+    // 图先能渲染，等附件 TTL 到了链接断掉就成"坏图"。
+    // 改成在 finally 里统一同步 DOM → state（functional setter 兜 race），
+    // 部分成功也会落到 state.assets，保存时就不会丢。
+    const createdAssets: FavoriteNoteAsset[] = [];
+    let errorMessage: string | null = null;
 
+    try {
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
@@ -682,39 +694,43 @@ export function DesktopNotesWorkspace({
           );
         }
       }
-
+    } catch (error) {
+      errorMessage =
+        error instanceof Error
+          ? error.message
+          : t(msg`附件上传失败，请稍后再试。`);
+    } finally {
       // 之前是 setEditorState({...tags: editorState.tags...})，editorState
       // 是 handleAttachmentSelection 进入时的闭包快照——上传走 await（可能几
       // 百 ms 到几秒），这期间用户在标签栏添加 / 删除标签（handleTagCommit /
       // handleRemoveTag 都已经是 functional updater 正确更新 state），上传
       // 完成后这一行把 tags 强行写回闭包旧值，用户在等上传时新加的标签直接
       // 没了。改成 functional updater，从最新 state 拼出最终值。
+      // 同时部分成功也走这条路径（无论 catch 是否触发），保证 state.assets
+      // 收下所有 createdAssets，不会出现 DOM 有图但 state 没记的不一致。
       const editor = editorRef.current;
-      setEditorState((current) => {
-        const nextHtml = normalizeEditorHtml(
-          editor?.innerHTML ?? current.contentHtml,
-        );
-        const nextAssets = mergeNoteAssets(current.assets, createdAssets);
-        return {
-          contentHtml: nextHtml,
-          contentText: extractNoteTextFromHtml(nextHtml),
-          tags: current.tags,
-          assets: filterAssetsByHtml(nextHtml, nextAssets),
-        };
-      });
-      setNotice({
-        tone: "success",
-        message: t(msg`附件已插入到笔记。`),
-      });
-    } catch (error) {
-      setNotice({
-        tone: "danger",
-        message:
-          error instanceof Error
-            ? error.message
-            : t(msg`附件上传失败，请稍后再试。`),
-      });
-    } finally {
+      if (createdAssets.length || editor) {
+        setEditorState((current) => {
+          const nextHtml = normalizeEditorHtml(
+            editor?.innerHTML ?? current.contentHtml,
+          );
+          const nextAssets = mergeNoteAssets(current.assets, createdAssets);
+          return {
+            contentHtml: nextHtml,
+            contentText: extractNoteTextFromHtml(nextHtml),
+            tags: current.tags,
+            assets: filterAssetsByHtml(nextHtml, nextAssets),
+          };
+        });
+      }
+      if (errorMessage) {
+        setNotice({ tone: "danger", message: errorMessage });
+      } else {
+        setNotice({
+          tone: "success",
+          message: t(msg`附件已插入到笔记。`),
+        });
+      }
       setAttachmentPending(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
