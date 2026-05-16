@@ -55,6 +55,27 @@ export function MessageQuoteSelectionSheet({
     return unregister;
   }, [isDesktop, onClose, open]);
 
+  // 桌面键盘 Esc：sheet 是 modal 风格（带半透明 backdrop），按 Esc 关闭符合
+  // 桌面用户对模态的预期。原写法只接了原生壳 Back 拦截，桌面用户只能点
+  // 「取消」或点 backdrop 关，跟同一文件下被 fix 过的会话/消息右键菜单
+  // 和确认弹层不一致。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) {
+        return;
+      }
+      event.preventDefault();
+      onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, open]);
+
   if (!open) {
     return null;
   }
