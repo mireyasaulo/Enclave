@@ -401,7 +401,10 @@ export function ChatMessageSearchPanel({
               value={keyword}
               onChange={(event) => setKeyword(event.target.value)}
               placeholder={t(msg`搜索`)}
-              className="min-w-0 flex-1 bg-transparent text-[14px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
+              // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+              // 这是查找聊天记录的输入框，进来就 auto focus（line 175-177）—
+              // 字号偏小直接触发 zoom，整页搜索 panel 抖一下。
+              className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
           <div className="mt-2.5 flex flex-wrap gap-1.5">
@@ -505,7 +508,8 @@ export function ChatMessageSearchPanel({
                     setDateFilter("all");
                   }
                 }}
-                className="min-w-0 flex-1 bg-transparent text-[13px] text-[color:var(--text-primary)] outline-none"
+                // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+                className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none"
               />
             </label>
             {enableSenderFilter ? (
@@ -516,7 +520,9 @@ export function ChatMessageSearchPanel({
                 <select
                   value={senderFilter}
                   onChange={(event) => setSenderFilter(event.target.value)}
-                  className="min-w-0 flex-1 bg-transparent text-[13px] text-[color:var(--text-primary)] outline-none"
+                  // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in，
+                  // 对 select 同样适用。
+                  className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none"
                 >
                   <option value="all">{t(msg`全部成员`)}</option>
                   {senderOptions.map((senderKey) => (

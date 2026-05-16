@@ -132,7 +132,10 @@ export function MessageQuoteSelectionSheet({
             className={`w-full resize-none bg-transparent text-[color:var(--text-primary)] outline-none ${
               isDesktop
                 ? "min-h-[164px] text-[15px] leading-7"
-                : "min-h-[152px] rounded-[12px] text-[14px] leading-6"
+                : // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport
+                  // zoom-in，readOnly 也不豁免。用户点 textarea 选文字也算
+                  // focus → 页面突然放大。
+                  "min-h-[152px] rounded-[12px] text-[16px] leading-6"
             }`}
           />
         </div>
