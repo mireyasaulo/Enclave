@@ -29,7 +29,22 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-type UrlInputError = "format" | "too_large" | "unsafe_scheme" | null;
+type UrlInputError =
+  | "format"
+  | "too_large"
+  | "unsafe_scheme"
+  | "data_url_empty"
+  | null;
+
+// data: 头部最短壳是 "data:image/x;," (14 字符) 或 "data:image/png;base64," (22 字符)。
+// 比这只多几个字节的 data URL（如 "data:image/png;base64,A"）解码后没有任何
+// 像素内容，AvatarChip 加载会失败回 fallback。比 1×1 透明 GIF (~41 字符) 更短
+// 的串几乎不可能是合法图片。设 32 字符作为下限：
+//   - 阻断 "data:image/x;,"、"data:image/png"、"data:image/png;base64," 这种 garbage
+//   - 放行 1×1 transparent GIF (41 字符)、空 SVG (~60 字符) 等真实最小图片
+// 第 2 轮新走查 W2R1.7 实测：之前粘 "data:image/x;," 完成按钮没 disable，PATCH
+// 直接落库——下次进 profile 看见默认 fallback 以为头像消失了，毫无线索可查。
+const MIN_AVATAR_DATA_URL_LENGTH = 32;
 
 // 之前 URL 输入框完全不校验，用户输 "abc"、"https//x"（漏冒号）这种
 // 也能 disable 不掉「完成」一路提交到服务端落库，AvatarChip 加载失败
@@ -86,8 +101,11 @@ function checkAvatarUrlInput(value: string): UrlInputError {
   if (!value) return null; // 空 = 不打算改，由 canSave 单独 gate
   // 提早判 image data URL：合法 data:image/png;... 走 length gate
   if (/^data:image\//i.test(value)) {
-    // 粘贴的 data URL 也要校长度，不然超 2MB 的话要等上传完才被服务端拒
-    return value.length > MAX_AVATAR_INPUT_LENGTH ? "too_large" : null;
+    if (value.length > MAX_AVATAR_INPUT_LENGTH) return "too_large";
+    // 太短的 data URL（"data:image/x;,"、空 base64 body 等）肯定不是真图片，
+    // 落库后 AvatarChip render 失败回 fallback，用户没线索。先在客户端 gate。
+    if (value.length < MIN_AVATAR_DATA_URL_LENGTH) return "data_url_empty";
+    return null;
   }
   // 同源相对路径放行（跟后端 isSafeAvatarValue 同 gate）：预设角色头像
   // 经常是 /api/character-assets/foo.svg，旧账号 / 测试脚本设的 owner.avatar
@@ -537,6 +555,11 @@ export function ProfileInfoAvatarPage() {
           {trimmed && urlInputError === "too_large" ? (
             <div className="mt-2 text-[11px] leading-4 text-[#92400e]">
               {t(msg`粘贴的图片超过 2MB 上限，请压缩或换个 URL。`)}
+            </div>
+          ) : null}
+          {trimmed && urlInputError === "data_url_empty" ? (
+            <div className="mt-2 text-[11px] leading-4 text-[#92400e]">
+              {t(msg`图片数据不完整或为空，请检查后再粘贴。`)}
             </div>
           ) : null}
         </div>
