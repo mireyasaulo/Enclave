@@ -223,23 +223,14 @@ export function useConversationThread(conversationId: string) {
       return;
     }
 
-    const markActiveConversationRead = async () => {
-      const readAt = new Date().toISOString();
-      syncActiveConversationReadState(readAt);
-
-      try {
-        await markConversationRead(conversationId, baseUrl);
-      } finally {
-        await queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        });
-      }
-    };
-
     setSocketError(null);
     setTypingState(null);
     joinConversationRoom({ conversationId });
-    void markActiveConversationRead();
+    // 这里不直接调 markConversationRead——下面 [messagesQuery.data?.length]
+    // 那个 effect 会在挂载和每次 cache 长度变化时统一触发一次。和
+    // group-chat-thread-panel 的写法对齐，避免角色连发 5 条消息就打 5 次
+    // markConversationRead + 5 次 conversations refetch（公网隧道 RTT ~600ms
+    // 下肉眼可见的卡顿）。
 
     const offMessage = onChatMessage((payload) => {
       if (
@@ -255,7 +246,8 @@ export function useConversationThread(conversationId: string) {
       // 把消息直接写进 messages cache：本地 state 已经有新消息了，但 cache 没动；
       // 用户离开再回来时 useQuery 会读 cache（移动端 staleTime=60s 内不 refetch），
       // 看不到 AI 回复。直接 setQueriesData 把新消息合并进所有 messageLimit 变体
-      // 的 cache，下次挂载立刻就在，不依赖 refetch RTT。
+      // 的 cache，下次挂载立刻就在，不依赖 refetch RTT。同时 cache 长度变化会
+      // 触发下面的 markRead effect 自动标已读，不在这里重复调。
       queryClient.setQueriesData<Message[]>(
         {
           queryKey: ["app-conversation-messages", baseUrl, conversationId],
@@ -270,7 +262,6 @@ export function useConversationThread(conversationId: string) {
         setTypingState((current) =>
           current?.characterId === payload.senderId ? null : current,
         );
-        void markActiveConversationRead();
         return;
       }
 
@@ -338,6 +329,32 @@ export function useConversationThread(conversationId: string) {
     ownerId,
     queryClient,
     syncActiveConversationMessage,
+    unreadSnapshotReady,
+  ]);
+
+  // 挂载 + 每次 messagesQuery cache 长度变化时统一标已读一次。和
+  // group-chat-thread-panel 的处理一致；socket 收到 character 消息后
+  // setQueriesData 会撑高 cache 长度，自动触发这里。
+  useEffect(() => {
+    if (!conversationId || !unreadSnapshotReady) {
+      return;
+    }
+
+    const readAt = new Date().toISOString();
+    syncActiveConversationReadState(readAt);
+
+    void markConversationRead(conversationId, baseUrl)
+      .catch(() => {})
+      .finally(() => {
+        void queryClient.invalidateQueries({
+          queryKey: ["app-conversations", baseUrl],
+        });
+      });
+  }, [
+    baseUrl,
+    conversationId,
+    messagesQuery.data?.length,
+    queryClient,
     syncActiveConversationReadState,
     unreadSnapshotReady,
   ]);
