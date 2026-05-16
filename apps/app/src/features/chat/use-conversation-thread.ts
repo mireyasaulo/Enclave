@@ -397,6 +397,10 @@ export function useConversationThread(conversationId: string) {
         messageId = optimistic.id;
         setMessages((current) => [...current, optimistic]);
         upsertPendingDirectMessage(conversationId, optimistic);
+        // 不光 thread 里要立刻显示，会话列表的 lastMessage 预览也要立刻反映出来。
+        // sleeping/busy 角色 8-22s 后才把消息入库 → 没有这步，回到 /tabs/chat
+        // 会看到旧的 lastMessage 在那挂着，等回声才"突然冒出来"。
+        syncActiveConversationMessage(optimistic);
       }
 
       if (!input.retryMessageId && input.payload.type !== "sticker") {
