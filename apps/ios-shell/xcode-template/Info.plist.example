@@ -2,10 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+  <key>CFBundleAllowMixedLocalizations</key>
+  <true/>
   <key>CFBundleDisplayName</key>
   <string></string>
   <key>CFBundleIdentifier</key>
   <string>com.yinjie.ios</string>
+  <key>CFBundleLocalizations</key>
+  <array>
+    <string>zh-Hans</string>
+    <string>en</string>
+    <string>ja</string>
+    <string>ko</string>
+  </array>
   <key>CFBundleName</key>
   <string>Yinjie</string>
   <key>YinjieApiBaseUrl</key>
@@ -16,6 +25,17 @@
   <string>production</string>
   <key>YinjiePublicAppName</key>
   <string></string>
+  <key>ITSAppUsesNonExemptEncryption</key>
+  <false/>
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+    <string>mailto</string>
+    <string>tel</string>
+    <string>sms</string>
+    <string>itms-apps</string>
+    <string>https</string>
+    <string>http</string>
+  </array>
   <key>LSRequiresIPhoneOS</key>
   <true/>
   <key>NSAppTransportSecurity</key>

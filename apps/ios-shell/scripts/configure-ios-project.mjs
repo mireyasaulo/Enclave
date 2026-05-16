@@ -325,6 +325,60 @@ function ensureAppTransportSecurity(source) {
   return insertBeforeDictEnd(source, snippet);
 }
 
+function ensureExportComplianceFalse(source) {
+  if (source.includes("<key>ITSAppUsesNonExemptEncryption</key>")) {
+    return source;
+  }
+
+  return insertBeforeDictEnd(
+    source,
+    "\t<key>ITSAppUsesNonExemptEncryption</key>\n\t<false/>\n",
+  );
+}
+
+function ensureBundleLocalizations(source) {
+  if (source.includes("<key>CFBundleLocalizations</key>")) {
+    return source;
+  }
+
+  const snippet = [
+    "\t<key>CFBundleLocalizations</key>\n",
+    "\t<array>\n",
+    "\t\t<string>zh-Hans</string>\n",
+    "\t\t<string>en</string>\n",
+    "\t\t<string>ja</string>\n",
+    "\t\t<string>ko</string>\n",
+    "\t</array>\n",
+  ].join("");
+
+  return insertBeforeDictEnd(source, snippet);
+}
+
+function ensureBundleAllowMixedLocalizations(source) {
+  if (source.includes("<key>CFBundleAllowMixedLocalizations</key>")) {
+    return source;
+  }
+
+  return insertBeforeDictEnd(
+    source,
+    "\t<key>CFBundleAllowMixedLocalizations</key>\n\t<true/>\n",
+  );
+}
+
+const DEFAULT_QUERIES_SCHEMES = ["mailto", "tel", "sms", "itms-apps", "https", "http"];
+
+function ensureApplicationQueriesSchemes(source) {
+  let patched = source;
+  for (const scheme of DEFAULT_QUERIES_SCHEMES) {
+    patched = ensurePlistArrayContainsString(
+      patched,
+      "LSApplicationQueriesSchemes",
+      scheme,
+    );
+  }
+  return patched;
+}
+
 function ensureCapacitorConfigIosScheme() {
   const configPath = path.join(cwd, "capacitor.config.ts");
   if (!fs.existsSync(configPath)) {
@@ -429,6 +483,10 @@ function ensureInfoPlistDefaults() {
 
   plist = ensurePlistArmArchitecture(plist);
   plist = ensureAppTransportSecurity(plist);
+  plist = ensureExportComplianceFalse(plist);
+  plist = ensureBundleLocalizations(plist);
+  plist = ensureBundleAllowMixedLocalizations(plist);
+  plist = ensureApplicationQueriesSchemes(plist);
 
   plist = ensurePlistArrayContainsString(
     plist,

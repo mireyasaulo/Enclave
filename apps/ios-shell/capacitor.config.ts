@@ -7,6 +7,8 @@ const config: CapacitorConfig = {
   ios: {
     scheme: "capacitor",
     contentInset: "always",
+    preferredContentMode: "mobile",
+    limitsNavigationsToAppBoundDomains: false,
   },
   plugins: {
     SplashScreen: {

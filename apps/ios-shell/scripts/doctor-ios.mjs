@@ -162,6 +162,8 @@ const checks = [
           "CAPBridgedPlugin",
           "jsName = \"YinjieRuntime\"",
           "CAPPluginMethod(name: \"getConfig\"",
+          "CAPPluginMethod(name: \"getLocale\"",
+          "CAPPluginMethod(name: \"setLocale\"",
         ])) &&
       (!fs.existsSync(secureStoragePluginPath) ||
         fileIncludesAll(secureStoragePluginPath, [
@@ -337,6 +339,102 @@ const checks = [
     detail: fs.existsSync(infoPlistPath)
       ? "Info.plist CFBundleDisplayName/YinjiePublicAppName are empty (driven by InfoPlist.strings)"
       : "Info.plist not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "info-plist-export-compliance",
+    ok:
+      !fs.existsSync(infoPlistPath) ||
+      fileMatches(
+        infoPlistPath,
+        /<key>ITSAppUsesNonExemptEncryption<\/key>\s*<false\/>/m,
+      ),
+    detail: fs.existsSync(infoPlistPath)
+      ? "Info.plist declares ITSAppUsesNonExemptEncryption=false (skips App Store export compliance prompt)"
+      : "Info.plist not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "info-plist-declared-localizations",
+    ok:
+      !fs.existsSync(infoPlistPath) ||
+      fileIncludesAll(infoPlistPath, [
+        "<key>CFBundleLocalizations</key>",
+        "<string>zh-Hans</string>",
+        "<string>en</string>",
+        "<string>ja</string>",
+        "<string>ko</string>",
+        "<key>CFBundleAllowMixedLocalizations</key>",
+      ]),
+    detail: fs.existsSync(infoPlistPath)
+      ? "Info.plist declares CFBundleLocalizations for zh-Hans/en/ja/ko and CFBundleAllowMixedLocalizations"
+      : "Info.plist not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "info-plist-queries-schemes",
+    ok:
+      !fs.existsSync(infoPlistPath) ||
+      fileIncludesAll(infoPlistPath, [
+        "<key>LSApplicationQueriesSchemes</key>",
+        "<string>mailto</string>",
+        "<string>tel</string>",
+        "<string>sms</string>",
+        "<string>itms-apps</string>",
+      ]),
+    detail: fs.existsSync(infoPlistPath)
+      ? "Info.plist declares LSApplicationQueriesSchemes (mailto/tel/sms/itms-apps)"
+      : "Info.plist not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "capacitor-config-ipad-mobile",
+    ok:
+      !fs.existsSync(capacitorConfigPath) ||
+      fileMatches(
+        capacitorConfigPath,
+        /preferredContentMode\s*:\s*["']mobile["']/m,
+      ),
+    detail: fs.existsSync(capacitorConfigPath)
+      ? "capacitor.config.ts forces preferredContentMode=mobile (phone layout on iPad)"
+      : "capacitor.config.ts not found",
+  },
+  {
+    label: "asset-app-icon",
+    ok:
+      !fs.existsSync(iosAppRoot) ||
+      fs.existsSync(
+        path.join(
+          iosAppRoot,
+          "Assets.xcassets",
+          "AppIcon.appiconset",
+          "Contents.json",
+        ),
+      ),
+    detail: fs.existsSync(iosAppRoot)
+      ? "Assets.xcassets/AppIcon.appiconset is present"
+      : "ios/App/App not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "asset-splash-imageset",
+    ok:
+      !fs.existsSync(iosAppRoot) ||
+      fs.existsSync(
+        path.join(
+          iosAppRoot,
+          "Assets.xcassets",
+          "Splash.imageset",
+          "Contents.json",
+        ),
+      ),
+    detail: fs.existsSync(iosAppRoot)
+      ? "Assets.xcassets/Splash.imageset is present"
+      : "ios/App/App not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "launch-storyboard",
+    ok:
+      !fs.existsSync(iosAppRoot) ||
+      fs.existsSync(path.join(iosAppRoot, "Base.lproj", "LaunchScreen.storyboard")),
+    detail: fs.existsSync(iosAppRoot)
+      ? "Base.lproj/LaunchScreen.storyboard is present"
+      : "ios/App/App not found yet; run `pnpm ios:sync` first",
   },
   {
     label: "info-plist-empty-permission-strings",
