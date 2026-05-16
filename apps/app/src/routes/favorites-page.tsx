@@ -137,12 +137,28 @@ function DesktopFavoritesPage() {
   }, [favoriteNotesQuery.data]);
 
   useEffect(() => {
+    // useState 初始化已经 merge 过一遍 local-only，TanStack 还没出数据
+    // (data === undefined) 这一帧别再 set 一次相同内容的新数组——白触发
+    // 一轮 re-render，下游 filteredFavorites/counts 跟着重算。
+    if (favoritesQuery.data === undefined) {
+      return;
+    }
     setFavorites(
       mergeDesktopFavoriteRecords(
-        favoritesQuery.data ?? [],
+        favoritesQuery.data,
         readDesktopFavorites(),
       ),
     );
+  }, [favoritesQuery.data]);
+
+  // syncFavorites 闭包要看最新的 favoritesQuery.data，但 effect 本身不该
+  // 因为 data 变就 add/remove 两个全局监听器（focus + visibilitychange）。
+  // 用 ref 把 data 暴露给 syncFavorites，effect 只依赖 nativeDesktopFavorites。
+  const favoritesRemoteDataRef = useRef<DesktopFavoriteRecord[] | undefined>(
+    favoritesQuery.data,
+  );
+  useEffect(() => {
+    favoritesRemoteDataRef.current = favoritesQuery.data;
   }, [favoritesQuery.data]);
 
   useEffect(() => {
@@ -160,7 +176,7 @@ function DesktopFavoritesPage() {
 
       setFavorites((current) => {
         const nextFavorites = mergeDesktopFavoriteRecords(
-          favoritesQuery.data ?? [],
+          favoritesRemoteDataRef.current ?? [],
           localFavorites,
         );
         // 每次 focus 都 JSON.stringify(700 项) 太重，换 sourceId+collectedAt 指纹。
@@ -190,7 +206,7 @@ function DesktopFavoritesPage() {
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [favoritesQuery.data, nativeDesktopFavorites]);
+  }, [nativeDesktopFavorites]);
 
   useEffect(() => {
     if (!notice) {
