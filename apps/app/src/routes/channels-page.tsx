@@ -2245,9 +2245,16 @@ function ChannelAudioPictorial({
   };
 
   // 点击屏幕处理：首次点解除静音 + 强制 play；之后切 play/pause。
+  //
+  // 走查 R2（本轮）：图集帖（mediaType=image）也复用本组件，但传入 audioUrl=""
+  // 表示"没有音轨"。原 handleTap 不分 audioUrl 都会 onUnlock() 把 viewport 级
+  // userUnmuted 翻 true；用户只是在看图集一拍了张图，下一张滑到的 audio 帖
+  // 立刻被自动 unmuted 播放，没有任何提示，体感像"莫名其妙突然出声"。
+  // 没有音轨的卡 tap 当 no-op：不要替用户决定 unmute 整页音频。
   const handleTap = () => {
     const audio = audioRef.current;
     if (!audio) return;
+    if (!audioUrl) return;
     if (!userUnmuted) {
       onUnlock();
       audio.muted = false;
@@ -3217,7 +3224,12 @@ const MobileChannelsCard = memo(function MobileChannelsCard({
                   </div>
                   <div className="space-y-1">
                     {commentsPreview.slice(0, 2).map((comment) => (
-                      <div key={comment.id}>
+                      // 走查 R2（本轮）：实测库里有 1000+ 字的"AI thinking 漏到
+                      // comment.text"长评论（feed_comments 最长 1019 字），不 clamp
+                      // 这条 review 会把卡片底部 chip 撑成半屏高，盖到上面的标题 / 头像 /
+                      // overflow-hidden 后还把封面切走一截。每行限 1 行，超出末尾省略号。
+                      // 后端那条 AI thinking 入库属于服务端 bug，前端先把这层显示兜住。
+                      <div key={comment.id} className="line-clamp-1">
                         <span className="font-medium">
                           {comment.authorName}
                         </span>
