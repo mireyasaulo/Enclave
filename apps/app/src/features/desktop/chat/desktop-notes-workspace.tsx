@@ -888,6 +888,13 @@ export function DesktopNotesWorkspace({
   async function handleSaveAndClose() {
     const savedNote = await handleSave();
     if (!savedNote) {
+      // 跟 sendMutation 失败那条路一个套路：DesktopNoteUnsavedDialog 也是 z-50
+      // modal，handleSave 走 hasContent / mutation error 这两条分支会把 notice
+      // setNotice 到编辑器主区，但弹层把整片主区盖住了——用户连按"保存并关闭"
+      // 看到的就是 dialog 没动、按钮停转，完全猜不到为啥没关。先 setCloseDialog
+      // Open(false) 把弹层关掉，让 InlineNotice ("先写点内容或加个附件再保存。"
+      // 之类) 显出来；用户看到错误后可以补内容再触发关闭，也可以直接点不保存。
+      setCloseDialogOpen(false);
       return;
     }
 
