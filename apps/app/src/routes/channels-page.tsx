@@ -3033,8 +3033,15 @@ function MobileChannelCommentsSheet({
           {comments.length ? (
             <div className="space-y-3">
               {comments.map((comment) => {
+                // 优先用后端 serializeComment 给的 replyToAuthorName——本地
+                // commentAuthorNameMap 只能反查到当前已显示的 comments；如果被
+                // 回复的根评论在分页之外 / 已删 / 已隐，本地 map 是空，"回复 X"
+                // 整段就漏掉了。后端的 lookup map 是整个 post 全量评论 + 单条
+                // reply 新建时临时灌入，覆盖面更广，优先取后端值。
                 const replyTargetName = comment.replyToCommentId
-                  ? (commentAuthorNameMap.get(comment.replyToCommentId) ?? null)
+                  ? (comment.replyToAuthorName ??
+                      commentAuthorNameMap.get(comment.replyToCommentId) ??
+                      null)
                   : null;
 
                 return (
