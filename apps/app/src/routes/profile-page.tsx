@@ -129,7 +129,11 @@ export function ProfilePage() {
                 {username?.trim() || t(msg`世界主人`)}
               </div>
               {username ? (
-                <div className="rounded-full bg-[rgba(7,193,96,0.08)] px-1.5 py-0.5 text-[10px] font-medium tracking-[0.04em] text-[#15803d]">
+                // shrink-0 + whitespace-nowrap：用户起了 20 字超长 username 时
+                // 父 flex 会把 chip 一起压缩，原本是单行的「世界主人」chip 会被
+                // 挤成「世界 / 主人」两行，视觉破。这里把 chip 钉成不可压缩 +
+                // 文字不许换行，让 username 这一侧 truncate 让出空间。
+                <div className="shrink-0 whitespace-nowrap rounded-full bg-[rgba(7,193,96,0.08)] px-1.5 py-0.5 text-[10px] font-medium tracking-[0.04em] text-[#15803d]">
                   {t(msg`世界主人`)}
                 </div>
               ) : null}
