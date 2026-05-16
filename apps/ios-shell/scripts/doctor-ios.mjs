@@ -445,6 +445,41 @@ const checks = [
       : "capacitor.config.ts not found",
   },
   (() => {
+    // xcode-template/Info.plist.example 是 configure-ios-project.mjs 在 fresh
+    // checkout 下没生成 Info.plist 时直接 copy 过去的源。如果模板写死了
+    // com.yinjie.ios 或 example URL，fork 出去的项目 / 第二个 bundle id 的
+    // 多分发就会以错的 identifier 上 App Store。盯紧关键字段必须是变量替换
+    // 形式而不是字面量。
+    const templateInfoPlist = path.join(
+      shellRoot,
+      "xcode-template",
+      "Info.plist.example",
+    );
+    const usesBundleVar = fileIncludes(
+      templateInfoPlist,
+      "<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>",
+    );
+    const usesNameVar = fileIncludes(
+      templateInfoPlist,
+      "<string>$(PRODUCT_NAME)</string>",
+    );
+    const hasExampleUrl = fileIncludes(
+      templateInfoPlist,
+      "<string>https://api.example.yinjie.app</string>",
+    );
+    return {
+      label: "info-plist-template-no-hardcoded-identity",
+      ok:
+        !fs.existsSync(templateInfoPlist) ||
+        (usesBundleVar && usesNameVar && !hasExampleUrl),
+      detail: fs.existsSync(templateInfoPlist)
+        ? usesBundleVar && usesNameVar && !hasExampleUrl
+          ? "xcode-template/Info.plist.example uses Xcode build-setting substitution (no hardcoded bundle id / example URLs)"
+          : "xcode-template/Info.plist.example must use $(PRODUCT_BUNDLE_IDENTIFIER) / $(PRODUCT_NAME) and not ship example URLs"
+        : "xcode-template/Info.plist.example not found",
+    };
+  })(),
+  (() => {
     // installed Podfile 跟 xcode-template/Podfile.example 必须对齐 iOS 最低
     // 部署版本，不然 fresh checkout 走 template 的副本会偷偷把 minimum bump
     // 起来，把 Capacitor 实际支持的 iPhone 6s/7/SE-1 等 14.x 设备全断掉。
