@@ -222,7 +222,12 @@ export function WeChatCommentBar({
               // 500 字软上限，跟后端 MOMENT_COMMENT_TOO_LONG 对齐——之前没有任何
               // 上限，长文评论会把整段 footer 撑开把卡片正文挤压到看不见。
               maxLength={500}
-              className="block w-full resize-none border-0 bg-transparent text-[15px] leading-[22px] outline-none placeholder:text-[#B0B0B0]"
+              // text-[16px]: iOS Safari/WKWebView 在 input/textarea focus 时只要
+              // 字段字号 <16px 就强制 viewport zoom-in。朋友圈/广场每条 post 点
+              // 评论都会让整页放大、回弹时还得双指捏才能回正，反复操作非常难受。
+              // 父级 wrapper 保留 text-[15px] 不动（控制 placeholder / 容器视
+              // 觉），只把字段本身放到 16px。
+              className="block w-full resize-none border-0 bg-transparent text-[16px] leading-[22px] outline-none placeholder:text-[#B0B0B0]"
               onKeyDown={(event) => {
                 if (event.key !== "Enter" || event.shiftKey) return;
                 // 走查新一轮 Round 3：Android Chrome 部分 IME（搜狗 / 百度键盘
