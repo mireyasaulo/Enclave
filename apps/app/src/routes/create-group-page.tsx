@@ -14,6 +14,7 @@ import { ArrowLeft, Check, Search, X } from "lucide-react";
 import {
   createGroup,
   getFriends,
+  SELF_CHARACTER_ID,
   type FriendListItem,
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -72,10 +73,16 @@ export function CreateGroupPage() {
     queryFn: () => getFriends(baseUrl),
   });
 
+  // 走查 Round 2：char-default-self 是用户的自我镜像，本质就是你自己；createGroup
+  // 后端已经隐式加你（owner role=owner）进群，再让"我自己"作为 character member 也被加
+  // 进去会出现"你跟自己同时在群里"的诡异成员列表，且单独选自己一个能造出一条只有
+  // 群主一个真人 + 0 个角色的空群。统一在 UI 列表里把 self 过掉，避免用户能选到。
   const friendItems = useMemo(
     () =>
       (friendsQuery.data ?? []).filter(
-        (item) => item.friendship.status !== "removed",
+        (item) =>
+          item.friendship.status !== "removed" &&
+          item.character.id !== SELF_CHARACTER_ID,
       ),
     [friendsQuery.data],
   );

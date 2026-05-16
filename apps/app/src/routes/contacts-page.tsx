@@ -40,6 +40,7 @@ import {
   setConversationMuted,
   setConversationPinned,
   setFriendStarred,
+  SELF_CHARACTER_ID,
   unblockCharacter,
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
@@ -346,6 +347,13 @@ export function ContactsPage() {
     setBulkSelectedIds(new Set(failedIds));
   }, []);
   const toggleBulkSelection = useCallback((characterId: string) => {
+    // 走查 Round 2：char-default-self 后端的 deleteFriend / blockCharacter 已经兜底
+    // 400 拒绝，但前端如果还允许把它放进 selectedIds，全选 + 删除走查到 1 项 failed
+    // 是 self → 用户看到 "删除：1 项操作失败" 没法理解失败原因。直接在 toggle 层
+    // 拦掉，让 self 行点击 / 全选都不进选区。
+    if (characterId === SELF_CHARACTER_ID) {
+      return;
+    }
     setBulkSelectedIds((current) => {
       const next = new Set(current);
       if (next.has(characterId)) {
@@ -714,17 +722,24 @@ export function ContactsPage() {
   // 原来同样的 flatMap 在 JSX 里写了两遍（totalIds + onSelectAll 里），每渲染都新建
   // 数组；这里抽出来共用，避免在 ContactsBulkActionBar 里也无谓地拿到不同的引用
   // 触发 allSelected 的重比较。
+  // 走查 Round 2：把 char-default-self 从全选集合里排除，跟 toggleBulkSelection 的
+  // self 守卫一致；否则 bulkBar.allSelected 永远没法变 true（totalIds 含 self，
+  // selectedIds 里 toggle 又永远进不去 self），「取消全选」按钮永远不亮。
   const desktopBulkAllIds = useMemo(
     () =>
       desktopFriendSections.flatMap((section) =>
-        section.items.map((item) => item.character.id),
+        section.items
+          .filter((item) => item.character.id !== SELF_CHARACTER_ID)
+          .map((item) => item.character.id),
       ),
     [desktopFriendSections],
   );
   const mobileBulkAllIds = useMemo(
     () =>
       friendSections.flatMap((section) =>
-        section.items.map((item) => item.character.id),
+        section.items
+          .filter((item) => item.character.id !== SELF_CHARACTER_ID)
+          .map((item) => item.character.id),
       ),
     [friendSections],
   );

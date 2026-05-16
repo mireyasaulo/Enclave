@@ -749,7 +749,15 @@ export class SocialService {
         sourceEntityType: 'friend_request_auto_accept',
         sourceEntityId: saved.id,
         dedupeKey: `friendship:auto-accept:${saved.id}`,
-        summaryText: `用户主动添加 ${char.name} 并直接成为好友。`,
+        // 走查 Round 8：原来 shake_keep 和 manual_add 都打成「用户主动添加 X」，
+        // 但 shake_keep 是用户摇一摇后系统自动落库，并不是用户挑了某个角色去加。
+        // 这条 summary 会进 cyber-avatar 的 prompt context，AI 误以为用户主动选了
+        // 谁，下一次摇一摇的 evidence 也会把它当"主动添加历史"参考。按 triggerScene
+        // 区分两种语义。
+        summaryText:
+          req.triggerScene === 'shake_keep'
+            ? `用户摇一摇随机遇到 ${char.name}，已自动加入通讯录。`
+            : `用户主动添加 ${char.name} 并直接成为好友。`,
         payload: {
           action: 'auto_accept_friend_request',
           requestId: saved.id,
