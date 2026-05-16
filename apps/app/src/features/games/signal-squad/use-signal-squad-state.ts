@@ -90,8 +90,11 @@ export function useSignalSquadState() {
     };
   }, []);
 
+  // idle / victory / defeat / timeout 时 reducer 仍会 cloneState 深拷贝 + re-render，
+  // 但实际没有事件推进；停在阵容选择 / 结算页就是纯空转。只 running 才 tick。
   useEffect(() => {
     const id = window.setInterval(() => {
+      if (stateRef.current.status !== "running") return;
       dispatch({ type: "tick", nowMs: Date.now() });
     }, 250);
     return () => window.clearInterval(id);

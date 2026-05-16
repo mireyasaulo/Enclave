@@ -86,8 +86,12 @@ export function useSkyRallyState() {
     };
   }, []);
 
+  // 60ms tick = ~16Hz；reducer 在 idle 也会 JSON.parse(JSON.stringify(state)) 深拷贝
+  // 一份新 state 并触发 React re-render，每秒空跑 16 次。用户停在选赛道 / 结算页
+  // 不操作的时候这就是纯电量浪费。idle/ended 状态直接不 dispatch；status 由 ref 跟踪。
   useEffect(() => {
     const id = window.setInterval(() => {
+      if (stateRef.current.status !== "racing") return;
       dispatch({ type: "tick", nowMs: Date.now() });
     }, 60);
     return () => window.clearInterval(id);

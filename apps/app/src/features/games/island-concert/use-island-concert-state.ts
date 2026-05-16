@@ -451,8 +451,13 @@ export function useIslandConcertState() {
     return () => saveState(stateRef.current);
   }, []);
 
+  // 80ms tick = ~12.5Hz；reducer 在 idle 也 JSON.parse(JSON.stringify(state))
+  // 深拷贝 + re-render，停在选乐器 / 结算页就是纯空转。只在 performing/between
+  // 才需要 tick。
   useEffect(() => {
     const id = window.setInterval(() => {
+      const status = stateRef.current.status;
+      if (status !== "performing" && status !== "between") return;
       dispatch({ type: "tick", nowMs: Date.now() });
     }, 80);
     return () => window.clearInterval(id);
