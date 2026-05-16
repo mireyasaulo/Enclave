@@ -491,7 +491,10 @@ export function ChatComposer({
         return leftStartsWith ? -1 : 1;
       })
       .slice(0, 6);
-  }, [activeMention, mentionCandidates, t]);
+    // 这里 t 不在 body 里调用：filtering + sorting 都不渲染本地化文案，
+    // 候选项的 name/subtitle 由调用方 (group-chat-thread-panel 的
+    // mentionCandidates) 算好后传进来。漏掉 t 不会导致 stale string。
+  }, [activeMention, mentionCandidates]);
   const mentionPickerOpen = Boolean(filteredMentionCandidates.length);
   const favoritesQuery = useQuery({
     queryKey: ["app-favorites", baseUrl],
@@ -1571,6 +1574,9 @@ export function ChatComposer({
     desktopScreenshotDraft,
     isDesktop,
     onSendAttachment,
+    // 截图失败 fallback 文案 t(msg`截图失败，请稍后再试。`) 漏 dep：locale
+    // 切换后这条 callback 用的是上次 render 的 t，弹出来是旧语言的"截图失败"。
+    t,
   ]);
 
   const activateMobileSpeechFallback = () => {
