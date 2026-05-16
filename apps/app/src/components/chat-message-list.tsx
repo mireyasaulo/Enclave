@@ -1641,7 +1641,10 @@ export function ChatMessageList({
     }
 
     return nextIds;
-  }, [visibleMessages]);
+    // t 必须进 deps：parseSharedHistorySummaryMessage 用 t 来识别"已转发 N 条
+    // 消息"系统提示的本地化前缀，locale 切换后旧 closure 用上个 locale 的前缀
+    // 匹配，会漏判 → 转发卡片在新 locale 下不会被标成 imported。
+  }, [t, visibleMessages]);
 
   // useMemo：每次父组件渲染（typing 指示器 tick / 任何 state 变化）都会
   // 走到这里，filter + map 历史里所有图片消息 → 让下游 standaloneViewerItems
@@ -1708,7 +1711,9 @@ export function ChatMessageList({
           returnTo: image.returnTo,
         }),
       ),
-    [imageMessages],
+    // t 必须进 deps：fallback title t(msg`图片`)（图片无 fileName/label 时）
+    // 漏 dep 会让 locale 切换后 viewer 标题卡在上个 locale 的"图片"。
+    [imageMessages, t],
   );
   const unreadMarkerDomId = buildChatUnreadMarkerDomId(threadContext);
   const resolvedUnreadMarkerLabel =
@@ -2400,7 +2405,10 @@ export function ChatMessageList({
         previewText: buildForwardPreviewText(t, message),
         typeLabel: resolveForwardTypeLabel(t, message),
       })),
-    [forwardMessages],
+    // t 必须进 deps：buildClipboardSender / buildForwardPreviewText /
+    // resolveForwardTypeLabel 都通过 t 渲染本地化文案（发送者别名 / "图片"
+    // / "语音" 等类型标签），locale 切换后转发预览卡片会卡上个语言。
+    [forwardMessages, t],
   );
 
   const handleOpenDirectCallInviteCard = (input: {
@@ -5662,6 +5670,20 @@ function VoiceMessage({
     };
   }, []);
 
+  // 切到别条消息时把自己暂停 —— 浏览器不会自动 mutual-exclude 多个 <audio>，
+  // 用户连点两条会同时响。MessageList 里 TTS 朗读用 speakRequestRef 串行化，
+  // voice 附件这条以前没有同款机制。
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+    return () => {
+      activeVoiceMessageAudios.delete(audio);
+      audio.pause();
+    };
+  }, []);
+
   const togglePlayback = () => {
     const audio = audioRef.current;
     if (!audio) {
@@ -5669,7 +5691,12 @@ function VoiceMessage({
     }
 
     if (audio.paused) {
-      void audio.play().catch(() => setPlaying(false));
+      stopOtherVoiceMessages(audio);
+      activeVoiceMessageAudios.add(audio);
+      void audio.play().catch(() => {
+        activeVoiceMessageAudios.delete(audio);
+        setPlaying(false);
+      });
       return;
     }
 
@@ -5731,6 +5758,19 @@ function VoiceMessage({
       <audio ref={audioRef} src={url} preload="none" />
     </div>
   );
+}
+
+// 模块级，跨 VoiceMessage 实例。点新一条就把其它正在播的暂停。
+const activeVoiceMessageAudios = new Set<HTMLAudioElement>();
+
+function stopOtherVoiceMessages(except: HTMLAudioElement) {
+  for (const audio of activeVoiceMessageAudios) {
+    if (audio === except) {
+      continue;
+    }
+    audio.pause();
+    activeVoiceMessageAudios.delete(audio);
+  }
 }
 
 function GroupRelaySummaryMessage({
