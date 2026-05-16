@@ -597,10 +597,21 @@ export function GroupChatThreadPanel({
   const submitOutgoingGroupMessage = useCallback(
     async (payload: SendGroupMessageRequest) => {
       const localMessageId = enqueueOutgoingGroupMessage(payload);
-      await sendMutation.mutateAsync({
-        payload,
-        localMessageId,
-      });
+      // mutateAsync 抛错（HTTP 4xx/5xx/网络断）后 sendMutation.onError 已经把
+      // 这条消息标 failed + 在 ChatComposer 的 error 槽里挂出错误提示，调用方
+      // 都是 await 顺序控制（清 replyDraft / scrollToBottom / track）。这里
+      // 不吞会让 rejection 经 chat-composer 的 onSendSticker / onSendAttachment
+      // / onSubmit 等回调一路冒到 button onClick，落到 window.unhandledrejection
+      // → 污染 telemetry errors。对齐单聊 use-conversation-thread 的 runSendMutation
+      // 兜底。
+      try {
+        await sendMutation.mutateAsync({
+          payload,
+          localMessageId,
+        });
+      } catch {
+        // onError 已处理
+      }
     },
     [enqueueOutgoingGroupMessage, sendMutation],
   );
@@ -873,10 +884,17 @@ export function GroupChatThreadPanel({
       }
 
       setMessages((current) => markThreadMessageSending(current, messageId));
-      await sendMutation.mutateAsync({
-        payload,
-        localMessageId: messageId,
-      });
+      // 同上：mutateAsync 抛错落到 unhandledrejection。message-list 调
+      // retryMessage 时是 `(message) => retryMessage(message.id)` 不 await
+      // 不 catch，rejection 没人处理。onError 已经把 message 标 failed。
+      try {
+        await sendMutation.mutateAsync({
+          payload,
+          localMessageId: messageId,
+        });
+      } catch {
+        // onError 已处理
+      }
     },
     [messages, sendMutation],
   );
