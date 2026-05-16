@@ -1429,6 +1429,22 @@ export function DesktopChatWorkspace({
     [],
   );
 
+  // DesktopMessageEntryCard 是 memo 的，但内联拼对象会让每次 workspace 重渲染
+  // （搜索框输入、reminders tick、conversationsQuery 60s refresh 等）都把所有
+  // 会话卡片重渲染一遍。把这条 prop 抽出来 useMemo，保持引用稳定。
+  const officialMessageContextMenuProp = useMemo(() => {
+    if (officialMessageContextMenu?.kind === "subscription") {
+      return { kind: "subscription" as const };
+    }
+    if (officialMessageContextMenu?.kind === "service") {
+      return {
+        kind: "service" as const,
+        accountId: officialMessageContextMenu.conversation.accountId,
+      };
+    }
+    return null;
+  }, [officialMessageContextMenu]);
+
   async function handleOpenConversationWindow(
     conversation: ConversationListItem,
   ) {
@@ -1749,17 +1765,7 @@ export function DesktopChatWorkspace({
                   conversationContextMenuId={
                     conversationContextMenu?.conversation.id
                   }
-                  officialMessageContextMenu={
-                    officialMessageContextMenu?.kind === "subscription"
-                      ? { kind: "subscription" }
-                      : officialMessageContextMenu?.kind === "service"
-                        ? {
-                            kind: "service",
-                            accountId:
-                              officialMessageContextMenu.conversation.accountId,
-                          }
-                        : null
-                  }
+                  officialMessageContextMenu={officialMessageContextMenuProp}
                   onConversationContextMenu={handleConversationContextMenu}
                   onSubscriptionContextMenu={handleSubscriptionContextMenu}
                   onServiceConversationContextMenu={
