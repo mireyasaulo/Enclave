@@ -402,6 +402,17 @@ export function ConversationThreadPanel({
   );
 
   const handleDismissRouteContextNotice = () => {
+    // 容器挂载后 useScrollAnchor 的 useLayoutEffect 会同步把 scrollTop 顶
+    // 到 scrollHeight（首次加载消息时一定会跑），scroll 事件就跟着触发
+    // onScrollCapture。如果不区分是不是用户手势，notice 在 callReturn /
+    // game-invite / group-invite 场景刚显示就被 mount 自身的 auto-scroll
+    // 干掉，用户根本没机会看到。
+    // isAtBottomRef.current 在 mount auto-scroll 内被 scrollToBottom 同步
+    // 写 true，stays true 直到用户真手势把列表拖出贴底窗口 → 此时再 dismiss
+    // 才是用户意图。typing-触发的 onChange 那条 path 不走这条 guard。
+    if (scrollAnchor.isAtBottomRef.current) {
+      return;
+    }
     routeContextNotice?.onDismiss?.();
   };
 
