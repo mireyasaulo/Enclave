@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useEffectEvent,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
 import { Heart, MessageCircle, Share2, Star } from "lucide-react";
@@ -61,10 +55,14 @@ export function WeChatActionBubble({
   // 下面两条 useEffect 把 pointerdown/scroll/resize/keydown 4 条 listener
   // + Android back interceptor 一齐 remove → re-add 一遍。父组件随便
   // 抖一下（like mutate optimistic 写 cache 触发重渲、commentDrafts 改）
-  // 就让气泡的 effect 重跑，纯白烧。useEffectEvent 套稳 onClose 身份，
-  // effect deps 只挂 [open]。
-  const handleCloseEvent = useEffectEvent(() => {
-    onClose();
+  // 就让气泡的 effect 重跑，纯白烧。
+  // 用 ref pattern 把 onClose 锁稳（不是 useEffectEvent —— 后者在
+  // React 19.2 上行为有抖：portal 渲染的气泡里 effect-event 偶发把
+  // 气泡刚 mount 就在 commit-pass 里 self-close，导致用户根本看不到
+  // 气泡）。每次 render 把最新 onClose 写到 ref，effect 里读 ref.current。
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
   });
 
   // Close on outside tap, scroll, resize, or Escape.
@@ -76,11 +74,11 @@ export function WeChatActionBubble({
       if (target && bubbleRef.current?.contains(target)) {
         return;
       }
-      handleCloseEvent();
+      onCloseRef.current();
     };
-    const handleScroll = () => handleCloseEvent();
+    const handleScroll = () => onCloseRef.current();
     const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") handleCloseEvent();
+      if (event.key === "Escape") onCloseRef.current();
     };
 
     window.addEventListener("pointerdown", handlePointerDown, true);
@@ -102,7 +100,7 @@ export function WeChatActionBubble({
     if (!open) return;
     return registerAndroidBackInterceptor((event) => {
       event.preventDefault();
-      handleCloseEvent();
+      onCloseRef.current();
       return true;
     });
   }, [open]);

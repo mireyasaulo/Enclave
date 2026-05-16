@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useEffectEvent,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -119,10 +118,12 @@ export function WeChatCommentBar({
   // 都会换 onClose 身份，下面两条 useEffect 把 keydown listener + Android
   // back interceptor remove → re-add 一遍。bar 一打开后每键 +4 次副作用，
   // 跟 Round 2 use-keyboard-inset 是同一种 cleanup-storm 模式。
-  // useEffectEvent 给 onClose 套个稳定身份，effect deps 只挂 [open]，
-  // bar 打开/关闭时各做一次 add/remove。
-  const handleCloseEvent = useEffectEvent(() => {
-    onClose();
+  // 用 ref 把最新 onClose 钉稳：每次 render 写一次 ref，effect 里读
+  // ref.current，effect deps 只挂 [open]，bar 打开/关闭时各做一次
+  // add/remove；中间敲字不再卷 listener。
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
   });
 
   // Close on Escape.
@@ -136,7 +137,7 @@ export function WeChatCommentBar({
     const handleKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       if (event.isComposing || event.keyCode === 229) return;
-      handleCloseEvent();
+      onCloseRef.current();
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -149,7 +150,7 @@ export function WeChatCommentBar({
     if (!open) return;
     return registerAndroidBackInterceptor((event) => {
       event.preventDefault();
-      handleCloseEvent();
+      onCloseRef.current();
       return true;
     });
   }, [open]);
