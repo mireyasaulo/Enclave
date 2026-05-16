@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import type { GroupMember } from "@yinjie/contracts";
 import {
@@ -83,6 +83,9 @@ export function DesktopGroupCallPanel({
     setStartedAt(new Date().toISOString());
     setPanelOpenedReported(false);
     setJoinedMemberIds(buildInitialJoinedMemberIds(members));
+    // 走查 Round 7 配套：切群/切通话类型也要清掉"已尝试过 counts"的记忆，
+    // 否则上一组 counts 卡住下一组的首次自动同步。
+    attemptedSyncCountsRef.current = null;
     // members 故意不进 deps：仅 groupId/kind 切换时初始化一次；后续 members
     // refetch 不能踩用户已有的 join/leave 状态。
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -135,12 +138,34 @@ export function DesktopGroupCallPanel({
     });
   }, [activeCount, members.length, onPanelOpened, panelOpenedReported]);
 
+  // 走查 Round 7：原版 auto-sync 撞失败 retry-storm — 1200ms 触发
+  // onSendInviteNotice → parent mutateAsync 失败 → lastPublishedCallCounts
+  // 不更新 → hasSyncedStatus 仍 false → 下个 render 这个 effect 重新跑、再
+  // 拉 1200ms 定时器 → 每 1200ms 重发一条 "进行中" 邀请，群被 spam 一堆
+  // 重复 ongoing 卡片。用 ref 记录"本组 counts 已经尝试过"，同 counts 不
+  // 再重发；activeCount/totalCount 变了（成员加入/离开）才重新解锁。
+  const attemptedSyncCountsRef = useRef<{
+    activeCount: number;
+    totalCount: number;
+  } | null>(null);
   useEffect(() => {
     if (inviteNoticePending || endNoticePending || hasSyncedStatus) {
       return;
     }
+    const last = attemptedSyncCountsRef.current;
+    if (
+      last &&
+      last.activeCount === activeCount &&
+      last.totalCount === members.length
+    ) {
+      return;
+    }
 
     const timer = window.setTimeout(() => {
+      attemptedSyncCountsRef.current = {
+        activeCount,
+        totalCount: members.length,
+      };
       onSendInviteNotice({
         activeCount,
         totalCount: members.length,
