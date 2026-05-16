@@ -28,6 +28,29 @@ const entitlementsPath = path.join(iosAppRoot, "App.entitlements");
 const privacyManifestPath = path.join(iosAppRoot, "PrivacyInfo.xcprivacy");
 const capacitorConfigPath = path.join(shellRoot, "capacitor.config.ts");
 const webDistIndexPath = path.resolve(shellRoot, "..", "app", "dist-mobile", "index.html");
+const shellConfigPath = path.join(shellRoot, "ios-shell.config.json");
+const shellLocalConfigPath = path.join(shellRoot, "ios-shell.config.local.json");
+
+function readJsonIfExists(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function resolveConfiguredApiBaseUrl() {
+  const envValue = (process.env.YINJIE_IOS_CORE_API_BASE_URL ?? "").trim();
+  if (envValue) return { value: envValue, source: "env" };
+  const local = readJsonIfExists(shellLocalConfigPath);
+  const localValue = (local?.runtime?.apiBaseUrl ?? "").trim();
+  if (localValue) return { value: localValue, source: "ios-shell.config.local.json" };
+  const base = readJsonIfExists(shellConfigPath);
+  const baseValue = (base?.runtime?.apiBaseUrl ?? "").trim();
+  if (baseValue) return { value: baseValue, source: "ios-shell.config.json" };
+  return { value: null, source: null };
+}
 const infoPlistStringLocalizations = ["zh-Hans", "en", "ja", "ko"];
 const requiredInfoPlistStringKeys = [
   "CFBundleDisplayName",
@@ -267,13 +290,16 @@ const checks = [
       ? "YinjieRuntime prefers bundled runtime-config.json, exposes sync status, and reads localized app metadata plus preferred locale fields"
       : "runtime plugin not found yet; run `pnpm ios:sync` first",
   },
-  {
-    label: "core-api-env",
-    ok: Boolean(process.env.YINJIE_IOS_CORE_API_BASE_URL),
-    detail: process.env.YINJIE_IOS_CORE_API_BASE_URL
-      ? `YINJIE_IOS_CORE_API_BASE_URL=${process.env.YINJIE_IOS_CORE_API_BASE_URL}`
-      : "YINJIE_IOS_CORE_API_BASE_URL is not set, `pnpm ios:sync` will fail",
-  },
+  (() => {
+    const resolved = resolveConfiguredApiBaseUrl();
+    return {
+      label: "core-api-base-url",
+      ok: Boolean(resolved.value),
+      detail: resolved.value
+        ? `apiBaseUrl=${resolved.value} (source: ${resolved.source})`
+        : "apiBaseUrl not set anywhere — set runtime.apiBaseUrl in ios-shell.config.json (or ios-shell.config.local.json) or export YINJIE_IOS_CORE_API_BASE_URL; otherwise `pnpm ios:sync` will fail",
+    };
+  })(),
   {
     label: "capacitor-config",
     ok:
@@ -479,6 +505,6 @@ for (const item of checks) {
 console.log("");
 console.log("Next steps:");
 console.log("1. Run this command on macOS.");
-console.log("2. Set YINJIE_IOS_CORE_API_BASE_URL before `pnpm ios:sync`.");
+console.log("2. Confirm runtime.apiBaseUrl is set in ios-shell.config.json (or override via local.json / env) before `pnpm ios:sync`.");
 console.log("3. After sync, run `pnpm ios:configure` to copy Xcode templates, seed any missing plugin files, and patch target membership.");
 console.log(`4. Hostname: ${os.hostname()}`);
