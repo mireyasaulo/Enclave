@@ -3,7 +3,7 @@ import { msg } from "@lingui/macro";
 import { Search, Star } from "lucide-react";
 import type { FriendListItem } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { ErrorBlock, LoadingBlock, cn } from "@yinjie/ui";
+import { Button, ErrorBlock, LoadingBlock, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { ContactDetailPane } from "../../contacts/contact-detail-pane";
@@ -42,6 +42,10 @@ type DesktopContactsStarredFriendsPaneProps = {
   onToggleMuted?: (characterId: string, muted: boolean) => void;
   onToggleBlock?: (characterId: string, blocked: boolean) => void;
   onDeleteFriend?: (characterId: string) => void;
+  // friendsQuery 失败时左侧 ErrorBlock 上挂一个「重试读取」按钮，跟
+  // desktop-contacts-friend-requests-pane 对齐。原本只渲染一条死的红色错误条，
+  // 用户除了手动切走再切回来 / 整页刷新，没办法触发重试。
+  onRetry?: () => void;
 };
 
 export function DesktopContactsStarredFriendsPane({
@@ -70,6 +74,7 @@ export function DesktopContactsStarredFriendsPane({
   onToggleMuted,
   onToggleBlock,
   onDeleteFriend,
+  onRetry,
 }: DesktopContactsStarredFriendsPaneProps) {
   const t = useRuntimeTranslator();
   const [searchText, setSearchText] = useState("");
@@ -158,7 +163,21 @@ export function DesktopContactsStarredFriendsPane({
             />
           ) : error ? (
             <div className="px-3 pt-3">
-              <ErrorBlock message={error} />
+              <ErrorBlock message={error}>
+                {onRetry ? (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={onRetry}
+                      className="rounded-[10px]"
+                    >
+                      {t(msg`重试读取`)}
+                    </Button>
+                  </div>
+                ) : null}
+              </ErrorBlock>
             </div>
           ) : !filteredFriends.length ? (
             <div className="px-3 pt-3">
@@ -237,25 +256,32 @@ export function DesktopContactsStarredFriendsPane({
           // loading=true && friends.length===0 时不要写「还没有星标朋友」，那是
           // 已经确认 0 条的措辞——首次进入时 friendsQuery 还在 pending，落这条
           // 文案会让用户误以为自己一个星标都没有，等数据回来才发现并不是。
+          // error && friends.length===0 同理——getFriends() 502 / 网络断了的时候
+          // friends 是空数组，落到「还没有星标朋友」会让用户以为数据没问题、自己
+          // 真的没星标，实际是接口挂了；这种情况指引去重试 / 看左侧错误条。
           emptyState={
             <DesktopContactPaneEmptyState
               title={
                 loading && friends.length === 0
                   ? t(msg`正在读取星标朋友...`)
-                  : friends.length === 0
-                    ? t(msg`还没有星标朋友`)
-                    : normalizedSearchText && filteredFriends.length === 0
-                      ? t(msg`没有匹配的星标朋友`)
-                      : t(msg`选一位星标朋友`)
+                  : error && friends.length === 0
+                    ? t(msg`星标朋友列表加载失败`)
+                    : friends.length === 0
+                      ? t(msg`还没有星标朋友`)
+                      : normalizedSearchText && filteredFriends.length === 0
+                        ? t(msg`没有匹配的星标朋友`)
+                        : t(msg`选一位星标朋友`)
               }
               description={
                 loading && friends.length === 0
                   ? t(msg`稍等片刻，列表加载完成后会出现在这里。`)
-                  : friends.length === 0
-                    ? t(msg`去联系人资料页把常联系的好友设为星标朋友，TA 们会出现在这里。`)
-                    : normalizedSearchText && filteredFriends.length === 0
-                      ? t(msg`换个关键词再试试，或清空搜索查看所有星标朋友。`)
-                      : t(msg`从中间星标列表里选一位，这里会显示资料和管理操作。`)
+                  : error && friends.length === 0
+                    ? t(msg`点左侧的「重试读取」会重新拉一次列表。`)
+                    : friends.length === 0
+                      ? t(msg`去联系人资料页把常联系的好友设为星标朋友，TA 们会出现在这里。`)
+                      : normalizedSearchText && filteredFriends.length === 0
+                        ? t(msg`换个关键词再试试，或清空搜索查看所有星标朋友。`)
+                        : t(msg`从中间星标列表里选一位，这里会显示资料和管理操作。`)
               }
             />
           }

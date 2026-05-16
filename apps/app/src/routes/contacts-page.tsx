@@ -2116,6 +2116,9 @@ export function ContactsPage() {
                     }),
                   });
                 }}
+                onRetry={() => {
+                  void friendsQuery.refetch();
+                }}
               />
             ) : desktopSelection?.kind === "tags" ? (
               <DesktopContactsTagsPane />
