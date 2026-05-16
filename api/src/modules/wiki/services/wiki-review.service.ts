@@ -22,6 +22,8 @@ export type ReviewDecisionInput = {
   note?: string;
 };
 
+const REVIEW_NOTE_MAX_LENGTH = 1000;
+
 @Injectable()
 export class WikiReviewService {
   constructor(
@@ -143,6 +145,18 @@ export class WikiReviewService {
       throw new AppError('WIKI_REVIEW_INVALID_STATE', {
         params: { detail: '无效的审核结果' },
         legacyMessage: '无效的审核结果',
+      });
+    }
+    // reviewerNote 落进 wiki_edit_submissions.reviewerNote，是 SQLite TEXT 没
+    // DB 上限。不挡的话 reject 一次能塞 1MB+，pending-reviews 列表渲染卡。
+    // 跟 wiki block.reason / role.reason / report.reason 同量级（200~2000）。
+    if (
+      typeof input.note === 'string' &&
+      input.note.length > REVIEW_NOTE_MAX_LENGTH
+    ) {
+      throw new AppError('WIKI_REVIEW_INVALID_STATE', {
+        params: { detail: `审核备注最长 ${REVIEW_NOTE_MAX_LENGTH} 字` },
+        legacyMessage: `审核备注最长 ${REVIEW_NOTE_MAX_LENGTH} 字`,
       });
     }
     const revision = await this.revisionRepo.findOne({

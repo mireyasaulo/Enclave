@@ -42,6 +42,20 @@ export type AuthProfile = {
 const MIN_PASSWORD_LENGTH = 6;
 const MIN_USERNAME_LENGTH = 2;
 const MAX_USERNAME_LENGTH = 32;
+
+// trim() 只剥常规空白，不剥零宽字符 (U+200B-U+200D / U+FEFF / U+2060 等)
+// 与各种 unicode 空格。register/changeUsername 不挡的话用户能注册成纯
+// 零宽账号 (e.g. U+200B U+200C)，admin 列表渲染显示空白行无法点击
+// (跟 wiki.types.ts 的 isNameVisuallyEmpty 同一类问题)。
+//
+// 注意：regex 字符类里直接放真实 U+2028 (LINE SEPARATOR) 会让 tsc 编译
+// 出来的 .js 在该位置真换行，导致 SyntaxError。所以这里用 \u 转义。
+const VISUAL_BLANK_USERNAME_REGEX =
+  /[\s\u00a0\u2000-\u200d\u2028-\u202f\u205f\u3000\ufeff\u2060]/g;
+
+function isUsernameVisuallyEmpty(raw: string): boolean {
+  return raw.replace(VISUAL_BLANK_USERNAME_REGEX, '').length === 0;
+}
 // bcrypt 只看密码的前 72 字节，超出部分静默丢弃 —— UTF-8 中文一字 3 字节，
 // 25 个汉字密码就触顶。允许更长 → 用户以为换了密码，实际只有前 72 字节生效，
 // 两段不同密码可能哈希一致；以及超长 payload 做 hash 还是个轻量 DoS。
@@ -106,6 +120,12 @@ export class AuthService {
       throw new AppError('AUTH_USERNAME_INVALID_CHAR', {
         status: HttpStatus.BAD_REQUEST,
         legacyMessage: '用户名不能包含 @ 字符',
+      });
+    }
+    if (isUsernameVisuallyEmpty(trimmed)) {
+      throw new AppError('AUTH_USERNAME_INVALID_CHAR', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '用户名不能只由空白或零宽字符组成',
       });
     }
     const exists = await this.userRepo.findOne({ where: { username: trimmed } });
@@ -239,6 +259,12 @@ export class AuthService {
       throw new AppError('AUTH_USERNAME_INVALID_CHAR', {
         status: HttpStatus.BAD_REQUEST,
         legacyMessage: '用户名不能包含 @ 字符',
+      });
+    }
+    if (isUsernameVisuallyEmpty(trimmed)) {
+      throw new AppError('AUTH_USERNAME_INVALID_CHAR', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '用户名不能只由空白或零宽字符组成',
       });
     }
     const user = await this.userRepo.findOne({ where: { id: userId } });

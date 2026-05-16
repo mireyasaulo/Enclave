@@ -10,6 +10,7 @@ import { WikiPageService } from './wiki-page.service';
 
 const VALID_LEVELS = new Set(['none', 'semi', 'full']);
 const VALID_REVIEW_POLICIES = new Set(['open', 'pending_changes']);
+const PROTECTION_REASON_MAX_LENGTH = 200;
 
 @Injectable()
 export class WikiProtectionService {
@@ -46,6 +47,18 @@ export class WikiProtectionService {
       throw new AppError('WIKI_VALIDATION_FAILED', {
         params: { detail: 'reviewPolicy 必须是 open / pending_changes' },
         legacyMessage: 'reviewPolicy 必须是 open / pending_changes',
+      });
+    }
+    // protectionReason 落进 character_pages.protectionReason 与
+    // wiki_protection_logs.reason 两处，无 DB 上限。跟 block.reason / role.reason
+    // 同样取 200 字上限，避免列表/卡片渲染时被 1MB 字符串撑出滚动条。
+    if (
+      typeof input.reason === 'string' &&
+      input.reason.length > PROTECTION_REASON_MAX_LENGTH
+    ) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: `reason 不能超过 ${PROTECTION_REASON_MAX_LENGTH} 个字符` },
+        legacyMessage: `reason 不能超过 ${PROTECTION_REASON_MAX_LENGTH} 个字符`,
       });
     }
     const page = await this.pages.getOrInitPage(characterId);

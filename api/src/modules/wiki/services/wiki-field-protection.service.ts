@@ -138,6 +138,21 @@ export class WikiFieldProtectionService implements OnModuleInit {
         });
       }
     }
+    // (characterId, fieldPath) 同一对不允许多条 —— effective 计算虽然会去重
+    // 取最严格，但 admin /admin/protection 列表里会展示两条，没人能看明白
+    // 哪条在生效。要改保护级别用 PATCH 现有那条，不要另开新条。
+    const dup = await this.repo.findOne({
+      where: { characterId, fieldPath },
+    });
+    if (dup) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.CONFLICT,
+        params: {
+          detail: `(${characterId}, ${fieldPath}) 已有保护策略，请直接修改现有那条`,
+        },
+        legacyMessage: `(${characterId}, ${fieldPath}) 已有保护策略，请直接修改现有那条`,
+      });
+    }
     return this.repo.save(
       this.repo.create({
         ...input,
