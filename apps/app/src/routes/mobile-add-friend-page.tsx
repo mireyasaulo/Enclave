@@ -170,18 +170,33 @@ function MobileAddFriend() {
   const friendRequestsQuery = useQuery({
     queryKey: ["app-friend-requests", baseUrl, "all"],
     queryFn: () => getFriendRequests(baseUrl, { direction: "all" }),
+    // 跟兄弟 query（charactersQuery / friendsQuery）一致：用户在通讯录 → +
+    // 添加朋友 → 角色详情来回切时不要每次都强制 refetch；同一 baseUrl 短时间
+    // 内复用缓存即可，被本页 sendRequestMutation.onSuccess 主动 invalidate
+    // 之后会立刻刷新。
+    staleTime: 15_000,
   });
 
   const blockedQuery = useQuery({
     queryKey: ["app-contacts-blocked", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
+    staleTime: 30_000,
   });
 
   const openChatMutation = useMutation({
     mutationFn: (characterId: string) =>
       getOrCreateConversation({ characterId }, baseUrl),
     onSuccess: (conversation) => {
-      void navigate({ to: "/chat/$conversationId", params: { conversationId: conversation.id } });
+      // 与 contacts-page.tsx 的 startChatMutation 对齐：conversation 可能为
+      // null（被拉黑 / 权限受限时后端会返回空），漏 null 守护会让
+      // navigate 取 .id 时 throw。
+      if (!conversation) {
+        return;
+      }
+      void navigate({
+        to: "/chat/$conversationId",
+        params: { conversationId: conversation.id },
+      });
     },
   });
 
@@ -762,14 +777,19 @@ function MobileAddFriendSendSheet({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [greeting, setGreeting] = useState("");
 
+  // 只在弹层打开 / 切换到不同角色时重置 greeting；以前 dep 用 result 整个对象，
+  // searchResults useMemo 一旦重算 result 引用就变，这条 effect 会把用户已经
+  // 改过的 greeting 直接覆盖回模板（在网络一抖 / friendRequestsQuery 自动 refresh
+  // 时复现）。
+  const targetCharacterId = result?.character.id ?? null;
   useEffect(() => {
-    if (!open || !result) {
+    if (!open || !targetCharacterId) {
       return;
     }
 
     const owner = ownerName.trim() || t(msg`我`);
     setGreeting(t(msg`你好，我是${owner}，想把你添加到通讯录里。`));
-  }, [open, ownerName, result, t]);
+  }, [open, ownerName, targetCharacterId, t]);
 
   useEffect(() => {
     if (!open) {

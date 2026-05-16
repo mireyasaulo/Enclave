@@ -7,7 +7,7 @@ import {
   updateFriendPermissions,
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { cn } from "@yinjie/ui";
+import { InlineNotice, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 
@@ -125,6 +125,18 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
           </div>
         </div>
       </div>
+
+      {mutation.isError && mutation.error instanceof Error ? (
+        // 之前失败时 switch 自己回滚但没任何提示，用户看着像 toggle 突然弹回，
+        // 不知道是网络挂了还是后端拒了。补一条 danger notice，错误消息直接来自
+        // mutation.error。
+        <InlineNotice
+          tone="danger"
+          className="mt-3 rounded-[11px] px-2.5 py-1.5 text-[11px] leading-4 shadow-none"
+        >
+          {mutation.error.message || t(msg`权限修改失败，请稍后再试。`)}
+        </InlineNotice>
+      ) : null}
 
       <ul className="mt-3 overflow-hidden rounded-[12px] bg-white shadow-[0_1px_0_rgba(15,23,42,0.04)]">
         <SwitchRow

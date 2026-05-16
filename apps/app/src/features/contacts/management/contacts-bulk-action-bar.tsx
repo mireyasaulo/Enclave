@@ -43,8 +43,20 @@ export function ContactsBulkActionBar({
     setNotice(success ? `${action}${t(msg`：操作成功`)}` : t(msg`部分操作失败`));
   };
 
+  // 整条 mutation 直接 reject（网络抖断 / 401 / 500）时之前没有 UI 反馈：bar 不
+  // 退出、按钮卡在 pending 看着像点击没生效。这里统一兜一条 danger notice，错误
+  // 详情交给上层 setNotice 渲染；同时不调 onDone()，保留批量选择让用户重试。
+  const flushError = (action: string, error: unknown) => {
+    if (!setNotice) return;
+    const reason = error instanceof Error && error.message.trim()
+      ? `：${error.message.trim()}`
+      : "";
+    setNotice(`${action}${t(msg`：操作失败`)}${reason}`);
+  };
+
   const runStar = (starred: boolean) => {
     if (!hasSelection) return;
+    const actionLabel = starred ? t(msg`设星标`) : t(msg`取消星标`);
     bulk.mutate(
       {
         characterIds: selectedIds,
@@ -52,8 +64,11 @@ export function ContactsBulkActionBar({
       },
       {
         onSuccess: (res) => {
-          flushNotice(res.failed.length === 0, starred ? t(msg`设星标`) : t(msg`取消星标`));
+          flushNotice(res.failed.length === 0, actionLabel);
           onDone();
+        },
+        onError: (error) => {
+          flushError(actionLabel, error);
         },
       },
     );
@@ -78,6 +93,10 @@ export function ContactsBulkActionBar({
           setTagDraft("");
           onDone();
         },
+        onError: (error) => {
+          flushError(t(msg`打标签`), error);
+          setShowTagDialog(false);
+        },
       },
     );
   };
@@ -94,6 +113,10 @@ export function ContactsBulkActionBar({
           flushNotice(res.failed.length === 0, t(msg`删除`));
           setShowDeleteDialog(false);
           onDone();
+        },
+        onError: (error) => {
+          flushError(t(msg`删除`), error);
+          setShowDeleteDialog(false);
         },
       },
     );
