@@ -132,6 +132,12 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   } | null>(null);
   const panelOpenedReportedRef = useRef(false);
   const initializedSessionKeyRef = useRef<string | null>(null);
+  // 同步防双击锁——下面 handleBack 和 handleEndCall 都用 `if (leavingScreen)
+  // return;` 当 guard，但 leavingScreen 是 React state，setLeavingScreen 要
+  // 等 commit 才生效，同帧内连点 2 次结束/返回按钮会同时通过 guard，两份
+  // sendGroupMessage("ended") + 两个 navigate 同时出去。第二份消息会被服务端
+  // 接受，群里出现 2 条"通话已结束"系统提示。ref 同步赋值不走 React render。
+  const leavingScreenRef = useRef(false);
 
   const groupQuery = useQuery({
     queryKey: ["app-group", baseUrl, resolvedGroupId],
@@ -210,6 +216,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     setMuted(false);
     setSpeakerEnabled(true);
     setCameraEnabled(mode === "video");
+    leavingScreenRef.current = false;
     setLeavingScreen(false);
     setStartedAt(
       routeState?.recordedAt ??
@@ -395,10 +402,11 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   ]);
 
   const handleBack = () => {
-    if (leavingScreen) {
+    if (leavingScreenRef.current || leavingScreen) {
       return;
     }
 
+    leavingScreenRef.current = true;
     setLeavingScreen(true);
     if (isDesktopLayout) {
       void navigate({
@@ -430,10 +438,11 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   );
 
   const handleEndCall = async () => {
-    if (leavingScreen) {
+    if (leavingScreenRef.current || leavingScreen) {
       return;
     }
 
+    leavingScreenRef.current = true;
     setLeavingScreen(true);
     if (!resolvedGroupId || !groupQuery.data || !totalCount) {
       void navigate({
@@ -464,6 +473,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
         replace: true,
       });
     } catch {
+      leavingScreenRef.current = false;
       setLeavingScreen(false);
     }
   };

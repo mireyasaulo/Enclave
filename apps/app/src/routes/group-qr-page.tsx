@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
@@ -993,7 +993,26 @@ export function GroupQrPage() {
     });
   }
 
+  // 同步防双击锁——下面 9 处「投递到会话」按钮全都用 `void sendToConversation(conv)`
+  // 触发，函数体里要 await sendGroupMessage / emitChatMessage（实际公网隧道约
+  // 600ms RTT）；按钮自身没有 disabled 状态，用户在第一次 click 还没回来之前
+  // 再戳一次同一行会再飞一份相同的群邀请文本到同一个会话——朋友收到 2 条
+  // 一模一样的"xxx 邀请你加入群聊"，体验很差。按 conversationId 维度上锁，
+  // finally 解锁；不同会话间不互相阻塞，用户可以连点不同行批量投。
+  const sendingConversationsRef = useRef<Set<string>>(new Set());
   async function sendToConversation(conversation: ConversationListItem) {
+    if (sendingConversationsRef.current.has(conversation.id)) {
+      return;
+    }
+    sendingConversationsRef.current.add(conversation.id);
+    try {
+      await doSendToConversation(conversation);
+    } finally {
+      sendingConversationsRef.current.delete(conversation.id);
+    }
+  }
+
+  async function doSendToConversation(conversation: ConversationListItem) {
     const conversationPath = isPersistedGroupConversation(conversation)
       ? `/group/${conversation.id}`
       : `/chat/${conversation.id}`;

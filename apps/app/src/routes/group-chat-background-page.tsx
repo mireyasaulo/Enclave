@@ -259,6 +259,35 @@ export function GroupChatBackgroundPage() {
     clearDefaultMutation.isPending ||
     saveGroupMutation.isPending ||
     clearGroupMutation.isPending;
+  // 同步防双击锁——下面 4 个保存/清除按钮都是 `() => xxxMutation.mutate()`
+  // 直裸触发，busy=isPending sum 要等 React commit 才生效。同帧连点 2 次会
+  // 同时通过 busy=false → 两份 PATCH 同时飞（公网隧道 RTT 下不罕见），
+  // 服务端虽然幂等但 UI 上 setNotice 会被后到的 onSuccess 反复写一遍。
+  // 4 个 mutation 共用一把锁——任意一个 in-flight 时其它的也禁用，对齐
+  // busy 的语义。
+  const runningMutationRef = useRef(false);
+  const guard = (run: () => void) => () => {
+    if (runningMutationRef.current) return;
+    if (busy) return;
+    runningMutationRef.current = true;
+    run();
+  };
+  // 用 onSettled 解锁；4 个 mutation 共用一把锁
+  const releaseLock = () => {
+    runningMutationRef.current = false;
+  };
+  const runSaveDefault = guard(() =>
+    saveDefaultMutation.mutate(undefined, { onSettled: releaseLock }),
+  );
+  const runClearDefault = guard(() =>
+    clearDefaultMutation.mutate(undefined, { onSettled: releaseLock }),
+  );
+  const runSaveGroup = guard(() =>
+    saveGroupMutation.mutate(undefined, { onSettled: releaseLock }),
+  );
+  const runClearGroup = guard(() =>
+    clearGroupMutation.mutate(undefined, { onSettled: releaseLock }),
+  );
   const pageError =
     (uploadMutation.error instanceof Error && uploadMutation.error.message) ||
     (saveDefaultMutation.error instanceof Error &&
@@ -518,7 +547,7 @@ export function GroupChatBackgroundPage() {
               <Button
                 variant="primary"
                 disabled={busy || !defaultDraft}
-                onClick={() => saveDefaultMutation.mutate()}
+                onClick={runSaveDefault}
                 className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
               >
                 {t(msg`保存默认背景`)}
@@ -526,7 +555,7 @@ export function GroupChatBackgroundPage() {
               <Button
                 variant="ghost"
                 disabled={busy}
-                onClick={() => clearDefaultMutation.mutate()}
+                onClick={runClearDefault}
                 className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
               >
                 {t(msg`恢复系统背景`)}
@@ -582,7 +611,7 @@ export function GroupChatBackgroundPage() {
                   <Button
                     variant="ghost"
                     disabled={busy}
-                    onClick={() => clearGroupMutation.mutate()}
+                    onClick={runClearGroup}
                     className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
                   >
                     {t(msg`跟随默认背景`)}
@@ -605,7 +634,7 @@ export function GroupChatBackgroundPage() {
               <Button
                 variant="primary"
                 disabled={busy || (groupMode === "custom" && !groupDraft)}
-                onClick={() => saveGroupMutation.mutate()}
+                onClick={runSaveGroup}
                 className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
               >
                 {groupMode === "custom"
