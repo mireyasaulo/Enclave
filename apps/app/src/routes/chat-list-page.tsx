@@ -97,6 +97,7 @@ import { isPersistedGroupConversation } from "../lib/conversation-route";
 import { buildCreateGroupRouteHash } from "../lib/create-group-route-state";
 import { formatConversationTimestamp } from "../lib/format";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { onChatMessage, onConversationUpdated } from "../lib/socket";
 
 type QuickActionItem = {
@@ -610,6 +611,42 @@ function MobileChatListPage() {
       setOpenSwipeConversationId(null);
     }
   }, [openSwipeConversationId, visibleConversations]);
+
+  // 原生壳硬件 Back 键：在 /tabs/chat 上展开了 + 菜单 / 滑开了会话操作 /
+  // 还在 5s 撤销删除窗口里时，BACK 应当先关掉这些瞬态层，而不是触发"再按
+  // 一次返回退出"的根 tab 默认行为。优先级：撤销删除 > 滑开 > 快捷菜单。
+  useEffect(() => {
+    if (!isActiveTab) {
+      return;
+    }
+    if (!pendingHideConversation && !openSwipeConversationId && !isQuickMenuOpen) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      if (pendingHideConversation) {
+        event.preventDefault();
+        handleUndoHideConversation();
+        return true;
+      }
+      if (openSwipeConversationId) {
+        event.preventDefault();
+        setOpenSwipeConversationId(null);
+        return true;
+      }
+      if (isQuickMenuOpen) {
+        event.preventDefault();
+        setIsQuickMenuOpen(false);
+        return true;
+      }
+      return false;
+    });
+    return unregister;
+  }, [
+    isActiveTab,
+    isQuickMenuOpen,
+    openSwipeConversationId,
+    pendingHideConversation,
+  ]);
 
   useEffect(() => {
     return () => {
