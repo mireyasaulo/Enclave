@@ -23,6 +23,7 @@ import {
   type WikiPageView,
   type WikiRevisionSummary,
 } from "../lib/wiki-api";
+import { CharacterAvatar } from "../components/character-avatar";
 import { SnapshotDiff } from "../components/snapshot-diff";
 import { TalkPanel } from "../components/talk-panel";
 import { WatchToggle } from "../components/watch-toggle";
@@ -307,13 +308,7 @@ function ReadView({ view }: { view: WikiPageView }) {
   return (
     <Card className="space-y-4 p-4 sm:p-6">
       <header className="flex items-start gap-3 sm:gap-4">
-        {c.avatar && (
-          <img
-            src={c.avatar}
-            alt={c.name}
-            className="h-14 w-14 shrink-0 rounded-full bg-[color:var(--surface-soft)] object-cover sm:h-16 sm:w-16 md:h-20 md:w-20"
-          />
-        )}
+        <CharacterAvatar name={c.name} src={c.avatar} size="lg" />
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold leading-tight sm:text-2xl">
             {c.name}
@@ -616,7 +611,7 @@ function RevisionCard({
           )}
           <button
             type="button"
-            className="underline hover:text-[var(--text-primary)]"
+            className="inline-flex min-h-[32px] items-center rounded-md px-2 py-1 underline hover:text-[var(--text-primary)]"
             onClick={() => setShowDiff((v) => !v)}
           >
             {showDiff ? t(msg`收起对比`) : t(msg`查看对比`)}
@@ -626,7 +621,7 @@ function RevisionCard({
               to="/character/$characterId/diff"
               params={{ characterId: rev.characterId }}
               search={{ from: previous.id, to: rev.id }}
-              className="underline hover:text-[var(--text-primary)]"
+              className="inline-flex min-h-[32px] items-center rounded-md px-2 py-1 underline hover:text-[var(--text-primary)]"
             >
               <Trans>独立对比</Trans>
             </Link>
@@ -634,7 +629,7 @@ function RevisionCard({
           {canRevert && !isCurrent && rev.status === "approved" && (
             <button
               type="button"
-              className="underline hover:text-[var(--text-primary)]"
+              className="inline-flex min-h-[32px] items-center rounded-md px-2 py-1 underline hover:text-[var(--text-primary)]"
               onClick={() => setShowRevert((v) => !v)}
             >
               <Trans>回滚到此版本</Trans>

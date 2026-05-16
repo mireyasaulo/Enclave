@@ -348,7 +348,7 @@ function PostTree({
               <>
                 <button
                   type="button"
-                  className="underline ml-auto hover:text-[var(--text-primary)]"
+                  className="ml-auto inline-flex min-h-[32px] items-center rounded-md px-2 py-1 underline hover:text-[var(--text-primary)]"
                   onClick={() => onReply(post.id)}
                 >
                   <Trans>回复</Trans>
@@ -357,7 +357,7 @@ function PostTree({
                 {canDelete(post) && (
                   <button
                     type="button"
-                    className="underline hover:text-[var(--state-danger-text)]"
+                    className="inline-flex min-h-[32px] items-center rounded-md px-2 py-1 underline hover:text-[var(--state-danger-text)]"
                     onClick={() => onDelete(post.id)}
                   >
                     <Trans>删除</Trans>
