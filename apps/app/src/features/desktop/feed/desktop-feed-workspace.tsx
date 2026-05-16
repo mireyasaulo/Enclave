@@ -284,19 +284,36 @@ export function DesktopFeedWorkspace({
   // 是本地 state；这一套 dep 在敲键码时不变。
   const detailQueryRefetch = detailQuery.refetch;
   const detailQueryIsError = detailQuery.isError;
+  // 走查新一轮 Round 7（perf）：handleLoadFullComments 原来 deps 包含 selectedPostId
+  // 和 detailQueryIsError —— selectedPostId 在用户点任一 row 「查看全部」时立刻翻
+  // 新值；detailQueryIsError 在 detailQuery 完成/失败时翻 boolean。任一变化都
+  // 让 callback identity 翻新 → workspace → list → 60 条 memo'd Row 的 onLoadFullComments
+  // prop 全换 → 整张 list 重渲（其中 59 条根本不是「查看全部」目标）。同款
+  // 套路：用 ref 兜最新值，callback 只依赖 stable refetch 即可。
+  const selectedPostIdRef = useRef(selectedPostId);
+  useEffect(() => {
+    selectedPostIdRef.current = selectedPostId;
+  }, [selectedPostId]);
+  const detailQueryIsErrorRef = useRef(detailQueryIsError);
+  useEffect(() => {
+    detailQueryIsErrorRef.current = detailQueryIsError;
+  }, [detailQueryIsError]);
   const handleLoadFullComments = useCallback(
     (postId: string) => {
       // 已经选中同一条 post 时 setState 是 no-op：React 跳过更新 →
       // useQuery 不会重跑。detailQuery 上一次失败、ErrorBlock 已经
       // 渲染出来时，用户点「查看全部」想重试，过去只能刷新整个页面。
       // 这里显式 refetch，让那条 button 真当"重试入口"用。
-      if (selectedPostId === postId && detailQueryIsError) {
+      if (
+        selectedPostIdRef.current === postId &&
+        detailQueryIsErrorRef.current
+      ) {
         void detailQueryRefetch();
         return;
       }
       setSelectedPostId(postId);
     },
-    [detailQueryIsError, detailQueryRefetch, selectedPostId],
+    [detailQueryRefetch],
   );
   const handleOpenCompose = useCallback(
     () => setShowCompose(true),
