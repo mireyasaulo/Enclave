@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 
 const t = translateRuntimeMessage;
 
@@ -36,6 +37,21 @@ export function FeatureUnavailableDialog({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, open]);
+
+  // 原生壳硬件 Back 键：dialog 打开时拦掉，关 dialog 不退页（场景：聊天页
+  // 里点不可用的语音/视频通话按钮弹出"功能开发中"对话框，BACK 应当先关掉
+  // 它）。和 desktop Escape 一致。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
   }, [onClose, open]);
 
   if (!open) {
