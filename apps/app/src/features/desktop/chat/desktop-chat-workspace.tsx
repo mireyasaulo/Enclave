@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type DragEvent as ReactDragEvent,
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type MouseEvent,
@@ -1535,10 +1536,44 @@ export function DesktopChatWorkspace({
     }
   }
 
+  // 兜底拦掉 drop：composer 自己有完整的拖拽附件流程，但用户把文件拖出
+  // composer、drop 到会话列表 / 消息列表 / 侧栏这些没 drop 处理的区域时，
+  // 浏览器默认行为是「把文件 URL 当导航跑」—— 整页跳走打开本地文件，所有
+  // 未发完的消息和状态全没了。这里在 workspace 根上 preventDefault 兜底，
+  // composer 内部 drop 不受影响（composer onDragOver/onDrop 仍然在 React
+  // 事件冒泡前被调用，attachment 流程照常）。
+  const handleWorkspaceDragOver = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+      if (!event.dataTransfer.types.includes("Files")) {
+        return;
+      }
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "none";
+    },
+    [],
+  );
+  const handleWorkspaceDrop = useCallback(
+    (event: ReactDragEvent<HTMLDivElement>) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+      if (!event.dataTransfer.types.includes("Files")) {
+        return;
+      }
+      event.preventDefault();
+    },
+    [],
+  );
+
   return (
     <div
       className="relative flex h-full min-h-0"
       onPointerDownCapture={handleWorkspacePointerDownCapture}
+      onDragOver={handleWorkspaceDragOver}
+      onDrop={handleWorkspaceDrop}
     >
       {standaloneWindow ? null : (
         <section className="flex w-[320px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
