@@ -165,6 +165,20 @@ export function ChannelAuthorPage() {
     setActiveCollection(readStoredChannelAuthorCollection(authorId));
   }, [authorId, baseUrl]);
 
+  // 走查 R2：success notice 之前一直挂着不消，跟主视频号页 2.4s 自动消失的
+  // 体验对不上。用户连续按 +关注/已关注/+关注 会看到三层通知或残影的成功
+  // 文案叠在简介卡顶端，盖到 followerCount 的更新。统一 2.4s 后自动清掉。
+  useEffect(() => {
+    if (!notice) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setNotice(null);
+    }, 2400);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
   useEffect(() => {
     writeStoredChannelAuthorCollection(authorId, activeCollection);
   }, [activeCollection, authorId]);
