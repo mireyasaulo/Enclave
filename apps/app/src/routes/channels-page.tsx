@@ -1998,12 +1998,20 @@ function ChannelAudioPictorial({
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const swipeHandledRef = useRef(false);
-  // 走查 R12：touchend 处理完 tap 后浏览器还会合成一次 click，原 handleClick
+  // 走查 R12 #1：touchend 处理完 tap 后浏览器还会合成一次 click，原 handleClick
   // 仅靠 touchStartXRef !== null 拦不住——touchend 里已经把它清成 null，
   // 合成 click 跑下来又会再 handleTap() 一次，等于点一下 → 一次 pause→一次 play
   // （或反之），用户 tap 想暂停永远暂停不下来，首次 tap 想解除静音也会立刻被
   // 反向 toggle 回去。touchend 走过 tap 后把这个 flag 置 1，吞掉紧跟着的合成 click。
   const suppressNextClickRef = useRef(false);
+  // 走查 R13：竖向滑（用户想往下翻到下一张卡）会进 touchstart/touchmove/touchend：
+  // handleTouchMove 只在横向位移超阈值时 setSwipeHandledRef，竖向情况下没被标记，
+  // touchend 走完 wasSwipe=false 分支 → handleTap() → audio 莫名其妙暂停。
+  // 真机上滑动到下一张快滚走时 IntersectionObserver 立刻把 activePostId 切走、
+  // 老卡的 useEffect 把 audio.pause() 兜底回去，肉眼看不出来；但在 *同一张卡内*
+  // 用户只是稍微往下拖一截（snap-mandatory 会回弹），audio 就真的被 tap 暂停了，
+  // 用户没法理解为什么"我什么都没点"音乐就停。任何方向超过 10px 都视为非 tap。
+  const movedBeyondTapRef = useRef(false);
 
   // 进入 active 时播放，离开时暂停 + 复位（保证全局只有一条 audio 在响）。
   // 注意：userUnmuted 不是这里的依赖——否则用户主动暂停后再切静音，会被
@@ -2095,6 +2103,7 @@ function ChannelAudioPictorial({
     touchStartXRef.current = touch.clientX;
     touchStartYRef.current = touch.clientY;
     swipeHandledRef.current = false;
+    movedBeyondTapRef.current = false;
   };
   const handleTouchMove = (event: React.TouchEvent) => {
     if (swipeHandledRef.current) return;
@@ -2104,6 +2113,11 @@ function ChannelAudioPictorial({
     }
     const dx = touch.clientX - touchStartXRef.current;
     const dy = touch.clientY - touchStartYRef.current;
+    // 任何方向超过 10px 就算"用户在滑而不是点"——iOS/Android tap 阈值都在这附近，
+    // touchend 时拒绝走 handleTap，避免竖向滚动顺手把 audio 暂停 / 解除静音。
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+      movedBeyondTapRef.current = true;
+    }
     // 横向位移占主导且超阈值 → 切图；竖向占主导 → 让外层 snap-y 接管
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) {
       swipeHandledRef.current = true;
@@ -2113,15 +2127,17 @@ function ChannelAudioPictorial({
   };
   const handleTouchEnd = () => {
     const wasSwipe = swipeHandledRef.current;
+    const movedBeyondTap = movedBeyondTapRef.current;
     touchStartXRef.current = null;
     touchStartYRef.current = null;
-    if (!wasSwipe) {
+    if (!wasSwipe && !movedBeyondTap) {
       // 纯点击：切播放/暂停（首次顺带解除静音）
       // 标记：本次合成 click 要被吞掉，否则下面 handleClick 会再跑一次 handleTap
       suppressNextClickRef.current = true;
       handleTap();
     }
-    // swipeHandledRef 不在这里清——下面 onClick 还要看；改在 touchStart 重置
+    // swipeHandledRef / movedBeyondTapRef 不在这里清——下面 onClick 还要看；
+    // 都改在 touchStart 重置。
   };
   // 桌面鼠标场景兜底：触屏 touchend 后浏览器仍会合成 click，但 swipe
   // 期间 click 多数浏览器会自动取消；这里只为非触屏鼠标点击服务。
@@ -2133,6 +2149,9 @@ function ChannelAudioPictorial({
       return;
     }
     if (swipeHandledRef.current) return;
+    // touch 路径下大幅滑动浏览器通常不会再 fire 合成 click，但同样兜底拦一下，
+    // 避免某些设备上的边缘行为重新触发 handleTap。
+    if (movedBeyondTapRef.current) return;
     handleTap();
   };
 
