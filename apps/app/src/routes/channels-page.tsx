@@ -1871,12 +1871,16 @@ function ChannelAudioPictorial({
         </div>
       ) : null}
 
-      {/* 隐藏音频元素：实际播放走 useEffect 控制 */}
+      {/* 隐藏音频元素：实际播放走 useEffect 控制。
+          仅 active 卡挂 src + preload metadata；其它卡 src 留空避免 25+ 卡
+          一起触发 mp3 metadata 拉取（实测一次 /discover/channels 进入会并发
+          27 条 minimax-music.mp3，离开时全 ERR_ABORTED，纯浪费带宽与公网隧道
+          RTT，移动端公网下首屏会卡顿）。 */}
       <audio
         ref={audioRef}
-        src={audioUrl ? resolveAppMediaUrl(audioUrl) : undefined}
+        src={active && audioUrl ? resolveAppMediaUrl(audioUrl) : undefined}
         loop
-        preload="metadata"
+        preload={active ? "metadata" : "none"}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         className="hidden"
@@ -1956,14 +1960,17 @@ function ChannelVideoSurface({
       tabIndex={0}
       aria-label={isPlaying ? t(msg`暂停`) : t(msg`播放`)}
     >
+      {/* 仅 active 卡挂 src；其它卡只显 poster，避免页面挂 N 个 <video>
+          自动拉 metadata（每条几百 KB）。视频源切换由 active 翻转 + 上面
+          useEffect 的 .play() 触发，poster 始终可见保持视觉。 */}
       <video
         ref={videoRef}
         key={videoUrl}
-        src={videoUrl ? resolveAppMediaUrl(videoUrl) : undefined}
+        src={active && videoUrl ? resolveAppMediaUrl(videoUrl) : undefined}
         poster={posterUrl ? resolveAppMediaUrl(posterUrl) : undefined}
         playsInline
         loop
-        preload={active ? "auto" : "metadata"}
+        preload={active ? "auto" : "none"}
         controls={false}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
