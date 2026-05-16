@@ -46,6 +46,8 @@ import { getMomentSummaryText } from "../features/moments/moment-content";
 import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
+  type MomentImageDraft,
+  type MomentVideoDraft,
 } from "../features/moments/moment-compose-media";
 import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { translateCharacterBio } from "../lib/character-i18n";
@@ -161,16 +163,29 @@ export function FriendMomentsPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    // 走查新 Round 1：跟 1b285789 / moments-page / profile-moments-page 同类 bug。
+    // 慢网下旧 mutation 的 onSuccess 跑回来会抹掉用户重开后输入的新草稿。
+    // snapshot draft 当 variables，onSuccess 用 reference equality 校验。
+    mutationFn: (input: {
+      text: string;
+      imageDrafts: MomentImageDraft[];
+      videoDraft: MomentVideoDraft | null;
+    }) =>
       publishMomentComposeDraft({
-        text: composeDraft.text,
-        imageDrafts: composeDraft.imageDrafts,
-        videoDraft: composeDraft.videoDraft,
+        text: input.text,
+        imageDrafts: input.imageDrafts,
+        videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newMoment) => {
-      composeDraft.reset();
-      setShowCompose(false);
+    onSuccess: (newMoment, input) => {
+      const draftStillMatchesPublish =
+        composeDraft.text === input.text &&
+        composeDraft.imageDrafts === input.imageDrafts &&
+        composeDraft.videoDraft === input.videoDraft;
+      if (draftStillMatchesPublish) {
+        composeDraft.reset();
+        setShowCompose(false);
+      }
       setNotice({ tone: "success", message: t(msg`朋友圈已发布。`) });
       // 立刻 prepend 到共享 flat / paged / mine 三套 cache：本页按好友 characterId 过滤
       // 不显示用户自己的动态，但用户随手切到 /tabs/moments、/profile/moments 时应该
@@ -786,6 +801,15 @@ export function FriendMomentsPage() {
         imageDrafts={composeDraft.imageDrafts}
         isBlocked={isBlocked}
         isLoading={momentsQuery.isLoading}
+        // 首屏失败 + 未被拉黑 + 0 条时空态优先渲「重试读取」（feed Round 2 同款）。
+        loadErrorMessage={
+          momentsQuery.isError && momentsQuery.error instanceof Error
+            ? momentsQuery.error.message
+            : null
+        }
+        onRetryLoad={() => {
+          void momentsQuery.refetch();
+        }}
         likeErrorMessage={
           likeMutation.isError && likeMutation.error instanceof Error
             ? likeMutation.error.message
@@ -827,7 +851,14 @@ export function FriendMomentsPage() {
             postId: momentId,
           })
         }
-        onCreate={() => createMutation.mutate()}
+        onCreate={() =>
+          createMutation.mutate({
+            // snapshot — 见 createMutation 注释。
+            text: composeDraft.text,
+            imageDrafts: composeDraft.imageDrafts,
+            videoDraft: composeDraft.videoDraft,
+          })
+        }
         onImageFilesSelected={(files) => {
           void handleImageFilesSelected(files);
         }}

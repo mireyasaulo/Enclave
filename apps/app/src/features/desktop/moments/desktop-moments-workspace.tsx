@@ -30,6 +30,9 @@ type DesktopMomentsWorkspaceProps = {
   errors?: string[];
   imageDrafts: MomentImageDraft[];
   isLoading: boolean;
+  /** momentsQuery 首屏失败的错误信息；moments=[] 时空态优先渲「重试读取」
+   *  而不是「发朋友圈」误导 CTA。 */
+  loadErrorMessage?: string | null;
   likeErrorMessage?: string | null;
   likePendingMomentId: string | null;
   moments: Moment[];
@@ -94,6 +97,7 @@ export function DesktopMomentsWorkspace({
   errors = [],
   imageDrafts,
   isLoading,
+  loadErrorMessage = null,
   likeErrorMessage,
   likePendingMomentId,
   moments,
@@ -209,6 +213,7 @@ export function DesktopMomentsWorkspace({
                 commentReplyTarget={commentReplyTarget}
                 deletePendingMomentId={deletePendingMomentId}
                 isLoading={isLoading}
+                loadErrorMessage={loadErrorMessage}
                 likePendingMomentId={likePendingMomentId}
                 moments={moments}
                 ownerId={ownerId}
@@ -230,6 +235,7 @@ export function DesktopMomentsWorkspace({
                 }
                 onToggleFavorite={onToggleFavorite}
                 onOpenCompose={() => setShowCompose(true)}
+                onRetryLoad={onRefresh}
                 onSelectAuthor={onOpenAuthorPopover}
                 onSelectLiker={onOpenLikerPopover}
               />

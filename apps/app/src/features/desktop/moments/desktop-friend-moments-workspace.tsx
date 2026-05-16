@@ -36,6 +36,11 @@ type DesktopFriendMomentsWorkspaceProps = {
   imageDrafts: MomentImageDraft[];
   isBlocked?: boolean;
   isLoading: boolean;
+  /** momentsQuery 首屏失败时的错误信息；moments=[] 且未被拉黑时空态优先渲
+   *  「重试读取」而不是「还没有发表朋友圈」误导文案。 */
+  loadErrorMessage?: string | null;
+  /** 「重试读取」按钮回调；friend-moments-page 绑 momentsQuery.refetch。 */
+  onRetryLoad?: () => void;
   likeErrorMessage?: string | null;
   likePendingMomentId: string | null;
   moments: Moment[];
@@ -96,6 +101,8 @@ export function DesktopFriendMomentsWorkspace({
   imageDrafts,
   isBlocked = false,
   isLoading,
+  loadErrorMessage = null,
+  onRetryLoad,
   likeErrorMessage,
   likePendingMomentId,
   moments,
@@ -211,6 +218,28 @@ export function DesktopFriendMomentsWorkspace({
     }
 
     if (!sortedMoments.length) {
+      // momentsQuery 首屏失败时之前永远渲「TA 还没有发表朋友圈」，把"读取
+      // 角色朋友圈失败"包装成"这个角色暂时没发"，用户被误导以为是空帐户。
+      // 跟 desktop-moments-feed Round 2 (674f3dfa / desktop-feed-list) 同款：
+      // 失败 + 未被拉黑 + 0 条直接渲「朋友圈暂时不可用 / 重试读取」。
+      // isBlocked 路径自己有专门文案，不被错误态覆盖。
+      if (loadErrorMessage && !isBlocked) {
+        return (
+          <div className="mx-auto max-w-[560px] py-10">
+            <EmptyState
+              title={t(msg`朋友圈暂时不可用`)}
+              description={loadErrorMessage}
+              action={
+                onRetryLoad ? (
+                  <Button variant="primary" onClick={onRetryLoad}>
+                    {t(msg`重试读取`)}
+                  </Button>
+                ) : undefined
+              }
+            />
+          </div>
+        );
+      }
       return (
         <div className="mx-auto max-w-[560px] py-10">
           <EmptyState

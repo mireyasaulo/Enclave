@@ -47,6 +47,8 @@ import { getMomentSummaryText } from "../features/moments/moment-content";
 import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
+  type MomentImageDraft,
+  type MomentVideoDraft,
 } from "../features/moments/moment-compose-media";
 import { consumeMomentPublishFlash } from "../features/moments/moment-publish-flash";
 import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
@@ -399,16 +401,30 @@ export function ProfileMomentsPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    // 走查新 Round 1：mutationFn 之前直接闭包读 composeDraft；onSuccess 又无脑
+    // reset() + setShowCompose(false)。慢网下用户发完 ESC 关掉重开输入新草稿，
+    // 旧 mutation 的 onSuccess 跑回来会抹掉新草稿。跟 1b285789 / moments-page
+    // 同类 bug；snapshot draft 当 variables、onSuccess 用 reference equality 校验。
+    mutationFn: (input: {
+      text: string;
+      imageDrafts: MomentImageDraft[];
+      videoDraft: MomentVideoDraft | null;
+    }) =>
       publishMomentComposeDraft({
-        text: composeDraft.text,
-        imageDrafts: composeDraft.imageDrafts,
-        videoDraft: composeDraft.videoDraft,
+        text: input.text,
+        imageDrafts: input.imageDrafts,
+        videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newMoment) => {
-      composeDraft.reset();
-      setShowCompose(false);
+    onSuccess: (newMoment, input) => {
+      const draftStillMatchesPublish =
+        composeDraft.text === input.text &&
+        composeDraft.imageDrafts === input.imageDrafts &&
+        composeDraft.videoDraft === input.videoDraft;
+      if (draftStillMatchesPublish) {
+        composeDraft.reset();
+        setShowCompose(false);
+      }
       setNotice({
         tone: "success",
         message: t(msg`朋友圈已发布。`),
@@ -666,6 +682,15 @@ export function ProfileMomentsPage() {
           errors={desktopErrors}
           imageDrafts={composeDraft.imageDrafts}
           isLoading={momentsQuery.isLoading}
+          // 首屏失败 + 0 条时空态优先渲「重试读取」（feed Round 2 同款）。
+          loadErrorMessage={
+            momentsQuery.isError && momentsQuery.error instanceof Error
+              ? momentsQuery.error.message
+              : null
+          }
+          onRetryLoad={() => {
+            void momentsQuery.refetch();
+          }}
           likeErrorMessage={
             likeMutation.isError && likeMutation.error instanceof Error
               ? likeMutation.error.message
@@ -694,7 +719,14 @@ export function ProfileMomentsPage() {
             }))
           }
           onCommentSubmit={(momentId) => commentMutation.mutate(momentId)}
-          onCreate={() => createMutation.mutate()}
+          onCreate={() =>
+            createMutation.mutate({
+              // snapshot — 见 createMutation 注释。
+              text: composeDraft.text,
+              imageDrafts: composeDraft.imageDrafts,
+              videoDraft: composeDraft.videoDraft,
+            })
+          }
           onDelete={(momentId) => deleteMutation.mutate(momentId)}
           onImageFilesSelected={(files) => {
             void handleDesktopImageFilesSelected(files);

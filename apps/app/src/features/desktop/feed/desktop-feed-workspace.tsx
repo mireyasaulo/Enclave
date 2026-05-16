@@ -249,10 +249,17 @@ export function DesktopFeedWorkspace({
     if (!target) {
       return;
     }
+    // 走查新 Round 8：ref 必须在 rAF *回调里* 才标"已滚过"，不能 schedule
+    // 完就标。否则深链 #post=<id> 命中首页后：effect 跑 → 找到 target →
+    // schedule rAF #1 → 立刻标 ref=id；下一刻 auto-prefetch 把 page 2 拼进
+    // posts → 这个 effect 跟着 posts 重跑 → cleanup 把 rAF #1 取消掉 → ref
+    // 已经是 id 了所以 early return → 新 rAF 不调度，scroll 永远不发生，
+    // 用户进来卡在 feed 顶部看不到自己点开的那条 post。把 ref-set 放进 rAF
+    // 回调，cancel 的情况下 ref 仍是 null，下次 effect 还能重新调度。
     const frame = window.requestAnimationFrame(() => {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrolledForPostIdRef.current = selectedPostId;
     });
-    scrolledForPostIdRef.current = selectedPostId;
     return () => window.cancelAnimationFrame(frame);
   }, [selectedPostId, posts]);
 

@@ -18,6 +18,10 @@ type DesktopMomentsFeedProps = {
   commentReplyTarget?: MomentCommentReplyTarget | null;
   deletePendingMomentId?: string | null;
   isLoading: boolean;
+  /** momentsQuery 首屏失败的错误信息；空 = 没失败。moments.length===0 时优先
+   *  渲「朋友圈暂时不可用 / 重试读取」而不是「还很安静 / 发朋友圈」CTA —
+   *  跟 desktop-feed-list Round 2 (674f3dfa) 同类修复。 */
+  loadErrorMessage?: string | null;
   likePendingMomentId: string | null;
   moments: Moment[];
   ownerId?: string | null;
@@ -33,6 +37,9 @@ type DesktopMomentsFeedProps = {
   onStartCommentReply?: (comment: MomentComment) => void;
   onToggleFavorite: (momentId: string) => void;
   onOpenCompose: () => void;
+  /** 错误空态上的「重试读取」按钮回调。复用 workspace 的 onRefresh —— 走
+   *  resetMomentsToFirstPage + refetch。 */
+  onRetryLoad?: () => void;
   onSelectAuthor?: (input: {
     anchorElement: HTMLButtonElement;
     moment: Moment;
@@ -50,6 +57,7 @@ export function DesktopMomentsFeed({
   commentReplyTarget = null,
   deletePendingMomentId = null,
   isLoading,
+  loadErrorMessage = null,
   likePendingMomentId,
   moments,
   ownerId,
@@ -63,6 +71,7 @@ export function DesktopMomentsFeed({
   onStartCommentReply,
   onToggleFavorite,
   onOpenCompose,
+  onRetryLoad,
   onSelectAuthor,
   onSelectLiker,
 }: DesktopMomentsFeedProps) {
@@ -134,15 +143,35 @@ export function DesktopMomentsFeed({
 
       {!isLoading && !moments.length ? (
         <div className="mx-auto flex min-h-[60vh] w-full max-w-[560px] items-center justify-center py-10">
-          <EmptyState
-            title={t(msg`朋友圈还很安静`)}
-            description={t(msg`你先发一条，或者等世界里的其他人先开口。`)}
-            action={
-              <Button variant="primary" onClick={onOpenCompose}>
-                {t(msg`发朋友圈`)}
-              </Button>
-            }
-          />
+          {/* momentsQuery 首屏失败时之前永远渲「朋友圈还很安静 / 发朋友圈」CTA，
+              把"服务端读取失败"包装成"朋友圈是空的，发一条吧"，用户被引导
+              去发动态填补"空 feed"——但其实是 server 抓不到。toolbar ErrorBlock
+              虽然显示了错误，但用户视线先落在中央 CTA 上很容易忽略。跟 feed
+              workspace Round 2 (674f3dfa) 同类修复：失败 + 0 条时空态直接渲
+              「朋友圈暂时不可用 / 重试读取」。 */}
+          {loadErrorMessage ? (
+            <EmptyState
+              title={t(msg`朋友圈暂时不可用`)}
+              description={loadErrorMessage}
+              action={
+                onRetryLoad ? (
+                  <Button variant="primary" onClick={onRetryLoad}>
+                    {t(msg`重试读取`)}
+                  </Button>
+                ) : undefined
+              }
+            />
+          ) : (
+            <EmptyState
+              title={t(msg`朋友圈还很安静`)}
+              description={t(msg`你先发一条，或者等世界里的其他人先开口。`)}
+              action={
+                <Button variant="primary" onClick={onOpenCompose}>
+                  {t(msg`发朋友圈`)}
+                </Button>
+              }
+            />
+          )}
         </div>
       ) : null}
     </>

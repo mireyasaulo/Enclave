@@ -34,6 +34,12 @@ type DesktopProfileMomentsWorkspaceProps = {
   errors?: string[];
   imageDrafts: MomentImageDraft[];
   isLoading: boolean;
+  /** momentsQuery 首屏失败时的错误信息；moments=[] 时空态优先渲「重试读取」
+   *  而不是「发条朋友圈」误导 CTA。跟 desktop-moments-feed Round 2 同款修复。 */
+  loadErrorMessage?: string | null;
+  /** 首屏失败 + 空态时空态上的「重试读取」按钮回调；profile-moments-page
+   *  绑 momentsQuery.refetch。 */
+  onRetryLoad?: () => void;
   likeErrorMessage?: string | null;
   likePendingMomentId: string | null;
   moments: Moment[];
@@ -87,6 +93,8 @@ export function DesktopProfileMomentsWorkspace({
   errors = [],
   imageDrafts,
   isLoading,
+  loadErrorMessage = null,
+  onRetryLoad,
   likeErrorMessage,
   likePendingMomentId,
   moments,
@@ -150,6 +158,28 @@ export function DesktopProfileMomentsWorkspace({
     }
 
     if (!sortedMoments.length) {
+      // momentsQuery 首屏失败时之前永远渲「还没有发布过朋友圈 / 发条朋友圈」CTA，
+      // 把"读取我的朋友圈失败"包装成"你还没发过，去发一条吧"，用户被误导去
+      // 发动态——但实际是 server 抓不到，再发也填不进来。跟 desktop-moments-feed
+      // Round 2 (674f3dfa / desktop-feed-list) 同款：失败 + 0 条直接渲
+      // 「朋友圈暂时不可用 / 重试读取」。
+      if (loadErrorMessage) {
+        return (
+          <div className="mx-auto max-w-[560px] py-10">
+            <EmptyState
+              title={t(msg`朋友圈暂时不可用`)}
+              description={loadErrorMessage}
+              action={
+                onRetryLoad ? (
+                  <Button variant="primary" onClick={onRetryLoad}>
+                    {t(msg`重试读取`)}
+                  </Button>
+                ) : undefined
+              }
+            />
+          </div>
+        );
+      }
       return (
         <div className="mx-auto max-w-[560px] py-10">
           <EmptyState

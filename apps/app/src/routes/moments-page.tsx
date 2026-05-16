@@ -1271,6 +1271,16 @@ export function MomentsPage() {
           errors={errors}
           imageDrafts={composeDraft.imageDrafts}
           isLoading={momentsQuery.isLoading}
+          // 首屏失败时空态优先渲「朋友圈暂时不可用 / 重试读取」（feed Round 2 同款）。
+          // isFetchNextPageError 单独走 toolbar 的 errors 通道（已加载内容时不该
+          // 把 empty-state 弹出来）。
+          loadErrorMessage={
+            momentsQuery.isError &&
+            !momentsQuery.isFetchNextPageError &&
+            momentsQuery.error instanceof Error
+              ? momentsQuery.error.message
+              : null
+          }
           likeErrorMessage={
             likeMutation.isError && likeMutation.error instanceof Error
               ? likeMutation.error.message
