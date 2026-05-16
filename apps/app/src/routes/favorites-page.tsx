@@ -439,7 +439,10 @@ export function FavoritesPage() {
             ? t(msg`这条笔记默认属于收藏，保存后会继续留在收藏列表里。`)
             : t(msg`新建笔记会直接作为收藏内容保存。`)
           : normalizedSearchText
-            ? t(msg`搜索“${searchText.trim()}”命中 ${filteredFavorites.length} 项`)
+            ? // 跟 deferredSearchText 对齐：filteredFavorites 用的是 deferred 值，
+              // 这里若再读 searchText（即时值）的话，连打字时分子用新词、分母用旧词，
+              // 显示成"搜索 hello 命中 0 项"实际还是 hell 的结果。
+              t(msg`搜索“${deferredSearchText.trim()}”命中 ${filteredFavorites.length} 项`)
             : activeCategory === "all"
               ? t(msg`${counts.all} 项内容已收进桌面收藏`)
               : t(msg`${resolveFavoriteCategoryLabel(activeCategory)} · ${counts[activeCategory]} 项`)

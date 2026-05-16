@@ -272,10 +272,17 @@ export function upsertFavoriteNoteSummary(
   note: FavoriteNoteDocument,
 ) {
   const nextNote = buildFavoriteNoteSummary(note);
+  // ISO 字符串走原生字典序，跟 favorites-storage 对齐，省掉 localeCompare Collator。
   return [
     nextNote,
     ...(current ?? []).filter((item) => item.id !== note.id),
-  ].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+  ].sort((left, right) =>
+    right.updatedAt < left.updatedAt
+      ? -1
+      : right.updatedAt > left.updatedAt
+        ? 1
+        : 0,
+  );
 }
 
 export function upsertFavoriteNoteRecord(
@@ -286,7 +293,13 @@ export function upsertFavoriteNoteRecord(
   return [
     nextRecord,
     ...(current ?? []).filter((item) => item.sourceId !== nextRecord.sourceId),
-  ].sort((left, right) => right.collectedAt.localeCompare(left.collectedAt));
+  ].sort((left, right) =>
+    right.collectedAt < left.collectedAt
+      ? -1
+      : right.collectedAt > left.collectedAt
+        ? 1
+        : 0,
+  );
 }
 
 export function removeFavoriteNoteSummary(
