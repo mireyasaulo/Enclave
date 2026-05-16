@@ -387,7 +387,10 @@ export class WikiPageService {
   > {
     const q = query.trim();
     if (!q) return [];
-    const like = `%${q.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+    // 用 '!' 作 ESCAPE 字符而不是 '\\'。TypeORM 把 SQL 片段里的反斜杠再 escape 一次，
+    // 实际跑到 SQLite 的是 ESCAPE '\\\\'（两字符）→ "ESCAPE expression must be a single
+    // character"。改成 '!' 后两边都不需要再过 backslash quoting。
+    const like = `%${q.replace(/[%_!]/g, (m) => `!${m}`)}%`;
     const rows = await this.characterRepo
       .createQueryBuilder('c')
       .leftJoin(
@@ -397,7 +400,7 @@ export class WikiPageService {
       )
       .where('(p.isDeleted = 0 OR p.isDeleted IS NULL)')
       .andWhere(
-        '(c.name LIKE :like ESCAPE \'\\\' OR c.bio LIKE :like ESCAPE \'\\\' OR c.relationship LIKE :like ESCAPE \'\\\' OR c.personality LIKE :like ESCAPE \'\\\' OR c.expertDomains LIKE :like ESCAPE \'\\\')',
+        "(c.name LIKE :like ESCAPE '!' OR c.bio LIKE :like ESCAPE '!' OR c.relationship LIKE :like ESCAPE '!' OR c.personality LIKE :like ESCAPE '!' OR c.expertDomains LIKE :like ESCAPE '!')",
         { like },
       )
       .select([

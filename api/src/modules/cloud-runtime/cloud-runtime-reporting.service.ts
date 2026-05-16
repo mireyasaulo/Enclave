@@ -172,14 +172,19 @@ export class CloudRuntimeReportingService implements OnModuleInit, OnModuleDestr
       this.buildContributionRevenueEvents(),
     ]);
 
-    if (usageEvents.length) {
-      await this.postRevenueSignal(config, 'usage-events', {
-        events: usageEvents,
-      });
+    // cloud-api 单批最多 100 条（ReportRevenueUsageEventsDto.events @ArrayMaxSize(100)）。
+    // contribution-events 一条 revision 会展开 1-3 个事件（editor + 可能的 logic_publish +
+    // 可能的 reviewer），100 个 revision 能轻松冲到 ~300，会被云端 400 拒掉整批。
+    // 这里强制分批，每批不超 100。
+    const MAX_EVENTS_PER_BATCH = 100;
+    for (let i = 0; i < usageEvents.length; i += MAX_EVENTS_PER_BATCH) {
+      const chunk = usageEvents.slice(i, i + MAX_EVENTS_PER_BATCH);
+      await this.postRevenueSignal(config, 'usage-events', { events: chunk });
     }
-    if (contributionEvents.length) {
+    for (let i = 0; i < contributionEvents.length; i += MAX_EVENTS_PER_BATCH) {
+      const chunk = contributionEvents.slice(i, i + MAX_EVENTS_PER_BATCH);
       await this.postRevenueSignal(config, 'contribution-events', {
-        events: contributionEvents,
+        events: chunk,
       });
     }
   }

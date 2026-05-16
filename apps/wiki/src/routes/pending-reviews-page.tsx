@@ -55,6 +55,13 @@ export function PendingReviewsPage() {
     },
   });
 
+  // 必须放在条件 return 之前，否则用户登入/登出时本组件下一次渲染会调用更少/更多
+  // hooks，触发 React "Rendered fewer/more hooks than during the previous render"。
+  const items = pendingQ.data ?? [];
+  const { resolve: resolveUsername } = useUsernameMap(
+    items.map((it) => it.revision.editorUserId),
+  );
+
   if (!user) {
     return (
       <PageShell eyebrow={t(msg`审核`)} title={t(msg`待审编辑`)}>
@@ -73,11 +80,6 @@ export function PendingReviewsPage() {
       </PageShell>
     );
   }
-
-  const items = pendingQ.data ?? [];
-  const { resolve: resolveUsername } = useUsernameMap(
-    items.map((it) => it.revision.editorUserId),
-  );
   return (
     <PageShell
       eyebrow={t(msg`审核`)}

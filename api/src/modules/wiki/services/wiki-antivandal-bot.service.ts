@@ -57,7 +57,9 @@ export class WikiAntivandalBotService {
     let actions = 0;
     for (const rev of recents) {
       if (actions >= SAFETY_LIMIT_PER_RUN) {
-        this.logger.error(
+        // 安全上限只是"本次扫够了，下次再来"，不是 incident。用 warn 别把
+        // 巡查 cron 的正常上限通报当成 ERROR 灌满 err.log。
+        this.logger.warn(
           `antivandal bot reached safety limit (${SAFETY_LIMIT_PER_RUN}); halting sweep`,
         );
         break;

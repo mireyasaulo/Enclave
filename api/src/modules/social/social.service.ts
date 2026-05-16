@@ -926,19 +926,23 @@ ${personaSummary || '（暂无更多信息）'}
       return;
     }
 
+    // TypeORM .remove() 会把 entity 的 id 字段清空（变 undefined），下面
+    // captureSignal 用 existing.id 就会写出 NOT NULL constraint failed:
+    // cyber_avatar_signals.sourceEntityId。先把 id 拷出来再删。
+    const removedFriendshipId = existing.id;
     await this.friendshipRepo.remove(existing);
     await this.cyberAvatar.captureSignal({
       ownerId: owner.id,
       signalType: 'friendship_event',
       sourceSurface: 'social',
       sourceEntityType: 'friend_unblock',
-      sourceEntityId: existing.id,
-      dedupeKey: `friendship:unblock:${existing.id}`,
+      sourceEntityId: removedFriendshipId,
+      dedupeKey: `friendship:unblock:${removedFriendshipId}`,
       summaryText: `用户取消了联系人 ${characterId} 的拉黑状态。`,
       payload: {
         action: 'unblock_friend',
         characterId,
-        friendshipId: existing.id,
+        friendshipId: removedFriendshipId,
       },
       occurredAt: new Date(),
     });
