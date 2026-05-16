@@ -832,6 +832,11 @@ export function MomentsPage() {
       ),
     [momentsData, blockedCharacterIds],
   );
+  // 「后端给了 N 条 moment 但全是被屏蔽角色」识别——空态 CTA 选「打开通讯录」
+  // 还是「发一条朋友圈」要按这条分支走。和 discover-feed-page 的
+  // hasFilteredOutPosts 同模式（commit 3b376e47 把"屏蔽=空"的兜底文案对齐）。
+  const hasFilteredOutMoments =
+    momentsData.length > 0 && visibleMoments.length === 0;
   const routeSelectedMoment = useMemo(
     () =>
       routeSelectedMomentId
@@ -1651,6 +1656,10 @@ export function MomentsPage() {
       onRetry={handleRetryLoad}
       onEmptyAction={handleEmptyStateAction}
       onNoticeBack={handleStatusBack}
+      hasFilteredOutMoments={hasFilteredOutMoments}
+      onOpenContacts={() => {
+        void navigate({ to: "/tabs/contacts" });
+      }}
     />
   );
 }
@@ -1699,6 +1708,8 @@ type MobileMomentsViewProps = {
   fetchNextPageError: Error | null;
   onLoadMore: () => void;
   onRetryNextPage: () => void;
+  hasFilteredOutMoments: boolean;
+  onOpenContacts: () => void;
 };
 
 function MobileMomentsView({
@@ -1742,6 +1753,8 @@ function MobileMomentsView({
   fetchNextPageError,
   onLoadMore,
   onRetryNextPage,
+  hasFilteredOutMoments,
+  onOpenContacts,
 }: MobileMomentsViewProps) {
   const t = tx;
   const { containerRef, state: pullState } = usePullToRefresh({
@@ -2067,28 +2080,67 @@ function MobileMomentsView({
             </div>
           ) : null}
 
-          {!momentsLoading &&
-          !momentsError &&
-          !visibleMoments.length &&
-          !hasNextPage ? (
-            <div className="px-4 pt-12 pb-16 text-center">
-              <div className="text-[14px] font-medium text-[#1A1A1A]">
-                {t(msg`还很安静`)}
+          {!momentsLoading && !momentsError && !visibleMoments.length ? (
+            hasFilteredOutMoments ? (
+              // 后端给了 N 条 moment 但全是被屏蔽角色——R21 加的「全被屏蔽 → 自动
+              // 翻下一页」effect 在 moments-page mobile 这边其实没有显式实现，靠
+              // sentinel IntersectionObserver 触底就够自动翻；下面两个分支按"还在
+              // 翻"和"翻完了"分开兜文案：
+              //   - 还在翻 (isFetchingNextPage || hasNextPage 且没失败)：换成
+              //     "正在寻找未屏蔽的动态" loading 文案，让用户知道在等什么；
+              //   - 翻完了：用「广场动态都被你屏蔽了」+「打开通讯录」按钮，跟
+              //     discover-feed-page 移动端的 MobileFeedStatusCard 同模式
+              //     （commit 3b376e47 把"屏蔽=空"的兜底文案对齐）。
+              isFetchingNextPage ||
+              (hasNextPage && !fetchNextPageError) ? (
+                <div className="px-4 pt-12 pb-16 text-center">
+                  <div className="text-[14px] font-medium text-[#1A1A1A]">
+                    {t(msg`正在寻找未屏蔽的动态`)}
+                  </div>
+                  <div className="mt-2 text-[12px] text-[#9A9A9A]">
+                    {t(msg`当前页加载到的动态作者都在你的屏蔽名单里，正在自动翻下一页找未屏蔽的居民动态。`)}
+                  </div>
+                </div>
+              ) : (
+                <div className="px-4 pt-12 pb-16 text-center">
+                  <div className="text-[14px] font-medium text-[#1A1A1A]">
+                    {t(msg`朋友圈都被你屏蔽了`)}
+                  </div>
+                  <div className="mt-2 text-[12px] text-[#9A9A9A]">
+                    {t(msg`已加载的动态作者全部在你的屏蔽名单里。去通讯录里解除屏蔽，或者等其他居民发布新动态。`)}
+                  </div>
+                  <div className="mt-4 flex justify-center">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="h-8 rounded-full bg-[#07C160] px-3.5 text-[12px] text-white hover:bg-[#06ad56]"
+                      onClick={onOpenContacts}
+                    >
+                      {t(msg`打开通讯录`)}
+                    </Button>
+                  </div>
+                </div>
+              )
+            ) : !hasNextPage ? (
+              <div className="px-4 pt-12 pb-16 text-center">
+                <div className="text-[14px] font-medium text-[#1A1A1A]">
+                  {t(msg`还很安静`)}
+                </div>
+                <div className="mt-2 text-[12px] text-[#9A9A9A]">
+                  {t(msg`你先发一条动态，或者等世界里的角色们先开口。`)}
+                </div>
+                <div className="mt-4 flex justify-center">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="h-8 rounded-full bg-[#07C160] px-3.5 text-[12px] text-white hover:bg-[#06ad56]"
+                    onClick={onEmptyAction}
+                  >
+                    {hasReturnPath ? t(msg`返回上一页`) : t(msg`发一条朋友圈`)}
+                  </Button>
+                </div>
               </div>
-              <div className="mt-2 text-[12px] text-[#9A9A9A]">
-                {t(msg`你先发一条动态，或者等世界里的角色们先开口。`)}
-              </div>
-              <div className="mt-4 flex justify-center">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="h-8 rounded-full bg-[#07C160] px-3.5 text-[12px] text-white hover:bg-[#06ad56]"
-                  onClick={onEmptyAction}
-                >
-                  {hasReturnPath ? t(msg`返回上一页`) : t(msg`发一条朋友圈`)}
-                </Button>
-              </div>
-            </div>
+            ) : null
           ) : null}
 
           <div className="h-[calc(env(safe-area-inset-bottom,0px)+24px)]" />
