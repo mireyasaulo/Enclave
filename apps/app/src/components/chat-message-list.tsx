@@ -711,6 +711,21 @@ export function ChatMessageList({
     onSelectionModeChange?.(selectionMode);
   }, [onSelectionModeChange, selectionMode]);
 
+  // 原生壳硬件 Back：移动端多选模式打开时，BACK 应该先退出多选，而不是
+  // 直接 history.back 退聊天页（用户进了多选准备转发/删除，BACK 误退会
+  // 让选好的几条全没了）。desktop 注册没副作用。
+  useEffect(() => {
+    if (isDesktop || !selectionMode) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      setSelectionMode(false);
+      return true;
+    });
+    return unregister;
+  }, [isDesktop, selectionMode]);
+
   const forwardConversationsQuery = useQuery({
     queryKey: ["desktop-message-forward-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
