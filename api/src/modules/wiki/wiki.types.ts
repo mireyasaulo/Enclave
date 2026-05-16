@@ -96,6 +96,14 @@ export function assertWikiNameNotVisuallyEmpty(raw: string): void {
   }
 }
 
+// 用 String() 把任何值（包括 {} / [] / function）兜成 string 是 dangerous 默认：
+// {"name":{"a":1}} 会被转成 "[object Object]"，绕过下面的 assertWikiNameNotVisuallyEmpty
+// 直接落进 character.name 列。2026-05-16 走查实测：admin 一次 POST /wiki/pages/:id/edits
+// 就把目标角色的 name 改成 "[object Object]"。改用 typeof 守，非字符串当空字符串处理。
+function asTrimmedString(v: unknown): string {
+  return typeof v === 'string' ? v.trim() : '';
+}
+
 export function pickWikiContent(input: Record<string, unknown>): WikiContentSnapshot {
   const rejected = WIKI_REJECTED_FIELDS.filter((key) => input[key] !== undefined);
   if (rejected.length > 0) {
@@ -106,21 +114,27 @@ export function pickWikiContent(input: Record<string, unknown>): WikiContentSnap
   }
   return {
     schemaVersion: WIKI_CONTENT_SCHEMA_VERSION,
-    name: String(input.name ?? '').trim(),
-    avatar: String(input.avatar ?? '').trim(),
-    bio: String(input.bio ?? '').trim(),
+    name: asTrimmedString(input.name),
+    avatar: asTrimmedString(input.avatar),
+    bio: asTrimmedString(input.bio),
     personality:
       input.personality === undefined || input.personality === null
         ? undefined
-        : String(input.personality),
+        : typeof input.personality === 'string'
+          ? input.personality
+          : '',
     expertDomains: Array.isArray(input.expertDomains)
-      ? (input.expertDomains as unknown[]).map((v) => String(v))
+      ? (input.expertDomains as unknown[]).map((v) =>
+          typeof v === 'string' ? v : '',
+        )
       : [],
     triggerScenes: Array.isArray(input.triggerScenes)
-      ? (input.triggerScenes as unknown[]).map((v) => String(v))
+      ? (input.triggerScenes as unknown[]).map((v) =>
+          typeof v === 'string' ? v : '',
+        )
       : undefined,
-    relationship: String(input.relationship ?? '').trim(),
-    relationshipType: String(input.relationshipType ?? '').trim(),
+    relationship: asTrimmedString(input.relationship),
+    relationshipType: asTrimmedString(input.relationshipType),
   };
 }
 
