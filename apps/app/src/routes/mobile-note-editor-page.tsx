@@ -94,6 +94,7 @@ import {
   navigateBackOrFallback,
 } from "../lib/history-back";
 import { emitChatMessage, joinConversationRoom } from "../lib/socket";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 
@@ -769,7 +770,20 @@ function MobileNoteEditor({
       return;
     }
     if (editorState.tags.includes(normalizedTag)) {
+      // 重复 tag 静默清空输入即可：用户已经看到该标签存在 → 没必要再 toast 弹一条
+      // "标签已存在"。
       setTagInput("");
+      return;
+    }
+    // 走查 R1：原写法 [...current.tags, normalizedTag].slice(0, 8) —— 已有 8 个时
+    // 第 9 个 tag 被 slice 静默丢弃，输入框清空但 tag 没出现，用户以为「点没反
+    // 应」。改成先卡 8 上限并以 danger notice 明示，保留用户输入让其知道为什么
+    // 没加上。
+    if (editorState.tags.length >= 8) {
+      setNotice({
+        tone: "danger",
+        message: t(msg`最多只能添加 8 个标签，先移除一个再来。`),
+      });
       return;
     }
     setEditorState((current) => ({
@@ -829,6 +843,56 @@ function MobileNoteEditor({
     }
     void leaveEditor();
   }, [activeDraftId, editorState, isDirty, leaveEditor, noteId]);
+
+  // 走查 R1：Android 原生壳硬件 Back 之前完全不被这页拦截 —— 用户从 + 菜单进
+  // 编辑器随便打了字按物理返回，history.back 直接走掉，dirty 内容静默丢失没
+  // 任何提示；即使没编辑也漏掉 requestClose 里的空草稿清理（chat-list-page
+  // 每次点「新建笔记」都 createDesktopNoteDraft，攒下来就拖慢 readDesktopNoteDrafts）。
+  // 优先级（后注册先消费）：先吃掉子层弹层（确认 / 删除确认 / 标签输入），
+  // sendDialog 由 MobileNoteSendSheet 自己注册的 interceptor 处理；最后兜底
+  // 调 requestClose，dirty 自动弹未保存确认、空 draft 自动清理。
+  useEffect(() => {
+    const unregister = registerAndroidBackInterceptor((event) => {
+      if (deleteConfirmOpen) {
+        event.preventDefault();
+        if (!deleteMutation.isPending) {
+          setDeleteConfirmOpen(false);
+        }
+        return true;
+      }
+      if (closeConfirmOpen) {
+        event.preventDefault();
+        if (!saveMutation.isPending) {
+          setCloseConfirmOpen(false);
+        }
+        return true;
+      }
+      if (sendDialogNote) {
+        // MobileNoteSendSheet 自己注册过 interceptor 优先消费；它在 pending
+        // 中不拦的兜底也得吃掉，不然 history.back 把用户从编辑器扔回 /tabs/chat
+        // 而发送请求还在飞。
+        event.preventDefault();
+        return true;
+      }
+      if (tagEditorOpen) {
+        event.preventDefault();
+        setTagEditorOpen(false);
+        return true;
+      }
+      event.preventDefault();
+      requestClose();
+      return true;
+    });
+    return unregister;
+  }, [
+    closeConfirmOpen,
+    deleteConfirmOpen,
+    deleteMutation.isPending,
+    requestClose,
+    saveMutation.isPending,
+    sendDialogNote,
+    tagEditorOpen,
+  ]);
 
   async function handleSaveAndClose() {
     const savedNote = await handleSave();
