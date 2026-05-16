@@ -362,6 +362,19 @@ function MobileDiscoverScenePage() {
         )
       }
     >
+      {/*
+        走查 R2-Round2：以前冷却倒计时贴在 button grid 下面，但 16 个 64px 高的
+        按钮在 2 列 8 行布局下整组占 ~870px，加上顶上 hero + notice 200+px，
+        冷却条整体落到 y≈1175，标准移动端 viewport (844) 看不见。用户点完按钮
+        看到全 16 个按钮齐刷刷灰掉但找不到原因。把冷却条搬到 button grid 之上，
+        紧跟 notice 后面，第一屏直接可见。
+      */}
+      {cooldownActive && !sceneMutation.isPending ? (
+        <div className="text-center text-[11px] text-[color:var(--text-secondary)]">
+          {t(msg`稍等 ${cooldownRemainSec} 秒再出发吧。`)}
+        </div>
+      ) : null}
+
       <section className="overflow-hidden rounded-[16px] border border-black/5 bg-white">
         <div className="grid grid-cols-2 gap-0.5 bg-black/5 p-0.5">
           {scenes.map((scene) => {
@@ -393,12 +406,6 @@ function MobileDiscoverScenePage() {
           })}
         </div>
       </section>
-
-      {cooldownActive && !sceneMutation.isPending ? (
-        <div className="text-center text-[11px] text-[color:var(--text-secondary)]">
-          {t(msg`稍等 ${cooldownRemainSec} 秒再出发吧。`)}
-        </div>
-      ) : null}
 
       {sceneMutation.isError && sceneMutation.error instanceof Error ? (
         <InlineNotice
