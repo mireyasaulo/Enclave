@@ -115,6 +115,21 @@ export function DesktopNotesWorkspace({
   const editorRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const initializedSessionKeyRef = useRef("");
+  // 用户点"保存"后接着点"返回"：保存这边 mutateAsync 还在飞，DesktopNotesWorkspace
+  // 已经被 unmount（noteEditorRouteState 变 null，FavoritesPage 切回列表视图）。
+  // saveMutation.onSuccess 仍然会在 mutateFn 收到响应时 fire，里面的
+  // onSavedNote?.(savedNote.id, nextDraftId) 会让父组件 navigate({...replace:true})
+  // 把 URL 写回 #draftId=...&noteId=... → 用户被"弹"回编辑器，体验是
+  // "我明明点了返回，编辑器自己跳回来了"。
+  // 标记 unmount 后跳过 onSavedNote 即可——setQueryData / 草稿落盘等本地副作用
+  // 仍然执行，列表能正确反映新存的笔记，但不再强行把用户拽回编辑器。
+  const unmountedRef = useRef(false);
+  useEffect(
+    () => () => {
+      unmountedRef.current = true;
+    },
+    [],
+  );
   const [noteId, setNoteId] = useState(selectedNoteId);
   const [activeDraftId, setActiveDraftId] = useState(
     () => draftId?.trim() || selectedNoteId?.trim() || "",
@@ -214,6 +229,10 @@ export function DesktopNotesWorkspace({
         }),
       ]);
 
+      // 见 unmountedRef 注释：用户点保存后又点了返回时，别再 navigate 回编辑器。
+      if (unmountedRef.current) {
+        return;
+      }
       onSavedNote?.(savedNote.id, nextDraftId);
     },
     onError: (error) => {
