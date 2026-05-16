@@ -108,7 +108,20 @@ export class CharactersService implements OnModuleInit {
   }
 
   async getRuntimeProfileFromCharacter(
-    character: Pick<CharacterEntity, 'id' | 'profile'> | null | undefined,
+    character:
+      | Pick<
+          CharacterEntity,
+          | 'id'
+          | 'profile'
+          | 'name'
+          | 'relationship'
+          | 'relationshipType'
+          | 'expertDomains'
+          | 'bio'
+          | 'personality'
+        >
+      | null
+      | undefined,
   ): Promise<PersonalityProfile | undefined> {
     return this.realWorldRuntimeProfile.buildRuntimeProfileFromCharacter(
       character,
