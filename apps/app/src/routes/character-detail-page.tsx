@@ -1098,6 +1098,14 @@ export function CharacterDetailPage() {
                 <ErrorBlock message={setStarredMutation.error.message} />
               </div>
             ) : null}
+            {setDefaultVoiceReplyMutation.isError &&
+            setDefaultVoiceReplyMutation.error instanceof Error ? (
+              <div className="mx-auto w-full max-w-[640px] px-3">
+                <ErrorBlock
+                  message={setDefaultVoiceReplyMutation.error.message}
+                />
+              </div>
+            ) : null}
             {pinMutation.isError && pinMutation.error instanceof Error ? (
               <div className="mx-auto w-full max-w-[640px] px-3">
                 <ErrorBlock message={pinMutation.error.message} />
@@ -1434,6 +1442,23 @@ export function CharacterDetailPage() {
                   action={renderMobileErrorBackAction()}
                 >
                   {setStarredMutation.error.message}
+                </MobileCharacterErrorNotice>
+              )
+            ) : null}
+            {/* 走查 Round 4：默认语音回复 switch 在桌面/移动两端都暴露，但
+                整页就这一个 mutation 没接 error 渲染——失败（如 token plan 配额
+                耗尽 / 网络抖动）时开关回弹但用户得不到任何提示，怀疑自己点漏。 */}
+            {setDefaultVoiceReplyMutation.isError &&
+            setDefaultVoiceReplyMutation.error instanceof Error ? (
+              isDesktopLayout ? (
+                <ErrorBlock
+                  message={setDefaultVoiceReplyMutation.error.message}
+                />
+              ) : (
+                <MobileCharacterErrorNotice
+                  action={renderMobileErrorBackAction()}
+                >
+                  {setDefaultVoiceReplyMutation.error.message}
                 </MobileCharacterErrorNotice>
               )
             ) : null}
