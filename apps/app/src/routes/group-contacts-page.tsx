@@ -356,8 +356,13 @@ function MobileGroupContactsPage() {
                     }),
                   });
                 }}
+                // 走查 Round 9：本页是和 contacts-page 主页、chat-list、
+                // world-characters 同口径的"长列表行"——用户加过 30/50+ 群时屏外
+                // 的 row 仍然被强制 layout/paint。隔壁页面早就靠 yj-list-item-virtual
+                // 把 content-visibility:auto + contain-intrinsic-size 接上，唯独
+                // 本页一直裸跑（typical 群行 ≈ 68px，挂在 64px 这一档下没问题）。
                 className={cn(
-                  "flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] px-4 py-2.5 text-left transition-colors hover:bg-[color:var(--surface-card-hover)]",
+                  "yj-list-item-virtual flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] px-4 py-2.5 text-left transition-colors hover:bg-[color:var(--surface-card-hover)]",
                   index > 0
                     ? "border-t border-[color:var(--border-faint)]"
                     : undefined,
