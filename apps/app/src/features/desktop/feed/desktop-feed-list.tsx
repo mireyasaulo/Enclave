@@ -44,6 +44,12 @@ type DesktopFeedListProps = {
   onLoadFullComments: (postId: string) => void;
   onLike: (postId: string) => void;
   onOpenCompose: () => void;
+  /** 「广场动态都被你屏蔽了」空态的兜底动作 — 跳通讯录给用户解除屏蔽。
+   *  之前桌面这条空态的描述写「去通讯录里解除屏蔽」，按钮却是「发广场动态」
+   *  开 compose 面板，与文案完全不挨着；用户照描述点按钮以为去通讯录，结果
+   *  弹出发帖面板，得自己关掉再去找通讯录入口。
+   *  与移动端 (discover-feed-page line 2225-2228 `打开通讯录` 按钮) 对齐。 */
+  onOpenContacts?: () => void;
   /** 可选 — 触发"分享图卡"上抛 postId。 */
   onShare?: (postId: string) => void;
   onStartCommentReply?: (comment: FeedComment) => void;
@@ -81,6 +87,7 @@ export function DesktopFeedList({
   onLoadFullComments,
   onLike,
   onOpenCompose,
+  onOpenContacts,
   onShare,
   onStartCommentReply,
   onSelectCommentAuthor,
@@ -172,9 +179,19 @@ export function DesktopFeedList({
                 msg`当前所有动态作者都在你的屏蔽名单里。去通讯录里解除屏蔽，或者等其他居民发布新动态。`,
               )}
               action={
-                <Button variant="primary" onClick={onOpenCompose}>
-                  {t(msg`发广场动态`)}
-                </Button>
+                // 文案明说"去通讯录里解除屏蔽"，按钮却是"发广场动态"开 compose
+                // 面板，与描述完全脱节；与移动端 `打开通讯录` 对齐让用户真能
+                // 走到解除屏蔽的入口。onOpenContacts 没接通时降级到原本的 compose
+                // CTA，避免空态没动作。
+                onOpenContacts ? (
+                  <Button variant="primary" onClick={onOpenContacts}>
+                    {t(msg`打开通讯录`)}
+                  </Button>
+                ) : (
+                  <Button variant="primary" onClick={onOpenCompose}>
+                    {t(msg`发广场动态`)}
+                  </Button>
+                )
               }
             />
           ) : (

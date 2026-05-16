@@ -1610,6 +1610,12 @@ export function DiscoverFeedPage() {
             void handleImageFilesSelected(files);
           }}
           onLike={handleRowLike}
+          onOpenContacts={() => {
+            // 「广场动态都被你屏蔽了」空态描述写"去通讯录里解除屏蔽"，按钮跟着
+            // 给一条真去通讯录的入口，跟移动端 (line 2222-2228) 对齐；之前桌面
+            // 按钮是 onOpenCompose（开发动态面板），与描述完全错位。
+            void navigate({ to: "/tabs/contacts" });
+          }}
           onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
           onRemoveVideo={() => composeDraft.clearVideoDraft()}
           onRefresh={() => {

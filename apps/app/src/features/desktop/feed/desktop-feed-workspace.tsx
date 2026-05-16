@@ -84,6 +84,8 @@ type DesktopFeedWorkspaceProps = {
   }) => void;
   onImageFilesSelected: (files: FileList | null) => void;
   onLike: (postId: string) => void;
+  /** 「广场动态都被你屏蔽了」空态的兜底动作 — 把用户带到通讯录解除屏蔽。 */
+  onOpenContacts?: () => void;
   onRemoveImage: (id: string) => void;
   onRemoveVideo: () => void;
   onRefresh: () => void;
@@ -137,6 +139,7 @@ export function DesktopFeedWorkspace({
   onSelectCommentAuthor,
   onSelectPostAuthor,
   onLike,
+  onOpenContacts,
   onRemoveImage,
   onRemoveVideo,
   onRefresh,
@@ -344,6 +347,7 @@ export function DesktopFeedWorkspace({
                 onLoadFullComments={handleLoadFullComments}
                 onLike={onLike}
                 onOpenCompose={handleOpenCompose}
+                onOpenContacts={onOpenContacts}
                 onShare={onShare}
                 onStartCommentReply={onStartCommentReply}
                 onSelectCommentAuthor={onSelectCommentAuthor}
