@@ -111,8 +111,12 @@ export function MobileShell({ children }: PropsWithChildren) {
     };
   }, [keyboardInset]);
 
+
   return (
-    <div className="yj-mobile-shell relative h-dvh min-h-dvh overflow-hidden bg-[color:var(--bg-canvas)] text-[color:var(--text-primary)]">
+    // fixed inset-0 锚定 viewport：cold start 时 Capacitor WebView 短暂会把
+    // 100dvh 报为 0，h-dvh 容器 flex-col 会塌缩导致 shrink-0 的 <nav> 临时
+    // 浮到顶部。锚到 viewport 后 nav 永远贴底部，不再有 1-2s 双 tab 闪烁。
+    <div className="yj-mobile-shell fixed inset-0 overflow-hidden bg-[color:var(--bg-canvas)] text-[color:var(--text-primary)]">
       <MobileReminderToastHost />
       <div className="flex h-full min-h-0 flex-col">
         <div className="relative min-h-0 flex-1">
