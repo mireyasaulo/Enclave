@@ -1095,6 +1095,13 @@ export function DiscoverFeedPage() {
     setShareCardPostId(null);
     setCommentInflightPostIds((current) => (current.size > 0 ? new Set() : current));
     setLikeInflightPostIds((current) => (current.size > 0 ? new Set() : current));
+    // 新一轮 Round 1 引入的 expandingPostIdsRef：跨账户时同步释放锁，
+    // 否则 A 账户 in-flight 的 expandFullComments 在切账户的瞬间被 baseUrl
+    // gate 静默丢弃（见 expandFullComments 内部 expandBaseUrl !== baseUrlRef
+    // 早返），finally 路径仍然会 delete(postId) 释放，但万一 A 账户的请求被
+    // 中途 cancel 没走到 finally（极端：worker 被 throttle 杀掉），ref Set
+    // 会永久挂着这个 postId，B 账户里同 id 的 post 永远点不开"查看全部"。
+    expandingPostIdsRef.current.clear();
     // 跟 moments-page 走查 R1 (a8165645) 同坑：A 账户 #post=X1 mobile snap
     // 后 ref 钉住 X1；切到 B 账户 URL hash 还是 #post=X1 时，若 X1 凑巧也存
     // 在 B 的 feedPosts 里（共享 wiki 角色发的同一条 post / 用户两个账号互
@@ -1186,9 +1193,22 @@ export function DiscoverFeedPage() {
     baseUrlRef.current = baseUrl;
   }, [baseUrl]);
 
+  // 新一轮走查 Round 1：expandFullComments 的并发去重靠 state
+  // `loadingFullCommentsPostId === postId` 的早返，但 React setState 是异步落
+  // 帧的——同帧内连点两下「查看全部 N 条评论」按钮（手指抖/iOS 双击/无障碍
+  // 工具回放），两次 handler 闭包看到的 loadingFullCommentsPostId 都是 null
+  // 且按钮的 `disabled={loadingFullCommentsPostId === post.id}` 也还没翻成
+  // true，全部通过 gate → 同时飞两次 listFeedComments(postId) HTTP。两次回
+  // 来都 setFullCommentsByPostId 写同一份内容（幂等），但 RTT 白浪费一次，
+  // 在长评论树（>100 条）上一次请求要 200-800ms，体感是按一下卡顿翻倍。
+  // 跟 commentInflightPostIds / likeInflightPostIds R4-R5 同模式：ref Set
+  // 同步上锁，第一次 click 翻进 set 后同帧的所有后续 click 都被早返。
+  const expandingPostIdsRef = useRef<Set<string>>(new Set());
+
   async function expandFullComments(postId: string) {
-    if (loadingFullCommentsPostId === postId) return;
+    if (expandingPostIdsRef.current.has(postId)) return;
     if (fullCommentsByPostId[postId]) return;
+    expandingPostIdsRef.current.add(postId);
     const expandBaseUrl = baseUrl;
     setLoadingFullCommentsPostId(postId);
     try {
@@ -1220,6 +1240,7 @@ export function DiscoverFeedPage() {
           : t(msg`读取全部评论失败，请稍后重试。`),
       );
     } finally {
+      expandingPostIdsRef.current.delete(postId);
       setLoadingFullCommentsPostId((current) =>
         current === postId ? null : current,
       );
