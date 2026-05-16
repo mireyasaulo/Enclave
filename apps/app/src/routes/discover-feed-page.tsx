@@ -1045,6 +1045,19 @@ export function DiscoverFeedPage() {
     setShareCardPostId(null);
     setCommentInflightPostIds((current) => (current.size > 0 ? new Set() : current));
     setLikeInflightPostIds((current) => (current.size > 0 ? new Set() : current));
+    // 走查新 Round 11：3 条 mutation 的 isError 状态跨账户残留。账号 A 评论 /
+    // 点赞 / 发布失败 → mutation.isError=true → toolbar 顶部 commentErrorMessage
+    // / likeErrorMessage / composeErrorMessage 三条错误条挂着；切到 B 时 reset
+    // effect 没碰 mutation 自身，B 一进去就看到一条莫名其妙的"评论最多 500 字"
+    // / "点赞失败" / "发布失败"红条，但 B 啥也没做。
+    // R10 已经把 cache 写入按 mutationBaseUrl 路由出去 / UI 反馈 gate 在 base-
+    // Url 匹配，但那是针对 onSuccess 里的"新成功"路径；旧 isError 不会被这条
+    // 链路自动清掉。
+    // mutation.reset() 不取消在飞的请求（只清 UI 状态），即使 mid-flight 切账
+    // 户也是安全的：旧 mutation 完成后还是会走 R10 的 mutationBaseUrl gate。
+    createMutation.reset();
+    likeMutation.reset();
+    commentMutation.reset();
     // 走查新 Round 6：第 6 个跨账户残留 — desktopSelectedPostId。账号 A 在
     // /tabs/feed#post=A1 上选中阅读一条 post，切换账号 B 后 URL hash 仍是
     // #post=A1：routeSelectedPostId=A1 一路驱动「目标深链 prefetch」effect
