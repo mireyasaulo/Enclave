@@ -27,6 +27,18 @@ type ThreadMessageLike = {
 export type DirectThreadMessage = Message & ChatLocalMessageState;
 export type GroupThreadMessage = GroupMessage & ChatLocalMessageState;
 
+// 走查 Round 3：原版 `local_${Date.now()}` 在同一毫秒内会撞 id；
+// mergeThreadMessageWindow / sortThreadMessages 用 Map<id, msg> 去重 → 同一
+// ms 内发出的两条本地消息只剩一条，UI 上"消息凭空消失"。粘贴/双击 send /
+// 连发表情都会复现。createdAt 维持 Date.now() 与时间戳排序一致，id 用
+// createdAt + 随机后缀避免碰撞。
+let optimisticLocalCounter = 0;
+function nextLocalMessageId(createdAt: string): string {
+  optimisticLocalCounter = (optimisticLocalCounter + 1) % 100000;
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return `local_${createdAt}_${optimisticLocalCounter}_${suffix}`;
+}
+
 export function buildOptimisticDirectMessage(input: {
   payload: SendMessagePayload;
   ownerId: string;
@@ -34,6 +46,7 @@ export function buildOptimisticDirectMessage(input: {
 }): DirectThreadMessage {
   const { ownerId, payload, senderName } = input;
   const createdAt = String(Date.now());
+  const localId = nextLocalMessageId(createdAt);
 
   if (payload.type === "sticker") {
     const stickerLabel = sanitizeDisplayedChatText(payload.text ?? "").replace(
@@ -44,7 +57,7 @@ export function buildOptimisticDirectMessage(input: {
     const optimisticAttachment = payload.attachment;
 
     return {
-      id: `local_${createdAt}`,
+      id: localId,
       conversationId: payload.conversationId,
       senderType: "user",
       senderId: ownerId,
@@ -85,7 +98,7 @@ export function buildOptimisticDirectMessage(input: {
     payload.type === "note_card"
   ) {
     return {
-      id: `local_${createdAt}`,
+      id: localId,
       conversationId: payload.conversationId,
       senderType: "user",
       senderId: ownerId,
@@ -101,7 +114,7 @@ export function buildOptimisticDirectMessage(input: {
   }
 
   return {
-    id: `local_${createdAt}`,
+    id: localId,
     conversationId: payload.conversationId,
     senderType: "user",
     senderId: ownerId,
@@ -122,10 +135,11 @@ export function buildOptimisticGroupMessage(input: {
 }): GroupThreadMessage {
   const { groupId, ownerId, payload, senderAvatar, senderName } = input;
   const createdAt = String(Date.now());
+  const localId = nextLocalMessageId(createdAt);
   const messageType = payload.type ?? "text";
 
   return {
-    id: `local_${createdAt}`,
+    id: localId,
     groupId,
     senderId: ownerId?.trim() || "world-owner",
     senderType: payload.senderType ?? "user",

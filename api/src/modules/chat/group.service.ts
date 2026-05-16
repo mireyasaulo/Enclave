@@ -246,6 +246,15 @@ export class GroupService {
       },
     );
 
+    // 走查 Round 3：createGroup 整路都没 emitGroupConversationUpdated；
+    // 多端在线（web + iOS shell / 双端同账号）时另一端 chat-list 不会立刻
+    // 出现这条新群，要等 60s 兜底轮询才显示。同时 copySharedConversationMessages
+    // 之前是在 transaction 内调 emit 的，但 emitGroupConversationUpdated 内部
+    // 用的是 this.groupRepo（默认数据源，不是 manager），事务还没 commit 时
+    // 另一端 socket handler 立刻 getGroup 会读到 404 跳回兜底页。统一在
+    // transaction 之后 emit 一次，跟其它写操作（updateGroup/hideGroup 等）对齐。
+    await this.emitGroupConversationUpdated(group.id);
+
     this.logger.log(
       `Created group ${group.id} with ${memberIds.length + 1} members and ${sharedMessageCount} shared messages`,
     );
@@ -1570,7 +1579,9 @@ export class GroupService {
 
     group.lastActivityAt = new Date();
     await groupRepo.save(group);
-    await this.emitGroupConversationUpdated(group.id);
+    // emit 已上提到 createGroup 调用方 transaction 之后；这里不再 emit 避免：
+    // (a) transaction 未 commit 时 emitGroupConversationUpdated 用默认数据源
+    //     查不到行造成 socket 静默丢失；(b) 同一次创建 fires 两次 emit。
     return selectedMessages.length;
   }
 

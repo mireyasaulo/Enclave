@@ -108,6 +108,13 @@ const FEED_DEAD_MEDIA_HOSTS = new Set<string>([
 // 或超长字符串。和 moments.service.ts 的 MOMENT_COMMENT_TOO_LONG 对齐。
 const MAX_FEED_COMMENT_TEXT_LENGTH = 500;
 
+// R2 走查：广场正文也要硬上限。前端 mobile-feed-publish-page 的 textarea
+// 之前完全没卡 maxLength，curl / 第三方端无限制能往 post.text 写几 MB；AI 角色
+// 走 character 路径生成 post 时偶发 CoT 漏文（gpt-4.1 等非推理模型把整段思考
+// prose 当正文吐出来），同样落库无上限。任一情况都会让 SocialPostCard 的
+// whitespace-pre-wrap 把卡片撑到一屏多，列表滚动卡顿。对齐 moments 2000 字。
+const MAX_FEED_TEXT_LENGTH = 2000;
+
 // 视觉为空：trim 后去掉零宽字符（U+200B–U+200D / U+FEFF / U+2060）和内部空白。
 // 防止"w：（空白）"这种 footer 仍在但正文空的鬼影评论。和 moments 一致。
 function isFeedCommentTextVisuallyEmpty(raw: string): boolean {
@@ -3190,6 +3197,15 @@ export class FeedService implements OnModuleInit {
     if (!text && media.length === 0 && input.publishStatus !== 'draft') {
       throw new AppError('FEED_EMPTY', {
         legacyMessage: '动态内容和媒体不能同时为空。',
+      });
+    }
+
+    // R2 走查：广场正文硬上限。前端 textarea 没卡 maxLength；AI 角色 CoT 漏文
+    // 也走这条；draft 暂不卡（保存草稿期间用户可能粘很长一段后再删）。
+    if (input.publishStatus !== 'draft' && text.length > MAX_FEED_TEXT_LENGTH) {
+      throw new AppError('FEED_TEXT_TOO_LONG', {
+        params: { max: MAX_FEED_TEXT_LENGTH },
+        legacyMessage: `广场动态正文最多 ${MAX_FEED_TEXT_LENGTH} 字。`,
       });
     }
 

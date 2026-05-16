@@ -561,6 +561,10 @@ export function translateAppErrorCode(
       );
     case "FEED_EMPTY":
       return translateRuntimeMessage(msg`动态内容和媒体不能同时为空。`);
+    case "FEED_TEXT_TOO_LONG":
+      return translateRuntimeMessage(
+        msg`广场动态正文最多 ${String(params.max ?? 2000)} 字。`,
+      );
     case "FEED_TEXT_NO_MEDIA":
       return translateRuntimeMessage(msg`纯文本动态不能附带图片或视频。`);
     case "FEED_VIDEO_SINGLE":

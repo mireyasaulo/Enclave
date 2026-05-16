@@ -91,7 +91,15 @@ function MobileGroupContactsPage() {
     queryFn: () => getGroups(baseUrl),
   });
 
-  const filteredGroups = useFilteredGroups(groupsQuery.data ?? [], searchText);
+  // 走查 Round 3：getGroups 后端 listGroups 不过滤 isHidden，被 hideGroup 隐藏
+  // 的群当前会和正常群混在通讯录里——和 hide 的语义不符（hide=暂时从入口摘掉，
+  // 收到新消息再重新冒出来；通讯录是"长期入口"，hide 期间不应该有）。客户端先
+  // 滤一遍 isHidden=true，避免改后端 listGroups 影响别处。
+  const visibleGroups = useMemo(
+    () => (groupsQuery.data ?? []).filter((group) => !group.isHidden),
+    [groupsQuery.data],
+  );
+  const filteredGroups = useFilteredGroups(visibleGroups, searchText);
   const hasSearchText = searchText.trim().length > 0;
 
   function navigateToRouteStateReturn() {

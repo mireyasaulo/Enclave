@@ -287,6 +287,10 @@ export function MobileFeedPublishPage() {
               value={composeDraft.text}
               onChange={(event) => composeDraft.setText(event.target.value)}
               placeholder={t(msg`写点想让世界居民都能看到的内容...`)}
+              // R2 走查：跟后端 MAX_FEED_TEXT_LENGTH=2000 对齐的软上限，超出由
+              // 后端 FEED_TEXT_TOO_LONG 兜底；UI 卡完用户不会再误传几 MB 长文
+              // 把 SocialPostCard 撑爆。
+              maxLength={2000}
               className="min-h-[11rem] resize-none rounded-[18px] border-0 bg-[color:var(--surface-console)] px-4 py-3.5 text-[16px] leading-7 shadow-none"
               autoFocus
             />
