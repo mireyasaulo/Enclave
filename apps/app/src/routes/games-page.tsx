@@ -201,6 +201,13 @@ export function GamesPage() {
       return;
     }
 
+    // 同样的 yinjie-farm 跨路由抢路问题：桌面端 banner click 也走
+    // navigate(/tabs/games/yinjie-farm)，再被这里 replace 回 /tabs/games?game=yinjie-farm
+    // farm 进不去。
+    if (selectedGameId === "yinjie-farm") {
+      return;
+    }
+
     const nextSearch = buildMobileGamesRouteSearch({
       gameId: selectedGameId,
       inviteId:
@@ -242,6 +249,16 @@ export function GamesPage() {
       normalizedPathname !== "/discover/games" ||
       !selectedGameId
     ) {
+      return;
+    }
+
+    // yinjie-farm 走独立路由 /tabs/games/yinjie-farm，handleLaunchGame 里已经
+    // 显式 navigate 过去；这里 selectedGameId 变成 yinjie-farm 时若也用 replace
+    // 写回 /discover/games?game=yinjie-farm，会跟前面 push 抢路 —— 用户从
+    // ?game=signal-squad 点 banner 时，最后 URL 落在 /discover/games 而不是
+    // /tabs/games/yinjie-farm，farm 永远拉不起来。yinjie-farm 在移动端 URL 里
+    // 没意义（slot 不渲染、navigate 已接管），直接跳过同步。
+    if (selectedGameId === "yinjie-farm") {
       return;
     }
 
