@@ -482,6 +482,31 @@ function buildReleaseEnvShellConfigOverride(env = process.env) {
   return override;
 }
 
+// Round 28：跟 iOS Round 36 对齐。release env example 的 URL 占位是
+// https://*.example.yinjie.app，本地 example 占位是 192.168.1.10 / your-domain
+// 这种。这条 helper 用来拦掉用户照 example 复制不改 URL 就 build 的情形。
+// 未配置 (undefined / null / 空串) 不算 placeholder —— 缺失由 Boolean(url)
+// 那条 check 单独拦。
+function isPlaceholderUrl(value) {
+  if (!value || typeof value !== "string") {
+    return false;
+  }
+  const lower = value.toLowerCase().trim();
+  if (!lower) {
+    return false;
+  }
+  // *.example.* / .example.com / api.example.foo —— 单独 "example" 一段是
+  // iOS Round 36 那种 placeholder 模板的指纹。
+  if (/\.example\./.test(lower) || /\bexample\.(com|org|net|io|app|dev|yinjie\.app)\b/.test(lower)) {
+    return true;
+  }
+  // your-domain.xxx / replace-me / placeholder / changeme：常见占位 token。
+  if (/\b(your[-_]?domain|replace[-_]?me|placeholder|changeme|todo[-_]?fill)\b/.test(lower)) {
+    return true;
+  }
+  return false;
+}
+
 function hasShellConfigOverride(override) {
   if (!override || typeof override !== "object") {
     return false;
@@ -965,6 +990,15 @@ if (command === "doctor") {
       "active production cleartext traffic disabled",
       !activeShellConfig.allowCleartextTraffic,
     ]);
+    // Round 28：active production URL 也要拦 placeholder。
+    checks.push([
+      "active production apiBaseUrl is not placeholder",
+      !isPlaceholderUrl(activeShellConfig.runtime.apiBaseUrl),
+    ]);
+    checks.push([
+      "active production cloudApiBaseUrl is not placeholder",
+      !isPlaceholderUrl(activeShellConfig.runtime.cloudApiBaseUrl),
+    ]);
   }
 
   if (
@@ -983,6 +1017,15 @@ if (command === "doctor") {
       "tracked production cleartext traffic disabled",
       !trackedShellConfig.allowCleartextTraffic,
     ]);
+    // Round 28：tracked production URL 也要拦 placeholder。
+    checks.push([
+      "tracked production apiBaseUrl is not placeholder",
+      !isPlaceholderUrl(trackedShellConfig.runtime.apiBaseUrl),
+    ]);
+    checks.push([
+      "tracked production cloudApiBaseUrl is not placeholder",
+      !isPlaceholderUrl(trackedShellConfig.runtime.cloudApiBaseUrl),
+    ]);
   }
 
   if (
@@ -1000,6 +1043,26 @@ if (command === "doctor") {
     checks.push([
       "release env production cleartext traffic disabled",
       !releaseEnvShellConfig.allowCleartextTraffic,
+    ]);
+
+    // Round 28：跟 iOS Round 36 对齐。android-release.env.example 里所有 URL
+    // 占位都是 https://*.example.yinjie.app —— 用户照样 cp env.example
+    // env.local 然后忘了改 URL，validate "Boolean(url)" 这条 check 不看内容，
+    // 静默放行后 release APK 装到真机所有请求 DNS NXDOMAIN，前端只能看到
+    // fetch reject「network-error」，根本不知道是 URL 占位没替换。这里拦
+    // *.example.* / placeholder.* / your-domain.* / replace-me 这几种典型
+    // 占位模式，强制 release build 之前必须用真实 URL。
+    checks.push([
+      "release env apiBaseUrl is not placeholder",
+      !isPlaceholderUrl(releaseEnvShellConfig.runtime.apiBaseUrl),
+    ]);
+    checks.push([
+      "release env socketBaseUrl is not placeholder",
+      !isPlaceholderUrl(releaseEnvShellConfig.runtime.socketBaseUrl),
+    ]);
+    checks.push([
+      "release env cloudApiBaseUrl is not placeholder",
+      !isPlaceholderUrl(releaseEnvShellConfig.runtime.cloudApiBaseUrl),
     ]);
   }
 
