@@ -198,6 +198,15 @@ export function ProfileInfoAvatarPage() {
       setLocalError(t(msg`图片过大，请压缩到 1MB 以内再试。`));
       return;
     }
+    if (file.size === 0) {
+      // 0 字节文件多半是相册导出失败、文件损坏。当时不拦的话 FileReader 会
+      // 读出 "data:image/...;base64,"（只有 MIME 头没有数据），照样塞进
+      // pickedLocal → canSave=true → 用户能保存这个「空头像」，下次进来
+      // AvatarChip onError 回落到 fallback；用户以为自己改了头像、profile
+      // 里却是 initials，毫无线索可查。
+      setLocalError(t(msg`这张图片是空文件，请换一张试试。`));
+      return;
+    }
     setLocalError(null);
     // 上次保存失败 → 错误 banner 钉死在底部，用户重新选了张图也还挂着——
     // 既看着新选了图、又同时挂着上次保存失败的红字，容易让用户以为新选的
