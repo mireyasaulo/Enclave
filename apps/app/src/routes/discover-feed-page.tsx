@@ -1915,16 +1915,25 @@ const pendingLikePostId = likeMutation.isPending
                   {commentMutation.error.message}
                 </span>
                 {/* 同上：refetch 整张 feed 解决不了"评论没发出去"。回放上一次
-                    的 mutate 变量（postId + replyTarget + text）真去重试。 */}
+                    的 mutate 变量（postId + replyTarget），text 现读现用——
+                    R15 直接 mutate(variables) 会把失败那一刻的旧 text 又发
+                    一遍，但用户在那之后通常已经改过草稿（评论太长被驳回时
+                    用户会缩一缩再点"重试发送"），旧 text 直接覆盖用户修改
+                    会把刚改完的本意又顶回去。 */}
                 <button
                   type="button"
                   onClick={() => {
                     const variables = commentMutation.variables;
-                    if (variables) {
-                      commentMutation.mutate(variables);
-                    } else {
+                    if (!variables) {
                       commentMutation.reset();
+                      return;
                     }
+                    const currentDraft =
+                      commentDrafts[variables.postId] ?? variables.text;
+                    commentMutation.mutate({
+                      ...variables,
+                      text: currentDraft,
+                    });
                   }}
                   className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                 >
