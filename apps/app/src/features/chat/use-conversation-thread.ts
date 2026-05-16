@@ -23,6 +23,7 @@ import {
   markThreadMessagesFailed,
   mergeDirectMessageWindow,
   upsertIncomingDirectMessage,
+  upsertServerMessageInCache,
 } from "./chat-message-delivery";
 import {
   loadPendingDirectMessages,
@@ -97,6 +98,10 @@ export function useConversationThread(conversationId: string) {
     queryFn: () =>
       getConversationMessages(conversationId, baseUrl, { limit: messageLimit }),
     enabled: Boolean(conversationId),
+    // 全局 staleTime=60s 让 useQuery 在 mount 时把 60s 内的旧 cache 当 fresh
+    // 不 refetch。聊天页面里 socket 漏一条（断网/切前后台/event drop）就会
+    // 显示不出新消息。强制每次挂载 refetch 一次，RTT 一次换正确性。
+    refetchOnMount: "always",
   });
 
   const conversationsQuery = useQuery({
@@ -247,12 +252,16 @@ export function useConversationThread(conversationId: string) {
       setSocketError(null);
       setMessages((current) => upsertIncomingDirectMessage(current, payload));
       syncActiveConversationMessage(payload);
-      // 把 messages cache 也标 stale：本地 state 已经有新消息了，但 cache 没动；
+      // 把消息直接写进 messages cache：本地 state 已经有新消息了，但 cache 没动；
       // 用户离开再回来时 useQuery 会读 cache（移动端 staleTime=60s 内不 refetch），
-      // 看不到 AI 回复。invalidate 让下次挂载强制 refetch。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-conversation-messages", baseUrl, conversationId],
-      });
+      // 看不到 AI 回复。直接 setQueriesData 把新消息合并进所有 messageLimit 变体
+      // 的 cache，下次挂载立刻就在，不依赖 refetch RTT。
+      queryClient.setQueriesData<Message[]>(
+        {
+          queryKey: ["app-conversation-messages", baseUrl, conversationId],
+        },
+        (current) => upsertServerMessageInCache(current, payload),
+      );
       if (isReminderConversation) {
         void invalidateReminderQueries();
       }

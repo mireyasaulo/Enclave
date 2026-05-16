@@ -171,6 +171,24 @@ export function upsertIncomingGroupMessage(
   return upsertIncomingThreadMessage(current, incoming);
 }
 
+// 写入 react-query messages cache 用：cache 里只放 server 消息，没有 local_* 乐观
+// 消息，所以不需要 echo 匹配。仅做"同 id 替换 / 否则追加 + 按 createdAt 排序"。
+export function upsertServerMessageInCache<
+  TMessage extends ThreadMessageLike,
+>(cache: TMessage[] | undefined, incoming: TMessage): TMessage[] | undefined {
+  if (!cache) return cache;
+  const idx = cache.findIndex((m) => m.id === incoming.id);
+  if (idx >= 0) {
+    const next = [...cache];
+    next[idx] = incoming;
+    return next;
+  }
+  return [...cache, incoming].sort(
+    (a, b) =>
+      (parseTimestamp(a.createdAt) ?? 0) - (parseTimestamp(b.createdAt) ?? 0),
+  );
+}
+
 export function markThreadMessagesFailed<
   TMessage extends ThreadMessageLike & ChatLocalMessageState,
 >(current: TMessage[], messageIds?: string[]) {

@@ -18,6 +18,7 @@ import {
   getGroupMembers,
   getGroupMessages,
   type FriendListItem,
+  type GroupMessage,
   markGroupRead,
   sendGroupMessage,
   type SendGroupMessageRequest,
@@ -81,6 +82,7 @@ import {
   mergeGroupMessageWindow,
   replaceGroupLocalMessage,
   upsertIncomingGroupMessage,
+  upsertServerMessageInCache,
 } from "./chat-message-delivery";
 import { parseMobileGroupRouteState } from "./mobile-group-route-state";
 import { buildMobileGroupRouteHash } from "./mobile-group-route-state";
@@ -245,6 +247,10 @@ export function GroupChatThreadPanel({
   const messagesQuery = useQuery({
     queryKey: ["app-group-messages", baseUrl, groupId, messageLimit],
     queryFn: () => getGroupMessages(groupId, baseUrl, { limit: messageLimit }),
+    // 全局 staleTime=60s 让 useQuery 在 mount 时把 60s 内的旧 cache 当 fresh
+    // 不 refetch。socket 漏一条群消息（断网/切前后台/event drop）就显示不出。
+    // 强制每次挂载 refetch 一次，RTT 一次换正确性。
+    refetchOnMount: "always",
   });
   const {
     ref: scrollAnchorRef,
@@ -388,12 +394,14 @@ export function GroupChatThreadPanel({
         });
       }
       setMessages((current) => upsertIncomingGroupMessage(current, payload));
-      // messages cache 标 stale：本地 state 已经有新消息，但 cache 没动；
+      // 直接把消息写进 cache：本地 state 已经有新消息，但 cache 没动；
       // 用户离开再回来时 useQuery 在移动端 staleTime=60s 内不会 refetch，
-      // 看不到这条群消息。invalidate 让下次挂载强制 refetch。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-group-messages", baseUrl, groupId],
-      });
+      // 看不到这条群消息。setQueriesData 直接合并进所有 messageLimit 变体
+      // 的 cache，下次挂载立刻就在，不依赖 refetch RTT。
+      queryClient.setQueriesData<GroupMessage[]>(
+        { queryKey: ["app-group-messages", baseUrl, groupId] },
+        (current) => upsertServerMessageInCache(current, payload),
+      );
       // 标已读：用户正活跃在群聊页面，收到新消息时主动同步
       // 后端读位。要是不调，会话列表的未读会一直涨——本地 messages 在 socket
       // 推送时长，但 messagesQuery.data 不变，下方"messages 长度变化时标已读"

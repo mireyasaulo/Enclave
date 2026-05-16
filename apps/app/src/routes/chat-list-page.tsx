@@ -26,7 +26,10 @@ import {
   setGroupPinned,
   updateGroupPreferences,
   type ConversationListItem,
+  type GroupMessage,
+  type Message,
 } from "@yinjie/contracts";
+import { upsertServerMessageInCache } from "../features/chat/chat-message-delivery";
 import {
   BellOff,
   BellRing,
@@ -617,18 +620,21 @@ function MobileChatListPage() {
       void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
-      // 同时 invalidate 对应会话的 messages cache：移动端全局 staleTime=60s，
-      // 用户在 chat-list 收到 AI 回复时 chat-room 已 unmount，下次点进去 useQuery
-      // 把 60s 内的旧 cache 当 fresh 直接返回 → 列表显示 AI 回复 preview，但
-      // 点进去要等到 staleTime 过期才看得到。invalidate 让下次挂载触发 refetch。
+      // 直接把新消息写进对应会话的 messages cache：上一版用 invalidate 依赖
+      // 下次 mount 触发 refetch，移动端 staleTime=60s 内 useQuery 可能仍然先
+      // 把旧 cache 返回再后台 refetch → 用户进去先看到旧消息，AI 回复要 RTT
+      // 后才出现。setQueriesData 直接合并新消息，进 chat-room 立刻就在。
+      // partial queryKey 匹配所有 messageLimit 变体（60/100/...）。
       if ("conversationId" in payload) {
-        void queryClient.invalidateQueries({
-          queryKey: ["app-conversation-messages", baseUrl, payload.conversationId],
-        });
+        queryClient.setQueriesData<Message[]>(
+          { queryKey: ["app-conversation-messages", baseUrl, payload.conversationId] },
+          (current) => upsertServerMessageInCache(current, payload),
+        );
       } else if ("groupId" in payload) {
-        void queryClient.invalidateQueries({
-          queryKey: ["app-group-messages", baseUrl, payload.groupId],
-        });
+        queryClient.setQueriesData<GroupMessage[]>(
+          { queryKey: ["app-group-messages", baseUrl, payload.groupId] },
+          (current) => upsertServerMessageInCache(current, payload),
+        );
       }
     });
     return () => {

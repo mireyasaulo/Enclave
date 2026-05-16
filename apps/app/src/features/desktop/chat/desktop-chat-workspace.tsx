@@ -52,7 +52,10 @@ import {
   updateOfficialAccountPreferences,
   updateGroupPreferences,
   type ConversationListItem,
+  type GroupMessage,
+  type Message,
 } from "@yinjie/contracts";
+import { upsertServerMessageInCache } from "../../chat/chat-message-delivery";
 import {
   ErrorBlock,
   InlineNotice,
@@ -341,10 +344,24 @@ export function DesktopChatWorkspace({
         queryKey: ["app-conversations", baseUrl],
       });
     });
-    const offMessage = onChatMessage(() => {
+    const offMessage = onChatMessage((payload) => {
       void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
+      // 直接把新消息写进对应会话的 messages cache：staleTime 内 useQuery 会先
+      // 返回旧 cache 再后台 refetch，用户切到该会话先看不到新消息。setQueriesData
+      // 直接合并进所有 messageLimit 变体的 cache，切到 chat-room 立刻就在。
+      if ("conversationId" in payload) {
+        queryClient.setQueriesData<Message[]>(
+          { queryKey: ["app-conversation-messages", baseUrl, payload.conversationId] },
+          (current) => upsertServerMessageInCache(current, payload),
+        );
+      } else if ("groupId" in payload) {
+        queryClient.setQueriesData<GroupMessage[]>(
+          { queryKey: ["app-group-messages", baseUrl, payload.groupId] },
+          (current) => upsertServerMessageInCache(current, payload),
+        );
+      }
     });
     return () => {
       offUpdated();
