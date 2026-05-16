@@ -585,25 +585,33 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             return
         }
 
+        // 旧实现用 `assets.append(asset)` 收集 loadImageAsset 完成回调里的资源 ——
+        // 但 loadFileRepresentation 是异步的，多张图同时跑完成回调顺序不固定（PhotoKit
+        // 转码大小 / HEIC vs JPG 解码耗时 / disk I/O 抢占都会影响）。用户在 PHPicker
+        // UI 里按 album 顺序勾 5 张 [A, B, C, D, E]，append 出来可能是 [C, A, E, B, D]，
+        // 上传到聊天界面 / 朋友圈 9 宫格直接错序，跟用户预期不一致。
+        //
+        // 改成按 results 顺序预分配槽位，每个完成回调按自己的 index 写入，最后
+        // compactMap 跳过 nil（loadImageAsset 失败的：罕见的 HEIC 解码失败 / itemProvider
+        // 不挂 public.image 等），既保顺序又干掉失败槽。
+        let assetsCount = results.count
+        var assetsOrdered: [[String: Any]?] = Array(repeating: nil, count: assetsCount)
         let group = DispatchGroup()
         let lock = NSLock()
-        var assets: [[String: Any]] = []
 
-        for result in results {
+        for (index, result) in results.enumerated() {
             group.enter()
             loadImageAsset(from: result) { asset in
-                if let asset {
-                    lock.lock()
-                    assets.append(asset)
-                    lock.unlock()
-                }
+                lock.lock()
+                assetsOrdered[index] = asset
+                lock.unlock()
                 group.leave()
             }
         }
 
         group.notify(queue: .main) {
             call.resolve([
-                "assets": assets
+                "assets": assetsOrdered.compactMap { $0 }
             ])
         }
     }
