@@ -490,7 +490,13 @@ function EditView({
     return (
       <Card className="p-6 space-y-3">
         <p>
-          <Trans>请先登录后再编辑。</Trans>
+          <Trans>
+            请先{" "}
+            <Link to="/login" className="font-medium underline">
+              登录
+            </Link>{" "}
+            后再编辑。
+          </Trans>
         </p>
       </Card>
     );

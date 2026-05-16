@@ -180,10 +180,15 @@ export function RootLayout() {
   }, [urlSearchQ]);
 
   // index.html 的 <title>隐界角色百科</title> 是硬编码 zh-CN，切到 en/ja/ko
-  // 之后浏览器 tab 仍然显示中文。这里在 locale 切换时同步更新 document.title。
+  // 之后浏览器 tab 仍然显示中文。这里在 locale 切换时同步更新 document.title，
+  // 同时把 <html lang> 也改掉——影响屏幕阅读器朗读、Google Translate 触发、
+  // CSS lang() 选择器与字体 fallback。
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.title = t(msg`隐界角色百科`);
+    if (i18n.locale) {
+      document.documentElement.lang = i18n.locale;
+    }
   }, [i18n.locale, t]);
 
   // Close mobile nav on route change.

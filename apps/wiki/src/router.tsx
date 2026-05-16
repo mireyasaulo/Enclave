@@ -3,8 +3,37 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  Link,
 } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+import { Button, Card } from "@yinjie/ui";
 import { RootLayout } from "./components/root-layout";
+
+// 默认 404 组件：tanstack-router 内置 fallback 是裸的英文 "Not Found"，
+// 公网访问者打错路径或点了过期链接看到一坨英文体验差。包成一张本地化卡片
+// + 回首页按钮。所有未注册路由（含 /admin/<错路径>）走这里。
+function WikiNotFound() {
+  const t = translateRuntimeMessage;
+  return (
+    <Card className="p-6 space-y-3">
+      <h1 className="text-lg font-semibold">
+        <Trans>页面不存在</Trans>
+      </h1>
+      <p className="text-sm text-[color:var(--text-muted)]">
+        <Trans>请检查链接是否正确，或回到首页继续浏览。</Trans>
+      </p>
+      <div>
+        <Link to="/">
+          <Button variant="primary" size="sm">
+            {t(msg`返回首页`)}
+          </Button>
+        </Link>
+      </div>
+    </Card>
+  );
+}
 
 const HomePage = lazy(async () => {
   const mod = await import("./routes/home-page");
@@ -311,7 +340,10 @@ const routeTree = rootRoute.addChildren([
   myDraftsRoute,
 ]);
 
-export const router = createRouter({ routeTree });
+export const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: WikiNotFound,
+});
 
 declare module "@tanstack/react-router" {
   interface Register {
