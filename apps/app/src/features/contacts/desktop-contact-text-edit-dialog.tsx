@@ -50,7 +50,11 @@ export function DesktopContactTextEditDialog({
         return;
       }
 
+      // 弹窗是 modal 层；只 preventDefault 不 stopPropagation 的话，Esc
+      // 会继续冒泡到 desktop-chat-workspace 的 dismissSidePanel window
+      // keydown，一下 Esc 把背后的「聊天信息」侧栏也一起关掉。
       event.preventDefault();
+      event.stopPropagation();
       onClose();
     };
 
