@@ -581,10 +581,18 @@ export function ChatMessageList({
   }, [contextMenuState]);
 
   useEffect(() => {
-    setContextMenuState(null);
-    // 长按 sheet 只在目标消息消失时关——socket 推新消息也会触发这个 effect，
-    // 如果无条件清空会把用户的点击意图打断。和下面 reminderTarget /
-    // quoteSelection / forward 等 7 个面板的 pattern 对齐。
+    // 注释原本说"长按 sheet 只在目标消息消失时关——socket 推新消息也会
+    // 触发这个 effect，如果无条件清空会把用户的点击意图打断。和下面
+    // reminderTarget / quoteSelection / forward 等 7 个面板的 pattern 对齐。"
+    // 但 contextMenuState 反倒是上面那个例外——之前一直无条件 setNull，
+    // 桌面右键消息打开 menu 时只要 AI 回一句话，messages 数组变了 effect
+    // 重跑，菜单就被强制关掉了，用户的点击意图被 socket 打断。补成同款
+    // 条件式：目标消息还在就保留，消失才关。
+    setContextMenuState((current) =>
+      current && messages.some((message) => message.id === current.message.id)
+        ? current
+        : null,
+    );
     setMobileActionMessage((current) =>
       current && messages.some((message) => message.id === current.id)
         ? current
