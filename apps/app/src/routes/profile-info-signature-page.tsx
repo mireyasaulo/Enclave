@@ -15,6 +15,15 @@ import { useWorldOwnerStore } from "../store/world-owner-store";
 
 const SIGNATURE_MAX_LENGTH = 30;
 
+// 把 CR/LF/Tab 折叠成普通空格、压缩连续空白、再 trim。
+// 抽到 component 外是为了让 dirty 比较和 initial draft 都走同一份逻辑（之前
+// 比较时 baseline 用 `signature.trim()`，sanitized 已去 \n，legacy 用户存的是
+// 带 \n 的签名 → 一打开页面 dirty 就为 true、「完成」绿着 → 用户没改任何东西
+// 也能误点保存）。
+function sanitizeOwnerSignature(value: string): string {
+  return value.replace(/[\r\n\t]+/g, " ").replace(/  +/g, " ").trim();
+}
+
 export function ProfileInfoSignaturePage() {
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
@@ -26,7 +35,10 @@ export function ProfileInfoSignaturePage() {
   const signature = useWorldOwnerStore((state) => state.signature);
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
 
-  const [draft, setDraft] = useState(signature);
+  // 进页面时把 stored signature 先过一遍 sanitize（去 \n / 多余空白），
+  // 避免 legacy 用户的 "行A\n行B" 显示在 textarea 里、跟 dirty 比较的
+  // sanitized 形态对不上 → 误判 dirty=true、「完成」绿着。
+  const [draft, setDraft] = useState(() => sanitizeOwnerSignature(signature));
   // 见 profile-info-name-page 同名 ref：用户已经动过输入框时，不要被
   // 后台 hydrate 把 draft 覆盖回 store 值。
   const userTouchedRef = useRef(false);
@@ -42,7 +54,7 @@ export function ProfileInfoSignaturePage() {
 
   useEffect(() => {
     if (!userTouchedRef.current) {
-      setDraft(signature);
+      setDraft(sanitizeOwnerSignature(signature));
     }
   }, [signature]);
 
@@ -58,12 +70,18 @@ export function ProfileInfoSignaturePage() {
       "/profile/info",
     );
 
-  const trimmed = draft.trim();
-  const dirty = trimmed !== signature.trim();
+  // textarea 默认允许 Enter 换行，用户敲 "line1\nline2" 后落库就是带 \n 的原文。
+  // 但 profile-page / profile-info-page 都用 truncate / line-clamp-1 单行展示
+  // （placeholder 文案"写一句此刻想说的话"也暗示单行短语），换行根本看不出来；
+  // 下次重新进编辑页又因为 textarea preserve \n 让用户以为存进去了 → 反复修不掉。
+  // 用顶部抽出的 sanitizeOwnerSignature 同时做 sanitize（保留中间空格、不剥所有控制字符）。
+  const sanitized = sanitizeOwnerSignature(draft);
+  // 跟 sanitized 对齐 baseline，避免 legacy 多行 signature 一打开就 dirty=true。
+  const dirty = sanitized !== sanitizeOwnerSignature(signature);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const owner = await updateWorldOwner({ signature: trimmed }, baseUrl);
+      const owner = await updateWorldOwner({ signature: sanitized }, baseUrl);
       queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
     },
@@ -125,6 +143,9 @@ export function ProfileInfoSignaturePage() {
           autoFocus
           value={draft}
           disabled={saveMutation.isPending}
+          spellCheck={false}
+          autoCapitalize="off"
+          autoCorrect="off"
           onChange={(event) => {
             userTouchedRef.current = true;
             setDraft(event.target.value);
@@ -144,7 +165,11 @@ export function ProfileInfoSignaturePage() {
           className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]"
           data-i18n-skip="true"
         >
-          {draft.length}/{SIGNATURE_MAX_LENGTH}
+          {/* 显示 sanitized.length 而非 draft.length——用户粘了 "line1\n\nline2"
+              (12 字符) 时 textarea raw 字符比真正会落库的 "line1 line2" (11) 多。
+              counter 跟实际保存的字符数对齐，免得用户看到 12/30 满意但实际
+              占用更少 / 看到 11/30 (全空白) 时实际保存为 0。*/}
+          {sanitized.length}/{SIGNATURE_MAX_LENGTH}
         </div>
       </div>
 

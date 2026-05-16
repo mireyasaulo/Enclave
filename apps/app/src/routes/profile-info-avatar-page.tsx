@@ -122,7 +122,12 @@ export function ProfileInfoAvatarPage() {
   // 巨型字符串。如果把它当 URL 灌进 TextField，又退化回 Round 1 修掉的卡顿/误改
   // 长串那一套。所以「URL 输入框」只接受真正的 URL，存的是 data URL 时一律把
   // 输入框留空（preview 仍然显示当前头像）。
-  const storedIsDataUrl = avatar.startsWith("data:");
+  // gate 在 hasCustomAvatar 上：Vite 把 default-owner-avatar.svg (3KB <
+  // 4KB 默认 inlineLimit) 内联成 data:image/svg+xml,... 后 resolveOwnerAvatar
+  // 兜底 "" 时返回它，store.avatar 也会以 data:URL 形式存在。如果不 gate，
+  // 从没设过头像的用户也会被判成 storedIsDataUrl=true，让"当前头像已存为本地
+  // 图片..."hint 钉死在他们看不到的"自定义头像"上下文里，逻辑反着的。
+  const storedIsDataUrl = hasCustomAvatar && avatar.startsWith("data:");
   const initialDraft = hasCustomAvatar && !storedIsDataUrl ? avatar : "";
   // draft 只装「URL」型的取值，pickedLocal 单独存从相册选的 data URL：
   // 之前把 base64 直接塞进 TextField，~1MB 的字符串显示在单行输入框里既看不
@@ -190,13 +195,26 @@ export function ProfileInfoAvatarPage() {
   // 它不是从 keystroke 来的，已经是 data URL，加载零成本。
   const [debouncedPreviewSrc, setDebouncedPreviewSrc] = useState<string>("");
   useEffect(() => {
-    // pickedLocal 在场时不用 debounce，由下面 previewSrc 优先级直接拿
+    // pickedLocal 在场时不用 debounce，由下面 previewSrc 优先级直接拿；但要把
+    // debouncedPreviewSrc 立即清掉——不清的话，用户「输 URL → 选本地图 → X 清掉」
+    // 流程里，pickedLocal 变 null 但 debounced 还停在旧 URL，previewSrc 优先级
+    // 第二段会回落到那个 stale URL，preview 短暂闪回旧 URL 才被 300ms 后的另一
+    // 次 effect 清掉。
     if (pickedLocal) {
+      if (debouncedPreviewSrc !== "") {
+        setDebouncedPreviewSrc("");
+      }
       return;
     }
     const previewable = looksLikePreviewableImageUrl(trimmed) ? trimmed : "";
     // 已经一致就别白触发 setState
     if (previewable === debouncedPreviewSrc) {
+      return;
+    }
+    // 目标 = "" (用户清空了 URL 或输入了不可预览的半截 URL) → 立即清，不 debounce。
+    // debounce 的意义是「敲一半 URL 别去发图片请求」，清空场景没必要等 300ms。
+    if (previewable === "") {
+      setDebouncedPreviewSrc("");
       return;
     }
     const timer = window.setTimeout(() => {
@@ -324,6 +342,12 @@ export function ProfileInfoAvatarPage() {
   function clearPickedLocal() {
     setPickedLocal(null);
     setLocalError(null);
+    // 之前 onload 把 userTouchedRef 拉成 true（"用户已经在这页操作过"）。
+    // 用户按 X 清掉本地图后这条状态没被擦掉，后续 store.avatar 异步 hydrate
+    // 进来时 useEffect([initialDraft]) 会因 userTouchedRef=true 跳过，URL 输入
+    // 框永远停在 onload 顺带 setDraft("") 时清空的状态、不回填新值。等同于把
+    // 用户从"刚开始编辑这页"的语境拽回到"未触碰、跟着 store 走"的状态。
+    userTouchedRef.current = false;
   }
 
   if (isDesktopLayout) {

@@ -152,6 +152,9 @@ export function ProfileInfoNamePage() {
           autoFocus
           value={draft}
           disabled={saveMutation.isPending}
+          spellCheck={false}
+          autoCapitalize="off"
+          autoCorrect="off"
           onChange={(event) => {
             userTouchedRef.current = true;
             setDraft(event.target.value);
