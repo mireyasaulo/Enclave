@@ -2381,6 +2381,33 @@ function MobileChannelsViewport({
       cardRefs.current.delete(postId);
     }
   };
+  // 每张卡传给 <article ref={...}> 的回调，必须按 postId 稳定。
+  // 原来用 `(node) => registerCardRef(post.id, node)` 内联 arrow，每次父级 re-render
+  // 都是新引用，React 会先把旧回调以 null 调用一次再以 element 调新回调，等于
+  // 每次 re-render 把这张卡 unobserve + observe 一遍。视频号 home 上 IntersectionObserver
+  // 维护的就是「当前居中的卡」，重复 unobserve/observe 期间它可能漏掉一次
+  // intersection 事件——表现是滑过去音频没自动切。useRef 缓存按 postId 缓存稳定回调。
+  const cardRefCallbacksRef = useRef(
+    new Map<string, (node: HTMLElement | null) => void>(),
+  );
+  const getCardRefCallback = (postId: string) => {
+    let cb = cardRefCallbacksRef.current.get(postId);
+    if (!cb) {
+      cb = (node) => registerCardRef(postId, node);
+      cardRefCallbacksRef.current.set(postId, cb);
+    }
+    return cb;
+  };
+  // 防 cardRefCallbacksRef 长期累积 stale postId：每次 posts 变化时把不在
+  // 当前 posts 里的回调清掉。
+  useEffect(() => {
+    const liveIds = new Set(posts.map((p) => p.id));
+    cardRefCallbacksRef.current.forEach((_, key) => {
+      if (!liveIds.has(key)) {
+        cardRefCallbacksRef.current.delete(key);
+      }
+    });
+  }, [posts]);
 
   // 进入页面时按 URL 的 #postId 把指定卡滚到顶部一次。
   // 不要把 posts 当 deps：home 一刷新（点赞 invalidate / generate / decorations）
@@ -2451,7 +2478,7 @@ function MobileChannelsViewport({
           commentsPreview={
             commentsPreviewByPostId?.[post.id] ?? post.commentsPreview ?? []
           }
-          setCardRef={(node) => registerCardRef(post.id, node)}
+          setCardRef={getCardRefCallback(post.id)}
           userUnmuted={userUnmuted}
           onUnlock={() => setUserUnmuted(true)}
           onLike={() => onLike(post.id)}
