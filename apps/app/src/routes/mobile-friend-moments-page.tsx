@@ -688,6 +688,7 @@ export function MobileFriendMomentsPage() {
               variant="ghost"
               size="icon"
               className="h-9 w-9 rounded-full border-0 bg-transparent text-[#1A1A1A] active:bg-black/[0.05]"
+              aria-label={t(msg`返回`)}
             >
               <ArrowLeft size={17} />
             </Button>
@@ -744,6 +745,7 @@ export function MobileFriendMomentsPage() {
             variant="ghost"
             size="icon"
             className="h-9 w-9 rounded-full border-0 bg-transparent text-[#1A1A1A] active:bg-black/[0.05]"
+            aria-label={t(msg`返回`)}
           >
             <ArrowLeft size={17} />
           </Button>
