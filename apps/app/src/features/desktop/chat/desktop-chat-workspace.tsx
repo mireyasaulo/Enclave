@@ -788,14 +788,21 @@ export function DesktopChatWorkspace({
     }
 
     const closeMenu = () => setConversationContextMenu(null);
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    };
     window.addEventListener("pointerdown", closeMenu);
     window.addEventListener("resize", closeMenu);
     window.addEventListener("scroll", closeMenu, true);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("pointerdown", closeMenu);
       window.removeEventListener("resize", closeMenu);
       window.removeEventListener("scroll", closeMenu, true);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [conversationContextMenu]);
 
@@ -805,14 +812,21 @@ export function DesktopChatWorkspace({
     }
 
     const closeMenu = () => setOfficialMessageContextMenu(null);
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    };
     window.addEventListener("pointerdown", closeMenu);
     window.addEventListener("resize", closeMenu);
     window.addEventListener("scroll", closeMenu, true);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("pointerdown", closeMenu);
       window.removeEventListener("resize", closeMenu);
       window.removeEventListener("scroll", closeMenu, true);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [officialMessageContextMenu]);
 
