@@ -1392,18 +1392,24 @@ export function CharacterDetailPage() {
                     : "rounded-[11px] px-2.5 py-1.5 text-[10px] leading-4 shadow-none"
                 }
               >
-                {!isDesktopLayout && notice.tone === "info" ? (
+                {!isDesktopLayout &&
+                notice.tone === "info" &&
+                notice.actionLabel &&
+                notice.onAction ? (
+                  // 走查 R3：原 info notice 永远会在右侧拼一个「返回通讯录 / 返回上
+                  // 一页」按钮。但实际两条 info 落点都是分享场景的 retry 提示——
+                  // "复制名片失败，请稍后重试" / "当前环境暂不支持复制名片"，都已经
+                  // 带有 actionLabel/onAction 触发的重试 button。再加一个"返回"按钮
+                  // 等于把分享失败误导成"该退回上一页"。AppPage 顶 header 已经有
+                  // 左上角 ArrowLeft 返回，info notice 就只暴露 retry 一颗按钮够了。
+                  // 兜底：如果某次 info 没带 actionLabel/onAction（目前没有这种调用
+                  // 点，但保留以防回潮），就 fall through 到纯文本，不再补 back。
                   <div className="flex items-center justify-between gap-2">
                     <span className="min-w-0 flex-1">{notice.message}</span>
-                    <div className="flex shrink-0 flex-wrap items-center gap-2">
-                      {notice.actionLabel && notice.onAction ? (
-                        <InlineNoticeActionButton
-                          label={notice.actionLabel}
-                          onClick={notice.onAction}
-                        />
-                      ) : null}
-                      {renderMobileErrorBackAction()}
-                    </div>
+                    <InlineNoticeActionButton
+                      label={notice.actionLabel}
+                      onClick={notice.onAction}
+                    />
                   </div>
                 ) : (
                   notice.message
@@ -1823,11 +1829,23 @@ export function CharacterDetailPage() {
               ) : null}
               {/* 走查 R1：朋友圈入口在移动端无条件渲染，非好友点进去后端按"未授权"
                   返回空列表/错误，跟 desktop ContactDetailPane（已用 isFriend 包过）
-                  不一致；非好友本来就拿不到对方朋友圈，挪到 isFriend 分支里。 */}
+                  不一致；非好友本来就拿不到对方朋友圈，挪到 isFriend 分支里。
+                  走查 R3：用户从「朋友权限管理」把这位朋友的"看 TA 的朋友圈"关掉
+                  (friendship.momentsHiddenFromMe=true) 之后，moments.service
+                  canOwnerViewPost 这边就会把 TA 过去发的 moments 全部过滤掉
+                  —但 contact-profile 这行 value 还是「查看这位角色最近的朋友圈」，
+                  点进去拿到的是一片空，连为什么空都没人告诉。和 friendship 字段
+                  对齐：hideTheir 状态下 value 文案改成「已不再看 TA 的朋友圈」，
+                  click 仍然带用户去 mobile-friend-moments，让 ta 在那一页能拿到
+                  empty state 解释 / 撤销路径，不再让人盯着空白页面发呆。 */}
               {isFriend ? (
                 <ProfileRow
                   label={momentsLabel}
-                  value={momentsValueLabel}
+                  value={
+                    friendship?.momentsHiddenFromMe
+                      ? t(msg`已不再看 TA 的朋友圈`)
+                      : momentsValueLabel
+                  }
                   onClick={handleOpenMoments}
                   compact={!isDesktopLayout}
                 />
