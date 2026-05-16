@@ -23,6 +23,7 @@ import {
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { pickImageFiles } from "../runtime/native-image-picker";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const t = translateRuntimeMessage;
@@ -47,7 +48,6 @@ export function MobileMomentsPublishPage() {
       : undefined;
   const safeReturnHash = safeReturnPath ? routeState.returnHash : undefined;
   const resetComposeDraft = composeDraft.reset;
-  const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
@@ -204,8 +204,12 @@ export function MobileMomentsPublishPage() {
     performBack();
   }
 
-  async function handleImageFilesSelected(files: FileList | null) {
+  async function handlePickImages() {
     try {
+      const files = await pickImageFiles({ multiple: true });
+      if (files.length === 0) {
+        return;
+      }
       await composeDraft.addImageFiles(files);
     } catch (error) {
       composeDraft.setMediaError(
@@ -414,7 +418,9 @@ export function MobileMomentsPublishPage() {
                   // 走到这里 grid 已经在渲染（showImageGrid 或 showVideoSlot 触发），
                   // 又因为 !showVideoSlot 排除了纯视频情况，剩下只可能是 imageCount>0，
                   // 用户已经在"图片相册"模式里，再 + 就直接进系统相册，跳过中间 sheet。
-                  onClick={() => imageInputRef.current?.click()}
+                  onClick={() => {
+                    void handlePickImages();
+                  }}
                   disabled={createMutation.isPending}
                   className="flex items-center justify-center bg-[#F7F7F7] text-[#B0B0B0] disabled:opacity-50 active:bg-[#EFEFEF]"
                   style={{ aspectRatio: "1 / 1" }}
@@ -476,7 +482,7 @@ export function MobileMomentsPublishPage() {
         <MediaPickerSheet
           onPickImages={() => {
             setMediaPickerOpen(false);
-            imageInputRef.current?.click();
+            void handlePickImages();
           }}
           onPickVideo={() => {
             setMediaPickerOpen(false);
@@ -547,17 +553,6 @@ export function MobileMomentsPublishPage() {
         </div>
       ) : null}
 
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={(event) => {
-          void handleImageFilesSelected(event.currentTarget.files);
-          event.currentTarget.value = "";
-        }}
-      />
       <input
         ref={videoInputRef}
         type="file"

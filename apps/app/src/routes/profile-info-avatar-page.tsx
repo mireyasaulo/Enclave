@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -11,6 +11,7 @@ import { AvatarChip } from "../components/avatar-chip";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { navigateBackOrFallback } from "../lib/history-back";
+import { pickImageFiles } from "../runtime/native-image-picker";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -40,7 +41,6 @@ export function ProfileInfoAvatarPage() {
   const initialDraft = hasCustomAvatar ? avatar : "";
   const [draft, setDraft] = useState(initialDraft);
   const [localError, setLocalError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setDraft(initialDraft);
@@ -75,9 +75,9 @@ export function ProfileInfoAvatarPage() {
     },
   });
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
+  async function handlePickAvatar() {
+    const files = await pickImageFiles({ multiple: false });
+    const file = files[0];
     if (!file) {
       return;
     }
@@ -166,7 +166,9 @@ export function ProfileInfoAvatarPage() {
       <div className="mt-2 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
         <button
           type="button"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => {
+            void handlePickAvatar();
+          }}
           className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors active:bg-[color:var(--surface-card-hover)]"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(7,193,96,0.10)] text-[#15803d]">
@@ -181,13 +183,6 @@ export function ProfileInfoAvatarPage() {
             </div>
           </div>
         </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-        />
       </div>
 
       {errorMessage ? (

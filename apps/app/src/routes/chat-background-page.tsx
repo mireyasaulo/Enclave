@@ -1,9 +1,7 @@
 import {
   useEffect,
   useMemo,
-  useRef,
   useState,
-  type ChangeEvent,
   type ReactNode,
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -41,6 +39,7 @@ import {
 import { buildDesktopChatRouteHash } from "../features/desktop/chat/desktop-chat-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { pickImageFiles } from "../runtime/native-image-picker";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 type UploadTarget = "default" | "conversation";
@@ -56,7 +55,6 @@ export function ChatBackgroundPage() {
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const isDesktopLayout = useDesktopLayout();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [uploadTarget, setUploadTarget] = useState<UploadTarget>("default");
   const [defaultDraft, setDefaultDraft] = useState<ChatBackgroundAsset | null>(
@@ -265,9 +263,14 @@ export function ChatBackgroundPage() {
       clearConversationMutation.error.message) ||
     null;
 
-  const openPicker = (target: UploadTarget) => {
+  const openPicker = async (target: UploadTarget) => {
     setUploadTarget(target);
-    fileInputRef.current?.click();
+    const files = await pickImageFiles({ multiple: false });
+    const file = files[0];
+    if (!file) {
+      return;
+    }
+    await uploadMutation.mutateAsync({ file });
   };
 
   const navigateToRouteStateReturn = () => {
@@ -319,17 +322,6 @@ export function ChatBackgroundPage() {
     setConversationMode("custom");
     setConversationDraft(background);
     setNotice(t(msg`当前聊天背景已切到新预览，保存后生效。`));
-  };
-
-  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.currentTarget.value = "";
-
-    if (!file) {
-      return;
-    }
-
-    await uploadMutation.mutateAsync({ file });
   };
 
   const content = (
@@ -616,13 +608,6 @@ export function ChatBackgroundPage() {
         </>
       ) : null}
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={(event) => void handleFileChange(event)}
-      />
     </>
   );
 

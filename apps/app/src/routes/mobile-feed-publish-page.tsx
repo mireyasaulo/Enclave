@@ -21,6 +21,7 @@ import {
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { pickImageFiles } from "../runtime/native-image-picker";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const t = translateRuntimeMessage;
@@ -46,7 +47,6 @@ export function MobileFeedPublishPage() {
   const safeReturnHash = safeReturnPath ? routeState.returnHash : undefined;
   const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : t(msg`返回广场`);
   const resetComposeDraft = composeDraft.reset;
-  const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
@@ -164,8 +164,12 @@ export function MobileFeedPublishPage() {
     performBack();
   }
 
-  async function handleImageFilesSelected(files: FileList | null) {
+  async function handlePickImages() {
     try {
+      const files = await pickImageFiles({ multiple: true });
+      if (files.length === 0) {
+        return;
+      }
       await composeDraft.addImageFiles(files);
     } catch (error) {
       composeDraft.setMediaError(
@@ -294,7 +298,9 @@ export function MobileFeedPublishPage() {
                   !composeDraft.canAddImages || createMutation.isPending
                 }
                 className="h-9 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 text-[11px]"
-                onClick={() => imageInputRef.current?.click()}
+                onClick={() => {
+                  void handlePickImages();
+                }}
               >
                 <ImagePlus size={14} className="mr-1" />
                 {t(msg`添加图片`)}
@@ -371,17 +377,6 @@ export function MobileFeedPublishPage() {
         </div>
       ) : null}
 
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={(event) => {
-          void handleImageFilesSelected(event.currentTarget.files);
-          event.currentTarget.value = "";
-        }}
-      />
       <input
         ref={videoInputRef}
         type="file"

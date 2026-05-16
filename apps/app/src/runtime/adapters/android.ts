@@ -1,3 +1,7 @@
+import {
+  registerAndroidAppStateChange,
+  registerAndroidBackButton,
+} from "../android-back-button";
 import type { AppRuntimeCapabilities } from "../platform";
 
 type CapacitorWindow = Window & {
@@ -50,4 +54,7 @@ export async function bootstrapAndroid() {
   } catch {
     // 插件缺失或调用失败时静默 —— 不阻塞 App 启动。
   }
+
+  void registerAndroidBackButton();
+  void registerAndroidAppStateChange();
 }
