@@ -1392,7 +1392,25 @@ const pendingLikePostId = likeMutation.isPending
                     (comment) =>
                       stripToolCallSyntax(comment.text).trim().length > 0,
                   );
-                  if (renderedComments.length === 0) return null;
+                  // preview 里全是被过滤掉的脏评论（gpt-4.1 等模型把 CoT prose 当
+                  // 广场评论存进来 → stripToolCallSyntax 后变 ""），但 commentCount
+                  // 仍 > 0：之前 return null 把「查看全部 N 条评论」也一并吞掉，
+                  // header summary 写「1 评论」但用户点不进去 — 评论被彻底藏起来。
+                  // 留出 expand 按钮入口；展开后若全量也全是脏评论，给一行占位。
+                  const showExpandButton =
+                    post.commentCount > renderedComments.length &&
+                    !expandedComments;
+                  const expandedAllFiltered =
+                    Boolean(expandedComments) &&
+                    renderedComments.length === 0 &&
+                    post.commentCount > 0;
+                  if (
+                    renderedComments.length === 0 &&
+                    !showExpandButton &&
+                    !expandedAllFiltered
+                  ) {
+                    return null;
+                  }
                   return (
                     <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">
                       <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
@@ -1504,6 +1522,11 @@ const pendingLikePostId = likeMutation.isPending
                               ? t(msg`正在读取全部评论…`)
                               : t(msg`查看全部 ${post.commentCount} 条评论`)}
                           </button>
+                        ) : null}
+                        {expandedAllFiltered ? (
+                          <div className="mt-1 text-[12px] text-[#9A9A9A]">
+                            {t(msg`评论暂时无法显示`)}
+                          </div>
                         ) : null}
                       </div>
                     </div>
