@@ -157,6 +157,13 @@ export function CreateGroupPage() {
 
   const createMutationResetRef = useRef(createMutation.reset);
   createMutationResetRef.current = createMutation.reset;
+  // 同步防双击锁——下面 rightActions 的「确定」按钮原本只靠 disabled=
+  // createMutation.isPending 兜底，但 disabled 要等 React commit 才生效，
+  // 同帧内连点 2 次会同时通过两次 isPending=false → 两个 POST /groups 同时
+  // 飞出去，结果用户进的是第 2 个群（replace:true），第 1 个群残留在通讯录里
+  // 变成"幽灵群"。submittingRef ref 同步赋值，第一次 click 把它翻 true 之后
+  // 同帧的所有后续 click 都被早返兜住；onSettled 解锁，失败也能重试。
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     if (previousBaseUrlRef.current === baseUrl) {
@@ -353,7 +360,16 @@ export function CreateGroupPage() {
         rightActions={
           <button
             type="button"
-            onClick={() => createMutation.mutate()}
+            onClick={() => {
+              if (submittingRef.current) return;
+              if (!selectedIds.length || createMutation.isPending) return;
+              submittingRef.current = true;
+              createMutation.mutate(undefined, {
+                onSettled: () => {
+                  submittingRef.current = false;
+                },
+              });
+            }}
             disabled={!selectedIds.length || createMutation.isPending}
             className={cn(
               "h-9 rounded-full px-3 text-[15px] font-medium transition",

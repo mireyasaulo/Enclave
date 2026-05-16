@@ -161,9 +161,26 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
     void groupQuery.refetch();
   };
 
+  // 同步防双击锁——下面「保存群公告」按钮原本只靠 disabled=isPending 兜底，
+  // 但 disabled 要等 React commit 才生效，同帧内连点 2 次会同时通过两次
+  // isPending=false → 两个 PATCH /groups/$id 同时飞出去；服务端虽然幂等
+  // 但白白多打一份请求 + 一份 invalidate，公网隧道 RTT 600ms 下尤其浪费。
+  // ref 同步赋值挡掉同帧后续 click，onSettled 解锁。
+  const submittingRef = useRef(false);
+  const triggerSave = () => {
+    if (submittingRef.current) return;
+    if (saveMutation.isPending) return;
+    submittingRef.current = true;
+    saveMutation.mutate(undefined, {
+      onSettled: () => {
+        submittingRef.current = false;
+      },
+    });
+  };
+
   const handleRetrySave = () => {
     setNotice(null);
-    saveMutation.mutate();
+    triggerSave();
   };
 
   async function handleShareAnnouncement() {
@@ -481,7 +498,7 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
                 draft.trim() ===
                   (groupQuery.data.announcement?.trim() ?? "")
               }
-              onClick={() => saveMutation.mutate()}
+              onClick={triggerSave}
               className="h-10 w-full rounded-[10px] bg-[color:var(--brand-primary)] text-white hover:opacity-95 disabled:opacity-50"
             >
               {saveMutation.isPending ? t(msg`正在保存...`) : t(msg`保存群公告`)}

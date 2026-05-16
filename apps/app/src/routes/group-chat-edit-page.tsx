@@ -214,6 +214,22 @@ function MobileGroupChatEditPage({
     saveMutation.isPending ||
     !trimmedDraft ||
     trimmedDraft === initialValue.trim();
+  // 同步防双击锁——下面「保存」按钮原本只靠 disabled=submitDisabled 兜底，
+  // 但 disabled 要等 React commit 才生效，同帧内连点 2 次会同时通过两次
+  // isPending=false → 两个 PATCH /groups/$id 同时飞出去（公网隧道 ~600ms RTT
+  // 下并不罕见）。和 mobile-moments-publish-page Round 6 同款修法：ref 同步
+  // 赋值挡掉同帧后续 click，onSettled 解锁。
+  const submittingRef = useRef(false);
+  const handleSave = () => {
+    if (submittingRef.current) return;
+    if (submitDisabled) return;
+    submittingRef.current = true;
+    saveMutation.mutate(trimmedDraft, {
+      onSettled: () => {
+        submittingRef.current = false;
+      },
+    });
+  };
 
   function openGroupDetails() {
     void navigate({
@@ -243,8 +259,7 @@ function MobileGroupChatEditPage({
     if (!trimmedDraft) {
       return;
     }
-
-    saveMutation.mutate(trimmedDraft);
+    handleSave();
   }
 
   return (
@@ -428,14 +443,7 @@ function MobileGroupChatEditPage({
               variant="primary"
               size="lg"
               disabled={submitDisabled}
-              onClick={() => {
-                if (mode === "name") {
-                  saveGroupNameMutation.mutate(trimmedDraft);
-                  return;
-                }
-
-                saveNicknameMutation.mutate(trimmedDraft);
-              }}
+              onClick={handleSave}
               className="h-10 w-full rounded-[10px] bg-[color:var(--brand-primary)] text-white hover:opacity-95"
             >
               {saveMutation.isPending ? t(msg`正在保存...`) : t(msg`保存`)}

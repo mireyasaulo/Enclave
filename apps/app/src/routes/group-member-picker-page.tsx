@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
@@ -274,6 +274,14 @@ function MobileGroupMemberPickerPage({
     setSelectedIds((current) => toggleSelectionItem(current, targetId));
   };
 
+  // 同步防双击锁——下面「确定」按钮原本只靠 disabled=submitMutation.isPending
+  // 兜底，但 disabled 要等 React commit 才生效。add 模式连点 2 次会同时通过
+  // 两次 isPending=false → 同一批 memberId 被 POST /groups/$id/members 两遍，
+  // 服务端唯一约束会让第二批全部 409，但还是浪费 RTT 且 UI 上看着像"成功了"
+  // 但实际后端冒出一堆 409 日志。submittingRef 同步赋值，第一次 click 翻
+  // true 后同帧后续 click 都被早返。remove 模式靠 setRemoveConfirmOpen 弹层
+  // 二次确认，天然只点一次，不受影响。
+  const submittingRef = useRef(false);
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!selectedIds.length) {
@@ -335,7 +343,15 @@ function MobileGroupMemberPickerPage({
       setRemoveConfirmOpen(true);
       return;
     }
-    submitMutation.mutate();
+    if (submittingRef.current) {
+      return;
+    }
+    submittingRef.current = true;
+    submitMutation.mutate(undefined, {
+      onSettled: () => {
+        submittingRef.current = false;
+      },
+    });
   }
 
   const pageTitle = mode === "add" ? t(msg`添加成员`) : t(msg`移除成员`);
@@ -362,8 +378,15 @@ function MobileGroupMemberPickerPage({
     if (!selectedIds.length) {
       return;
     }
-
-    submitMutation.mutate();
+    if (submittingRef.current) {
+      return;
+    }
+    submittingRef.current = true;
+    submitMutation.mutate(undefined, {
+      onSettled: () => {
+        submittingRef.current = false;
+      },
+    });
   }
 
   return (
@@ -682,7 +705,15 @@ function MobileGroupMemberPickerPage({
                 if (submitMutation.isPending) {
                   return;
                 }
-                submitMutation.mutate();
+                if (submittingRef.current) {
+                  return;
+                }
+                submittingRef.current = true;
+                submitMutation.mutate(undefined, {
+                  onSettled: () => {
+                    submittingRef.current = false;
+                  },
+                });
               },
             },
           ]}
