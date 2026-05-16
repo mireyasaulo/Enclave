@@ -444,6 +444,19 @@ export function ChatMessageList({
   // 飘红，UI 上则跑到 setActionNotice("批量删除失败...") 让用户以为操作没
   // 成功——其实第一轮已经全删了。ref 同步赋值挡掉同帧第二次 click。
   const selectionActionBusyRef = useRef(false);
+  // 走查 R3：单条消息「撤回 / 删除」按钮在 context menu / mobile action sheet
+  // 上原本只有 setContextMenuState(null) / setMobileActionMessage(null) 关弹
+  // 层，但 sheet/menu 关闭是 React state，要等 commit 才生效，同帧第二次
+  // click 仍能进 onClick → recallMutation.mutate(message) 飞两份相同 POST。
+  // 后端 recallOwnerMessage 第一次把 message senderType 改成 system，第二次
+  // 看到 message.senderType !== "user" → 抛 CHAT_REVOKE_OWN_ONLY「只能撤回
+  // 自己发送的消息」；deleteMessage 第二次直接 404。两条错误都会被 onError
+  // 写进 actionNotice，把"已撤回这条消息"/"已删除这条消息"成功提示覆盖掉，
+  // 用户看着像失败但操作其实成功了。按 messageId 上锁，onSettled 解锁，
+  // 不同消息互不影响。triggerRecallMessage / triggerDeleteMessage 定义在
+  // recallMutation / deleteMutation 之后，避免 closure 时 mutation 还未声明。
+  const recallingMessageIdsRef = useRef<Set<string>>(new Set());
+  const deletingMessageIdsRef = useRef<Set<string>>(new Set());
   const [forwardMessages, setForwardMessages] = useState<
     ChatRenderableMessage[] | null
   >(null);
@@ -1020,7 +1033,7 @@ export function ChatMessageList({
         tone: "danger",
         actionLabel: t(msg`继续撤回`),
         onAction: () => {
-          recallMutation.mutate(message);
+          triggerRecallMessage(message);
         },
         secondaryActionLabel: errorActionLabel,
         onSecondaryAction: onErrorAction ?? undefined,
@@ -1092,13 +1105,39 @@ export function ChatMessageList({
         tone: "danger",
         actionLabel: t(msg`继续删除`),
         onAction: () => {
-          deleteMutation.mutate(message);
+          triggerDeleteMessage(message);
         },
         secondaryActionLabel: errorActionLabel,
         onSecondaryAction: onErrorAction ?? undefined,
       });
     },
   });
+
+  // 见上方 recallingMessageIdsRef / deletingMessageIdsRef 注释——按 messageId
+  // 上同步锁，挡掉同帧第二次 click 让两份相同 POST 飞出去把成功 notice 覆盖
+  // 成失败提示。
+  const triggerRecallMessage = (message: ChatRenderableMessage) => {
+    if (recallingMessageIdsRef.current.has(message.id)) {
+      return;
+    }
+    recallingMessageIdsRef.current.add(message.id);
+    recallMutation.mutate(message, {
+      onSettled: () => {
+        recallingMessageIdsRef.current.delete(message.id);
+      },
+    });
+  };
+  const triggerDeleteMessage = (message: ChatRenderableMessage) => {
+    if (deletingMessageIdsRef.current.has(message.id)) {
+      return;
+    }
+    deletingMessageIdsRef.current.add(message.id);
+    deleteMutation.mutate(message, {
+      onSettled: () => {
+        deletingMessageIdsRef.current.delete(message.id);
+      },
+    });
+  };
 
   const addToStickerMutation = useMutation({
     mutationFn: async (message: ChatRenderableMessage) => {
@@ -2249,7 +2288,7 @@ export function ChatMessageList({
     }
 
     if (threadContext) {
-      deleteMutation.mutate(message);
+      triggerDeleteMessage(message);
       return;
     }
 
@@ -3717,7 +3756,7 @@ export function ChatMessageList({
           onRecall={
             canRecallMessage(contextMenuState.message, threadContext)
               ? () => {
-                  recallMutation.mutate(contextMenuState.message);
+                  triggerRecallMessage(contextMenuState.message);
                   setContextMenuState(null);
                 }
               : undefined
@@ -3892,7 +3931,7 @@ export function ChatMessageList({
           mobileActionMessage &&
           canRecallMessage(mobileActionMessage, threadContext)
             ? () => {
-                recallMutation.mutate(mobileActionMessage);
+                triggerRecallMessage(mobileActionMessage);
                 setMobileActionMessage(null);
               }
             : undefined
