@@ -1695,6 +1695,12 @@ const pendingLikePostId = likeMutation.isPending
                               }}
                               className="block w-full cursor-pointer text-left text-[#1A1A1A] active:bg-[#EFEFEF]"
                             >
+                              {/* 长名字（wiki 走查角色叫 "走查词条_1778866835578221688"、
+                                  群里改备注成一句话等）会按字宽 wrap，把后面的
+                                  「回复 X：评论正文」推到下一行甚至撞断句。
+                                  跟 wechat-moment-card 对齐：作者名 + 被回复名都
+                                  套 inline-block + truncate + max-w-[160px]，单
+                                  名字最多占一行，超出 …。 */}
                               {authorIsCharacter ? (
                                 <button
                                   type="button"
@@ -1705,12 +1711,16 @@ const pendingLikePostId = likeMutation.isPending
                                       comment.authorType,
                                     );
                                   }}
-                                  className="text-[#576B95] hover:opacity-80"
+                                  className="inline-block max-w-[160px] truncate align-bottom text-[#576B95] hover:opacity-80"
+                                  title={comment.authorName}
                                 >
                                   {comment.authorName}
                                 </button>
                               ) : (
-                                <span className="text-[#576B95]">
+                                <span
+                                  className="inline-block max-w-[160px] truncate align-bottom text-[#576B95]"
+                                  title={comment.authorName}
+                                >
                                   {comment.authorName}
                                 </span>
                               )}
@@ -1727,12 +1737,16 @@ const pendingLikePostId = likeMutation.isPending
                                           replyToComment.authorType,
                                         );
                                       }}
-                                      className="text-[#576B95] hover:opacity-80"
+                                      className="inline-block max-w-[160px] truncate align-bottom text-[#576B95] hover:opacity-80"
+                                      title={replyToName}
                                     >
                                       {replyToName}
                                     </button>
                                   ) : (
-                                    <span className="text-[#576B95]">
+                                    <span
+                                      className="inline-block max-w-[160px] truncate align-bottom text-[#576B95]"
+                                      title={replyToName}
+                                    >
                                       {replyToName}
                                     </span>
                                   )}
