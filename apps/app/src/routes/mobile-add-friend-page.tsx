@@ -871,12 +871,24 @@ function MobileAddFriendSendSheet({
   // searchResults useMemo 一旦重算 result 引用就变，这条 effect 会把用户已经
   // 改过的 greeting 直接覆盖回模板（在网络一抖 / friendRequestsQuery 自动 refresh
   // 时复现）。
+  // 二次收紧：ownerName / t 也别进 dep —— ownerName 来自 world-owner-store，
+  // hydrate 完 / 用户在另一处改了用户名 / WS 推过来都会让引用换；t 来自
+  // useRuntimeTranslator，locale 一变就换。这两条本来都和"用户正在敲招呼"
+  // 互不相干，但只要进 dep，effect 一重跑就把 draft 拍回模板，用户的"hi
+  // 啊好久不见"立刻被覆盖成"你好，我是X，想把你添加到通讯录里。"
+  // 用 sessionRef 标记"这次会话已经初始化过模板了"——同一个 (open=true,
+  // targetCharacterId) 组合下不再重置。
   const targetCharacterId = result?.character.id ?? null;
+  const initializedSessionRef = useRef<string | null>(null);
   useEffect(() => {
     if (!open || !targetCharacterId) {
+      initializedSessionRef.current = null;
       return;
     }
-
+    if (initializedSessionRef.current === targetCharacterId) {
+      return;
+    }
+    initializedSessionRef.current = targetCharacterId;
     const owner = ownerName.trim() || t(msg`我`);
     setGreeting(t(msg`你好，我是${owner}，想把你添加到通讯录里。`));
   }, [open, ownerName, targetCharacterId, t]);
