@@ -1019,7 +1019,12 @@ export function MobileFriendMomentsPage() {
         moment={shareMoment}
         liked={shareLiked}
         ownerId={ownerId}
-        ownerDisplayName={displayName}
+        // 走查 R3：watermark "{name} 的 AI 朋友圈" 里的 name 是**世界主人**的
+        // 用户名（"我的 AI 世界"品牌），不是被分享的那位角色名。之前传 displayName
+        // （角色名 / 备注名）会让用户在分享 陆远 朋友圈卡片时水印写"陆远 的 AI 朋友圈"，
+        // 跟主朋友圈页 (moments-page) 与"我的朋友圈" (profile-moments-page) 一致改成
+        // ownerUsername || 世界主人 兜底。
+        ownerDisplayName={ownerUsername?.trim() || t(msg`世界主人`)}
         onClose={() => setShareMomentId(null)}
       />
 
