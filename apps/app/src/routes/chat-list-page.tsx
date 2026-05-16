@@ -349,6 +349,12 @@ function MobileChatListPage() {
   // 才有 UI 反应。reorder=true 时按后端的排序规则
   // （isPinned → pinnedAt desc → lastActivityAt desc）就地重排，避免 pin
   // 之后会话留在原位置 600ms 才跳到顶部。
+  //
+  // 不再返回完整 snapshot —— 之前 onError 把整张 conversations cache 全覆盖
+  // 回去，并发场景下（pin A 还在飞 → mute B / pin C 又乐观跑了 → pin A 失败）
+  // 会把 B / C 的乐观更新一起冲掉，红心闪回旧态。改为 onError 在调用端拿
+  // 旧字段值反向 patch 那一条，对其他行零影响（参见 discover-feed-page
+  // likeMutation 同款修复）。
   const patchConversationCache = async (
     conversationId: string,
     patch: (item: ConversationListItem) => ConversationListItem,
@@ -357,25 +363,16 @@ function MobileChatListPage() {
     await queryClient.cancelQueries({
       queryKey: ["app-conversations", baseUrl],
     });
-    const snapshots = queryClient.getQueriesData<ConversationListItem[]>({
-      queryKey: ["app-conversations", baseUrl],
-    });
-    snapshots.forEach(([key, data]) => {
-      if (!data) return;
-      const next = data.map((item) =>
-        item.id === conversationId ? patch(item) : item,
-      );
-      queryClient.setQueryData<ConversationListItem[]>(
-        key,
-        options?.reorder ? sortConversationsByBackendOrder(next) : next,
-      );
-    });
-    return snapshots;
-  };
-  const restoreConversationCache = (
-    snapshots: ReturnType<typeof queryClient.getQueriesData<ConversationListItem[]>>,
-  ) => {
-    snapshots.forEach(([key, data]) => queryClient.setQueryData(key, data));
+    queryClient.setQueriesData<ConversationListItem[]>(
+      { queryKey: ["app-conversations", baseUrl] },
+      (data) => {
+        if (!data) return data;
+        const next = data.map((item) =>
+          item.id === conversationId ? patch(item) : item,
+        );
+        return options?.reorder ? sortConversationsByBackendOrder(next) : next;
+      },
+    );
   };
 
   const pinMutation = useMutation({
@@ -393,7 +390,23 @@ function MobileChatListPage() {
         : setConversationPinned(conversationId, { pinned }, baseUrl),
     onMutate: async (variables) => {
       const now = new Date().toISOString();
-      const snapshots = await patchConversationCache(
+      // 记下这一条 conv 改前的 isPinned / pinnedAt，onError 单独翻回去；
+      // 全 snapshot rollback 会把并发的 mute/pin 一起冲掉，避坑。
+      let previousPinned: boolean | undefined;
+      let previousPinnedAt: string | null | undefined;
+      const cached = queryClient.getQueriesData<ConversationListItem[]>({
+        queryKey: ["app-conversations", baseUrl],
+      });
+      for (const [, data] of cached) {
+        if (!data) continue;
+        const found = data.find((item) => item.id === variables.conversationId);
+        if (found) {
+          previousPinned = found.isPinned;
+          previousPinnedAt = found.pinnedAt ?? null;
+          break;
+        }
+      }
+      await patchConversationCache(
         variables.conversationId,
         (item) => ({
           ...item,
@@ -402,10 +415,20 @@ function MobileChatListPage() {
         }),
         { reorder: true },
       );
-      return { snapshots };
+      return { previousPinned, previousPinnedAt };
     },
     onError: (error, variables, context) => {
-      if (context?.snapshots) restoreConversationCache(context.snapshots);
+      if (context && context.previousPinned !== undefined) {
+        void patchConversationCache(
+          variables.conversationId,
+          (item) => ({
+            ...item,
+            isPinned: context.previousPinned!,
+            pinnedAt: context.previousPinnedAt ?? undefined,
+          }),
+          { reorder: true },
+        );
+      }
       // optimistic 已回滚，但用户看不到任何反馈：列表里 pin 状态默默闪回原样。
       // 公网隧道偶发超时 / cloud token 过期重连那几百 ms 都会触发，必须给个 toast，
       // 否则用户以为"系统忽略了我的点击"。
@@ -446,18 +469,35 @@ function MobileChatListPage() {
         : setConversationMuted(conversationId, { muted }, baseUrl),
     onMutate: async (variables) => {
       const now = new Date().toISOString();
-      const snapshots = await patchConversationCache(
-        variables.conversationId,
-        (item) => ({
-          ...item,
-          isMuted: variables.muted,
-          mutedAt: variables.muted ? now : undefined,
-        }),
-      );
-      return { snapshots };
+      let previousMuted: boolean | undefined;
+      let previousMutedAt: string | null | undefined;
+      const cached = queryClient.getQueriesData<ConversationListItem[]>({
+        queryKey: ["app-conversations", baseUrl],
+      });
+      for (const [, data] of cached) {
+        if (!data) continue;
+        const found = data.find((item) => item.id === variables.conversationId);
+        if (found) {
+          previousMuted = found.isMuted;
+          previousMutedAt = found.mutedAt ?? null;
+          break;
+        }
+      }
+      await patchConversationCache(variables.conversationId, (item) => ({
+        ...item,
+        isMuted: variables.muted,
+        mutedAt: variables.muted ? now : undefined,
+      }));
+      return { previousMuted, previousMutedAt };
     },
     onError: (error, variables, context) => {
-      if (context?.snapshots) restoreConversationCache(context.snapshots);
+      if (context && context.previousMuted !== undefined) {
+        void patchConversationCache(variables.conversationId, (item) => ({
+          ...item,
+          isMuted: context.previousMuted!,
+          mutedAt: context.previousMutedAt ?? undefined,
+        }));
+      }
       setNoticeError(
         error instanceof Error && error.message
           ? error.message
