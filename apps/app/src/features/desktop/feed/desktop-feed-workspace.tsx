@@ -40,6 +40,8 @@ type DesktopFeedWorkspaceProps = {
   ownerAvatar?: string | null;
   ownerUsername?: string | null;
   posts: FeedPostListItem[];
+  /** 服务端汇报的广场总数；不传或 <= posts.length 时按已加载条数显示。 */
+  serverTotal?: number;
   onRequestMore?: () => void;
   onSelectedPostChange?: (postId: string | null) => void;
   routeSelectedPostId?: string | null;
@@ -94,6 +96,7 @@ export function DesktopFeedWorkspace({
   ownerAvatar,
   ownerUsername,
   posts,
+  serverTotal,
   onRequestMore,
   onSelectedPostChange,
   routeSelectedPostId = null,
@@ -230,7 +233,8 @@ export function DesktopFeedWorkspace({
             errors={errors}
             likeErrorMessage={likeErrorMessage}
             successNotice={successNotice}
-            totalCount={posts.length}
+            loadedCount={posts.length}
+            serverTotal={serverTotal}
             onBackToTop={() => {
               scrollViewportRef.current?.scrollTo({
                 top: 0,

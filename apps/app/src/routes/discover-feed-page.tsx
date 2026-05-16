@@ -511,13 +511,36 @@ const pendingLikePostId = likeMutation.isPending
   const pendingCommentPostId = commentMutation.isPending
     ? (commentMutation.variables?.postId ?? null)
     : null;
-  const blockedCharacterIds = new Set(
-    (blockedQuery.data ?? []).map((item) => item.characterId),
+  // blockedCharacterIds + visiblePosts 之前每 render 都 new Set / new Array：
+  // 桌面 workspace 拿 posts={visiblePosts} 作 prop，引用每次都换 → workspace
+  // 内部 useEffect 依赖 posts 的（比如 selectedPostId 校验、scrollIntoView lock）
+  // 全部 re-run，DesktopFeedList → 每条 Row 跟着 re-render。打字、点赞气泡、
+  // 滚动这些高频路径下都跟着抖。两层都包 useMemo，保住引用稳定。
+  const blockedCharacterIds = useMemo(
+    () =>
+      new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
+    [blockedQuery.data],
   );
-  const visiblePosts = feedPosts.filter(
-    (post) =>
-      post.authorType !== "character" ||
-      !blockedCharacterIds.has(post.authorId),
+  const visiblePosts = useMemo(
+    () =>
+      feedPosts.filter(
+        (post) =>
+          post.authorType !== "character" ||
+          !blockedCharacterIds.has(post.authorId),
+      ),
+    [feedPosts, blockedCharacterIds],
+  );
+  // 收藏命中查每条 row 一次走 includes：100 条 post × 50 个收藏 ≈ O(N×M)
+  // 数组扫，每次 page render 都重做。落成 Set + useCallback 一举两得 ——
+  // 查询 O(1)，闭包引用稳定不再让 workspace 因为 isPostFavorite prop 变天
+  // 而 re-render。
+  const favoriteSourceIdSet = useMemo(
+    () => new Set(favoriteSourceIds),
+    [favoriteSourceIds],
+  );
+  const isPostFavorite = useCallback(
+    (postId: string) => favoriteSourceIdSet.has(`feed-${postId}`),
+    [favoriteSourceIdSet],
   );
 
   function toggleFavoriteByPostId(postId: string) {
@@ -527,7 +550,7 @@ const pendingLikePostId = likeMutation.isPending
     }
 
     const sourceId = `feed-${post.id}`;
-    const collected = favoriteSourceIds.includes(sourceId);
+    const collected = favoriteSourceIdSet.has(sourceId);
     const nextFavorites = collected
       ? removeDesktopFavorite(sourceId)
       : upsertDesktopFavorite({
@@ -1057,6 +1080,12 @@ const pendingLikePostId = likeMutation.isPending
           isFetchingNextPage={feedQuery.isFetchingNextPage}
           imageDrafts={composeDraft.imageDrafts}
           isLoading={feedQuery.isLoading}
+          serverTotal={
+            // 用最新一页的 total（中间有删/加 post 时数字会跟着变），fallback
+            // 到首页。两个都没拿到就交给 toolbar 自己用 loadedCount 兜。
+            feedQuery.data?.pages.at(-1)?.total ??
+            feedQuery.data?.pages[0]?.total
+          }
           likeErrorMessage={
             likeMutation.isError && likeMutation.error instanceof Error
               ? likeMutation.error.message
@@ -1073,9 +1102,7 @@ const pendingLikePostId = likeMutation.isPending
           successNotice={notice}
           text={composeDraft.text}
           videoDraft={composeDraft.videoDraft}
-          isPostFavorite={(postId) =>
-            favoriteSourceIds.includes(`feed-${postId}`)
-          }
+          isPostFavorite={isPostFavorite}
           setShowCompose={(next) => {
             // 上一次发布失败 / 选错图片 → 关闭面板 → 重开：composeErrorMessage
             // 还会渲染上次的 createMutation.error 和 composeDraft.mediaError，
@@ -1715,7 +1742,7 @@ const pendingLikePostId = likeMutation.isPending
         }
         favorited={
           actionBubble
-            ? favoriteSourceIds.includes(`feed-${actionBubble.postId}`)
+            ? favoriteSourceIdSet.has(`feed-${actionBubble.postId}`)
             : false
         }
         onLike={() => {

@@ -8,7 +8,9 @@ type DesktopFeedToolbarProps = {
   errors?: string[];
   likeErrorMessage?: string | null;
   successNotice?: string;
-  totalCount: number;
+  loadedCount: number;
+  /** 服务端汇报的总数；不传或 < loadedCount 时按 loadedCount 显示。 */
+  serverTotal?: number;
   onBackToTop: () => void;
   onOpenCompose: () => void;
   onRefresh: () => void;
@@ -19,7 +21,8 @@ export function DesktopFeedToolbar({
   errors = [],
   likeErrorMessage,
   successNotice,
-  totalCount,
+  loadedCount,
+  serverTotal,
   onBackToTop,
   onOpenCompose,
   onRefresh,
@@ -59,7 +62,9 @@ export function DesktopFeedToolbar({
 
         <div className="mt-4 flex items-center justify-end">
           <div className="text-[12px] text-[color:var(--text-muted)]">
-            {t(msg`当前共 ${totalCount} 条动态`)}
+            {typeof serverTotal === "number" && serverTotal > loadedCount
+              ? t(msg`已加载 ${loadedCount} / 共 ${serverTotal} 条动态`)
+              : t(msg`共 ${loadedCount} 条动态`)}
           </div>
         </div>
 
