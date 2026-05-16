@@ -333,8 +333,8 @@ export function MobileMomentsPublishPage() {
         {errorMessage ? (
           <div className="px-4 pt-3">
             <InlineNotice
-              tone="info"
-              className="rounded-[8px] border border-[#ECECEC] bg-white px-3 py-2 text-[12px] shadow-none"
+              tone="danger"
+              className="rounded-[8px] px-3 py-2 text-[12px] shadow-none"
             >
               {errorMessage}
             </InlineNotice>

@@ -122,7 +122,9 @@ export function MomentsPage() {
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
-  const [noticeTone, setNoticeTone] = useState<"success" | "info">("success");
+  const [noticeTone, setNoticeTone] = useState<"success" | "info" | "danger">(
+    "success",
+  );
   const [noticeActionLabel, setNoticeActionLabel] = useState<string | null>(
     null,
   );
@@ -313,7 +315,9 @@ export function MomentsPage() {
       optimisticLike.onError(error, momentId, context);
       // 之前 error 只回滚 cache、UI 沉默到底部那块 likeError 一直挂着不消失。
       // 把错误冒到顶 notice 通道，2.4s 自动收 + 给个「重试点赞」按钮。
-      setNoticeTone("info");
+      // tone="danger" 红条——之前用 tone="info" 蓝条，色调和「朋友圈互动已更新。」
+      // 成功 toast 太接近，用户根本看不出是失败，跟 chat Round 6 同类 bug。
+      setNoticeTone("danger");
       setNoticeActionLabel(t(msg`重试点赞`));
       setNoticeAction(() => () => likeMutation.mutate(momentId));
       setNotice(
@@ -500,7 +504,7 @@ export function MomentsPage() {
       // 顶 notice 走错误提示，2.4s 自动收。
       // 不放「重试」按钮——commentBar 已经被 setCommentBarTarget 重新打开，
       // 用户直接在评论框内点「发送」就能再试。
-      setNoticeTone("info");
+      setNoticeTone("danger");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(
@@ -578,7 +582,7 @@ export function MomentsPage() {
       });
       // 删除失败也冒到 notice，给「重试删除」按钮——之前完全沉默，
       // 用户只看到帖子又出现了，根本搞不清是不是删除生效。
-      setNoticeTone("info");
+      setNoticeTone("danger");
       setNoticeActionLabel(t(msg`重试删除`));
       setNoticeAction(() => () => deleteMutation.mutate(momentId));
       setNotice(
@@ -1292,7 +1296,7 @@ export function MomentsPage() {
         } catch (error) {
           // 下拉刷新失败之前完全沉默——指示器走完一遍消失，但用户根本不知道
           // 列表没换。冒到 notice 通道 2.4s 自动收，跟点赞/删除失败一致。
-          setNoticeTone("info");
+          setNoticeTone("danger");
           setNoticeActionLabel(null);
           setNoticeAction(null);
           setNotice(
@@ -1345,7 +1349,7 @@ type MobileMomentsViewProps = {
   momentsError: Error | null;
   pendingCommentMomentId: string | null | undefined;
   notice: string;
-  noticeTone: "success" | "info";
+  noticeTone: "success" | "info" | "danger";
   noticeActionLabel: string | null;
   noticeAction: (() => void) | null;
   interactionActionLabel: string;
@@ -1571,7 +1575,9 @@ function MobileMomentsView({
                   // 否则（如评论失败 且 没有 returnPath），secondary 「重试读取」
                   // 跟主重试按钮重复 / 跟用户当下操作（commentBar 已重开）无关，
                   // 整行 action 不渲染，避免 toast 里冒一个误导的孤儿按钮。
-                  noticeTone === "info" &&
+                  // 失败 toast 现在走 "danger" 红条而非 "info" 蓝条；成功 "success"
+                  // 不需要 action 行（朋友圈互动已更新本身就是终态）。
+                  noticeTone !== "success" &&
                   ((noticeAction && noticeActionLabel) || hasReturnPath) ? (
                     <div className="flex items-center gap-1.5">
                       {noticeAction && noticeActionLabel ? (
@@ -1847,7 +1853,7 @@ function MobileMomentsInlineNotice({
   action,
 }: {
   children: ReactNode;
-  tone: "success" | "info";
+  tone: "success" | "info" | "danger";
   action?: ReactNode;
 }) {
   return (

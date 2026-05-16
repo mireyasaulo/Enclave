@@ -6,8 +6,8 @@ import {
   addMomentComment,
   getBlockedCharacters,
   getCharacter,
+  getCharacterMoments,
   getFriends,
-  getMoments,
   toggleMomentLike,
   type MomentComment,
   type MomentLike,
@@ -39,6 +39,7 @@ import {
 import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -93,8 +94,10 @@ export function MobileFriendMomentsPage() {
     replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
   const [notice, setNotice] = useState<{
-    tone: "success" | "info";
+    tone: "success" | "info" | "danger";
     message: string;
+    actionLabel?: string;
+    action?: () => void;
   } | null>(null);
   // 「分享图卡」目标 — 点 ⋯ → 分享时把 momentId 存下来。
   // 用 id 而不是整个对象，friendMoments 后续刷新时预览也会跟着新。
@@ -109,9 +112,13 @@ export function MobileFriendMomentsPage() {
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
   });
+  // ?character=ID 服务端过滤，只回该角色发的几条 ≤几KB，省掉之前 getMoments
+  // 全表 ~724KB 的浪费。和「我的朋友圈」（mine=true）走同一类模式，但每个角色
+  // 一个独立 cache，避免互相覆盖。
   const momentsQuery = useQuery({
-    queryKey: ["app-moments", baseUrl],
-    queryFn: () => getMoments(baseUrl),
+    queryKey: ["app-moments-character", baseUrl, resolvedCharacterId],
+    queryFn: () => getCharacterMoments(resolvedCharacterId, baseUrl),
+    enabled: Boolean(resolvedCharacterId),
   });
   const blockedQuery = useQuery({
     queryKey: ["app-moments-blocked-characters", baseUrl],
@@ -128,7 +135,22 @@ export function MobileFriendMomentsPage() {
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
     onMutate: optimisticLike.onMutate,
-    onError: optimisticLike.onError,
+    onError: (error, momentId, context) => {
+      optimisticLike.onError(error, momentId, context);
+      // 失败走顶 notice 通道——之前在底部挂一条 tone="info" 蓝条直接显示
+      // raw error.message，色调跟「朋友圈互动已更新。」成功提示一样，
+      // 加上没有「点赞失败：」前缀，用户根本看不出是失败。和 chat Round 6
+      // (78b6a272) / 主朋友圈页处理方式对齐：danger 红条 + 失败前缀 + 重试按钮。
+      setNotice({
+        tone: "danger",
+        message:
+          error instanceof Error
+            ? t(msg`点赞失败：${error.message}`)
+            : t(msg`点赞失败，请稍后重试。`),
+        actionLabel: t(msg`重试点赞`),
+        action: () => likeMutation.mutate(momentId),
+      });
+    },
     onSuccess: () => {
       setNotice({
         tone: "success",
@@ -162,16 +184,39 @@ export function MobileFriendMomentsPage() {
     },
     onSuccess: (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
-      setCommentBarTarget(null);
+      // 只在用户还停在「同一条 moment 的评论条」时关闭——pending 期间用户切到
+      // 另一条 moment 写评论的话，旧 onSuccess 不该把新评论条关掉。和
+      // moments-page 主页面的 onMutate 守卫等价。
+      setCommentBarTarget((current) =>
+        current?.momentId === momentId ? null : current,
+      );
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
       // fire-and-forget：await refetch 会让"发表"按钮一直 disabled，
       // 公网隧道下感觉评论"卡好几秒"。让 invalidate 在后台跑就行。
+      // app-moments-character 是当前页用的 cache，必须 invalidate 才能让服务端
+      // 真实评论 ID 替换 optimistic 临时 ID；同时 paged / flat / mine 也 invalidate，
+      // 保证别的朋友圈页（主页 / profile）跨页一致。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-character", baseUrl, resolvedCharacterId],
+      });
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
+      });
+    },
+    onError: (error) => {
+      // 失败也走顶 notice danger 红条 + 「评论失败：」前缀。不挂「重试」按钮：
+      // commentBar 在 onError 路径下没被关闭、草稿也保留，用户直接在评论框里
+      // 点「发送」就能再试，跟主朋友圈页的处理一致。
+      setNotice({
+        tone: "danger",
+        message:
+          error instanceof Error
+            ? t(msg`评论失败：${error.message}`)
+            : t(msg`评论失败，请稍后重试。`),
       });
     },
   });
@@ -196,20 +241,21 @@ export function MobileFriendMomentsPage() {
     () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
     [blockedQuery.data],
   );
+  // 服务端按 ?character=ID 已经把非该角色的帖子过滤掉了；这里只需要再过一遍
+  // 黑名单（防御性：在 SQL 层 where authorId=characterId 的同时，UI 层若用户
+  // 刚把该角色加黑就立刻清空朋友圈卡片，比等服务端 refetch 快）+ 按 postedAt
+  // 倒序排（服务端已 ORDER BY postedAt DESC，但 Date.parse 客户端再保一道防
+  // 偶发返回顺序错乱）。
   const friendMoments = useMemo(
     () =>
       (momentsQuery.data ?? [])
-        .filter(
-          (moment) =>
-            (moment.authorType !== "character" ||
-              !blockedCharacterIds.has(moment.authorId)) &&
-            moment.authorId === resolvedCharacterId,
-        )
+        .filter((moment) => !blockedCharacterIds.has(moment.authorId))
         .sort(
           (left, right) =>
-            new Date(right.postedAt).getTime() - new Date(left.postedAt).getTime(),
+            new Date(right.postedAt).getTime() -
+            new Date(left.postedAt).getTime(),
         ),
-    [blockedCharacterIds, momentsQuery.data, resolvedCharacterId],
+    [blockedCharacterIds, momentsQuery.data],
   );
   const relationshipLoading = friendsQuery.isLoading || blockedQuery.isLoading;
   const timelineLoading = momentsQuery.isLoading || relationshipLoading;
@@ -246,6 +292,28 @@ export function MobileFriendMomentsPage() {
     const timer = window.setTimeout(() => setNotice(null), 2400);
     return () => window.clearTimeout(timer);
   }, [notice]);
+
+  // Android 硬件 Back：弹层打开时先收弹层（评论条 > 行动菜单 > 分享卡片），
+  // 与 publish / chat 系列最近的 Back 行为对齐——别把整页退掉。
+  useEffect(() => {
+    const hasOverlay = Boolean(
+      commentBarTarget || actionBubble || shareMomentId,
+    );
+    if (!hasOverlay) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      if (commentBarTarget) {
+        setCommentBarTarget(null);
+        return true;
+      }
+      if (actionBubble) {
+        setActionBubble(null);
+        return true;
+      }
+      setShareMomentId(null);
+      return true;
+    });
+  }, [actionBubble, commentBarTarget, shareMomentId]);
 
   function navigateToRouteStateReturn() {
     if (!safeReturnPath) {
@@ -439,9 +507,24 @@ export function MobileFriendMomentsPage() {
             <div className="px-4 pt-3">
               <InlineNotice
                 tone={notice.tone}
-                className="rounded-[8px] border border-[#ECECEC] bg-white px-3 py-2 text-[12px] shadow-none"
+                className="rounded-[8px] px-3 py-2 text-[12px] shadow-none"
               >
-                {notice.message}
+                {notice.action && notice.actionLabel ? (
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 flex-1">{notice.message}</span>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      className="h-7 shrink-0 rounded-full border-[#E5E5E5] bg-white px-3 text-[11px]"
+                      onClick={notice.action}
+                    >
+                      {notice.actionLabel}
+                    </Button>
+                  </div>
+                ) : (
+                  notice.message
+                )}
               </InlineNotice>
             </div>
           ) : null}
@@ -620,27 +703,9 @@ export function MobileFriendMomentsPage() {
               })
             : null}
 
-          {likeMutation.isError && likeMutation.error instanceof Error ? (
-            <div className="px-4 pt-3">
-              <InlineNotice
-                tone="info"
-                className="rounded-[8px] border border-[#ECECEC] bg-white px-3 py-2 text-[12px] shadow-none"
-              >
-                {likeMutation.error.message}
-              </InlineNotice>
-            </div>
-          ) : null}
-
-          {commentMutation.isError && commentMutation.error instanceof Error ? (
-            <div className="px-4 pt-3">
-              <InlineNotice
-                tone="info"
-                className="rounded-[8px] border border-[#ECECEC] bg-white px-3 py-2 text-[12px] shadow-none"
-              >
-                {commentMutation.error.message}
-              </InlineNotice>
-            </div>
-          ) : null}
+          {/* like/comment 失败统一上提到顶部 notice（danger 红条 + 失败前缀 +
+              点赞带「重试点赞」），不再单独挂底部一块永驻的 tone="info" 错误块。
+              和 chat Round 6 / 主朋友圈页失败提示色调一致。 */}
 
           <div className="h-[calc(env(safe-area-inset-bottom,0px)+24px)]" />
         </div>
