@@ -278,13 +278,22 @@ export function ContactsBulkActionBar({
                 value={tagDraft}
                 onChange={(e) => setTagDraft(e.target.value)}
                 placeholder={t(msg`标签名称`)}
+                // maxLength=20: 后端 normalizeTags 没 length 限制，前端没卡的话
+                // 用户复制粘贴一段 5000 字进来照样 commit 到 friendship.tags（JSON
+                // 字段），后续好友卡片 / 编辑 / 桌面 tags pane 渲染都会被这条
+                // 超长 tag 撑爆布局。20 字符跟微信"打标签"上限对齐，常用 tag
+                // 名（朋友、家人、同事、客户、初中同学 …）都够。
+                maxLength={20}
                 // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
                 // zoom-in，autoFocus 一打开就抖；text-[14px] 时还会把 dialog
                 // 推出可视区一截。
                 className="h-10 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[16px] text-[color:var(--text-primary)] outline-none focus:border-[#07c160]"
               />
-              <div className="mt-1 text-[11px] text-[color:var(--text-muted)]">
-                {t(msg`已选 ${selectedIds.length} 项`)}
+              <div className="mt-1 flex items-center justify-between text-[11px] text-[color:var(--text-muted)]">
+                <span>{t(msg`已选 ${selectedIds.length} 项`)}</span>
+                <span className="text-[color:var(--text-dim)]">
+                  {tagDraft.length}/20
+                </span>
               </div>
               <div className="mt-4 flex justify-end gap-2">
                 <button
