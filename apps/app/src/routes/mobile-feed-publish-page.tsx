@@ -100,13 +100,34 @@ export function MobileFeedPublishPage() {
         videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newPost, input) => {
-      storeFeedPublishFlash(t(msg`广场动态已发布，世界居民公开可见。`));
+    // 走查 Round 2：跟 discover-feed-page createMutation R10 (b9d6a116 之前的
+    // R10 链路) 对齐，钉 mutationBaseUrl 防 mid-flight 切账户。慢网下用户路径：
+    //   1. A 账户点发表 → mutation 飞 5s
+    //   2. 第 2s A logout / 切到 B 账户 → world-owner-store.baseUrl 翻成 B
+    //   3. 第 5s 服务端（仍由 A 的 baseUrl 命中）回 newPost；react-query 从
+    //      "最新一次 render 的 options" 拿 onSuccess，闭包里 baseUrl 已经是 B。
+    //      旧实现：
+    //        a. storeFeedPublishFlash() 全局 sessionStorage 写一条"广场动态已
+    //           发布"。下一次 B 进 /discover/feed 时 consumeFeedPublishFlash
+    //           弹给 B —— B 看着像自己发了，但 B 啥也没发。
+    //        b. setQueryData(["app-feed-paged", B], ...) 把 A 的 newPost
+    //           prepend 到 B 的 cache 头部，B 进广场首屏闪一条不属于自己的
+    //           post 再被 invalidate refetch 矫正掉，肉眼可见的脏闪。
+    //        c. setQueryData(["app-feed", B], ...) 同上。
+    //        d. invalidateQueries(["app-feed", B]) / ["app-feed-paged", B]
+    //           逼 B 当前活跃的广场 query 立刻重拉。
+    //   onMutate 把当前 baseUrl 钉进 context，cache 写按 mutationBaseUrl（A）走
+    //   保证用户回 A 时第一帧能看到刚发的 post；flash / navigate / composeDraft
+    //   .reset() 这些"对当前用户的 UI 反馈"只在 mutationBaseUrl===当前 baseUrl
+    //   时才做，切走了静默。
+    onMutate: () => ({ mutationBaseUrl: baseUrl }),
+    onSuccess: (newPost, input, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
       // 把新 post prepend 到 paged 头部 + 平铺 flat cache，跳到 /discover/feed 时立刻可见，
       // 不必等后台 refetch；同时砍回 page 1，避免发布后分页边界重复。
       const newListItem = { ...newPost, commentsPreview: [] };
       queryClient.setQueryData<InfiniteData<FeedListResponse>>(
-        ["app-feed-paged", baseUrl],
+        ["app-feed-paged", mutationBaseUrl],
         (current) =>
           current && current.pages.length > 0
             ? {
@@ -122,7 +143,7 @@ export function MobileFeedPublishPage() {
             : current,
       );
       queryClient.setQueryData<FeedListResponse>(
-        ["app-feed", baseUrl],
+        ["app-feed", mutationBaseUrl],
         (current) =>
           current
             ? {
@@ -132,15 +153,27 @@ export function MobileFeedPublishPage() {
             : current,
       );
       // fire-and-forget：原来 await refetch 让"发表中"按钮多卡 600ms+。
-      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
       void queryClient.invalidateQueries({
-        queryKey: ["app-feed-paged", baseUrl],
+        queryKey: ["app-feed", mutationBaseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-feed-paged", mutationBaseUrl],
       });
       // discover-feed-page createMutation R4 已经把 ["app-feed-post"] 这条
       // 没意义的 invalidate 删了——"新发了一条 post"对任何 *已存在* post 的
       // detail cache 都没影响，只会逼桌面 workspace / channels-page 当前选中
       // 的 detail useQuery 做一次毫无意义的 refetch（200-500ms 一发）。
       // 本路径同模式，跟着拿掉。
+
+      // mid-flight 切账户后剩下的 UI / state 反馈都跟当前账户体验有关，全部静默：
+      //   - flash 不写到全局 sessionStorage 让 B 进广场看到 A 的成功提示；
+      //   - composeDraft.reset() 不动 B 的草稿状态；
+      //   - navigate 不把 B 从他们正在看的页面踹回广场。
+      const accountStillMatches = mutationBaseUrl === baseUrl;
+      if (!accountStillMatches) {
+        return;
+      }
+      storeFeedPublishFlash(t(msg`广场动态已发布，世界居民公开可见。`));
       const draftStillMatchesPublish =
         composeDraft.text === input.text &&
         composeDraft.imageDrafts === input.imageDrafts &&
