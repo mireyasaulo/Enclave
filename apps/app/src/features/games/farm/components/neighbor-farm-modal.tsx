@@ -38,6 +38,34 @@ export function NeighborFarmModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [toast, setToast] = useState<StealToast | null>(null);
 
+  // 跟着 toast.expiresAt 走带 cleanup 的定时器；之前用裸 setTimeout，关掉模态或快连
+  // 偷两次会留下野定时器，要么把后一个 toast 提前抹掉，要么对已卸载组件 setState。
+  useEffect(() => {
+    if (!toast) return;
+    const remaining = toast.expiresAt - Date.now();
+    if (remaining <= 0) {
+      setToast(null);
+      return;
+    }
+    const timer = window.setTimeout(() => setToast(null), remaining);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  useEffect(() => {
+    // 走查新一轮 R7：早返 `if (!characterId) return null` 原本在 useEffect 之前，
+    // 5 个上方 hook 永远跑 + 后面 2 个 useEffect 在 characterId 为 null 时被
+    // skip → characterId 由 null 翻成有值时 React 看到「上轮 5 个 hook，本轮
+    // 7 个 hook」，throw `Rendered more hooks than during the previous render`，
+    // 真机上点邻居农场首次会让 React tree 直接崩，需要刷新整页才能恢复。
+    // 把 useEffect 全部提到早返之前，里面用 characterId 决定是否真的挂监听。
+    if (!characterId) return;
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose, characterId]);
+
   if (!characterId) return null;
 
   function handleSteal(plot: FarmPlot) {
@@ -57,27 +85,6 @@ export function NeighborFarmModal({
       },
     );
   }
-
-  // 跟着 toast.expiresAt 走带 cleanup 的定时器；之前用裸 setTimeout，关掉模态或快连
-  // 偷两次会留下野定时器，要么把后一个 toast 提前抹掉，要么对已卸载组件 setState。
-  useEffect(() => {
-    if (!toast) return;
-    const remaining = toast.expiresAt - Date.now();
-    if (remaining <= 0) {
-      setToast(null);
-      return;
-    }
-    const timer = window.setTimeout(() => setToast(null), remaining);
-    return () => window.clearTimeout(timer);
-  }, [toast]);
-
-  useEffect(() => {
-    const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
 
   return (
     <div
