@@ -363,6 +363,11 @@ export function DesktopNotesWorkspace({
       });
     },
     onError: (error) => {
+      // 之前发送失败只 setNotice，但发送弹层是 z-50 modal，会把编辑器底下的
+      // InlineNotice 整片盖住——用户点完"发送"看到对话列表又冒回来、按钮停转，
+      // 却没看见任何错误文案，只能瞎猜是不是没生效。把弹层一起关掉，让 notice
+      // 在编辑器主区显出来，至少能告诉用户为什么发送没成。
+      setSendDialogNote(null);
       setNotice({
         tone: "danger",
         message:
