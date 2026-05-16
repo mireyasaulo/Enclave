@@ -90,8 +90,13 @@ export function ManagementPermissionsScreen({
           {search ? (
             // 对齐 mobile-add-friend 的搜索框：有输入时显示 X 一键清空，避免
             // 用户搜出"无匹配"后只能手动删除每个字符才能继续。
+            // 新一轮走查 R4：onMouseDown.preventDefault 防止 X 按钮夺走 input 的 focus。
+            // 原写法手机上点 X → button 抢焦点 → input 失焦 → 软键盘收回，用户清完
+            // 还想继续敲就要再点一次 input 把键盘叫回来。pointer-press 不变更焦点
+            // 是搜索框 clear 按钮的标准做法（iOS 原生 type=search clear 也是这行为）。
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => onSearchChange("")}
               className="-mr-1 flex h-5 w-5 items-center justify-center rounded-full text-[color:var(--text-dim)] active:bg-black/5"
               aria-label={t(msg`清空输入`)}
