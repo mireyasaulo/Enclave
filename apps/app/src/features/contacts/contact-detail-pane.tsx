@@ -345,9 +345,21 @@ export function ContactDetailPane({
         {isFriend ? (
           <DesktopContactProfileRow
             label={t(msg`最近互动`)}
-            value={formatTimestamp(
-              friendship?.lastInteractedAt ?? character.lastActiveAt ?? null,
-            )}
+            // formatTimestamp(null) 会落到「刚刚」分支——对刚加好友、还没真正
+            // 互动过的联系人，「最近互动：刚刚」会让人误以为对方刚刚发了消息；
+            // 没有任何 lastInteractedAt / lastActiveAt 时显式落「暂无互动」+ muted。
+            value={
+              friendship?.lastInteractedAt || character.lastActiveAt
+                ? formatTimestamp(
+                    friendship?.lastInteractedAt ??
+                      character.lastActiveAt ??
+                      null,
+                  )
+                : t(msg`暂无互动`)
+            }
+            muted={
+              !friendship?.lastInteractedAt && !character.lastActiveAt
+            }
           />
         ) : null}
         {isFriend && (friendship?.sparkStreak ?? 0) >= 3 ? (
