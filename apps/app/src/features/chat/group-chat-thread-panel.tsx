@@ -531,10 +531,22 @@ export function GroupChatThreadPanel({
 
     const offTypingStart = onTypingStart((payload) => {
       if (payload.conversationId === groupId) {
-        setTypingStates((current) => ({
-          ...current,
-          [payload.characterId]: payload.stage,
-        }));
+        // 对齐单聊 use-conversation-thread.ts 同款 dedup：AI 回复期间
+        // typing_start 会按几秒一次的节奏持续 emit（reply 整段 + image_generation
+        // 阶段跨 30-60s，多角色并发触发频次更高）。同 characterId + 同 stage
+        // 时硬塞新对象会让 typingStates 引用变 → typingSummary useMemo 重算 +
+        // GroupChatThreadPanel + ChatMessageList + ChatComposer 整条链白渲染。
+        // 内容相等时直接复用旧 state 跳过 setState，watchdog 那个
+        // [typingStates] effect 也跟着不会重挂 120s 定时器。
+        setTypingStates((current) => {
+          if (current[payload.characterId] === payload.stage) {
+            return current;
+          }
+          return {
+            ...current,
+            [payload.characterId]: payload.stage,
+          };
+        });
       }
     });
 
@@ -568,9 +580,13 @@ export function GroupChatThreadPanel({
       void queryClient.invalidateQueries({
         queryKey: ["app-group-members", baseUrl, groupId],
       });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-group-messages", baseUrl, groupId],
-      });
+      // perf：group.service.ts 里 emitGroupConversationUpdated 的所有调用点
+      // （create/update/addMember/removeMember/leave/pin/mute/preferences/
+      // announcement/owner-profile）都只动 group 元数据，不会写入 group_messages
+      // 表——sendSystemMessage 虽然定义着但全代码库没人 call。invalidate
+      // app-group-messages 会强制 GET /groups/$id/messages?limit=60（公网隧道
+      // ~600ms RTT × N 条），白白浪费。messages cache 仍由 onChatMessage 路径
+      // 维护，幂等不漏。
       void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
@@ -706,15 +722,21 @@ export function GroupChatThreadPanel({
         },
         baseUrl,
       ),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["app-group-messages", baseUrl, groupId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        }),
-      ]);
+    onSuccess: async (message) => {
+      // perf：和 sendMutation Round 3 同款修法——sendGroupMessage 服务端响应
+      // 已经是 canonical GroupMessage，跟 socket onChatMessage echo 走同一个
+      // upsertServerMessageInCache，不需要再 invalidate(["app-group-messages"])
+      // 触发整个列表 GET 重拉（公网隧道 ~600ms RTT × N 条）。setQueriesData
+      // 直接合并进所有 messageLimit 变体；socket echo 到时再 upsert 一次幂等。
+      // 桌面群语音/视频面板上"开始通话/发送邀请/同步在席人数/挂断"4 个动作
+      // 都走这条 mutation，连续 4 次状态变化原版 = 4 次群消息全量 GET。
+      queryClient.setQueriesData<GroupMessage[]>(
+        { queryKey: ["app-group-messages", baseUrl, groupId] },
+        (current) => upsertServerMessageInCache(current, message),
+      );
+      await queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
       scrollToBottom("smooth");
     },
   });
