@@ -1499,15 +1499,48 @@ export function DiscoverFeedPage() {
     },
     [likeMutationMutate],
   );
-  const handleRowToggleFavorite = useCallback(
-    (postId: string) => {
-      toggleFavoriteByPostId(postId);
-    },
-    // toggleFavoriteByPostId 闭包了 visiblePosts/favoriteSourceIdSet — 这两个
-    // 只在真数据变（fetch / 收藏切换）时换，键盘敲字不会重生成。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [visiblePosts, favoriteSourceIdSet],
-  );
+  // 走查新一轮 Round 2（perf）：handleRowToggleFavorite 之前 deps=[visiblePosts,
+  // favoriteSourceIdSet] —— 但 visiblePosts 在用户任何一次 like / comment 乐观
+  // 更新后都换新 array 引用（feedQuery.data 更新 → feedPosts useMemo → visiblePosts
+  // useMemo），favoriteSourceIdSet 自己也会在切收藏时换。结果：每次 like 一条 post，
+  // handleRowToggleFavorite identity 翻新 → workspace → list → 60 条 memo'd Row 的
+  // onToggleFavorite prop 全换 → 60 条 Row 一齐重渲（其中 59 条只是 prop 变了，
+  // 数据完全没变）。同款问题 Round 6 已经在 handleRowCommentSubmit 上修过（用
+  // desktopReplyTargetRef 兜住最新值，callback 用 stable mutate 依赖），这里
+  // 沿用：ref 兜 visiblePosts + favoriteSourceIdSet，callback 只依赖稳定的
+  // setFavoriteSourceIds setter（reactstable），任何时候 row 重渲都因为它自己的
+  // data 真变。
+  const visiblePostsRef = useRef(visiblePosts);
+  useEffect(() => {
+    visiblePostsRef.current = visiblePosts;
+  }, [visiblePosts]);
+  const favoriteSourceIdSetRef = useRef(favoriteSourceIdSet);
+  useEffect(() => {
+    favoriteSourceIdSetRef.current = favoriteSourceIdSet;
+  }, [favoriteSourceIdSet]);
+  const handleRowToggleFavorite = useCallback((postId: string) => {
+    const post = visiblePostsRef.current.find((item) => item.id === postId);
+    if (!post) {
+      return;
+    }
+    const sourceId = `feed-${post.id}`;
+    const collected = favoriteSourceIdSetRef.current.has(sourceId);
+    const nextFavorites = collected
+      ? removeDesktopFavorite(sourceId)
+      : upsertDesktopFavorite({
+          id: `favorite-${sourceId}`,
+          sourceId,
+          category: "feed",
+          title: post.authorName,
+          description: getFeedSummaryText(post),
+          meta: formatTimestamp(post.createdAt),
+          to: `/tabs/feed${buildFeedRouteHash({ postId: post.id }) ? `#${buildFeedRouteHash({ postId: post.id })}` : ""}`,
+          badge: t(msg`广场动态`),
+          avatarName: post.authorName,
+          avatarSrc: post.authorAvatar,
+        });
+    setFavoriteSourceIds(nextFavorites.map((favorite) => favorite.sourceId));
+  }, [t]);
   const handleRowStartCommentReply = useCallback((comment: FeedComment) => {
     setDesktopReplyTarget({
       authorId: comment.authorId,
