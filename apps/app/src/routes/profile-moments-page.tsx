@@ -18,7 +18,7 @@ import {
   type MomentLike,
   type MomentsPageResponse,
 } from "@yinjie/contracts";
-import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
+import { useAppLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -106,6 +106,10 @@ export function ProfileMomentsPage() {
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
+  // 「分享图卡」目标 —— 之前在 mobile 分支里宣告，导致顶部 useEffect([baseUrl])
+  // 想清弹层状态时引用不到 setShareMomentId。提到组件顶部 useState 区，
+  // 桌面分支不用就一直是 null；mobile 分支引用同一份 setter。
+  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{
     tone: "success" | "info" | "danger";
     message: string;
@@ -145,25 +149,84 @@ export function ProfileMomentsPage() {
     );
   }, [momentsQuery.data, ownerId]);
 
+  // 走查 R1：日期列预格式化。之前 PersonalAlbumRow 里每行每次 render 都
+  // new Intl.DateTimeFormat —— 评论草稿每按一键父组件 setState 重渲，
+  // N 条 moment × 每键一次 ICU 实例化在 30+ 条时主线程能吃几十 ms。
+  // 跟 mobile-friend-moments-page.tsx 同模板：activeLocale 切换或列表
+  // 变化才重算；同一天的"日／月"只显示在第一条上，后续留空保留对齐宽度。
+  const { locale: activeLocale } = useAppLocale();
+  const ownMomentDateLabels = useMemo(() => {
+    const monthFormatter = new Intl.DateTimeFormat(activeLocale, {
+      month: "long",
+    });
+    return ownMoments.map((moment, index) => {
+      const previous = index > 0 ? ownMoments[index - 1] : null;
+      const showDate =
+        !previous || !isSameLocalDay(previous.postedAt, moment.postedAt);
+      if (!showDate) {
+        return { showDate: false as const, day: "", monthLabel: "" };
+      }
+      const date = new Date(moment.postedAt);
+      if (Number.isNaN(date.getTime())) {
+        return { showDate: true as const, day: "--", monthLabel: "--" };
+      }
+      return {
+        showDate: true as const,
+        day: `${date.getDate()}`.padStart(2, "0"),
+        monthLabel: monthFormatter.format(date),
+      };
+    });
+  }, [activeLocale, ownMoments]);
+
   const optimisticLike = useOptimisticMomentLikeHandlers({
     baseUrl,
     ownerId,
     ownerUsername: ownerName,
     ownerAvatar,
   });
+  // 走查 R1：mid-flight 切账户 guard。和 moments-page / mobile-friend-moments-page
+  // 同思路 —— 旧 baseUrl 上的 mutation 完成时不能在新账户 UI 上冒
+  // 「朋友圈互动已更新」/「点赞失败」红条，也不该把新账户的 cache
+  // 当成 ownMoments 的 cache 写。在 onMutate 捕获 baseUrl，onError / onSuccess
+  // 比对 ref；不一致直接跳过 UI 反馈。
+  const mutationBaseUrlRef = useRef(baseUrl);
+  useEffect(() => {
+    mutationBaseUrlRef.current = baseUrl;
+  }, [baseUrl]);
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
-    onMutate: optimisticLike.onMutate,
+    onMutate: (momentId: string) => {
+      const inner = optimisticLike.onMutate(momentId);
+      return Promise.resolve(inner).then((snapshots) => ({
+        ...snapshots,
+        mutationBaseUrl: baseUrl,
+      }));
+    },
     onError: (error, momentId, context) => {
       // 先回滚 optimistic（cache 写回原状态），再把失败原因抛到 toast，
       // 否则用户看到的只是"心标闪了一下又弹回去"。
       optimisticLike.onError(error, momentId, context);
+      // mid-flight 切账户：当时点赞的 momentId 在新账户的 ownMoments 里不存在；
+      // 在新 UI 弹「点赞失败」是错的，闭包指着旧 momentId。和 moments-page
+      // / mobile-friend-moments-page 同处理：静默跳过。
+      if (
+        context &&
+        context.mutationBaseUrl !== mutationBaseUrlRef.current
+      ) {
+        return;
+      }
       setNotice({
         tone: "danger",
         message: describeRequestError(error, t(msg`点赞失败，请稍后重试。`)),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, _momentId, context) => {
+      if (
+        context &&
+        context.mutationBaseUrl !== mutationBaseUrlRef.current
+      ) {
+        return;
+      }
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
@@ -281,6 +344,11 @@ export function ProfileMomentsPage() {
       const savedDraft = commentDrafts[momentId] ?? "";
       const savedDesktopReply =
         desktopReplyTarget?.postId === momentId ? desktopReplyTarget : null;
+      // 钉住触发时刻的 baseUrl —— mid-flight 切账户后 onError / onSuccess 比对，
+      // 旧账户的失败不要在新账户里 reopen commentBar / 弹红条；成功也不要在
+      // 新账户的 cache 里写「temp 评论替换成 realComment」（新账户压根没那条
+      // moment，是 no-op，但更重要的是 toast 不要错位）。
+      const mutationBaseUrl = baseUrl;
 
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setCommentBarTarget(null);
@@ -298,6 +366,7 @@ export function ProfileMomentsPage() {
         tempId,
         savedDraft,
         savedDesktopReply,
+        mutationBaseUrl,
       };
     },
     mutationFn: (momentId: string) => {
@@ -318,6 +387,17 @@ export function ProfileMomentsPage() {
     },
     onSuccess: (realComment, momentId, context) => {
       delete commentSubmitArgsRef.current[momentId];
+      // mid-flight 切账户：success toast 在新账户里冒「朋友圈互动已更新」很
+      // 误导（用户在新账户没做交互），下面的 setQueriesData 用新 baseUrl 的 cache
+      // 写「temp 评论替换成 realComment」也是 no-op（新 cache 里压根没这条
+      // moment），顺手跳过省一次空操作。
+      if (
+        context &&
+        !context.skipped &&
+        context.mutationBaseUrl !== mutationBaseUrlRef.current
+      ) {
+        return;
+      }
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
@@ -372,6 +452,13 @@ export function ProfileMomentsPage() {
         });
         return;
       }
+      // mid-flight 切账户：旧账户的失败不要在新账户里 reopen 一个指着别的
+      // 账户帖子的 commentBar，也不该弹「评论失败」红条。cache 回滚也跳过 ——
+      // 旧 baseUrl 的 cache 用户已经看不到了。和 moments-page / mobile-friend-moments-page
+      // 同模板。
+      if (context.mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
       context.flatSnapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
@@ -416,34 +503,26 @@ export function ProfileMomentsPage() {
         videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newMoment, input) => {
-      const draftStillMatchesPublish =
-        composeDraft.text === input.text &&
-        composeDraft.imageDrafts === input.imageDrafts &&
-        composeDraft.videoDraft === input.videoDraft;
-      if (draftStillMatchesPublish) {
-        composeDraft.reset();
-        setShowCompose(false);
-      }
-      setNotice({
-        tone: "success",
-        message: t(msg`朋友圈已发布。`),
-      });
-      // 立刻 prepend 到 flat cache + mine cache，本页直接绑 mine，必须把
-      // mine 同步 prepend 否则用户发完看不到（要等 invalidate refetch）。
-      // 走查 Round 1：paged 也得同步 prepend —— 之前只 invalidate，/tabs/moments
-      // 没挂载时只是标 stale，用户从「我的朋友圈」发完跳回 /tabs/moments 要
-      // 等一次 RTT refetch 才能看到新帖。跟 moments-page.tsx / friend-moments-page
-      // Round 1 createMutation 模板对齐；momentsData useMemo 的 id 去重兜底。
-      queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
-        current ? [newMoment, ...current] : current,
+    onMutate: () => {
+      // onMutate 同步跑：钉住 publish 发到的目标账户。和 mobile-moments-publish-page
+      // 同模板 —— mid-flight 切账户后，prepend / invalidate 要落到旧账户
+      // 的 cache 上，但 toast / draft reset 留给当前页（旧账户）。
+      return { mutationBaseUrl: baseUrl };
+    },
+    onSuccess: (newMoment, input, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
+      // cache 写到 mutation 触发时刻的 baseUrl —— 切到 B 后切回 A 时第一帧
+      // 就能看到刚发的；不要污染新账户 B 的 cache。
+      queryClient.setQueryData<Moment[]>(
+        ["app-moments", mutationBaseUrl],
+        (current) => (current ? [newMoment, ...current] : current),
       );
       queryClient.setQueryData<Moment[]>(
-        ["app-moments-mine", baseUrl],
+        ["app-moments-mine", mutationBaseUrl],
         (current) => (current ? [newMoment, ...current] : current),
       );
       queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
-        ["app-moments-paged", baseUrl],
+        ["app-moments-paged", mutationBaseUrl],
         (current) =>
           current && current.pages.length > 0
             ? {
@@ -457,12 +536,31 @@ export function ProfileMomentsPage() {
               }
             : current,
       );
-      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
+        queryKey: ["app-moments", mutationBaseUrl],
       });
       void queryClient.invalidateQueries({
-        queryKey: ["app-moments-mine", baseUrl],
+        queryKey: ["app-moments-paged", mutationBaseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", mutationBaseUrl],
+      });
+      // mid-flight 切账户：剩下的 draft reset / toast / compose 关都属于当前
+      // 页面的 UI 反馈 —— 用户已经切到 B 了不该让他看到 A 的「朋友圈已发布」绿条。
+      if (mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
+      const draftStillMatchesPublish =
+        composeDraft.text === input.text &&
+        composeDraft.imageDrafts === input.imageDrafts &&
+        composeDraft.videoDraft === input.videoDraft;
+      if (draftStillMatchesPublish) {
+        composeDraft.reset();
+        setShowCompose(false);
+      }
+      setNotice({
+        tone: "success",
+        message: t(msg`朋友圈已发布。`),
       });
     },
   });
@@ -515,9 +613,15 @@ export function ProfileMomentsPage() {
           })),
         });
       });
-      return { snapshots, pagedSnapshots };
+      return { snapshots, pagedSnapshots, mutationBaseUrl: baseUrl };
     },
     onError: (error, _momentId, context) => {
+      // mid-flight 切账户：旧账户的失败不该在新账户里弹「删除失败」红条 ——
+      // 用户已经看不到原 moment 了。cache 回滚也跳过（旧 baseUrl 的 cache 用户已
+      // 经看不到了）。和 moments-page / mobile-friend-moments-page 同模板。
+      if (context && context.mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
       // 先回滚 optimistic（被删的 moment 在 flat / mine / paged cache 里恢复），
       // 再给用户一个红条提示——否则用户只会看到"删过的 moment 又自己冒出来"，
       // 没法判断是网络 / 权限 / 还是被服务端拒了。
@@ -532,18 +636,25 @@ export function ProfileMomentsPage() {
         message: describeRequestError(error, t(msg`删除失败，请稍后重试。`)),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, _momentId, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
+      // invalidate 落到 mutation 触发时刻的 baseUrl —— 删除发生在 A 但用户切到 B 了，
+      // 不要 invalidate B 账户的 cache（B 完全不该被这次 A 的删除牵动）。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments", mutationBaseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", mutationBaseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", mutationBaseUrl],
+      });
+      if (mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
       setNotice({
         tone: "success",
         message: t(msg`已删除这条朋友圈。`),
-      });
-      // fire-and-forget：optimistic 已把该条从 flat cache 抹掉；await 让删除按钮多卡 600ms+。
-      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-mine", baseUrl],
       });
     },
   });
@@ -563,6 +674,23 @@ export function ProfileMomentsPage() {
     const timer = window.setTimeout(() => setNotice(null), 2400);
     return () => window.clearTimeout(timer);
   }, [notice]);
+
+  // 走查 R1：切账户时清所有挂在「上一个 baseUrl」的交互态，否则在 A 账户里
+  // 打开了 ⋯ 弹出 actionBubble、写一半评论、开着分享卡片 → 切到 B 账户后这些
+  // 弹层还浮在屏幕上、anchorRect 指着上一个账户的卡片位置；点 like / 评论
+  // 会用旧 momentId 走 mutation → 在新账户里 404 → 弹红条；mutation guard 已经
+  // 拦住 toast，但弹层本身的 UI 残留还是错的。和 moments-page / mobile-friend-moments-page
+  // 同模板。
+  useEffect(() => {
+    setActionBubble(null);
+    setCommentBarTarget(null);
+    setDesktopReplyTarget(null);
+    setCommentDrafts({});
+    setShareMomentId(null);
+    // mid-flight 评论 args 也清——onSuccess/onError 会清自己那条，但切账户时
+    // 如果还有 mid-flight，旧 args 会残留在内存，长期跑就是泄漏。
+    commentSubmitArgsRef.current = {};
+  }, [baseUrl]);
 
   // 从 /discover/moments/publish 走 returnPath=/profile/moments 回到本页时，
   // 发布页只往 sessionStorage 塞 flash 不会自己跳 toast。本页之前不消费——
@@ -830,8 +958,8 @@ export function ProfileMomentsPage() {
     ownerId && activeMoment?.likes.some((like) => like.authorId === ownerId),
   );
 
-  // 「分享图卡」目标 — 点 ⋯ → 分享时把 momentId 存下来。
-  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
+  // 「分享图卡」目标 — 点 ⋯ → 分享时把 momentId 存下来。shareMomentId
+  // 已在组件顶部宣告（见上方），方便 baseUrl reset useEffect 一并清。
   const shareMoment = shareMomentId
     ? ownMoments.find((moment) => moment.id === shareMomentId) ?? null
     : null;
@@ -954,12 +1082,15 @@ export function ProfileMomentsPage() {
           ) : null}
 
           {ownMoments.map((moment, index) => {
-            const previous = index > 0 ? ownMoments[index - 1] : null;
             // 微信样式：同一天发的多条只在第一条显示「日／月」，避免左侧
-            // 「15 五月」「15 五月」「15 五月」连续重复——用户已经看到一次就够了，
-            // 后续条目的日期柱留空保留对齐宽度。
-            const showDate =
-              !previous || !isSameLocalDay(previous.postedAt, moment.postedAt);
+            // 「15 五月」「15 五月」连续重复。日期标签已经在父级 useMemo 里
+            // 按 ownMoments + activeLocale 一次性预算好（见 ownMomentDateLabels），
+            // 评论草稿高频 re-render 时不会再每行 new 一份 Intl.DateTimeFormat。
+            const dateLabel = ownMomentDateLabels[index] ?? {
+              showDate: true as const,
+              day: "--",
+              monthLabel: "--",
+            };
             return (
               <div
                 key={moment.id}
@@ -972,7 +1103,9 @@ export function ProfileMomentsPage() {
                 <PersonalAlbumRow
                   moment={moment}
                   ownerId={ownerId}
-                  showDate={showDate}
+                  showDate={dateLabel.showDate}
+                  dayLabel={dateLabel.day}
+                  monthLabel={dateLabel.monthLabel}
                   onOpenActionMenu={(rect) =>
                     setActionBubble({ momentId: moment.id, anchorRect: rect })
                   }
@@ -1077,6 +1210,8 @@ function PersonalAlbumRow({
   moment,
   ownerId,
   showDate,
+  dayLabel,
+  monthLabel,
   onOpenActionMenu,
   onDoubleTapLike,
   onCommentTap,
@@ -1086,26 +1221,23 @@ function PersonalAlbumRow({
   moment: Moment;
   ownerId: string | null;
   showDate: boolean;
+  dayLabel: string;
+  monthLabel: string;
   onOpenActionMenu: (rect: DOMRect) => void;
   onDoubleTapLike: () => void;
   onCommentTap: (comment: MomentComment | null) => void;
   onLikeAuthorTap: (like: MomentLike) => void;
   onDelete?: () => void;
 }) {
-  const date = new Date(moment.postedAt);
-  const day = Number.isNaN(date.getTime())
-    ? "--"
-    : `${date.getDate()}`.padStart(2, "0");
-  const monthLabel = Number.isNaN(date.getTime())
-    ? "--"
-    : new Intl.DateTimeFormat(getActiveLocale(), { month: "long" }).format(date);
+  // 日期标签由父级 useMemo 一次性算好（按 activeLocale + ownMoments 缓存），
+  // 这里只负责画——避免每条 moment、每次 parent re-render 都 new Intl.DateTimeFormat。
   return (
     <div className="flex items-start gap-2 px-4 py-3.5">
       <div className="w-12 shrink-0 pt-1 text-right" aria-hidden={!showDate}>
         {showDate ? (
           <>
             <div className="text-[26px] font-semibold leading-none text-[#1A1A1A]">
-              {day}
+              {dayLabel}
             </div>
             <div className="mt-1 text-[11px] tracking-[0.04em] text-[#9A9A9A]">
               {monthLabel}
