@@ -1864,7 +1864,18 @@ export function DesktopChatWorkspace({
         </section>
       )}
 
-      <section className="min-w-0 flex-1">
+      {/* 详情侧栏开着时给中间这一栏加上 352px 右内边距：DesktopChatSidePanel
+          走 absolute（top-[64px] right-0 w-[352px] xl:flex），不占 flex 空间，
+          没这层 padding 的话用户消息和 composer 右半部分（含发送按钮）会被
+          panel 整块盖住——1440 屏实测用户气泡 (1075~1324) 整条都掉进 aside
+          (1066~1418) 区域里看不见，发送按钮也躲在 panel 后面点不到。查找记录
+          走中央弹窗，不进这条 padding。 */}
+      <section
+        className={cn(
+          "min-w-0 flex-1",
+          rightPanelMode === "details" ? "xl:pr-[352px]" : "",
+        )}
+      >
         {officialAccountsActive ? (
           <Suspense fallback={null}>
           <DesktopOfficialAccountsWorkspace
