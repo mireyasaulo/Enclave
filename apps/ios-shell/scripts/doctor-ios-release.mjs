@@ -39,6 +39,7 @@ function fileMatches(filePath, regex) {
 }
 
 const apiBaseUrl = (process.env.YINJIE_IOS_CORE_API_BASE_URL ?? "").trim();
+const cloudApiBaseUrl = (process.env.YINJIE_IOS_CLOUD_API_BASE_URL ?? "").trim();
 const environment = (process.env.YINJIE_IOS_ENVIRONMENT ?? "").trim();
 const bundleId = (process.env.YINJIE_IOS_BUNDLE_IDENTIFIER ?? "").trim();
 const marketingVersion = (process.env.YINJIE_IOS_MARKETING_VERSION ?? "").trim();
@@ -84,6 +85,17 @@ const checks = [
     detail: nonEmpty(apiBaseUrl)
       ? `YINJIE_IOS_CORE_API_BASE_URL=${apiBaseUrl}`
       : "YINJIE_IOS_CORE_API_BASE_URL must be set to an https:// URL",
+  },
+  {
+    // 原生壳 origin 是 capacitor://，apps/app 里 resolveCloudApiBaseUrl
+    // 在 isInsideCapacitorShell() 时显式不允许 origin 回落。release 包必须
+    // 显式注入 cloudApiBaseUrl，否则 worlds 列表 / cloud session refresh /
+    // push token 注册等所有 cloud-api 入口都会 fetch null 直接报错。
+    label: "cloud-api-base-url",
+    ok: nonEmpty(cloudApiBaseUrl) && /^https:\/\//.test(cloudApiBaseUrl),
+    detail: nonEmpty(cloudApiBaseUrl)
+      ? `YINJIE_IOS_CLOUD_API_BASE_URL=${cloudApiBaseUrl}`
+      : "YINJIE_IOS_CLOUD_API_BASE_URL must be set to an https:// URL (Capacitor 原生壳没法 origin 回落)",
   },
   {
     label: "environment-production",
