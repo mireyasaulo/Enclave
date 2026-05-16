@@ -1,4 +1,11 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import {
+  Suspense,
+  lazy,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -70,6 +77,11 @@ function MobileGroupContactsPage() {
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const [searchText, setSearchText] = useState("");
+  // 走查 Round 8：搜索框直接拿 searchText 喂 filter，长群表（用户加过 50+ 群
+  // 时）连续敲字每个 keystroke 都打一次同步 toLowerCase + filter，输入框肉眼可
+  // 见的卡顿。和 contacts-page / favorites-page / search-page 同口径补
+  // useDeferredValue，让 React 优先把字打进输入框、过滤排到下一个 idle 帧。
+  const deferredSearchText = useDeferredValue(searchText);
   const routeState = useMemo(() => parseMobileGroupRouteState(hash), [hash]);
   const safeReturnPath =
     routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
@@ -88,9 +100,22 @@ function MobileGroupContactsPage() {
   );
 
   const queryClient = useQueryClient();
+  // 走查 Round 8：
+  // 1) 没设 staleTime → 默认 0，每次进页都会立刻 refetch /groups 一次。父级
+  //    /tabs/contacts 的 contactGroupsQuery 已经用 staleTime:30_000 同 key 在
+  //    缓存里，新页一挂载又强制打一次。和父级对齐到 30s。
+  // 2) 这页过去只靠 socket onConversationUpdated/onChatMessage 触发 invalidate，
+  //    但 cloud-api gateway 的这两个事件都是房间级 emit（client 必须 emit
+  //    join_conversation 才会收到），而 /contacts/groups 自己从不 join 任何
+  //    group room——chat-list-page 旁边那条 comment 早就点过这个坑。结果就是
+  //    用户刚装/重启 app、socket 还没 join 任何房间时，从后台切回前台、群
+  //    被改名 / 被另一端 hide / 被另一端 leave 后这里看到的还是旧数据。补
+  //    refetchOnWindowFocus 兜底，跟 chat-list-page 同口径。
   const groupsQuery = useQuery({
     queryKey: ["app-contact-groups", baseUrl],
     queryFn: () => getGroups(baseUrl),
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   // 走查 Round 5：群被 AI 回复触发 touchGroupActivity → isHidden=false 翻回
@@ -133,7 +158,7 @@ function MobileGroupContactsPage() {
     () => (groupsQuery.data ?? []).filter((group) => !group.isHidden),
     [groupsQuery.data],
   );
-  const filteredGroups = useFilteredGroups(visibleGroups, searchText);
+  const filteredGroups = useFilteredGroups(visibleGroups, deferredSearchText);
   const hasSearchText = searchText.trim().length > 0;
 
   function navigateToRouteStateReturn() {
