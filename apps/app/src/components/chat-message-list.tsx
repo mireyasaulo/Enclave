@@ -149,7 +149,11 @@ import {
   parseGroupCallInviteMessage,
   type CallInviteSource,
 } from "../features/chat/group-call-message";
-import { getGroupCallStatusLabel } from "../features/chat/group-call-presentation";
+import {
+  buildDirectCallWorkspaceSummaryLines,
+  buildGroupCallWorkspaceSummaryLines,
+  getGroupCallStatusLabel,
+} from "../features/chat/group-call-presentation";
 import {
   resolveGroupRelayCompletionBadge,
   resolveGroupRelayCompletionTime,
@@ -5940,6 +5944,20 @@ function GroupCallInviteMessage({
   const canReopenCall = Boolean(onOpen);
   const footerCopy = resolveGroupCallFooterCopy(invite, canReopenCall);
   const completionBadge = resolveGroupCallCompletionBadge(invite);
+  const translatedSummaryLines = buildGroupCallWorkspaceSummaryLines({
+    kind: invite.kind,
+    status: invite.status,
+    sourceLabel: invite.sourceLabel,
+    counts: invite.activeCount
+      ? {
+          activeCount: invite.activeCount.current,
+          totalCount: invite.activeCount.total,
+          waitingCount:
+            invite.waitingCount ??
+            Math.max(invite.activeCount.total - invite.activeCount.current, 0),
+        }
+      : null,
+  });
 
   const card = (
     <div
@@ -6053,7 +6071,7 @@ function GroupCallInviteMessage({
             />
           </div>
         ) : null}
-        {invite.summaryLines.map((line) => (
+        {translatedSummaryLines.map((line) => (
           <div
             key={line}
             className={
@@ -6161,6 +6179,11 @@ function DirectCallInviteMessage({
   const isDesktop = variant === "desktop";
   const canReopenCall = Boolean(onOpen);
   const footerCopy = resolveDirectCallFooterCopy(invite, canReopenCall);
+  const translatedSummaryLines = buildDirectCallWorkspaceSummaryLines({
+    kind: invite.kind,
+    status: invite.connectionStatus ?? "waiting",
+    sourceLabel: invite.sourceLabel,
+  });
 
   const card = (
     <div
@@ -6233,7 +6256,7 @@ function DirectCallInviteMessage({
             variant={variant}
           />
         ) : null}
-        {invite.summaryLines.map((line) => (
+        {translatedSummaryLines.map((line) => (
           <div
             key={line}
             className={

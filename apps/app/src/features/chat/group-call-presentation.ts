@@ -32,6 +32,42 @@ export function getDirectCallStatusLabel(
   return kind === "video" ? t(msg`等待接入画面` ) : t(msg`等待接听`);
 }
 
+export function buildDirectCallWorkspaceSummaryLines(input: {
+  kind: DesktopChatCallKind;
+  status: DirectCallInviteStatus;
+  sourceLabel: string | null;
+}) {
+  const sourceLabel = input.sourceLabel ?? t(msg`当前设备`);
+
+  if (input.status === "ended") {
+    if (input.kind === "video") {
+      return [
+        t(msg`本轮单聊视频通话已结束，可继续在聊天里跟进。`),
+        t(msg`如需再次发起，请重新打开当前聊天顶部的视频通话面板。`),
+      ];
+    }
+    return [
+      t(msg`本轮单聊语音通话已结束，可继续在聊天里跟进。`),
+      t(msg`如需再次发起，请重新打开当前聊天顶部的语音通话面板。`),
+    ];
+  }
+
+  if (input.kind === "video") {
+    return [
+      t(
+        msg`已从 ${sourceLabel} 打开单聊视频通话工作台，可直接查看当前画面与通话状态。`,
+      ),
+      t(msg`如需切回聊天或转到其他设备，请回到当前聊天顶部的视频通话面板。`),
+    ];
+  }
+  return [
+    t(
+      msg`已从 ${sourceLabel} 打开单聊语音通话工作台，可直接查看当前通话状态。`,
+    ),
+    t(msg`如需切回聊天或转到其他设备，请回到当前聊天顶部的语音通话面板。`),
+  ];
+}
+
 export function buildGroupCallWorkspaceSummaryLines(input: {
   kind: DesktopChatCallKind;
   status: GroupCallInviteStatus;
