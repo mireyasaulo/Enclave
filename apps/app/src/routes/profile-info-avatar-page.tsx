@@ -43,7 +43,12 @@ export function ProfileInfoAvatarPage() {
     () => Boolean(avatar) && avatar !== defaultOwnerAvatar,
     [avatar],
   );
-  const initialDraft = hasCustomAvatar ? avatar : "";
+  // 之前存过 base64 本地图的用户，第二次打开本页时 avatar 是「data:image/...」
+  // 巨型字符串。如果把它当 URL 灌进 TextField，又退化回 Round 1 修掉的卡顿/误改
+  // 长串那一套。所以「URL 输入框」只接受真正的 URL，存的是 data URL 时一律把
+  // 输入框留空（preview 仍然显示当前头像）。
+  const storedIsDataUrl = avatar.startsWith("data:");
+  const initialDraft = hasCustomAvatar && !storedIsDataUrl ? avatar : "";
   // draft 只装「URL」型的取值，pickedLocal 单独存从相册选的 data URL：
   // 之前把 base64 直接塞进 TextField，~1MB 的字符串显示在单行输入框里既看不
   // 清也容易让用户误改一个字符破坏整段 data URL；而且每次输入触发 React 重
@@ -220,6 +225,11 @@ export function ProfileInfoAvatarPage() {
             placeholder={t(msg`粘贴图片 URL 或留空`)}
             className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[13px] shadow-none focus:translate-y-0"
           />
+          {storedIsDataUrl ? (
+            <div className="mt-2 text-[11px] leading-4 text-[color:var(--text-muted)]">
+              {t(msg`当前头像已存为本地图片。粘贴新 URL 或重新选择都会替换它。`)}
+            </div>
+          ) : null}
         </div>
       )}
 

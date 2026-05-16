@@ -129,7 +129,7 @@ msgstr "Forward to chat"
 #: apps/app/src/routes/contacts-page.tsx:2154
 #: apps/app/src/routes/contacts-page.tsx:2156
 #: apps/app/src/routes/mobile-add-friend-page.tsx:464
-#: apps/app/src/routes/mobile-add-friend-page.tsx:842
+#: apps/app/src/routes/mobile-add-friend-page.tsx:847
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:303
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:679
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1275
@@ -499,7 +499,7 @@ msgstr "Enter to send"
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:200
 #: apps/app/src/routes/channels-page.tsx:2761
 #: apps/app/src/routes/discover-page.tsx:1072
-#: apps/app/src/routes/mobile-add-friend-page.tsx:858
+#: apps/app/src/routes/mobile-add-friend-page.tsx:863
 #: apps/app/src/routes/mobile-note-editor-page.tsx:981
 msgid "发送"
 msgstr "Send"
@@ -1598,7 +1598,7 @@ msgstr "Me"
 #: apps/app/src/routes/discover-page.tsx:477
 #: apps/app/src/routes/group-chat-details-page.tsx:409
 #: apps/app/src/routes/mobile-add-friend-page.tsx:104
-#: apps/app/src/routes/mobile-add-friend-page.tsx:785
+#: apps/app/src/routes/mobile-add-friend-page.tsx:790
 #: apps/app/src/routes/moments-page.tsx:336
 #: apps/app/src/routes/moments-page.tsx:445
 #: apps/app/src/routes/profile-page.tsx:103
@@ -2384,7 +2384,7 @@ msgstr "Untitled note"
 #: apps/app/src/routes/official-accounts-page.tsx:390
 #: apps/app/src/routes/profile-character-import-page.tsx:196
 #: apps/app/src/routes/profile-feedback-page.tsx:174
-#: apps/app/src/routes/profile-info-avatar-page.tsx:149
+#: apps/app/src/routes/profile-info-avatar-page.tsx:154
 #: apps/app/src/routes/profile-info-name-page.tsx:81
 #: apps/app/src/routes/profile-info-page.tsx:54
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:52
@@ -2532,7 +2532,7 @@ msgstr "Close dialog"
 #: apps/app/src/i18n/static-dom-seed.ts:855
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1067
 #: apps/app/src/routes/live-companion-page.tsx:876
-#: apps/app/src/routes/mobile-add-friend-page.tsx:825
+#: apps/app/src/routes/mobile-add-friend-page.tsx:830
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:653
 msgid "关闭"
 msgstr "Close"
@@ -3542,7 +3542,7 @@ msgstr "Reply to {0}: "
 #: apps/app/src/components/wechat-comment-bar.tsx:171
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:202
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:200
-#: apps/app/src/routes/mobile-add-friend-page.tsx:858
+#: apps/app/src/routes/mobile-add-friend-page.tsx:863
 msgid "发送中"
 msgstr "Sending"
 
@@ -4364,7 +4364,7 @@ msgstr "Pending"
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:907
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1096
 #: apps/app/src/routes/mini-programs-page.tsx:365
-#: apps/app/src/routes/profile-info-avatar-page.tsx:166
+#: apps/app/src/routes/profile-info-avatar-page.tsx:171
 #: apps/app/src/routes/profile-info-name-page.tsx:98
 #: apps/app/src/routes/profile-info-signature-page.tsx:96
 msgid "完成"
@@ -10670,7 +10670,7 @@ msgid "验证信息"
 msgstr "Verification message"
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:141
-#: apps/app/src/routes/mobile-add-friend-page.tsx:889
+#: apps/app/src/routes/mobile-add-friend-page.tsx:894
 msgid "请输入验证信息"
 msgstr "Enter your verification message"
 
@@ -12924,16 +12924,16 @@ msgid "买了种子"
 msgstr "Bought seeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:270
+msgid "卖了"
+msgstr "Sold"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:258
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:260
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:270
 msgid "作物"
 msgstr "Crops"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:270
-msgid "卖了"
-msgstr "Sold"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -13167,13 +13167,13 @@ msgid "h 成熟"
 msgstr "h to ripen"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ pack, price"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ each"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ pack, price"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -14311,17 +14311,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "Hold the base and wipe out 20 enemy tanks."
 
 #: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "Co-op"
+
+#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "Pixel"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "Action"
-
-#: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "Co-op"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -26903,15 +26903,15 @@ msgstr "Enter a full Yinjie ID for an exact match, or search by character name o
 msgid "请检查隐界号是否完整，或者换个关键词试试。"
 msgstr "Make sure the Yinjie ID is complete, or try a different keyword."
 
-#: apps/app/src/routes/mobile-add-friend-page.tsx:786
+#: apps/app/src/routes/mobile-add-friend-page.tsx:791
 msgid "你好，我是{owner}，想把你添加到通讯录里。"
 msgstr "Hi, I'm {owner}. I'd like to add you to my contacts."
 
-#: apps/app/src/routes/mobile-add-friend-page.tsx:845
+#: apps/app/src/routes/mobile-add-friend-page.tsx:850
 msgid "好友申请"
 msgstr "Friend requests"
 
-#: apps/app/src/routes/mobile-add-friend-page.tsx:880
+#: apps/app/src/routes/mobile-add-friend-page.tsx:885
 msgid "发送验证申请，对方通过后即可成为朋友。"
 msgstr "Send a friend request. You'll become friends once they accept."
 
@@ -27080,7 +27080,7 @@ msgid "切换桌面笔记..."
 msgstr "Switching to desktop notes…"
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:995
-#: apps/app/src/routes/profile-info-avatar-page.tsx:166
+#: apps/app/src/routes/profile-info-avatar-page.tsx:171
 #: apps/app/src/routes/profile-info-name-page.tsx:98
 #: apps/app/src/routes/profile-info-signature-page.tsx:96
 msgid "保存中"
@@ -27487,43 +27487,47 @@ msgstr "Tell us what you saw and what you expected — the more specific the bet
 msgid "反馈会同步到隐界云端控制台，处理结果可能不会逐条回复。涉及账号问题请前往设置。"
 msgstr "Feedback syncs to the Enclave cloud console. We may not reply to each item individually. For account issues, please go to Settings."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:105
+#: apps/app/src/routes/profile-info-avatar-page.tsx:110
 msgid "图片过大，请压缩到 1MB 以内再试。"
 msgstr "Image is too large. Please compress it to under 1 MB and try again."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:111
+#: apps/app/src/routes/profile-info-avatar-page.tsx:116
 msgid "读取图片失败，请换一张试试。"
 msgstr "Failed to load image. Please try another."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:142
+#: apps/app/src/routes/profile-info-avatar-page.tsx:147
 msgid "更换头像"
 msgstr "Change avatar"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:178
+#: apps/app/src/routes/profile-info-avatar-page.tsx:183
 msgid "点击下方更换"
 msgstr "Tap below to change"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:190
+#: apps/app/src/routes/profile-info-avatar-page.tsx:195
 msgid "本地图片"
 msgstr "Local image"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:202
+#: apps/app/src/routes/profile-info-avatar-page.tsx:207
 msgid "清除已选图片"
 msgstr "Clear selected image"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:212
+#: apps/app/src/routes/profile-info-avatar-page.tsx:217
 msgid "图片地址"
 msgstr "Image URL"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:220
+#: apps/app/src/routes/profile-info-avatar-page.tsx:225
 msgid "粘贴图片 URL 或留空"
 msgstr "Paste image URL or leave empty"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:239
+#: apps/app/src/routes/profile-info-avatar-page.tsx:230
+msgid "当前头像已存为本地图片。粘贴新 URL 或重新选择都会替换它。"
+msgstr "Current avatar is stored as a local image. Pasting a new URL or picking again will replace it."
+
+#: apps/app/src/routes/profile-info-avatar-page.tsx:249
 msgid "从相册选择"
 msgstr "Select from album"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:242
+#: apps/app/src/routes/profile-info-avatar-page.tsx:252
 msgid "图片大小不超过 1MB"
 msgstr "Image must be under 1 MB"
 
