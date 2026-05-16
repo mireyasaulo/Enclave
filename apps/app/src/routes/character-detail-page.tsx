@@ -177,9 +177,22 @@ export function CharacterDetailPage() {
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
   });
+  const isAlreadyFriend = useMemo(
+    () =>
+      (friendsQuery.data ?? []).some(
+        (item) => item.character.id === characterId,
+      ),
+    [characterId, friendsQuery.data],
+  );
+  // 走查 R1：character-detail 进来时如果已经是好友（绝大多数从消息 tab→详情进入
+  // 都是这条路径），底部按钮直接渲染「发消息 / 音视频通话」，friendRequestsQuery
+  // 的结果只在 "添加到通讯录" / "等待对方通过" / "查看好友申请" 三种非好友状态下
+  // 使用。原来无条件 enabled 让每个名片打开都触发一次 /social/friend-requests
+  // 全量查询，毫无价值地多一次后台往返。等 friendsQuery 解析后再判断是否需要拉。
   const friendRequestsQuery = useQuery({
     queryKey: ["app-friend-requests", baseUrl, "all"],
     queryFn: () => getFriendRequests(baseUrl, { direction: "all" }),
+    enabled: friendsQuery.isSuccess && !isAlreadyFriend,
   });
   const blockedQuery = useQuery({
     queryKey: ["app-chat-details-blocked", baseUrl],
@@ -1741,12 +1754,17 @@ export function CharacterDetailPage() {
                   compact={!isDesktopLayout}
                 />
               ) : null}
-              <ProfileRow
-                label={momentsLabel}
-                value={momentsValueLabel}
-                onClick={handleOpenMoments}
-                compact={!isDesktopLayout}
-              />
+              {/* 走查 R1：朋友圈入口在移动端无条件渲染，非好友点进去后端按"未授权"
+                  返回空列表/错误，跟 desktop ContactDetailPane（已用 isFriend 包过）
+                  不一致；非好友本来就拿不到对方朋友圈，挪到 isFriend 分支里。 */}
+              {isFriend ? (
+                <ProfileRow
+                  label={momentsLabel}
+                  value={momentsValueLabel}
+                  onClick={handleOpenMoments}
+                  compact={!isDesktopLayout}
+                />
+              ) : null}
               <ProfileRow
                 label={recommendToFriendLabel}
                 value={
