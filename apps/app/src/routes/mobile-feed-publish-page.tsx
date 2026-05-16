@@ -253,6 +253,34 @@ export function MobileFeedPublishPage() {
     });
   }, [discardConfirmOpen]);
 
+  // 新一轮走查 Round 5：左上角返回按钮（handleBack）在 hasContent 时会弹
+  // 「放弃发表」确认条；Android 硬件 Back 键 / 系统手势 back 只在 discard
+  // 确认 modal 已打开时被拦截（上面那条 effect）。modal 没打开时 Android
+  // back 走 history.back —— hasContent=true 时用户已经敲了一长段文案 / 加
+  // 了 9 张图，Android back 不经确认直接弹回广场，复选 input 都没出来，
+  // 草稿（虽然在 hook state 里活着）实际上看不见因为页 unmount → useMomentComposeDraft
+  // 的 cleanup 会 release imageDrafts / videoDraft（object URL）；正文 text
+  // 是字符串没单独释放但 hook unmount 后 state 一并丢，下次再开页是新的
+  // 空 draft，等同于"用户被原生 back 偷走了内容"。
+  // 跟 ESC handler / topbar 返回按钮对齐：hasContent 且不在 publish 飞行中
+  // 时，Android back 转去打开 discard confirmation，让用户主动选「放弃」
+  // 才走 performBack；mutation pending 时不拦让用户随时跑路（onSuccess 有
+  // isMountedRef 守卫不会硬把人拽回来）。
+  useEffect(() => {
+    if (discardConfirmOpen) return;
+    if (!composeDraft.hasContent) return;
+    if (createMutation.isPending) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      setDiscardConfirmOpen(true);
+      return true;
+    });
+  }, [
+    discardConfirmOpen,
+    composeDraft.hasContent,
+    createMutation.isPending,
+  ]);
+
   function performBack() {
     navigateBackOrFallback(
       () => {
