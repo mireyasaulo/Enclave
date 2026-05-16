@@ -219,7 +219,12 @@ export function ContactsBulkActionBar({
           <button
             type="button"
             onClick={allSelected ? onClearSelection : onSelectAll}
-            disabled={!totalIds.length}
+            // bulk.isPending 时也锁住"全选 / 取消全选"：动作按钮（打标签/星标/删除）
+            // 已经按 isPending 锁了，但 全选 漏了。在删除请求 in-flight 时点全选会
+            // 把 bulkSelectedIds 立刻盖成 totalIds，等 onSuccess→handleResult
+            // 回来时 onPartialFailure(res.failed) 又把它覆盖成"上一轮的失败集合"，
+            // 用户看着像"我点了全选但只剩几个高亮"，根本对不上。
+            disabled={!totalIds.length || bulk.isPending}
             className={cn(
               "flex h-9 shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-[color:var(--border-subtle)] bg-white text-[12px] text-[color:var(--text-secondary)] disabled:opacity-50",
               desktop ? "px-2.5" : "px-3",
