@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ImagePlus, X } from "lucide-react";
+import { ArrowLeft, ImagePlus, RotateCcw, X } from "lucide-react";
 import { updateWorldOwner } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, TextField, cn } from "@yinjie/ui";
@@ -154,6 +154,24 @@ export function ProfileInfoAvatarPage() {
     },
   });
 
+  // 之前没有路径把已存的头像清回默认（系统打包出来的 SVG）：URL 输入框
+  // 留空 + 不选图 → valueToSave="" → canSave=false，「完成」按钮永远灰着。
+  // 用户哪天后悔自定义头像、想恢复默认，只能输个奇怪的旧 URL 顶一下，体验
+  // 很糟。加一个独立的「恢复默认头像」入口，hasCustomAvatar 才显示，独立
+  // mutation 单发 avatar:""，绕开 valueToSave gating。
+  const resetMutation = useMutation({
+    mutationFn: async () => {
+      const owner = await updateWorldOwner({ avatar: "" }, baseUrl);
+      queryClient.setQueryData(["world-owner", baseUrl], owner);
+      hydrateOwner(owner);
+    },
+    onSuccess: () => {
+      if (!isMountedRef.current) return;
+      goBack();
+    },
+  });
+  const isSaving = saveMutation.isPending || resetMutation.isPending;
+
   // 防 race：用户连点「从相册选择」两次时，FileReader 是各自独立的，且
   // 不保证 readAsDataURL 完成顺序——大文件 A 先开始读、小文件 B 后开始
   // 读但更快完成，会出现 B 的 onload 先 setPickedLocal(B)、A 的 onload
@@ -205,7 +223,9 @@ export function ProfileInfoAvatarPage() {
     localError ??
     (saveMutation.isError && saveMutation.error instanceof Error
       ? saveMutation.error.message
-      : null);
+      : resetMutation.isError && resetMutation.error instanceof Error
+        ? resetMutation.error.message
+        : null);
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
@@ -225,11 +245,11 @@ export function ProfileInfoAvatarPage() {
         rightActions={
           <button
             type="button"
-            disabled={!canSave || saveMutation.isPending}
+            disabled={!canSave || isSaving}
             onClick={() => saveMutation.mutate()}
             className={cn(
               "rounded-full px-3 py-1 text-[13px] font-medium transition-colors",
-              !canSave || saveMutation.isPending
+              !canSave || isSaving
                 ? "text-[color:var(--text-dim)]"
                 : "text-[#07c160] active:bg-black/[0.05]",
             )}
@@ -288,7 +308,7 @@ export function ProfileInfoAvatarPage() {
           </div>
           <TextField
             value={draft}
-            disabled={saveMutation.isPending}
+            disabled={isSaving}
             onChange={(event) => {
               userTouchedRef.current = true;
               setDraft(event.target.value);
@@ -320,7 +340,7 @@ export function ProfileInfoAvatarPage() {
       <div className="mt-2 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
         <button
           type="button"
-          disabled={saveMutation.isPending}
+          disabled={isSaving}
           onClick={() => {
             void handlePickAvatar();
           }}
@@ -328,7 +348,7 @@ export function ProfileInfoAvatarPage() {
           // 完「完成」后趁着上传那几秒又选了张图，结果 save success → goBack
           // 把页面退回 /profile/info，新选的图被一起带走没机会落库——用户白
           // 选一遍且毫无提示。同样的窗口 URL 输入框也照理 disable，下面 TextField
-          // disabled={saveMutation.isPending}。
+          // disabled={isSaving}。
           className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60 disabled:active:bg-transparent"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(7,193,96,0.10)] text-[#15803d]">
@@ -344,6 +364,31 @@ export function ProfileInfoAvatarPage() {
           </div>
         </button>
       </div>
+
+      {hasCustomAvatar ? (
+        <div className="mt-2 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
+          <button
+            type="button"
+            disabled={isSaving}
+            onClick={() => resetMutation.mutate()}
+            className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60 disabled:active:bg-transparent"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(148,163,184,0.16)] text-[color:var(--text-secondary)]">
+              <RotateCcw size={16} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[14px] text-[color:var(--text-primary)]">
+                {resetMutation.isPending
+                  ? t(msg`正在恢复…`)
+                  : t(msg`恢复默认头像`)}
+              </div>
+              <div className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
+                {t(msg`清掉自定义头像，换回系统默认。`)}
+              </div>
+            </div>
+          </button>
+        </div>
+      ) : null}
 
       {errorMessage ? (
         <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(220,38,38,0.18)] bg-[rgba(254,242,242,0.96)] px-3 py-2 text-[12px] leading-5 text-[color:var(--state-danger-text)]">

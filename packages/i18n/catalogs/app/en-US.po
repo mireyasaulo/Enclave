@@ -1481,7 +1481,7 @@ msgstr "Deleting..."
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:983
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1155
 #: apps/app/src/features/search/mobile-search-workspace.tsx:384
-#: apps/app/src/routes/chat-list-page.tsx:1736
+#: apps/app/src/routes/chat-list-page.tsx:1776
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1149
 msgid "删除"
 msgstr "Delete"
@@ -1710,8 +1710,8 @@ msgstr "Save attachment"
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:976
 #: apps/app/src/features/shell/desktop-nav-matching.ts:34
 #: apps/app/src/features/shell/desktop-nav-matching.ts:35
-#: apps/app/src/routes/chat-list-page.tsx:839
-#: apps/app/src/routes/chat-list-page.tsx:1349
+#: apps/app/src/routes/chat-list-page.tsx:879
+#: apps/app/src/routes/chat-list-page.tsx:1389
 #: apps/app/src/routes/desktop-mobile-page.tsx:119
 #: apps/app/src/routes/desktop-mobile-page.tsx:165
 #: apps/app/src/routes/favorites-page.tsx:72
@@ -2384,7 +2384,7 @@ msgstr "Untitled note"
 #: apps/app/src/routes/official-accounts-page.tsx:390
 #: apps/app/src/routes/profile-character-import-page.tsx:196
 #: apps/app/src/routes/profile-feedback-page.tsx:174
-#: apps/app/src/routes/profile-info-avatar-page.tsx:220
+#: apps/app/src/routes/profile-info-avatar-page.tsx:240
 #: apps/app/src/routes/profile-info-name-page.tsx:99
 #: apps/app/src/routes/profile-info-page.tsx:54
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:52
@@ -3326,7 +3326,7 @@ msgstr "Official Account"
 #: apps/app/src/components/official-article-card.tsx:68
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1399
 #: apps/app/src/i18n/static-dom-seed.ts:919
-#: apps/app/src/routes/chat-list-page.tsx:1694
+#: apps/app/src/routes/chat-list-page.tsx:1734
 #: apps/app/src/routes/subscription-inbox-page.tsx:406
 msgid "置顶"
 msgstr "Pin"
@@ -3438,7 +3438,7 @@ msgstr "Just now"
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:119
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:500
 #: apps/app/src/routes/chat-details-page.tsx:1057
-#: apps/app/src/routes/chat-list-page.tsx:1598
+#: apps/app/src/routes/chat-list-page.tsx:1638
 #: apps/app/src/routes/group-chat-details-page.tsx:806
 msgid "消息免打扰"
 msgstr "Mute notifications"
@@ -4019,7 +4019,7 @@ msgstr "Search chat history"
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:473
 #: apps/app/src/features/shell/desktop-nav-matching.ts:98
 #: apps/app/src/features/shell/desktop-shell.tsx:647
-#: apps/app/src/routes/chat-list-page.tsx:938
+#: apps/app/src/routes/chat-list-page.tsx:978
 #: apps/app/src/routes/contacts-page.tsx:2336
 #: apps/app/src/routes/contacts-page.tsx:2410
 #: apps/app/src/routes/create-group-page.tsx:422
@@ -4098,7 +4098,7 @@ msgstr "All members"
 #: apps/app/src/routes/character-detail-page.tsx:291
 #: apps/app/src/routes/chat-background-page.tsx:334
 #: apps/app/src/routes/chat-details-page.tsx:840
-#: apps/app/src/routes/chat-list-page.tsx:1016
+#: apps/app/src/routes/chat-list-page.tsx:1056
 #: apps/app/src/routes/contacts-page.tsx:2398
 #: apps/app/src/routes/create-group-page.tsx:434
 #: apps/app/src/routes/discover-feed-page.tsx:1430
@@ -4146,8 +4146,8 @@ msgstr "Chat history is temporarily unavailable"
 #: apps/app/src/routes/chat-background-page.tsx:391
 #: apps/app/src/routes/chat-background-page.tsx:459
 #: apps/app/src/routes/chat-details-page.tsx:211
-#: apps/app/src/routes/chat-list-page.tsx:1006
-#: apps/app/src/routes/chat-list-page.tsx:1041
+#: apps/app/src/routes/chat-list-page.tsx:1046
+#: apps/app/src/routes/chat-list-page.tsx:1081
 #: apps/app/src/routes/contacts-page.tsx:1579
 #: apps/app/src/routes/contacts-page.tsx:1589
 #: apps/app/src/routes/contacts-page.tsx:1606
@@ -4363,7 +4363,7 @@ msgstr "Pending"
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:907
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1097
 #: apps/app/src/routes/mini-programs-page.tsx:365
-#: apps/app/src/routes/profile-info-avatar-page.tsx:237
+#: apps/app/src/routes/profile-info-avatar-page.tsx:257
 #: apps/app/src/routes/profile-info-name-page.tsx:116
 #: apps/app/src/routes/profile-info-signature-page.tsx:111
 msgid "完成"
@@ -6200,7 +6200,7 @@ msgstr "Close reminder result toast"
 
 #: apps/app/src/features/chat/mobile-reminder-toast-host.tsx:236
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1643
-#: apps/app/src/routes/chat-list-page.tsx:1052
+#: apps/app/src/routes/chat-list-page.tsx:1092
 msgid "消息提醒"
 msgstr "Message reminders"
 
@@ -7731,7 +7731,7 @@ msgstr "Starred friend"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1616
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:113
 #: apps/app/src/routes/chat-details-page.tsx:1063
-#: apps/app/src/routes/chat-list-page.tsx:1623
+#: apps/app/src/routes/chat-list-page.tsx:1663
 #: apps/app/src/routes/group-chat-details-page.tsx:844
 msgid "置顶聊天"
 msgstr "Pin chat"
@@ -8426,7 +8426,7 @@ msgstr "Close {title} popup"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:121
 #: apps/app/src/routes/character-detail-page.tsx:608
 #: apps/app/src/routes/chat-details-page.tsx:428
-#: apps/app/src/routes/chat-list-page.tsx:422
+#: apps/app/src/routes/chat-list-page.tsx:445
 #: apps/app/src/routes/contacts-page.tsx:888
 msgid "聊天已置顶。"
 msgstr "Chat pinned."
@@ -8435,7 +8435,7 @@ msgstr "Chat pinned."
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:121
 #: apps/app/src/routes/character-detail-page.tsx:608
 #: apps/app/src/routes/chat-details-page.tsx:428
-#: apps/app/src/routes/chat-list-page.tsx:422
+#: apps/app/src/routes/chat-list-page.tsx:445
 #: apps/app/src/routes/contacts-page.tsx:888
 msgid "聊天已取消置顶。"
 msgstr "Chat unpinned."
@@ -8445,7 +8445,7 @@ msgstr "Chat unpinned."
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:149
 #: apps/app/src/routes/character-detail-page.tsx:629
 #: apps/app/src/routes/chat-details-page.tsx:455
-#: apps/app/src/routes/chat-list-page.tsx:472
+#: apps/app/src/routes/chat-list-page.tsx:512
 #: apps/app/src/routes/contacts-page.tsx:914
 msgid "已开启消息免打扰。"
 msgstr "Chat notifications muted."
@@ -8455,7 +8455,7 @@ msgstr "Chat notifications muted."
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:150
 #: apps/app/src/routes/character-detail-page.tsx:630
 #: apps/app/src/routes/chat-details-page.tsx:456
-#: apps/app/src/routes/chat-list-page.tsx:473
+#: apps/app/src/routes/chat-list-page.tsx:513
 #: apps/app/src/routes/contacts-page.tsx:915
 msgid "已关闭消息免打扰。"
 msgstr "Chat notifications are no longer muted."
@@ -9448,18 +9448,18 @@ msgid "当前浏览器不支持语音输入"
 msgstr "Current browser doesn't support voice input"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1581
-#: apps/app/src/routes/chat-list-page.tsx:852
+#: apps/app/src/routes/chat-list-page.tsx:892
 #: apps/app/src/routes/contacts-page.tsx:2249
 msgid "打开快捷菜单"
 msgstr "Open quick menu"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1709
-#: apps/app/src/routes/chat-list-page.tsx:1120
+#: apps/app/src/routes/chat-list-page.tsx:1160
 msgid "展开已通知提醒"
 msgstr "Expand notified reminders"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1710
-#: apps/app/src/routes/chat-list-page.tsx:1121
+#: apps/app/src/routes/chat-list-page.tsx:1161
 msgid "收起已通知提醒"
 msgstr "Collapse notified reminders"
 
@@ -9529,12 +9529,12 @@ msgid "已取消置顶聊天。"
 msgstr "Unpinned this chat."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2786
-#: apps/app/src/routes/chat-list-page.tsx:514
+#: apps/app/src/routes/chat-list-page.tsx:554
 msgid "已标记为已读。"
 msgstr "Marked as read."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2788
-#: apps/app/src/routes/chat-list-page.tsx:515
+#: apps/app/src/routes/chat-list-page.tsx:555
 msgid "已标记为未读。"
 msgstr "Marked as unread."
 
@@ -9548,7 +9548,7 @@ msgid "聊天已隐藏。"
 msgstr "Chat hidden."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2798
-#: apps/app/src/routes/chat-list-page.tsx:540
+#: apps/app/src/routes/chat-list-page.tsx:580
 msgid "聊天已从列表移除。"
 msgstr "Chat removed from the list."
 
@@ -9565,7 +9565,7 @@ msgid "在独立窗口打开"
 msgstr "Open in separate window"
 
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:113
-#: apps/app/src/routes/chat-list-page.tsx:1694
+#: apps/app/src/routes/chat-list-page.tsx:1734
 msgid "取消置顶"
 msgstr "Unpin"
 
@@ -11762,18 +11762,18 @@ msgstr "Open"
 
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
+#: apps/app/src/i18n/static-dom-seed.ts:195
+msgid "移出常用"
+msgstr "Remove from frequent"
+
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:278
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
 #: apps/app/src/i18n/static-dom-seed.ts:197
 msgid "加入常用"
 msgstr "Add to frequent"
-
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
-#: apps/app/src/i18n/static-dom-seed.ts:195
-msgid "移出常用"
-msgstr "Remove from frequent"
 
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:802
@@ -12303,7 +12303,7 @@ msgstr "Hold on — preparing this subscription article."
 #: apps/app/src/routes/chat-details-page.tsx:864
 #: apps/app/src/routes/chat-details-page.tsx:877
 #: apps/app/src/routes/chat-details-page.tsx:890
-#: apps/app/src/routes/chat-list-page.tsx:1026
+#: apps/app/src/routes/chat-list-page.tsx:1066
 #: apps/app/src/routes/create-group-page.tsx:444
 #: apps/app/src/routes/discover-feed-page.tsx:1438
 #: apps/app/src/routes/friend-requests-page.tsx:256
@@ -13150,13 +13150,13 @@ msgid "h 成熟"
 msgstr "h to ripen"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ pack, price"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ each"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ pack, price"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -16434,7 +16434,7 @@ msgstr "Done"
 
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:280
 #: apps/app/src/i18n/static-dom-seed.ts:909
-#: apps/app/src/routes/chat-list-page.tsx:961
+#: apps/app/src/routes/chat-list-page.tsx:1001
 msgid "撤销"
 msgstr "Undo"
 
@@ -23152,24 +23152,24 @@ msgid "复制联系人摘要失败，请稍后重试。"
 msgstr "Failed to copy the contact summary. Please try again later."
 
 #: apps/app/src/routes/chat-details-page.tsx:443
-#: apps/app/src/routes/chat-list-page.tsx:416
+#: apps/app/src/routes/chat-list-page.tsx:439
 #: apps/app/src/routes/group-chat-details-page.tsx:253
 msgid "置顶失败，请稍后再试。"
 msgstr ""
 
 #: apps/app/src/routes/chat-details-page.tsx:444
-#: apps/app/src/routes/chat-list-page.tsx:417
+#: apps/app/src/routes/chat-list-page.tsx:440
 #: apps/app/src/routes/group-chat-details-page.tsx:254
 msgid "取消置顶失败，请稍后再试。"
 msgstr ""
 
 #: apps/app/src/routes/chat-details-page.tsx:469
-#: apps/app/src/routes/chat-list-page.tsx:465
+#: apps/app/src/routes/chat-list-page.tsx:505
 msgid "开启免打扰失败，请稍后再试。"
 msgstr ""
 
 #: apps/app/src/routes/chat-details-page.tsx:470
-#: apps/app/src/routes/chat-list-page.tsx:466
+#: apps/app/src/routes/chat-list-page.tsx:506
 msgid "关闭免打扰失败，请稍后再试。"
 msgstr ""
 
@@ -23372,90 +23372,90 @@ msgstr "Loading the desktop messages workspace. Recent conversations will appear
 msgid "载入桌面消息工作区..."
 msgstr "Loading desktop messages workspace..."
 
-#: apps/app/src/routes/chat-list-page.tsx:507
+#: apps/app/src/routes/chat-list-page.tsx:547
 msgid "标记已读失败，请稍后再试。"
 msgstr ""
 
-#: apps/app/src/routes/chat-list-page.tsx:508
+#: apps/app/src/routes/chat-list-page.tsx:548
 msgid "标记未读失败，请稍后再试。"
 msgstr ""
 
-#: apps/app/src/routes/chat-list-page.tsx:546
+#: apps/app/src/routes/chat-list-page.tsx:586
 msgid "聊天移除失败，请稍后再试。"
 msgstr "Failed to remove the chat. Try again later."
 
-#: apps/app/src/routes/chat-list-page.tsx:813
+#: apps/app/src/routes/chat-list-page.tsx:853
 msgid "已撤销删除。"
 msgstr "Deletion undone."
 
-#: apps/app/src/routes/chat-list-page.tsx:852
+#: apps/app/src/routes/chat-list-page.tsx:892
 #: apps/app/src/routes/contacts-page.tsx:2249
 msgid "关闭快捷菜单"
 msgstr "Close quick menu"
 
-#: apps/app/src/routes/chat-list-page.tsx:931
+#: apps/app/src/routes/chat-list-page.tsx:971
 #: apps/app/src/routes/contacts-page.tsx:2333
 msgid "打开搜一搜"
 msgstr "Open Search"
 
 #. placeholder {0}: pendingHideConversation.title
-#: apps/app/src/routes/chat-list-page.tsx:953
+#: apps/app/src/routes/chat-list-page.tsx:993
 msgid "{0} 已从列表移除，5 秒内可撤销。"
 msgstr "{0} was removed from the list. You can undo within 5 seconds."
 
-#: apps/app/src/routes/chat-list-page.tsx:989
+#: apps/app/src/routes/chat-list-page.tsx:1029
 msgid "订阅号与服务号入口暂时没有刷新成功。"
 msgstr "Subscription and service account entries did not refresh."
 
-#: apps/app/src/routes/chat-list-page.tsx:997
+#: apps/app/src/routes/chat-list-page.tsx:1037
 msgid "查看公众号"
 msgstr "View Official Accounts"
 
-#: apps/app/src/routes/chat-list-page.tsx:1017
+#: apps/app/src/routes/chat-list-page.tsx:1057
 msgid "正在刷新消息列表"
 msgstr "Refreshing message list"
 
-#: apps/app/src/routes/chat-list-page.tsx:1018
+#: apps/app/src/routes/chat-list-page.tsx:1058
 msgid "稍等一下，正在同步最近会话和消息入口。"
 msgstr "Please wait while recent conversations and message entries sync."
 
-#: apps/app/src/routes/chat-list-page.tsx:1027
+#: apps/app/src/routes/chat-list-page.tsx:1067
 msgid "消息页暂时不可用"
 msgstr "Messages are temporarily unavailable"
 
-#: apps/app/src/routes/chat-list-page.tsx:1350
+#: apps/app/src/routes/chat-list-page.tsx:1390
 msgid "还没有新消息"
 msgstr "No new messages yet"
 
-#: apps/app/src/routes/chat-list-page.tsx:1352
+#: apps/app/src/routes/chat-list-page.tsx:1392
 msgid "等角色、群聊或服务号开始发消息后，这里会显示最近会话。"
 msgstr "Recent conversations will appear here once characters, group chats, or service accounts start sending messages."
 
-#: apps/app/src/routes/chat-list-page.tsx:1363
+#: apps/app/src/routes/chat-list-page.tsx:1403
 msgid "去通讯录看看"
 msgstr "Open Contacts"
 
-#: apps/app/src/routes/chat-list-page.tsx:1463
+#: apps/app/src/routes/chat-list-page.tsx:1503
 msgid "标已读"
 msgstr "Mark read"
 
-#: apps/app/src/routes/chat-list-page.tsx:1463
+#: apps/app/src/routes/chat-list-page.tsx:1503
 msgid "标未读"
 msgstr "Mark unread"
 
-#: apps/app/src/routes/chat-list-page.tsx:1481
+#: apps/app/src/routes/chat-list-page.tsx:1521
 msgid "从这里开始第一句问候"
 msgstr "Start with the first hello here"
 
-#: apps/app/src/routes/chat-list-page.tsx:1605
+#: apps/app/src/routes/chat-list-page.tsx:1645
 msgid "有未读消息"
 msgstr "Unread messages"
 
-#: apps/app/src/routes/chat-list-page.tsx:1709
+#: apps/app/src/routes/chat-list-page.tsx:1749
 msgid "取消免打扰"
 msgstr "Unmute"
 
-#: apps/app/src/routes/chat-list-page.tsx:1709
+#: apps/app/src/routes/chat-list-page.tsx:1749
 msgid "免打扰"
 msgstr "Mute"
 
@@ -27287,7 +27287,7 @@ msgid "切换桌面笔记..."
 msgstr "Switching to desktop notes…"
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:995
-#: apps/app/src/routes/profile-info-avatar-page.tsx:237
+#: apps/app/src/routes/profile-info-avatar-page.tsx:257
 #: apps/app/src/routes/profile-info-name-page.tsx:116
 #: apps/app/src/routes/profile-info-signature-page.tsx:111
 msgid "保存中"
@@ -27699,57 +27699,69 @@ msgstr "Tell us what you saw and what you expected — the more specific the bet
 msgid "反馈会同步到隐界云端控制台，处理结果可能不会逐条回复。涉及账号问题请前往设置。"
 msgstr "Feedback syncs to the Enclave cloud console. We may not reply to each item individually. For account issues, please go to Settings."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:173
+#: apps/app/src/routes/profile-info-avatar-page.tsx:191
 msgid "图片过大，请压缩到 1MB 以内再试。"
 msgstr "Image is too large. Please compress it to under 1 MB and try again."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:180
+#: apps/app/src/routes/profile-info-avatar-page.tsx:198
 msgid "读取图片失败，请换一张试试。"
 msgstr "Failed to load image. Please try another."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:213
+#: apps/app/src/routes/profile-info-avatar-page.tsx:233
 msgid "更换头像"
 msgstr "Change avatar"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:249
+#: apps/app/src/routes/profile-info-avatar-page.tsx:269
 msgid "点击下方更换"
 msgstr "Tap below to change"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:261
+#: apps/app/src/routes/profile-info-avatar-page.tsx:281
 msgid "本地图片"
 msgstr "Local image"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:273
+#: apps/app/src/routes/profile-info-avatar-page.tsx:293
 msgid "清除已选图片"
 msgstr "Clear selected image"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:287
+#: apps/app/src/routes/profile-info-avatar-page.tsx:307
 msgid "图片地址"
 msgstr "Image URL"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:297
+#: apps/app/src/routes/profile-info-avatar-page.tsx:317
 msgid "粘贴图片 URL 或留空"
 msgstr "Paste image URL or leave empty"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:304
+#: apps/app/src/routes/profile-info-avatar-page.tsx:324
 msgid "当前头像已存为本地图片。粘贴新 URL 或重新选择都会替换它。"
 msgstr "Current avatar is stored as a local image. Pasting a new URL or picking again will replace it."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:309
+#: apps/app/src/routes/profile-info-avatar-page.tsx:329
 msgid "需要是 http/https 开头的合法图片链接。"
 msgstr "Needs to be a valid image URL starting with http/https."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:314
+#: apps/app/src/routes/profile-info-avatar-page.tsx:334
 msgid "粘贴的图片超过 2MB 上限，请压缩或换个 URL。"
 msgstr "The pasted image exceeds the 2 MB limit. Please compress it or use a different URL."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:339
+#: apps/app/src/routes/profile-info-avatar-page.tsx:359
 msgid "从相册选择"
 msgstr "Select from album"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:342
+#: apps/app/src/routes/profile-info-avatar-page.tsx:362
 msgid "图片大小不超过 1MB"
 msgstr "Image must be under 1 MB"
+
+#: apps/app/src/routes/profile-info-avatar-page.tsx:382
+msgid "正在恢复…"
+msgstr "Restoring…"
+
+#: apps/app/src/routes/profile-info-avatar-page.tsx:383
+msgid "恢复默认头像"
+msgstr "Restore default avatar"
+
+#: apps/app/src/routes/profile-info-avatar-page.tsx:386
+msgid "清掉自定义头像，换回系统默认。"
+msgstr "Clear the custom avatar and switch back to the system default."
 
 #: apps/app/src/routes/profile-info-name-page.tsx:92
 #: apps/app/src/routes/profile-info-page.tsx:72
