@@ -138,6 +138,8 @@ function buildSearchLauncherHistoryActionId(keyword: string) {
   return `history-${keyword}`;
 }
 
+const REMOTE_SEARCH_DEBOUNCE_MS = 280;
+
 function buildDesktopOfficialAccountSearchPath(
   accountId: string,
   articleId?: string,
@@ -334,6 +336,22 @@ export function DesktopSearchDropdownPanel({
   const localMessageActionState = useLocalChatMessageActionState();
   const trimmedKeyword = keyword.trim();
   const normalizedKeyword = trimmedKeyword.toLowerCase();
+  // 消息全文搜索是对**全部会话**并行打 HTTP（searchConversationMessages
+  // / searchGroupMessages），每按一个键就是一整轮 fan-out。N=50 会话 +
+  // 用户每秒打 4 个字 = 200 个并发请求/秒，公网隧道 RTT 600ms 会瞬间被
+  // 排满。本地命中（friends / world characters / favorites / 会话标题）
+  // 都是同步 filter，仍然用即时的 normalizedKeyword 给出实时反馈；只把
+  // 远程的消息搜索 debounce 一下即可。和 desktop-chat-history-panel
+  // 自己的搜索框 SEARCH_DEBOUNCE_MS=280 对齐。
+  const [debouncedRemoteKeyword, setDebouncedRemoteKeyword] = useState(
+    normalizedKeyword,
+  );
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedRemoteKeyword(normalizedKeyword);
+    }, REMOTE_SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [normalizedKeyword]);
   const currentSearchRouteHash = useMemo(
     () =>
       buildSearchRouteHash({
@@ -451,11 +469,11 @@ export function DesktopSearchDropdownPanel({
       "desktop-search-launcher-message-matches",
       baseUrl,
       conversationsSearchKey,
-      normalizedKeyword,
+      debouncedRemoteKeyword,
     ],
     enabled:
       shouldLoadSuggestions &&
-      Boolean(normalizedKeyword) &&
+      Boolean(debouncedRemoteKeyword) &&
       conversations.length > 0,
     staleTime: 60_000,
     queryFn: async () => {
@@ -465,7 +483,7 @@ export function DesktopSearchDropdownPanel({
             ? await searchGroupMessages(
                 conversation.id,
                 {
-                  keyword: normalizedKeyword,
+                  keyword: debouncedRemoteKeyword,
                   limit: 3,
                 },
                 baseUrl,
@@ -473,7 +491,7 @@ export function DesktopSearchDropdownPanel({
             : await searchConversationMessages(
                 conversation.id,
                 {
-                  keyword: normalizedKeyword,
+                  keyword: debouncedRemoteKeyword,
                   limit: 3,
                 },
                 baseUrl,
