@@ -1718,7 +1718,9 @@ export function CharacterDetailPage() {
                 />
               ) : null}
               {isFriend && isEditingProfile ? (
-                <div className="border-t border-[color:var(--border-faint)] bg-[#f7f7f7] px-4 py-3">
+                // border-t 由父级 ProfileSection 的 divide-y 统一管（走查 R5），
+                // 这里只留 background 跟 padding 避免叠成双线。
+                <div className="bg-[#f7f7f7] px-4 py-3">
                   <div className="space-y-3">
                     <DetailInputField
                       label={remarkLabel}
@@ -2181,7 +2183,14 @@ function ProfileSection({
       >
         {title}
       </div>
-      <div className="border-t border-[color:var(--border-faint)]">
+      {/* 走查 R5：ProfileSection 的 children 容器只画了顶部一条横线（隔开 title
+          跟第一行），相邻 ProfileRow / ProfileSwitchRow 之间没有任何 separator。
+          移动端"设置备注和标签 / 地区 / 来源 / 标签 / 朋友圈 / 推荐给朋友"这堆
+          ProfileRow 在 WeChat 白底面板里挨在一起、视觉上糊成一块连看哪行是哪行
+          都得数 label 字数。和 chat-details-page 用的 divide-y 模式对齐，给所
+          有非首子加 border-t。inline 编辑表单本身就有 border-t（line 1671），
+          配合 divide-y 会把它跟自己叠成双线，下方把它移除让 divide 统一管。 */}
+      <div className="divide-y divide-[color:var(--border-faint)] border-t border-[color:var(--border-faint)]">
         {children}
       </div>
     </section>
