@@ -2348,6 +2348,22 @@ function MobileChannelsViewport({
   const [userUnmuted, setUserUnmuted] = useState(false);
   const cardRefs = useRef(new Map<string, HTMLElement>());
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // 切 tab 时把滚动复位到顶部 + active 重置：之前用户在 推荐 tab 滚到第 5 张，
+  // 切去 朋友 tab，如果 朋友 tab 有缓存（isLoading=false），viewport 不会 unmount，
+  // scrollTop 留在原位，新 tab 的内容从中间显示，非常错乱。切到新 tab 就当成
+  // 「从头开始看」，体感对齐抖音 / 视频号。
+  // 不依赖 posts，因为 posts 数组身份在 home 刷新时也会变（点赞 / 关注的
+  // optimistic + invalidate），那时不该 reset 滚动。
+  useEffect(() => {
+    const node = scrollContainerRef.current;
+    if (!node) return;
+    if (node.scrollTop !== 0) {
+      node.scrollTop = 0;
+    }
+    setActivePostId(null);
+  }, [activeSection]);
 
   // 首次有数据时 pick 第一条作为 active；之后 activePostId 由 IntersectionObserver
   // 维护。注意：如果 activePostId 指向的 post 被删（"减少推荐"乐观 filter 掉），
@@ -2527,7 +2543,10 @@ function MobileChannelsViewport({
   }, [activePostId, onVisiblePost]);
 
   return (
-    <div className="h-[calc(100dvh-9.6rem)] snap-y snap-mandatory space-y-2 overflow-y-auto overscroll-contain scroll-pb-2 pb-2">
+    <div
+      ref={scrollContainerRef}
+      className="h-[calc(100dvh-9.6rem)] snap-y snap-mandatory space-y-2 overflow-y-auto overscroll-contain scroll-pb-2 pb-2"
+    >
       {posts.map((post) => (
         <MobileChannelsCard
           key={post.id}
