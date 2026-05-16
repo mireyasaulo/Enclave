@@ -17,7 +17,7 @@ import {
   getSystemStatus,
   type VoiceCallTurnResult,
 } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
 import { translateCharacterActivity } from "../../lib/character-i18n";
 import {
   AppPage,
@@ -67,7 +67,14 @@ type MobileAiCallScreenProps = {
 };
 
 export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
-  const t = translateRuntimeMessage;
+  // 用 useRuntimeTranslator() 而不是 translateRuntimeMessage——下面四处
+  // useMemo (statusLabel / statusHint / userBubblePlaceholder /
+  // assistantBubblePlaceholder) 在 body 里都直接调 t(msg`...`)，但 deps 都
+  // 没列 t。translateRuntimeMessage 是全局稳定 fn，把它当 dep 也不会因
+  // locale 切换而换引用，useMemo 会卡在上个 locale 的翻译。
+  // useRuntimeTranslator 用 useCallback 把 activationVersion+locale 串进 deps，
+  // 拿到的 t 引用在 locale 切换时换，下方 useMemo 加上 t dep 就能跟着重算。
+  const t = useRuntimeTranslator();
   const { conversationId } = useParams({
     strict: false,
   }) as {
@@ -445,6 +452,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
     lastAssistantText,
     playbackSettling,
     speech.status,
+    t,
   ]);
   const statusHint = useMemo(() => {
     if (isVideoMode && digitalHumanCall.sessionState === "connecting") {
@@ -521,6 +529,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
     lastAssistantText,
     playbackSettling,
     speech.status,
+    t,
   ]);
 
   const releaseRecordButtonPointer = (
@@ -894,7 +903,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
     }
 
     return t(msg`按住底部按钮，说出你想对 TA 说的话。`);
-  }, [callPhase, isVideoMode]);
+  }, [callPhase, isVideoMode, t]);
   const assistantBubblePlaceholder = useMemo(() => {
     if (callPhase === "error") {
       return t(msg`这一轮的回复暂时没有顺利回来，恢复后会继续显示在这里。`);
@@ -919,7 +928,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
     return isVideoMode
       ? t(msg`数字人的回复会先显示在这里，再通过语音自动播报。`)
       : t(msg`TA 的回复会在这里显示，并自动播报给你听。`);
-  }, [callPhase, isVideoMode]);
+  }, [callPhase, isVideoMode, t]);
 
   useEffect(() => {
     if (
