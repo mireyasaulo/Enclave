@@ -1149,12 +1149,16 @@ function applyEntitlementsFromEnv() {
   }
 
   if (associatedDomain) {
-    if (!source.includes(`<string>${associatedDomain}</string>`)) {
-      source = source.replace(
-        /(<key>com\.apple\.developer\.associated-domains<\/key>\s*<array>\n)([\s\S]*?)(\n\s*<\/array>)/m,
-        `$1$2\n    <string>${associatedDomain}</string>$3`,
-      );
-    }
+    // 直接整体替换 associated-domains 数组内容，不再 append。原实现碰到种子
+    // 里的 applinks:app.example.yinjie.app 占位符不会清掉，导致用户每次跑
+    // configure 都往里堆一条新 domain（占位符 + 真实域名 + 历史值）。iOS
+    // 装机时会对每个 applinks: 拉一次 https://${domain}/.well-known/apple-
+    // app-site-association，占位域名根本不解析 / 不返 AASA，平白浪费首装
+    // 网络请求，安全审查也会问为什么列那么多没指向的域。
+    source = source.replace(
+      /(<key>com\.apple\.developer\.associated-domains<\/key>\s*<array>)[\s\S]*?(<\/array>)/m,
+      `$1\n    <string>${associatedDomain}</string>\n  $2`,
+    );
   }
 
   if (bundleId) {
