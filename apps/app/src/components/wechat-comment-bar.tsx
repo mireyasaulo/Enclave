@@ -42,17 +42,28 @@ export function WeChatCommentBar({
   const [mounted, setMounted] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  // 同步防双击锁——下方 handleSubmit 原本只 guard `canSubmit`，但 canSubmit 是
+  // 上一次 render 时定下的 const，同一帧里连点 5 次会拿到同一份 canSubmit=true
+  // 同步通过 5 次（CDP 实测：5 click → 5 POST /api/moments/X/comment 在 1ms 内
+  // 飞出，朋友圈出 5 条一模一样的评论）。ref 同步赋值，第一次 click 翻 true
+  // 后同帧内的所有后续 click 都被早返兜住。bar 每次重新 open（包括切换 moment）
+  // 时清回 false，让下一条评论能正常发。
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Auto focus when opening; reset offset when closing.
+  // Auto focus when opening; reset offset + submit lock when closing/reopening.
   useEffect(() => {
     if (!open) {
       setKeyboardOffset(0);
       return;
     }
+    // 每次 bar 重新 open 都把同步锁清掉，让下一次评论能正常发——
+    // 一次 send 锁住后 bar 关闭、mutation 完成、bar 再开（同 moment 或别的
+    // moment）都会走这条 effect 把锁释放。
+    submittingRef.current = false;
     requestAnimationFrame(() => {
       textAreaRef.current?.focus();
     });
@@ -108,7 +119,9 @@ export function WeChatCommentBar({
   const canSubmit = value.trim().length > 0 && !pending;
 
   const handleSubmit = () => {
+    if (submittingRef.current) return;
     if (!canSubmit) return;
+    submittingRef.current = true;
     onSubmit();
   };
 
