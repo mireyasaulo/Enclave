@@ -904,12 +904,28 @@ export function DesktopNotesWorkspace({
     void handleClose();
   }, [activeDraftId, editorState, handleClose, isDirty, noteId]);
 
+  // handleSave / requestClose 的 useCallback deps 里都吊着 editorState（前者读
+  // contentText/assets 判空，后者通过 isDirty 间接读），editorState 每次按键都
+  // 翻新一次 → 两个 callback 每按一下键都重新生成 → 之前 keydown effect 把它们
+  // 写在 deps 里，等于每次按键 add/removeEventListener 一对——长笔记快速打字
+  // 一秒 5-10 次白挂载。改成 useRef 抓最新的 handler，effect 只依赖几个真正会
+  // 影响快捷键语义的开关（dialog/tag-editor/standalone），这些状态切换频率
+  // 比击键低几个数量级。
+  const handleSaveRef = useRef(handleSave);
+  const requestCloseRef = useRef(requestClose);
+  useEffect(() => {
+    handleSaveRef.current = handleSave;
+  }, [handleSave]);
+  useEffect(() => {
+    requestCloseRef.current = requestClose;
+  }, [requestClose]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const withCommand = event.metaKey || event.ctrlKey;
       if (withCommand && event.key.toLowerCase() === "s") {
         event.preventDefault();
-        void handleSave();
+        void handleSaveRef.current();
         return;
       }
 
@@ -926,20 +942,13 @@ export function DesktopNotesWorkspace({
 
       if (standaloneWindow && !deleteDialogOpen && !closeDialogOpen) {
         event.preventDefault();
-        requestClose();
+        requestCloseRef.current();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [
-    closeDialogOpen,
-    deleteDialogOpen,
-    handleSave,
-    requestClose,
-    standaloneWindow,
-    tagEditorOpen,
-  ]);
+  }, [closeDialogOpen, deleteDialogOpen, standaloneWindow, tagEditorOpen]);
 
   async function requestSend() {
     const hasSendableContent =

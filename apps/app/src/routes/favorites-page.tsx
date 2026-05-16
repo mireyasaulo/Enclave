@@ -575,15 +575,26 @@ function DesktopFavoritesPage() {
               : t(msg`${resolveFavoriteCategoryLabel(activeCategory)} · ${counts[activeCategory]} 项`)
       }
       toolbar={
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => openInlineNoteEditor()}
-          className="h-9 rounded-[10px] bg-[color:var(--brand-primary)] px-3 text-white hover:opacity-95"
-        >
-          <FileText size={15} />
-          {t(msg`新建笔记`)}
-        </Button>
+        // 编辑器开着时仍让"新建笔记"挂在 shell header 上是陷阱：用户点
+        // 一下，openInlineNoteEditor 立刻 createDesktopNoteDraft 并 navigate
+        // 到一个新 draftId 的 hash → DesktopNotesWorkspace 的 sessionKey 翻面
+        // → init effect 把 editorState 重置为新空草稿。最近 180ms 内打的字
+        // 还没落到 saveDesktopNoteDraft 就被覆盖了；落了的那些虽然还在
+        // localStorage，但 UI 上没有可视化入口，用户看到的就是"刚才打的内
+        // 容凭空消失"。也没有 isDirty 二次确认（close 弹窗只走 requestClose
+        // 这条路径）。最干净的修法是编辑器开着时直接收起这个按钮——你已经
+        // 在编辑一条笔记了，再来一条得先把当前这条关掉。
+        noteEditorRouteState ? null : (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => openInlineNoteEditor()}
+            className="h-9 rounded-[10px] bg-[color:var(--brand-primary)] px-3 text-white hover:opacity-95"
+          >
+            <FileText size={15} />
+            {t(msg`新建笔记`)}
+          </Button>
+        )
       }
       sidebar={
         <>
