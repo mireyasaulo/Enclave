@@ -58,6 +58,7 @@ import { buildMobileFriendRequestsRouteHash } from "../features/contacts/mobile-
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { useCappedPending } from "../hooks/use-capped-pending";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -431,7 +432,9 @@ function MobileAddFriend() {
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               placeholder={t(msg`隐界号 / 角色名`)}
-              className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-[14px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
+              // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in，
+              // 这里 autoFocus 进来就直接抖。
+              className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
               autoFocus
               enterKeyHint="search"
             />
@@ -816,6 +819,20 @@ function MobileAddFriendSendSheet({
     };
   }, [onClose, open, pending]);
 
+  // 原生壳硬件 Back：sheet 打开时先关 sheet，不让 BACK 把用户从 /add-friend 直
+  // 接 history.back 弹回 /tabs/contacts。pending 中（正在发送）不拦避免打断。
+  useEffect(() => {
+    if (!open || pending) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [open, onClose, pending]);
+
   if (!open || !result) {
     return null;
   }
@@ -893,7 +910,8 @@ function MobileAddFriendSendSheet({
               onChange={(event) => setGreeting(event.target.value)}
               placeholder={t(msg`请输入验证信息`)}
               rows={4}
-              className="min-h-[112px] w-full resize-none rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[14px] leading-6 text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.42)]"
+              // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+              className="min-h-[112px] w-full resize-none rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] leading-6 text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.42)]"
             />
             <div className="mt-1 flex justify-end text-[11px] text-[color:var(--text-dim)]">
               {greeting.length}/60
