@@ -96,7 +96,20 @@ function writeDesktopFavorites(
   }
 
   if (favorites.length) {
-    storage.setItem(DESKTOP_FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+    try {
+      storage.setItem(DESKTOP_FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+    } catch (error) {
+      // localStorage 满（典型 5-10MB）时 setItem 抛 QuotaExceededError，
+      // 之前未捕获，会顺着 upsertDesktopFavorite 冒到 React 点击 handler 里
+      // 让组件崩。这里降级：原子 native 同步还能继续，仅本地 web 存储未持久化。
+      // 不主动驱逐，避免一次写入把用户辛苦收藏的旧内容也吞了。
+      if (typeof console !== 'undefined') {
+        console.warn(
+          'Failed to persist desktop favorites to localStorage',
+          error,
+        );
+      }
+    }
   } else {
     storage.removeItem(DESKTOP_FAVORITES_STORAGE_KEY);
   }

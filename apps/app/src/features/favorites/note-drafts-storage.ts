@@ -117,7 +117,22 @@ function writeDesktopNoteDraftRecords(records: DesktopNoteDraftRecord[]) {
   }
 
   if (records.length) {
-    storage.setItem(DESKTOP_NOTE_DRAFTS_STORAGE_KEY, JSON.stringify(records));
+    try {
+      storage.setItem(
+        DESKTOP_NOTE_DRAFTS_STORAGE_KEY,
+        JSON.stringify(records),
+      );
+    } catch (error) {
+      // 跟 favorites-storage 一致：localStorage 满 → 默默吃掉异常，避免每
+      // 180ms 自动保存草稿一旦超额就把编辑器 onInput 整个 crash。下一次写
+      // 入若用户已经手动腾出空间又会成功。
+      if (typeof console !== 'undefined') {
+        console.warn(
+          'Failed to persist desktop note drafts to localStorage',
+          error,
+        );
+      }
+    }
   } else {
     storage.removeItem(DESKTOP_NOTE_DRAFTS_STORAGE_KEY);
   }
