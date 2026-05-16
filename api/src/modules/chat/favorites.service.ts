@@ -969,17 +969,43 @@ function normalizeFavoriteNoteDocument(
   });
 }
 
+// 收藏笔记的 contentHtml 在 chat-message-list 里走 dangerouslySetInnerHTML，
+// 必须挡住 javascript:/vbscript:/data:text 等危险协议，再连 <iframe>/<object>/
+// <svg> 等 XSS 通道一并去掉。走查 R1 抓到 <a href="javascript:..."> 没被洗，
+// 在 message 里点开会执行。
+const DANGEROUS_URL_PROTOCOL =
+  /^\s*(?:javascript|vbscript|data:(?:text|application))/i;
+const DANGEROUS_HTML_TAGS =
+  /<\/?(?:iframe|object|embed|style|link|meta|form|input|base|svg|frame|frameset|applet)\b[^>]*>/gi;
+
 function sanitizeFavoriteNoteHtml(value: string) {
   const normalized = value.trim();
   if (!normalized) {
     return '';
   }
 
-  return normalized
-    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
-    .replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, '')
-    .replace(/\son[a-z]+\s*=\s*'[^']*'/gi, '')
-    .replace(/\son[a-z]+\s*=\s*[^\s>]+/gi, '');
+  let html = normalized;
+  // <script>...</script>（兜底，DANGEROUS_HTML_TAGS 不覆盖闭合块内文本）
+  html = html.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '');
+  html = html.replace(/<\/?script\b[^>]*>/gi, '');
+  // 直接危险的标签
+  html = html.replace(DANGEROUS_HTML_TAGS, '');
+  // 三种引号形态的 on* 事件 attr
+  html = html.replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, '');
+  html = html.replace(/\son[a-z]+\s*=\s*'[^']*'/gi, '');
+  html = html.replace(/\son[a-z]+\s*=\s*[^\s>]+/gi, '');
+  // href/src/xlink:href 里的危险协议改成 # —— 三种引号形态分别匹配
+  html = html.replace(
+    /(\s(?:href|src|xlink:href)\s*=\s*)(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi,
+    (match, attr, doubleQuoted, singleQuoted, unquoted) => {
+      const url = doubleQuoted ?? singleQuoted ?? unquoted ?? '';
+      if (DANGEROUS_URL_PROTOCOL.test(url)) {
+        return `${attr}"#"`;
+      }
+      return match;
+    },
+  );
+  return html;
 }
 
 function normalizeFavoriteNoteContentText(
