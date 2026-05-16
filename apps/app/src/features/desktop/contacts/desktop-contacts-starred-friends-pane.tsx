@@ -156,12 +156,40 @@ export function DesktopContactsStarredFriendsPane({
             </div>
           ) : null}
 
+          {/* 已有数据但 refetch 失败时（getFriends() 之前成功过，再次失败 →
+              friends.length>0 && error），下方分支会保留列表，但用户得知道刷新
+              失败了，否则会以为自己看到的就是最新数据；这条 banner 兜底，让
+              「列表里看到的是旧数据 + 刚才点的重试没成」这种状态可见。 */}
+          {error && friends.length > 0 ? (
+            <div className="px-3 pt-3">
+              <ErrorBlock message={error}>
+                {onRetry ? (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={onRetry}
+                      className="rounded-[10px]"
+                    >
+                      {t(msg`重试读取`)}
+                    </Button>
+                  </div>
+                ) : null}
+              </ErrorBlock>
+            </div>
+          ) : null}
+
           {loading ? (
             <LoadingBlock
               className="px-4 py-6 text-left"
               label={t(msg`正在读取星标朋友...`)}
             />
-          ) : error ? (
+          ) : error && !friends.length ? (
+            // 仅当没有数据时把 ErrorBlock 撑满；refetch 失败但 query 还留着前一次
+            // 成功的 data 时，把列表保住，让用户接着浏览/操作星标朋友，错误本身
+            // 由上方 actionError 提示就够了（跟 desktop-contacts-friend-requests-pane
+            // 一致）。
             <div className="px-3 pt-3">
               <ErrorBlock message={error}>
                 {onRetry ? (

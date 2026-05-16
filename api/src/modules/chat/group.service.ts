@@ -269,9 +269,16 @@ export class GroupService {
     return member;
   }
 
-  async getGroup(groupId: string): Promise<Group | null> {
-    const group = await this.findAccessibleGroup(groupId);
-    return group ? this.toGroup(group) : null;
+  async getGroup(groupId: string): Promise<Group> {
+    // 必须 require：本服务其它 endpoint（getMembers / getMessages / getBackground
+    // 等）都走 requireAccessibleGroup → 群不存在抛 404；唯独本接口用
+    // findAccessibleGroup → null → NestJS 把 null 序列化成 200 + 空 body
+    // → 前端 request() 把空 body 当 undefined 返回 → React Query 抛
+    // "Query data cannot be undefined". 同时本接口不抛 404 也让前端的
+    // isMissingGroupError(groupQuery.error, groupId) 永远 false，得靠
+    // membersQuery 的 404 才能触发跳转兜底——多走一个 RTT。
+    const group = await this.requireAccessibleGroup(groupId);
+    return this.toGroup(group);
   }
 
   async listGroups(): Promise<Group[]> {
