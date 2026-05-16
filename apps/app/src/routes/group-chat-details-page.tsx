@@ -243,6 +243,17 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
         }),
       ]);
     },
+    // 失败时 toggle 不会被 invalidate 拉回 → UI 看着没动，没提示。和单聊
+    // chat-details-page 同步加 onError。
+    onError: (error, pinned) => {
+      showNotice(
+        error instanceof Error && error.message
+          ? error.message
+          : pinned
+            ? t(msg`置顶失败，请稍后再试。`)
+            : t(msg`取消置顶失败，请稍后再试。`),
+      );
+    },
   });
 
   const preferencesMutation = useMutation({
@@ -289,6 +300,13 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
         }),
       ]);
     },
+    onError: (error) => {
+      showNotice(
+        error instanceof Error && error.message
+          ? error.message
+          : t(msg`群聊设置更新失败，请稍后再试。`),
+      );
+    },
   });
 
   const clearMutation = useMutation({
@@ -306,6 +324,13 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
           queryKey: ["app-conversations", baseUrl],
         }),
       ]);
+    },
+    onError: (error) => {
+      showNotice(
+        error instanceof Error && error.message
+          ? error.message
+          : t(msg`清空群聊记录失败，请稍后再试。`),
+      );
     },
   });
 
@@ -335,6 +360,13 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
 
       void navigate({ to: "/tabs/chat", replace: true });
     },
+    onError: (error) => {
+      showNotice(
+        error instanceof Error && error.message
+          ? error.message
+          : t(msg`退出群聊失败，请稍后再试。`),
+      );
+    },
   });
 
   const hideMutation = useMutation({
@@ -353,6 +385,13 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
       }
 
       void navigate({ to: "/tabs/chat", replace: true });
+    },
+    onError: (error) => {
+      showNotice(
+        error instanceof Error && error.message
+          ? error.message
+          : t(msg`隐藏群聊失败，请稍后再试。`),
+      );
     },
   });
 
