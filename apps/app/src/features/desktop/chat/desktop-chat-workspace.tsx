@@ -805,6 +805,12 @@ export function DesktopChatWorkspace({
     const closeMenu = () => setConversationContextMenu(null);
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
+        // 不 preventDefault：下面那条 dismissSidePanel 用 window keydown +
+        // queueMicrotask 兜底（line 919），defaultPrevented = false 就接着跑。
+        // 用户在桌面单聊开着「聊天信息」侧栏然后右键会话列表里的另一段会话
+        // 打开 contextMenu，按 Esc 会同时把 contextMenu 和背后的侧栏一起关
+        // 掉。和 image viewer / chat-message-list contextMenu 同款修法。
+        event.preventDefault();
         closeMenu();
       }
     };
@@ -829,6 +835,9 @@ export function DesktopChatWorkspace({
     const closeMenu = () => setOfficialMessageContextMenu(null);
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
+        // 跟上面 conversationContextMenu 同款：不 preventDefault 会让
+        // dismissSidePanel 兜底把背后的「聊天信息」侧栏一起关掉。
+        event.preventDefault();
         closeMenu();
       }
     };
@@ -863,6 +872,11 @@ export function DesktopChatWorkspace({
         return;
       }
 
+      // 跟其他 contextMenu Esc 同款：不 preventDefault 的话下面那条
+      // dismissSidePanel microtask 兜底会接着跑。用户在桌面单聊开着「聊天
+      // 信息」侧栏然后点 + 按钮打开 quick menu (发起群聊/添加朋友/新建笔记)，
+      // 按 Esc 会同时把 menu 和背后的侧栏一起关掉。
+      event.preventDefault();
       closeMenu();
     };
 
