@@ -22,6 +22,12 @@ const config: CapacitorConfig = {
     contentInset: "always",
     preferredContentMode: "mobile",
     limitsNavigationsToAppBoundDomains: false,
+    // 关掉 WKWebView 默认的 Peek-and-Pop 链接预览。聊天消息 / 朋友圈正文里
+    // 经常带 URL，长按打开我们自己的上下文菜单（转发 / 复制 / 删除）；如果
+    // 留着 allowsLinkPreview=true（Capacitor 默认值），长按链接本身会被
+    // iOS 抢去弹一个 mini-Safari 预览，把我们的菜单直接挡住，用户也会
+    // 困惑「这是从哪儿冒出来的浏览器」。
+    allowsLinkPreview: false,
   },
   plugins: {
     SplashScreen: {
