@@ -112,11 +112,19 @@ export function useSearchIndex(
       setDebouncedRemoteKeyword("");
       return;
     }
+    // 桌面 search-page 用 committedSearchText（Enter / 点提交才更新），上游
+    // 已经做了"一次输入只 fire 一次"的节流；再 debounce 280ms 就是凭空给用户
+    // 加的延迟，按 Enter 后等小半秒才出结果。只有移动端是实时绑定每键，才有
+    // N 倍 fan-out 的问题需要 debounce 抹掉。
+    if (isDesktopLayout) {
+      setDebouncedRemoteKeyword(normalizedSearchText);
+      return;
+    }
     const timer = window.setTimeout(() => {
       setDebouncedRemoteKeyword(normalizedSearchText);
     }, REMOTE_SEARCH_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [normalizedSearchText]);
+  }, [normalizedSearchText, isDesktopLayout]);
   const {
     favoriteSearchResults,
     miniProgramSearchResults,
