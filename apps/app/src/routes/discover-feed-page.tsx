@@ -1757,13 +1757,22 @@ export function DiscoverFeedPage() {
             // 同上：评论失败回放 variables，但 text 现读当前 commentDrafts —
             // 用户在错误条挂着的时候大概率已经把过长的草稿改短，旧 text 强发
             // 一遍只会再撞同一个 server 限制。
+            // 走查新一轮 Round 3：原本 `commentDrafts[postId] ?? variables.text`
+            // 只在 nullish 时兜底；用户失败后把 row 内草稿清空（或只剩空白）→
+            // 点 toolbar「重试发送」时 currentDraft="" → mutationFn 的 `if (!text)`
+            // 校验直接抛 "请先输入评论内容。" 替换掉原来的 server 错误，用户视感
+            // 是"点了重试反而蹦出一条不相干的报错"。trim 后为空时兜回 variables.text
+            // —— 用户主动点重试就是要把上次那条再发一遍。
             const variables = commentMutation.variables;
             if (!variables) {
               commentMutation.reset();
               return;
             }
+            const draftCandidate = commentDrafts[variables.postId];
             const currentDraft =
-              commentDrafts[variables.postId] ?? variables.text;
+              draftCandidate && draftCandidate.trim()
+                ? draftCandidate
+                : variables.text;
             commentMutation.mutate({
               ...variables,
               text: currentDraft,
