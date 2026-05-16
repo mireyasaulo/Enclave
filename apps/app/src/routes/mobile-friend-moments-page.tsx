@@ -176,7 +176,17 @@ export function MobileFriendMomentsPage() {
         action: () => likeMutation.mutate(momentId),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, _momentId, context) => {
+      // mid-flight 切角色 / 切账户：成功 toast 冒在新页面里没有任何对应 UI 变化，
+      // 反而误导。和 onError 同 guard。
+      const guard = mutationGuardRef.current;
+      if (
+        context &&
+        (context.baseUrl !== guard.baseUrl ||
+          context.characterId !== guard.characterId)
+      ) {
+        return;
+      }
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
@@ -328,6 +338,19 @@ export function MobileFriendMomentsPage() {
     },
     onSuccess: (realComment, momentId, context) => {
       delete commentSubmitArgsRef.current[momentId];
+      // mid-flight 切走（角色 / 账户）：success toast 在新页面里冒「朋友圈互动已
+      // 更新」很误导（用户在这里啥都没做），下面的 setQueriesData 也用的是当前
+      // baseUrl，往 wrong cache 里写「temp 评论替换成 realComment」是 no-op
+      // （新页面 cache 里压根没那条 moment），顺手跳过省一次空操作。
+      const guard = mutationGuardRef.current;
+      if (
+        context &&
+        !context.skipped &&
+        (context.mutationBaseUrl !== guard.baseUrl ||
+          context.mutationCharacterId !== guard.characterId)
+      ) {
+        return;
+      }
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),

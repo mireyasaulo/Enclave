@@ -63,6 +63,8 @@ import { consumeMomentPublishFlash } from "../features/moments/moment-publish-fl
 import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
+  type MomentImageDraft,
+  type MomentVideoDraft,
 } from "../features/moments/moment-compose-media";
 import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { getMomentSummaryText } from "../features/moments/moment-content";
@@ -264,16 +266,35 @@ export function MomentsPage() {
   }
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    // 走查新 Round 1：mutationFn 之前直接闭包读 composeDraft.{text,imageDrafts,videoDraft}，
+    // onSuccess 又无脑 composeDraft.reset() + setShowCompose(false)。慢网场景：
+    //   1. 输入 "A" 点发布，请求 5s 才回。
+    //   2. 等 1s 嫌烦按 ESC，面板关。
+    //   3. 重开面板输入 "B"。
+    //   4. 第 5s "A" 的 onSuccess 跑回来，无条件 reset → "B" 草稿被抹掉，
+    //      面板被强制关闭，用户没保存的新内容凭空消失。跟 1b285789 同类 bug。
+    // 改：mutate 时把 draft snapshot 当 variables 传进去，onSuccess 用 reference
+    // equality 校验当前 draft 是否还是那份 snapshot；动了就只发提示、不碰用户草稿。
+    mutationFn: (input: {
+      text: string;
+      imageDrafts: MomentImageDraft[];
+      videoDraft: MomentVideoDraft | null;
+    }) =>
       publishMomentComposeDraft({
-        text: composeDraft.text,
-        imageDrafts: composeDraft.imageDrafts,
-        videoDraft: composeDraft.videoDraft,
+        text: input.text,
+        imageDrafts: input.imageDrafts,
+        videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newMoment) => {
-      composeDraft.reset();
-      setShowCompose(false);
+    onSuccess: (newMoment, input) => {
+      const draftStillMatchesPublish =
+        composeDraft.text === input.text &&
+        composeDraft.imageDrafts === input.imageDrafts &&
+        composeDraft.videoDraft === input.videoDraft;
+      if (draftStillMatchesPublish) {
+        composeDraft.reset();
+        setShowCompose(false);
+      }
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -366,7 +387,14 @@ export function MomentsPage() {
           : t(msg`点赞失败，请稍后重试。`),
       );
     },
-    onSuccess: () => {
+    onSuccess: (_data, _momentId, context) => {
+      // mid-flight 切账户：成功 toast「朋友圈互动已更新」是当前账户的 notice 通道，
+      // 但这条点赞其实发生在上一个账户，用户切过来还看不到任何 UI 变化反而冒
+      // 一个绿条会困惑「我刚刚做了啥？」onError 路径已经按这个 guard 静默，
+      // onSuccess 也对齐。
+      if (context && context.mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -601,6 +629,18 @@ export function MomentsPage() {
     },
     onSuccess: (realComment, momentId, context) => {
       delete commentSubmitArgsRef.current[momentId];
+      // mid-flight 切账户：success toast 在新账户里冒「朋友圈互动已更新」很
+      // 误导（用户根本没在这账户做交互），并且下面的 setQueriesData 用的是
+      // 当前账户的 cache key——往 wrong cache 里写「这条 moment 的 temp 评论替换
+      // 成 realComment」也是 no-op（新账户 cache 里根本没那条 moment），但
+      // 顺手跳过省一次空操作。
+      if (
+        context &&
+        !context.skipped &&
+        context.mutationBaseUrl !== mutationBaseUrlRef.current
+      ) {
+        return;
+      }
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -737,7 +777,15 @@ export function MomentsPage() {
           : t(msg`删除失败，请稍后重试。`),
       );
     },
-    onSuccess: () => {
+    onSuccess: (_data, _momentId, context) => {
+      // mid-flight 切账户：删除成功发生在上一个账户，新账户里不该弹「已删除
+      // 这条朋友圈」绿条 + 把新账户的多页 cache 砍回 page 1（resetMomentsToFirstPage
+      // 用闭包里的当前 baseUrl）→ 用户会看到列表瞬间变短、auto-prefetch 重拉。
+      // 闭包里 invalidate 的 baseUrl 也是新账户的，invalidate 新账户 cache 来对应
+      // 旧账户的删除完全错位 —— 静默跳过最安全。
+      if (context && context.mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -1264,7 +1312,14 @@ export function MomentsPage() {
               postId: momentId,
             })
           }
-          onCreate={() => createMutation.mutate()}
+          onCreate={() =>
+            createMutation.mutate({
+              // 拍 snapshot 进 variables — 见上方 createMutation 注释。
+              text: composeDraft.text,
+              imageDrafts: composeDraft.imageDrafts,
+              videoDraft: composeDraft.videoDraft,
+            })
+          }
           onDeleteMoment={(momentId) => {
             // 行内 DesktopMomentRow 已经有 window.confirm；这里直接走 mutation。
             if (deleteMutation.isPending) return;
