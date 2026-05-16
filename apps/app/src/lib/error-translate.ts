@@ -196,6 +196,10 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`当前摇一摇结果无法创建对应角色。`);
     case "SHAKE_NO_DIRECTIONS":
       return translateRuntimeMessage(msg`没有可用的摇一摇方向。`);
+    case "SHAKE_AI_PLANNING_FAILED":
+      return translateRuntimeMessage(msg`摇一摇生成失败，请稍后重试。`);
+    case "SHAKE_AI_GENERATION_FAILED":
+      return translateRuntimeMessage(msg`摇一摇生成失败，请稍后重试。`);
     case "AUTH_USERNAME_PASSWORD_REQUIRED":
       return translateRuntimeMessage(msg`用户名与密码不能为空。`);
     case "AUTH_USERNAME_TAKEN":
