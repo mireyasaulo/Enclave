@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { memo, useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
 import {
@@ -34,7 +34,18 @@ type ViewerState =
       kind: "video";
     };
 
-export function MomentMediaGallery({
+// 新一轮走查 Round 1 (perf)：广场 / 朋友圈一屏 60 条 post 各挂一张
+// MomentMediaGallery，父页（discover-feed-page / moments-page）任何高频
+// state 切换（评论 bar 敲键 → setCommentDrafts、点赞 optimistic 写 cache、
+// pull-refresh 状态、inflightSet 进出）都触发整页重渲，60 张 gallery 跟
+// 着重跑 imageCount reduce + images filter + cellPx 一套常量 + map 出
+// WeChatGridCell。`contentType` 来源是 `resolveFeedMomentContentType(post.media)`
+// 每次现算，但返回的字符串字面量 React.memo 浅比时按值相等；`media`
+// 是 post.media 引用，cache 没变时 useInfiniteQuery 不会换；`variant`
+// 是字面量。三个 prop 都有引用稳定性，memo 命中率高。
+// 注意内部 viewerState 是组件内 useState；memo 不改 stateful 行为，
+// 用户当前打开的 image/video viewer 不会因为 memo 而丢失。
+function MomentMediaGalleryInner({
   contentType,
   media,
   variant = "desktop",
@@ -515,6 +526,8 @@ export function MomentMediaGallery({
     </>
   );
 }
+
+export const MomentMediaGallery = memo(MomentMediaGalleryInner);
 
 function MomentImageViewerOverlay({
   image,
