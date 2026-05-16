@@ -134,9 +134,17 @@ export function DesktopFeedRow({
       }
     }
     if (comment.replyToAuthorId) {
-      return authorNameById.get(comment.replyToAuthorId) ?? null;
+      const fromMap = authorNameById.get(comment.replyToAuthorId);
+      if (fromMap) {
+        return fromMap;
+      }
     }
-    return null;
+    // commentsPreview .slice(-3) 把被回复的根评论挤出窗口时，commentsById /
+    // authorNameById 都查不到——但服务端 serializeComment 已经在 reply 的 DTO
+    // 上塞了 replyToAuthorName 兜底（feed-contract.ts 第 87 行）。漏掉这层
+    // fallback → 桌面端该回复就丢了"回复 X："前缀，与移动端 discover-feed-page
+    // 的 ?? comment.replyToAuthorName ?? null 对齐。
+    return comment.replyToAuthorName ?? null;
   }
 
   function lookupReplyToComment(comment: FeedComment): FeedComment | null {
