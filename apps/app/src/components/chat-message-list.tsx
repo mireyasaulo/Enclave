@@ -915,13 +915,18 @@ export function ChatMessageList({
         tone: "danger",
         actionLabel: t(msg`继续转发消息`),
         onAction: () => {
-          void forwardMutation.mutateAsync(input);
+          forwardMutation.mutate(input);
         },
         secondaryActionLabel: errorActionLabel,
         onSecondaryAction: onErrorAction ?? undefined,
       });
     },
   });
+  // 用 mutate() 而不是 mutateAsync()——forwardMutation 同文件 line 4018 的
+  // sheet onForward 也是同样的 fire-and-forget 场景。把上面 onAction 里
+  // void forwardMutation.mutateAsync(input) 换成 mutate() 是为了避免转发
+  // 重试再次失败时落 window.unhandledrejection（这里 onError 已重新挂出
+  // notice，业务上不需要 await 结果）。
 
   const recallMutation = useMutation({
     mutationFn: async (message: ChatRenderableMessage) => {
@@ -4015,7 +4020,7 @@ export function ChatMessageList({
             }
             onClose={() => setForwardMessages(null)}
             onForward={(conversation, mode) => {
-              void forwardMutation.mutateAsync({ conversation, mode });
+              forwardMutation.mutate({ conversation, mode });
             }}
           />
         </Suspense>
