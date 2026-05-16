@@ -243,7 +243,11 @@ export function ProfileInfoAvatarPage() {
               type="button"
               onClick={clearPickedLocal}
               aria-label={t(msg`清除已选图片`)}
-              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] transition-colors active:bg-black/[0.05]"
+              // h-7 w-7（28×28）触摸点比 Apple HIG 44pt 最低线还小一大截，
+              // 真机上点击 X 经常戳到旁边的文件名行甚至不响应。把视觉保留小
+              // 巧的同时，用 -mr-2 / 同级 padding 把可点击区域撑到 44px 宽，
+              // 视觉上 X 仍居右、不占用文件名行。
+              className="relative -mr-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] transition-colors active:bg-black/[0.05]"
             >
               <X size={14} />
             </button>
