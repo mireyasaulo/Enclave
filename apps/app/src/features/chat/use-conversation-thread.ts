@@ -466,8 +466,11 @@ export function useConversationThread(conversationId: string) {
       // Fail-fast：socket 断开时不要让消息卡在 sending。socket.io-client 在
       // 断开期间会 buffer emits 并在重连后 replay，但用户当下不知道，体感是
       // 「发了没动静」。直接抛错让 onError 把消息标 failed + 显示重试按钮。
+      // 错误文案必须可读 —— sendMutation.error.message 会原样塞进
+      // InlineNotice / ChatComposer 的 error 槽，原来 "socket-disconnected"
+      // 直接给用户看是技术字符串，不是中/英文提示。
       if (!getChatSocket().connected) {
-        throw new Error("socket-disconnected");
+        throw new Error(t(msg`网络暂时连不上，消息已保存，点重试可重新发送。`));
       }
       emitChatMessage(input.payload);
     },
