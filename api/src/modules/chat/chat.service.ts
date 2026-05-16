@@ -70,7 +70,6 @@ import {
 import {
   guessChatAttachmentExtension,
   normalizeChatAttachmentDisplayName,
-  resolveChatPublicApiBaseUrl,
   sanitizeChatAttachmentFileName,
 } from './chat-attachment-file.utils';
 import {
@@ -694,10 +693,12 @@ export class ChatService {
     await mkdir(storageDir, { recursive: true });
     await writeFile(path.join(storageDir, storedFileName), file.buffer);
 
+    // 存相对 URL 而非快照 PUBLIC_API_BASE_URL：公网入口端口/协议变更后绝对 URL 会永远 404。
+    // 前端 contracts/client.ts normalizeAttachmentAssetUrl 渲染时按当前 apiBaseUrl absolutize。
     if (isImage) {
       return {
         kind: 'image',
-        url: `${this.resolvePublicApiBaseUrl()}/api/chat/attachments/${storedFileName}`,
+        url: `/api/chat/attachments/${storedFileName}`,
         mimeType: normalizedMimeType,
         fileName: displayName,
         size: file.size,
@@ -709,7 +710,7 @@ export class ChatService {
     if (isVoice) {
       return {
         kind: 'voice',
-        url: `${this.resolvePublicApiBaseUrl()}/api/chat/attachments/${storedFileName}`,
+        url: `/api/chat/attachments/${storedFileName}`,
         mimeType: normalizedMimeType,
         fileName: displayName,
         size: file.size,
@@ -719,7 +720,7 @@ export class ChatService {
 
     return {
       kind: 'file',
-      url: `${this.resolvePublicApiBaseUrl()}/api/chat/attachments/${storedFileName}`,
+      url: `/api/chat/attachments/${storedFileName}`,
       mimeType: normalizedMimeType,
       fileName: displayName,
       size: file.size,
@@ -2425,10 +2426,6 @@ export class ChatService {
 
   private resolveAttachmentStorageDir(): string {
     return resolvePrimaryChatAttachmentStorageDir();
-  }
-
-  private resolvePublicApiBaseUrl(): string {
-    return resolveChatPublicApiBaseUrl();
   }
 }
 
