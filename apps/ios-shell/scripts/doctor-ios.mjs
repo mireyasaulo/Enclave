@@ -316,6 +316,22 @@ const checks = [
         : "App.entitlements not seeded yet; run `pnpm ios:configure` to prepare Push/Keychain defaults",
   },
   {
+    // applinks:app.example.yinjie.app 是 xcode-template 里的占位符。Round 9
+    // 顺手修了「不要 append」，但没把占位本身清掉；configure 只在显式给了
+    // YINJIE_IOS_ASSOCIATED_DOMAIN 时才替换。一旦没配，占位直接跟着 release
+    // 包上 App Store / TestFlight，iOS 装机每次都会去拉 https://app.example.
+    // yinjie.app/.well-known/apple-app-site-association，必失败，console 全
+    // 是 swcd 报错。Round 22 让 configure 在无 domain 时清掉占位 entitlement，
+    // doctor 同步盯，防止下一次又有人把占位塞回来。
+    label: "entitlements-no-example-applink",
+    ok:
+      !fs.existsSync(entitlementsPath) ||
+      !fileIncludes(entitlementsPath, "applinks:app.example.yinjie.app"),
+    detail: fs.existsSync(entitlementsPath)
+      ? "App.entitlements does not ship the applinks:app.example.yinjie.app placeholder"
+      : "App.entitlements not found yet; run `pnpm ios:configure` first",
+  },
+  {
     label: "privacy-manifest",
     ok:
       (!fs.existsSync(privacyManifestPath) ||

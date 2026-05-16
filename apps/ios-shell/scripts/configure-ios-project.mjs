@@ -1134,10 +1134,6 @@ function applyEntitlementsFromEnv() {
     shellConfig.appId,
   );
 
-  if (!apsEnv && !associatedDomain && !bundleId) {
-    return;
-  }
-
   let source = fs.readFileSync(entitlementsPath, "utf8");
   const original = source;
 
@@ -1158,6 +1154,19 @@ function applyEntitlementsFromEnv() {
     source = source.replace(
       /(<key>com\.apple\.developer\.associated-domains<\/key>\s*<array>)[\s\S]*?(<\/array>)/m,
       `$1\n    <string>${associatedDomain}</string>\n  $2`,
+    );
+  } else {
+    // associatedDomain 没配，但模板里那条 applinks:app.example.yinjie.app 占位
+    // 不该跟着 release 包一起上 App Store / TestFlight。Round 9 修了「不要
+    // append」，但留了占位 string；占位域名永远不返 AASA，iOS 装机后每次也会
+    // 对它发起一次 https://.well-known/apple-app-site-association 请求 —— 真
+    // 机日志里能看到「Connection ... failed: nodename nor servname provided」
+    // 一类报错。仅在数组里只剩这条 example 占位时整条 entitlement 删掉；如果
+    // 已经被人手填过 / 之前 configure 写进真实域名了，就保持不动，避免把用户
+    // 已配的 universal link 误清。
+    source = source.replace(
+      /\n?\s*<key>com\.apple\.developer\.associated-domains<\/key>\s*<array>\s*<string>applinks:app\.example\.yinjie\.app<\/string>\s*<\/array>/m,
+      "",
     );
   }
 
