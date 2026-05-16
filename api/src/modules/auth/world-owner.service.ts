@@ -28,6 +28,39 @@ import {
 import { WelcomeMessageService } from './welcome-message.service';
 
 const MIN_OWNER_NAME_LENGTH = 2;
+// 与移动端 profile-info-name-page MAX=20 / signature MAX=30 对齐，但服务端给
+// 一点宽容（粘贴时多空格、不同前端版本）。avatar 接受 URL 或 base64 data URL，
+// 1MB 文件 → ~1.33MB base64，给 2MB 上限挡掉粘贴 10MB 大字符串 / 恶意客户端。
+// 之前完全没卡 → 同 phone 反复 PATCH 巨型 avatar 让 DB 行膨胀、每次 GET owner
+// 都把整坨拉回前端。
+const MAX_OWNER_NAME_LENGTH = 64;
+const MAX_OWNER_SIGNATURE_LENGTH = 300;
+const MAX_OWNER_AVATAR_LENGTH = 2 * 1024 * 1024;
+
+// username 内嵌 \r \n \t 等控制字符是脏数据：profile-page 头部 truncate 会让
+// "foo\nbar" 看成 "foo bar"，但下游某些 chat sender / moments author 会照原样
+// 渲染断行。前端 sanitize 已落，这里再兜一次，挡住老客户端 / curl 直调。
+const CONTROL_CHAR_REGEX = new RegExp('[\\u0000-\\u001f\\u007f-\\u009f]+', 'g');
+function sanitizeOwnerName(value: string): string {
+  return value.replace(CONTROL_CHAR_REGEX, ' ').replace(/\s+/g, ' ').trim();
+}
+
+// avatar 字段允许的协议：http / https / data:image/*。其它（javascript: /
+// vbscript: / file: / ftp: / data:text/... 等）一律拒——即便 <img src> 不
+// 执行 javascript:，落库的脏值会被其它复用 owner.avatar 的组件（社交分享、
+// 第三方 webview、未来某个 <a href>）命中。
+function isSafeAvatarValue(value: string): boolean {
+  if (!value) return true; // 空 = 恢复默认，安全
+  if (/^data:image\//i.test(value)) return true;
+  const schemeMatch = /^([a-z][a-z0-9+.-]*):/i.exec(value);
+  if (!schemeMatch) {
+    // 无 scheme：可能是相对路径（/avatars/...）。允许 / 开头的同源相对路径，
+    // 拒绝裸 "abc" 这种垃圾输入。
+    return value.startsWith('/') && !value.startsWith('//');
+  }
+  const scheme = schemeMatch[1]!.toLowerCase();
+  return scheme === 'http' || scheme === 'https';
+}
 
 type UpdateWorldOwnerInput = {
   username?: string;
@@ -215,7 +248,13 @@ export class WorldOwnerService {
 
   async updateOwner(input: UpdateWorldOwnerInput): Promise<WorldOwnerProfile> {
     const owner = await this.getOwnerOrThrow();
-    const nextUsername = input.username?.trim();
+    // username: 先 sanitize（剥控制字符 + 折叠空白）再校长度，跟前端
+    // profile-info-name-page 同款；这样 curl 直调 / 老客户端 PATCH
+    // "foo\nbar" 时落库的也是 "foo bar"，不会污染 chat sender 渲染。
+    const nextUsername =
+      input.username === undefined
+        ? undefined
+        : sanitizeOwnerName(input.username);
     const nextAvatar = input.avatar?.trim();
     const nextSignature = input.signature?.trim();
 
@@ -226,6 +265,40 @@ export class WorldOwnerService {
         status: HttpStatus.BAD_REQUEST,
         params: { minLength: MIN_OWNER_NAME_LENGTH },
         legacyMessage: `世界主人昵称至少 ${MIN_OWNER_NAME_LENGTH} 个字。`,
+      });
+    }
+    if (nextUsername !== undefined && nextUsername.length > MAX_OWNER_NAME_LENGTH) {
+      throw new AppError('WORLD_OWNER_NAME_TOO_LONG', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { maxLength: MAX_OWNER_NAME_LENGTH },
+        legacyMessage: `世界主人昵称最多 ${MAX_OWNER_NAME_LENGTH} 个字符。`,
+      });
+    }
+    if (
+      nextSignature !== undefined &&
+      nextSignature.length > MAX_OWNER_SIGNATURE_LENGTH
+    ) {
+      throw new AppError('WORLD_OWNER_SIGNATURE_TOO_LONG', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { maxLength: MAX_OWNER_SIGNATURE_LENGTH },
+        legacyMessage: `个性签名最多 ${MAX_OWNER_SIGNATURE_LENGTH} 个字符。`,
+      });
+    }
+    if (
+      nextAvatar !== undefined &&
+      nextAvatar.length > MAX_OWNER_AVATAR_LENGTH
+    ) {
+      throw new AppError('WORLD_OWNER_AVATAR_TOO_LARGE', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { maxBytes: MAX_OWNER_AVATAR_LENGTH },
+        legacyMessage: '头像图片超过 2MB 上限，请压缩后再试。',
+      });
+    }
+    if (nextAvatar !== undefined && !isSafeAvatarValue(nextAvatar)) {
+      throw new AppError('WORLD_OWNER_AVATAR_UNSAFE_URL', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage:
+          '头像链接必须是 http/https 图片地址，或 data:image/ 开头的图片数据。',
       });
     }
 

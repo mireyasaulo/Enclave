@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, QrCode } from "lucide-react";
+import { ArrowLeft, ChevronRight, Copy, QrCode } from "lucide-react";
 import { AppPage, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../components/avatar-chip";
@@ -9,6 +9,7 @@ import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { buildYinjieId } from "../lib/yinjie-id";
+import { writeClipboardText } from "../runtime/native-clipboard";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
 export function ProfileInfoPage() {
@@ -19,6 +20,23 @@ export function ProfileInfoPage() {
   const ownerId = useWorldOwnerStore((state) => state.id);
   const avatar = useWorldOwnerStore((state) => state.avatar);
   const signature = useWorldOwnerStore((state) => state.signature);
+  // 隐界号像微信号一样要能复制给好友——之前这一行是 readOnly、点不动也长按
+  // 没菜单（mobile webview 长按选中文本经常被 yj-no-callout 一类的祖先样式吃掉），
+  // 用户想分享给朋友只能在 Welcome 页拼一次拿到。给它配 toast 短反馈，{key} 走
+  // mobile-moments-publish-page 同款 setTimeout 重置，连点也稳。
+  const [toast, setToast] = useState<{ message: string; key: number } | null>(
+    null,
+  );
+  const toastKeyRef = useRef(0);
+  function showToast(message: string) {
+    toastKeyRef.current += 1;
+    setToast({ message, key: toastKeyRef.current });
+  }
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 1600);
+    return () => window.clearTimeout(timer);
+  }, [toast?.key]);
 
   useEffect(() => {
     if (isDesktopLayout) {
@@ -35,6 +53,15 @@ export function ProfileInfoPage() {
   // 一起 fallback 到「世界主人」。
   const ownerLabel = username?.trim() || t(msg`世界主人`);
   const trimmedSignature = signature?.trim() ?? "";
+  const yinjieIdText = ownerId ? buildYinjieId(ownerId) : null;
+
+  async function handleCopyYinjieId() {
+    if (!yinjieIdText) {
+      return;
+    }
+    const copied = await writeClipboardText(yinjieIdText);
+    showToast(copied ? t(msg`已复制隐界号`) : t(msg`复制失败，请重试`));
+  }
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
@@ -77,15 +104,40 @@ export function ProfileInfoPage() {
               </span>
             }
           />
-          <InfoRow
-            label={t(msg`隐界号`)}
-            value={
-              <span className="truncate text-[13px] text-[color:var(--text-muted)]">
-                {ownerId ? buildYinjieId(ownerId) : t(msg`未生成`)}
-              </span>
-            }
-            readOnly
-          />
+          {yinjieIdText ? (
+            <InfoRow
+              label={t(msg`隐界号`)}
+              value={
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span
+                    className="truncate text-[13px] text-[color:var(--text-muted)]"
+                    data-i18n-skip="true"
+                  >
+                    {yinjieIdText}
+                  </span>
+                  <Copy
+                    size={13}
+                    className="shrink-0 text-[color:var(--text-dim)]"
+                    aria-hidden="true"
+                  />
+                </span>
+              }
+              onClick={() => {
+                void handleCopyYinjieId();
+              }}
+              ariaLabel={t(msg`复制隐界号`)}
+            />
+          ) : (
+            <InfoRow
+              label={t(msg`隐界号`)}
+              value={
+                <span className="truncate text-[13px] text-[color:var(--text-muted)]">
+                  {t(msg`未生成`)}
+                </span>
+              }
+              readOnly
+            />
+          )}
           <InfoRow
             label={t(msg`更多信息`)}
             to="/profile/info/more"
@@ -135,6 +187,14 @@ export function ProfileInfoPage() {
           />
         </InfoRowGroup>
       </div>
+
+      {toast ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+96px)] z-[1100] flex justify-center">
+          <div className="rounded-[6px] bg-black/72 px-3 py-1.5 text-[13px] text-white">
+            {toast.message}
+          </div>
+        </div>
+      ) : null}
     </AppPage>
   );
 }
@@ -164,6 +224,10 @@ type InfoRowProps = {
   to?: string;
   readOnly?: boolean;
   denseValue?: boolean;
+  // onClick：纯按钮型行（如「点一下复制隐界号」），不导航也不是 readOnly。
+  // 跟 to 互斥；同时传时 onClick 优先。
+  onClick?: () => void;
+  ariaLabel?: string;
 };
 
 function InfoRow({
@@ -172,6 +236,8 @@ function InfoRow({
   to,
   readOnly,
   denseValue,
+  onClick,
+  ariaLabel,
 }: InfoRowProps) {
   const inner = (
     <>
@@ -188,7 +254,7 @@ function InfoRow({
           {value}
         </div>
       ) : null}
-      {readOnly ? null : (
+      {readOnly || onClick ? null : (
         <ChevronRight
           size={14}
           className="shrink-0 text-[color:var(--text-dim)]"
@@ -198,11 +264,25 @@ function InfoRow({
     </>
   );
 
+  const interactive = !readOnly && (Boolean(to) || Boolean(onClick));
   const cellClass = cn(
     "flex w-full items-center gap-3 px-4 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
     denseValue ? "py-2" : "py-3",
-    readOnly ? undefined : "hover:bg-[color:var(--surface-card-hover)]",
+    interactive ? "hover:bg-[color:var(--surface-card-hover)]" : undefined,
   );
+
+  if (onClick && !readOnly) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={ariaLabel}
+        className={cn(cellClass, "active:bg-[color:var(--surface-card-hover)]")}
+      >
+        {inner}
+      </button>
+    );
+  }
 
   if (readOnly || !to) {
     return <div className={cellClass}>{inner}</div>;

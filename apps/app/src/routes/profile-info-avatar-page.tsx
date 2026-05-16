@@ -28,7 +28,7 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-type UrlInputError = "format" | "too_large" | null;
+type UrlInputError = "format" | "too_large" | "unsafe_scheme" | null;
 
 // 之前 URL 输入框完全不校验，用户输 "abc"、"https//x"（漏冒号）这种
 // 也能 disable 不掉「完成」一路提交到服务端落库，AvatarChip 加载失败
@@ -36,11 +36,29 @@ type UrlInputError = "format" | "too_large" | null;
 // 拍照 / 重新进来 / 等等几个入口都看不出哪里错了，毫无反馈。
 // 跟 profile-settings 校验 customApiBase 同样的逻辑：trim + 用 URL
 // 构造器 try / catch 一下，只放行 http(s) 和 data:image/。
+//
+// 安全：先单独拦 javascript: / vbscript: / data:text/... / file: 这一类
+// 危险协议——它们走 new URL() 一样能 parse 成功，但塞进数据库后任何把
+// avatar 当 href / 作为 <a> / 第三方 webview 渲染的下游路径都可能命中
+// 脚本执行 / 本地文件读取。即使 <img src> 不会执行 javascript:，写到
+// session storage 再被第三方组件复用就晚了。
 function checkAvatarUrlInput(value: string): UrlInputError {
   if (!value) return null; // 空 = 不打算改，由 canSave 单独 gate
+  // 提早判 image data URL：合法 data:image/png;... 走 length gate
   if (/^data:image\//i.test(value)) {
     // 粘贴的 data URL 也要校长度，不然超 2MB 的话要等上传完才被服务端拒
     return value.length > MAX_AVATAR_INPUT_LENGTH ? "too_large" : null;
+  }
+  // scheme sniff：在 try-parse 前先看冒号前缀。new URL("javascript:alert(1)")
+  // 会成功（protocol=javascript:），protocol 检查也会 catch 到，但单独抛
+  // "unsafe_scheme" 文案，让用户一眼看出问题不是「URL 格式」而是「这种链接不行」。
+  const schemeMatch = /^([a-z][a-z0-9+.-]*):/i.exec(value);
+  if (schemeMatch) {
+    const scheme = schemeMatch[1]!.toLowerCase();
+    if (scheme !== "http" && scheme !== "https") {
+      // data: 已经在上面 image/ 分支放行；这里挡 data:text/... 等非 image data URL
+      return "unsafe_scheme";
+    }
   }
   let parsed: URL | null = null;
   try {
@@ -377,6 +395,12 @@ export function ProfileInfoAvatarPage() {
               // 跟 profile-info-name-page 同款：粘完 URL 习惯性按回车直接
               // submit，外面没 <form> 不会自动触发；手动接一下，可保存就走
               // saveMutation。
+              // isComposing：URL 框理论上不开 IME，但中文桌面输入法在英文场景
+              // 偶尔会切到拼音模式（用户没注意），半截输入按 Enter 同样可能误触；
+              // 跟 name 页保持一致 gate 不开销也几乎为零。
+              if (event.nativeEvent.isComposing) {
+                return;
+              }
               if (event.key === "Enter" && canSave && !isSaving) {
                 event.preventDefault();
                 saveMutation.mutate();
@@ -396,6 +420,11 @@ export function ProfileInfoAvatarPage() {
           {trimmed && urlInputError === "format" ? (
             <div className="mt-2 text-[11px] leading-4 text-[#92400e]">
               {t(msg`需要是 http/https 开头的合法图片链接。`)}
+            </div>
+          ) : null}
+          {trimmed && urlInputError === "unsafe_scheme" ? (
+            <div className="mt-2 text-[11px] leading-4 text-[#92400e]">
+              {t(msg`只支持 http/https 图片链接，或 data:image/ 开头的图片数据。`)}
             </div>
           ) : null}
           {trimmed && urlInputError === "too_large" ? (

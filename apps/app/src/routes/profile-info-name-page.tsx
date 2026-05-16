@@ -15,6 +15,20 @@ import { useWorldOwnerStore } from "../store/world-owner-store";
 const NAME_MAX_LENGTH = 20;
 const NAME_MIN_LENGTH = 2;
 
+// 粘贴时连带 \r \n \t 等控制字符（从富文本编辑器 / 表格里复制名字常见），
+// 之前 trim 只去首尾，内嵌的不动。落库后 chat / moments 拿这串 username 渲染
+// 会出现「foo↵bar」断行 / 制表位空白，profile-page 头部 truncate
+// 又会让它看起来像 "foo bar"（实际数据有 \n），用户根本看不出哪里坏。
+// 保存前折叠掉所有 ASCII / Unicode 控制字符（U+0000..U+001F、U+007F、U+0080..U+009F），
+// 内部的连续空白合并成一个普通空格。
+const CONTROL_CHAR_PATTERN = new RegExp(
+  "[\\u0000-\\u001f\\u007f-\\u009f]+",
+  "g",
+);
+function sanitizeOwnerName(value: string): string {
+  return value.replace(CONTROL_CHAR_PATTERN, " ").replace(/\s+/g, " ").trim();
+}
+
 export function ProfileInfoNamePage() {
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
@@ -61,13 +75,20 @@ export function ProfileInfoNamePage() {
       "/profile/info",
     );
 
-  const trimmed = draft.trim();
-  const dirty = trimmed !== (username ?? "").trim();
-  const canSave = trimmed.length >= NAME_MIN_LENGTH && dirty;
+  // 比较 dirty 和长度 gate 走同一份 sanitize：用户粘贴 "foo\nbar" 后能看出
+  // 「完成」会保存的是 "foo bar"（长度 7），同时 dirty 比对的是真正会落库的
+  // 形态而不是 draft 原样。
+  const sanitized = sanitizeOwnerName(draft);
+  const baselineUsername = sanitizeOwnerName(username ?? "");
+  const dirty = sanitized !== baselineUsername;
+  const canSave = sanitized.length >= NAME_MIN_LENGTH && dirty;
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const owner = await updateWorldOwner({ username: trimmed }, baseUrl);
+      const owner = await updateWorldOwner(
+        { username: sanitized },
+        baseUrl,
+      );
       queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
     },
@@ -135,6 +156,12 @@ export function ProfileInfoNamePage() {
             // 软键盘点 Done 默认只 blur，外面没 form 包，回车也不会触发任何
             // submit；用户要再戳一下右上「完成」按钮才能保存。手动接 Enter 在
             // canSave 时调 mutate，路径短一步。
+            // isComposing：中文 IME 选词阶段按回车「确认拼音」会触发 keydown，
+            // 这时不能 submit——会把半截拼音状态当作完成保存。chat-composer /
+            // moment-comment-composer 同款 gate（grep "isComposing"）。
+            if (event.nativeEvent.isComposing) {
+              return;
+            }
             if (event.key === "Enter" && canSave && !saveMutation.isPending) {
               event.preventDefault();
               saveMutation.mutate();
@@ -150,7 +177,7 @@ export function ProfileInfoNamePage() {
           className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] shadow-none focus:translate-y-0 disabled:bg-[color:var(--bg-canvas)] disabled:text-[color:var(--text-muted)]"
         />
         <div className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]" data-i18n-skip="true">
-          {draft.length}/{NAME_MAX_LENGTH}
+          {sanitized.length}/{NAME_MAX_LENGTH}
         </div>
       </div>
 
@@ -161,8 +188,15 @@ export function ProfileInfoNamePage() {
       </div>
 
       {/* 名字短于下限时（legacy 1 字用户进入页面也是这种情况），把 disabled
-          「完成」的原因显式告诉用户；空串不提示，避免一进页面就跳红字。 */}
-      {trimmed.length > 0 && trimmed.length < NAME_MIN_LENGTH ? (
+          「完成」的原因显式告诉用户；之前 trimmed.length===0 完全不提示，用户
+          清空输入后只看到「完成」灰着，毫无线索，以为是 bug。这里改成：
+          ① 1 字符 → 文案 "至少 N 字符"
+          ② 0 字符 → 文案 "请输入名字"  */}
+      {sanitized.length === 0 && draft.length > 0 ? (
+        <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
+          {t(msg`请输入有效的名字（不能只有空白或换行符）。`)}
+        </div>
+      ) : sanitized.length > 0 && sanitized.length < NAME_MIN_LENGTH ? (
         <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
           {t(msg`名字太短啦，至少要 ${NAME_MIN_LENGTH} 个字符。`)}
         </div>
