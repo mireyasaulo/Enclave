@@ -111,6 +111,7 @@ export function ProfileInfoNamePage() {
         <TextField
           autoFocus
           value={draft}
+          disabled={saveMutation.isPending}
           onChange={(event) => {
             userTouchedRef.current = true;
             setDraft(event.target.value);
@@ -119,7 +120,9 @@ export function ProfileInfoNamePage() {
           placeholder={t(msg`输入名字`)}
           // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
           // 本输入框 autoFocus，进页就 focus，字号偏小会让整页抖一下。
-          className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] shadow-none focus:translate-y-0"
+          // disabled={isPending}: 上传中再敲字也会被 onSuccess→goBack 一起带走，
+          //   见 profile-info-avatar-page 同款修法（commit 5fe4e7e3）。
+          className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] shadow-none focus:translate-y-0 disabled:bg-[color:var(--bg-canvas)] disabled:text-[color:var(--text-muted)]"
         />
         <div className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]" data-i18n-skip="true">
           {draft.length}/{NAME_MAX_LENGTH}
