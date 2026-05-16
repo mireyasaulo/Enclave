@@ -1026,6 +1026,11 @@ export class ReplyLogicAdminService {
     runtimeRules: Awaited<ReturnType<ReplyLogicRulesService['getRules']>>,
     activity?: string | null,
   ): ReplyLogicStateGateSummary {
+    // 慢回复模拟（sleeping 12-22s / busy 8-15s 延迟回复 + "对方在睡觉" 系统提示）
+    // 已经在 chat.gateway.ts / 1f1c0e8e 中删掉了。这里不再按 activity 分支
+    // 返回 sleep_hint_delay / busy_hint_delay 模式——不然 admin 检视面板会展示
+    // 实际不存在的延迟。currentActivity 仍是 AI prompt 里给角色用的语境信号，
+    // 但不再决定回复时机。
     const activityLabel =
       runtimeRules.semanticLabels.activityLabels[
         (activity ??
@@ -1033,36 +1038,6 @@ export class ReplyLogicAdminService {
       ] ??
       activity ??
       runtimeRules.semanticLabels.activityLabels.free;
-    if (activity === 'sleeping') {
-      return {
-        mode: 'sleep_hint_delay',
-        activity,
-        reason: renderTemplate(
-          runtimeRules.observabilityTemplates.stateGateSleeping,
-          {
-            activity: activityLabel,
-          },
-        ),
-        delayMs: { ...runtimeRules.sleepDelayMs },
-        hintMessages: [...runtimeRules.sleepHintMessages],
-      };
-    }
-
-    if (activity === 'working' || activity === 'commuting') {
-      return {
-        mode: 'busy_hint_delay',
-        activity,
-        reason: renderTemplate(
-          runtimeRules.observabilityTemplates.stateGateBusy,
-          {
-            activity: activityLabel,
-          },
-        ),
-        delayMs: { ...runtimeRules.busyDelayMs },
-        hintMessages: [...(runtimeRules.busyHintMessages[activity] ?? [])],
-      };
-    }
-
     return {
       mode: 'immediate',
       activity: activity ?? null,
