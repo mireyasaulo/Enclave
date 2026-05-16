@@ -36,6 +36,9 @@ type DesktopConversationContextMenuProps = {
 const MENU_WIDTH = 196;
 const MENU_ITEM_HEIGHT = 42;
 const MENU_VERTICAL_PADDING = 16;
+// MenuDivider 实际渲染高度（my-1 上下 4px + border-t 1px ≈ 9px）。
+// 不算 divider 时，靠近视口底部右键最多会裁掉一行可见动作。
+const MENU_DIVIDER_HEIGHT = 9;
 const VIEWPORT_PADDING = 12;
 
 export function DesktopConversationContextMenu({
@@ -66,7 +69,17 @@ export function DesktopConversationContextMenu({
     Number(Boolean(showMarkUnread && onMarkUnread)) +
     Number(Boolean(onHide)) +
     Number(Boolean(onDelete));
-  const menuHeight = actionCount * MENU_ITEM_HEIGHT + MENU_VERTICAL_PADDING;
+  // 实际渲染里的 MenuDivider 数量：onOpenWindow 后 1 条；有已读/未读项时
+  // 1 条；onHide || onDelete 时 1 条。和 JSX 里的条件保持一致，免得贴底
+  // 右键裁掉下面一行。
+  const dividerCount =
+    Number(Boolean(onOpenWindow)) +
+    Number(Boolean((showMarkRead && onMarkRead) || (showMarkUnread && onMarkUnread))) +
+    Number(Boolean(onHide || onDelete));
+  const menuHeight =
+    actionCount * MENU_ITEM_HEIGHT +
+    dividerCount * MENU_DIVIDER_HEIGHT +
+    MENU_VERTICAL_PADDING;
   const viewportWidth =
     typeof window === "undefined" ? MENU_WIDTH : window.innerWidth;
   const viewportHeight =

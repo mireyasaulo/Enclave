@@ -588,67 +588,61 @@ export function ChatMessageList({
     // 桌面右键消息打开 menu 时只要 AI 回一句话，messages 数组变了 effect
     // 重跑，菜单就被强制关掉了，用户的点击意图被 socket 打断。补成同款
     // 条件式：目标消息还在就保留，消失才关。
+    //
+    // 这里 9 条 setX 都依赖"目标 id 是否还在 messages 里"。每条单独
+    // .some() 是 O(n)，9 条加起来 9·n。socket 一推消息（reply / typing tick /
+    // 任何 setQueriesData）就跑一遍，长聊天里 messages 长度 ~200 时每次状态
+    // 变化 ~1800 次比较；最后那条 avatar popover 还要按 senderId 扫一遍
+    // character 消息。一次性把 id 集合和 character senderId 集合算出来，
+    // 后面所有 has() 走 O(1)。
+    const messageIdSet = new Set(messages.map((message) => message.id));
     setContextMenuState((current) =>
-      current && messages.some((message) => message.id === current.message.id)
-        ? current
-        : null,
+      current && messageIdSet.has(current.message.id) ? current : null,
     );
     setMobileActionMessage((current) =>
-      current && messages.some((message) => message.id === current.id)
-        ? current
-        : null,
+      current && messageIdSet.has(current.id) ? current : null,
     );
     setReminderTargetMessage((current) =>
-      current && messages.some((message) => message.id === current.id)
-        ? current
-        : null,
+      current && messageIdSet.has(current.id) ? current : null,
     );
     setQuoteSelectionMessage((current) =>
-      current && messages.some((message) => message.id === current.id)
-        ? current
-        : null,
+      current && messageIdSet.has(current.id) ? current : null,
     );
     setSelectedMessageIds((current) =>
-      filterStableStringIds(current, (item) =>
-        messages.some((message) => message.id === item),
-      ),
+      filterStableStringIds(current, (item) => messageIdSet.has(item)),
     );
     setForwardMessages((current) =>
-      filterStableMessageList(current, (item) =>
-        messages.some((message) => message.id === item.id),
-      ),
+      filterStableMessageList(current, (item) => messageIdSet.has(item.id)),
     );
     setSelectionAnchorMessageId((current) =>
-      current && messages.some((message) => message.id === current)
-        ? current
-        : null,
+      current && messageIdSet.has(current) ? current : null,
     );
     setViewerMessageId((current) =>
-      current && messages.some((message) => message.id === current)
-        ? current
-        : null,
+      current && messageIdSet.has(current) ? current : null,
     );
     setLocationViewerMessageId((current) =>
-      current && messages.some((message) => message.id === current)
-        ? current
-        : null,
+      current && messageIdSet.has(current) ? current : null,
     );
     setNoteViewerMessageId((current) =>
-      current && messages.some((message) => message.id === current)
-        ? current
-        : null,
+      current && messageIdSet.has(current) ? current : null,
     );
-    setDesktopAvatarPopover((current) =>
-      current &&
-      (current.kind === "owner" ||
-        messages.some(
-          (message) =>
-            message.senderType === "character" &&
-            message.senderId === current.characterId,
-        ))
-        ? current
-        : null,
-    );
+    setDesktopAvatarPopover((current) => {
+      if (!current) {
+        return current;
+      }
+      if (current.kind === "owner") {
+        return current;
+      }
+      for (const message of messages) {
+        if (
+          message.senderType === "character" &&
+          message.senderId === current.characterId
+        ) {
+          return current;
+        }
+      }
+      return null;
+    });
   }, [messages]);
 
   useEffect(() => {
