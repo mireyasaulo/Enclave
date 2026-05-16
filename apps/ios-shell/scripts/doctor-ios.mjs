@@ -282,6 +282,24 @@ const checks = [
       : "AppDelegate not found yet; run `pnpm ios:sync` first",
   },
   {
+    // 走查 R4/R5/R6：applicationDidBecomeActive 必须带 lastNotificationAuthStatus
+    // 状态机 + register-on-transition：用户「在 Settings 里手动开通知权限 → 回到
+    // app」是 iOS 唯一稳定能捕获到的 hook，不在这里 re-register 的话 APNs 永远
+    // 没新 device token，cloud-api push_tokens 表里这个用户没行，朋友回复永远收
+    // 不到推送 —— 要 force-quit 重启走 didFinishLaunching 才能恢复，根因极难
+    // trace。同时盯死「transition 才 register」而不是「每次切回前台都 register」
+    // —— 后者每次切回都打一次 cloud-api POST 完全是浪费（R5 修过）。
+    label: "appdelegate-settings-change-rebroadcast",
+    ok:
+      !fs.existsSync(appDelegatePath) ||
+      (fileIncludes(appDelegatePath, "lastNotificationAuthStatus") &&
+        fileIncludes(appDelegatePath, "wasGranted") &&
+        fileIncludes(appDelegatePath, "isGranted")),
+    detail: fs.existsSync(appDelegatePath)
+      ? "applicationDidBecomeActive re-registers APNs only on not-granted → granted transition (handles user toggling permission in Settings without burning cloud-api POST on every foreground)"
+      : "AppDelegate not found yet; run `pnpm ios:sync` first",
+  },
+  {
     label: "plugin-bridge-metadata",
     ok:
       (!fs.existsSync(runtimePluginPath) ||

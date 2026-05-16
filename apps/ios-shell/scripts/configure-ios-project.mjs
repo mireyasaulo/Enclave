@@ -856,6 +856,13 @@ function ensureAppDelegatePushHooks() {
   // any tasks...」英文注释的空 applicationDidBecomeActive 替换成清零 badge 的
   // 实现；已经写过 setBadgeCount(0) / applicationIconBadgeNumber = 0 的 case
   // 跳过，保留开发者手写的其它定制。
+  //
+  // 走查 R4/R5：同时塞 lastNotificationAuthStatus 状态机 + register-on-transition。
+  // 否则 fresh checkout 装好后，「用户在 Settings 里手动开通知权限 → 回到 app
+  // → 永远拿不到 APNs token」这条死链就会复发（R4 修过的，patcher 不带这段
+  // 就等于 patcher 把 installed 倒退回 R3 之前的状态）。同时引入 instance var
+  // lastNotificationAuthStatus 让 didFinishLaunching 跟 didBecomeActive 共享，
+  // 避免每次切回前台都 register 一次（R5 修的浪费）。
   if (
     !source.includes("setBadgeCount(0)") &&
     !source.includes("applicationIconBadgeNumber = 0")
@@ -869,10 +876,57 @@ function ensureAppDelegatePushHooks() {
         "        } else {",
         "            application.applicationIconBadgeNumber = 0",
         "        }",
+        "",
+        "        UNUserNotificationCenter.current().getNotificationSettings { settings in",
+        "            let previous = self.lastNotificationAuthStatus",
+        "            let current = settings.authorizationStatus",
+        "            self.lastNotificationAuthStatus = current",
+        "",
+        "            let wasGranted =",
+        "                previous == .authorized || previous == .provisional",
+        "            let isGranted =",
+        "                current == .authorized || current == .provisional",
+        "",
+        "            guard isGranted, !wasGranted else {",
+        "                return",
+        "            }",
+        "            DispatchQueue.main.async {",
+        "                UIApplication.shared.registerForRemoteNotifications()",
+        "            }",
+        "        }",
         "    }",
       ].join("\n");
       source = source.replace(vanillaPattern, replacement);
     }
+  }
+
+  // 走查 R5/R6：lastNotificationAuthStatus instance var 是 didFinishLaunching
+  // 跟 didBecomeActive 之间的状态桥。class body 没有就 patch 一条进去 ——
+  // 紧贴 `var window: UIWindow?` 后面（vanilla Capacitor 模板里这一行肯定有）。
+  if (
+    fs.existsSync(appDelegatePath) &&
+    !source.includes("lastNotificationAuthStatus")
+  ) {
+    const windowPropertyPattern = /(\n\s*var window: UIWindow\?\n)/;
+    if (windowPropertyPattern.test(source)) {
+      source = source.replace(
+        windowPropertyPattern,
+        `$1\n    private var lastNotificationAuthStatus: UNAuthorizationStatus?\n`,
+      );
+    }
+  }
+
+  // 同步给 didFinishLaunching 的 register 块前面塞一条 self.lastNotificationAuthStatus
+  // = settings.authorizationStatus，让冷启时种基线；不然 didBecomeActive 第一次
+  // 跑时 previous=nil → wasGranted=false → 重复 register 一次。已经写过的 case 跳过。
+  if (
+    source.includes("UIApplication.shared.registerForRemoteNotifications()") &&
+    !source.includes("self.lastNotificationAuthStatus = settings.authorizationStatus")
+  ) {
+    source = source.replace(
+      /(UNUserNotificationCenter\.current\(\)\.getNotificationSettings \{ settings in\n\s*)(guard settings\.authorizationStatus == \.authorized)/,
+      "$1self.lastNotificationAuthStatus = settings.authorizationStatus\n            $2",
+    );
   }
 
   if (source !== original) {
