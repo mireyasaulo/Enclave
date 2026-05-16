@@ -121,9 +121,15 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
             if let presenter = self.bridge?.viewController {
                 self.configurePopoverPresentation(for: controller, presenter: presenter)
-                presenter.present(controller, animated: true) {
+                // 不要在 present completion 里 resolve —— 那个回调只表示「sheet
+                // 的入场动画跑完了」，用户连分享目标都还没点。JS 那边 await
+                // share() 之后立刻闪「分享成功」toast，会比真的把链接发出去早
+                // 好几秒。改成 completionWithItemsHandler：iOS 在用户挑完目标
+                // 或者点取消把 sheet 关掉时才 fire，这才是真正的「完成」时机。
+                controller.completionWithItemsHandler = { _, _, _, _ in
                     call.resolve()
                 }
+                presenter.present(controller, animated: true)
             } else {
                 call.reject("missing presenter for share sheet")
             }
@@ -152,10 +158,12 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                 controller.setValue(title, forKey: "subject")
             }
             self.configurePopoverPresentation(for: controller, presenter: presenter)
-
-            presenter.present(controller, animated: true) {
+            // 同 share()：present completion 是入场动画完成，不是分享完成。
+            // completionWithItemsHandler 才是用户挑完目标 / 取消时的回调。
+            controller.completionWithItemsHandler = { _, _, _, _ in
                 call.resolve()
             }
+            presenter.present(controller, animated: true)
         }
     }
 
