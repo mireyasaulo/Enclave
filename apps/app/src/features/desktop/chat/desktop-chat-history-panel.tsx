@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
@@ -166,20 +166,33 @@ export function DesktopChatHistoryPanel({
     staleTime: 30_000,
   });
 
-  const senderOptions = buildSenderOptions(membersQuery.data ?? []);
-  const selectedSender =
-    senderOptions.find((option) => option.id === senderId) ?? null;
-  const visibleSenderOptions = senderOptions.filter((option) =>
-    option.label.toLowerCase().includes(memberKeyword.trim().toLowerCase()),
+  const senderOptions = useMemo(
+    () => buildSenderOptions(membersQuery.data ?? []),
+    [membersQuery.data],
   );
-  const dateRange = resolveDateRange(quickDateFilter, customDate);
+  const selectedSender = useMemo(
+    () => senderOptions.find((option) => option.id === senderId) ?? null,
+    [senderOptions, senderId],
+  );
+  const visibleSenderOptions = useMemo(() => {
+    const keyword = memberKeyword.trim().toLowerCase();
+    if (!keyword) {
+      return senderOptions;
+    }
+    return senderOptions.filter((option) =>
+      option.label.toLowerCase().includes(keyword),
+    );
+  }, [senderOptions, memberKeyword]);
+  const dateRange = useMemo(
+    () => resolveDateRange(quickDateFilter, customDate),
+    [quickDateFilter, customDate],
+  );
   const hasDateFilter = Boolean(dateRange.dateFrom) || Boolean(dateRange.dateTo);
   const hasSearchRequest =
     Boolean(debouncedKeyword) ||
     activeCategory !== "all" ||
     Boolean(senderId) ||
-    Boolean(dateRange.dateFrom) ||
-    Boolean(dateRange.dateTo);
+    hasDateFilter;
   const searchQueryEnabled = true;
 
   const resultsQuery = useInfiniteQuery({
@@ -215,20 +228,35 @@ export function DesktopChatHistoryPanel({
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 
-  const resultItems =
-    resultsQuery.data?.pages.flatMap((page) => page.items) ?? [];
-  const resultSections = buildResultSections(resultItems);
+  const resultItems = useMemo(
+    () => resultsQuery.data?.pages.flatMap((page) => page.items) ?? [],
+    [resultsQuery.data],
+  );
+  const resultSections = useMemo(
+    () => buildResultSections(resultItems),
+    [resultItems],
+  );
   const totalResults = resultsQuery.data?.pages[0]?.total ?? resultItems.length;
 
   const showResultsView = true;
   const openedFromDetails = Boolean(onBackToDetails);
-  const emptyStateCopy = buildEmptyStateCopy({
-    keyword: debouncedKeyword,
-    activeCategory,
-    selectedSenderLabel: selectedSender?.label,
-    quickDateFilter,
-    customDate,
-  });
+  const emptyStateCopy = useMemo(
+    () =>
+      buildEmptyStateCopy({
+        keyword: debouncedKeyword,
+        activeCategory,
+        selectedSenderLabel: selectedSender?.label,
+        quickDateFilter,
+        customDate,
+      }),
+    [
+      debouncedKeyword,
+      activeCategory,
+      selectedSender?.label,
+      quickDateFilter,
+      customDate,
+    ],
+  );
 
   function focusSearchInput(moveCaretToEnd = false) {
     window.requestAnimationFrame(() => {

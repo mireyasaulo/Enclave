@@ -1,6 +1,7 @@
 import {
   Suspense,
   lazy,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -1398,46 +1399,55 @@ export function DesktopChatWorkspace({
     subscriptionInboxActive,
   ]);
 
-  function handleConversationContextMenu(
-    event: MouseEvent<HTMLElement>,
-    conversation: ConversationListItem,
-  ) {
-    event.preventDefault();
-    setOfficialMessageContextMenu(null);
-    setConversationContextMenu({
-      conversation,
-      x: event.clientX,
-      y: event.clientY,
-    });
-  }
+  const handleConversationContextMenu = useCallback(
+    (
+      event: MouseEvent<HTMLElement>,
+      conversation: ConversationListItem,
+    ) => {
+      event.preventDefault();
+      setOfficialMessageContextMenu(null);
+      setConversationContextMenu({
+        conversation,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    },
+    [],
+  );
 
-  function handleSubscriptionContextMenu(
-    event: MouseEvent<HTMLElement>,
-    summary: OfficialAccountSubscriptionInboxSummary,
-  ) {
-    event.preventDefault();
-    setConversationContextMenu(null);
-    setOfficialMessageContextMenu({
-      kind: "subscription",
-      summary,
-      x: event.clientX,
-      y: event.clientY,
-    });
-  }
+  const handleSubscriptionContextMenu = useCallback(
+    (
+      event: MouseEvent<HTMLElement>,
+      summary: OfficialAccountSubscriptionInboxSummary,
+    ) => {
+      event.preventDefault();
+      setConversationContextMenu(null);
+      setOfficialMessageContextMenu({
+        kind: "subscription",
+        summary,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    },
+    [],
+  );
 
-  function handleServiceConversationContextMenu(
-    event: MouseEvent<HTMLElement>,
-    conversation: OfficialAccountServiceConversationSummary,
-  ) {
-    event.preventDefault();
-    setConversationContextMenu(null);
-    setOfficialMessageContextMenu({
-      kind: "service",
-      conversation,
-      x: event.clientX,
-      y: event.clientY,
-    });
-  }
+  const handleServiceConversationContextMenu = useCallback(
+    (
+      event: MouseEvent<HTMLElement>,
+      conversation: OfficialAccountServiceConversationSummary,
+    ) => {
+      event.preventDefault();
+      setConversationContextMenu(null);
+      setOfficialMessageContextMenu({
+        kind: "service",
+        conversation,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    },
+    [],
+  );
 
   async function handleOpenConversationWindow(
     conversation: ConversationListItem,
@@ -2343,7 +2353,7 @@ export function DesktopChatWorkspace({
   );
 }
 
-function DesktopMessageEntryCard({
+const DesktopMessageEntryCard = memo(function DesktopMessageEntryCard({
   entry,
   activeConversationId,
   officialAccountsActive,
@@ -2489,7 +2499,7 @@ function DesktopMessageEntryCard({
   }
 
   return (
-    <ConversationCard
+    <ConversationCardLink
       active={entry.conversation.id === activeConversationId}
       conversation={entry.conversation}
       localMessageActionState={localMessageActionState}
@@ -2497,7 +2507,7 @@ function DesktopMessageEntryCard({
       onContextMenu={onConversationContextMenu}
     />
   );
-}
+});
 
 function DesktopReminderCard({
   active,
@@ -2583,34 +2593,7 @@ function DesktopReminderCard({
   );
 }
 
-function ConversationCard({
-  active,
-  conversation,
-  localMessageActionState,
-  contextMenuOpen,
-  onContextMenu,
-}: {
-  active: boolean;
-  conversation: ConversationListItem;
-  localMessageActionState: ReturnType<typeof useLocalChatMessageActionState>;
-  contextMenuOpen: boolean;
-  onContextMenu: (
-    event: MouseEvent<HTMLElement>,
-    conversation: ConversationListItem,
-  ) => void;
-}) {
-  return (
-    <ConversationCardLink
-      active={active}
-      conversation={conversation}
-      localMessageActionState={localMessageActionState}
-      contextMenuOpen={contextMenuOpen}
-      onContextMenu={onContextMenu}
-    />
-  );
-}
-
-function ConversationCardLink({
+const ConversationCardLink = memo(function ConversationCardLink({
   active,
   conversation,
   localMessageActionState,
@@ -2758,7 +2741,7 @@ function ConversationCardLink({
       {content}
     </Link>
   );
-}
+});
 
 function buildConversationActionNotice(
   action:
