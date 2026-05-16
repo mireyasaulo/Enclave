@@ -147,7 +147,13 @@ export function ContactsBulkActionBar({
       {
         onSuccess: (res) => {
           setShowTagDialog(false);
-          setTagDraft("");
+          // 仅在全部成功时清 tagDraft；部分失败时保留用户刚才打的 tag，
+          // 配合 retainBulkFailures 把选区收敛到失败那几条之后，用户重开
+          // dialog 看到原来的 tag 还在，直接点确定即可重试，不用重打
+          // "初中同学"、"客户"这种长 tag 一遍。
+          if (res.failed.length === 0) {
+            setTagDraft("");
+          }
           handleResult(res, t(msg`打标签`));
         },
         onError: (error) => {
