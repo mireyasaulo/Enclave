@@ -1106,6 +1106,35 @@ const pendingLikePostId = likeMutation.isPending
     fetchNextFeedPage,
   ]);
 
+  // 后端给的 page 1 整页 20 条全是被屏蔽角色（用户跟一堆 wiki 走查角色发
+  // 生过恩怨，刷出来全是同人 cluster），visiblePosts 直接为空，触发 R15
+  // 加的「广场动态都被你屏蔽了」空态——但底部 sentinel 是 gate 在
+  // `visiblePosts.length > 0` 才挂上的，没 visiblePost 也就没 observer 自动
+  // 翻页，用户陷在空态里看不到后面 200 多条非屏蔽内容。这条 effect 跟
+  // 「目标驱动拉页」对齐，专门处理「有后端数据 + 全被过滤 + 还有下一页」
+  // 的情况：自动翻页直到出现非屏蔽内容或没有下一页。
+  // 闸门齐全：依赖 blockedQuery 已经 ready（visiblePosts 是 feedPosts -
+  // blocked，blocked 还没回来时 visiblePosts 可能虚为空 → 不要拉），
+  // hasNext + !isFetching + !isFetchNextPageError 一票否决。
+  useEffect(() => {
+    if (isDesktopLayout) return;
+    if (visiblePosts.length > 0) return;
+    if (feedPosts.length === 0) return;
+    if (blockedQuery.isPending) return;
+    if (!hasNextFeedPage || isFetchingNextFeedPage) return;
+    if (isFetchNextFeedPageError) return;
+    void fetchNextFeedPage();
+  }, [
+    isDesktopLayout,
+    visiblePosts.length,
+    feedPosts.length,
+    blockedQuery.isPending,
+    hasNextFeedPage,
+    isFetchingNextFeedPage,
+    isFetchNextFeedPageError,
+    fetchNextFeedPage,
+  ]);
+
   async function handleSharePost(post: (typeof visiblePosts)[number]) {
     const shareHash = buildFeedRouteHash({
       postId: post.id,
