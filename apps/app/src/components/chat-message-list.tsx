@@ -3182,6 +3182,11 @@ export function ChatMessageList({
                       label={message.attachment.fileName || displayText}
                       variant={variant}
                       maxSize={isDesktop ? 180 : 136}
+                      // 真实图片宽高，让浏览器在加载完成前就按 aspect-ratio
+                      // 占位，避免 60 条历史里每张图加载完再撑高一格 → 整列
+                      // 跳动（CLS）。server 早已返回，但之前没透传进 <img>。
+                      width={message.attachment.width}
+                      height={message.attachment.height}
                       onOpen={
                         selectionMode
                           ? undefined
@@ -5039,6 +5044,8 @@ function ImageMessage({
   label,
   variant,
   maxSize,
+  width,
+  height,
   onOpen,
   onMediaReady,
 }: {
@@ -5046,6 +5053,8 @@ function ImageMessage({
   label: string;
   variant: "mobile" | "desktop";
   maxSize: number;
+  width?: number;
+  height?: number;
   onOpen?: () => void;
   onMediaReady?: () => void;
 }) {
@@ -5070,10 +5079,23 @@ function ImageMessage({
     );
   }
 
+  // 用真实宽高按 maxSize 等比缩放占位：CLS 修复关键 — 图片加载前
+  // <img> 就有 aspect-ratio + 真实显示尺寸，60 条历史的图陆续完成
+  // 解码时不会让列高一格一格往上长。server 没给尺寸时回退到老行为
+  // （maxWidth + maxHeight 双向 cap，加载完才知道高度）。
+  const renderedSize =
+    width && height && width > 0 && height > 0
+      ? width >= height
+        ? { width: maxSize, height: Math.round((height / width) * maxSize) }
+        : { width: Math.round((width / height) * maxSize), height: maxSize }
+      : null;
+
   const image = (
     <img
       src={url}
       alt={label}
+      width={renderedSize?.width}
+      height={renderedSize?.height}
       onError={() => setLoadFailed(true)}
       onLoad={onMediaReady}
       className={`bg-white object-cover shadow-none ${
@@ -5081,8 +5103,18 @@ function ImageMessage({
           ? "rounded-[16px] border border-black/6"
           : "rounded-[13px] border border-[color:var(--border-subtle)]"
       }`}
-      style={{ maxWidth: `${maxSize}px`, maxHeight: `${maxSize}px` }}
+      style={
+        renderedSize
+          ? {
+              width: `${renderedSize.width}px`,
+              height: `${renderedSize.height}px`,
+              maxWidth: `${maxSize}px`,
+              maxHeight: `${maxSize}px`,
+            }
+          : { maxWidth: `${maxSize}px`, maxHeight: `${maxSize}px` }
+      }
       loading="lazy"
+      decoding="async"
     />
   );
 
