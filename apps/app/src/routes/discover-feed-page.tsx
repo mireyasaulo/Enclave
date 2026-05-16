@@ -935,6 +935,10 @@ export function DiscoverFeedPage() {
     value: null,
   });
   const isDesktopLayoutAtMountRef = useRef(isDesktopLayout);
+  // baseUrl 第一次 effect 跑就等于"初次挂载"，里面 setDesktopSelectedPostId(null)
+  // 必须跳过——否则 URL 上合法的 #post=<id> 深链会被一进来就被这层 reset 抹掉。
+  // 第二次起说明是真正的"账户切换"。
+  const baseUrlChangedOnceRef = useRef(false);
   useEffect(() => {
     resetComposeDraft();
     setCommentDrafts({});
@@ -963,6 +967,22 @@ export function DiscoverFeedPage() {
     setShareCardPostId(null);
     setCommentInflightPostIds((current) => (current.size > 0 ? new Set() : current));
     setLikeInflightPostIds((current) => (current.size > 0 ? new Set() : current));
+    // 走查新 Round 6：第 6 个跨账户残留 — desktopSelectedPostId。账号 A 在
+    // /tabs/feed#post=A1 上选中阅读一条 post，切换账号 B 后 URL hash 仍是
+    // #post=A1：routeSelectedPostId=A1 一路驱动「目标深链 prefetch」effect
+    // （discover-feed-page L342-357），新账户上 A1 永远找不到 → 一路翻页
+    // 直到 hasNextPage=false，最坏 ~10 个无意义 RTT；同期 detail useQuery 也
+    // 一直对 A1 发 getFeedPost(A1, newBaseUrl) → 服务端 404；workspace 内
+    // scrollIntoView 也一直在找 desktop-feed-post-A1 这个永远不存在的节点。
+    // 直接清掉 desktopSelectedPostId，让 hash-sync effect (L1094-1138) 把 URL
+    // 上的 #post= 替换掉；routeSelectedPostId 跟着归零，三条 effect 全短路。
+    // 注意一定要 gate 在 "baseUrl 真正变过一次" — 首次挂载时 routeSelectedPostId
+    // 是用户合法的深链，不能抹。
+    if (baseUrlChangedOnceRef.current) {
+      setDesktopSelectedPostId(null);
+    } else {
+      baseUrlChangedOnceRef.current = true;
+    }
     // baseUrl 改变（切换账户）→ feedQuery 变成全新 query，但 ref 计数器是
     // 跨账户共享的：上一个账户已经把它打满到 cap 时，新账户的页 1 加载完
     // 后自动 prefetch 直接被卡住，只剩 20 条得用户自己滚才能再翻。
@@ -1358,17 +1378,29 @@ export function DiscoverFeedPage() {
     },
     [],
   );
+  // 走查新 Round 6（perf）：handleRowCommentSubmit 的 deps 直读 desktopReplyTarget，
+  // 用户点 Row 内任意一条评论的「回复」就会让这个 callback identity 翻新一遍 →
+  // workspace → list → 所有 Row 的 onCommentSubmit prop 跟着换 → React.memo 全
+  // 部 fail，60 条 Row 一起重渲（stripToolCallSyntax / commentsById Map 建表 /
+  // MomentMediaGallery 协调），但其中 59 条根本不是回复目标。用 ref 兜住最新
+  // replyTarget，callback 只依赖 stable mutate 引用就行，切换回复目标时只有"刚
+  // 失焦的"和"刚获焦的"两条 Row 因为 commentReplyTarget prop 真变化而重渲。
+  const desktopReplyTargetRef = useRef(desktopReplyTarget);
+  useEffect(() => {
+    desktopReplyTargetRef.current = desktopReplyTarget;
+  }, [desktopReplyTarget]);
   const handleRowCommentSubmit = useCallback(
     (postId: string, text: string) => {
+      const currentReplyTarget = desktopReplyTargetRef.current;
       // text 由 row 顺手传上来 — 不再读 commentDrafts，page callback 跨键码稳定。
       commentMutationMutate({
         postId,
         replyTarget:
-          desktopReplyTarget?.postId === postId ? desktopReplyTarget : null,
+          currentReplyTarget?.postId === postId ? currentReplyTarget : null,
         text,
       });
     },
-    [commentMutationMutate, desktopReplyTarget],
+    [commentMutationMutate],
   );
   const handleRowLike = useCallback(
     (postId: string) => {
