@@ -541,11 +541,21 @@ function MomentImageViewerOverlay({
   // 卡片大小的盒子里而不是全屏。portal 到 document.body 跳出 transform 笼子。
   const overlay = (
     <div className="fixed inset-0 z-50 bg-[rgba(15,23,42,0.92)] backdrop-blur-sm">
+      {/* i18n-ignore-start: dev comment - 关闭层叠说明 */}
+      {/* 原本想用一个 `absolute inset-0 button` 当"点击任意空白关闭"层，但下面的
+          图片容器也是 `absolute inset-0`（没 z-index），按 CSS 默认 stack 后兄弟
+          靠 DOM 顺序：图片容器 DOM 在后 → 落在 close button 之上，把整层吃掉。
+          除了顶栏 X 按钮和左右翻页（z-10）以外，背景空白点击全部沉默。
+          直接把 onClick 挂到图片容器上：tap 图 / tap 背景空白都会冒泡到这层
+          触发 onClose，跟 WeChat 行为一致（长按图仍走原生 contextmenu，不受影响）。
+          底下 inset-0 那颗 button 保留只是给屏幕阅读器留一个可聚焦的"关闭"语义入口。 */}
+      {/* i18n-ignore-end */}
       <button
         type="button"
         onClick={onClose}
         className="absolute inset-0"
         aria-label={t(msg`关闭图片预览`)}
+        tabIndex={-1}
       />
       <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-10 flex items-center justify-between gap-3 px-4 text-white">
         <button
@@ -567,7 +577,11 @@ function MomentImageViewerOverlay({
         <div className="w-10 shrink-0" aria-hidden="true" />
       </div>
 
-      <div className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+4.5rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]">
+      <div
+        className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+4.5rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]"
+        onClick={onClose}
+        role="presentation"
+      >
         <img
           src={resolveAppMediaUrl(image.url)}
           alt={image.fileName || t(msg`朋友圈图片`)}
@@ -637,11 +651,18 @@ function MomentVideoViewerOverlay({
   // 同图片 viewer，朋友圈页 transform 祖先会把 fixed 困在 post 卡片里。portal 出去。
   const overlay = (
     <div className="fixed inset-0 z-50 bg-[rgba(15,23,42,0.94)] backdrop-blur-sm">
+      {/* 跟图片 viewer 同样的层叠陷阱：absolute inset-0 close button 被下方的
+          视频容器（也是 absolute inset-0）盖住，背景空白点击全部沉默。差别在
+          于视频元素自带 controls，整层 onClick={onClose} 会导致点 controls 也
+          关掉 viewer。这里改成只接 currentTarget 直接命中：背景空白触发关闭，
+          点在 <video> 上的事件冒泡上来时 target!==currentTarget，不关。
+          底下 inset-0 button 保留作为屏幕阅读器入口。 */}
       <button
         type="button"
         onClick={onClose}
         className="absolute inset-0"
         aria-label={t(msg`关闭视频预览`)}
+        tabIndex={-1}
       />
       <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-10 flex items-center justify-between gap-3 px-4 text-white">
         <div className="min-w-0">
@@ -664,7 +685,13 @@ function MomentVideoViewerOverlay({
         </button>
       </div>
 
-      <div className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+2rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]">
+      <div
+        className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+2rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) onClose();
+        }}
+        role="presentation"
+      >
         <video
           ref={videoRef}
           src={resolveAppMediaUrl(video.url)}

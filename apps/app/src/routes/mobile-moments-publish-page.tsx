@@ -412,6 +412,16 @@ export function MobileMomentsPublishPage() {
             // 然后列表渲染那条卡片把整段 whitespace-pre-wrap 一次性绘出来，
             // 移动 Safari 直接卡顿，且 DB 里 moment_posts.text 持续膨胀。
             maxLength={2000}
+            // 发表 mutation pending 期间锁死 textarea：
+            //   1) mutationFn 闭包读的是按下"发表"那一刻的 composeDraft.text 快照，
+            //      用户 mid-flight 继续输入并不会被一起发出去；
+            //   2) onSuccess 无条件 composeDraft.reset() + navigate replace 到
+            //      /discover/moments，新输入的内容会被静默清掉再被卸载页带走。
+            //   X 移除图/视频按钮和"取消"/"发表"按钮已经按 pending 禁用；textarea
+            //   不锁就是这条路径里唯一能让用户白打字的地方。
+            //   readOnly 而非 disabled —— disabled 会把已有内容置灰看起来像出错，
+            //   readOnly 视觉上跟正常态一致，键盘也压下去。
+            readOnly={createMutation.isPending}
             // outline-none 干掉浏览器原生轮廓；focus/focus-visible:shadow-none 干掉
             // tokens.css 里 :focus-visible 的全局 3px 绿光 box-shadow——autoFocus
             // 一进页面就吃这一圈、看起来像微信里冒出来一个绿色描边的输入框，
