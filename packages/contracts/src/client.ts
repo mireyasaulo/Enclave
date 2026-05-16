@@ -2997,6 +2997,40 @@ export function getMoments(baseUrl?: string) {
   );
 }
 
+// 「我的朋友圈」专用：服务端只返回当前 world owner 发的 Moment[]，
+// 不再把全表 248+ 条 ~960KB 都拉回前端 filter 出 7 条。
+export function getOwnMoments(baseUrl?: string) {
+  const resolvedBaseUrl = resolveCoreApiBaseUrl(baseUrl, {
+    allowDefault: false,
+  });
+  return requestLegacyApi<Moment[]>(
+    "/moments?mine=true",
+    undefined,
+    baseUrl,
+  ).then((moments) =>
+    moments.map((moment) => normalizeMoment(moment, resolvedBaseUrl)),
+  );
+}
+
+// 单角色朋友圈专用：服务端按 authorType='character' AND authorId=id 过滤，
+// mobile-friend-moments-page / friend-moments-page 用。之前走 getMoments 拉全表
+// ~724KB 再客户端 filter 出该角色 5-10 条，每次进单个角色朋友圈页都付这流量。
+// 改成服务端过滤后只回该角色实际发过的几条。
+export function getCharacterMoments(characterId: string, baseUrl?: string) {
+  const resolvedBaseUrl = resolveCoreApiBaseUrl(baseUrl, {
+    allowDefault: false,
+  });
+  const search = new URLSearchParams();
+  search.set("character", characterId);
+  return requestLegacyApi<Moment[]>(
+    `/moments?${search.toString()}`,
+    undefined,
+    baseUrl,
+  ).then((moments) =>
+    moments.map((moment) => normalizeMoment(moment, resolvedBaseUrl)),
+  );
+}
+
 export interface MomentsPageResponse {
   items: Moment[];
   total: number;
