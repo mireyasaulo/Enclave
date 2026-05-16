@@ -1692,18 +1692,21 @@ export function CharacterDetailPage() {
                       }}
                       className="h-11 rounded-[12px] bg-[#07c160] text-[15px] text-white shadow-none hover:bg-[#06ad56]"
                       disabled={
+                        isBlocked ||
                         hasOutboundFriendRequest ||
                         (sendFriendRequestMutation.isPending &&
                           !hasPendingFriendRequest)
                       }
                     >
-                      {hasOutboundFriendRequest
-                        ? awaitingAcceptanceLabel
-                        : hasInboundFriendRequest
-                          ? viewFriendRequestLabel
-                          : sendFriendRequestDisplayedPending
-                            ? sendingLabel
-                            : addToContactsLabel}
+                      {isBlocked
+                        ? t(msg`已加入黑名单`)
+                        : hasOutboundFriendRequest
+                          ? awaitingAcceptanceLabel
+                          : hasInboundFriendRequest
+                            ? viewFriendRequestLabel
+                            : sendFriendRequestDisplayedPending
+                              ? sendingLabel
+                              : addToContactsLabel}
                     </Button>
                   )}
                 </div>
@@ -1927,17 +1930,25 @@ export function CharacterDetailPage() {
                   compact={!isDesktopLayout}
                 />
               ) : null}
-              <ProfileSwitchRow
-                label={t(msg`默认用语音回复`)}
-                checked={character.defaultVoiceReply ?? false}
-                onToggle={() =>
-                  setDefaultVoiceReplyMutation.mutate(
-                    !(character.defaultVoiceReply ?? false),
-                  )
-                }
-                disabled={setDefaultVoiceReplyMutation.isPending}
-                compact={!isDesktopLayout}
-              />
+              {/* 走查 R1：「默认用语音回复」只对已经在通讯录里的好友有意义——
+                  你还没加上 ta，根本没有 chat conversation 可以"默认转语音"。桌面
+                  ContactDetailPane 早就把这个 toggle 关在 isFriend 块里
+                  (contact-detail-pane.tsx L409-L438)，移动端这里漏了 gate，导致
+                  非好友 / 黑名单状态的"关系管理"面板里挂着一个动了也没人会受影响
+                  的语音开关。和桌面行为对齐：只给好友显示。 */}
+              {isFriend ? (
+                <ProfileSwitchRow
+                  label={t(msg`默认用语音回复`)}
+                  checked={character.defaultVoiceReply ?? false}
+                  onToggle={() =>
+                    setDefaultVoiceReplyMutation.mutate(
+                      !(character.defaultVoiceReply ?? false),
+                    )
+                  }
+                  disabled={setDefaultVoiceReplyMutation.isPending}
+                  compact={!isDesktopLayout}
+                />
+              ) : null}
               <ProfileRow
                 label={isBlocked ? t(msg`移出黑名单`) : t(msg`加入黑名单`)}
                 value={
@@ -2013,18 +2024,27 @@ export function CharacterDetailPage() {
                 />
               </>
             ) : (
+              // 走查 R1：拉黑后会把 friendship 删掉，整页转回非好友 layout，bottom
+              // bar 直接展示「添加到通讯录」邀请用户再 sendFriendRequest——但用户
+              // 刚刚才点了"加入黑名单"，此刻再发一次好友请求只会跑去后端被审计
+              // (autoAccept=true 时甚至会立刻 reactivate friendship 把 block
+              // 的效果绕过)。黑名单态下把主按钮换成不可点的「已加入黑名单」，
+              // 让用户先走"移出黑名单"那条 row 才能继续添加。
               <MobileProfileActionButton
                 primary
                 label={
-                  hasOutboundFriendRequest
-                    ? awaitingAcceptanceLabel
-                    : hasInboundFriendRequest
-                      ? viewFriendRequestLabel
-                      : sendFriendRequestDisplayedPending
-                        ? sendingLabel
-                        : addToContactsLabel
+                  isBlocked
+                    ? t(msg`已加入黑名单`)
+                    : hasOutboundFriendRequest
+                      ? awaitingAcceptanceLabel
+                      : hasInboundFriendRequest
+                        ? viewFriendRequestLabel
+                        : sendFriendRequestDisplayedPending
+                          ? sendingLabel
+                          : addToContactsLabel
                 }
                 disabled={
+                  isBlocked ||
                   hasOutboundFriendRequest ||
                   (sendFriendRequestMutation.isPending &&
                     !hasPendingFriendRequest)
