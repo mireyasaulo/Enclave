@@ -770,6 +770,31 @@ export function CharacterDetailPage() {
     },
   });
 
+  // 走查 R4：每个 mutation hook 在整个 CharacterDetailPage 生命周期内是同一个
+  // 实例，character 切换只走 useParams 路由 re-render 不会 unmount。意味着用户
+  // 在 A 的资料页"拉黑/删除/改备注"失败留下的 mutation.error，挂到 B 的页面上
+  // 同样会被 isError && error instanceof Error 那一组 MobileCharacterErrorNotice
+  // 全部点亮——Bob 没动一下就看到一条"加入黑名单失败：xxx"，会以为是自己页面
+  // 的 Bug。桌面 ContactDetailPane 早就给 updateProfileMutation 加过 reset()
+  // (contact-detail-pane.tsx L135-L145)，但只覆盖了 desktop pane 自己持有的一个；
+  // 移动 page 这一侧 10 个 mutation 全漏。切角色时把它们一并 reset。
+  // mutations 在上面已经全部用 const 初始化完成，这个 effect 在 mount/update
+  // 之后才执行，闭包能拿到它们；不放进 deps 因为每次 render 引用都新，避免无限
+  // 重置死循环。
+  useEffect(() => {
+    startChatMutation.reset();
+    openCallMutation.reset();
+    sendFriendRequestMutation.reset();
+    setStarredMutation.reset();
+    setDefaultVoiceReplyMutation.reset();
+    pinMutation.reset();
+    muteMutation.reset();
+    updateProfileMutation.reset();
+    blockMutation.reset();
+    deleteFriendMutation.reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [characterId]);
+
   const handleBack = () => {
     const expectedPreviousPath = safeMobileReturnPath ?? "/tabs/contacts";
     navigateBackOrFallback(
