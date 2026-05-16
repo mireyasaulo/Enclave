@@ -140,6 +140,28 @@ function MobileAddFriend() {
   const [sendDialogCharacterId, setSendDialogCharacterId] = useState<
     string | null
   >(null);
+  const previousBaseUrlRef = useRef(baseUrl);
+
+  // baseUrl 切换（切账号 / 切世界）后旧 character.id 在新世界里基本不存在：
+  // 1) submittedKeyword="Alice" 残留 → buildAddFriendSearchResults 在新世界字典
+  //    里 filter 出空 → "没有找到 Alice" 误导态，用户以为新世界没人叫 Alice。
+  // 2) sendDialogCharacterId 还指向旧世界的 character.id，sendDialogResult 通过
+  //    searchResults.find 在新世界数据里找不到 → 立即变成 null → MobileAddFriend
+  //    SendSheet 接到 open=false 自动关掉，用户正在敲的招呼语整段丢失，且没有任何
+  //    "切世界了" 之类提示，看着像点击没生效。
+  // 3) 旧的 notice（来自上个世界的 "好友申请已发送。"）2.4s 内还会在新世界顶端
+  //    继续吊着，跟新世界毫无关系。
+  // 上述三条本质都是"旧世界 UI 状态泄漏到新世界"，统一在 baseUrl 翻面那一刻清掉。
+  useEffect(() => {
+    if (previousBaseUrlRef.current === baseUrl) {
+      return;
+    }
+    previousBaseUrlRef.current = baseUrl;
+    setSearchText("");
+    setSubmittedKeyword("");
+    setSendDialogCharacterId(null);
+    setNotice(null);
+  }, [baseUrl]);
 
   useEffect(() => {
     if (routeState.keyword) {
