@@ -387,8 +387,18 @@ function MobileChatListPage() {
       );
       return { snapshots };
     },
-    onError: (_err, _variables, context) => {
+    onError: (error, variables, context) => {
       if (context?.snapshots) restoreConversationCache(context.snapshots);
+      // optimistic 已回滚，但用户看不到任何反馈：列表里 pin 状态默默闪回原样。
+      // 公网隧道偶发超时 / cloud token 过期重连那几百 ms 都会触发，必须给个 toast，
+      // 否则用户以为"系统忽略了我的点击"。
+      setNotice(
+        error instanceof Error && error.message
+          ? error.message
+          : variables.pinned
+            ? t(msg`置顶失败，请稍后再试。`)
+            : t(msg`取消置顶失败，请稍后再试。`),
+      );
     },
     onSuccess: async (_, variables) => {
       setNotice(
@@ -429,8 +439,15 @@ function MobileChatListPage() {
       );
       return { snapshots };
     },
-    onError: (_err, _variables, context) => {
+    onError: (error, variables, context) => {
       if (context?.snapshots) restoreConversationCache(context.snapshots);
+      setNotice(
+        error instanceof Error && error.message
+          ? error.message
+          : variables.muted
+            ? t(msg`开启免打扰失败，请稍后再试。`)
+            : t(msg`关闭免打扰失败，请稍后再试。`),
+      );
     },
     onSuccess: async (_, variables) => {
       setNotice(
@@ -465,6 +482,15 @@ function MobileChatListPage() {
         : action === "read"
           ? markConversationRead(conversationId, baseUrl)
           : markConversationUnread(conversationId, baseUrl),
+    onError: (error, variables) => {
+      setNotice(
+        error instanceof Error && error.message
+          ? error.message
+          : variables.action === "read"
+            ? t(msg`标记已读失败，请稍后再试。`)
+            : t(msg`标记未读失败，请稍后再试。`),
+      );
+    },
     onSuccess: async (_, variables) => {
       setNotice(
         variables.action === "read"
