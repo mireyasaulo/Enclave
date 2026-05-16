@@ -42,6 +42,47 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             name: Notification.Name("YinjiePushTokenChanged"),
             object: nil
         )
+
+        // Round 48: 把上一次 app run 留在 4 个 tmp 子目录里的 stale 文件全清掉。
+        // 历史问题：pickImages / captureImage / pickFile / shareFile / openFile
+        // 这五条入口分别写到 yinjie-picker / yinjie-camera / yinjie-documents /
+        // yinjie-shared 四个 subdir，全程没人清理 —— 每次用户「选图发出去」/
+        // 「拍照发出去」/「转发文件」都留一份 5-50MB 的临时副本。日活用户一个
+        // 月堆 GB 级 tmp 文件不是夸张，Settings → Storage 里就只显示成「其它」，
+        // 用户也只能整 app 删重装才能腾出来。iOS 在磁盘吃紧时会自动清 tmp，
+        // 但靠系统自动 GC 不可控（可能等几周也不动）。
+        //
+        // 不要在每条入口的 completion 里删 —— shareFile 的 receiver app（AirDrop
+        // 异步发、Save to Files 等）有可能在 UIActivityViewController dismiss
+        // 之后还要读这个 url 几秒到几十秒，立刻删容易撞它的异步路径；pickFile /
+        // pickImages / captureImage 返回的 path JS 那边走 fetch → blob → upload，
+        // 时机更不好框死。改在 plugin load 时一次性清干净：这条只在 app 真正
+        // 冷启动 / kill-relaunch 时跑（不是 background→foreground），跑的时候
+        // 整个 JS 还没 mount，肯定没人正在读这些 tmp 文件，是绝对安全的。
+        //
+        // 后果：JS 不能跨 app 重启依赖以前拿到的 file:// path。但本来 iOS 自己
+        // 也会在 cross-launch 清理 tmp，apps 也不该依赖 tmp 跨进程持久化 ——
+        // 跟 Apple 「files in tmp/ should be deleted when no longer needed」的
+        // 指引一致。
+        purgeOwnedTemporarySubdirectories()
+    }
+
+    private func purgeOwnedTemporarySubdirectories() {
+        let fileManager = FileManager.default
+        let ownedSubdirNames = [
+            "yinjie-picker",
+            "yinjie-camera",
+            "yinjie-documents",
+            "yinjie-shared",
+        ]
+
+        for name in ownedSubdirNames {
+            let dir = fileManager.temporaryDirectory.appendingPathComponent(name, isDirectory: true)
+            guard fileManager.fileExists(atPath: dir.path) else {
+                continue
+            }
+            try? fileManager.removeItem(at: dir)
+        }
     }
 
     deinit {

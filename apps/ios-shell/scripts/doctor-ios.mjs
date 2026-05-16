@@ -439,6 +439,25 @@ const checks = [
     // PHAsset，带 .shared() 会让 app 在 iOS Privacy Report 里被标「访问过
     // Photos」、App Store privacy 审查也得多写一条 Photos 数据收集。盯死
     // PHPickerConfiguration 不能再带 photoLibrary 参数（含 .shared 在内）。
+    // Round 48: 4 个 yinjie-* tmp 子目录从来没人清理，pickImages/captureImage/
+    // pickFile/shareFile/openFile 每次都留一份 5-50MB 临时副本。改在 plugin
+    // load 一次性清。盯死 purgeOwnedTemporarySubdirectories 必须存在 —— 防
+    // Capacitor 升级 / 谁手抖把 load() 还原回 vanilla.
+    label: "mobile-bridge-temp-cleanup",
+    ok:
+      !fs.existsSync(mobileBridgePluginPath) ||
+      fileIncludesAll(mobileBridgePluginPath, [
+        "purgeOwnedTemporarySubdirectories",
+        "yinjie-picker",
+        "yinjie-camera",
+        "yinjie-documents",
+        "yinjie-shared",
+      ]),
+    detail: fs.existsSync(mobileBridgePluginPath)
+      ? "YinjieMobileBridge.load() purges owned tmp subdirs at cold start (yinjie-picker/camera/documents/shared)"
+      : "mobile bridge plugin not found yet; run `pnpm ios:sync` first",
+  },
+  {
     label: "phpicker-no-photolibrary",
     ok:
       !fs.existsSync(mobileBridgePluginPath) ||
