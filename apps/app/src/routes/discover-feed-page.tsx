@@ -59,6 +59,7 @@ import {
   publishFeedComposeDraft,
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
+import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import {
   buildFeedRouteHash,
   parseFeedRouteHash,
@@ -542,6 +543,47 @@ const pendingLikePostId = likeMutation.isPending
     void feedQuery.refetch();
     void blockedQuery.refetch();
   }
+
+  // 下拉刷新：只替换头部 page 1，保留已加载的 page 2+，避免列表瞬间变短引发
+  // 橡皮筋反弹 + 串行 fetchNextPage 把内容堆回来；新发布的内容若把老 page 2
+  // 起点往下挤，由 feedPosts 的 id 去重 useMemo 兜底。和 moments-page 对齐。
+  const handlePullRefresh = async () => {
+    const key = ["app-feed-paged", baseUrl];
+    try {
+      await Promise.all([
+        getFeed(1, 20, baseUrl).then((fresh) => {
+          queryClient.setQueryData<InfiniteData<FeedListResponse>>(
+            key,
+            (current) => {
+              if (!current || current.pages.length === 0) {
+                return { pages: [fresh], pageParams: [1] };
+              }
+              return {
+                pages: [fresh, ...current.pages.slice(1)],
+                pageParams: current.pageParams,
+              };
+            },
+          );
+        }),
+        ownerId ? blockedQuery.refetch() : Promise.resolve(null),
+      ]);
+    } catch (error) {
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(
+        error instanceof Error
+          ? t(msg`广场刷新失败：${error.message}`)
+          : t(msg`广场刷新失败，请稍后重试。`),
+      );
+    }
+  };
+
+  const { containerRef: pullContainerRef, state: pullState } =
+    usePullToRefresh({
+      onRefresh: handlePullRefresh,
+      enabled: !isDesktopLayout,
+    });
 
   function openMobileFeedPublishPage() {
     const currentHash = hash.startsWith("#") ? hash.slice(1) : hash;
@@ -1088,6 +1130,30 @@ const pendingLikePostId = likeMutation.isPending
         }
       />
 
+      <div ref={pullContainerRef} className="relative">
+        {pullState.offset || pullState.refreshing ? (
+          <div
+            className="pointer-events-none absolute left-0 right-0 z-10 flex items-center justify-center text-[12px] text-[#9A9A9A]"
+            style={{ top: 0, height: `${pullState.offset || 60}px` }}
+          >
+            <span>
+              {pullState.refreshing
+                ? t(msg`正在刷新...`)
+                : pullState.offset >= 64
+                  ? t(msg`松手刷新`)
+                  : t(msg`下拉刷新`)}
+            </span>
+          </div>
+        ) : null}
+
+        <div
+          style={{
+            transform: `translateY(${pullState.offset}px)`,
+            transition: pullState.pulling
+              ? "none"
+              : "transform 220ms ease-out",
+          }}
+        >
       <div className="space-y-2.5 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-2.5">
         <section className="space-y-2">
           <div className="px-1">
@@ -1474,6 +1540,8 @@ const pendingLikePostId = likeMutation.isPending
             />
           ) : null}
         </section>
+      </div>
+        </div>
       </div>
 
       <FeedPostShareCardModal
