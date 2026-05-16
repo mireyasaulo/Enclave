@@ -780,9 +780,24 @@ export function DiscoverFeedPage() {
         }
         return current;
       });
-      setCommentBarTarget((current) =>
-        current?.postId === input.postId ? null : current,
-      );
+      // 走查再 Round 3：mobile WeChatCommentBar 的 textarea 在 pending 期间没
+      // readOnly，用户在 RTT (~500ms+) 内可以继续打字 — L749-762 已经把
+      // commentDrafts 的"draft 还是 input.text 才清"那一支 gate 住，避免抹掉
+      // 用户新打的内容；但这里 setCommentBarTarget 仍然无脑关 bar：用户
+      // 看着是"评论成功 → bar 自己消失 → 我刚刚还在打的下一条不见了"，
+      // 实际 draft 安全地存在 commentDrafts[postId]，但他得再点一次评论入
+      // 口才能把 bar 重开继续编辑。跟 commentDrafts 的判定对齐：draft 仍
+      // 是 input.text（即用户没继续打字）才关 bar，否则留着让用户接着发。
+      // 注意 commentDrafts 是 closure-captured 值——onSuccess 是 react-query
+      // 每次 render 重写的 options.onSuccess，最新 render 的 closure 一定看
+      // 到的是最新的 commentDrafts（包括 mid-flight 打字累积），所以读这里
+      // 的 commentDrafts 就是用户最新状态。
+      const draftStillMatchesSubmit =
+        (commentDrafts[input.postId] ?? "") === input.text;
+      setCommentBarTarget((current) => {
+        if (current?.postId !== input.postId) return current;
+        return draftStillMatchesSubmit ? null : current;
+      });
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
