@@ -608,13 +608,30 @@ export function MomentsPage() {
   const deleteMutation = useMutation({
     mutationFn: (momentId: string) => deleteMoment(momentId, baseUrl),
     onMutate: async (momentId) => {
-      await queryClient.cancelQueries({ queryKey: ["app-moments-paged", baseUrl] });
-      const snapshots = queryClient.getQueriesData<
+      // 同步从 4 把 cache 里把这条 moment 抹掉：flat / paged / mine。
+      // 之前只动 paged → 用户在 /tabs/moments 删一条自己的动态后立刻切到
+      // /profile/moments，那条已删的帖子还在那挂着 ~600ms 直到 invalidate
+      // 把 mine refetch 回来。跟 use-optimistic-like 同模式：multi-cache 同步。
+      // character cache 里不会有用户自己发的 moment（按 character=ID 服务端过滤），
+      // 不必动，但 cancel 一下避免 in-flight refetch 把刚抹掉的拉回来（用户的 moment
+      // 不会进 character cache 但 cancel 是安全 no-op）。
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["app-moments-paged", baseUrl] }),
+        queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] }),
+        queryClient.cancelQueries({ queryKey: ["app-moments-mine", baseUrl] }),
+      ]);
+      const pagedSnapshots = queryClient.getQueriesData<
         InfiniteData<MomentsPageResponse>
       >({
         queryKey: ["app-moments-paged", baseUrl],
       });
-      snapshots.forEach(([key, data]) => {
+      const flatSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      const mineSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-mine", baseUrl],
+      });
+      pagedSnapshots.forEach(([key, data]) => {
         if (!data) return;
         queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(key, {
           ...data,
@@ -624,10 +641,30 @@ export function MomentsPage() {
           })),
         });
       });
-      return { snapshots };
+      flatSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(
+          key,
+          data.filter((item) => item.id !== momentId),
+        );
+      });
+      mineSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(
+          key,
+          data.filter((item) => item.id !== momentId),
+        );
+      });
+      return { pagedSnapshots, flatSnapshots, mineSnapshots };
     },
     onError: (error, momentId, context) => {
-      context?.snapshots.forEach(([key, data]) => {
+      context?.pagedSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context?.flatSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context?.mineSnapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
       // 删除失败也冒到 notice，给「重试删除」按钮——之前完全沉默，
