@@ -282,33 +282,77 @@ function MobileGroupMemberPickerPage({
   // true 后同帧后续 click 都被早返。remove 模式靠 setRemoveConfirmOpen 弹层
   // 二次确认，天然只点一次，不受影响。
   const submittingRef = useRef(false);
+  // 走查 Round 2：原版用 Promise.all，任意一条 add/remove 失败就把整批抛错——
+  // 但已经先成功的那几条仍然落库了，membersQuery 不 invalidate / selectedIds
+  // 不收口，用户点"重试" 会拿同一批 memberId 再打一遍：
+  //   - remove 模式下，已经成功移除的那些会触发 CHAT_GROUP_MEMBER_NOT_FOUND，
+  //     本来"部分成功"的批次反而被翻成"整批失败"，UI 没法区分；
+  //   - add 模式下 addMember 服务端遇到重复直接 return existing（不抛），所
+  //     以 retry 在 add 模式是幂等的，但 selectedIds 还留着已经加进群的 ID，
+  //     重试 toast 总条数显示也不对。
+  // 改成 Promise.allSettled：把已成功的 ID 从 selectedIds 摘掉、refetch 群
+  // 成员，让用户基于真实当前成员状态决定剩余失败项要不要重试。
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!selectedIds.length) {
         return;
       }
 
-      if (mode === "add") {
-        await Promise.all(
-          selectedIds.map((memberId) =>
-            addGroupMember(
-              groupId,
-              {
-                memberId,
-                memberType: "character",
-              },
-              baseUrl,
-            ),
-          ),
-        );
-        return;
-      }
-
-      await Promise.all(
+      const results = await Promise.allSettled(
         selectedIds.map((memberId) =>
-          removeGroupMember(groupId, memberId, baseUrl),
+          mode === "add"
+            ? addGroupMember(
+                groupId,
+                {
+                  memberId,
+                  memberType: "character",
+                },
+                baseUrl,
+              ).then(() => memberId)
+            : removeGroupMember(groupId, memberId, baseUrl).then(
+                () => memberId,
+              ),
         ),
       );
+
+      const fulfilledIds: string[] = [];
+      const errors: Error[] = [];
+      for (const result of results) {
+        if (result.status === "fulfilled") {
+          fulfilledIds.push(result.value);
+        } else {
+          const reason = result.reason;
+          errors.push(
+            reason instanceof Error ? reason : new Error(String(reason)),
+          );
+        }
+      }
+
+      if (errors.length) {
+        if (fulfilledIds.length) {
+          setSelectedIds((current) =>
+            current.filter((id) => !fulfilledIds.includes(id)),
+          );
+          await Promise.all([
+            queryClient.invalidateQueries({
+              queryKey: ["app-group", baseUrl, groupId],
+            }),
+            queryClient.invalidateQueries({
+              queryKey: ["app-group-members", baseUrl, groupId],
+            }),
+            queryClient.invalidateQueries({
+              queryKey: ["app-conversations", baseUrl],
+            }),
+          ]);
+        }
+        const firstMessage = errors[0]?.message?.trim();
+        throw new Error(
+          firstMessage ||
+            (mode === "add"
+              ? t(msg`部分成员添加失败，请稍后再试。`)
+              : t(msg`部分成员移除失败，请稍后再试。`)),
+        );
+      }
     },
     onSuccess: async () => {
       setRemoveConfirmOpen(false);

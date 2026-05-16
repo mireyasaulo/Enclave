@@ -98,13 +98,19 @@ function MobileGroupContactsPage() {
   // 刷新；但通讯录页只裸 useQuery 没订阅 socket，要等用户离开再回来才看到
   // 这条群。这里订阅同样的两个事件 invalidate 自己的 cache key，对齐
   // chat-list-page 的口径。
+  // 走查 Round 6：onChatMessage 同时分发单聊 + 群聊消息，原版无条件 invalidate
+  // 让每条单聊消息也强制 refetch /groups——一个活跃单聊用户每秒能在通讯录-群
+  // 聊页打出几十次 getGroups 浪费 RTT。按 payload 有没有 groupId 过滤一下。
   useEffect(() => {
     const offUpdated = onConversationUpdated(() => {
       void queryClient.invalidateQueries({
         queryKey: ["app-contact-groups", baseUrl],
       });
     });
-    const offMessage = onChatMessage(() => {
+    const offMessage = onChatMessage((payload) => {
+      if (!("groupId" in payload)) {
+        return;
+      }
       void queryClient.invalidateQueries({
         queryKey: ["app-contact-groups", baseUrl],
       });
