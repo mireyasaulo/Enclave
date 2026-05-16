@@ -21,13 +21,17 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
   const baseUrl = runtimeConfig.apiBaseUrl;
   const queryClient = useQueryClient();
 
+  // 新一轮走查：同 contacts-page 共享 cache key，配 staleTime 让权限明细
+  // 屏频繁返回时不重复 fetch；permissions mutation 已经显式 invalidate。
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    staleTime: 15_000,
   });
   const charactersQuery = useQuery({
     queryKey: ["app-characters", baseUrl],
     queryFn: () => listCharacters(baseUrl),
+    staleTime: 30_000,
   });
 
   const friend = (friendsQuery.data ?? []).find(

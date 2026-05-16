@@ -60,15 +60,19 @@ export function ContactsManagementModal({
   // 仅在打开 permissions-detail 时才查（弹窗未打开时 useQuery 不订阅）。
   const detailCharacterId =
     current.type === "permissions-detail" ? current.characterId : null;
+  // 新一轮走查：共享 contacts-page / permissions-detail 的同 cache key，配 staleTime
+  // 让 modal 反复打开 permissions-detail 时不重复 fetch。
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
     enabled: Boolean(open && detailCharacterId),
+    staleTime: 15_000,
   });
   const charactersQuery = useQuery({
     queryKey: ["app-characters", baseUrl],
     queryFn: () => listCharacters(baseUrl),
     enabled: Boolean(open && detailCharacterId),
+    staleTime: 30_000,
   });
   const detailFriendName = useMemo(() => {
     if (!detailCharacterId) return null;

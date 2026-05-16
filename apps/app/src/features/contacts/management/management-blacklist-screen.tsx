@@ -17,13 +17,19 @@ export function ManagementBlacklistScreen() {
   const baseUrl = runtimeConfig.apiBaseUrl;
   const queryClient = useQueryClient();
 
+  // 新一轮走查：modal 同时持有这两条 query 的副本（permissions-detail 屏的
+  // friendsQuery + charactersQuery 也用同样 key）+ contacts-page 主入口也已经
+  // 拉过一遍，每次切进黑名单屏都触发 background refetch 浪费流量。15-30s
+  // staleTime 让短时复入命中缓存，unblock mutation 仍然显式 invalidate 这条 key。
   const blockedQuery = useQuery({
     queryKey: ["app-contacts-blocked", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
+    staleTime: 15_000,
   });
   const charactersQuery = useQuery({
     queryKey: ["app-characters", baseUrl],
     queryFn: () => listCharacters(baseUrl),
+    staleTime: 30_000,
   });
 
   const characterMap = useMemo(

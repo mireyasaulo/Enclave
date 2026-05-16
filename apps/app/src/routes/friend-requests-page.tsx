@@ -79,9 +79,13 @@ function MobileFriendRequestsPage() {
     returnHash: safeReturnHash,
   });
 
+  // 新一轮走查：和 contacts-page / mobile-add-friend-page 同 cache key，但前两者已经
+  // 把 staleTime 设到 15s；这边不设 → 用户从通讯录 / 加号页跳进来时仍触发 background
+  // refetch，cache 明明是新鲜的（< 15s 前刚拉过）也照刷一遍。同步 15s。
   const requestsQuery = useQuery({
     queryKey: ["app-friend-requests", baseUrl],
     queryFn: () => getFriendRequests(baseUrl),
+    staleTime: 15_000,
   });
 
   const acceptMutation = useMutation({

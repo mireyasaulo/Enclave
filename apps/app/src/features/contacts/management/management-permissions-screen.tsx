@@ -31,9 +31,13 @@ export function ManagementPermissionsScreen({
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
 
+  // 新一轮走查：同 contacts-page / mobile-add-friend-page 同 cache key，主页已经
+  // 拉过；这里不设 staleTime 会让每次切入"朋友权限"屏都重新 background fetch。
+  // 15s 跟主页一致。
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    staleTime: 15_000,
   });
 
   const trimmedSearch = search.trim();

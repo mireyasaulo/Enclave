@@ -96,9 +96,12 @@ function MobileTagsPage() {
     [safeReturnHash, safeReturnPath, searchText],
   );
 
+  // 新一轮走查：通讯录管理 → 标签 共享 contacts-page 同 cache key；配 staleTime
+  // 让"打开标签 → 看某标签下成员 → 返回 → 再开"不每次都 background fetch。
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    staleTime: 15_000,
   });
 
   const tagGroups = useMemo(

@@ -100,9 +100,12 @@ function MobileStarredFriendsPage() {
     [safeReturnHash, safeReturnPath, searchText],
   );
 
+  // 新一轮走查：共享 contacts-page 同 cache key 的星标朋友页，配 staleTime
+  // 让短时间反复进出星标列表不重复 fetch。star/unstar mutation 仍显式 invalidate。
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    staleTime: 15_000,
   });
 
   const starredFriends = useMemo(
