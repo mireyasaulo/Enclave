@@ -104,6 +104,35 @@ function runInterceptors(canGoBack: boolean) {
   return prevented;
 }
 
+// 这里不能用 lingui t/Trans —— android-back-button 在 React 树外，
+// 也不在 AppLocaleProvider context 下。直接读 localStorage 的 locale
+// 偏好（apps/app 自己维护的 key），加 navigator.language 做兜底。
+const EXIT_HINT_MESSAGES: Record<string, string> = {
+  "zh-CN": "再按一次返回键退出",
+  "en-US": "Press back again to exit",
+  "ja-JP": "もう一度押して終了",
+  "ko-KR": "한 번 더 누르면 종료",
+};
+
+function resolveExitHintText(): string {
+  try {
+    const stored = window.localStorage.getItem("yinjie-i18n-locale:app");
+    if (stored && EXIT_HINT_MESSAGES[stored]) {
+      return EXIT_HINT_MESSAGES[stored];
+    }
+  } catch {
+    // ignore
+  }
+  const lang = (
+    typeof navigator !== "undefined" ? navigator.language : ""
+  ).toLowerCase();
+  if (lang.startsWith("zh")) return EXIT_HINT_MESSAGES["zh-CN"];
+  if (lang.startsWith("ja")) return EXIT_HINT_MESSAGES["ja-JP"];
+  if (lang.startsWith("ko")) return EXIT_HINT_MESSAGES["ko-KR"];
+  if (lang.startsWith("en")) return EXIT_HINT_MESSAGES["en-US"];
+  return EXIT_HINT_MESSAGES["zh-CN"];
+}
+
 function showExitHintToast() {
   if (typeof document === "undefined") {
     return;
@@ -114,7 +143,7 @@ function showExitHintToast() {
   }
   const node = document.createElement("div");
   node.id = "yj-android-exit-hint";
-  node.textContent = "再按一次返回键退出";
+  node.textContent = resolveExitHintText();
   Object.assign(node.style, {
     position: "fixed",
     left: "50%",
