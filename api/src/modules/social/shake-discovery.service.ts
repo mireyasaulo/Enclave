@@ -534,18 +534,46 @@ export class ShakeDiscoveryService {
       ownerId: owner.id,
       characterId: character.id,
     });
+    const resolvedGreeting =
+      session.greeting?.trim() ||
+      (await this.worldLanguage.buildGenericGreetingFallback(character.name));
     if (!isActiveFriendshipStatus(friendship?.status)) {
       await this.socialService.sendFriendRequest(
         character.id,
-        session.greeting ||
-          (await this.worldLanguage.buildGenericGreetingFallback(
-            character.name,
-          )),
+        resolvedGreeting,
         {
           autoAccept: true,
           triggerScene: 'shake_keep',
         },
       );
+      // 走查 Round 7：encounter 成功 notice 显示「X 已加入通讯录：[greeting]」，把
+      // greeting 当 X 刚说的一句话呈现给用户。但 activateFriendship 只塞了
+      // 「你已添加了 X」系统消息，进 chat 看不到 greeting 本身——用户读完 notice 进
+      // 来一脸 ?，对话窗一句话都没有。把 greeting 落库成 character text message，
+      // 跟 notice 文案对齐。idempotent：和 sendFriendRequest 同处于 isActive=false
+      // 分支，重复 keep 不会再插一次。
+      try {
+        const conversationId = `direct_${character.id}`;
+        await this.messageRepo.save(
+          this.messageRepo.create({
+            id: `msg_${Date.now()}_shake_greeting_${randomUUID().slice(0, 8)}`,
+            conversationId,
+            senderType: 'character',
+            senderId: character.id,
+            senderName: character.name,
+            type: 'text',
+            text: resolvedGreeting,
+          }),
+        );
+        await this.conversationRepo.update(
+          { id: conversationId, ownerId: owner.id },
+          { lastActivityAt: new Date() },
+        );
+      } catch {
+        // greeting 落库失败不应该阻断 keep 整体——sendFriendRequest 已经把
+        // friendship / conversation 写好了。后续重试也只能补 greeting，不能复跑
+        // sendFriendRequest（status 已经 active）。
+      }
     }
     session.status = 'kept';
     session.characterId = character.id;
