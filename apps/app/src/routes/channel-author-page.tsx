@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import {
+  SELF_CHARACTER_ID,
   followChannelAuthor,
   getChannelAuthorProfile,
   unfollowChannelAuthor,
@@ -426,24 +427,30 @@ export function ChannelAuthorPage() {
               </div>
 
               <div className="mt-5 flex flex-wrap gap-2">
-                <Button
-                  variant={profile.isFollowing ? "secondary" : "primary"}
-                  size="lg"
-                  disabled={followMutation.isPending}
-                  onClick={() => followMutation.mutate()}
-                  className={cn(
-                    "h-11 rounded-full px-5 shadow-none",
-                    profile.isFollowing
-                      ? "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)]"
-                      : "bg-[color:var(--brand-primary)] text-white hover:opacity-95",
-                  )}
-                >
-                  {followMutation.isPending
-                    ? t(msg`处理中...`)
-                    : profile.isFollowing
-                      ? t(msg`已关注`)
-                      : t(msg`+关注`)}
-                </Button>
+                {/* 「我自己」是用户的代理角色（char-default-self ≠ owner.id）；
+                    后端 followChannelAuthor 对 owner===authorId 才 no-op，
+                    char-default-self 会被真插一行 follow → 按钮在 +关注/已关注
+                    之间反复横跳，没语义。和移动端卡片里的逻辑保持一致：隐掉。 */}
+                {profile.authorId !== SELF_CHARACTER_ID ? (
+                  <Button
+                    variant={profile.isFollowing ? "secondary" : "primary"}
+                    size="lg"
+                    disabled={followMutation.isPending}
+                    onClick={() => followMutation.mutate()}
+                    className={cn(
+                      "h-11 rounded-full px-5 shadow-none",
+                      profile.isFollowing
+                        ? "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)]"
+                        : "bg-[color:var(--brand-primary)] text-white hover:opacity-95",
+                    )}
+                  >
+                    {followMutation.isPending
+                      ? t(msg`处理中...`)
+                      : profile.isFollowing
+                        ? t(msg`已关注`)
+                        : t(msg`+关注`)}
+                  </Button>
+                ) : null}
                 <Button
                   variant="secondary"
                   size="lg"
