@@ -69,9 +69,9 @@ export function CharacterPage() {
   const isPendingCreate = lifecycleStatus === "pending_create";
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)]">
+    <div className="space-y-4 sm:space-y-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+        <div className="wiki-touch-scroll -mx-1 inline-flex overflow-x-auto rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)] sm:mx-0 sm:overflow-visible">
           <TabButton active={tab === "read"} onClick={() => setTab("read")}>
             <Trans>阅读</Trans>
           </TabButton>
@@ -92,7 +92,7 @@ export function CharacterPage() {
             <Trans>讨论</Trans>
           </TabButton>
         </div>
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
           <WatchToggle characterId={characterId} />
         </div>
       </div>
@@ -121,12 +121,12 @@ export function CharacterPage() {
             <div
               role="group"
               aria-label={t(msg`版本切换`)}
-              className="ml-auto inline-flex shrink-0 overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]"
+              className="inline-flex w-full shrink-0 overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)] sm:ml-auto sm:w-auto"
             >
               <button
                 type="button"
                 aria-pressed={viewMode === "stable"}
-                className={`px-3 py-1.5 ${
+                className={`flex-1 px-3 py-1.5 sm:flex-none ${
                   viewMode === "stable"
                     ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
                     : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
@@ -138,7 +138,7 @@ export function CharacterPage() {
               <button
                 type="button"
                 aria-pressed={viewMode === "current"}
-                className={`px-3 py-1.5 ${
+                className={`flex-1 px-3 py-1.5 sm:flex-none ${
                   viewMode === "current"
                     ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
                     : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
@@ -156,7 +156,7 @@ export function CharacterPage() {
           <Button
             size="sm"
             variant={isDeleted ? "primary" : "danger"}
-            className="ml-auto"
+            className="w-full sm:ml-auto sm:w-auto"
             disabled={softDeleteMut.isPending}
             onClick={() => setShowLifecycleForm((value) => !value)}
           >
@@ -301,18 +301,20 @@ function ReadView({ view }: { view: WikiPageView }) {
     view.currentRevision?.editorUserId,
   ]);
   return (
-    <Card className="p-6 space-y-4">
-      <header className="flex items-start gap-4">
+    <Card className="space-y-4 p-4 sm:p-6">
+      <header className="flex items-start gap-3 sm:gap-4">
         {c.avatar && (
           <img
             src={c.avatar}
             alt={c.name}
-            className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover bg-[color:var(--surface-soft)]"
+            className="h-14 w-14 shrink-0 rounded-full bg-[color:var(--surface-soft)] object-cover sm:h-16 sm:w-16 md:h-20 md:w-20"
           />
         )}
-        <div className="flex-1">
-          <h1 className="text-2xl font-semibold">{c.name}</h1>
-          <div className="text-sm text-[var(--text-muted)] mt-1">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl font-semibold leading-tight sm:text-2xl">
+            {c.name}
+          </h1>
+          <div className="mt-1 text-sm text-[var(--text-muted)]">
             {c.relationship} · {c.relationshipType}
           </div>
         </div>
@@ -432,7 +434,7 @@ function EditView({
     );
   }
   return (
-    <Card className="p-6 space-y-4">
+    <Card className="space-y-4 p-4 sm:p-6">
       <p className="text-sm text-[var(--text-muted)]">
         <Trans>
           当前你的权限是 <strong className="mx-1">{user.role}</strong>。
@@ -562,11 +564,11 @@ function RevisionCard({
   const [showRevert, setShowRevert] = useState(false);
   const [reason, setReason] = useState("");
   return (
-    <Card className="p-3 flex items-start gap-3 text-sm">
-      <div className="w-12 font-mono text-[var(--text-muted)] pt-0.5">
+    <Card className="flex items-start gap-3 p-3 text-sm">
+      <div className="w-10 shrink-0 pt-0.5 font-mono text-[var(--text-muted)] sm:w-12">
         v{rev.version}
       </div>
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
           <strong>{editorName}</strong>
           <span className="text-xs text-[var(--text-muted)]">
@@ -714,7 +716,7 @@ function DriftBanner({
   const totalDrift = drift.contentDrift.length + drift.recipeDrift.length;
   return (
     <Card className="border-[color:var(--state-warning-bg)] bg-[rgba(255,247,205,0.6)] p-4">
-      <div className="flex items-start gap-2">
+      <div className="flex flex-col items-start gap-2 sm:flex-row">
         <div className="flex-1 text-sm">
           <strong>
             <Trans>⚠ 角色已被管理员后台直接修改</Trans>
@@ -746,6 +748,7 @@ function DriftBanner({
         <Button
           size="sm"
           variant="primary"
+          className="w-full shrink-0 sm:w-auto"
           disabled={syncMut.isPending}
           onClick={() => syncMut.mutate()}
         >

@@ -184,6 +184,20 @@ export function RootLayout() {
     setMobileNavOpen(false);
   }, [pathname]);
 
+  // 抽屉打开时锁掉背景滚动（fixed + overflow），避免移动端透到下层内容
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    if (mobileNavOpen) {
+      root.classList.add("wiki-nav-open");
+    } else {
+      root.classList.remove("wiki-nav-open");
+    }
+    return () => {
+      root.classList.remove("wiki-nav-open");
+    };
+  }, [mobileNavOpen]);
+
   const visibleGroups = useMemo(
     () =>
       NAV_GROUPS.map((g) => ({
@@ -203,10 +217,10 @@ export function RootLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-30 border-b border-[color:var(--border-subtle)] bg-[color:var(--surface-shell)] backdrop-blur">
-        <div className="mx-auto flex w-full max-w-screen-2xl items-center gap-3 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex w-full max-w-screen-2xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3">
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-white text-lg lg:hidden"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-white text-lg lg:hidden"
             aria-label={t(msg`打开导航`)}
             onClick={() => setMobileNavOpen((v) => !v)}
           >
@@ -216,7 +230,7 @@ export function RootLayout() {
             to="/"
             className="flex min-w-0 items-center gap-2 text-base font-semibold sm:text-lg"
           >
-            <span className="grid h-9 w-9 place-items-center rounded-2xl bg-[image:var(--brand-gradient)] text-base text-[color:var(--text-on-brand)] shadow-[var(--shadow-card)]">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-[image:var(--brand-gradient)] text-base text-[color:var(--text-on-brand)] shadow-[var(--shadow-card)]">
               <Trans>隐</Trans>
             </span>
             <span className="hidden truncate sm:inline">
@@ -243,10 +257,27 @@ export function RootLayout() {
               />
             </div>
           </form>
-          <div className="ml-auto flex items-center gap-2 md:ml-4">
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 md:ml-4">
+            <button
+              type="button"
+              onClick={() => {
+                const target = pickTutorialLocale(i18n.locale);
+                window.open(
+                  `/tutorial-${target}.html`,
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+              }}
+              title={t(msg`新手教程 / Tutorial`)}
+              aria-label={t(msg`新手教程`)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-white text-base hover:bg-[color:var(--surface-card-hover)] sm:hidden"
+            >
+              <span aria-hidden>📖</span>
+            </button>
             <Button
               variant="ghost"
               size="sm"
+              className="hidden sm:inline-flex"
               onClick={() => {
                 const target = pickTutorialLocale(i18n.locale);
                 window.open(
@@ -258,7 +289,7 @@ export function RootLayout() {
               title={t(msg`新手教程 / Tutorial`)}
             >
               <span aria-hidden>📖</span>
-              <span className="ml-1 hidden sm:inline">
+              <span className="ml-1">
                 <Trans>教程</Trans>
               </span>
             </Button>
@@ -270,6 +301,7 @@ export function RootLayout() {
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="hidden sm:inline-flex"
                   onClick={() => void navigate({ to: "/login" })}
                 >
                   <Trans>登录</Trans>
@@ -277,9 +309,21 @@ export function RootLayout() {
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => void navigate({ to: "/register" })}
+                  onClick={() => {
+                    const target =
+                      typeof window !== "undefined" &&
+                      window.matchMedia("(min-width: 640px)").matches
+                        ? "/register"
+                        : "/login";
+                    void navigate({ to: target });
+                  }}
                 >
-                  <Trans>注册</Trans>
+                  <span className="hidden sm:inline">
+                    <Trans>注册</Trans>
+                  </span>
+                  <span className="sm:hidden">
+                    <Trans>登录</Trans>
+                  </span>
                 </Button>
               </>
             )}
@@ -304,7 +348,7 @@ export function RootLayout() {
         </div>
       </header>
 
-      <div className="relative mx-auto flex w-full max-w-screen-2xl flex-1 gap-6 px-4 pb-12 pt-6 sm:px-6">
+      <div className="relative mx-auto flex w-full max-w-screen-2xl flex-1 gap-6 px-3 pb-10 pt-4 sm:px-6 sm:pt-6 sm:pb-12">
         {mobileNavOpen && (
           <button
             type="button"
@@ -314,10 +358,19 @@ export function RootLayout() {
           />
         )}
         <aside
-          className={`fixed inset-y-0 left-0 z-40 w-72 max-w-[85%] transform overflow-y-auto border-r border-[color:var(--border-subtle)] bg-[color:var(--surface-shell)] px-4 py-5 shadow-2xl transition-transform duration-[var(--motion-fast)] ease-[var(--ease-standard)] lg:static lg:z-auto lg:block lg:w-64 lg:max-w-none lg:shrink-0 lg:translate-x-0 lg:border-r-0 lg:bg-transparent lg:px-0 lg:py-0 lg:shadow-none lg:overflow-visible ${
+          className={`wiki-touch-scroll fixed inset-y-0 left-0 z-40 w-72 max-w-[85%] transform overflow-y-auto border-r border-[color:var(--border-subtle)] bg-[color:var(--surface-shell)] px-4 py-5 shadow-2xl transition-transform duration-[var(--motion-fast)] ease-[var(--ease-standard)] lg:static lg:z-auto lg:block lg:w-64 lg:max-w-none lg:shrink-0 lg:translate-x-0 lg:border-r-0 lg:bg-transparent lg:px-0 lg:py-0 lg:shadow-none lg:overflow-visible ${
             mobileNavOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
+          {/* 抽屉内顶部一个关闭按钮：移动端用户除了点遮罩，也能在抽屉内直接点 X 关闭 */}
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label={t(msg`关闭导航`)}
+            className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-white text-base lg:hidden"
+          >
+            ✕
+          </button>
           <div className="lg:sticky lg:top-[88px]">
             <NavList groups={visibleGroups} pathname={pathname} />
           </div>

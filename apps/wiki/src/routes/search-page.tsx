@@ -65,7 +65,7 @@ export function SearchPage() {
                     {r.relationship}
                   </span>
                 )}
-                <span className="ml-auto text-xs text-[color:var(--text-muted)]">
+                <span className="ml-auto whitespace-nowrap text-xs text-[color:var(--text-muted)]">
                   <Trans>相关度 {Math.round(r.score * 100) / 100}</Trans>
                 </span>
               </div>

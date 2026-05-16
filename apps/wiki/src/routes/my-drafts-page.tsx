@@ -268,13 +268,19 @@ function DraftCard({
           <Trans>由 AI 一键生成自动保存</Trans>
         </div>
       </div>
-      <div className="flex items-center gap-2 sm:shrink-0">
-        <Button variant="primary" size="sm" onClick={onRestore}>
+      <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+        <Button
+          variant="primary"
+          size="sm"
+          className="flex-1 sm:flex-none"
+          onClick={onRestore}
+        >
           <Trans>恢复编辑</Trans>
         </Button>
         <Button
           variant="ghost"
           size="sm"
+          className="flex-1 sm:flex-none"
           onClick={onDelete}
           disabled={isDeleting}
         >

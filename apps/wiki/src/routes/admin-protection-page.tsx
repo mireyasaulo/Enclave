@@ -202,6 +202,7 @@ export function AdminProtectionPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <Button
                   variant="primary"
+                  className="w-full sm:w-auto"
                   disabled={setProtMut.isPending}
                   onClick={() => setProtMut.mutate()}
                 >

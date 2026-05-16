@@ -213,11 +213,11 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
           required
           autoFocus
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder={t(msg`you@example.com`)}
         />
       </FormRow>
       <FormRow label={t(msg`验证码`)} hint={t(msg`6 位数字，10 分钟内有效`)}>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <TextField
             value={code}
             onChange={(e) => setCode(e.target.value)}
@@ -230,6 +230,7 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
           <Button
             type="button"
             variant="ghost"
+            className="whitespace-nowrap"
             disabled={!email.trim() || sending || cooldown > 0}
             onClick={() => void sendCode()}
           >

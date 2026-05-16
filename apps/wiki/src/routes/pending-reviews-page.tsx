@@ -92,7 +92,7 @@ export function PendingReviewsPage() {
         msg`所有等待巡查的提交。可按操作类型、修订类型、风险等级筛选；快速通过 / 要求修改 / 驳回。`,
       )}
     >
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-3 text-sm shadow-[var(--shadow-soft)]">
+      <div className="grid grid-cols-1 gap-2 rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-3 text-sm shadow-[var(--shadow-soft)] sm:flex sm:flex-wrap sm:items-center">
         <FilterSelect
           label={t(msg`操作`)}
           value={operation}
@@ -175,10 +175,12 @@ function FilterSelect({
 }) {
   const t = translateRuntimeMessage;
   return (
-    <label className="flex items-center gap-2">
-      <span className="text-xs text-[color:var(--text-muted)]">{label}</span>
+    <label className="flex w-full items-center gap-2 sm:w-auto">
+      <span className="w-12 shrink-0 text-xs text-[color:var(--text-muted)] sm:w-auto">
+        {label}
+      </span>
       <select
-        className="rounded-full border border-[color:var(--border-subtle)] bg-white px-3 py-1.5 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
+        className="w-full rounded-full border border-[color:var(--border-subtle)] bg-white px-3 py-1.5 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none sm:w-auto"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -234,7 +236,7 @@ function ReviewCard({
             <Trans>高风险</Trans>
           </StatusPill>
         )}
-        <span className="ml-auto text-xs text-[color:var(--text-muted)]">
+        <span className="text-xs text-[color:var(--text-muted)] sm:ml-auto">
           <Trans>
             由 {editorName}（{rev.editorRoleAtTime}）提交于{" "}
             {formatDateTime(rev.createdAt)}
@@ -291,10 +293,11 @@ function ReviewCard({
           />
         </FormRow>
       </div>
-      <div className="flex flex-wrap items-center gap-2 border-t border-[color:var(--border-faint)] bg-[color:var(--surface-card-hover)] px-4 py-3">
+      <div className="grid grid-cols-1 gap-2 border-t border-[color:var(--border-faint)] bg-[color:var(--surface-card-hover)] px-4 py-3 sm:flex sm:flex-wrap sm:items-center">
         <Button
           variant="primary"
           size="sm"
+          className="w-full sm:w-auto"
           disabled={loading}
           onClick={() => onDecide("approve", note || undefined)}
         >
@@ -303,6 +306,7 @@ function ReviewCard({
         <Button
           variant="secondary"
           size="sm"
+          className="w-full sm:w-auto"
           disabled={loading}
           onClick={() => onDecide("request_changes", note || undefined)}
         >
@@ -311,6 +315,7 @@ function ReviewCard({
         <Button
           variant="danger"
           size="sm"
+          className="w-full sm:w-auto"
           disabled={loading}
           onClick={() => onDecide("reject", note || undefined)}
         >

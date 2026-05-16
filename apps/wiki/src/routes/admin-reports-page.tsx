@@ -47,13 +47,13 @@ export function AdminReportsPage() {
         msg`社区举报的内容会先进入"未处理"状态。逐条审核后选择已处理或驳回。`,
       )}
       actions={
-        <div className="inline-flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {reportsQ.isFetching && (
             <span className="text-xs text-[color:var(--text-muted)]">
               <Trans>载入中…</Trans>
             </span>
           )}
-          <div className="inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)]">
+          <div className="wiki-touch-scroll inline-flex max-w-full overflow-x-auto rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)]">
             {tabs.map(([s, label]) => (
               <button
                 key={s}
@@ -158,10 +158,11 @@ function ReportCard({
           </Link>
         )}
         {report.status === "open" && (
-          <div className="ml-auto flex gap-2">
+          <div className="flex w-full gap-2 sm:ml-auto sm:w-auto">
             <Button
               size="sm"
               variant="primary"
+              className="flex-1 sm:flex-none"
               disabled={disabled}
               onClick={() => onDecide("resolved")}
             >
@@ -170,6 +171,7 @@ function ReportCard({
             <Button
               size="sm"
               variant="ghost"
+              className="flex-1 sm:flex-none"
               disabled={disabled}
               onClick={() => onDecide("dismissed")}
             >

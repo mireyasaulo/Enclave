@@ -79,7 +79,7 @@ export function WatchlistPage() {
                     params={{ characterId: entry.characterId }}
                     className="font-medium text-[color:var(--text-primary)] hover:underline"
                   >
-                    {entry.characterId}
+                    {entry.title || entry.characterId}
                   </Link>
                   {entry.isDeleted && (
                     <StatusPill>
@@ -93,7 +93,7 @@ export function WatchlistPage() {
                         : t(msg`完全保护`)}
                     </StatusPill>
                   )}
-                  <span className="ml-auto text-xs text-[color:var(--text-muted)]">
+                  <span className="ml-auto whitespace-nowrap text-xs text-[color:var(--text-muted)]">
                     <Trans>
                       自 {formatDate(entry.addedAt)}
                     </Trans>
@@ -136,7 +136,9 @@ export function WatchlistPage() {
                         params={{ characterId: item.characterId }}
                         className="font-medium hover:underline"
                       >
-                        {item.characterId}
+                        {item.title ||
+                          item.revision.contentSnapshot?.name ||
+                          item.characterId}
                       </Link>
                       <span className="ml-auto text-xs text-[color:var(--text-muted)]">
                         v{item.revision.version} ·{" "}
@@ -160,7 +162,7 @@ export function WatchlistPage() {
                         params={{ characterId: item.characterId }}
                         className="font-medium hover:underline"
                       >
-                        {item.characterId}
+                        {item.title || item.characterId}
                       </Link>
                       <span className="ml-auto text-xs text-[color:var(--text-muted)]">
                         {item.thread.lastReplyAt

@@ -163,6 +163,7 @@ function ChangeRow({
         <Button
           size="sm"
           variant="primary"
+          className="shrink-0"
           disabled={patrolling}
           onClick={onPatrol}
         >
