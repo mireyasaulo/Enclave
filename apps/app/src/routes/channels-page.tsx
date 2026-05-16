@@ -1926,7 +1926,7 @@ function ChannelVideoSurface({
         poster={posterUrl ? resolveAppMediaUrl(posterUrl) : undefined}
         playsInline
         loop
-        preload="metadata"
+        preload={active ? "auto" : "metadata"}
         controls={false}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
