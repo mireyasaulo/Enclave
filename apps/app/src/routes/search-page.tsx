@@ -237,10 +237,22 @@ export function SearchPage() {
   // 来没调过——这些 AI 看到的搜索行为永远是空的。在 commit / apply
   // history 两个真正"用户主动定型一次搜索意图"的入口里 fire-and-
   // forget 上报；失败默默吞掉（埋点，不影响主流程）。
+  //
+  // 走查 R5 真机：handleOpenResult 里也调 handleCommitSearch（"打开结果
+  // 也算定型一次搜索意图"），导致用户「打 '苏' → Enter → 点结果」一个
+  // 行为段上报两次相同 query。会在后端 owner_search_history_records 里
+  // 堆同 query 时间相邻的行，cyber-avatar 信号被同一意图重复加权。用 ref
+  // 记上一次刚 fire 出去的 query，相同 query 直接 short-circuit；下一个
+  // 不同 query 会自动重置（覆盖 ref）。
+  const lastRecordedQueryRef = useRef<string | null>(null);
   function recordSearchActivityFireAndForget(query: string) {
     if (!query) {
       return;
     }
+    if (lastRecordedQueryRef.current === query) {
+      return;
+    }
+    lastRecordedQueryRef.current = query;
     void recordSearchActivity(
       {
         query,
