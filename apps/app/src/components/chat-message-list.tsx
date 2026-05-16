@@ -3932,6 +3932,13 @@ export function ChatMessageList({
           onOpenInWindow={
             isDesktop
               ? () => {
+                  // 上面 openImagePreview 那条同款链有 .catch 兜底（line 1803）。
+                  // 这两个 overlay 上的「在独立窗口打开 / 打印」按钮一直只有
+                  // .then 没 .catch —— openDesktopChatImageViewerWindowOnDemand
+                  // 本质是 dynamic import + 跨窗口 IPC，chunk 拉失败 / 桌面
+                  // shell 没起来都会让它 reject，这条 rejection 走 void 直接
+                  // 落 window.unhandledrejection 污染 telemetry。补一条
+                  // ActionNotice 反馈 + .catch 吞掉冒泡。
                   void openDesktopChatImageViewerWindowOnDemand({
                     imageUrl: activeImage.url,
                     title: activeImage.fileName || activeImage.label || t(msg`图片`),
@@ -3939,20 +3946,27 @@ export function ChatMessageList({
                     returnTo: activeImage.returnTo,
                     items: standaloneViewerItems,
                     activeId: activeImage.id,
-                  }).then((opened) => {
-                    if (opened) {
-                      setActionNotice({
-                        message: t(msg`已在独立窗口打开图片。`),
-                        tone: "success",
-                      });
-                      return;
-                    }
+                  })
+                    .then((opened) => {
+                      if (opened) {
+                        setActionNotice({
+                          message: t(msg`已在独立窗口打开图片。`),
+                          tone: "success",
+                        });
+                        return;
+                      }
 
-                    setActionNotice({
-                      message: t(msg`浏览器阻止了新窗口，请检查弹窗权限。`),
-                      tone: "danger",
+                      setActionNotice({
+                        message: t(msg`浏览器阻止了新窗口，请检查弹窗权限。`),
+                        tone: "danger",
+                      });
+                    })
+                    .catch(() => {
+                      setActionNotice({
+                        message: t(msg`打开独立窗口失败，请稍后再试。`),
+                        tone: "danger",
+                      });
                     });
-                  });
                 }
               : undefined
           }
@@ -3967,20 +3981,27 @@ export function ChatMessageList({
                     items: standaloneViewerItems,
                     activeId: activeImage.id,
                     autoPrint: true,
-                  }).then((opened) => {
-                    if (opened) {
-                      setActionNotice({
-                        message: t(msg`已打开图片打印视图。`),
-                        tone: "success",
-                      });
-                      return;
-                    }
+                  })
+                    .then((opened) => {
+                      if (opened) {
+                        setActionNotice({
+                          message: t(msg`已打开图片打印视图。`),
+                          tone: "success",
+                        });
+                        return;
+                      }
 
-                    setActionNotice({
-                      message: t(msg`浏览器阻止了打印窗口，请检查弹窗权限。`),
-                      tone: "danger",
+                      setActionNotice({
+                        message: t(msg`浏览器阻止了打印窗口，请检查弹窗权限。`),
+                        tone: "danger",
+                      });
+                    })
+                    .catch(() => {
+                      setActionNotice({
+                        message: t(msg`打开打印窗口失败，请稍后再试。`),
+                        tone: "danger",
+                      });
                     });
-                  });
                 }
               : undefined
           }

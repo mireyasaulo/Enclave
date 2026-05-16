@@ -686,18 +686,30 @@ export function ChannelsPage() {
 
       return { previousFullComments, previousDecorationsEntries };
     },
-    onError: (_error, input, context) => {
-      if (!context) return;
-      if (context.previousFullComments) {
-        queryClient.setQueryData(
-          ["app-feed-comments", baseUrl, input.postId],
-          context.previousFullComments,
-        );
+    onError: (error, input, context) => {
+      if (context) {
+        if (context.previousFullComments) {
+          queryClient.setQueryData(
+            ["app-feed-comments", baseUrl, input.postId],
+            context.previousFullComments,
+          );
+        }
+        context.previousDecorationsEntries.forEach(([key, data]) => {
+          if (data === undefined) return;
+          queryClient.setQueryData(key, data);
+        });
       }
-      context.previousDecorationsEntries.forEach(([key, data]) => {
-        if (data === undefined) return;
-        queryClient.setQueryData(key, data);
-      });
+      // 走查 R8: 跟 commentMutation 一样的兜底——用户点赞完后立刻关 sheet，
+      // mutation 失败时 mobileCommentSheetErrorMessage 已经不渲染了，optimistic
+      // 翻回去用户也不知道为啥，加 page 级 notice 兜底。
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(
+        error instanceof Error
+          ? t(msg`评论点赞失败：${error.message}`)
+          : t(msg`评论点赞失败，请稍后重试。`),
+      );
     },
     onSuccess: (_, input) => {
       setNoticeTone("success");
