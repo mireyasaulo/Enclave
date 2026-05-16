@@ -272,10 +272,18 @@ function InfoRow({
   );
 
   const interactive = !readOnly && (Boolean(to) || Boolean(onClick));
+  // active:bg-... 给移动端「按下」反馈，hover:bg-... 给桌面鼠标悬停。两者
+  // 都要：mobile webview tap 不会触发 hover（即便触发，hover 会"卡住"在被
+  // 点击的行上直到下一次 tap，体验糟糕），所以移动端真正按下反馈靠 active。
+  // 之前 cellClass 只有 hover，导致用户在 mobile 点头像/名字/签名等 Link 行
+  // 时完全没有视觉按压反馈；button 形态（onClick）则在下面 cn() 里又重复加
+  // 了一次 active。把 active 统一收进 cellClass 里，两条分支都享受到。
   const cellClass = cn(
     "flex w-full items-center gap-3 px-4 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
     denseValue ? "py-2" : "py-3",
-    interactive ? "hover:bg-[color:var(--surface-card-hover)]" : undefined,
+    interactive
+      ? "hover:bg-[color:var(--surface-card-hover)] active:bg-[color:var(--surface-card-hover)]"
+      : undefined,
   );
 
   if (onClick && !readOnly) {
@@ -284,7 +292,7 @@ function InfoRow({
         type="button"
         onClick={onClick}
         aria-label={ariaLabel}
-        className={cn(cellClass, "active:bg-[color:var(--surface-card-hover)]")}
+        className={cellClass}
       >
         {inner}
       </button>

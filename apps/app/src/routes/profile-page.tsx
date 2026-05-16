@@ -130,7 +130,11 @@ export function ProfilePage() {
       <div className="pb-8">
         <Link
           to="/profile/info"
-          className="mt-1 flex items-center gap-2.5 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-3 transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)]"
+          // active:bg：mobile tap 按压反馈，跟 profile-settings 行同款（line 334 / 359）。
+          // 之前只有 hover:bg，桌面鼠标悬停有反馈，但移动端 tap 一下整个头像区
+          // 没有任何视觉响应——明显感受到「我按了，但 app 没回应」，才能看到目标
+          // 页面打开。
+          className="mt-1 flex items-center gap-2.5 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-3 transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)] active:bg-[color:var(--surface-card-hover)]"
         >
           <AvatarChip
             name={username?.trim() || t(msg`世界主人`)}
@@ -300,7 +304,9 @@ function ProfileEntry({
   return (
     <Link
       to={to as never}
-      className="flex items-center gap-2.5 px-4 py-2.75 transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)]"
+      // active:bg 同步加上，移动端 tap「设置/收藏/朋友圈/会员中心/...」时
+      // 有按压反馈，跟 profile-settings 行同款。
+      className="flex items-center gap-2.5 px-4 py-2.75 transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)] active:bg-[color:var(--surface-card-hover)]"
     >
       <div
         className={cn(
@@ -336,7 +342,8 @@ function ProfileActionEntry({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-2.5 px-4 py-2.75 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)]"
+      // 「退出登录」按钮也补 active:bg；mobile tap 这条 danger 行时有按压反馈。
+      className="flex w-full items-center gap-2.5 px-4 py-2.75 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)] active:bg-[color:var(--surface-card-hover)]"
     >
       <div
         className={cn(
