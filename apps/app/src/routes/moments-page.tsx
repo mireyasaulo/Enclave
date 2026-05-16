@@ -1584,6 +1584,14 @@ function MobileMomentsView({
     enabled: true,
   });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  // onLoadMore caller 是 inline 箭头，每次 parent re-render 都新引用。下面 useEffect
+  // 若依赖 onLoadMore，输入评论草稿那种高频 setState（每按一键 parent re-render）
+  // 会让 IntersectionObserver 反复 disconnect+reobserve，本来稳定挂着的触底监听
+  // 被白白拆装。收到 ref 里读最新值，effect 只跟三态 boolean。
+  const onLoadMoreRef = useRef(onLoadMore);
+  useEffect(() => {
+    onLoadMoreRef.current = onLoadMore;
+  }, [onLoadMore]);
 
   // 触底加载：观察列表底部 sentinel；进入视野且还有下一页 → 自动触发 fetchNextPage。
   // root 必须留 null（document viewport）。原来传 containerRef.current 是错的：
@@ -1606,14 +1614,15 @@ function MobileMomentsView({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
-          onLoadMore();
+          onLoadMoreRef.current();
         }
       },
       { rootMargin: "240px 0px" },
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPageError, onLoadMore]);
+    // 故意只跟三态 boolean，不跟 onLoadMore——通过 ref 读最新值。
+  }, [hasNextPage, isFetchingNextPage, fetchNextPageError]);
 
   const activeMoment = actionBubble
     ? visibleMoments.find((moment) => moment.id === actionBubble.momentId) ??
