@@ -341,9 +341,15 @@ export function useSearchIndex(
         id: `message-${message.messageId}`,
         category: "messages",
         title: message.conversationTitle,
+        // preview 用 debouncedRemoteKeyword 而不是 normalizedSearchText：消息
+        // 是按 debouncedRemoteKeyword 拉的，preview 跟数据保持同一时序的 keyword；
+        // 同时也把 indexedResults 从「每按一键就全量重算」解放出来——上面
+        // conversations/contacts/officialAccounts/moments/feed 全表打平的 .map
+        // 都跟 keyword 无关，不应该跟着每个按键节奏重算（这台账户上 conversations
+        // ≈74 / characters ≈300，每按一键就跑 600+ 次构造一遍）。
         description: t(msg`${localizeSearchMessageSender(message.senderName)}：${buildSearchPreview(
           message.text || t(msg`这条消息没有可展示文本。`),
-          normalizedSearchText,
+          debouncedRemoteKeyword,
         )}`),
         meta: t(msg`聊天记录 · ${formatMessageTimestamp(message.createdAt)}`),
         keywords: [message.conversationTitle, message.senderName, message.text]
@@ -607,7 +613,7 @@ export function useSearchIndex(
     messageSearchIndexQuery.data,
     miniProgramSearchResults,
     momentsQuery.data,
-    normalizedSearchText,
+    debouncedRemoteKeyword,
     officialAccountArticlesQuery.data,
     officialAccounts,
     isDesktopLayout,

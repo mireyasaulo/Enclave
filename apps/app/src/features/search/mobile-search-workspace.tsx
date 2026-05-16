@@ -488,7 +488,13 @@ export function MobileSearchWorkspace({
           </div>
         ) : null}
 
-        {!loading && !error && hasKeyword && searchingMessages ? (
+        {/* 走查 R1：banner 文案是「消息结果会继续增加」——只在「全部」/「聊天记录」
+            两个 chip 下才有意义；用户切到「联系人」/「朋友圈」/「广场动态」/
+            「公众号」/「收藏」时挂这条横幅会让人误以为当前分类的结果也在追加，
+            实际上消息索引跟这些分类毫无关系。和下面「无结果」卡片的"等消息索引"
+            分支保持同一组分类。 */}
+        {!loading && !error && hasKeyword && searchingMessages &&
+        (activeCategory === "all" || activeCategory === "messages") ? (
           <InlineNotice
             className="rounded-[11px] px-2.5 py-1.5 text-[11px] leading-[1.35rem] shadow-none"
             tone="info"
@@ -553,8 +559,14 @@ export function MobileSearchWorkspace({
                           onClick={() => setActiveCategory(section.category)}
                           className="flex w-full items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-left text-[12px] text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
                         >
+                          {/* 走查 R1：原文"查看更多 ${total} 条 ${分类}"。total 是
+                              该分类下所有命中的总数（含已展示的 3 条），但措辞"查看更多"
+                              让用户误以为这是「除了已经看到的，还剩 X 条」的语义——
+                              "查看更多 4 条 联系人" 看着像下钻能再看到 4 条，实际下钻
+                              是 4 条全部（1 条新增）。统一改成"查看全部"，跟跳转后的
+                              category 视图（展示全部 total 条）对齐。 */}
                           <span>
-                            {t(msg`查看更多 ${section.results.length} 条 ${getCategoryTitle(section.category)}`)}
+                            {t(msg`查看全部 ${section.results.length} 条 ${getCategoryTitle(section.category)}`)}
                           </span>
                           <ChevronRight size={13} className="shrink-0" />
                         </button>
