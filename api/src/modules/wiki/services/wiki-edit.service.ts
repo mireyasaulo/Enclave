@@ -440,6 +440,13 @@ export class WikiEditService {
     if (autoApprove) {
       try {
         await this.applyApprovedRevision(revision, user.id);
+        // createCharacterFromRecipe 会为空 expertDomains 注入 ['general']、把
+        // 空字符串 personality 落库成 NULL 等 runtime 默认值，导致刚 create
+        // 完 wiki-page.service 的 computeDrift 立刻把 v1 标成 admin_override
+        // 弹"角色已被管理员后台直接修改"banner。重新基于落库后的 character +
+        // published recipe snapshot 回写 v1，使 drift=0 直到用户/admin 真的
+        // 在 wiki 之外改了 runtime。
+        await this.resyncCreateRevisionToRuntime(revision.id, characterId);
         void this.roles.checkPromotion(user.id).catch(() => undefined);
       } catch (err) {
         // 把页降回 pending_create，让用户的创建请求进入审核队列而不是消失。
@@ -472,6 +479,31 @@ export class WikiEditService {
       appliedToCharacter: autoApprove,
       warnings: abuseCreate.warnings.length > 0 ? abuseCreate.warnings : undefined,
     };
+  }
+
+  private async resyncCreateRevisionToRuntime(
+    revisionId: string,
+    characterId: string,
+  ): Promise<void> {
+    const character = await this.characterRepo.findOne({ where: { id: characterId } });
+    if (!character) return;
+    const liveContent = snapshotFromCharacter(
+      character as unknown as Record<string, unknown>,
+    );
+    let publishedRecipe: CharacterBlueprintRecipeValue | null = null;
+    try {
+      const factory = await this.blueprints.getFactorySnapshot(characterId);
+      publishedRecipe = factory.blueprint.publishedRecipe ?? null;
+    } catch {
+      publishedRecipe = null;
+    }
+    await this.revisionRepo.update(
+      { id: revisionId },
+      {
+        contentSnapshot: liveContent,
+        ...(publishedRecipe ? { recipeSnapshot: publishedRecipe } : {}),
+      },
+    );
   }
 
   async requestLifecycle(
