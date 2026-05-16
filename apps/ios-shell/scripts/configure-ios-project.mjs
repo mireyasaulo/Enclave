@@ -1230,9 +1230,26 @@ function applyEntitlementsFromEnv() {
     );
   }
 
+  // Round 45：把老种子里 `<string>$(AppIdentifierPrefix)com.yinjie.ios</string>`
+  // 这种写死的 keychain-access-groups 迁移成 `$(AppIdentifierPrefix)$(PRODUCT_
+  // BUNDLE_IDENTIFIER)` —— 跟 Round 30 修 Info.plist 同款思路。模板已经用
+  // Xcode 变量替换，这里把已有 installed 副本里的硬编码 com.yinjie.ios 一并
+  // 迁过去，防止 fork 用户改了 bundle id 之后 keychain-access-groups 还顶着
+  // 老名字，SecItemAdd 默认落到 "XXXTEAMID.com.yinjie.ios" 这种跟实际 bundle
+  // 不对应的组里（同 Apple Developer 团队下任何一个声明了这条 group 的兄弟
+  // app 都能读，App Store 隐私审查会注意到访问组名跟 bundle id 不一致）。
+  source = source.replace(
+    /<string>\$\(AppIdentifierPrefix\)com\.yinjie\.ios<\/string>/g,
+    "<string>$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)</string>",
+  );
+
+  // bundleId env 来时再补一道：仍然把残留的 `$(AppIdentifierPrefix)<literal>`
+  // （非 $() 形式）改成显式 bundleId —— 罕见，多半是用户手填过一个真实
+  // bundle id。但不能误伤刚迁好的 `$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_
+  // IDENTIFIER)`，加 negative lookahead 把 Xcode 变量形式跳掉。
   if (bundleId) {
     source = source.replace(
-      /<string>\$\(AppIdentifierPrefix\)[^<]*<\/string>/m,
+      /<string>\$\(AppIdentifierPrefix\)(?!\$\()[^<]*<\/string>/m,
       `<string>$(AppIdentifierPrefix)${bundleId}</string>`,
     );
   }

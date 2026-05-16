@@ -363,6 +363,24 @@ const checks = [
         : "App.entitlements not seeded yet; run `pnpm ios:configure` to prepare Push/Keychain defaults",
   },
   {
+    // Round 45: keychain-access-groups 写死 com.yinjie.ios 是 fork 用户的暗坑
+    // —— SecItemAdd 没指定组时 iOS 拿数组里第一条当默认，于是 fork 用户的
+    // session token 全落到 "XXXTEAMID.com.yinjie.ios" 这种跟自己 bundle id
+    // 不对应的组里。模板已经迁到 `$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_
+    // IDENTIFIER)`，doctor 盯死装好的 entitlements 不能再回退到硬编码 ——
+    // 防止 Capacitor 升级 / 谁手抖把模板回滚。
+    label: "entitlements-no-hardcoded-keychain-bundle",
+    ok:
+      !fs.existsSync(entitlementsPath) ||
+      !fileIncludes(
+        entitlementsPath,
+        "<string>$(AppIdentifierPrefix)com.yinjie.ios</string>",
+      ),
+    detail: fs.existsSync(entitlementsPath)
+      ? "App.entitlements keychain-access-groups uses $(PRODUCT_BUNDLE_IDENTIFIER) (no hardcoded com.yinjie.ios)"
+      : "App.entitlements not found yet; run `pnpm ios:configure` first",
+  },
+  {
     // applinks:app.example.yinjie.app 是 xcode-template 里的占位符。Round 9
     // 顺手修了「不要 append」，但没把占位本身清掉；configure 只在显式给了
     // YINJIE_IOS_ASSOCIATED_DOMAIN 时才替换。一旦没配，占位直接跟着 release
