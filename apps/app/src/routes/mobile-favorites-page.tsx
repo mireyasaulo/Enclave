@@ -32,6 +32,7 @@ import { EmptyState } from "../components/empty-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { MobileDetailsActionSheet } from "../features/chat-details/mobile-details-action-sheet";
 import {
+  computeDesktopFavoritesFingerprint,
   hydrateDesktopFavoritesFromNative,
   mergeDesktopFavoriteRecords,
   readDesktopFavorites,
@@ -170,7 +171,10 @@ export function MobileFavoritesPage({
           favoritesQuery.data ?? [],
           localFavorites,
         );
-        return JSON.stringify(current) === JSON.stringify(nextFavorites)
+        // 跟 favorites-page.tsx 对齐：focus/visibilitychange 频繁触发，
+        // JSON.stringify(700 项) 改成 sourceId+collectedAt 指纹。
+        return computeDesktopFavoritesFingerprint(current) ===
+          computeDesktopFavoritesFingerprint(nextFavorites)
           ? current
           : nextFavorites;
       });

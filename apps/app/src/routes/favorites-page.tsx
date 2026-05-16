@@ -38,6 +38,7 @@ import {
 } from "../features/favorites/favorites-route-state";
 import { createDesktopNoteDraft } from "../features/favorites/note-drafts-storage";
 import {
+  computeDesktopFavoritesFingerprint,
   hydrateDesktopFavoritesFromNative,
   mergeDesktopFavoriteRecords,
   readDesktopFavorites,
@@ -152,7 +153,9 @@ export function FavoritesPage() {
           favoritesQuery.data ?? [],
           localFavorites,
         );
-        return JSON.stringify(current) === JSON.stringify(nextFavorites)
+        // 每次 focus 都 JSON.stringify(700 项) 太重，换 sourceId+collectedAt 指纹。
+        return computeDesktopFavoritesFingerprint(current) ===
+          computeDesktopFavoritesFingerprint(nextFavorites)
           ? current
           : nextFavorites;
       });
@@ -372,21 +375,26 @@ export function FavoritesPage() {
     ? resolveFavoriteNoteSummary(selectedFavorite, favoriteNoteSummaryMap)
     : null;
 
-  const counts = useMemo(
-    () => ({
+  const counts = useMemo(() => {
+    // 单次 reduce 替代 7 遍 filter()——侧栏 + 概览卡 + subtitle 各取一个分类，
+    // 改成多遍 filter() 后每条收藏会被反复扫，700 项收藏 → 4900 次比较。
+    const next = {
       all: favorites.length,
-      messages: favorites.filter((item) => item.category === "messages").length,
-      notes: favorites.filter((item) => item.category === "notes").length,
-      contacts: favorites.filter((item) => item.category === "contacts").length,
-      officialAccounts: favorites.filter(
-        (item) => item.category === "officialAccounts",
-      ).length,
-      moments: favorites.filter((item) => item.category === "moments").length,
-      feed: favorites.filter((item) => item.category === "feed").length,
-      channels: favorites.filter((item) => item.category === "channels").length,
-    }),
-    [favorites],
-  );
+      messages: 0,
+      notes: 0,
+      contacts: 0,
+      officialAccounts: 0,
+      moments: 0,
+      feed: 0,
+      channels: 0,
+    };
+    for (const item of favorites) {
+      if (item.category in next) {
+        next[item.category as keyof typeof next] += 1;
+      }
+    }
+    return next;
+  }, [favorites]);
 
   if (!isDesktopLayout) {
     return <MobileFavoritesPage />;
@@ -590,6 +598,9 @@ export function FavoritesPage() {
                             selectedFavorite.sourceId,
                           );
                           if (!noteId) {
+                            // 之前是 return; 但用户点击没反应，看不出按钮坏了还是
+                            // 数据脏了。给条 notice，让用户重新选一条笔记。
+                            setNotice(t(msg`这条笔记的标识异常，无法直接打开。`));
                             return;
                           }
 

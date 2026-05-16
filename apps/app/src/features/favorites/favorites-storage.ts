@@ -37,7 +37,13 @@ function normalizeDesktopFavorites(value: unknown) {
         typeof item.badge === "string" &&
         typeof item.collectedAt === "string",
     )
-    .sort((left, right) => right.collectedAt.localeCompare(left.collectedAt));
+    .sort((left, right) =>
+      right.collectedAt < left.collectedAt
+        ? -1
+        : right.collectedAt > left.collectedAt
+          ? 1
+          : 0,
+    );
 }
 
 function parseDesktopFavorites(raw: string | null | undefined) {
@@ -206,10 +212,32 @@ export function mergeDesktopFavoriteRecords(
     remoteFavorites.map((favorite) => favorite.sourceId),
   );
 
+  // ISO-8601 字符串本身就字典序可比，不必走 localeCompare 的 Collator 路径。
   return [
     ...remoteFavorites,
     ...localFavorites.filter(
       (favorite) => !remoteSourceIdSet.has(favorite.sourceId),
     ),
-  ].sort((left, right) => right.collectedAt.localeCompare(left.collectedAt));
+  ].sort((left, right) =>
+    right.collectedAt < left.collectedAt
+      ? -1
+      : right.collectedAt > left.collectedAt
+        ? 1
+        : 0,
+  );
+}
+
+// Tauri 桌面 focus/visibilitychange 上 setFavorites 的兜底比较器。
+// 之前是 JSON.stringify(700 项) === JSON.stringify(700 项)，每次 focus 都新建 ~700KB
+// 字符串。改成 sourceId + collectedAt 的轻量指纹：长度不同直接返回 false，
+// 否则按下标拼一个紧凑串，跳过 title/description/avatar 等大字段。
+export function computeDesktopFavoritesFingerprint(
+  favorites: DesktopFavoriteRecord[],
+) {
+  if (favorites.length === 0) return "0|";
+  let fingerprint = `${favorites.length}|`;
+  for (const item of favorites) {
+    fingerprint += `${item.sourceId}@${item.collectedAt};`;
+  }
+  return fingerprint;
 }
