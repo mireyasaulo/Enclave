@@ -372,9 +372,18 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
   const hideMutation = useMutation({
     mutationFn: () => hideGroup(groupId, baseUrl),
     onSuccess: async () => {
+      // 走查 Round 3：hideGroup 完成后 group-contacts-page 已经靠 socket
+      // conversationUpdated 触发 invalidate；但 socket 断开 / cloud token
+      // 失效那几百 ms 落到 hideGroup 后，事件投递不过来，contacts/groups
+      // 列表会继续显示这条群（visibleGroups 过滤 isHidden=true 拿不到新
+      // 的 isHidden 值）。和 pin/preferences/leave 几条同源对齐，显式
+      // invalidate 一遍 app-contact-groups。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-group", baseUrl, groupId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-contact-groups", baseUrl],
         }),
         queryClient.invalidateQueries({
           queryKey: ["app-conversations", baseUrl],
