@@ -26,7 +26,8 @@ type DesktopFeedListProps = {
   hasFilteredOutPosts?: boolean;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
-  likePendingPostId: string | null;
+  /** Round 5：跨 row 并发追踪，Set 让每条 row 各查 .has(post.id)。 */
+  likePendingPostIds: ReadonlySet<string>;
   posts: FeedPostListItem[];
   isPostFavorite: (postId: string) => boolean;
   onCancelCommentReply?: () => void;
@@ -65,7 +66,7 @@ export function DesktopFeedList({
   hasFilteredOutPosts = false,
   hasNextPage = false,
   isFetchingNextPage = false,
-  likePendingPostId,
+  likePendingPostIds,
   posts,
   isPostFavorite,
   onCancelCommentReply,
@@ -114,7 +115,7 @@ export function DesktopFeedList({
                     : null
                 }
                 favorite={isPostFavorite(post.id)}
-                likeLoading={likePendingPostId === post.id}
+                likeLoading={likePendingPostIds.has(post.id)}
                 post={post}
                 onCancelCommentReply={onCancelCommentReply}
                 onCommentChange={onCommentChange}

@@ -138,6 +138,14 @@ export function DiscoverFeedPage() {
   const [commentInflightPostIds, setCommentInflightPostIds] = useState<
     ReadonlySet<string>
   >(() => new Set());
+  // 走查 Round 5：likeMutation 同样的并发追踪坑——用户在 Row A 还在飞时
+  // 把 Row B 也点赞，likeMutation.variables 翻到 B，Row A 的"处理中..."
+  // 解锁回"已赞"。此时用户在 Row A 再点一下又触发一次 UNLIKE 飞向服务端，
+  // 跟在飞的 LIKE 撞包（两个请求同时到达服务端，谁先 commit 谁说了算）。
+  // 用同样的 Set 模式跟踪 inflight postIds，让 row 各查各的。
+  const [likeInflightPostIds, setLikeInflightPostIds] = useState<
+    ReadonlySet<string>
+  >(() => new Set());
   const [showCompose, setShowCompose] = useState(false);
   // 「查看全部 N 条评论」点开后，按 postId 把 listFeedComments 的全量结果放进来；
   // 命中即在 secondary 区用全量替换 commentsPreview。loadingPostId 用来在点击
@@ -428,6 +436,12 @@ export function DiscoverFeedPage() {
     },
     onMutate: async (postId) => {
       await queryClient.cancelQueries({ queryKey: ["app-feed-paged", baseUrl] });
+      setLikeInflightPostIds((current) => {
+        if (current.has(postId)) return current;
+        const next = new Set(current);
+        next.add(postId);
+        return next;
+      });
       // 直接 setQueriesData 翻 hasLiked/likeCount，不再 capture full snapshot
       // —— onError 用反向 toggle 回滚（见下方 onError 注释）。
       queryClient.setQueriesData<InfiniteData<FeedListResponse>>(
@@ -512,6 +526,14 @@ export function DiscoverFeedPage() {
           };
         },
       );
+    },
+    onSettled: (_data, _error, postId) => {
+      setLikeInflightPostIds((current) => {
+        if (!current.has(postId)) return current;
+        const next = new Set(current);
+        next.delete(postId);
+        return next;
+      });
     },
     onSuccess: () => {
       setNoticeTone("success");
@@ -665,9 +687,10 @@ export function DiscoverFeedPage() {
     });
   }
 
-const pendingLikePostId = likeMutation.isPending
-    ? likeMutation.variables
-    : null;
+// Round 5 之前 pendingLikePostId 派生自 likeMutation.variables，但
+  // useMutation 只追最后一次 mutate；改为读 likeInflightPostIds 让多 row
+  // 并发能各自追踪。保留兼容旧名给本文件后面的 row callback / mobile
+  // bubble 引用 (但都改成 has() 查询)。
   // Round 4：桌面端要并发跟踪多条 row 的 inflight 状态，单值 `pendingCommentPostId`
   // 已不够用。这里保留旧名给移动端 commentBar 兜 `.has()`（移动端只能有一条
   // 评论 bar 打开），桌面端走 commentInflightPostIds 直传。
@@ -1432,7 +1455,7 @@ const pendingLikePostId = likeMutation.isPending
               ? likeMutation.error.message
               : null
           }
-          likePendingPostId={pendingLikePostId}
+          likePendingPostIds={likeInflightPostIds}
           ownerAvatar={ownerAvatar}
           ownerUsername={ownerUsername}
           posts={visiblePosts}

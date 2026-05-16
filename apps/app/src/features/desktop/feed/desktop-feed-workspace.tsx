@@ -42,7 +42,8 @@ type DesktopFeedWorkspaceProps = {
   imageDrafts: MomentImageDraft[];
   isLoading: boolean;
   likeErrorMessage?: string | null;
-  likePendingPostId: string | null;
+  /** Round 5：likeMutation 同样多 row 并发的坑，Set 让每条 row 各查各的。 */
+  likePendingPostIds: ReadonlySet<string>;
   ownerAvatar?: string | null;
   ownerUsername?: string | null;
   posts: FeedPostListItem[];
@@ -107,7 +108,7 @@ export function DesktopFeedWorkspace({
   imageDrafts,
   isLoading,
   likeErrorMessage,
-  likePendingPostId,
+  likePendingPostIds,
   ownerAvatar,
   ownerUsername,
   posts,
@@ -329,7 +330,7 @@ export function DesktopFeedWorkspace({
                 }
                 hasNextPage={hasNextPage}
                 isFetchingNextPage={isFetchingNextPage}
-                likePendingPostId={likePendingPostId}
+                likePendingPostIds={likePendingPostIds}
                 posts={posts}
                 isPostFavorite={isPostFavorite}
                 onCancelCommentReply={onCancelCommentReply}
