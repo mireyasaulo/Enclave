@@ -1423,19 +1423,47 @@ const pendingLikePostId = likeMutation.isPending
                     {noticeAction && noticeActionLabel ? (
                       <button
                         type="button"
-                        onClick={noticeAction}
+                        onClick={() => {
+                          // Round 1 把 action 提示从 2.4s 自动收掉改成持久显示，
+                          // 但忘了清掉旧 notice：用户点「重试」成功后，老错误条
+                          // 没人收，挂在屏幕上像没修好一样。先把当前条收掉再调
+                          // action；如果重试又失败，setNotice 会重新写新条。
+                          const action = noticeAction;
+                          setNotice(""); // i18n-ignore-line
+                          setNoticeActionLabel(null);
+                          setNoticeAction(null);
+                          action();
+                        }}
                         className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                       >
                         {noticeActionLabel}
                       </button>
                     ) : null}
-                    <button
-                      type="button"
-                      onClick={handleStatusBack}
-                      className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
-                    >
-                      {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
-                    </button>
+                    {/* 副按钮：没有具体 noticeAction 时（如下拉刷新失败），
+                        给「重试读取/返回上一页」做兜底；已经有 noticeAction
+                        时（如展开评论/分享失败），多挂一个无关的 feed refetch
+                        反而扰人，改成单纯的「知道了」让用户能手动收掉提示。 */}
+                    {noticeAction && noticeActionLabel ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNotice(""); // i18n-ignore-line
+                          setNoticeActionLabel(null);
+                          setNoticeAction(null);
+                        }}
+                        className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
+                      >
+                        {t(msg`知道了`)}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleStatusBack}
+                        className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
+                      >
+                        {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
+                      </button>
+                    )}
                   </div>
                 </div>
               ) : (
