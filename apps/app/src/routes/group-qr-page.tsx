@@ -784,41 +784,37 @@ export function GroupQrPage() {
       unavailableMessage?: string;
     },
   ) {
-    if (
-      typeof navigator === "undefined" ||
-      !navigator.clipboard ||
-      typeof navigator.clipboard.writeText !== "function"
-    ) {
-      if (retryOptions?.unavailableMessage) {
-        showRetryNotice(
-          retryOptions.unavailableMessage,
-          retryOptions.actionLabel,
-          retryOptions.onAction,
-        );
-        return;
-      }
-
-      showNotice(t(msg`当前环境暂不支持复制。`), "danger");
+    // 走查 Round 6：原版 if (!navigator.clipboard) → 返回"当前环境暂不支持
+    // 复制"。但 writeClipboardText 内部有 3 层兜底（原生 iOS UIPasteboard /
+    // Android shell 桥 → Clipboard API → execCommand），iOS WKWebView 里
+    // navigator.clipboard 通常 undefined，但原生桥能写。原版的 gate 把这条
+    // 路径堵死。删掉 gate，统一由 writeClipboardText 返回的 boolean 决定
+    // 后续 toast，并且仍保留 retryOptions.unavailableMessage 用于真的没桥
+    // 也没 API 的极端兜底（execCommand 失败）。
+    if (await writeClipboardText(value)) {
+      showNotice(successMessage);
       return;
     }
 
-    try {
-      if (!(await writeClipboardText(value))) {
-        throw new Error("clipboard copy failed");
-      }
-      showNotice(successMessage);
-    } catch {
-      if (retryOptions) {
-        showRetryNotice(
-          t(msg`复制失败，请稍后重试。`),
-          retryOptions.actionLabel,
-          retryOptions.onAction,
-        );
-        return;
-      }
-
-      showNotice(t(msg`复制失败，请稍后重试。`), "danger");
+    if (retryOptions?.unavailableMessage) {
+      showRetryNotice(
+        retryOptions.unavailableMessage,
+        retryOptions.actionLabel,
+        retryOptions.onAction,
+      );
+      return;
     }
+
+    if (retryOptions) {
+      showRetryNotice(
+        t(msg`复制失败，请稍后重试。`),
+        retryOptions.actionLabel,
+        retryOptions.onAction,
+      );
+      return;
+    }
+
+    showNotice(t(msg`复制失败，请稍后重试。`), "danger");
   }
 
   async function downloadInviteCard() {
@@ -869,13 +865,12 @@ export function GroupQrPage() {
   }
 
   async function sendToMobile() {
-    if (
-      typeof navigator === "undefined" ||
-      !navigator.clipboard ||
-      typeof navigator.clipboard.writeText !== "function"
-    ) {
+    // 走查 Round 6 同 copyText：去掉 navigator.clipboard 前置 gate，让
+    // writeClipboardText 自己走原生 iOS UIPasteboard / Android shell 桥 →
+    // Clipboard API → execCommand 兜底；只在三层兜底都失败时才弹 retry。
+    if (!(await writeClipboardText(mobileLink))) {
       showRetryNotice(
-        t(msg`当前环境暂不支持复制到手机。`),
+        t(msg`复制到手机失败，请稍后重试。`),
         t(msg`重试复制到手机`),
         () => {
           void sendToMobile();
@@ -883,11 +878,7 @@ export function GroupQrPage() {
       );
       return;
     }
-
     try {
-      if (!(await writeClipboardText(mobileLink))) {
-        throw new Error("clipboard copy failed");
-      }
       pushMobileHandoffRecord({
         category: "group_invite",
         label: t(msg`${groupQuery.data?.name ?? fallbackGroupLabel} 邀请`),
