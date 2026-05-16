@@ -26,6 +26,11 @@ type DesktopFeedListProps = {
   hasFilteredOutPosts?: boolean;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  /** fetchNextPage 失败后 react-query 留的标记；用于在「全被过滤 + 仍声称有
+   *  下一页」时区分"正在自动翻页"vs"自动翻页已经死在错误上"。 */
+  isFetchNextPageError?: boolean;
+  /** 「加载更多失败 · 点击重试」回调；与底部 sentinel 那个相同。 */
+  onRetryNextPage?: () => void;
   /** feedQuery 首屏失败时的错误信息；空 = 没失败。posts.length===0 时优先
    *  渲染「广场动态暂时不可用 + 重试读取」而不是误导性的「发广场动态」CTA。 */
   feedErrorMessage?: string | null;
@@ -76,6 +81,8 @@ export function DesktopFeedList({
   hasFilteredOutPosts = false,
   hasNextPage = false,
   isFetchingNextPage = false,
+  isFetchNextPageError = false,
+  onRetryNextPage,
   feedErrorMessage = null,
   onRetryFeed,
   likePendingPostIds,
@@ -161,6 +168,26 @@ export function DesktopFeedList({
                 onRetryFeed ? (
                   <Button variant="primary" onClick={onRetryFeed}>
                     {t(msg`重试读取`)}
+                  </Button>
+                ) : undefined
+              }
+            />
+          ) : hasFilteredOutPosts && isFetchNextPageError ? (
+            // 走查新一轮 Round 4：全被屏蔽 + 自动翻下一页错出错时旧版仍渲
+            // 「正在寻找未屏蔽的动态」"loading"文案，但 page 那侧 auto-prefetch
+            // 已经被 isFetchNextFeedPageError 闸门关死了 —— 真的什么都没在拉，
+            // 用户盯着这条假 loading 卡死。底部「加载更多失败」按钮只在 posts.length>0
+            // 时挂出来，全被过滤的情况下它根本不显示，用户也没别的回路。改成显式
+            // 给一个「加载更多失败 · 点击重试」入口，与底部 sentinel 那个对齐。
+            <EmptyState
+              title={t(msg`加载更多失败`)}
+              description={t(
+                msg`当前页的动态作者都在你的屏蔽名单里，向后端翻下一页找未屏蔽的居民动态时出错了。`,
+              )}
+              action={
+                onRetryNextPage ? (
+                  <Button variant="primary" onClick={onRetryNextPage}>
+                    {t(msg`重试加载更多`)}
                   </Button>
                 ) : undefined
               }

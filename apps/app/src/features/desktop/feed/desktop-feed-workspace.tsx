@@ -351,6 +351,8 @@ export function DesktopFeedWorkspace({
                 }
                 hasNextPage={hasNextPage}
                 isFetchingNextPage={isFetchingNextPage}
+                isFetchNextPageError={isFetchNextPageError}
+                onRetryNextPage={onRetryNextPage}
                 feedErrorMessage={feedErrorMessage}
                 onRetryFeed={onRefresh}
                 likePendingPostIds={likePendingPostIds}
