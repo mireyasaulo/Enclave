@@ -52,6 +52,16 @@ export function MyDraftsPage() {
       void qc.invalidateQueries({ queryKey: ["wiki", "my-drafts"] });
     },
     onError: (err) => {
+      // 404 = 草稿已被别处删了（多 tab、或刚好别人也在跑流程），把它当成最终
+      // 一致的 success：把它从本地列表里扫走，避免 chip 计数与卡片继续残留。
+      if (err instanceof WikiApiError && err.status === 404) {
+        setNotice({
+          tone: "success",
+          text: t(msg`草稿已被其它会话删除，已为你刷新列表。`),
+        });
+        void qc.invalidateQueries({ queryKey: ["wiki", "my-drafts"] });
+        return;
+      }
       const text =
         err instanceof WikiApiError ? err.message : (err as Error).message;
       setNotice({ tone: "danger", text });
@@ -77,7 +87,11 @@ export function MyDraftsPage() {
         <Card className="p-6 text-sm">
           <Trans>
             请先{" "}
-            <Link to="/login" className="font-medium underline">
+            <Link
+              to="/login"
+              search={{ redirect: "/my-drafts" }}
+              className="font-medium underline"
+            >
               登录
             </Link>{" "}
             后再使用此功能。
@@ -204,7 +218,9 @@ export function MyDraftsPage() {
                   row={row}
                   onRestore={() => handleRestore(row)}
                   onDelete={() => handleDelete(row)}
-                  isDeleting={deleteMut.isPending}
+                  isDeleting={
+                    deleteMut.isPending && deleteMut.variables === row.id
+                  }
                 />
               ))}
             </ul>
