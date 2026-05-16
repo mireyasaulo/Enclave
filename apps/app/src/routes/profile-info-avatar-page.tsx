@@ -223,7 +223,9 @@ export function ProfileInfoAvatarPage() {
               setLocalError(null);
             }}
             placeholder={t(msg`粘贴图片 URL 或留空`)}
-            className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[13px] shadow-none focus:translate-y-0"
+            // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+            // tap 一下输入框整页抖一下。
+            className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] shadow-none focus:translate-y-0"
           />
           {storedIsDataUrl ? (
             <div className="mt-2 text-[11px] leading-4 text-[color:var(--text-muted)]">

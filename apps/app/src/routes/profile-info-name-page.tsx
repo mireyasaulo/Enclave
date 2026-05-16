@@ -107,7 +107,9 @@ export function ProfileInfoNamePage() {
           onChange={(event) => setDraft(event.target.value)}
           maxLength={NAME_MAX_LENGTH}
           placeholder={t(msg`输入名字`)}
-          className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[15px] shadow-none focus:translate-y-0"
+          // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+          // 本输入框 autoFocus，进页就 focus，字号偏小会让整页抖一下。
+          className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] shadow-none focus:translate-y-0"
         />
         <div className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]" data-i18n-skip="true">
           {draft.length}/{NAME_MAX_LENGTH}

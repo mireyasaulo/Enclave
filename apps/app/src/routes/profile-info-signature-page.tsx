@@ -105,7 +105,9 @@ export function ProfileInfoSignaturePage() {
           onChange={(event) => setDraft(event.target.value)}
           maxLength={SIGNATURE_MAX_LENGTH}
           placeholder={t(msg`写一句此刻想说的话`)}
-          className="min-h-[5.5rem] resize-none rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[14px] leading-6 shadow-none focus:translate-y-0"
+          // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+          // 本 textarea autoFocus，进页就 focus，字号偏小会让整页抖一下。
+          className="min-h-[5.5rem] resize-none rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] leading-6 shadow-none focus:translate-y-0"
         />
         <div
           className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]"
