@@ -11,6 +11,7 @@ import {
   isPersistedGroupConversation,
 } from "../../lib/conversation-route";
 import { formatMessageTimestamp, parseTimestamp } from "../../lib/format";
+import { registerAndroidBackInterceptor } from "../../runtime/android-back-button";
 import type { NoteSendDialogNote } from "../favorites/note-editor-helpers";
 
 type MobileNoteSendSheetProps = {
@@ -43,6 +44,21 @@ export function MobileNoteSendSheet({
     }
     setSearchTerm("");
   }, [open]);
+
+  // 原生壳硬件 Back 键：sheet 打开时先关 sheet，不让 BACK 同时 history.back
+  // 把用户从笔记编辑页带回上一级。pending 中（消息正在发送）不拦，避免
+  // 中途打断。
+  useEffect(() => {
+    if (!open || pending) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [open, onClose, pending]);
 
   const filteredConversations = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
