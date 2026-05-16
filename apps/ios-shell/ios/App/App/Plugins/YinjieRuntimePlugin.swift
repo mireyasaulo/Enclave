@@ -28,6 +28,9 @@ public class YinjieRuntimePlugin: CAPPlugin, CAPBridgedPlugin {
             nonEmptyString(bundledConfig["socketBaseUrl"] as? String) ??
             nonEmptyString(info["YinjieSocketBaseUrl"] as? String) ??
             apiBaseUrl
+        let cloudApiBaseUrl =
+            nonEmptyString(bundledConfig["cloudApiBaseUrl"] as? String) ??
+            nonEmptyString(info["YinjieCloudApiBaseUrl"] as? String)
         let environment =
             nonEmptyString(bundledConfig["environment"] as? String) ??
             nonEmptyString(info["YinjieEnvironment"] as? String) ??
@@ -55,6 +58,10 @@ public class YinjieRuntimePlugin: CAPPlugin, CAPBridgedPlugin {
 
         if let socketBaseUrl {
             result["socketBaseUrl"] = socketBaseUrl
+        }
+
+        if let cloudApiBaseUrl {
+            result["cloudApiBaseUrl"] = cloudApiBaseUrl
         }
 
         if let versionName = nonEmptyString(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) {

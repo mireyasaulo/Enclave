@@ -63,6 +63,15 @@ const socketBaseUrl =
   normalizeOptionalString(template.socketBaseUrl) ||
   apiBaseUrl;
 
+// cloud-api（多租户反代入口）。原生壳的 origin 是 capacitor://localhost，
+// 没真实 HTTP 服务，apps/app/src/lib/runtime-config.ts 在 isInsideCapacitorShell()
+// 时显式不允许 origin 回落，所以这里必须显式注入。
+const cloudApiBaseUrl =
+  pickEnv("YINJIE_IOS_CLOUD_API_BASE_URL") ||
+  normalizeOptionalString(localRuntime.cloudApiBaseUrl) ||
+  normalizeOptionalString(baseRuntime.cloudApiBaseUrl) ||
+  normalizeOptionalString(template.cloudApiBaseUrl);
+
 const environment =
   pickEnv("YINJIE_IOS_ENVIRONMENT") ||
   normalizeOptionalString(localRuntime.environment) ||
@@ -97,6 +106,7 @@ const runtimeConfig = {
   ...template,
   apiBaseUrl,
   socketBaseUrl,
+  cloudApiBaseUrl: cloudApiBaseUrl || null,
   environment,
   publicAppName,
   applicationId: applicationId || null,
@@ -108,5 +118,5 @@ fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(runtimeConfig, null, 2)}\n`);
 console.log(`Injected iOS runtime config into ${outputPath}`);
 console.log(
-  `  applicationId=${runtimeConfig.applicationId ?? "(unset)"} appVersionName=${runtimeConfig.appVersionName ?? "(unset)"} appVersionCode=${runtimeConfig.appVersionCode ?? "(unset)"} env=${runtimeConfig.environment}`,
+  `  applicationId=${runtimeConfig.applicationId ?? "(unset)"} appVersionName=${runtimeConfig.appVersionName ?? "(unset)"} appVersionCode=${runtimeConfig.appVersionCode ?? "(unset)"} env=${runtimeConfig.environment} cloudApiBaseUrl=${runtimeConfig.cloudApiBaseUrl ?? "(unset)"}`,
 );

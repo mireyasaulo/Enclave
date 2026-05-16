@@ -105,6 +105,7 @@ Push token 约定：
 | --- | :-: | --- |
 | `YINJIE_IOS_CORE_API_BASE_URL` | ✓ | 业务后端入口（https） |
 | `YINJIE_IOS_SOCKET_BASE_URL` |  | 默认等于 `YINJIE_IOS_CORE_API_BASE_URL` |
+| `YINJIE_IOS_CLOUD_API_BASE_URL` |  | cloud-api 多租户反代入口；不显式设原生壳里所有 cloud-api 调用会失败（capacitor:// 没法 origin 回落） |
 | `YINJIE_IOS_ENVIRONMENT` |  | 默认 `production` |
 | `YINJIE_IOS_PUBLIC_APP_NAME` |  | 默认 `Yinjie` |
 | `YINJIE_IOS_BUNDLE_IDENTIFIER` | ✓ | reverse-DNS bundle id |
