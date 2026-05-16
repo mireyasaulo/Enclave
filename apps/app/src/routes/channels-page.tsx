@@ -3409,6 +3409,31 @@ function MobileChannelCommentsSheet({
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const hasAutoScrolledRef = useRef(false);
   const previousCommentCountRef = useRef(0);
+  // 走查 R4（新一轮）：原 isNearBottom 在评论增长的 effect 里读 *新 DOM* 的
+  // scrollHeight——新评论已经被 React 渲到 DOM 里，scrollHeight 提前涨上去，
+  // scrollTop 没动 → scrollHeight-scrollTop-clientHeight 突然变大（典型新评论
+  // 卡 80-120px 高就够把 diff 干过 80px 阈值），isNearBottom=false，
+  // 错把"用户刚发完一条还在底部"判成"用户已经主动上滑读老评论"，shouldAutoScroll=false。
+  // 实测：用户在底部发评论后，scrollTop=1477 / 新 scrollHeight=2085 / diff=107
+  // → 自己发的新评论被卡在视口外，得手动再滑一下。
+  // 改用 *上一次 scroll 事件捕获到的* 用户位置（ref 跟 scroll 事件实时同步），
+  // 评论被 append 后 scrollTop 没动 → scroll 事件不 fire → ref 仍是用户上一次
+  // 主动滚的"贴底"状态，growth + 贴底 → 跟随到底；用户主动滚上去时 scroll
+  // 事件已经把 ref 翻成 false，growth 时不跟随、尊重阅读位置。
+  const userNearBottomRef = useRef(true);
+  useEffect(() => {
+    if (!open) return;
+    const node = scrollContainerRef.current;
+    if (!node) return;
+    const updateNearBottom = () => {
+      userNearBottomRef.current =
+        node.scrollHeight - node.scrollTop - node.clientHeight < 80;
+    };
+    updateNearBottom();
+    node.addEventListener("scroll", updateNearBottom, { passive: true });
+    return () => node.removeEventListener("scroll", updateNearBottom);
+  }, [open]);
+
   const commentAuthorNameMap = useMemo(() => {
     const map = new Map<string, string>();
     comments.forEach((comment) => {
@@ -3495,8 +3520,10 @@ function MobileChannelCommentsSheet({
 
     const previousCount = previousCommentCountRef.current;
     const growth = comments.length > previousCount;
-    const isNearBottom =
-      node.scrollHeight - node.scrollTop - node.clientHeight < 80;
+    // 用 userNearBottomRef.current（scroll 事件实时维护）而不是 *此刻* 重算
+    // DOM。新评论 append 后 DOM scrollHeight 已经涨上去而 scrollTop 没动，
+    // 这里如果用 DOM 算会立即判成"用户已上滑"，把贴底状态错杀。
+    const isNearBottom = userNearBottomRef.current;
     const shouldAutoScroll =
       !hasAutoScrolledRef.current || (growth && isNearBottom);
     if (shouldAutoScroll) {
@@ -3519,6 +3546,9 @@ function MobileChannelCommentsSheet({
         if (!scrollContainerRef.current) return;
         scrollContainerRef.current.scrollTop =
           scrollContainerRef.current.scrollHeight;
+        // 程序滚到底时显式同步 ref——某些环境（极短滚动距离 / 浏览器节流）
+        // scroll 事件不一定 fire，下一次 effect 又会拿到 stale 的 false。
+        userNearBottomRef.current = true;
       });
     } else {
       previousCommentCountRef.current = comments.length;
