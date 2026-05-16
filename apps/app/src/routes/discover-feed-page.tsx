@@ -2296,9 +2296,16 @@ export function DiscoverFeedPage() {
                 <button
                   type="button"
                   onClick={() => {
+                    // 走查新 Round 11 之后再走 — 上轮把 createMutation/likeMutation/
+                    // commentMutation.reset() 三发塞进切账户 effect 里时把这里
+                    // 一并改了，但 commentMutation.variables 是 object 形态，从
+                    // TS 视角看 narrow 完属于推断兜底，紧跟着 .reset() 触发
+                    // TS2339 "Property 'reset' does not exist on type 'never'"。
+                    // 切账户 effect 那一份 .reset() 已经覆盖 stale isError，这
+                    // 里 retry 按钮自然只剩两条分支：能回放就 mutate，回放不
+                    // 出来直接 return 让用户重新点；无需再额外 reset。
                     const variables = commentMutation.variables;
                     if (!variables) {
-                      commentMutation.reset();
                       return;
                     }
                     const currentDraft =
