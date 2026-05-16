@@ -116,8 +116,11 @@ describe('CharactersService.importPersonalCharacter', () => {
       recipe,
     });
     expect(spy).toHaveBeenCalledWith(recipe, '新角色');
-    // saved character 的 profile 应来自派生
-    expect((out.character as Char).profile).toEqual({ derived: true });
+    // saved character 的 profile 应来自派生（characterId 由 import 在 save
+    // 之后回填，2026-05-16 修复，对应 saved.id）
+    const savedProfile = (out.character as Char).profile as Record<string, unknown>;
+    expect(savedProfile).toMatchObject({ derived: true });
+    expect(savedProfile.characterId).toBe(out.character.id);
   });
 
   it('prefers explicit profile over recipe (does not derive)', async () => {
@@ -129,7 +132,10 @@ describe('CharactersService.importPersonalCharacter', () => {
       profile: { explicit: true } as never,
     });
     expect(buildProfileSpy).not.toHaveBeenCalled();
-    expect((out.character as Char).profile).toEqual({ explicit: true });
+    const savedProfile = (out.character as Char).profile as Record<string, unknown>;
+    expect(savedProfile).toMatchObject({ explicit: true });
+    // characterId 也会被 import 路径补成 entity.id（非 undefined）
+    expect(savedProfile.characterId).toBe(out.character.id);
   });
 
   it('rejects oversized bio at the validation gate', async () => {
@@ -189,5 +195,74 @@ describe('CharactersService.importPersonalCharacter', () => {
     expect(profile.name).toBe('小蓝');
     expect(profile.relationship).toBe('邻居');
     expect(profile.traits).toBeTruthy();
+  });
+
+  // 2026-05-16 修复：同名 re-import 时，bundle 没带 profile/recipe 不能用
+  // baseline 把现存 profile 整盘覆盖（会丢 chat memory compression 累积的
+  // memory.recentSummary + 用户填的 coreLogic）。
+  it('preserves existing meaningful profile on bare re-import', async () => {
+    const existingProfile = {
+      characterId: 'private-old',
+      name: '苏然',
+      relationship: '朋友',
+      coreLogic: '用户填的 coreLogic',
+      memory: { coreMemory: '记得用户喜欢冷笑话', recentSummary: '昨天聊了天气', forgettingCurve: 70 },
+      traits: { speechPatterns: [], catchphrases: [], topicsOfInterest: [], emotionalTone: '冷静', responseLength: 'medium', emojiUsage: 'occasional' },
+    };
+    const { svc, repo } = makeService({
+      existing: {
+        id: 'private-old',
+        name: '苏然',
+        sourceType: 'private_import',
+        deletionPolicy: 'archive_allowed',
+        profile: existingProfile,
+      } as Char,
+    });
+    const out = await svc.importPersonalCharacter({
+      name: '苏然',
+      bio: '更新一下 bio',
+    });
+    expect(out.overwrote).toBe(true);
+    const profile = (out.character as Char).profile as Record<string, unknown>;
+    // memory 和 coreLogic 保留
+    expect(profile.coreLogic).toBe('用户填的 coreLogic');
+    expect((profile.memory as Record<string, unknown>).coreMemory).toBe('记得用户喜欢冷笑话');
+    expect((profile.memory as Record<string, unknown>).recentSummary).toBe('昨天聊了天气');
+    // bio 字段已经更新
+    expect((out.character as Char).bio).toBe('更新一下 bio');
+    expect(repo.save).toHaveBeenCalled();
+  });
+
+  // 2026-05-16 修复：re-import 带新 profile 时，旧 memory 子树应 merge 回新 profile，
+  // 不能因为用户改了 personality 就把 AI 记忆全冲掉。
+  it('merges existing memory into newly imported profile', async () => {
+    const existingProfile = {
+      characterId: 'private-old',
+      name: '苏然',
+      memory: { coreMemory: '老的核心记忆', recentSummary: '老的近期记忆', forgettingCurve: 70 },
+      traits: { speechPatterns: [], catchphrases: [], topicsOfInterest: [], emotionalTone: '', responseLength: 'medium', emojiUsage: 'occasional' },
+    };
+    const { svc } = makeService({
+      existing: {
+        id: 'private-old',
+        name: '苏然',
+        sourceType: 'private_import',
+        deletionPolicy: 'archive_allowed',
+        profile: existingProfile,
+      } as Char,
+    });
+    const out = await svc.importPersonalCharacter({
+      name: '苏然',
+      profile: {
+        characterId: 'private-old',
+        name: '苏然',
+        coreLogic: '新的 coreLogic',
+        traits: { speechPatterns: [], catchphrases: [], topicsOfInterest: [], emotionalTone: '活泼', responseLength: 'medium', emojiUsage: 'occasional' },
+      } as never,
+    });
+    const profile = (out.character as Char).profile as Record<string, unknown>;
+    expect(profile.coreLogic).toBe('新的 coreLogic');
+    expect((profile.memory as Record<string, unknown>)?.coreMemory).toBe('老的核心记忆');
+    expect((profile.memory as Record<string, unknown>)?.recentSummary).toBe('老的近期记忆');
   });
 });

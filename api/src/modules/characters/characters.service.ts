@@ -30,7 +30,10 @@ import { AIBehaviorLogEntity } from '../analytics/ai-behavior-log.entity';
 import { ModerationReportEntity } from '../moderation/moderation-report.entity';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { NeedDiscoveryCandidateEntity } from '../need-discovery/need-discovery-candidate.entity';
-import { RealWorldRuntimeProfileService } from '../real-world-sync/real-world-runtime-profile.service';
+import {
+  RealWorldRuntimeProfileService,
+  hasMeaningfulProfile,
+} from '../real-world-sync/real-world-runtime-profile.service';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
   buildDefaultCharacters,
@@ -64,6 +67,7 @@ export class CharactersService implements OnModuleInit {
 
   async onModuleInit() {
     await this.backfillCharacterAvatarAssets();
+    await this.backfillEmptyPrivateImportProfiles();
   }
 
   async findAll(): Promise<CharacterEntity[]> {
@@ -559,7 +563,24 @@ export class CharactersService implements OnModuleInit {
       if (derived) patch.profile = derived;
     }
     if (!patch.profile) {
-      patch.profile = this.buildBaselineProfileFromInput(trimmedName, input);
+      // 同名 re-import：bundle 没带 profile/recipe（用户可能只想刷一下 bio / avatar），
+      // 但现存 row 的 profile 已经被前一次正常 import 填好、且 chat memory 压缩
+      // 可能往里追写了 memory.recentSummary —— 这时不能再用 baseline 把 existing.profile
+      // 整盘覆盖（会丢角色记忆 + 用户精心填的 coreLogic）。只有现存 row 没 profile
+      // 或 profile 不可用时才补 baseline。
+      const existingProfileMeaningful = hasMeaningfulProfile(existing?.profile);
+      if (!existingProfileMeaningful) {
+        patch.profile = this.buildBaselineProfileFromInput(trimmedName, input);
+      }
+    }
+    // recipe / explicit profile 路径强制覆盖时，把现存 row 的 memory 子树 merge
+    // 回来：用户改个 bio 重新导入，不能把"她还记得上次说过 xxx"这种运行时积累
+    // 的对话记忆一起冲掉。
+    if (patch.profile && existing?.profile?.memory && !patch.profile.memory) {
+      patch.profile = {
+        ...patch.profile,
+        memory: { ...existing.profile.memory },
+      };
     }
 
     // —— 2026-05-15 起：wiki 私有角色已和 admin 一一对应到这 11 个字段，
@@ -622,7 +643,13 @@ export class CharactersService implements OnModuleInit {
           sourceKey: trimmedName,
           deletionPolicy: 'archive_allowed',
           isTemplate: false,
-          isOnline: false,
+          // private_import 默认 isOnline=true：用户从 wiki 主动把这个角色导
+          // 入"我的世界"就是想跟 ta 互动 —— offline 默认让角色发完欢迎语后
+          // 不再发动态、不响应 feed、不被 shake-discovery 匹配，导入完用户的
+          // 直觉是"导入完没动静"。wiki bundle 不带 isOnline（admin-only），
+          // 这里靠 import-personal 自身的默认 true 兜住；bundle 显式带 false
+          // 时仍然透传（patch.isOnline 优先级高）。
+          isOnline: true,
           onlineMode: 'auto',
           activityFrequency: 'normal',
           momentsFrequency: 1,
@@ -636,6 +663,18 @@ export class CharactersService implements OnModuleInit {
           ...patch,
         } as Partial<CharacterEntity>),
       );
+    }
+
+    // 把 entity.id 回写到 profile.characterId：buildBaselineProfileFromInput
+    // 这一刻还没 newId，会落 characterId=''；后续 chat orchestrator 走
+    // `runtimeProvider = resolveRuntimeProvider({ characterId: profile.characterId })`
+    // 拿到空串会跳过 character_override 路由——通过 usageContext.characterId
+    // 还能兜住但语义上是错的。这里 saved 之后补一道 upsert，DB 行的 profile
+    // 自始终带正确的 characterId。只在 characterId 为空 / 缺失时补，避免误改
+    // 用户在 wiki 端 finalize 过的 profile.characterId（极少见但允许）。
+    if (saved.profile && !saved.profile.characterId) {
+      saved.profile = { ...saved.profile, characterId: saved.id };
+      await this.repo.save(saved);
     }
 
     // Ensure friendship with world-owner so the character shows up in the
@@ -837,6 +876,60 @@ export class CharactersService implements OnModuleInit {
       /^https?:\/\//i.test(value) ||
       /^data:image\//i.test(value) ||
       /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i.test(value)
+    );
+  }
+
+  /**
+   * 一次性迁移：把 sourceType='private_import' 且 profile 空 / 不可用的历史行
+   * 补成 baseline profile，让对话路径不再依赖 RealWorldRuntimeProfileService
+   * 的运行时回填（运行时回填没问题，但 chat memory compression / moments
+   * generation 等会 mutate `char.profile.memory` 的路径会写在 {} 之上，导致
+   * 字段半残）。
+   *
+   * 仅当 worldOwnerService 已就绪时做（多租户 spawn 早期可能还没装好），失败
+   * 兜底不阻塞 boot。幂等：hasMeaningfulProfile 通过后跳过。
+   */
+  private async backfillEmptyPrivateImportProfiles() {
+    let dirtyRows: CharacterEntity[];
+    try {
+      dirtyRows = await this.repo.find({
+        where: { sourceType: 'private_import' },
+      });
+    } catch (err) {
+      this.logger.warn(
+        // i18n-ignore-line: backend log line, not user-facing
+        `[backfillEmptyPrivateImportProfiles] DB query failed: ${(err as Error).message}`,
+      );
+      return;
+    }
+    const pending = dirtyRows.filter(
+      (row) => !hasMeaningfulProfile(row.profile),
+    );
+    if (pending.length === 0) return;
+
+    const healed: CharacterEntity[] = [];
+    for (const row of pending) {
+      const synthesized = this.buildBaselineProfileFromInput(row.name, {
+        relationship: row.relationship,
+        relationshipType: row.relationshipType,
+        expertDomains: row.expertDomains,
+        bio: row.bio,
+        personality: row.personality ?? undefined,
+      });
+      synthesized.characterId = row.id;
+      // 历史 row 可能曾经被 memory compression 写过 memory 字段，但 hasMeaningfulProfile
+      // 标准是 name/coreLogic/basePrompt/scenePrompts.chat —— memory 单飞不算"可用"。
+      // 这里 merge 一下保留旧 memory，避免清掉积累的对话记忆。
+      if (row.profile?.memory) {
+        synthesized.memory = { ...row.profile.memory };
+      }
+      row.profile = synthesized;
+      healed.push(row);
+    }
+    await this.repo.save(healed);
+    this.logger.log(
+      // i18n-ignore-line: backend log line, not user-facing
+      `[backfillEmptyPrivateImportProfiles] healed ${healed.length} private_import rows with empty profile`,
     );
   }
 

@@ -150,7 +150,12 @@ type CharacterEntityForRuntimeProfile = Pick<
   | 'personality'
 >;
 
-function isMeaningfulProfile(
+/**
+ * 用来判断一份 profile 是不是已经"够用"——name 或任意一种 prompt 文本里至少
+ * 有一个非空。CharactersService.importPersonalCharacter 同名 re-import / chat
+ * memory compression / runtime backfill 都按这个判定决定要不要覆盖。
+ */
+export function hasMeaningfulProfile(
   profile: PersonalityProfile | null | undefined,
 ): profile is PersonalityProfile {
   if (!profile || typeof profile !== 'object') return false;
@@ -222,7 +227,7 @@ export class RealWorldRuntimeProfileService {
       | PersonalityProfile
       | null
       | undefined;
-    const baseProfile = isMeaningfulProfile(rawProfile)
+    const baseProfile = hasMeaningfulProfile(rawProfile)
       ? cloneProfile(rawProfile)
       : backfillProfileFromCharacterScalars(
           rawProfile ? cloneProfile(rawProfile) : undefined,
