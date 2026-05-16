@@ -6,12 +6,32 @@ export type ManagementScreen =
   | { type: "permissions" }
   | { type: "permissions-detail"; characterId: string };
 
+function isSameScreen(a: ManagementScreen, b: ManagementScreen): boolean {
+  if (a.type !== b.type) return false;
+  if (a.type === "permissions-detail" && b.type === "permissions-detail") {
+    return a.characterId === b.characterId;
+  }
+  return true;
+}
+
 export function useManagementScreenStack(open: boolean) {
   const [stack, setStack] = useState<ManagementScreen[]>([{ type: "root" }]);
 
   const reset = useCallback(() => setStack([{ type: "root" }]), []);
+  // 新一轮走查：dedupe 连续重复 push。原写法无条件 append → 用户在手机端
+  // 双击好友 / 双击"朋友权限"行（屏切换有一帧延迟，手指就习惯多按一下），
+  // 同一个 screen 会被压两次，stack = [..., permissions-detail:X, permissions-detail:X]，
+  // 视觉无变化但回退要按两次 Back，第一次看着像"卡住没反应"。栈顶等于目标屏
+  // 时直接忽略，跟 React Router / WeChat navigation 的去重语义对齐。
   const push = useCallback(
-    (screen: ManagementScreen) => setStack((cur) => [...cur, screen]),
+    (screen: ManagementScreen) =>
+      setStack((cur) => {
+        const top = cur[cur.length - 1];
+        if (top && isSameScreen(top, screen)) {
+          return cur;
+        }
+        return [...cur, screen];
+      }),
     [],
   );
   const pop = useCallback(

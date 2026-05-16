@@ -267,10 +267,19 @@ export function ContactsBulkActionBar({
 
       {showTagDialog ? (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
+          {/* 新一轮走查：bulk.isPending 时禁用 backdrop close + cancel + 确定。
+              原写法只锁了 确定 按钮，cancel + 点空白处都没拦：mutation 在飞 8s
+              的弱网场景下用户随手点取消，dialog 关掉，请求继续在后台写完，看着
+              像"取消失败"。Android 硬件 Back 已经在 isPending 时返回 false 不拦，
+              这三处对齐就行为一致。 */}
           <button
             type="button"
             aria-label={t(msg`关闭`)}
-            onClick={() => setShowTagDialog(false)}
+            onClick={() => {
+              if (bulk.isPending) return;
+              setShowTagDialog(false);
+            }}
+            disabled={bulk.isPending}
             className="absolute inset-0"
           />
           <div className="relative w-full max-w-[420px] overflow-hidden rounded-[16px] bg-white shadow-[var(--shadow-overlay)]">
@@ -284,6 +293,7 @@ export function ContactsBulkActionBar({
                 value={tagDraft}
                 onChange={(e) => setTagDraft(e.target.value)}
                 placeholder={t(msg`标签名称`)}
+                disabled={bulk.isPending}
                 // maxLength=20: 后端 normalizeTags 没 length 限制，前端没卡的话
                 // 用户复制粘贴一段 5000 字进来照样 commit 到 friendship.tags（JSON
                 // 字段），后续好友卡片 / 编辑 / 桌面 tags pane 渲染都会被这条
@@ -293,7 +303,7 @@ export function ContactsBulkActionBar({
                 // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
                 // zoom-in，autoFocus 一打开就抖；text-[14px] 时还会把 dialog
                 // 推出可视区一截。
-                className="h-10 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[16px] text-[color:var(--text-primary)] outline-none focus:border-[#07c160]"
+                className="h-10 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[16px] text-[color:var(--text-primary)] outline-none focus:border-[#07c160] disabled:opacity-60"
               />
               <div className="mt-1 flex items-center justify-between text-[11px] text-[color:var(--text-muted)]">
                 <span>{t(msg`已选 ${selectedIds.length} 项`)}</span>
@@ -305,7 +315,8 @@ export function ContactsBulkActionBar({
                 <button
                   type="button"
                   onClick={() => setShowTagDialog(false)}
-                  className="h-9 rounded-full border border-[color:var(--border-faint)] bg-white px-4 text-[13px] text-[color:var(--text-secondary)]"
+                  disabled={bulk.isPending}
+                  className="h-9 rounded-full border border-[color:var(--border-faint)] bg-white px-4 text-[13px] text-[color:var(--text-secondary)] disabled:opacity-50"
                 >
                   {t(msg`取消`)}
                 </button>
@@ -315,7 +326,7 @@ export function ContactsBulkActionBar({
                   disabled={!tagDraft.trim() || bulk.isPending}
                   className="h-9 rounded-full bg-[#07c160] px-4 text-[13px] font-medium text-white disabled:opacity-50"
                 >
-                  {t(msg`确定`)}
+                  {bulk.isPending ? t(msg`处理中...`) : t(msg`确定`)}
                 </button>
               </div>
             </div>
@@ -325,10 +336,18 @@ export function ContactsBulkActionBar({
 
       {showDeleteDialog ? (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
+          {/* 新一轮走查：删除是不可逆操作，pending 时锁 backdrop + 取消尤其重要。
+              用户点了删除按钮发现选错人，第一反应可能去点空白处或取消想撤销，
+              但批量删除已经在后端逐个 deleteFriend，关 dialog 也救不回。这里
+              保留拦截让用户至少知道"正在执行中"。 */}
           <button
             type="button"
             aria-label={t(msg`关闭`)}
-            onClick={() => setShowDeleteDialog(false)}
+            onClick={() => {
+              if (bulk.isPending) return;
+              setShowDeleteDialog(false);
+            }}
+            disabled={bulk.isPending}
             className="absolute inset-0"
           />
           <div className="relative w-full max-w-[380px] overflow-hidden rounded-[16px] bg-white shadow-[var(--shadow-overlay)]">
@@ -344,7 +363,8 @@ export function ContactsBulkActionBar({
               <button
                 type="button"
                 onClick={() => setShowDeleteDialog(false)}
-                className="h-11 text-[14px] text-[color:var(--text-secondary)]"
+                disabled={bulk.isPending}
+                className="h-11 text-[14px] text-[color:var(--text-secondary)] disabled:opacity-50"
               >
                 {t(msg`取消`)}
               </button>
@@ -354,7 +374,7 @@ export function ContactsBulkActionBar({
                 disabled={bulk.isPending}
                 className="h-11 border-l border-[color:var(--border-faint)] text-[14px] font-medium text-[#d74b45] disabled:opacity-50"
               >
-                {t(msg`删除`)}
+                {bulk.isPending ? t(msg`处理中...`) : t(msg`删除`)}
               </button>
             </div>
           </div>
