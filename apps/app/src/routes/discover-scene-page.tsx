@@ -189,8 +189,14 @@ function MobileDiscoverScenePage() {
 
   const sceneMutation = useMutation({
     mutationFn: async (scene: string) => {
+      // 走查 R2-Round2：把 mutate 触发那一刻的 baseUrl 一起带回 onSuccess，
+      // 用来识别"AI 4-20s 等 greeting 期间用户切了 world"的脏 settle —
+      // 否则旧 world 的好友申请会写到新 world 的 localStorage encounter 里、
+      // 给新 world 上一个 2.5s 莫名冷却、并把 app-friend-requests 缓存按新
+      // baseUrl 失效（实际上请求落在旧 baseUrl，新 world 缓存里没这条）。
+      const capturedBaseUrl = baseUrl;
       const result = await triggerSceneFriendRequest({ scene }, baseUrl);
-      return { ...result, scene };
+      return { ...result, scene, capturedBaseUrl };
     },
     // 走查 R2：点新场景时把上一轮的成功 / 提示 notice 立刻清掉。否则在
     // AI 出 greeting 那 4-20s 里，旧条目"X 在咖啡馆里注意到了你"还挂着，
@@ -201,7 +207,13 @@ function MobileDiscoverScenePage() {
       setMessage(""); // i18n-ignore-line: clearing state
       setLastRequestId(null);
     },
-    onSuccess: ({ request, matchSource, scene }) => {
+    onSuccess: ({ request, matchSource, scene, capturedBaseUrl }) => {
+      if (capturedBaseUrl !== baseUrl) {
+        // 走查 R2-Round2：在 await 期间用户切了 world，settle 已经不属于当前
+        // 这一屏的语义，全部丢弃。请求本身已经在旧 world 落库，登回旧 world
+        // 的好友请求列表里仍会看到，不会丢数据。
+        return;
+      }
       setCooldownUntil(Date.now() + COOLDOWN_MS);
       setNow(Date.now());
 
@@ -252,6 +264,14 @@ function MobileDiscoverScenePage() {
     // 走查 R2：切 world 时也要把冷却清掉。前 world 设置的 cooldownUntil 跟新
     // world 没关系（服务端按 owner 维度独立限频），残留会让人无法立即试新 world。
     setCooldownUntil(0);
+    // 走查 R2-Round2：切 world 时也把上一次 mutation 的 isError/error 残留
+    // 一并 reset 掉。否则上一 world 因为 SOCIAL_SCENE_DAILY_LIMIT 弹的红条
+    // 会一直跟到新 world，并且页面 onMount 后用户在新 world 第一次还没点
+    // 就看到「今天的场景相遇次数已经用完」——非常误导。
+    sceneMutation.reset();
+  // sceneMutation 是 useMutation 返回的稳定对象，不放进依赖避免每次 mutate
+  // 都 reset。仅 baseUrl 真正变更时执行清理。
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseUrl]);
 
   const handleGoToRequests = useCallback(() => {
