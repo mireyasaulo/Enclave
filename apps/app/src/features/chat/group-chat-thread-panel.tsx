@@ -227,6 +227,14 @@ export function GroupChatThreadPanel({
     scrollTop: number;
   } | null>(null);
   const highlightedWindowRequestRef = useRef<string | null>(null);
+  // 走 around-message-id 拉锚点窗口失败（404 / 网络错 / 服务端返回空窗口）
+  // 后，原版会落到 loadOlderMessages() 兜底翻历史；但 highlightedMessageId
+  // 永远不存在（坏的 deeplink / 已被对方撤回 / 记录已被清空），消息库里压根
+  // 找不到 → hasOlderMessages 一直 true、hasHighlightedMessage 一直 false，
+  // useEffect 每次 fetch 完都会再触发 loadOlderMessages → 一直翻到最早一条
+  // 把整个群历史拉下来，公网 600ms RTT × 40 条/页 在大群里能拉几十秒。
+  // 记下"这个 highlight 已经走过 anchor 兜底翻页都没找到"，下次不再翻。
+  const failedHighlightRef = useRef<Set<string>>(new Set());
   const handledDesktopCallRequestTokenRef = useRef<number | null>(null);
 
   const groupQuery = useQuery({
@@ -302,6 +310,7 @@ export function GroupChatThreadPanel({
     setLoadingAnchorWindow(false);
     loadMoreRequestRef.current = null;
     highlightedWindowRequestRef.current = null;
+    failedHighlightRef.current.clear();
   }, [baseUrl, groupId]);
 
   useEffect(() => {
@@ -1010,19 +1019,30 @@ export function GroupChatThreadPanel({
       return;
     }
 
+    // 此 highlight 之前已经"anchor + 翻全程"都找不到，不再继续翻。
+    if (failedHighlightRef.current.has(highlightedMessageId)) {
+      return;
+    }
+
     if (highlightedWindowRequestRef.current === highlightedMessageId) {
       if (hasOlderMessages) {
         void loadOlderMessages();
+      } else {
+        // 已经翻到最早一条仍然没找到 → 锁住，不再重新触发兜底翻页。
+        failedHighlightRef.current.add(highlightedMessageId);
       }
       return;
     }
 
     highlightedWindowRequestRef.current = highlightedMessageId;
     void loadAnchorWindow(highlightedMessageId).then((found) => {
-      if (found || !hasOlderMessages) {
+      if (found) {
         return;
       }
-
+      if (!hasOlderMessages) {
+        failedHighlightRef.current.add(highlightedMessageId);
+        return;
+      }
       void loadOlderMessages();
     });
   }, [

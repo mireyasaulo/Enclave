@@ -1388,6 +1388,7 @@ const pendingLikePostId = likeMutation.isPending
           errors={errors}
           hasNextPage={feedQuery.hasNextPage}
           isFetchingNextPage={feedQuery.isFetchingNextPage}
+          isFetchNextPageError={isFetchNextFeedPageError}
           imageDrafts={composeDraft.imageDrafts}
           isLoading={feedQuery.isLoading}
           serverTotal={
@@ -1406,6 +1407,14 @@ const pendingLikePostId = likeMutation.isPending
           ownerUsername={ownerUsername}
           posts={visiblePosts}
           onRequestMore={desktopRequestMore}
+          onRetryNextPage={() => {
+            // 用户在 fetchNextPage 失败的红条上点「重试」，desktopRequestMore
+            // 自身 gate 在 isFetchNextPageError 上会直接 return；这里走原始
+            // fetchNextPage 让 react-query 清掉错误标记并重新发请求。
+            if (hasNextFeedPage && !isFetchingNextFeedPage) {
+              void fetchNextFeedPage();
+            }
+          }}
           onSelectedPostChange={setDesktopSelectedPostId}
           routeSelectedPostId={routeSelectedPostId}
           showCompose={showCompose}

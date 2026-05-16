@@ -34,6 +34,8 @@ type DesktopFeedWorkspaceProps = {
   errors?: string[];
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  /** fetchNextPage 失败后 react-query 留的标记；和移动端 isFetchNextPageError 一致。 */
+  isFetchNextPageError?: boolean;
   imageDrafts: MomentImageDraft[];
   isLoading: boolean;
   likeErrorMessage?: string | null;
@@ -44,6 +46,8 @@ type DesktopFeedWorkspaceProps = {
   /** 服务端汇报的广场总数；不传或 <= posts.length 时按已加载条数显示。 */
   serverTotal?: number;
   onRequestMore?: () => void;
+  /** 用户点击「加载更多失败 · 重试」时调用；通常等价于 onRequestMore 但语义更明确。 */
+  onRetryNextPage?: () => void;
   onSelectedPostChange?: (postId: string | null) => void;
   routeSelectedPostId?: string | null;
   showCompose: boolean;
@@ -93,6 +97,7 @@ export function DesktopFeedWorkspace({
   errors = [],
   hasNextPage = false,
   isFetchingNextPage = false,
+  isFetchNextPageError = false,
   imageDrafts,
   isLoading,
   likeErrorMessage,
@@ -102,6 +107,7 @@ export function DesktopFeedWorkspace({
   posts,
   serverTotal,
   onRequestMore,
+  onRetryNextPage,
   onSelectedPostChange,
   routeSelectedPostId = null,
   showCompose,
@@ -138,9 +144,13 @@ export function DesktopFeedWorkspace({
   // 滚到接近底部时调用 onRequestMore（page 层 fetchNextFeedPage）。
   // root=scrollViewportRef 让观察器跟桌面滚动容器对齐而不是 window；rootMargin
   // 320px 提前触发避免触底空等。
+  // 命中 fetchNextPage 错误后直接关掉 observer：父级 desktopRequestMore 虽然
+  // 已经 gate 在 isFetchNextPageError 上做了 no-op，但 sentinel 一直在视口里
+  // 时观察器每次都会再发一次 onRequestMore，徒增 React commit 噪音。
   useEffect(() => {
     if (!onRequestMore) return;
     if (!hasNextPage || isFetchingNextPage) return;
+    if (isFetchNextPageError) return;
     const sentinel = loadMoreSentinelRef.current;
     const root = scrollViewportRef.current;
     if (!sentinel || !root) return;
@@ -154,7 +164,7 @@ export function DesktopFeedWorkspace({
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, onRequestMore]);
+  }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, onRequestMore]);
 
   useEffect(() => {
     setSelectedPostId((current) =>
@@ -332,6 +342,19 @@ export function DesktopFeedWorkspace({
                     <div className="py-4 text-center text-[12px] text-[color:var(--text-muted)]">
                       {t(msg`正在加载更多…`)}
                     </div>
+                  ) : isFetchNextPageError ? (
+                    // fetchNextPage 失败时旧版桌面 workspace 什么都不渲染，sentinel
+                    // 还原地挂在视口里 → observer 持续触发已经被 page 层 gate 死的
+                    // requestMore（净空转）。用户视角是「滚到底部一片空白，看不到
+                    // 失败提示也不知道怎么继续」，与移动端「加载更多失败 · 点击重试」
+                    // 行为割裂。
+                    <button
+                      type="button"
+                      onClick={() => onRetryNextPage?.()}
+                      className="block w-full py-4 text-center text-[12px] font-medium text-[color:var(--brand-primary)] hover:opacity-80"
+                    >
+                      {t(msg`加载更多失败 · 点击重试`)}
+                    </button>
                   ) : !hasNextPage ? (
                     <div className="py-4 text-center text-[12px] text-[color:var(--text-muted)]">
                       {t(msg`已经到底了`)}

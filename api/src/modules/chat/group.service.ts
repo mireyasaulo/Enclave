@@ -336,24 +336,34 @@ export class GroupService {
       order: { joinedAt: 'ASC' },
     });
 
-    return Promise.all(
-      members.map(async (member) => {
-        if (member.memberType !== 'character') {
-          return member;
-        }
-
-        const character = await this.characters.findById(member.memberId);
-        if (!character) {
-          return member;
-        }
-
-        return {
-          ...member,
-          memberName: member.memberName ?? character.name,
-          memberAvatar: member.memberAvatar ?? character.avatar ?? undefined,
-        };
-      }),
+    // 原版对每个 character 成员各 await 一次 characters.findById：50 人群 ×
+    // 每次 chat-list ↔ thread ↔ details ↔ picker ↔ call screen 切页都重打
+    // 一遍 useQuery → 50 次串行 SQL。改成单次 findManyByIds，整页 1 次。
+    const characterIds = members
+      .filter((member) => member.memberType === 'character')
+      .map((member) => member.memberId);
+    if (!characterIds.length) {
+      return members;
+    }
+    const characters = await this.characters.findManyByIds(characterIds);
+    const characterMap = new Map(
+      characters.map((character) => [character.id, character] as const),
     );
+
+    return members.map((member) => {
+      if (member.memberType !== 'character') {
+        return member;
+      }
+      const character = characterMap.get(member.memberId);
+      if (!character) {
+        return member;
+      }
+      return {
+        ...member,
+        memberName: member.memberName ?? character.name,
+        memberAvatar: member.memberAvatar ?? character.avatar ?? undefined,
+      };
+    });
   }
 
   async getMessages(
@@ -644,6 +654,10 @@ export class GroupService {
       hiddenAt: new Date(),
     });
 
+    // 同其它写操作（updateGroup / updatePreferences / clearGroupMessages /
+    // setGroupPinned）对齐：不 emit 的话另一端 chat-list（web + iOS shell
+    // / 双端同账号）还会一直显示这条群，要等下一次 60s 兜底轮询才消失。
+    await this.emitGroupConversationUpdated(groupId);
     return this.toGroup(updated);
   }
 
@@ -677,6 +691,22 @@ export class GroupService {
 
   async leaveGroup(groupId: string): Promise<{ success: true }> {
     const group = await this.requireOwnedGroup(groupId);
+
+    // delete 后 emitGroupConversationUpdated 拿不到 group 行 → 内部 early
+    // return，没事件发出。这里先在 delete 前抓住 members 直接调 gateway，
+    // 让另一端 chat-list 收到 conversation_updated → invalidate
+    // /conversations 列表 → 列表里没了这条群，自然从 UI 消失。不 emit 的话
+    // 多端在线时另一端要等到 60s 兜底轮询；期间用户点进去会撞 404 死页。
+    const membersBeforeDelete = await this.memberRepo.find({
+      where: { groupId: group.id },
+      order: { joinedAt: 'ASC' },
+    });
+    this.chatGateway.emitConversationUpdated({
+      id: group.id,
+      type: 'group',
+      title: group.name,
+      participants: membersBeforeDelete.map((member) => member.memberId),
+    });
 
     await this.memberRepo.delete({ groupId: group.id });
     await this.messageRepo.delete({ groupId: group.id });
