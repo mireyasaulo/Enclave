@@ -464,6 +464,18 @@ export function MobileFriendMomentsPage() {
     setNotice(null);
     setCommentBarTarget(null);
     setActionBubble(null);
+    // shareMomentId 也要清——同一个 MobileFriendMomentsPage 实例在 characterId 变
+    // 化时只 re-render 不 unmount（TanStack Router 同 route 复用组件），如果在
+    // 角色 A 上打开了分享卡片然后导航到 B：B 的 friendMoments 里找不到 A 的
+    // 那条 moment → shareMoment === null → MomentShareCardModal 隐藏。但
+    // shareMomentId 仍然挂在 "A 的 momentId"。一旦再返回 A 的 moments 加载回
+    // 来，shareMoment 又能 find 到，分享卡片自动重开，体验是"我没点为啥
+    // 突然冒出来"。
+    setShareMomentId(null);
+    // pending 的评论 ref 也清——同样道理：A 上还没结算的评论 ref 残留到 B，
+    // 虽然 mutationFn 用 momentId 拿对应 args，但 ref 占内存且语义上属于
+    // 上一个角色页。onSuccess/onError 也会清，这里只是兜底防御。
+    commentSubmitArgsRef.current = {};
   }, [baseUrl, resolvedCharacterId]);
 
   useEffect(() => {
