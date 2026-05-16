@@ -89,7 +89,15 @@ public class YinjieRuntimePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     private func readBundledRuntimeConfig() -> [String: Any] {
-        guard let url = Bundle.main.url(forResource: "runtime-config", withExtension: "json"),
+        // Capacitor 把 webDir 整体作为 folder reference 同步到 ios/App/App/public/，
+        // 进 .app 后会保留目录层级；Bundle.main.url 不会递归搜子目录，必须显式
+        // 指 subdirectory:"public"，否则永远拿不到 bundled runtime-config.json，
+        // 业务侧只能靠 WebView fetch 兜底，这条 native 路径就成了死代码。
+        let bundleUrl =
+            Bundle.main.url(forResource: "runtime-config", withExtension: "json", subdirectory: "public") ??
+            Bundle.main.url(forResource: "runtime-config", withExtension: "json")
+
+        guard let url = bundleUrl,
               let data = try? Data(contentsOf: url),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             return [:]
