@@ -81,6 +81,18 @@ export function ProfileInfoAvatarPage() {
   // 用户已经在 URL 输入框里改过 / 已经从相册选过图时，不要被后台 hydrate
   // 把这俩 draft 覆盖回 store 值——会吞用户输入。
   const userTouchedRef = useRef(false);
+  // 保存上传中，用户如果手动点了 ← 返回 / 系统硬件 Back 退出本页，此时
+  // saveMutation 在 React Query 里仍然继续跑，几秒后 onSuccess 还会调一次
+  // goBack——但 navigate 这时是从用户已经退到的页面（如 /profile/info）再
+  // 退一格，跳到 /tabs/profile，整个一跳两格的诡异感。用 isMounted ref
+  // 在 onSuccess 里 gating，让用户主动退出后不要再被这次保存抢二次导航。
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!userTouchedRef.current) {
@@ -122,6 +134,7 @@ export function ProfileInfoAvatarPage() {
       hydrateOwner(owner);
     },
     onSuccess: () => {
+      if (!isMountedRef.current) return;
       goBack();
     },
   });

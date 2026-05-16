@@ -32,6 +32,16 @@ export function ProfileInfoNamePage() {
   // username"。但如果用户已经在输入框里改过字了，再被外部 store 更新覆盖回
   // 去就是吞输入。用 ref 记一下用户有没有动过输入框，动过就不再 auto-sync。
   const userTouchedRef = useRef(false);
+  // 用户在保存中点了 ← 返回 / Back 键退出本页时，saveMutation 不会因此被
+  // 取消，几秒后 onSuccess 仍会再调一次 goBack——这时 navigate 会从用户已经
+  // 退到的页（如 /profile/info）再退一格到 /tabs/profile，一跳两格。
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!userTouchedRef.current) {
@@ -62,6 +72,7 @@ export function ProfileInfoNamePage() {
       hydrateOwner(owner);
     },
     onSuccess: () => {
+      if (!isMountedRef.current) return;
       goBack();
     },
   });

@@ -29,6 +29,15 @@ export function ProfileInfoSignaturePage() {
   // 见 profile-info-name-page 同名 ref：用户已经动过输入框时，不要被
   // 后台 hydrate 把 draft 覆盖回 store 值。
   const userTouchedRef = useRef(false);
+  // 保存中用户手动 ← 退出页面后，几秒后 onSuccess 还会再调 goBack 一次，
+  // 多跳一格——见 profile-info-name-page / -avatar-page 同款 ref。
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!userTouchedRef.current) {
@@ -58,6 +67,7 @@ export function ProfileInfoSignaturePage() {
       hydrateOwner(owner);
     },
     onSuccess: () => {
+      if (!isMountedRef.current) return;
       goBack();
     },
   });
