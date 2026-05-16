@@ -200,6 +200,16 @@ export function useSearchIndex(
     [officialAccounts],
   );
 
+  // 走查 R2 真机 e2e：用户从「通讯录」按搜索来，常立刻点「联系人」chip 把范围
+  // 缩到联系人。但 messageSearchIndexQuery 的 enabled 不看 activeCategory，每次
+  // debounce 过完都会对当前账户全部 73 个会话 fan-out 73 个并发 POST /message-search
+  // ——而用户根本看不到结果（视图过滤掉了所有 messages 分类的条目）。本地实测
+  // 73 并发完成 ~105ms，公网隧道下 RTT × 73 量级会更夸张。把 enabled 也跟
+  // activeCategory 挂钩：只在「全部」/「聊天记录」两个 chip 下才发起远端消息检索；
+  // placeholderData=keepPreviousData 保证用户切回「全部」时旧数据先顶上、再被新
+  // 数据替换，体感不撞死等待。
+  const messageSearchEnabledForCategory =
+    activeCategory === "all" || activeCategory === "messages";
   const messageSearchIndexQuery = useQuery({
     queryKey: [
       "app-search-message-index",
@@ -207,7 +217,10 @@ export function useSearchIndex(
       conversationsSearchKey,
       debouncedRemoteKeyword,
     ],
-    enabled: Boolean(debouncedRemoteKeyword) && conversations.length > 0,
+    enabled:
+      Boolean(debouncedRemoteKeyword) &&
+      conversations.length > 0 &&
+      messageSearchEnabledForCategory,
     staleTime: 60_000,
     // 没有 placeholderData：每次用户多打一个字 normalizedSearchText 变 →
     // queryKey 变 → useQuery.data 退回 undefined → globalMessageResults 整段
