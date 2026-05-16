@@ -261,7 +261,20 @@ public class YinjieMobileBridgePlugin extends Plugin {
 
     @PluginMethod
     public void captureImage(PluginCall call) {
-        if (getPermissionState("camera") != PermissionState.GRANTED) {
+        PermissionState cameraState = getPermissionState("camera");
+        if (cameraState == PermissionState.DENIED) {
+            // 用户之前点过「拒绝」（Android 11+ 多次拒绝后系统标 PROMPT_NEVER_AGAIN
+            // → DENIED）；再 requestPermissionForAlias 不会弹任何系统 dialog，回调里
+            // 同样拿到 DENIED，跟 captureImageResult 里「用户点取消」完全没法区分。
+            // iOS 壳 Round 25 已经统一用 PERMISSION_DENIED code，这里照搬。
+            call.reject(
+                "camera permission denied — open Settings to grant access",
+                "PERMISSION_DENIED"
+            );
+            return;
+        }
+
+        if (cameraState != PermissionState.GRANTED) {
             requestPermissionForAlias("camera", call, "cameraPermissionResult");
             return;
         }
@@ -334,7 +347,10 @@ public class YinjieMobileBridgePlugin extends Plugin {
         }
 
         if (getPermissionState("camera") != PermissionState.GRANTED) {
-            call.reject("camera permission is not granted");
+            call.reject(
+                "camera permission denied — open Settings to grant access",
+                "PERMISSION_DENIED"
+            );
             return;
         }
 
