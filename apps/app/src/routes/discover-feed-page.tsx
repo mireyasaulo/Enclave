@@ -681,10 +681,15 @@ const pendingLikePostId = likeMutation.isPending
   // setNotice("") 把刚显的发布提示清掉 → 用户从发表页跳回广场看不到任何成功提示。
   // 合并成一个 effect + 用 ref 缓存第一次 consume 的结果，dev/prod 行为一致；
   // 同时把 setNotice 的写入留到 flash 取完之后，再考虑要不要清。
+  // 注意：isDesktopLayout 只在 publishFlashRef.taken 第一次为 false 时被读，
+  // 取过一次就锁住——所以它*不能*作为 effect deps，否则窗口宽度跨 960px 时
+  // 用户半路写到一半的评论草稿、compose 文本全被这层 reset 抹掉。用 ref
+  // 兜住"挂载那一刻是否桌面"。
   const publishFlashRef = useRef<{ taken: boolean; value: string | null }>({
     taken: false,
     value: null,
   });
+  const isDesktopLayoutAtMountRef = useRef(isDesktopLayout);
   useEffect(() => {
     resetComposeDraft();
     setCommentDrafts({});
@@ -696,7 +701,7 @@ const pendingLikePostId = likeMutation.isPending
 
     if (!publishFlashRef.current.taken) {
       publishFlashRef.current.taken = true;
-      publishFlashRef.current.value = isDesktopLayout
+      publishFlashRef.current.value = isDesktopLayoutAtMountRef.current
         ? null
         : consumeFeedPublishFlash();
     }
@@ -712,7 +717,7 @@ const pendingLikePostId = likeMutation.isPending
     setNoticeActionLabel(null);
     setNoticeAction(null);
     setNotice(""); // i18n-ignore-line
-  }, [baseUrl, isDesktopLayout, resetComposeDraft]);
+  }, [baseUrl, resetComposeDraft]);
 
   async function expandFullComments(postId: string) {
     if (loadingFullCommentsPostId === postId) return;
@@ -1072,11 +1077,15 @@ const pendingLikePostId = likeMutation.isPending
             favoriteSourceIds.includes(`feed-${postId}`)
           }
           setShowCompose={(next) => {
-            // 上一次发布失败 → 关闭面板 → 重开：composeErrorMessage 还会渲染
-            // 旧的 createMutation.error，用户没法分辨"这是上次失败"还是"这次
-            // 又失败"。开关之间显式 reset mutation，让面板每次开都是干净状态。
-            if (!next || (next && createMutation.isError)) {
+            // 上一次发布失败 / 选错图片 → 关闭面板 → 重开：composeErrorMessage
+            // 还会渲染上次的 createMutation.error 和 composeDraft.mediaError，
+            // 用户没法分辨"这是上次失败"还是"这次又失败"。开/关一次显式
+            // reset，让面板每次开都是干净状态（草稿文本/图片/视频留着）。
+            if (createMutation.isError) {
               createMutation.reset();
+            }
+            if (composeDraft.mediaError) {
+              composeDraft.setMediaError(null);
             }
             setShowCompose(next);
           }}
