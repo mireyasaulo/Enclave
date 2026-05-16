@@ -75,6 +75,17 @@ type SearchMessageRow = {
   createdAt: string;
 };
 
+// 后端 ChatMessageSearchItem.senderName 对系统消息原样下发 "system"——直接拼进
+// description 用户看到 "system：你已添加了 苏澄"，跟正常 sender 名混在一起看着像
+// 个 raw 字段漏出来。统一映射成本地化标签；其它 senderName 用户可见 / 已经做过
+// 后端 normalize，不动。
+function localizeSearchMessageSender(senderName: string) {
+  if (senderName.trim().toLowerCase() === "system") {
+    return t(msg`系统消息`);
+  }
+  return senderName;
+}
+
 function buildDesktopOfficialAccountSearchPath(
   accountId: string,
   articleId?: string,
@@ -330,7 +341,7 @@ export function useSearchIndex(
         id: `message-${message.messageId}`,
         category: "messages",
         title: message.conversationTitle,
-        description: t(msg`${message.senderName}：${buildSearchPreview(
+        description: t(msg`${localizeSearchMessageSender(message.senderName)}：${buildSearchPreview(
           message.text || t(msg`这条消息没有可展示文本。`),
           normalizedSearchText,
         )}`),
