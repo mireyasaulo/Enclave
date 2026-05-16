@@ -52,11 +52,13 @@ export function ContactsManagementModal({
   // permissions list 搜索框：state 提到 modal，list ↔ detail 切换不丢词。
   // 模态关闭时一并清，下次重开从空白起始（跟 stack reset 节奏一致）。
   const [permissionsSearch, setPermissionsSearch] = useState("");
+  // R2 走查：原 dep 含 permissionsSearch → 用户每敲一字都触发 effect 跑一次
+  //（即便 !open 分支永远走不到）。只看 open 就够，关闭瞬间 setState("") 安全。
   useEffect(() => {
-    if (!open && permissionsSearch !== "") {
+    if (!open) {
       setPermissionsSearch("");
     }
-  }, [open, permissionsSearch]);
+  }, [open]);
   // 仅在打开 permissions-detail 时才查（弹窗未打开时 useQuery 不订阅）。
   const detailCharacterId =
     current.type === "permissions-detail" ? current.characterId : null;
@@ -98,6 +100,13 @@ export function ContactsManagementModal({
   // 重开时 useManagementScreenStack(open) 会把 stack reset 回 root，screenKey
   // 也回到 "root"，记忆体里没有 root 的旧 scrollTop（root 几乎没滚动空间）
   // → 默认从顶部开始，符合预期。
+  // R2 走查：handler 通过 ref 读 currentScreenKey，避免 screenKey 一变就把 listener
+  // 拆掉重装；同一个 modal 生命周期里只 add 一次，scroll 60Hz 不会再来回挂钩子。
+  const currentScreenKeyRef = useRef(screenKey);
+  useEffect(() => {
+    currentScreenKeyRef.current = screenKey;
+  }, [screenKey]);
+
   useEffect(() => {
     if (!open) {
       return;
@@ -107,13 +116,16 @@ export function ContactsManagementModal({
       return;
     }
     const handleScroll = () => {
-      savedScrollByScreenRef.current.set(screenKey, container.scrollTop);
+      savedScrollByScreenRef.current.set(
+        currentScreenKeyRef.current,
+        container.scrollTop,
+      );
     };
     container.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       container.removeEventListener("scroll", handleScroll);
     };
-  }, [open, screenKey]);
+  }, [open]);
 
   useLayoutEffect(() => {
     if (!open) {
@@ -126,6 +138,17 @@ export function ContactsManagementModal({
     const saved = savedScrollByScreenRef.current.get(screenKey) ?? 0;
     container.scrollTop = saved;
   }, [open, screenKey]);
+
+  // R2 走查：modal 关闭后清空记忆 Map。原写法 Map 在 modal 关 / 重开之间一直
+  // 留着，用户在一个会话里依次进 30 个不同好友的 permissions-detail，就在 Map 里
+  // 堆 30 个 'permissions-detail:<uuid>' 条目（每条 scrollTop 几乎都是 0，因为
+  // detail 屏内容很短），后续再也用不到。整轮会话结束前都不释放。关闭时
+  // 顺手清掉，下次重开从干净状态起步。
+  useEffect(() => {
+    if (!open) {
+      savedScrollByScreenRef.current.clear();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;

@@ -152,21 +152,30 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
       ) : null}
 
       <ul className="mt-3 overflow-hidden rounded-[12px] bg-white shadow-[0_1px_0_rgba(15,23,42,0.04)]">
+        {/* R2 走查：mutation.isPending 时锁住三个 switch。原写法没锁，
+            用户连点 hideMine on / off / on 时多次 mutate 并发起飞，server
+            可能乱序完成；如果其中一条失败，单条 onError 用 setX(!next.X) 朴素
+            翻转，会把"另一条尚未落库的乐观值"也一并翻回去，看起来像 switch
+            自己反弹。锁到上一条落库再让点下一条，最差只是慢一点，不再有
+            状态错乱。 */}
         <SwitchRow
           label={t(msg`不让TA看我朋友圈`)}
           checked={hideMine}
+          disabled={mutation.isPending}
           onChange={(checked) => apply({ hideMine: checked })}
           first
         />
         <SwitchRow
           label={t(msg`不看TA的朋友圈`)}
           checked={hideTheir}
+          disabled={mutation.isPending}
           onChange={(checked) => apply({ hideTheir: checked })}
         />
         <SwitchRow
           label={t(msg`仅聊天的朋友`)}
           description={t(msg`仅保留聊天，TA 不会出现在朋友圈、动态等场景。`)}
           checked={chatOnly}
+          disabled={mutation.isPending}
           onChange={(checked) => apply({ chatOnly: checked })}
         />
       </ul>
@@ -179,12 +188,14 @@ function SwitchRow({
   description,
   checked,
   onChange,
+  disabled = false,
   first = false,
 }: {
   label: string;
   description?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  disabled?: boolean;
   first?: boolean;
 }) {
   return (
@@ -193,7 +204,12 @@ function SwitchRow({
         !first ? "border-t border-[color:var(--border-faint)]" : undefined
       }
     >
-      <label className="flex cursor-pointer items-center gap-3 px-4 py-3">
+      <label
+        className={cn(
+          "flex items-center gap-3 px-4 py-3",
+          disabled ? "cursor-not-allowed" : "cursor-pointer",
+        )}
+      >
         <div className="min-w-0 flex-1">
           <div className="text-[14px] text-[color:var(--text-primary)]">
             {label}
@@ -208,10 +224,12 @@ function SwitchRow({
           type="button"
           role="switch"
           aria-checked={checked}
+          disabled={disabled}
           onClick={() => onChange(!checked)}
           className={cn(
             "relative inline-flex h-[26px] w-[44px] shrink-0 items-center rounded-full transition-colors",
             checked ? "bg-[#07c160]" : "bg-[#e0e0e0]",
+            disabled ? "opacity-60" : undefined,
           )}
         >
           <span

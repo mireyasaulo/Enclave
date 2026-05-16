@@ -123,8 +123,12 @@ export function ManagementBlacklistScreen() {
       <ul className="overflow-hidden rounded-[12px] bg-white shadow-[0_1px_0_rgba(15,23,42,0.04)]">
         {blocked.map((entry, index) => {
           const character = characterMap.get(entry.characterId);
+          // R2 走查：原 fallback 是 entry.characterId.slice(0,8)，charactersQuery 还在
+          // 飞 / 角色已被删 时会把 "char-cel" "char-def" 这种 UUID 前缀当人名贴出来，
+          // 头像 chip 还会用 "c" 当首字母占位。改成"未知联系人"+ avatar 走 fallback 渲染，
+          // 比泄露内部 id 更友好。
           const name =
-            character?.name ?? entry.characterId.slice(0, 8);
+            character?.name ?? t(msg`未知联系人`);
           return (
             <li
               key={entry.id}
