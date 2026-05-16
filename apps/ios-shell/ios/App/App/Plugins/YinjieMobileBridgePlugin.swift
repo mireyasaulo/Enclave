@@ -106,12 +106,47 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             "yinjie-shared",
         ]
 
+        // 真机走查 R2：原版本 removeItem 整个 subdir。R1 把它挪到 background queue
+        // 之后引入了一条竞态：用户在冷启后很快就点「相册 → 选图」，PHPicker
+        // 落 yinjie-picker/<UUID>.jpg → JS 立刻 fetch(webPath)。如果 background
+        // 那条 removeItem(yinjie-picker) 正好在「文件写完」「JS fetch 之前」
+        // 这段窗口里跑完，整个 yinjie-picker 连同新写的图一起被删。JS 收到
+        // 404，用户看到「读取图片失败，请换一张再试」但实际上图是好的。
+        //
+        // 改成基于 mtime 的逐 child 清理：只删 cutoff(5 min 前) 之前 modify 过
+        // 的条目。本次 run 刚写的 tmp 全部 mtime 在 now 附近，被 cutoff 过滤
+        // 保留；前次 run 留下来的孤儿都比 cutoff 老，正常被清。对 yinjie-shared
+        // 也成立：UUID subdir 里 atomic write 完成时 dir.mtime ≈ write 时刻，
+        // 5 min 后才进入可清范围。新写入的 subdir/file 永远安全。
+        //
+        // 5 min 选型：iOS 自己的 tmp GC 通常 24h 起；5 min 已经远长于「用户
+        // 选图 / 拍照 / 转发文件」单次操作 → JS fetch upload 的端到端时间
+        // （正常 100ms-数秒），同时跑 5 min 之前留下的副本也覆盖绝大多数
+        // stale 场景。
+        let cutoff = Date().addingTimeInterval(-300)
+
         for name in ownedSubdirNames {
             let dir = fileManager.temporaryDirectory.appendingPathComponent(name, isDirectory: true)
             guard fileManager.fileExists(atPath: dir.path) else {
                 continue
             }
-            try? fileManager.removeItem(at: dir)
+
+            guard let entries = try? fileManager.contentsOfDirectory(
+                at: dir,
+                includingPropertiesForKeys: [.contentModificationDateKey],
+                options: []
+            ) else {
+                continue
+            }
+
+            for entry in entries {
+                let mtime =
+                    (try? entry.resourceValues(forKeys: [.contentModificationDateKey])
+                        .contentModificationDate) ?? Date.distantFuture
+                if mtime < cutoff {
+                    try? fileManager.removeItem(at: entry)
+                }
+            }
         }
     }
 
