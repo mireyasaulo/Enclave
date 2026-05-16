@@ -256,7 +256,16 @@ export function useSearchIndex(
             conversationSource: conversation.source,
             messageId: message.messageId,
             senderName: message.senderName,
-            text: message.previewText || t(msg`这条消息没有可展示文本。`),
+            // 走查 R4 真机：服务端 resolveMessageSemanticPreview 直接吐 message.text.trim()
+            // 没经任何 sanitize，AI 历史里残留的 <thought>...</thought> / <internal_reasoning>
+            // ... 块、[角色名]: 前缀这些"本来不该给用户看"的内部 token 直接进了 previewText。
+            // 同账户 direct_char-default-self 里实测能看到这类 raw AI 推理被搜出来。
+            // 跟 conversation.lastMessage 一致用 sanitizeDisplayedChatText 兜底（拆 reply
+            // 元数据 + 抹掉 <thought>/<internal_reasoning>/Speaker 前缀）。fallback 仍然给
+            // 一条人话提示而不是空字符串。
+            text:
+              sanitizeDisplayedChatText(message.previewText || "") ||
+              t(msg`这条消息没有可展示文本。`),
             createdAt: message.createdAt,
           }));
         }),
