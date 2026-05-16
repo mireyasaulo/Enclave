@@ -269,7 +269,10 @@ function MenuOverlay({
               Math.max(1, Math.min(hud.maxUnlockedStage, Number(e.target.value) || 1)),
             )
           }
-          className="w-16 rounded bg-white/10 px-2 py-1 text-[12px] text-white"
+          // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
+          // zoom-in。在 HUD 上选关时整个游戏画面瞬间被拉大，玩家被迫先双指
+          // 捏回来才能看 maxUnlockedStage / 已解锁数。
+          className="w-16 rounded bg-white/10 px-2 py-1 text-[16px] text-white"
         />
         <span className="text-[11px] text-white/50">
           {t(msg`已解锁 ${hud.maxUnlockedStage} / 35`)}
