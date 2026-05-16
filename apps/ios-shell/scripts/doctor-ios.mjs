@@ -444,6 +444,38 @@ const checks = [
       ? "capacitor.config.ts declares ios.scheme and does not override server.androidScheme/hostname"
       : "capacitor.config.ts not found",
   },
+  (() => {
+    // installed Podfile 跟 xcode-template/Podfile.example 必须对齐 iOS 最低
+    // 部署版本，不然 fresh checkout 走 template 的副本会偷偷把 minimum bump
+    // 起来，把 Capacitor 实际支持的 iPhone 6s/7/SE-1 等 14.x 设备全断掉。
+    // 当前 Capacitor 7.6.1 的 s.ios.deployment_target = '14.0'。
+    const installedPodfile = path.join(shellRoot, "ios", "App", "Podfile");
+    const templatePodfile = path.join(
+      shellRoot,
+      "xcode-template",
+      "Podfile.example",
+    );
+    const installedMatch = fileMatches(
+      installedPodfile,
+      /platform\s*:ios,\s*['"]14\.0['"]/m,
+    );
+    const templateMatch = fileMatches(
+      templatePodfile,
+      /platform\s*:ios,\s*['"]14\.0['"]/m,
+    );
+    return {
+      label: "podfile-deployment-target",
+      ok:
+        (!fs.existsSync(installedPodfile) || installedMatch) &&
+        (!fs.existsSync(templatePodfile) || templateMatch),
+      detail:
+        fs.existsSync(installedPodfile) || fs.existsSync(templatePodfile)
+          ? installedMatch && templateMatch
+            ? "Podfile + xcode-template/Podfile.example both target ios 14.0 (matches Capacitor 7 minimum)"
+            : "Podfile drift: installed and xcode-template Podfile.example must both pin platform :ios, '14.0'"
+          : "Podfile not generated yet; run `pnpm ios:sync` first",
+    };
+  })(),
   {
     label: "info-plist-arm64",
     ok:
