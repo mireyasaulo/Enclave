@@ -39,9 +39,15 @@ export function DesktopChatHeaderActions({
       }
     }
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setCallMenuOpen(false);
+      if (event.key !== "Escape") {
+        return;
       }
+      // 通话菜单在 desktopHeaderActionsRef 内，开它不会触发 workspace
+      // pointerdown 的 dismissSidePanel；按 Esc 时若不 stopPropagation，
+      // workspace 那条 window keydown 会顺手把背后的「聊天信息」侧栏也关掉。
+      event.preventDefault();
+      event.stopPropagation();
+      setCallMenuOpen(false);
     }
 
     window.addEventListener("pointerdown", handlePointerDown);
