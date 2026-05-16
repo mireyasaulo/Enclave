@@ -10,6 +10,50 @@ const appDelegatePath = path.join(appRoot, "AppDelegate.swift");
 const infoPlistPath = path.join(appRoot, "Info.plist");
 const privacyManifestPath = path.join(appRoot, "PrivacyInfo.xcprivacy");
 const entitlementsPath = path.join(appRoot, "App.entitlements");
+const shellConfigPath = path.join(cwd, "ios-shell.config.json");
+const shellLocalConfigPath = path.join(cwd, "ios-shell.config.local.json");
+
+function readJsonIfExists(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch (error) {
+    console.error(`Failed to parse ${path.relative(cwd, filePath)}: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function deepMerge(target, source) {
+  if (!isPlainObject(target)) {
+    return isPlainObject(source) ? deepMerge({}, source) : source;
+  }
+  if (!isPlainObject(source)) {
+    return target;
+  }
+  const result = { ...target };
+  for (const key of Object.keys(source)) {
+    const srcVal = source[key];
+    const tgtVal = result[key];
+    if (isPlainObject(tgtVal) && isPlainObject(srcVal)) {
+      result[key] = deepMerge(tgtVal, srcVal);
+    } else {
+      result[key] = srcVal;
+    }
+  }
+  return result;
+}
+
+const baseShellConfig = readJsonIfExists(shellConfigPath) ?? {};
+const localShellConfig = readJsonIfExists(shellLocalConfigPath) ?? {};
+const shellConfig = deepMerge(baseShellConfig, localShellConfig);
+const permissionsByRegion = shellConfig?.localization?.permissions ?? {};
+const iosOptions = shellConfig?.ios ?? {};
 
 if (!fs.existsSync(iosRoot)) {
   console.error("Missing ios/App directory. Run `pnpm ios:sync` first.");
@@ -42,12 +86,21 @@ const privacyManifestFileRefId = "7A6C0F112B0E4C9200D10014";
 const entitlementsFileRefId = "7A6C0F112B0E4C9200D10015";
 const infoPlistStringsBuildFileId = "7A6C0F112B0E4C9200D10005";
 const infoPlistStringsVariantGroupId = "7A6C0F112B0E4C9200D10030";
-const infoPlistStringLocalizations = [
+const PERMISSION_KEY_MAPPING = {
+  appDisplayName: "CFBundleDisplayName",
+  publicAppName: "YinjiePublicAppName",
+  camera: "NSCameraUsageDescription",
+  photoLibrary: "NSPhotoLibraryUsageDescription",
+  photoLibraryAdd: "NSPhotoLibraryAddUsageDescription",
+  microphone: "NSMicrophoneUsageDescription",
+};
+
+const INFO_PLIST_LOCALIZATION_DEFAULTS = [
   {
     region: "zh-Hans",
     directory: "zh-Hans.lproj",
     fileRefId: "7A6C0F112B0E4C9200D10031",
-    values: {
+    defaults: {
       CFBundleDisplayName: "隐界",
       YinjiePublicAppName: "隐界",
       NSCameraUsageDescription: "用于拍摄头像或动态图片。",
@@ -60,7 +113,7 @@ const infoPlistStringLocalizations = [
     region: "en",
     directory: "en.lproj",
     fileRefId: "7A6C0F112B0E4C9200D10032",
-    values: {
+    defaults: {
       CFBundleDisplayName: "Yinjie",
       YinjiePublicAppName: "Yinjie",
       NSCameraUsageDescription: "Used to take profile photos or moment images.",
@@ -76,7 +129,7 @@ const infoPlistStringLocalizations = [
     region: "ja",
     directory: "ja.lproj",
     fileRefId: "7A6C0F112B0E4C9200D10033",
-    values: {
+    defaults: {
       CFBundleDisplayName: "Yinjie",
       YinjiePublicAppName: "Yinjie",
       NSCameraUsageDescription:
@@ -93,7 +146,7 @@ const infoPlistStringLocalizations = [
     region: "ko",
     directory: "ko.lproj",
     fileRefId: "7A6C0F112B0E4C9200D10034",
-    values: {
+    defaults: {
       CFBundleDisplayName: "Yinjie",
       YinjiePublicAppName: "Yinjie",
       NSCameraUsageDescription:
@@ -107,6 +160,27 @@ const infoPlistStringLocalizations = [
     },
   },
 ];
+
+function resolveLocalizedValues(region, defaults) {
+  const overrides = permissionsByRegion[region] ?? {};
+  const merged = { ...defaults };
+  for (const [shortKey, plistKey] of Object.entries(PERMISSION_KEY_MAPPING)) {
+    const candidate = overrides[shortKey];
+    if (typeof candidate === "string" && candidate.trim()) {
+      merged[plistKey] = candidate;
+    }
+  }
+  return merged;
+}
+
+const infoPlistStringLocalizations = INFO_PLIST_LOCALIZATION_DEFAULTS.map(
+  ({ region, directory, fileRefId, defaults }) => ({
+    region,
+    directory,
+    fileRefId,
+    values: resolveLocalizedValues(region, defaults),
+  }),
+);
 
 const copies = [
   {
@@ -917,6 +991,24 @@ function optionalEnv(name) {
   return value || null;
 }
 
+function optionalShellString(...candidates) {
+  for (const candidate of candidates) {
+    if (candidate === undefined || candidate === null) {
+      continue;
+    }
+    const value = String(candidate).trim();
+    if (value) {
+      return value;
+    }
+  }
+  return null;
+}
+
+function pickConfigured(envName, ...configCandidates) {
+  // env 优先级最高（CI 用），否则按 deep-merged shellConfig 取
+  return optionalEnv(envName) ?? optionalShellString(...configCandidates);
+}
+
 function replaceBuildSetting(source, key, value) {
   const pattern = new RegExp(
     `(${key.replace(/[.*+?^${}()|[\\\\]]/g, "\\$&")}\\s*=\\s*)(\"[^\"\\n]*\"|[^;\\n]+)(;)`,
@@ -950,15 +1042,34 @@ function applyReleaseBuildSettings() {
   }
 
   const settings = {
-    PRODUCT_BUNDLE_IDENTIFIER: optionalEnv("YINJIE_IOS_BUNDLE_IDENTIFIER"),
-    MARKETING_VERSION: optionalEnv("YINJIE_IOS_MARKETING_VERSION"),
-    CURRENT_PROJECT_VERSION: optionalEnv("YINJIE_IOS_BUILD_NUMBER"),
-    DEVELOPMENT_TEAM: optionalEnv("YINJIE_IOS_DEVELOPMENT_TEAM"),
-    CODE_SIGN_STYLE: optionalEnv("YINJIE_IOS_CODE_SIGN_STYLE"),
-    PROVISIONING_PROFILE_SPECIFIER: optionalEnv(
-      "YINJIE_IOS_PROVISIONING_PROFILE_SPECIFIER",
+    PRODUCT_BUNDLE_IDENTIFIER: pickConfigured(
+      "YINJIE_IOS_BUNDLE_IDENTIFIER",
+      shellConfig.appId,
     ),
-    CODE_SIGN_IDENTITY: optionalEnv("YINJIE_IOS_CODE_SIGN_IDENTITY"),
+    MARKETING_VERSION: pickConfigured(
+      "YINJIE_IOS_MARKETING_VERSION",
+      shellConfig.marketingVersion,
+    ),
+    CURRENT_PROJECT_VERSION: pickConfigured(
+      "YINJIE_IOS_BUILD_NUMBER",
+      shellConfig.buildNumber,
+    ),
+    DEVELOPMENT_TEAM: pickConfigured(
+      "YINJIE_IOS_DEVELOPMENT_TEAM",
+      iosOptions.developmentTeam,
+    ),
+    CODE_SIGN_STYLE: pickConfigured(
+      "YINJIE_IOS_CODE_SIGN_STYLE",
+      iosOptions.codeSignStyle,
+    ),
+    PROVISIONING_PROFILE_SPECIFIER: pickConfigured(
+      "YINJIE_IOS_PROVISIONING_PROFILE_SPECIFIER",
+      iosOptions.provisioningProfileSpecifier,
+    ),
+    CODE_SIGN_IDENTITY: pickConfigured(
+      "YINJIE_IOS_CODE_SIGN_IDENTITY",
+      iosOptions.codeSignIdentity,
+    ),
   };
 
   const provided = Object.entries(settings).filter(([, value]) => value);
@@ -990,9 +1101,18 @@ function applyEntitlementsFromEnv() {
     return;
   }
 
-  const apsEnv = optionalEnv("YINJIE_IOS_APS_ENVIRONMENT");
-  const associatedDomain = optionalEnv("YINJIE_IOS_ASSOCIATED_DOMAIN");
-  const bundleId = optionalEnv("YINJIE_IOS_BUNDLE_IDENTIFIER");
+  const apsEnv = pickConfigured(
+    "YINJIE_IOS_APS_ENVIRONMENT",
+    iosOptions.apsEnvironment,
+  );
+  const associatedDomain = pickConfigured(
+    "YINJIE_IOS_ASSOCIATED_DOMAIN",
+    iosOptions.associatedDomain,
+  );
+  const bundleId = pickConfigured(
+    "YINJIE_IOS_BUNDLE_IDENTIFIER",
+    shellConfig.appId,
+  );
 
   if (!apsEnv && !associatedDomain && !bundleId) {
     return;
@@ -1032,6 +1152,11 @@ function applyEntitlementsFromEnv() {
 
 applyReleaseBuildSettings();
 applyEntitlementsFromEnv();
+
+// 标记一次 shell config 实际生效的来源，便于 doctor 排查
+console.log(
+  `shell config: appId=${shellConfig.appId ?? "(unset)"} marketingVersion=${shellConfig.marketingVersion ?? "(unset)"} buildNumber=${shellConfig.buildNumber ?? "(unset)"} apsEnvironment=${iosOptions.apsEnvironment ?? "(unset)"}`,
+);
 
 const readmePath = path.join(pluginsRoot, "README.generated.txt");
 fs.writeFileSync(

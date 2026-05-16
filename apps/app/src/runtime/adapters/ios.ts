@@ -21,7 +21,7 @@ export function getIosRuntimeCapabilities(): AppRuntimeCapabilities {
     canConfigureProviderLocally: false,
     canUseSecureStorage: true,
     canReceivePush: false,
-    canPickImages: false,
+    canPickImages: true,
     canConfigureRemoteService: true,
     canExportDiagnostics: false,
     canManageProvider: false,

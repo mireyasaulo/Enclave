@@ -27,7 +27,7 @@ const projectPath = path.join(shellRoot, "ios", "App", "App.xcodeproj", "project
 const entitlementsPath = path.join(iosAppRoot, "App.entitlements");
 const privacyManifestPath = path.join(iosAppRoot, "PrivacyInfo.xcprivacy");
 const capacitorConfigPath = path.join(shellRoot, "capacitor.config.ts");
-const webDistIndexPath = path.resolve(shellRoot, "..", "app", "dist", "index.html");
+const webDistIndexPath = path.resolve(shellRoot, "..", "app", "dist-mobile", "index.html");
 const infoPlistStringLocalizations = ["zh-Hans", "en", "ja", "ko"];
 const requiredInfoPlistStringKeys = [
   "CFBundleDisplayName",
@@ -464,8 +464,8 @@ const checks = [
       return !hasAbsoluteAsset;
     })(),
     detail: fs.existsSync(webDistIndexPath)
-      ? "apps/app/dist/index.html uses relative asset paths (WKWebView file:// safe)"
-      : "apps/app/dist not built yet; run `pnpm --filter @yinjie/ios-shell prepare:web`",
+      ? "apps/app/dist-mobile/index.html uses relative asset paths (WKWebView file:// safe)"
+      : "apps/app/dist-mobile not built yet; run `pnpm --filter @yinjie/ios-shell prepare:web`",
   },
 ];
 

@@ -1,9 +1,22 @@
 import type { CapacitorConfig } from "@capacitor/cli";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+type ShellConfig = {
+  appId: string;
+  appName: string;
+};
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const shellConfig = JSON.parse(
+  readFileSync(path.join(here, "ios-shell.config.json"), "utf8"),
+) as ShellConfig;
 
 const config: CapacitorConfig = {
-  appId: "com.yinjie.ios",
-  appName: "隐界",
-  webDir: "../app/dist",
+  appId: shellConfig.appId,
+  appName: shellConfig.appName,
+  webDir: "../app/dist-mobile",
   ios: {
     scheme: "capacitor",
     contentInset: "always",

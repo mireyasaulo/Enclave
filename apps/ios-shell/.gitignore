@@ -6,6 +6,7 @@ ios/App/Pods
 ios/App/Podfile.lock
 ios-release.env.local
 ios-export-options.local.plist
+ios-shell.config.local.json
 build
 *.ipa
 *.xcarchive
