@@ -1015,6 +1015,16 @@ if (command === "doctor") {
       ]);
     }
 
+    // Round 19：缺这条 meta-data，background 系统通知会回落到 SDK 的
+    // fcm_fallback_notification_channel（IMPORTANCE_DEFAULT + 英文 Miscellaneous），
+    // 跟我们前台 / 本地推送的 yinjie_messages 高优先级 channel 脱节。
+    checks.push([
+      "manifest fcm default channel = yinjie_messages",
+      /com\.google\.firebase\.messaging\.default_notification_channel_id[\s\S]*?android:value="yinjie_messages"/.test(
+        androidManifest,
+      ),
+    ]);
+
     // Hardening: manifest cleartext must be a build-variant placeholder, not
     // a hardcoded literal that can drift in tracked git history.
     checks.push([
