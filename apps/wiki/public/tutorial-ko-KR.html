@@ -507,17 +507,40 @@
   <li>스키마 버전 불일치 / 필드 초과 → 400 거부</li>
 </ul>
 
-<h3>6.8 삭제</h3>
+<h3>6.8 은계 app에 연동해 실제로 사용하기</h3>
+<p>wiki 쪽 비공개 캐릭터는 「설정 파일」일 뿐입니다. <strong>AI가 실제로 그 캐릭터를 연기하며 대화하게 하려면, 은계 app(런타임 클라이언트)으로 가져와야 합니다</strong>. 전체 흐름:</p>
+
+<div class="steps">
+  <div class="step"><span class="n">1</span><h4>wiki에서 내보내기</h4><p>비공개 캐릭터 목록 / 편집 페이지에서 「📤 JSON 내보내기」 클릭 → <code>.json</code> 다운로드.</p></div>
+  <div class="step"><span class="n">2</span><h4>은계 app 열기</h4><p>임의의 클라이언트(모바일 / 데스크톱)에서 로그인. 가져오기는 로그인 필요.</p></div>
+  <div class="step"><span class="n">3</span><h4>가져오기 페이지로 이동</h4><p>모바일: 「나」 탭 → 「캐릭터 가져오기」.<br>데스크톱: 메뉴 진입점 없음, <code>/profile/character-import</code> 직접 접속.</p></div>
+  <div class="step"><span class="n">4</span><h4>.json 업로드</h4><p>방금 다운받은 파일(≤ 5 MB) 선택 → 제출. 백엔드가 <code>POST /characters/import-personal</code>로 검증·저장.</p></div>
+  <div class="step"><span class="n">5</span><h4>대화 시작</h4><p>가져오기 성공 후 캐릭터는 자동으로 친구 추가되어 「연락처」에 표시. 연락처에서 캐릭터 탭 → 캐릭터 상세 페이지 → 「대화 시작」으로 채팅 시작.</p></div>
+</div>
+
+<div class="callout warn">
+  <span class="label">⚠️ 버전 동기화 없음</span>
+  <p>wiki 쪽과 app 쪽은 <strong>독립된 사본</strong>입니다. wiki에서 캐릭터 설정을 수정해도 app은 자동 업데이트되지 않으며, app에서 대화로 쌓인 기억 / 관계 진행도는 wiki에서 보이지 않습니다.</p>
+  <p><strong>동기화하려면</strong>: wiki에서 다시 내보내기 → app 가져오기 페이지에서 재업로드. <strong>동명 덮어쓰기는 이전에 가져온 캐릭터에만 적용</strong>(<code>sourceType=private_import</code>) — 다른 출처의 동명 캐릭터는 충돌 에러로 덮어쓸 수 없습니다.</p>
+</div>
+
+<div class="callout tip">
+  <span class="label">💡 왜 「wiki에서 만들고 app에서 실행」?</span>
+  <p>app에는 <strong>「비공개 캐릭터 만들기」 UI가 없습니다</strong>. 설계상 wiki는 「완전한 캐릭터 편집 환경 + AI 보조」, app은 「대화 런타임」 — 만들기·편집은 wiki, 실행은 app. 이 분리가 wiki에 비공개 캐릭터 기능이 존재하는 핵심 이유입니다.</p>
+</div>
+
+<h3>6.9 삭제</h3>
 <div class="callout warn">
   <span class="label">⚠️ 하드 삭제, 복구 불가</span>
   <p>비공개 캐릭터 삭제는 <strong>실삭제</strong>(Wiki 문서의 소프트 삭제와 다름) — 확인 즉시 DB에서 완전히 사라지며, 「복구 신청」 절차가 없습니다. 삭제 전에 「『X』를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.」 확인 다이얼로그가 표시됩니다.</p>
   <p>장기 보관이 필요하면, 먼저 「📤 JSON 내보내기」로 로컬에 저장한 후 삭제하세요.</p>
+  <p><strong>주의</strong>: wiki 쪽에서 삭제해도 이미 app에 가져온 사본에는 <strong>영향이 없습니다</strong>(둘은 독립) — app 쪽에서도 없애려면 연락처에서 별도로 삭제하세요.</p>
 </div>
 
-<h3>6.9 현재 미지원</h3>
+<h3>6.10 현재 미지원</h3>
 <p>비공개 캐릭터에서 현재 <strong>할 수 없는 것</strong>을 알아두면, 진입점을 찾느라 헤매지 않습니다:</p>
 <ul>
-  <li>❌ <strong>비공개 캐릭터와 직접 대화 불가</strong>: 비공개 캐릭터는 「설정 파일」일 뿐, 실제로 AI가 그 캐릭터를 연기하게 하려면 JSON 내보내기 후 app 측에 가져오기</li>
+  <li>❌ <strong>wiki 안에서 직접 캐릭터와 대화 불가</strong>: wiki 쪽에 대화 UI가 없습니다 — <a href="#private">6.8</a>에 따라 app으로 가져오세요</li>
   <li>❌ <strong>공유 / 협업 불가</strong>: 다른 사용자에게는 로그인해도 접근 불가</li>
   <li>❌ <strong>「Wiki에 일괄 공개」 기능 없음</strong>: 비공개 캐릭터를 공개 문서로 만들려면 <a href="/create">/create</a>에서 직접 다시 입력</li>
   <li>❌ <strong>버전 이력 없음</strong>: 저장 시마다 덮어써지며, 이전 버전은 볼 수 없음</li>

@@ -507,17 +507,40 @@
   <li>スキーマバージョン不一致 / 項目超過 → 400 で拒否</li>
 </ul>
 
-<h3>6.8 削除</h3>
+<h3>6.8 隠界 app に取り込んで実際に使う</h3>
+<p>wiki 上のプライベートキャラは「設定ファイル」に過ぎません。<strong>AI に実際に演じさせて対話するには、隠界 app（実行クライアント）にインポートする必要があります</strong>。手順：</p>
+
+<div class="steps">
+  <div class="step"><span class="n">1</span><h4>wiki でエクスポート</h4><p>プライベートキャラ一覧 / 編集ページで「📤 JSON エクスポート」をクリックし <code>.json</code> をダウンロード。</p></div>
+  <div class="step"><span class="n">2</span><h4>隠界 app を開く</h4><p>任意のクライアント（モバイル / デスクトップ）でログイン。インポートにはログインが必要。</p></div>
+  <div class="step"><span class="n">3</span><h4>インポートページへ</h4><p>モバイル：「マイ」タブ → 「キャラクターをインポート」。<br>デスクトップ：メニュー入口なし、直接 <code>/profile/character-import</code> にアクセス。</p></div>
+  <div class="step"><span class="n">4</span><h4>.json をアップロード</h4><p>ダウンロードしたファイル（≤ 5 MB）を選択 → 送信。バックエンドが <code>POST /characters/import-personal</code> で検証・保存。</p></div>
+  <div class="step"><span class="n">5</span><h4>対話を開始</h4><p>インポート成功後、キャラは自動でフレンドに追加され「連絡先」に表示。連絡先でキャラをタップ → キャラ詳細ページ → 「会話を開始」をタップで対話開始。</p></div>
+</div>
+
+<div class="callout warn">
+  <span class="label">⚠️ バージョン同期なし</span>
+  <p>wiki 側と app 側は<strong>独立したコピー</strong>です。wiki でキャラ設定を変更しても app は自動更新されず、app の対話で蓄積された記憶 / 関係進展は wiki からは見えません。</p>
+  <p><strong>同期するには</strong>：wiki から再エクスポート → app のインポートページで再アップロード。<strong>同名上書きは過去にインポートしたキャラ限定</strong>（<code>sourceType=private_import</code>）— 別ソース由来の同名キャラは衝突エラーで上書きできません。</p>
+</div>
+
+<div class="callout tip">
+  <span class="label">💡 なぜ「wiki で作って app で動かす」？</span>
+  <p>app には<strong>「プライベートキャラ作成」UI がありません</strong>。設計上、wiki は「完全なキャラクター編集環境 + AI 補助」、app は「対話ランタイム」— 作成・編集は wiki、実行は app。この分離が wiki にプライベートキャラ機能が存在する核心的な理由です。</p>
+</div>
+
+<h3>6.9 削除</h3>
 <div class="callout warn">
   <span class="label">⚠️ ハード削除、復旧不可</span>
   <p>プライベートキャラの削除は<strong>本物の削除</strong>（Wiki 記事のソフト削除と異なる）— 確定すると DB から完全に消え、「復旧申請」フローはありません。削除前に「『X』を削除しますか？この操作は取り消せません。」の確認ダイアログが表示されます。</p>
   <p>長期保存したい場合は、先に「📤 JSON エクスポート」でローカル保存してから削除。</p>
+  <p><strong>注意</strong>：wiki 側で削除しても、すでに app にインポートされたコピーには<strong>影響しません</strong>（両者は独立）— app 側でも消したい場合は連絡先から別途削除してください。</p>
 </div>
 
-<h3>6.9 現時点で未対応</h3>
+<h3>6.10 現時点で未対応</h3>
 <p>プライベートキャラで現在<strong>できないこと</strong>を把握しておくと、入口探しで困りません：</p>
 <ul>
-  <li>❌ <strong>プライベートキャラと直接対話できない</strong>：これは「設定ファイル」に過ぎず、実際に AI に演じさせるには JSON エクスポート → app 側でインポート</li>
+  <li>❌ <strong>wiki 内で直接キャラと対話できない</strong>：wiki 側に対話 UI はありません — <a href="#private">6.8</a> に従い app へインポートしてください</li>
   <li>❌ <strong>共有 / 共同編集ができない</strong>：他利用者にはログインしていてもアクセス不可</li>
   <li>❌ <strong>「Wiki に一括公開」機能はない</strong>：プライベートキャラを公開記事にするには <a href="/create">/create</a> で手動再入力</li>
   <li>❌ <strong>バージョン履歴がない</strong>：保存ごとに上書きされ、以前の版は見られない</li>

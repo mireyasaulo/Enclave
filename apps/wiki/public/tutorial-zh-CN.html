@@ -650,17 +650,40 @@
   <li>schema 版本不匹配 / 字段超长 → 直接 400 拒绝</li>
 </ul>
 
-<h3>6.8 删除</h3>
+<h3>6.8 接入隐界 app 实际使用</h3>
+<p>私有角色在 wiki 这边只是「配置文件」。<strong>要让 AI 真的扮演这个角色和你对话，需要把它导入到隐界 app</strong>（前端壳）。完整流程：</p>
+
+<div class="steps">
+  <div class="step"><span class="n">1</span><h4>wiki 端导出</h4><p>在私有角色列表 / 编辑页点「📤 导出 JSON」，下载 <code>.json</code> 文件。</p></div>
+  <div class="step"><span class="n">2</span><h4>打开隐界 app</h4><p>登录任意端（手机 / 桌面）。导入功能需要登录账号。</p></div>
+  <div class="step"><span class="n">3</span><h4>进入导入页</h4><p>移动端：「我」标签 → 「导入角色」。<br>桌面端：菜单无入口，直接访问 <code>/profile/character-import</code>。</p></div>
+  <div class="step"><span class="n">4</span><h4>上传 .json</h4><p>选刚下载的文件（≤ 5 MB）→ 提交。后端调 <code>POST /characters/import-personal</code> 校验并落库。</p></div>
+  <div class="step"><span class="n">5</span><h4>开始对话</h4><p>导入成功后角色自动加为好友，出现在「通讯录」。点角色 → 进入角色详情页 → 点「发起对话」即可开聊。</p></div>
+</div>
+
+<div class="callout warn">
+  <span class="label">⚠️ 没有版本同步</span>
+  <p>wiki 和 app 这两边是<strong>独立副本</strong>。wiki 改了角色配置，app 那边不会自动更新；app 那边对话产生的记忆 / 关系进度，wiki 也看不到。</p>
+  <p><strong>要同步</strong>：重新「📤 导出 JSON」→ 再次去 app 导入页上传。<strong>同名覆盖只对之前导入的角色生效</strong>（<code>sourceType=private_import</code>）；和其它来源同名时不能覆盖，会报冲突。</p>
+</div>
+
+<div class="callout tip">
+  <span class="label">💡 为什么是 wiki 创建、app 运行？</span>
+  <p>app 端<strong>没有「创建私有角色」UI</strong>。设计上 wiki 是"完整的角色编辑环境 + AI 辅助生成"，app 是"对话运行时" — 创建编辑用 wiki，运行用 app，工作流分离。这也是 wiki 私有角色存在的核心价值。</p>
+</div>
+
+<h3>6.9 删除</h3>
 <div class="callout warn">
   <span class="label">⚠️ 硬删除，不可恢复</span>
   <p>私有角色的删除是<strong>真删</strong>（区别 Wiki 词条的软删除）— 一旦确认，数据从数据库直接消失，没有"申请恢复"流程。删除前会弹「确认删除『X』？此操作无法撤销。」二次确认。</p>
   <p>需要长期保留？先「📤 导出 JSON」存到本地，再删。</p>
+  <p><strong>注意</strong>：wiki 这边删除<strong>不会</strong>影响已经导入到 app 的副本（两边独立）— 如果不想 app 那边继续出现，得在 app 通讯录里另外删一次。</p>
 </div>
 
-<h3>6.9 当前不支持</h3>
+<h3>6.10 当前不支持</h3>
 <p>了解一下私有角色目前<strong>做不到</strong>的事，避免找不到入口困惑：</p>
 <ul>
-  <li>❌ <strong>不能直接和私有角色聊天</strong>：私有角色只是"配置文件"，要让 AI 真的演这个角色，需要导出 JSON 后到 app 端导入</li>
+  <li>❌ <strong>在 wiki 里直接和角色聊天</strong>：wiki 没有对话 UI，必须按 <a href="#private">6.8</a> 流程导入到 app 才能用</li>
   <li>❌ <strong>不能分享 / 协作</strong>：链接对其他用户登录后也访问不到</li>
   <li>❌ <strong>没有「一键发布到 Wiki」</strong>：要把私有角色变成公开词条，得自己去 <a href="/create">/create</a> 重新填一份</li>
   <li>❌ <strong>没有版本历史</strong>：每次保存都是直接覆盖，看不到上一版长什么样</li>
