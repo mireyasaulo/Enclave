@@ -652,12 +652,24 @@ export function MobileFriendMomentsPage() {
 
   const { containerRef, state: pullState } = usePullToRefresh({
     onRefresh: async () => {
-      await Promise.all([
+      // 走查 R2：refetch() 在 TanStack Query v5 默认不会 reject —— 错误落到
+      // result.error 而不是抛出，Promise.all 也就吞不掉错误。之前网络挂死时
+      // 用户看到指示器走完一遍消失，但根本不知道列表没换。和 moments-page mobile
+      // 下拉刷新失败的 danger notice 通道对齐：每个 refetch 单独看 result.error，
+      // 任何一个失败都冒到顶部红条 2.4s 自动收。
+      const results = await Promise.all([
         momentsQuery.refetch(),
         blockedQuery.refetch(),
         friendsQuery.refetch(),
         characterQuery.refetch(),
       ]);
+      const failed = results.find((r) => r.isError && r.error instanceof Error);
+      if (failed?.error instanceof Error) {
+        setNotice({
+          tone: "danger",
+          message: t(msg`刷新失败：${failed.error.message}`),
+        });
+      }
     },
     enabled: Boolean(resolvedCharacterId),
   });
