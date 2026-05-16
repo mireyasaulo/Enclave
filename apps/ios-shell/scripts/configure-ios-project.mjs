@@ -499,6 +499,14 @@ function ensureInfoPlistDefaults() {
   const requiredStrings = [
     ["YinjieApiBaseUrl", ""],
     ["YinjieSocketBaseUrl", ""],
+    // YinjieRuntimePlugin.getConfig 的 Info.plist 兜底分支会读 info["YinjieCloudApiBaseUrl"]，
+    // 但 Round 21/28/33 一路给 bundled runtime-config.json 加 cloudApiBaseUrl 的时候漏了
+    // Info.plist 这条镜像 —— 模板 Info.plist.example 没声明这个 key，ensureInfoPlistDefaults
+    // 也没把它塞进 requiredStrings。结果 cloud-api 那条「bundled 失踪 → Info.plist 兜底」
+    // 跟其它三个 URL 的对齐路径，从来就不存在；如果哪天 cap sync 没把 public/runtime-config.json
+    // 拷过来（手动 archive、CI 漏跑 sync 等），cloud-api 入口直接全死，Swift 端死代码不报错。
+    // 跟 YinjieApiBaseUrl / YinjieSocketBaseUrl 拉齐。
+    ["YinjieCloudApiBaseUrl", ""],
     ["YinjieEnvironment", ""],
     ["CFBundleDisplayName", ""],
     ["YinjiePublicAppName", ""],

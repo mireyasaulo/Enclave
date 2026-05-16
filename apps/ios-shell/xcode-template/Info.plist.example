@@ -50,6 +50,8 @@
   <string></string>
   <key>YinjieSocketBaseUrl</key>
   <string></string>
+  <key>YinjieCloudApiBaseUrl</key>
+  <string></string>
   <key>YinjieEnvironment</key>
   <string></string>
   <key>YinjiePublicAppName</key>

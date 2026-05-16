@@ -70,10 +70,11 @@ iOS 壳优先从以下位置读取运行时配置：
 2. `Info.plist`
    - `YinjieApiBaseUrl`
    - `YinjieSocketBaseUrl`
+   - `YinjieCloudApiBaseUrl`
    - `YinjieEnvironment`
    - `YinjiePublicAppName`
 
-`apiBaseUrl` / `socketBaseUrl` / `environment` 以 `runtime-config.json` 为准，`Info.plist` 只是兜底。
+`apiBaseUrl` / `socketBaseUrl` / `cloudApiBaseUrl` / `environment` 以 `runtime-config.json` 为准，`Info.plist` 只是兜底。
 
 原生 plugin 列表：
 

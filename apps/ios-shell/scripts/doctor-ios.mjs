@@ -203,6 +203,10 @@ const checks = [
       fileIncludesAll(infoPlistPath, [
         "YinjieApiBaseUrl",
         "YinjieSocketBaseUrl",
+        // Round 44: YinjieRuntimePlugin 早就读 info["YinjieCloudApiBaseUrl"] 当 Info.plist 兜底，
+        // 但模板 / configure / doctor 三处都漏写这个 key —— cloud-api 那条「bundled 失踪 → Info.plist
+        // 兜底」事实上从没工作过。盯死 Info.plist 必须有 YinjieCloudApiBaseUrl，跟其它三条 URL 对齐。
+        "YinjieCloudApiBaseUrl",
         "YinjieEnvironment",
         "YinjiePublicAppName",
       ]),
