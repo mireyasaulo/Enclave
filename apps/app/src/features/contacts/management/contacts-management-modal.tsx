@@ -1,4 +1,10 @@
-import { useEffect, useMemo, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  type ReactNode,
+} from "react";
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, X } from "lucide-react";
@@ -33,6 +39,15 @@ export function ContactsManagementModal({
 
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
+  // 模态体里的滚动容器是 modal 共享一个 overflow-y-auto，list / detail 两屏内容
+  // 切换时 detail（一般 1 屏内）比 list（A-Z 26 段）短得多。用户在 list 滚到
+  // "M" 段 → 点某个好友 → push 'permissions-detail' → DOM 换成短内容 → 浏览器
+  // 自动 clamp 滚动容器的 scrollTop 到新内容的 maxScrollTop（趋近 0）→ 点返回
+  // 回到 list，滚动条已经被拍回顶部，用户得重新 A-Z 一路滚到 M。在 modal 这一层
+  // 拦截屏切换记录 / 恢复 scrollTop（用 useLayoutEffect 保证 paint 前生效，
+  // 避免肉眼看到一帧"先在顶部、再瞬移到 M"）。
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const savedScrollByScreenRef = useRef<Map<string, number>>(new Map());
   // 仅在打开 permissions-detail 时才查（弹窗未打开时 useQuery 不订阅）。
   const detailCharacterId =
     current.type === "permissions-detail" ? current.characterId : null;
@@ -59,6 +74,45 @@ export function ContactsManagementModal({
     );
     return char?.name ?? null;
   }, [detailCharacterId, friendsQuery.data, charactersQuery.data]);
+
+  const screenKey =
+    current.type === "permissions-detail"
+      ? `permissions-detail:${current.characterId}`
+      : current.type;
+
+  // 屏切换前后：先把当前屏正在被滚动的 scrollTop 持续 sync 进 ref；屏一变
+  // 就在 useLayoutEffect 里把新屏之前存的 scrollTop 写回容器。modal 关闭 →
+  // 重开时 useManagementScreenStack(open) 会把 stack reset 回 root，screenKey
+  // 也回到 "root"，记忆体里没有 root 的旧 scrollTop（root 几乎没滚动空间）
+  // → 默认从顶部开始，符合预期。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const container = scrollContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const handleScroll = () => {
+      savedScrollByScreenRef.current.set(screenKey, container.scrollTop);
+    };
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [open, screenKey]);
+
+  useLayoutEffect(() => {
+    if (!open) {
+      return;
+    }
+    const container = scrollContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const saved = savedScrollByScreenRef.current.get(screenKey) ?? 0;
+    container.scrollTop = saved;
+  }, [open, screenKey]);
 
   useEffect(() => {
     if (!open) return;
@@ -162,7 +216,10 @@ export function ContactsManagementModal({
         />
         <div className="relative flex max-h-[80vh] w-full max-w-[480px] flex-col overflow-hidden rounded-[16px] border border-[color:var(--border-faint)] bg-white shadow-[var(--shadow-overlay)]">
           {header}
-          <div className="min-h-0 flex-1 overflow-y-auto bg-[#f7f7f7]">
+          <div
+            ref={scrollContainerRef}
+            className="min-h-0 flex-1 overflow-y-auto bg-[#f7f7f7]"
+          >
             {body}
           </div>
         </div>
@@ -183,7 +240,10 @@ export function ContactsManagementModal({
           <div className="h-1 w-9 rounded-full bg-black/10" />
         </div>
         {header}
-        <div className="min-h-0 flex-1 overflow-y-auto bg-[#f7f7f7]">
+        <div
+          ref={scrollContainerRef}
+          className="min-h-0 flex-1 overflow-y-auto bg-[#f7f7f7]"
+        >
           {body}
         </div>
       </div>
