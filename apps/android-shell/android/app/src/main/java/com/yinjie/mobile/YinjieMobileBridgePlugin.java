@@ -2,6 +2,8 @@ package com.yinjie.mobile;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ClipData;
 import android.content.Context;
@@ -722,12 +724,30 @@ public class YinjieMobileBridgePlugin extends Plugin {
     }
 
     private String readNotificationPermissionState() {
-        // areNotificationsEnabled 反映用户在系统设置 → 应用 → 通知里的总开关，
+        // areNotificationsEnabled 反映用户在系统设置 → 应用 → 通知里的「总开关」，
         // 一旦用户主动关掉，就算 Android 13+ runtime permission 还停留在 GRANTED，
         // showLocalNotification 也是静默丢掉不弹任何东西。pre-Tiramisu 没 runtime
         // permission，全靠这条开关来定 granted/denied。
-        boolean notificationsEnabled =
-            NotificationManagerCompat.from(getContext()).areNotificationsEnabled();
+        NotificationManagerCompat manager =
+            NotificationManagerCompat.from(getContext());
+        boolean notificationsEnabled = manager.areNotificationsEnabled();
+
+        // Round 30：Android 8+ 的通知系统是 channel 粒度的，用户可以在
+        // 系统设置 → 应用 → 通知 → 「隐界消息」单独关掉这条 channel
+        // （IMPORTANCE_NONE），整条 app 通知总开关却仍开着。这种状态下
+        // areNotificationsEnabled() 返 true、runtime permission 也是 GRANTED，
+        // 但所有走 yinjie_messages channel 的 notify() —— 包括 FCM 推送和
+        // showLocalNotification 本地提醒 —— 都被系统层静默丢弃，JS 收到
+        // resolve() 还以为弹了，「打开通知」引导也压根不弹（state="granted"）。
+        // 把 channel-level 的 disable 状态合并进 effective enabled。
+        if (notificationsEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel =
+                manager.getNotificationChannel(CHANNEL_ID);
+            if (channel != null
+                && channel.getImportance() == NotificationManager.IMPORTANCE_NONE) {
+                notificationsEnabled = false;
+            }
+        }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return notificationsEnabled ? "granted" : "denied";

@@ -73,6 +73,34 @@ class MusicQuotaExhaustedError extends Error {
 const MAX_MOMENT_TEXT_LENGTH = 2000;
 const MAX_COMMENT_TEXT_LENGTH = 500;
 
+// 朋友圈 media[].url 白名单：合法上传通过 POST /api/moments/media 一律返回相对路径
+// `/api/moments/media/<fileName>`（见 saveUploadedMedia）。任何不匹配此模式的 URL —
+// 无论是 `http://evil/track.gif` 还是其他相对路径——都不能在 createUserMoment
+// 落库。否则 frontend 渲染时 <img src="https://evil/..."> 会把 user IP / 公网隧道
+// token / Cookie 全部泄露到第三方域名（实际真机走查 Round 1 验证：直接 POST 一个
+// SSRF 测试 URL 成功落库返回 200，前端会发起对 evil.example.com 的请求）。
+// 字段：url / thumbnailUrl / posterUrl / livePhoto.motionUrl 都走这个白名单。
+const MOMENT_MEDIA_URL_PREFIX = '/api/moments/media/';
+function assertMomentMediaUrl(value: string | null | undefined, field: string): void {
+  if (value === null || value === undefined || value === '') return;
+  if (!value.startsWith(MOMENT_MEDIA_URL_PREFIX)) {
+    throw new AppError('MOMENTS_MEDIA_URL_INVALID', {
+      params: { field },
+      legacyMessage: `朋友圈媒体 ${field} 必须来自上传接口。`,
+    });
+  }
+  // 阻止 path traversal：尽管 normalizeMomentMediaFileName 在读取时会再卡一道，
+  // 落库阶段就拦掉更保险——`/api/moments/media/../../etc/passwd` 这种 fileName
+  // 会被 path.normalize 卷回上层目录。fileName 不允许包含 `..` / `/` / `\`。
+  const fileName = value.slice(MOMENT_MEDIA_URL_PREFIX.length);
+  if (!fileName || /[\\/]|\.\.|^\.+$/.test(fileName)) {
+    throw new AppError('MOMENTS_MEDIA_URL_INVALID', {
+      params: { field },
+      legacyMessage: `朋友圈媒体 ${field} 文件名非法。`,
+    });
+  }
+}
+
 // trim 后再剥掉零宽字符（U+200B–U+200D / U+FEFF / U+2060）和**内部空白**。
 // 用来判定 text 是不是"视觉为空"——纯 ZWS / ZWS+内部空格混排的正文/评论会让
 // 卡片渲染出一行空白，但 likes/comments footer 依然挂着，看着像幽灵帖。
@@ -1602,11 +1630,16 @@ export class MomentsService implements OnModuleInit {
     index: number,
   ): MomentMediaAsset {
     if (asset.kind === 'video') {
+      const url = asset.url?.trim() || '';
+      const posterUrl = asset.posterUrl?.trim() || undefined;
+      // 阻止 SSRF：url / posterUrl 必须命中 /api/moments/media/ 白名单。
+      assertMomentMediaUrl(url, 'video.url');
+      assertMomentMediaUrl(posterUrl, 'video.posterUrl');
       return {
         id: asset.id?.trim() || `moment-video-${index + 1}`,
         kind: 'video',
-        url: asset.url?.trim() || '',
-        posterUrl: asset.posterUrl?.trim() || undefined,
+        url,
+        posterUrl,
         mimeType: asset.mimeType?.trim() || 'video/mp4',
         fileName: asset.fileName?.trim() || `video-${index + 1}`,
         size: Math.max(0, Math.round(asset.size ?? 0)),
@@ -1617,11 +1650,15 @@ export class MomentsService implements OnModuleInit {
     }
 
     if (asset.kind === 'audio') {
+      const url = asset.url?.trim() || '';
+      const posterUrl = asset.posterUrl?.trim() || undefined;
+      assertMomentMediaUrl(url, 'audio.url');
+      assertMomentMediaUrl(posterUrl, 'audio.posterUrl');
       return {
         id: asset.id?.trim() || `moment-audio-${index + 1}`,
         kind: 'audio',
-        url: asset.url?.trim() || '',
-        posterUrl: asset.posterUrl?.trim() || undefined,
+        url,
+        posterUrl,
         mimeType: asset.mimeType?.trim() || 'audio/mpeg',
         fileName: asset.fileName?.trim() || `audio-${index + 1}`,
         size: Math.max(0, Math.round(asset.size ?? 0)),
@@ -1631,12 +1668,17 @@ export class MomentsService implements OnModuleInit {
       };
     }
 
+    const url = asset.url?.trim() || '';
+    const thumbnailUrl = asset.thumbnailUrl?.trim() || url || undefined;
+    const motionUrl = asset.livePhoto?.motionUrl?.trim() || undefined;
+    assertMomentMediaUrl(url, 'image.url');
+    assertMomentMediaUrl(thumbnailUrl, 'image.thumbnailUrl');
+    assertMomentMediaUrl(motionUrl, 'image.livePhoto.motionUrl');
     return {
       id: asset.id?.trim() || `moment-image-${index + 1}`,
       kind: 'image',
-      url: asset.url?.trim() || '',
-      thumbnailUrl:
-        asset.thumbnailUrl?.trim() || asset.url?.trim() || undefined,
+      url,
+      thumbnailUrl,
       mimeType: asset.mimeType?.trim() || 'image/jpeg',
       fileName: asset.fileName?.trim() || `image-${index + 1}`,
       size: Math.max(0, Math.round(asset.size ?? 0)),
@@ -1645,7 +1687,7 @@ export class MomentsService implements OnModuleInit {
       livePhoto: asset.livePhoto?.enabled
         ? {
             enabled: true,
-            motionUrl: asset.livePhoto.motionUrl?.trim() || undefined,
+            motionUrl,
           }
         : undefined,
     };

@@ -102,6 +102,8 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`请先选择一个朋友圈媒体文件。`);
     case "MOMENTS_INVALID_MEDIA_TYPE":
       return translateRuntimeMessage(msg`朋友圈当前仅支持图片或视频。`);
+    case "MOMENTS_MEDIA_URL_INVALID":
+      return translateRuntimeMessage(msg`朋友圈媒体必须来自上传接口。`);
     case "MOMENTS_MEDIA_NOT_FOUND":
       return translateRuntimeMessage(msg`朋友圈媒体不存在。`);
     case "MOMENTS_NOT_FOUND":

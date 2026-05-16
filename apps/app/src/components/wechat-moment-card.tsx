@@ -145,23 +145,26 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
     const hasText = Boolean(displayText);
     const hasMedia = moment.media.length > 0;
     const hasLikes = moment.likes.length > 0;
-    // visibleComments：filter 掉 stripToolCallSyntax 清成空串的「残骸」评论
-    // （LLM 漏出 [TOOL_CALL] / CoT prose 被 sanitize 掉的）。这样 hasComments /
-    // showFooterBlock 都跟着真实可显示的评论数走 —— 之前若一条 moment 只有一条
-    // 残骸评论，footer 仍然 render 一个空的 px-2.5 py-1.5 灰块，看起来像「评论
-    // 区暴露但里头空空」。
-    const visibleComments = moment.comments.filter(
-      (c) => stripToolCallSyntax(c.text).trim().length > 0,
-    );
-    const hasComments = visibleComments.length > 0;
-    const showFooterBlock = hasLikes || hasComments;
-    // 评论行渲染时要按 replyToCommentId 反查 author 名字。原写法是 visibleComments
-    // .map 里再 moment.comments.find()——典型的 O(N²)。33 条评论 1k 次查表、
-    // 100 条评论 1w 次。一次过 Map 起来共享。
+    // 一遍过预计算每条评论的 cleanText + 同时建 authorId 反查表。之前 filter
+    // 阶段（line 154）跑一次 stripToolCallSyntax，render map 里（line 347）又
+    // 跑一次同样的 regex，50 条评论 ＝ 100 次正则；而且 commentAuthorById 还要
+    // 再循环一次 moment.comments。合三为一：
+    //   - visibleComments：保留 cleanText 非空的（filter 掉 [TOOL_CALL] / CoT
+    //     prose 残骸，否则 footer 会渲染空灰块）
+    //   - cleanTextById：渲染时直接读已算好的 cleanText
+    //   - commentAuthorById：reply-to 名字查表（O(1) 替代 O(N) find）
+    const cleanTextById = new Map<string, string>();
     const commentAuthorById = new Map<string, string>();
+    const visibleComments: typeof moment.comments = [];
     for (const c of moment.comments) {
       commentAuthorById.set(c.id, c.authorName);
+      const cleanText = stripToolCallSyntax(c.text);
+      if (cleanText.trim().length === 0) continue;
+      cleanTextById.set(c.id, cleanText);
+      visibleComments.push(c);
     }
+    const hasComments = visibleComments.length > 0;
+    const showFooterBlock = hasLikes || hasComments;
 
     return (
       <article
@@ -344,7 +347,10 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
                     const replyToName = comment.replyToCommentId
                       ? commentAuthorById.get(comment.replyToCommentId) ?? null
                       : null;
-                    const cleanCommentText = stripToolCallSyntax(comment.text);
+                    // 上一遍循环已算过 stripToolCallSyntax，这里直接读
+                    // ——visibleComments 是过完滤的，cleanTextById 必有该 key。
+                    const cleanCommentText =
+                      cleanTextById.get(comment.id) ?? comment.text;
                     return (
                       <button
                         key={comment.id}
