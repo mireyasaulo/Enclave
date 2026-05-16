@@ -12,6 +12,7 @@ import {
   isNativeMobileBridgeAvailable,
   shareFileWithNativeShell,
 } from "../runtime/mobile-bridge";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 
 // qrcode (~70KB) + html-to-image (~30KB) 是分享卡片专用的重依赖。
 // 静态 import 会让它们被 vendor-misc chunk 吃掉，模块预加载链路一并拉，公网
@@ -231,6 +232,18 @@ export function ShareCardModal({
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
+  }, [cardKey, onClose]);
+
+  // Android 硬件 Back：分享卡 modal 打开时按 Back 应该收 modal 而不是退掉
+  // 整个广场/朋友圈页 —— modal 已经 body.overflow=hidden 屏蔽了底层交互，
+  // 用户视觉上"在 modal 里"，Back 自然语义就是收 modal。
+  useEffect(() => {
+    if (!cardKey) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
   }, [cardKey, onClose]);
 
   // body 滚动锁 — modal 打开时背景不能滚动（手机上特别重要，否则手指滑动
