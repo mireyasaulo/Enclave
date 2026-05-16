@@ -6863,6 +6863,8 @@ function NoteViewerOverlay({
                     <img
                       src={previewImageUrl}
                       alt={title}
+                      loading="lazy"
+                      decoding="async"
                       className="my-2 max-h-[60vw] w-full rounded-[14px] border border-[rgba(15,23,42,0.08)] object-cover"
                     />
                   ) : null}
@@ -6876,6 +6878,8 @@ function NoteViewerOverlay({
                         key={asset.id}
                         src={asset.url}
                         alt={asset.fileName}
+                        loading="lazy"
+                        decoding="async"
                         className="my-2 max-h-[60vw] w-full rounded-[14px] border border-[rgba(15,23,42,0.08)] object-cover"
                       />
                     ))}
