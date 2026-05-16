@@ -41,7 +41,10 @@ export function DesktopContactsFriendRequestsPane({
   const pendingCount = requests.length;
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-auto bg-[rgba(245,247,247,0.96)]">
+    // 外层不能再背 overflow-auto，否则 header 会跟着列表一起往上卷出视区。
+    // 改成 header + 独立滚动容器（content），跟 starred-friends pane 同款结构，
+    // 用户批处理时顶端的"x 条待处理"一直可见。
+    <div className="flex h-full min-h-0 flex-col bg-[rgba(245,247,247,0.96)]">
       <div className="border-b border-[color:var(--border-faint)] bg-white/82 px-8 py-6 backdrop-blur-xl">
         <div className="min-w-0">
           <div className="text-[22px] font-medium text-[color:var(--text-primary)]">
@@ -59,7 +62,7 @@ export function DesktopContactsFriendRequestsPane({
         </div>
       </div>
 
-      <div className="flex-1 px-8 py-6">
+      <div className="min-h-0 flex-1 overflow-auto px-8 py-6">
         {actionError ? (
           <div className="mb-4">
             <InlineNotice tone="danger">{actionError}</InlineNotice>
@@ -74,7 +77,10 @@ export function DesktopContactsFriendRequestsPane({
           <div className="flex h-full items-center justify-center">
             <LoadingBlock label={t(msg`正在读取好友请求...`)} />
           </div>
-        ) : error ? (
+        ) : error && !requests.length ? (
+          // 仅当没有数据时把 ErrorBlock 撑满；refetch 失败但 query 还留着前一次
+          // 成功的 data 时，把列表保住，让用户接着处理手头那一批，错误以下面顶部
+          // 的 actionError 提示。
           <ErrorBlock message={error} />
         ) : requests.length ? (
           <div className="space-y-3">
