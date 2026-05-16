@@ -302,7 +302,16 @@ export function ProfileInfoAvatarPage() {
   // （改 URL 又紧接着选图的极端情况），点「完成」会把那个 URL 而不是刚选的图
   // 落库。reader.onload 之后 pickedLocal 才出来、setDraft("") 才执行，但已经
   // 晚了。用一个 isReadingFile 标志在读图期间锁住「完成」/「恢复默认」。
+  //
+  // 由 inFlightReadersRef 集合驱动：每个进行中的 FileReader 把自己的 pickId
+  // 加进集合，onload/onerror 不管 pickId 是否最新都把自己从集合移除。集合
+  // 非空就 setIsReadingFile(true)、空了就 setIsReadingFile(false)，避免
+  // 「老 reader 因为 pickId mismatch 早退而永远不清状态」的死锁
+  // （Round 1 走查实测：用户连点两次「从相册选择」、第二次在 picker 里取消，
+  //  第一次的 onload 由于 pickId mismatch 早退、finish() 永不调用，UI 永久
+  //  停在「读取中」状态，「完成」「恢复默认」全部 disabled，必须刷新页面才能恢复）。
   const [isReadingFile, setIsReadingFile] = useState(false);
+  const inFlightReadersRef = useRef<Set<number>>(new Set());
   const isSaving =
     saveMutation.isPending || resetMutation.isPending || isReadingFile;
 
@@ -310,7 +319,7 @@ export function ProfileInfoAvatarPage() {
   // 不保证 readAsDataURL 完成顺序——大文件 A 先开始读、小文件 B 后开始
   // 读但更快完成，会出现 B 的 onload 先 setPickedLocal(B)、A 的 onload
   // 再 setPickedLocal(A)，最终用户看到 A（实际想要 B）。用一个自增 id 给
-  // 每次 pick 编号，onload 时校验是不是最新那次，不是就丢弃。
+  // 每次 pick 编号，onload 时校验是不是最新那次，不是就丢弃 state 写入。
   const latestPickIdRef = useRef(0);
 
   async function handlePickAvatar() {
@@ -350,30 +359,35 @@ export function ProfileInfoAvatarPage() {
     // reset 两个 mutation 把红字清掉。
     saveMutation.reset();
     resetMutation.reset();
+    inFlightReadersRef.current.add(pickId);
     setIsReadingFile(true);
     const reader = new FileReader();
     const finish = () => {
-      // 只有最新 pickId 才负责把 reading 状态关掉，避免被 stale onload
-      // 提前 clear（race 时旧文件的 onload 比新文件早到）。
-      if (pickId === latestPickIdRef.current) {
+      // 不管 pickId 是否还是最新都必须把自己从集合里移除——只看 pickId 会
+      // 让「stale onload」永不清状态、UI 锁死（见上面 inFlightReadersRef 注释）。
+      inFlightReadersRef.current.delete(pickId);
+      if (inFlightReadersRef.current.size === 0) {
         setIsReadingFile(false);
       }
     };
     reader.onerror = () => {
-      if (pickId !== latestPickIdRef.current) return;
-      setLocalError(t(msg`读取图片失败，请换一张试试。`));
+      // localError 文案只在最新一次失败时显示——stale reader 的 onerror 不
+      // 该把用户当前正在读的新文件的错误覆盖掉，也不该在没有"当前活动文件"
+      // 时弹出过时错误。
+      if (pickId === latestPickIdRef.current) {
+        setLocalError(t(msg`读取图片失败，请换一张试试。`));
+      }
       finish();
     };
     reader.onload = () => {
-      if (pickId !== latestPickIdRef.current) {
-        return;
-      }
-      const result = reader.result;
-      if (typeof result === "string") {
-        userTouchedRef.current = true;
-        setPickedLocal({ dataUrl: result, size: file.size, name: file.name });
-        // 选了本地图后，URL 输入框里的旧 URL 不再适用，先清掉
-        setDraft("");
+      if (pickId === latestPickIdRef.current) {
+        const result = reader.result;
+        if (typeof result === "string") {
+          userTouchedRef.current = true;
+          setPickedLocal({ dataUrl: result, size: file.size, name: file.name });
+          // 选了本地图后，URL 输入框里的旧 URL 不再适用，先清掉
+          setDraft("");
+        }
       }
       finish();
     };
