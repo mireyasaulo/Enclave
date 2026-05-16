@@ -967,6 +967,12 @@ export function MomentsPage() {
     // mid-flight，旧 args 残留在内存。每次切账户都会堆，长期跑就是泄漏；
     // 顺手 wipe 防御。
     commentSubmitArgsRef.current = {};
+    // hash 携带 momentId 时一次性 scroll-into-view 用的"已 snap 锁"也得清——
+    // 否则 A 账户 snap 过的 momentId 留在 ref 里，B 账户如果碰巧 hash 还带着
+    // 同 id（或 routeSelectedMomentId 未变），新账户里 momentsQuery 拉回来时
+    // 不会重新 snap 到目标卡片。和 actionBubble/commentBarTarget 同模式：
+    // 跨 baseUrl 不要让状态泄漏。
+    mobileScrollSnappedRouteIdRef.current = null;
     const flashNotice = consumeMomentPublishFlash();
     if (flashNotice) {
       setNoticeTone("success");
