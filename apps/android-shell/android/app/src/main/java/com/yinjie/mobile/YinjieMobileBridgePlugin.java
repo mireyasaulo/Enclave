@@ -70,8 +70,11 @@ public class YinjieMobileBridgePlugin extends Plugin {
             return;
         }
 
+        // 不要无脑 addCategory(BROWSABLE)：浏览器的 filter 同时声明 DEFAULT + BROWSABLE
+        // 是「我能接 web 跳转」，但 dialer / mail / sms 的 filter 只声明 DEFAULT，
+        // 一旦 intent 里带上 BROWSABLE，tel:/mailto:/sms: 都会 ActivityNotFoundException，
+        // 公众号文章里的电话 / 邮箱 / 短信链接全部静默打不开。
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        intent.addCategory(Intent.CATEGORY_BROWSABLE);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         try {
