@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { registerAndroidBackInterceptor } from "../../runtime/android-back-button";
 
 const t = translateRuntimeMessage;
 
@@ -66,6 +68,20 @@ export function MobileMessageActionSheet({
   onDelete,
   deleteLabel = t(msg`删除`),
 }: MobileMessageActionSheetProps) {
+  // 原生壳硬件 Back 键打开时优先关 sheet，不让 BACK 同时 history.back 把
+  // 用户从聊天页带回 chat list。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [open, onClose]);
+
   if (!open) {
     return null;
   }

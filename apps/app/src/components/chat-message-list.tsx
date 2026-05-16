@@ -476,6 +476,29 @@ export function ChatMessageList({
     [baseUrl],
   );
 
+  // mobile 长按消息气泡时 Android WebView 会同时触发系统 selection 工具栏，
+  // 跟自家的 MessageActionSheet 重叠。yj-no-callout 关 webkit-user-select
+  // 还不够 —— Chromium 在 long-press 触发 selectstart 之后才看 user-select，
+  // 必须在 selectstart 阶段就 preventDefault。React 没有 onSelectStart 类型，
+  // 这里 mobile 平台用 document-level listener，按 [data-yj-msg-bubble] 命中。
+  useEffect(() => {
+    if (isDesktop || typeof document === "undefined") {
+      return;
+    }
+    const blockOnBubble = (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.("[data-yj-msg-bubble='1']")) {
+        event.preventDefault();
+      }
+    };
+    document.addEventListener("selectstart", blockOnBubble, true);
+    document.addEventListener("contextmenu", blockOnBubble, true);
+    return () => {
+      document.removeEventListener("selectstart", blockOnBubble, true);
+      document.removeEventListener("contextmenu", blockOnBubble, true);
+    };
+  }, [isDesktop]);
+
   useEffect(() => {
     if (!highlightedMessageId) {
       setActiveHighlightedMessageId(undefined);
@@ -3011,12 +3034,15 @@ export function ChatMessageList({
               onPointerUp={clearLongPressTimer}
               onPointerCancel={clearLongPressTimer}
               onPointerMove={handleMobileMessagePointerMove}
+              data-yj-msg-bubble={isDesktop ? undefined : "1"}
               className={`rounded-[16px] transition-[background-color,box-shadow] duration-300 ${
                 isDesktop
                   ? "space-y-1.5 px-2 py-1.5"
-                  : continuesMessageRun
-                    ? "space-y-0.5 px-1.5 py-0.5"
-                    : "space-y-1 px-1.5 py-1"
+                  : `yj-no-callout ${
+                      continuesMessageRun
+                        ? "space-y-0.5 px-1.5 py-0.5"
+                        : "space-y-1 px-1.5 py-1"
+                    }`
               } ${
                 isHighlighted
                   ? "bg-[rgba(255,224,120,0.15)] shadow-[0_0_0_1px_rgba(255,191,0,0.16)]"
