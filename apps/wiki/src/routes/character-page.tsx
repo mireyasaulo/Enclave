@@ -130,7 +130,7 @@ export function CharacterPage() {
               <button
                 type="button"
                 aria-pressed={viewMode === "stable"}
-                className={`flex-1 px-3 py-1.5 sm:flex-none ${
+                className={`flex-1 px-3 py-2 sm:flex-none ${
                   viewMode === "stable"
                     ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
                     : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
@@ -142,7 +142,7 @@ export function CharacterPage() {
               <button
                 type="button"
                 aria-pressed={viewMode === "current"}
-                className={`flex-1 px-3 py-1.5 sm:flex-none ${
+                className={`flex-1 px-3 py-2 sm:flex-none ${
                   viewMode === "current"
                     ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
                     : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
@@ -276,7 +276,7 @@ function TabButton({
       type="button"
       onClick={onClick}
       aria-current={active ? "page" : undefined}
-      className={`min-w-[68px] rounded-full px-4 py-1.5 text-sm transition-colors ${
+      className={`inline-flex min-h-[36px] min-w-[68px] items-center justify-center rounded-full px-4 py-1.5 text-sm transition-colors ${
         active
           ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)] shadow-[var(--shadow-soft)]"
           : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
