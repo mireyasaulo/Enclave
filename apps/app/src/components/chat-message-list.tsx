@@ -2258,7 +2258,29 @@ export function ChatMessageList({
   };
 
   const handleClearReminder = async (messageId: string) => {
-    await clearReminder(messageId);
+    // clearReminder 走的是 removeReminderMutation.mutateAsync —— 公网隧道
+    // 偶发超时 / cloud token 重连那几百 ms 都会 reject。caller 是
+    // void handleClearReminder(...) fire-and-forget，漏 try/catch 整条
+    // rejection 直接落 unhandledrejection 污染 telemetry，用户那边还看不到
+    // 任何 toast，以为操作生效了。
+    try {
+      await clearReminder(messageId);
+    } catch (error) {
+      setActionNotice({
+        message:
+          error instanceof Error
+            ? error.message
+            : t(msg`取消提醒失败，请稍后再试。`),
+        tone: "danger",
+        actionLabel: t(msg`继续取消提醒`),
+        onAction: () => {
+          void handleClearReminder(messageId);
+        },
+        secondaryActionLabel: errorActionLabel,
+        onSecondaryAction: onErrorAction ?? undefined,
+      });
+      return;
+    }
     setReminderTargetMessage((current) =>
       current?.id === messageId ? null : current,
     );
