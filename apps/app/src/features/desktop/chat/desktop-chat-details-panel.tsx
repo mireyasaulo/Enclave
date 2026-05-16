@@ -344,6 +344,17 @@ function DirectChatDetailsPanel({
         queryKey: ["app-friends", baseUrl],
       });
     },
+    // 没有 onError 时，updateFriendProfile 网络失败/FRIEND_NOT_FOUND 都被
+    // 静默吞掉：用户在「设置备注/标签」弹层点保存，看不到任何反馈，下面
+    // handleProfileSave 的 mutateAsync 又会 reject 一路冒到
+    // `void currentEditDialog.onConfirm(value)` 落 window.unhandledrejection。
+    onError: (error) => {
+      setNotice(
+        error instanceof Error && error.message !== "FRIEND_NOT_FOUND"
+          ? error.message
+          : t(msg`联系人资料更新失败，请稍后再试。`),
+      );
+    },
   });
 
   const clearMutation = useMutation({
@@ -477,8 +488,10 @@ function DirectChatDetailsPanel({
           onConfirm: async (value: string) => {
             const nextForm = { ...profileForm, remarkName: value };
             setProfileForm(nextForm);
-            await handleProfileSave(nextForm);
-            setEditingField(null);
+            const saved = await handleProfileSave(nextForm);
+            if (saved) {
+              setEditingField(null);
+            }
           },
         }
       : editingField === "tags"
@@ -490,8 +503,10 @@ function DirectChatDetailsPanel({
             onConfirm: async (value: string) => {
               const nextForm = { ...profileForm, tags: value };
               setProfileForm(nextForm);
-              await handleProfileSave(nextForm);
-              setEditingField(null);
+              const saved = await handleProfileSave(nextForm);
+              if (saved) {
+                setEditingField(null);
+              }
             },
           }
         : null;
@@ -500,13 +515,24 @@ function DirectChatDetailsPanel({
     remarkName: string;
     tags: string;
   }) {
-    await updateProfileMutation.mutateAsync({
-      remarkName: nextForm.remarkName.trim() || null,
-      tags: nextForm.tags
-        .split(/[，,]/)
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-    });
+    // 旧版直接 await mutateAsync 不 catch：mutation 失败时 mutateAsync 会
+    // reject 一路冒到 currentEditDialog.onConfirm → 父层的
+    // `void currentEditDialog.onConfirm(value)` 漏接，落 window
+    // unhandledrejection。这里改成 try/catch — 成功 / 失败由 mutation
+    // 的 onSuccess / onError 各自负责写 notice，函数只负责告诉调用方该不
+    // 该关弹层。
+    try {
+      await updateProfileMutation.mutateAsync({
+        remarkName: nextForm.remarkName.trim() || null,
+        tags: nextForm.tags
+          .split(/[，,]/)
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   const busy =

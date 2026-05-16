@@ -162,7 +162,18 @@ export function useLocalChatMessageActionState() {
         return;
       }
 
-      setState(nextState);
+      // 用 updatedAt 当 cheap hash：buildWritableState 每次写都会刷一遍 ISO
+      // 串，没动过就一定相同。focus/visibility/storage/CHANGE_EVENT 回访时
+      // readLocalChatMessageActionState 每次都 JSON.parse 出一个新对象引用 —
+      // 不做这一层 bail-out，下游（chat-list / desktop workspace 整列会话卡
+      // 片 / use-message-reminders / search-index）每次 cmd-tab 回前台都跟
+      // 着 state 引用变白白重渲染一轮。
+      setState((current) => {
+        if (current.updatedAt === nextState.updatedAt) {
+          return current;
+        }
+        return nextState;
+      });
     };
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
