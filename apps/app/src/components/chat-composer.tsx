@@ -3339,7 +3339,11 @@ export function ChatComposer({
                     onKeyUp={syncInputCursor}
                     onSelect={syncInputCursor}
                     placeholder={placeholder}
-                    className="min-h-[34px] max-h-[96px] flex-1 resize-none bg-transparent py-1.5 text-[15px] leading-[20px] text-[#111827] outline-none placeholder:text-[#a3a3a3]"
+                    // text-[16px]: iOS Safari < 16px 字号会在 focus 时强制
+                    // viewport zoom-in（导致整页布局抖一下 + 退出 focus 后
+                    // 不会自动 zoom 回去）。这里聊天 composer 是 web 移动端
+                    // 用户最常 focus 的输入框，必须 ≥16px。
+                    className="min-h-[34px] max-h-[96px] flex-1 resize-none bg-transparent py-1.5 text-[16px] leading-[22px] text-[#111827] outline-none placeholder:text-[#a3a3a3]"
                   />
                 </div>
               )}
