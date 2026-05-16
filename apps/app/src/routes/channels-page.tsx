@@ -329,6 +329,20 @@ export function ChannelsPage() {
         queryKey: ["app-feed-comments", baseUrl, input.postId],
       });
     },
+    // 走查 R7: 失败兜底。原来没 onError，错误只通过 mobileCommentSheetErrorMessage
+    // 在 sheet 里显示——但用户在提交完后立刻关 sheet（提交按钮不阻挡关闭 X），
+    // mutation 还在飞，最终失败时 sheet 已经关了，红条没人看到。用户以为"发送
+    // 成功"了，因为既没 success notice 也没 error notice。这里加 page 级 notice
+    // 兜底，info tone，2.4s 自动消失（同 like/favorite 的失败提示样式）。
+    onError: (error, input) => {
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      const fallback = input.replyTarget
+        ? t(msg`视频号回复发送失败，请稍后重试。`)
+        : t(msg`视频号评论发送失败，请稍后重试。`);
+      setNotice(error instanceof Error ? `${fallback} (${error.message})` : fallback);
+    },
   });
   const generateMutation = useMutation({
     mutationFn: () => generateChannelPost(baseUrl),
