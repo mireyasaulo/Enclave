@@ -195,6 +195,10 @@ export function DiscoverFeedPage() {
       );
       return fetched < lastPage.total ? allPages.length + 1 : undefined;
     },
+    // staleTime 默认 0 → 切 tab 回来 / 路由再 mount 时把 4 页全 refetch（每次 ~80
+    // 条 post + media JSON 重传）。广场不是高频更新的数据，30s 内的"陈旧"完全
+    // 可接受；publish / 手动刷新仍走 invalidate 强制 refetch，不受影响。
+    staleTime: 30_000,
   });
   // 按 id 去重：分页路径下若新发/删除导致页间边界偏移，page N 末尾和 page N+1 开头
   // 可能拿到同一条 post。UI 层兜底去重，避免列表重复闪烁。
@@ -298,6 +302,11 @@ export function DiscoverFeedPage() {
     queryKey: ["app-discover-blocked-characters", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: Boolean(ownerId),
+    // block 名单几乎不变（用户主动屏蔽角色才更新）。默认 staleTime=0 会让每次
+    // 路由 mount / window focus 都重拉，纯浪费。给 5 分钟兜底，用户手动 unblock
+    // 后回到广场不至于太久才看到生效——必要时由 contacts/blocks 那一侧
+    // invalidate 推过来即可。
+    staleTime: 5 * 60_000,
   });
 
   const createMutation = useMutation({

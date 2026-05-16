@@ -168,6 +168,10 @@ export function DesktopFeedWorkspace({
       return (await getFeedPost(selectedPostId, baseUrl)) ?? null;
     },
     enabled: Boolean(selectedPostId),
+    // 同一条 post 的完整评论 30 秒内不再重拉：用户在 A 和 B 之间反复切「查看
+    // 全部」时不再每次都 RTT，本端 commentMutation 走乐观更新也会把 detail
+    // cache 跟着追加，新评论本会同步可见。
+    staleTime: 30_000,
   });
 
   useEffect(() => {
