@@ -2533,6 +2533,13 @@ function MobileChannelsCard({
                     ))}
                   </div>
                 </>
+              ) : post.commentCount > 0 ? (
+                // home 主接口先返回，decorations 第二个并行请求才带 commentsPreview。
+                // 在 decorations 落地前，commentCount > 0 的卡如果显示"还没有评论"
+                // 会和 action rail 上"143 评论"的小角标自相矛盾——给个占位提示。
+                <span className="text-white/70">
+                  {t(msg`正在载入最近评论...`)}
+                </span>
               ) : (
                 <span>{t(msg`还没有评论，先聊一句。`)}</span>
               )}
