@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   getConversations,
@@ -55,6 +55,15 @@ import { translateRuntimeMessage } from "@yinjie/i18n";
 
 const t = translateRuntimeMessage;
 
+// 远端消息搜索 fan-out 是按 conversation 一个 HTTP（searchConversationMessages /
+// searchGroupMessages），74 个会话每多按一个键就是一整轮 N 倍并发。AbortSignal
+// 没接通 contracts，老 in-flight 请求即使被 react-query 丢弃也还是会跑完 RTT，
+// 公网隧道一旦慢一点连接池立刻被排满。本地数据（会话标题 / 联系人 / 朋友圈 /
+// 广场动态 / 收藏）依然用即时的 normalizedSearchText 同步过滤，保留实时反馈；
+// 只把远程消息检索 debounce 一下即可。和 desktop-search-launcher 里同名常量
+// 一致 280ms。
+const REMOTE_SEARCH_DEBOUNCE_MS = 280;
+
 type SearchMessageRow = {
   conversationId: string;
   conversationTitle: string;
@@ -93,6 +102,21 @@ export function useSearchIndex(
   // 这里再 deferred 一次只会让 normalizedSearchText 比 UI 滞后一帧、卡片高亮跟
   // 命中条目错位。直接用 prop 值参与 query / filter 即可。
   const normalizedSearchText = normalizeSearchKeyword(searchText);
+  const [debouncedRemoteKeyword, setDebouncedRemoteKeyword] = useState(
+    normalizedSearchText,
+  );
+  useEffect(() => {
+    if (!normalizedSearchText) {
+      // 清空时立即同步——避免 staleTime 内一直挂着旧 keyword 的远端数据，
+      // 也避免"空 keyword 状态"延迟出现。
+      setDebouncedRemoteKeyword("");
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setDebouncedRemoteKeyword(normalizedSearchText);
+    }, REMOTE_SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [normalizedSearchText]);
   const {
     favoriteSearchResults,
     miniProgramSearchResults,
@@ -162,9 +186,9 @@ export function useSearchIndex(
       "app-search-message-index",
       baseUrl,
       conversationsSearchKey,
-      normalizedSearchText,
+      debouncedRemoteKeyword,
     ],
-    enabled: Boolean(normalizedSearchText) && conversations.length > 0,
+    enabled: Boolean(debouncedRemoteKeyword) && conversations.length > 0,
     staleTime: 60_000,
     // 没有 placeholderData：每次用户多打一个字 normalizedSearchText 变 →
     // queryKey 变 → useQuery.data 退回 undefined → globalMessageResults 整段
@@ -179,7 +203,7 @@ export function useSearchIndex(
             ? await searchGroupMessages(
                 conversation.id,
                 {
-                  keyword: normalizedSearchText,
+                  keyword: debouncedRemoteKeyword,
                   limit: 8,
                 },
                 baseUrl,
@@ -187,7 +211,7 @@ export function useSearchIndex(
             : await searchConversationMessages(
                 conversation.id,
                 {
-                  keyword: normalizedSearchText,
+                  keyword: debouncedRemoteKeyword,
                   limit: 8,
                 },
                 baseUrl,
@@ -821,8 +845,15 @@ export function useSearchIndex(
     // -query v5：data 存在即非 isPending）；只有 isFetching 才忠实反映"当前
     // keyword 是否还在背景里重跑"。banner「正在补全全局聊天记录索引」依赖这条
     // 才能在每一次 keyword 变更期间正确出现。
+    //
+    // 又加上 normalizedSearchText !== debouncedRemoteKeyword 是为了 cover debounce
+    // 等待期：用户刚打完字 0~280ms 内 query 还没被 enable，isFetching=false，但
+    // 显然"远端结果还没追上来"——这段时间也要让 banner 在线，否则用户瞄一眼以
+    // 为搜完了，结果再过 200ms 又跳出来一批，体验上像"结果在跳"。
     searchingMessages:
-      Boolean(normalizedSearchText) && messageSearchIndexQuery.isFetching,
+      Boolean(normalizedSearchText) &&
+      (normalizedSearchText !== debouncedRemoteKeyword ||
+        messageSearchIndexQuery.isFetching),
     scopeCounts: loading ? emptySearchScopeCounts : scopeCounts,
   };
 }
