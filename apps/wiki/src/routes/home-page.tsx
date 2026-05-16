@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -129,22 +129,62 @@ export function HomePage() {
   );
 }
 
+// 角色 avatar 可能是 URL，也可能是单 emoji（隐界 APP 里 142 角色 ~80 是 emoji）。
+// URL → <img>（带 onError 兜底）；emoji → 文字 glyph；其余 → 渐变首字母方块。
+// 不能让 <img src="🧰"> 走 404 兜底破图。
 function Avatar({ name, url }: { name: string; url?: string }) {
-  const [broken, setBroken] = useState(false);
-  if (url && !broken) {
-    return (
-      <img
-        src={url}
-        alt={name}
-        onError={() => setBroken(true)}
-        className="h-10 w-10 shrink-0 rounded-2xl object-cover md:h-12 md:w-12"
-      />
-    );
+  const trimmed = (url ?? "").trim();
+  const [loadFailed, setLoadFailed] = useState(false);
+  useEffect(() => {
+    setLoadFailed(false);
+  }, [trimmed]);
+
+  if (trimmed && !loadFailed) {
+    if (isLikelyImageSource(trimmed)) {
+      return (
+        <img
+          src={trimmed}
+          alt={name}
+          onError={() => setLoadFailed(true)}
+          className="h-10 w-10 shrink-0 rounded-2xl object-cover md:h-12 md:w-12"
+        />
+      );
+    }
+    if (isEmojiAvatar(trimmed)) {
+      return (
+        <div
+          aria-label={name}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[color:var(--surface-soft)] text-2xl leading-none md:h-12 md:w-12 md:text-3xl"
+        >
+          <span aria-hidden="true">{trimmed}</span>
+        </div>
+      );
+    }
   }
   const initial = name?.[0] ?? "?";
   return (
     <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[image:var(--brand-gradient)] text-base font-semibold text-[color:var(--text-on-brand)] md:h-12 md:w-12">
       {initial}
     </div>
+  );
+}
+
+const EMOJI_PICTOGRAPHIC = /\p{Extended_Pictographic}/u;
+
+function isEmojiAvatar(value: string) {
+  if (!value || value.length > 12) return false;
+  return EMOJI_PICTOGRAPHIC.test(value);
+}
+
+function isLikelyImageSource(value: string) {
+  if (!value) return false;
+  return (
+    value.startsWith("/") ||
+    value.startsWith("./") ||
+    value.startsWith("../") ||
+    value.startsWith("blob:") ||
+    /^https?:\/\//i.test(value) ||
+    /^data:image\//i.test(value) ||
+    /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i.test(value)
   );
 }

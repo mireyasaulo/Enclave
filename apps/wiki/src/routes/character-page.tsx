@@ -23,7 +23,6 @@ import {
   type WikiPageView,
   type WikiRevisionSummary,
 } from "../lib/wiki-api";
-import { CharacterAvatar } from "../components/character-avatar";
 import { SnapshotDiff } from "../components/snapshot-diff";
 import { TalkPanel } from "../components/talk-panel";
 import { WatchToggle } from "../components/watch-toggle";
@@ -308,7 +307,7 @@ function ReadView({ view }: { view: WikiPageView }) {
   return (
     <Card className="space-y-4 p-4 sm:p-6">
       <header className="flex items-start gap-3 sm:gap-4">
-        <CharacterAvatar name={c.name} src={c.avatar} size="lg" />
+        <ReadViewAvatar name={c.name} src={c.avatar} />
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold leading-tight sm:text-2xl">
             {c.name}
@@ -389,6 +388,70 @@ function ReadView({ view }: { view: WikiPageView }) {
           ` · ${t(msg`稳定版 v${view.stableRevision.version} / 最新版 v${view.latestRevision.version}`)}`}
       </footer>
     </Card>
+  );
+}
+
+// 角色 avatar 可能是 URL、`/api/...` 资源路径，或单 emoji（隐界 APP 里 142
+// 角色 ~80 是 emoji）。`<img src="🧰">` 必然 404 破图，三段式处理。
+function ReadViewAvatar({ name, src }: { name: string; src?: string | null }) {
+  const trimmed = (src ?? "").trim();
+  const [loadFailed, setLoadFailed] = useState(false);
+  useEffect(() => {
+    setLoadFailed(false);
+  }, [trimmed]);
+
+  const base =
+    "h-14 w-14 shrink-0 rounded-2xl bg-[color:var(--surface-soft)] sm:h-16 sm:w-16 md:h-20 md:w-20";
+
+  if (trimmed && !loadFailed) {
+    if (isLikelyAvatarImageSource(trimmed)) {
+      return (
+        <img
+          src={trimmed}
+          alt={name}
+          onError={() => setLoadFailed(true)}
+          className={`${base} object-cover`}
+        />
+      );
+    }
+    if (isEmojiAvatar(trimmed)) {
+      return (
+        <div
+          aria-label={name}
+          className={`${base} grid place-items-center text-3xl leading-none sm:text-4xl md:text-5xl`}
+        >
+          <span aria-hidden="true">{trimmed}</span>
+        </div>
+      );
+    }
+  }
+  const initial = name?.[0] ?? "?";
+  return (
+    <div
+      className={`${base.replace("bg-[color:var(--surface-soft)]", "bg-[image:var(--brand-gradient)]")} grid place-items-center text-2xl font-semibold text-[color:var(--text-on-brand)] md:text-3xl`}
+    >
+      {initial}
+    </div>
+  );
+}
+
+const AVATAR_EMOJI_PICTOGRAPHIC = /\p{Extended_Pictographic}/u;
+
+function isEmojiAvatar(value: string) {
+  if (!value || value.length > 12) return false;
+  return AVATAR_EMOJI_PICTOGRAPHIC.test(value);
+}
+
+function isLikelyAvatarImageSource(value: string) {
+  if (!value) return false;
+  return (
+    value.startsWith("/") ||
+    value.startsWith("./") ||
+    value.startsWith("../") ||
+    value.startsWith("blob:") ||
+    /^https?:\/\//i.test(value) ||
+    /^data:image\//i.test(value) ||
+    /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i.test(value)
   );
 }
 
