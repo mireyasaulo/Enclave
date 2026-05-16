@@ -1,12 +1,18 @@
 import {
+  Catch,
   Controller,
+  type ExceptionFilter,
   Get,
+  HttpStatus,
   Param,
+  PayloadTooLargeException,
   Post,
   Res,
   UploadedFile,
+  UseFilters,
   UseGuards,
   UseInterceptors,
+  type ArgumentsHost,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
@@ -18,6 +24,24 @@ import {
   WikiAvatarService,
   type UploadedWikiAvatarFile,
 } from '../services/wiki-avatar.service';
+
+// multer 触发 fileSize 上限时丢出 PayloadTooLargeException，message 是英文
+// 'File too large'。前端 wiki-api request() 把它当 LEGACY_ERROR 直接渲染给用户。
+// 这里只把 avatar 上传那条路径的 PayloadTooLargeException 替成中文 + 实际上限。
+@Catch(PayloadTooLargeException)
+class WikiAvatarPayloadTooLargeFilter implements ExceptionFilter {
+  catch(_exception: PayloadTooLargeException, host: ArgumentsHost) {
+    const response = host.switchToHttp().getResponse<Response>();
+    const limitMb = Math.round(WIKI_AVATAR_UPLOAD_LIMIT_BYTES / (1024 * 1024));
+    response.status(HttpStatus.PAYLOAD_TOO_LARGE).json({
+      code: 'WIKI_AVATAR_TOO_LARGE',
+      statusCode: HttpStatus.PAYLOAD_TOO_LARGE,
+      message: `头像文件不能超过 ${limitMb} MB。`,
+      legacyMessage: `头像文件不能超过 ${limitMb} MB。`,
+      params: { maxMb: limitMb },
+    });
+  }
+}
 
 // 头像上传必须登录（防止匿名灌内容到磁盘），GET 不挂 guard：保存到角色后任意人
 // 都要能在角色卡里看到这张图，再过一层 token 鉴权就读不动了。
@@ -31,6 +55,7 @@ export class WikiAvatarController {
 
   @Post()
   @UseGuards(JwtAuthGuard, PrivateCharacterRateLimitGuard)
+  @UseFilters(WikiAvatarPayloadTooLargeFilter)
   @UseInterceptors(
     FileInterceptor('file', {
       limits: { fileSize: WIKI_AVATAR_UPLOAD_LIMIT_BYTES },
