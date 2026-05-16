@@ -35,6 +35,7 @@ import {
   type FeedAuthorType,
   type FeedComment,
   type FeedListResponse,
+  type FeedPostWithComments,
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -487,7 +488,7 @@ export function DiscoverFeedPage() {
 
       return addFeedComment(input.postId, { text }, baseUrl);
     },
-    onSuccess: (_, input) => {
+    onSuccess: (newComment, input) => {
       setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
       setDesktopReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
@@ -503,23 +504,64 @@ export function DiscoverFeedPage() {
           ? t(msg`广场回复已发送。`)
           : t(msg`广场互动已更新。`),
       );
-      // fire-and-forget：await 会让"发送"按钮一直 disabled，公网隧道下卡几秒。
-      void queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] });
-      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
-      void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
-      // 「查看全部」展开后再发评论：同步刷一次该 post 的完整评论列表，
-      // 不然新评论只进 commentsPreview，展开视图里看不到自己刚发的那条。
+      // 旧版每次评论都 invalidate paged-feed + legacy + post 三套 cache，
+      // 桌面端自动 prefetch 4 页时 paged 失效 → 80+ 条 post 含 media JSON
+      // 整把重拉，连续评论的体感是"输入框卡，列表轻微抖动 1-2s"。
+      // 改成乐观更新本地 cache：在受影响的那条 post 上 commentsPreview append
+      // 新评论 + .slice(-3)（与服务端 buildCommentsPreviewMap 同样保留最近 3），
+      // commentCount += 1。detail post cache 也同样 append。下次自然 refetch
+      // 时 server 会校准——但常规路径不再触发 N 页拉回。
+      const appendToPost = <P extends {
+        id: string;
+        commentsPreview: FeedComment[];
+        commentCount: number;
+      }>(
+        post: P,
+      ): P =>
+        post.id !== input.postId
+          ? post
+          : {
+              ...post,
+              commentsPreview: [...post.commentsPreview, newComment].slice(-3),
+              commentCount: post.commentCount + 1,
+            };
+      queryClient.setQueriesData<InfiniteData<FeedListResponse>>(
+        { queryKey: ["app-feed-paged", baseUrl] },
+        (current) =>
+          current
+            ? {
+                ...current,
+                pages: current.pages.map((page) => ({
+                  ...page,
+                  posts: page.posts.map(appendToPost),
+                })),
+              }
+            : current,
+      );
+      queryClient.setQueryData<FeedListResponse>(
+        ["app-feed", baseUrl],
+        (current) =>
+          current
+            ? { ...current, posts: current.posts.map(appendToPost) }
+            : current,
+      );
+      queryClient.setQueryData<FeedPostWithComments>(
+        ["app-feed-post", baseUrl, input.postId],
+        (current) =>
+          current
+            ? {
+                ...current,
+                comments: [...current.comments, newComment],
+                commentCount: current.commentCount + 1,
+              }
+            : current,
+      );
+      // 「查看全部」展开后（移动端 fullCommentsByPostId）：直接 append 避免再拉一遍。
       if (fullCommentsByPostId[input.postId]) {
-        void listFeedComments(input.postId, baseUrl)
-          .then((all) => {
-            setFullCommentsByPostId((current) => ({
-              ...current,
-              [input.postId]: all,
-            }));
-          })
-          .catch(() => {
-            // 静默：展开视图刷新失败时下次再点「查看全部」会重新拉。
-          });
+        setFullCommentsByPostId((current) => ({
+          ...current,
+          [input.postId]: [...(current[input.postId] ?? []), newComment],
+        }));
       }
     },
   });
@@ -758,6 +800,10 @@ const pendingLikePostId = likeMutation.isPending
     setShowCompose(false);
     setFullCommentsByPostId({});
     setLoadingFullCommentsPostId(null);
+    // baseUrl 改变（切换账户）→ feedQuery 变成全新 query，但 ref 计数器是
+    // 跨账户共享的：上一个账户已经把它打满到 cap 时，新账户的页 1 加载完
+    // 后自动 prefetch 直接被卡住，只剩 20 条得用户自己滚才能再翻。
+    resetDesktopAutoPrefetchCounter();
 
     if (!publishFlashRef.current.taken) {
       publishFlashRef.current.taken = true;
