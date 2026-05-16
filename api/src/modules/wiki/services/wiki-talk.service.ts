@@ -10,6 +10,12 @@ import { WikiTalkThreadEntity } from '../entities/wiki-talk-thread.entity';
 import { rankOf } from '../guards/wiki-role.guard';
 import { WikiBlockService } from './wiki-block.service';
 
+// Body 是 SQLite TEXT，没有 DB 层长度限制 —— 不挡的话用户能 POST 1MB+ 的
+// post 撑爆讨论页/页面 hydration 体积。Wiki MediaWiki 同类阈值在 ~64K，这里取
+// 10K（约 5000 中文字 / 10000 英文字），常规讨论 + 引用差不多够用。Title
+// 已经在下面挡了 200，body 单独定。
+const MAX_TALK_BODY_LENGTH = 10000;
+
 @Injectable()
 export class WikiTalkService {
   constructor(
@@ -84,6 +90,12 @@ export class WikiTalkService {
         legacyMessage: '标题最长 200 字',
       });
     }
+    if (body.length > MAX_TALK_BODY_LENGTH) {
+      throw new AppError('WIKI_TALK_INVALID_STATE', {
+        params: { detail: `内容最长 ${MAX_TALK_BODY_LENGTH} 字` },
+        legacyMessage: `内容最长 ${MAX_TALK_BODY_LENGTH} 字`,
+      });
+    }
 
     return this.dataSource.transaction(async (manager) => {
       const thread = manager.create(WikiTalkThreadEntity, {
@@ -128,6 +140,12 @@ export class WikiTalkService {
         params: { detail: '回复内容不能为空' },
         legacyMessage: '回复内容不能为空',
       });
+    if (body.length > MAX_TALK_BODY_LENGTH) {
+      throw new AppError('WIKI_TALK_INVALID_STATE', {
+        params: { detail: `回复内容最长 ${MAX_TALK_BODY_LENGTH} 字` },
+        legacyMessage: `回复内容最长 ${MAX_TALK_BODY_LENGTH} 字`,
+      });
+    }
     if (input.parentPostId) {
       const parent = await this.postRepo.findOne({
         where: { id: input.parentPostId },

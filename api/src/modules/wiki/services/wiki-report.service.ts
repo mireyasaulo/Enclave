@@ -64,6 +64,22 @@ export class WikiReportService {
         params: { detail: '举报原因必填' },
         legacyMessage: '举报原因必填',
       });
+    // 不挡长度的话用户可以提交 1MB+ 的 reason / details 撑爆 admin 列表渲染。
+    // 200 字 reason + 2000 字 details 跟其它 wiki 实例（封禁理由 200 / 角色 bio 几百）量级一致。
+    if (reason.length > 200) {
+      throw new AppError('WIKI_REPORT_INVALID_STATE', {
+        params: { detail: '举报原因最长 200 字' },
+        legacyMessage: '举报原因最长 200 字',
+      });
+    }
+    const trimmedDetails =
+      typeof input.details === 'string' ? input.details.trim() : '';
+    if (trimmedDetails.length > 2000) {
+      throw new AppError('WIKI_REPORT_INVALID_STATE', {
+        params: { detail: '补充说明最长 2000 字' },
+        legacyMessage: '补充说明最长 2000 字',
+      });
+    }
     // 目标必须真存在再允许举报；否则任何字符串都能塞进 moderation 队列，
     // patroller 看到一堆指向不存在 id 的 open report（2026-05-16 R2 走查）。
     await this.assertTargetExists(targetType, targetId);
@@ -73,10 +89,7 @@ export class WikiReportService {
         targetType,
         targetId,
         reason,
-        details:
-          typeof input.details === 'string'
-            ? input.details.trim() || null
-            : null,
+        details: trimmedDetails || null,
         status: 'open',
       }),
     );
