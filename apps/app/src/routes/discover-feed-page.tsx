@@ -917,14 +917,19 @@ const pendingLikePostId = likeMutation.isPending
     if (!notice) {
       return;
     }
-
+    // 带「重试」之类操作按钮的提示（评论失败/分享失败/读全部评论失败）以前
+    // 也被无脑 2.4s 自动收掉，用户根本来不及瞄到按钮就消失了。带 action 的
+    // 一律不自动 dismiss，由下次提示覆盖或用户手动点击 action 后再清。
+    if (noticeAction) {
+      return;
+    }
     const timer = window.setTimeout(() => {
       setNotice(""); // i18n-ignore-line
       setNoticeActionLabel(null);
       setNoticeAction(null);
     }, 2400);
     return () => window.clearTimeout(timer);
-  }, [notice]);
+  }, [notice, noticeAction]);
 
   useEffect(() => {
     setDesktopSelectedPostId(routeSelectedPostId);
@@ -1607,14 +1612,19 @@ const pendingLikePostId = likeMutation.isPending
                   ) {
                     return null;
                   }
+                  // 展开「查看全部 N 条评论」后 renderedComments 体量可能上百。
+                  // 旧逻辑给每条评论都 .find 一遍找被回复评论 → O(N²)，100 条 = 1 万次
+                  // 字符串比较，每次父组件 setState（如点赞气泡）整张广场重渲都会重算。
+                  // 落成 Map 一次 O(N) 建好，每条 O(1) 命中。
+                  const commentById = new Map(
+                    renderedComments.map((item) => [item.id, item]),
+                  );
                   return (
                     <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">
                       <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
                         {renderedComments.map((comment) => {
                           const replyToComment = comment.replyToCommentId
-                            ? renderedComments.find(
-                                (item) => item.id === comment.replyToCommentId,
-                              ) ?? null
+                            ? commentById.get(comment.replyToCommentId) ?? null
                             : null;
                           // commentsPreview 只截最后 3 条；当前评论的被回复评论可能不在 preview 里。
                           // 优先用 renderedComments 里找到的（自带 authorType，能渲成可点按钮），
