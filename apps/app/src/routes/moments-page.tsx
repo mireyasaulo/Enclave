@@ -383,11 +383,25 @@ export function MomentsPage() {
 
       commentSubmitArgsRef.current[momentId] = { text, target };
 
+      // 4 把 cache key 都得 optimistic 同步：
+      //   - flat (app-moments)：search index / 旧 component
+      //   - paged (app-moments-paged)：本页主数据源
+      //   - mine (app-moments-mine)：/profile/moments
+      //   - character (app-moments-character[X])：/desktop/friend-moments/X
+      // 之前只更新前两套；用户在 /tabs/moments 评论一条角色 X 的动态后立刻切到
+      // /desktop/friend-moments/X 会看不到新评论（character cache 还是旧值，
+      // 要等下次 refetch）。跟 use-optimistic-like 同模板：4 把 key 全更新。
       await Promise.all([
         queryClient.cancelQueries({
           queryKey: ["app-moments-paged", baseUrl],
         }),
         queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-mine", baseUrl],
+        }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-character", baseUrl],
+        }),
       ]);
 
       const flatSnapshots = queryClient.getQueriesData<Moment[]>({
@@ -397,6 +411,12 @@ export function MomentsPage() {
         InfiniteData<MomentsPageResponse>
       >({
         queryKey: ["app-moments-paged", baseUrl],
+      });
+      const mineSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-mine", baseUrl],
+      });
+      const characterSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-character", baseUrl],
       });
 
       const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
@@ -436,6 +456,14 @@ export function MomentsPage() {
           })),
         });
       });
+      mineSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+      characterSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
 
       // 清输入与 reply target —— 用户看到立刻清空，体感"已发送"。
       const savedDraft = commentDrafts[momentId] ?? "";
@@ -458,6 +486,8 @@ export function MomentsPage() {
         skipped: false as const,
         flatSnapshots,
         pagedSnapshots,
+        mineSnapshots,
+        characterSnapshots,
         momentId,
         tempId,
         savedDraft,
@@ -492,6 +522,12 @@ export function MomentsPage() {
         queryClient.setQueryData(key, data);
       });
       context.pagedSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.mineSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.characterSnapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
       // 恢复 drafts / reply target，让用户能改后重发。
@@ -555,6 +591,16 @@ export function MomentsPage() {
                   })),
                 }
               : data,
+        );
+        // 跟 onMutate 的 4 把 key 对齐：mine + character 也得把 temp 换成 real，
+        // 否则 /profile/moments、/desktop/friend-moments/X 看到的还是 optimistic id。
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments-mine", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments-character", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
         );
       }
     },
