@@ -57,15 +57,22 @@ export class WikiAiGenerateController {
     if (!draft || typeof draft !== 'object') {
       throw new BadRequestException('currentDraft required');
     }
-    if (!draft.name?.trim()) {
+    // typeof 守，避免 ?.trim() 在非字符串上抛 TypeError → 500（同 R7 套路）。
+    const draftName =
+      typeof draft.name === 'string' ? draft.name.trim() : '';
+    if (!draftName) {
       throw new BadRequestException(
         '请先在表单顶部填写"名称"再使用 AI 生成。',
       );
     }
     if (section === 'all') {
       const missing: string[] = [];
-      if (!draft.bio?.trim()) missing.push('角色简介');
-      if (!draft.relationship?.trim()) missing.push('关系描述');
+      const draftBio =
+        typeof draft.bio === 'string' ? draft.bio.trim() : '';
+      const draftRel =
+        typeof draft.relationship === 'string' ? draft.relationship.trim() : '';
+      if (!draftBio) missing.push('角色简介');
+      if (!draftRel) missing.push('关系描述');
       if (missing.length > 0) {
         throw new BadRequestException(
           `顶部一键生成需要先填写：${missing.join('、')}。`,

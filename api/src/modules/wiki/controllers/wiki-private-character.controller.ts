@@ -143,17 +143,25 @@ export class WikiPrivateCharacterController {
     if (!draft || typeof draft !== 'object') {
       throw new BadRequestException('currentDraft required');
     }
-    if (!draft.name?.trim()) {
+    // typeof 守：客户端传 {"currentDraft":{"name":{"a":1}}} 时 ?.trim() 抛
+    // TypeError → 500 把原始 stack 漏出去。非字符串当空字符串处理。
+    const draftName =
+      typeof draft.name === 'string' ? draft.name.trim() : '';
+    if (!draftName) {
       throw new BadRequestException(
         '请先在表单顶部填写"名称"再使用 AI 生成。',
       );
     }
     if (section === 'all') {
-      // sacred gate（2026-05-15 起对齐 wiki UI）：name 已由 L142 检查；
+      // sacred gate（2026-05-15 起对齐 wiki UI）：name 已由上一行检查；
       // 这里只需 bio + relationship。personality 字段已从 wiki 砍掉。
       const missing: string[] = [];
-      if (!draft.bio?.trim()) missing.push('角色简介');
-      if (!draft.relationship?.trim()) missing.push('关系描述');
+      const draftBio =
+        typeof draft.bio === 'string' ? draft.bio.trim() : '';
+      const draftRel =
+        typeof draft.relationship === 'string' ? draft.relationship.trim() : '';
+      if (!draftBio) missing.push('角色简介');
+      if (!draftRel) missing.push('关系描述');
       if (missing.length > 0) {
         throw new BadRequestException(
           `顶部一键生成需要先填写：${missing.join('、')}。`,
