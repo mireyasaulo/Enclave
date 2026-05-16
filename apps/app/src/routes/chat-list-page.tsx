@@ -316,11 +316,16 @@ function MobileChatListPage() {
     }
   }, [hasNotifiedReminderGroup, isNotifiedReminderGroupExpanded]);
 
-  const hasConversations =
-    reminderEntries.length > 0 ||
+  // 「下方会话列表 section 该不该渲染」只看真正会塞进 section 的三类条目；
+  // reminderEntries 走单独的「消息提醒」section（line 1020 起），不应该
+  // 撑起一张空的会话 section。否则用户「只有提醒、没有会话」时下面就会
+  // 多出一条 border-y 包着的空白横条。
+  const hasConversationSectionContent =
     visibleConversations.length > 0 ||
     serviceConversations.length > 0 ||
     showSubscriptionInboxItem;
+  const hasConversations =
+    reminderEntries.length > 0 || hasConversationSectionContent;
   const hasConversationLoadError =
     conversationsQuery.isError && conversationsQuery.error instanceof Error;
   const hasMessageEntriesError =
@@ -1209,7 +1214,7 @@ function MobileChatListPage() {
         ) : null}
 
         {!conversationsQuery.isLoading && !hasConversationLoadError ? (
-          hasConversations ? (
+          hasConversationSectionContent ? (
             <section className="mt-1.5 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
               {showSubscriptionInboxItem && subscriptionInboxSummary ? (
                 <SubscriptionInboxCard
@@ -1314,11 +1319,14 @@ function MobileChatListPage() {
                 />
               ))}
             </section>
-          ) : pendingHideConversation ? null : (
-            // pendingHideConversation 在 5s 撤销窗口内同时把 hasConversations 拉成
-            // false——这时上方 InlineNotice 已经在显示「xxx 已从列表移除，5 秒内可
+          ) : pendingHideConversation || hasConversations ? null : (
+            // pendingHideConversation 在 5s 撤销窗口内同时把 hasConversationSectionContent
+            // 拉成 false——这时上方 InlineNotice 已经在显示「xxx 已从列表移除，5 秒内可
             // 撤销」，再叠一张「还没有新消息」会误导用户以为永久没了；空态等撤销
             // 窗口过期或被取消后下一次渲染再补。
+            // hasConversations 但 !hasConversationSectionContent 的场景：用户只有
+            // 「消息提醒」没有任何 conv / service / subscription，提醒 section 已经
+            // 在上方独立渲染，这里再补「还没有新消息」会和已经在列的提醒自相矛盾。
             <div className="px-3 pt-2">
               <MobileChatListStatusCard
                 badge={t(msg`消息`)}
