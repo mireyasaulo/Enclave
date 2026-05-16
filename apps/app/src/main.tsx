@@ -30,8 +30,14 @@ import {
 import { NativeLocaleSync } from "./runtime/native-locale-sync";
 import { BackendLocaleSync } from "./runtime/backend-locale-sync";
 import { registerAppServiceWorker } from "./runtime/register-service-worker";
-import { bootstrapAndroid } from "./runtime/adapters/android";
-import { bootstrapIos } from "./runtime/adapters/ios";
+import {
+  bootstrapAndroid,
+  bootstrapAndroidPushTokenAfterHydrate,
+} from "./runtime/adapters/android";
+import {
+  bootstrapIos,
+  bootstrapIosPushTokenAfterHydrate,
+} from "./runtime/adapters/ios";
 import { router } from "./router";
 import {
   hydrateCloudSessionStore,
@@ -113,6 +119,15 @@ async function bootstrap() {
   void bootstrapIos();
   void bootstrapAndroid();
   const runtimeConfig = await hydrateNativeRuntimeConfig();
+  // 走查 R5：APNs / FCM push token 的初次 sync 必须在 hydrate 之后跑。bootstrap*
+  // 是 void fire-and-forget 在 hydrate 之前起跑的，原来在 bootstrap* 内部直接
+  // void syncIosPushToken() 会跟 hydrate 抢跑 —— sync 内部 resolveAppCoreApiBaseUrl
+  // 拿不到 apiBaseUrl → throw → catch → reason "network-error" 静默丢，device
+  // token 这次没 POST 到 cloud-api，要等下次 owner 变化 / token 轮换才能补报。
+  // listener 是 config-free 的留在 bootstrap* 里挂上；初次 sync 拆到这里，确
+  // 保 hydrate 跑完 runtimeConfig.apiBaseUrl 一定有值。
+  void bootstrapIosPushTokenAfterHydrate();
+  void bootstrapAndroidPushTokenAfterHydrate();
   const cloudSession = await hydrateCloudSessionStore();
   // 身份哨兵：electronic 客户端持久化的"已登录用户身份"跟 hydrate 出来的 cloud
   // session 不一致时（比如旧版本切号没清干净、用户跨版本登录、手动改过

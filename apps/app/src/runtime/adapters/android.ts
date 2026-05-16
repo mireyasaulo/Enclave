@@ -65,12 +65,36 @@ export async function bootstrapAndroid() {
   // 表里只有 iOS 行，Android 用户在「真机走查」前几轮修过的所有 notification
   // builder / channel 都白做了，因为根本没人朝 Android 端发推送。这里补齐
   // bootstrap 兜底同步 + owner 变化重报，对应 iOS adapter 同款 try/await。
+  //
+  // 走查 R5：listener 是 config-free 的留在这里挂上；初次 sync 拆到
+  // bootstrapAndroidPushTokenAfterHydrate，让 main.tsx 在 await
+  // hydrateNativeRuntimeConfig() 完成后再调，避免 sync 跟 hydrate 抢跑导致
+  // resolveAppCoreApiBaseUrl 抛 "Remote Core API base URL is not configured"
+  // 静默吞回 "network-error"，FCM token 永远 POST 不出去要等下次 owner 变化
+  // 才能补报。
   try {
-    const { startAndroidOwnerChangeListener, syncAndroidPushToken } =
+    const { startAndroidOwnerChangeListener } =
       await import("../push-token-sync");
     startAndroidOwnerChangeListener();
-    void syncAndroidPushToken();
   } catch {
     // 动态 import 失败不阻塞启动；下次 owner 变化 / 冷启再试。
+  }
+}
+
+/**
+ * 冷启走完 hydrateNativeRuntimeConfig 后再跑的初次 FCM sync。
+ * 对应 bootstrapIosPushTokenAfterHydrate，main.tsx 在 hydrate 之后
+ * 按平台分发调用。
+ */
+export async function bootstrapAndroidPushTokenAfterHydrate() {
+  if (!isAndroidPlatform()) {
+    return;
+  }
+
+  try {
+    const { syncAndroidPushToken } = await import("../push-token-sync");
+    void syncAndroidPushToken();
+  } catch {
+    // 动态 import 失败不阻塞启动
   }
 }
