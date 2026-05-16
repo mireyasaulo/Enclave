@@ -1114,6 +1114,18 @@ export function MomentsPage() {
     }
   }
 
+  // 走查新 Round 1：跟 discover-feed-page 的 mobileScrollSnappedRouteIdRef 锁
+  // 同模式——之前只看 visibleMoments.length 一变就 hard-snap，hash auto-load
+  // 期间反复 snap 是它的设计目的，但**目标已经在视口里、用户也已经手动滚开**
+  // 之后还在 snap，用户继续向下滚 sentinel 触底自动 fetchNextPage →
+  // visibleMoments.length 又变 → 整张朋友圈被弹回 X，刚滚到的位置全没了。
+  // 加 snap lock：第一次目标真出现在 visibleMoments 才 snap，snap 完锁住当前
+  // routeSelectedMomentId；后续 length 变化（用户翻页 / 新 moment prepend）不
+  // 再触发。routeSelectedMomentId 切到另一条时锁里的 id 不匹配，自然解锁。
+  // 同时把 smooth → auto：smooth 在 hash auto-load 多 page chain 拉过来期间
+  // 动画会被 IntersectionObserver 又一次 fetchNextPage 打断，scrollTop 偏过
+  // target 一截。
+  const mobileScrollSnappedRouteIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (
       isDesktopLayout ||
@@ -1122,16 +1134,26 @@ export function MomentsPage() {
     ) {
       return;
     }
+    if (mobileScrollSnappedRouteIdRef.current === routeSelectedMomentId) {
+      return;
+    }
+    const targetLoaded = visibleMoments.some(
+      (moment) => moment.id === routeSelectedMomentId,
+    );
+    if (!targetLoaded) {
+      return;
+    }
 
     window.requestAnimationFrame(() => {
       document
         .getElementById(`moment-post-${routeSelectedMomentId}`)
         ?.scrollIntoView({
-          behavior: "smooth",
+          behavior: "auto",
           block: "start",
         });
     });
-  }, [isDesktopLayout, routeSelectedMomentId, visibleMoments.length]);
+    mobileScrollSnappedRouteIdRef.current = routeSelectedMomentId;
+  }, [isDesktopLayout, routeSelectedMomentId, visibleMoments]);
 
   if (isDesktopLayout) {
     if (syncedRouteSelectedAuthorId) {
