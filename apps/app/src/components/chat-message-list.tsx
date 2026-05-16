@@ -766,8 +766,19 @@ export function ChatMessageList({
     return unregister;
   }, [isDesktop, selectionMode]);
 
+  // perf：原来用独立 cache key ["desktop-message-forward-conversations"]，
+  // 跟全 app 其它十几处统一的 ["app-conversations", baseUrl]
+  // （chat-list / desktop-chat-window-page / discover-page / group-chat-thread-panel /
+  // use-conversation-thread / desktop-notes-workspace 等都用这个 key）两份
+  // 完全独立的 cache。chat-list 早就把 app-conversations 拉热了，但开"转发"
+  // 弹层（dialog 在 desktop 和 mobile 都用，long-press → 转发都走这条）这边
+  // cache 是冷的，要等 getConversations 网络回来才能渲染目标 picker —— 公网
+  // 隧道 ~600ms RTT。统一到 app-conversations 复用主缓存，配 60s staleTime；
+  // sendMutation / 群消息流程 invalidate app-conversations 时也会自动覆盖。
+  // 同 desktop-notes-workspace.tsx 走查 R10 / create-group-page.tsx app-friends
+  // R1 同款修法。
   const forwardConversationsQuery = useQuery({
-    queryKey: ["desktop-message-forward-conversations", baseUrl],
+    queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: Boolean(forwardMessages?.length),
   });
