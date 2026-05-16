@@ -88,11 +88,13 @@ export function useNightMarketState() {
     };
   }, [state]);
 
+  // 卸载时刷新最新 state；直接闭包 state + deps [] 会把 disk 回滚到 mount 时的初始 state。
+  const stateRef = useRef(state);
+  stateRef.current = state;
   useEffect(() => {
     return () => {
-      saveNightMarketState(state);
+      saveNightMarketState(stateRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

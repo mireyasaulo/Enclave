@@ -78,11 +78,16 @@ export function useSignalSquadState() {
     };
   }, [state]);
 
+  // 卸载时把最新 state 刷盘。原来直接闭包了 `state`，但 deps 是 []，
+  // 闭包永远停在 mount 时的初始 state；切换 / 退出游戏会把 disk 回滚到
+  // 进入页面那一刻的 state，丢失本轮所有进度。用 ref 把最新 state 暴露给
+  // cleanup。
+  const stateRef = useRef(state);
+  stateRef.current = state;
   useEffect(() => {
     return () => {
-      saveSignalSquadState(state);
+      saveSignalSquadState(stateRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
