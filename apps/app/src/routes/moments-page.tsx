@@ -1,6 +1,7 @@
 import {
   Suspense,
   lazy,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -121,7 +122,7 @@ export function MomentsPage() {
     replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
-  const [notice, setNotice] = useState("");
+  const [notice, _setNoticeRaw] = useState("");
   const [noticeTone, setNoticeTone] = useState<"success" | "info" | "danger">(
     "success",
   );
@@ -129,6 +130,19 @@ export function MomentsPage() {
     null,
   );
   const [noticeAction, setNoticeAction] = useState<(() => void) | null>(null);
+  // 用递增 nonce 给 notice 倒计时 useEffect 当 reset 锚——「朋友圈互动已更新。」
+  // 是通用 success 文案，连续点赞/评论会触发两次相同 setNotice(同字符串)；React
+  // 看作 no-op → useEffect 不重跑 → 第二次只继承第一次剩余的倒计时，用户看不到
+  // 2.4s 完整窗口。包一层 setNotice 自动 bump nonce，useEffect 跟 [noticeKey,
+  // notice] 走就能稳定 clear-and-restart 倒计时。setNotice("") clear 路径也走这里，
+  // useEffect 内部 if(!notice) return 短路掉无需启动 timer。
+  const noticeKeyRef = useRef(0);
+  const [noticeKey, setNoticeKey] = useState(0);
+  const setNotice = useCallback((text: string) => {
+    noticeKeyRef.current += 1;
+    setNoticeKey(noticeKeyRef.current);
+    _setNoticeRaw(text);
+  }, []);
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
   const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<
     | {
@@ -919,7 +933,9 @@ export function MomentsPage() {
       setNoticeAction(null);
     }, 2400);
     return () => window.clearTimeout(timer);
-  }, [notice]);
+    // 跟 noticeKey 而不是只 notice ——两次相同字符串走 setNotice 也得重置倒计时；
+    // 见 noticeKeyRef 注释。setNotice 已 wrap：注意 deps 里 setNotice 引用稳定。
+  }, [noticeKey, notice, setNotice]);
 
   useEffect(() => {
     const desktopPathMismatch = pathname !== desktopMomentsPath;

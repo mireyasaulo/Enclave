@@ -403,20 +403,16 @@ export function MobileFriendMomentsPage() {
     () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
     [blockedQuery.data],
   );
-  // 服务端按 ?character=ID 已经把非该角色的帖子过滤掉了；这里只需要再过一遍
-  // 黑名单（防御性：在 SQL 层 where authorId=characterId 的同时，UI 层若用户
-  // 刚把该角色加黑就立刻清空朋友圈卡片，比等服务端 refetch 快）+ 按 postedAt
-  // 倒序排（服务端已 ORDER BY postedAt DESC，但 Date.parse 客户端再保一道防
-  // 偶发返回顺序错乱）。
+  // 服务端按 ?character=ID 已经把非该角色的帖子过滤掉了，且 ORDER BY postedAt
+  // DESC —— 这里只需要再过一遍黑名单（防御性：用户刚把该角色加黑时立刻清空
+  // 朋友圈卡片，比等服务端 refetch 快）。客户端再 sort 一遍是冗余 ——
+  // 8 条帖子 16 次 new Date 影响不大，但输入评论草稿时父组件每次按键都
+  // re-render，叠加 N 个 useMemo 重算会把高频 setState 路径多吃几 ms。
   const friendMoments = useMemo(
     () =>
-      (momentsQuery.data ?? [])
-        .filter((moment) => !blockedCharacterIds.has(moment.authorId))
-        .sort(
-          (left, right) =>
-            new Date(right.postedAt).getTime() -
-            new Date(left.postedAt).getTime(),
-        ),
+      (momentsQuery.data ?? []).filter(
+        (moment) => !blockedCharacterIds.has(moment.authorId),
+      ),
     [blockedCharacterIds, momentsQuery.data],
   );
   // 时间线左边那列「日 / 月」的预格式化。之前在 friendMoments.map 内联里每条
@@ -628,15 +624,19 @@ export function MobileFriendMomentsPage() {
     ? friendMoments.find((moment) => moment.id === actionBubble.momentId) ??
       null
     : null;
+  // 用 authorId === ownerId 而不是 authorType === "user"——跟 moments-page
+  // 主页一致。authorType==='user' 的语义是"任何用户类型点赞者"，单世界主人
+  // 架构下两个判定等价，但若 cache 残留多用户脏数据（历史 multi-owner 实验 /
+  // 帐号切换残值）会把 actionBubble 错显示成"已赞"。
   const liked = Boolean(
-    activeMoment?.likes.some((like) => like.authorType === "user"),
+    ownerId && activeMoment?.likes.some((like) => like.authorId === ownerId),
   );
 
   const shareMoment = shareMomentId
     ? friendMoments.find((moment) => moment.id === shareMomentId) ?? null
     : null;
   const shareLiked = Boolean(
-    shareMoment?.likes.some((like) => like.authorType === "user"),
+    ownerId && shareMoment?.likes.some((like) => like.authorId === ownerId),
   );
 
   const onCommentTap = (momentId: string, comment: MomentComment | null) => {
@@ -874,9 +874,12 @@ export function MobileFriendMomentsPage() {
                         <WeChatMomentCard
                           cardId={`moment-post-${moment.id}`}
                           moment={moment}
-                          ownerId={null}
-                          liked={moment.likes.some(
-                            (like) => like.authorType === "user",
+                          ownerId={ownerId}
+                          liked={Boolean(
+                            ownerId &&
+                              moment.likes.some(
+                                (like) => like.authorId === ownerId,
+                              ),
                           )}
                           hideAuthor
                           flush
@@ -935,7 +938,7 @@ export function MobileFriendMomentsPage() {
       <MomentShareCardModal
         moment={shareMoment}
         liked={shareLiked}
-        ownerId={null}
+        ownerId={ownerId}
         ownerDisplayName={displayName}
         onClose={() => setShareMomentId(null)}
       />
