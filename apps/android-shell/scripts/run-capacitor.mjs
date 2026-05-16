@@ -1132,6 +1132,22 @@ if (command === "doctor") {
       ),
     ]);
 
+    // Round 31：<uses-permission CAMERA> 必须配 <uses-feature CAMERA required=false>，
+    // 否则 Play Store 把无摄像头设备过滤出可安装名单，listing 看不到。
+    // record_audio 同款逻辑。
+    checks.push([
+      "manifest uses-feature camera optional",
+      /<uses-feature[^>]*android:name="android\.hardware\.camera"[^>]*android:required="false"/.test(
+        androidManifest,
+      ),
+    ]);
+    checks.push([
+      "manifest uses-feature microphone optional",
+      /<uses-feature[^>]*android:name="android\.hardware\.microphone"[^>]*android:required="false"/.test(
+        androidManifest,
+      ),
+    ]);
+
     // Hardening: manifest cleartext must be a build-variant placeholder, not
     // a hardcoded literal that can drift in tracked git history.
     checks.push([

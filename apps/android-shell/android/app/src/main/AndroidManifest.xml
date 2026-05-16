@@ -153,4 +153,19 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!--
+        Round 31：声明 <uses-permission android:name="android.permission.CAMERA" />
+        但没配对应 <uses-feature>，Google Play 默认把 camera / microphone 当
+        硬件必备项—— 没摄像头 / 没麦克风的设备（无前后摄的部分平板、Android TV、
+        部分 Chromebook、Android Auto 头单元等）在 Play Store 内被强制过滤掉，
+        listing 直接看不到，侧载也会触发兼容性警告。
+        captureImage 只是「可选」功能（用户没相机也能用文字 / 文件 picker），
+        record_audio 同样是 voice-call / 摇一摇这类可选场景。required="false"
+        让 Play Store 把这些设备也涵盖进可安装范围。
+    -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 </manifest>

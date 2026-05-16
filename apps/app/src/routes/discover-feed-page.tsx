@@ -61,6 +61,8 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import {
   publishFeedComposeDraft,
   useMomentComposeDraft,
+  type MomentImageDraft,
+  type MomentVideoDraft,
 } from "../features/moments/moment-compose-media";
 import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import {
@@ -366,16 +368,37 @@ export function DiscoverFeedPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    // 新一轮 Round 1：mutationFn 之前直接闭包读 composeDraft.text/imageDrafts/videoDraft，
+    // onSuccess 又一把调 composeDraft.reset() + setShowCompose(false)。慢网下用户场景：
+    //   1. 输入 "A"，点发布。mutation 飞 5s 慢请求。
+    //   2. 等 1s 嫌烦按 ESC，面板关。
+    //   3. 重开面板，输入 "B" 准备发新草稿。
+    //   4. 第 5s "A" 的 onSuccess 跑回来，无条件 composeDraft.reset() → "B" 草稿
+    //      被抹掉、面板被强制关闭，用户没保存的新内容凭空消失。
+    // 改成：mutate 时把当时的 draft snapshot 当 variables 传进去，onSuccess 检查
+    // 当前 draft 是否还是那份 snapshot（用 reference equality 比 imageDrafts /
+    // videoDraft，因为 ref 一变就说明用户加/删过媒体；text 直接字符串比较），
+    // 没动才 reset+close，动了就只发提示、不碰用户草稿。
+    mutationFn: (input: {
+      text: string;
+      imageDrafts: MomentImageDraft[];
+      videoDraft: MomentVideoDraft | null;
+    }) =>
       publishFeedComposeDraft({
-        text: composeDraft.text,
-        imageDrafts: composeDraft.imageDrafts,
-        videoDraft: composeDraft.videoDraft,
+        text: input.text,
+        imageDrafts: input.imageDrafts,
+        videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newPost) => {
-      composeDraft.reset();
-      setShowCompose(false);
+    onSuccess: (newPost, input) => {
+      const draftStillMatchesPublish =
+        composeDraft.text === input.text &&
+        composeDraft.imageDrafts === input.imageDrafts &&
+        composeDraft.videoDraft === input.videoDraft;
+      if (draftStillMatchesPublish) {
+        composeDraft.reset();
+        setShowCompose(false);
+      }
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -1513,7 +1536,14 @@ export function DiscoverFeedPage() {
           onStartCommentReply={handleRowStartCommentReply}
           onSelectCommentAuthor={handleRowSelectCommentAuthor}
           onSelectPostAuthor={handleRowSelectPostAuthor}
-          onCreate={() => createMutationMutate()}
+          onCreate={() =>
+            createMutationMutate({
+              // 拍 snapshot 进 variables —— 见上方 createMutation 的注释。
+              text: composeDraft.text,
+              imageDrafts: composeDraft.imageDrafts,
+              videoDraft: composeDraft.videoDraft,
+            })
+          }
           onImageFilesSelected={(files) => {
             void handleImageFilesSelected(files);
           }}
