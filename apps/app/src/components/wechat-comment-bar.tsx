@@ -192,14 +192,22 @@ export function WeChatCommentBar({
               maxLength={500}
               className="block w-full resize-none border-0 bg-transparent text-[15px] leading-[22px] outline-none placeholder:text-[#B0B0B0]"
               onKeyDown={(event) => {
+                if (event.key !== "Enter" || event.shiftKey) return;
+                // 走查新一轮 Round 3：Android Chrome 部分 IME（搜狗 / 百度键盘
+                // 等）在 composing 期间按 Enter 确认候选时，原生 KeyboardEvent
+                // 的 isComposing 没置 true，仅 keyCode 走 229 信号；上方 ESC
+                // 监听已经按这套双判定兜过，这条 Enter 路径却只看 isComposing
+                // 漏了 keyCode。中文用户敲拼音回车选词时 handleSubmit 直接把
+                // 半个词当评论发出去，UI 视感是"刚要选词突然评论就发了"。
+                // 跟 desktop-feed-compose-panel R1 (76行) 同模式补全。
                 if (
-                  event.key === "Enter" &&
-                  !event.shiftKey &&
-                  !event.nativeEvent.isComposing
+                  event.nativeEvent.isComposing ||
+                  event.nativeEvent.keyCode === 229
                 ) {
-                  event.preventDefault();
-                  handleSubmit();
+                  return;
                 }
+                event.preventDefault();
+                handleSubmit();
               }}
             />
           </div>
