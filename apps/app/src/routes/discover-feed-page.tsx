@@ -772,6 +772,15 @@ const pendingLikePostId = likeMutation.isPending
         }),
         ownerId ? blockedQuery.refetch() : Promise.resolve(null),
       ]);
+      // R18-R19 给底部"加载更多失败 · 点击重试"挂上之后，下拉刷新成功了
+      // 这条红条不会自己消失（手动 setQueryData 不会重置 useInfiniteQuery 的
+      // isFetchNextPageError）。用户刚刚下拉成功又看到「加载更多失败」会以为
+      // 整张 feed 还在抖。pull-refresh 成功通常意味着网络也恢复了，顺手再
+      // 试一次 fetchNextPage，成功就把错误位清掉、observer 也能继续自动加载；
+      // 失败就维持原状让用户继续走「点击重试」路径。
+      if (hasNextFeedPage && isFetchNextFeedPageError) {
+        void fetchNextFeedPage();
+      }
     } catch (error) {
       setNoticeTone("info");
       setNoticeActionLabel(null);
