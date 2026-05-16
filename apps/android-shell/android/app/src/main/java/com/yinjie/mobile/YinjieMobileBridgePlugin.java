@@ -317,13 +317,23 @@ public class YinjieMobileBridgePlugin extends Plugin {
         }
 
         Intent data = result.getData();
+        int dataFlags = data.getFlags();
         if (data.getClipData() != null) {
             for (int index = 0; index < data.getClipData().getItemCount(); index += 1) {
                 Uri uri = data.getClipData().getItemAt(index).getUri();
+                // pickFileResult 早就调 persistReadPermission，pickImagesResult
+                // 这条路径漏了。ACTION_OPEN_DOCUMENT 给的 content:// URI 默认
+                // 只在调用方 process 存活期间可读；用户选完图后切到后台 / 系统
+                // 因为内存压力回收 activity，回前台时 webview 加载 webPath 预览
+                // 或上传组件 fetch() 这条 URI 都会拿到 SecurityException，
+                // 选好的图静默变灰 / 上传失败。
+                persistReadPermission(uri, dataFlags);
                 assets.put(buildAsset(uri));
             }
         } else if (data.getData() != null) {
-            assets.put(buildAsset(data.getData()));
+            Uri uri = data.getData();
+            persistReadPermission(uri, dataFlags);
+            assets.put(buildAsset(uri));
         }
 
         call.resolve(response);
