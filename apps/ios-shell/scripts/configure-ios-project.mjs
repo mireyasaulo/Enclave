@@ -801,7 +801,34 @@ function ensureAppDelegatePushHooks() {
         "        }",
         "",
         "        UserDefaults.standard.set(payload, forKey: \"YinjiePendingLaunchTarget\")",
+        "",
+        "        NotificationCenter.default.post(",
+        "            name: Notification.Name(\"YinjiePendingLaunchTargetChanged\"),",
+        "            object: nil",
+        "        )",
         "    }",
+      ].join("\n"),
+    );
+  }
+
+  // Round R4 真机走查：如果 AppDelegate 已经被前面分支写入过老版本的 cacheLaunchTarget
+  // （没带 NotificationCenter.post），那段路径不会被 insertBeforeClassEnd 再次插入。
+  // 这里兜底：检测到老 cacheLaunchTarget 末尾只有 UserDefaults.set 但没有
+  // YinjiePendingLaunchTargetChanged 的 post，就给它补上前台横幅点击 → JS sync 的
+  // 信号通道，确保 mobile-notification-launch-bridge 能收到 native 主动信号。
+  if (
+    source.includes("UserDefaults.standard.set(payload, forKey: \"YinjiePendingLaunchTarget\")") &&
+    !source.includes("YinjiePendingLaunchTargetChanged")
+  ) {
+    source = source.replace(
+      "UserDefaults.standard.set(payload, forKey: \"YinjiePendingLaunchTarget\")",
+      [
+        "UserDefaults.standard.set(payload, forKey: \"YinjiePendingLaunchTarget\")",
+        "",
+        "        NotificationCenter.default.post(",
+        "            name: Notification.Name(\"YinjiePendingLaunchTargetChanged\"),",
+        "            object: nil",
+        "        )",
       ].join("\n"),
     );
   }

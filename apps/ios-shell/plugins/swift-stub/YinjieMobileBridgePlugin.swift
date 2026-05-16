@@ -43,6 +43,19 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             object: nil
         )
 
+        // 真机走查 R4：AppDelegate.cacheLaunchTarget 写完 UserDefaults 后 post
+        // 一条 NotificationCenter 信号；我们在这听到后 notifyListeners 把它转给
+        // JS，让 MobileNotificationLaunchBridge 重读 UserDefaults 跑一次 sync。
+        // 解决用户在前台收到 push、点横幅之后 didReceive 已经把 pending target
+        // 写进 UserDefaults 但 JS 那条 focus/visibilitychange/pageshow 监听都
+        // 没醒、横幅消失但没有 navigate 的死链问题。
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePendingLaunchTargetChanged(_:)),
+            name: Notification.Name("YinjiePendingLaunchTargetChanged"),
+            object: nil
+        )
+
         // Round 48: 把上一次 app run 留在 4 个 tmp 子目录里的 stale 文件全清掉。
         // 历史问题：pickImages / captureImage / pickFile / shareFile / openFile
         // 这五条入口分别写到 yinjie-picker / yinjie-camera / yinjie-documents /
@@ -101,6 +114,14 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             payload["error"] = error
         }
         notifyListeners("pushTokenChanged", data: payload)
+    }
+
+    @objc private func handlePendingLaunchTargetChanged(_ notification: Notification) {
+        // 不带数据，JS 接到信号自己去 getPendingLaunchTarget 重读 UserDefaults。
+        // 这样 payload 字段约束完全跟 getPendingLaunchTarget 那条同款 contract
+        // 走 RawMobilePushLaunchTarget → normalizeMobilePushLaunchTarget，不用
+        // 再单独维护一份 event payload 序列化逻辑。
+        notifyListeners("pendingLaunchTargetChanged", data: [:])
     }
 
     @objc func openExternalUrl(_ call: CAPPluginCall) {

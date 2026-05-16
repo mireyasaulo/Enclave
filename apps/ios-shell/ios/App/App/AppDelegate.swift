@@ -183,6 +183,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         UserDefaults.standard.set(payload, forKey: "YinjiePendingLaunchTarget")
+
+        // 真机走查 R4：用户「正在前台」时收到 push（用户在 chat A，push 来自
+        // chat B），willPresent 选项里有 .banner 会让 iOS 在顶部弹横幅。用户点
+        // 横幅 → didReceive 触发 → 我们把 target 写进 UserDefaults，但 JS 那条
+        // MobileNotificationLaunchBridge 只挂在 window.focus / pageshow /
+        // visibilitychange 三个事件上，**前台点横幅一个都不触发**——app 始终
+        // 是 focused & visible 的，横幅只是 UI overlay 不切焦点。结果：
+        // UserDefaults 写完了，JS 完全不知道有新的 pending target，横幅消失，
+        // 用户还停留在 chat A，看上去「点了横幅没反应」。
+        //
+        // 借 NotificationCenter 把「pending target 变了」这条信号推到
+        // YinjieMobileBridgePlugin，让它 notifyListeners 出去通知 JS 重读
+        // UserDefaults 跑一次 syncPendingLaunchTarget。冷启场景：plugin load
+        // 在 didFinishLaunching 之后，AppDelegate post 时 plugin 还没观察这条
+        // notification，这条 post 自然丢；冷启依赖的是 JS mount 之后主动调用
+        // getPendingLaunchTarget 读 UserDefaults 的兜底路径，不受影响。
+        NotificationCenter.default.post(
+            name: Notification.Name("YinjiePendingLaunchTargetChanged"),
+            object: nil
+        )
     }
 
     private func normalize(_ value: Any?) -> String? {

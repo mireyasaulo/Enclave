@@ -100,6 +100,10 @@ type MobileBridgePlugin = {
     eventName: "pushTokenChanged",
     listener: (event: { token: string | null; error?: string }) => void,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(
+    eventName: "pendingLaunchTargetChanged",
+    listener: () => void,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
 };
 
 export type PushTokenChangedEvent = {
@@ -550,6 +554,30 @@ export async function onNativePushTokenChanged(
         token: event?.token ?? null,
         error: event?.error,
       });
+    });
+  } catch {
+    return null;
+  }
+}
+
+// 真机走查 R4：用户在前台收到 push 之后点横幅 → AppDelegate.didReceive 把
+// pending target 写进 UserDefaults，但 window.focus / pageshow /
+// visibilitychange 都不触发（app 一直 focused & visible），JS 那条
+// MobileNotificationLaunchBridge 没人叫醒它读 target。
+//
+// native 侧 AppDelegate.cacheLaunchTarget 完成后 post 一条
+// "YinjiePendingLaunchTargetChanged" NotificationCenter 通知，
+// YinjieMobileBridgePlugin 转 notifyListeners 把它推到 JS。这里包一层
+// 给 launch bridge 订阅，收到信号 callback 直接重跑 syncPendingLaunchTarget。
+export async function onNativePendingLaunchTargetChanged(
+  callback: () => void,
+): Promise<PluginListenerHandle | null> {
+  if (!isNativeMobileBridgeAvailable()) {
+    return null;
+  }
+  try {
+    return await mobileBridge.addListener("pendingLaunchTargetChanged", () => {
+      callback();
     });
   } catch {
     return null;
