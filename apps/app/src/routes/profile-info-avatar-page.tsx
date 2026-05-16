@@ -207,6 +207,15 @@ export function ProfileInfoAvatarPage() {
       setLocalError(t(msg`这张图片是空文件，请换一张试试。`));
       return;
     }
+    if (!file.type.startsWith("image/")) {
+      // <input accept="image/*"> 在多数浏览器只是 hint，桌面版 Safari /
+      // 拖拽场景下仍能丢一个 application/pdf / text/plain 进来。FileReader
+      // 照读不误，能塞进 pickedLocal 拼出 "data:application/pdf;base64,..."
+      // 落库，AvatarChip 当然加载失败回 fallback。跟 chat-composer
+      // (line 5592) / compress-chat-background-image (line 18) 同款 MIME 严校。
+      setLocalError(t(msg`只能选择图片文件。`));
+      return;
+    }
     setLocalError(null);
     // 上次保存失败 → 错误 banner 钉死在底部，用户重新选了张图也还挂着——
     // 既看着新选了图、又同时挂着上次保存失败的红字，容易让用户以为新选的

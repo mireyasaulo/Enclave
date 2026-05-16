@@ -130,7 +130,7 @@ msgstr "Forward to chat"
 #: apps/app/src/routes/contacts-page.tsx:2259
 #: apps/app/src/routes/contacts-page.tsx:2261
 #: apps/app/src/routes/mobile-add-friend-page.tsx:484
-#: apps/app/src/routes/mobile-add-friend-page.tsx:939
+#: apps/app/src/routes/mobile-add-friend-page.tsx:945
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:315
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:691
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1278
@@ -500,7 +500,7 @@ msgstr "Enter to send"
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:201
 #: apps/app/src/routes/channels-page.tsx:2761
 #: apps/app/src/routes/discover-page.tsx:1072
-#: apps/app/src/routes/mobile-add-friend-page.tsx:955
+#: apps/app/src/routes/mobile-add-friend-page.tsx:961
 #: apps/app/src/routes/mobile-note-editor-page.tsx:981
 msgid "发送"
 msgstr "Send"
@@ -786,7 +786,7 @@ msgstr "Send original (Cmd/Ctrl+Enter)"
 #: apps/app/src/routes/channels-page.tsx:2761
 #: apps/app/src/routes/character-detail-page.tsx:302
 #: apps/app/src/routes/discover-page.tsx:1071
-#: apps/app/src/routes/mobile-add-friend-page.tsx:815
+#: apps/app/src/routes/mobile-add-friend-page.tsx:821
 #: apps/app/src/routes/welcome-page.tsx:1184
 msgid "发送中..."
 msgstr "Sending..."
@@ -1599,7 +1599,7 @@ msgstr "Me"
 #: apps/app/src/routes/discover-page.tsx:477
 #: apps/app/src/routes/group-chat-details-page.tsx:409
 #: apps/app/src/routes/mobile-add-friend-page.tsx:105
-#: apps/app/src/routes/mobile-add-friend-page.tsx:852
+#: apps/app/src/routes/mobile-add-friend-page.tsx:858
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:225
 #: apps/app/src/routes/moments-page.tsx:407
 #: apps/app/src/routes/profile-page.tsx:117
@@ -2386,7 +2386,7 @@ msgstr "Untitled note"
 #: apps/app/src/routes/official-accounts-page.tsx:390
 #: apps/app/src/routes/profile-character-import-page.tsx:196
 #: apps/app/src/routes/profile-feedback-page.tsx:174
-#: apps/app/src/routes/profile-info-avatar-page.tsx:274
+#: apps/app/src/routes/profile-info-avatar-page.tsx:283
 #: apps/app/src/routes/profile-info-name-page.tsx:99
 #: apps/app/src/routes/profile-info-page.tsx:54
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:52
@@ -2534,7 +2534,7 @@ msgstr "Close dialog"
 #: apps/app/src/i18n/static-dom-seed.ts:855
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1067
 #: apps/app/src/routes/live-companion-page.tsx:876
-#: apps/app/src/routes/mobile-add-friend-page.tsx:916
+#: apps/app/src/routes/mobile-add-friend-page.tsx:922
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:665
 msgid "关闭"
 msgstr "Close"
@@ -3543,7 +3543,7 @@ msgstr "Reply to {0}: "
 #: apps/app/src/components/wechat-comment-bar.tsx:171
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:202
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:201
-#: apps/app/src/routes/mobile-add-friend-page.tsx:955
+#: apps/app/src/routes/mobile-add-friend-page.tsx:961
 msgid "发送中"
 msgstr "Sending"
 
@@ -4367,7 +4367,7 @@ msgstr "Pending"
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:907
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1097
 #: apps/app/src/routes/mini-programs-page.tsx:365
-#: apps/app/src/routes/profile-info-avatar-page.tsx:291
+#: apps/app/src/routes/profile-info-avatar-page.tsx:300
 #: apps/app/src/routes/profile-info-name-page.tsx:116
 #: apps/app/src/routes/profile-info-signature-page.tsx:111
 msgid "完成"
@@ -6741,7 +6741,7 @@ msgstr "You can keep adding images and GIFs so favorite stickers are easier to f
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1376
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1104
 #: apps/app/src/routes/group-chat-details-page.tsx:508
-#: apps/app/src/routes/mobile-add-friend-page.tsx:815
+#: apps/app/src/routes/mobile-add-friend-page.tsx:821
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1057
 msgid "添加"
 msgstr "Add"
@@ -7334,7 +7334,7 @@ msgstr "Added"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:991
 #: apps/app/src/routes/live-companion-page.tsx:323
 #: apps/app/src/routes/live-companion-page.tsx:583
-#: apps/app/src/routes/mobile-add-friend-page.tsx:794
+#: apps/app/src/routes/mobile-add-friend-page.tsx:800
 msgid "待处理"
 msgstr "Pending"
 
@@ -7509,7 +7509,7 @@ msgstr "Enter contact tags"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:519
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:82
 #: apps/app/src/features/shell/desktop-shell.tsx:987
-#: apps/app/src/routes/mobile-add-friend-page.tsx:780
+#: apps/app/src/routes/mobile-add-friend-page.tsx:786
 msgid "打开中..."
 msgstr "Opening..."
 
@@ -7519,7 +7519,7 @@ msgstr "Opening..."
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:916
 #: apps/app/src/features/shell/desktop-shell.tsx:987
 #: apps/app/src/routes/character-detail-page.tsx:297
-#: apps/app/src/routes/mobile-add-friend-page.tsx:780
+#: apps/app/src/routes/mobile-add-friend-page.tsx:786
 msgid "发消息"
 msgstr "Message"
 
@@ -10172,7 +10172,7 @@ msgstr "View profile"
 
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:513
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:104
-#: apps/app/src/routes/mobile-add-friend-page.tsx:808
+#: apps/app/src/routes/mobile-add-friend-page.tsx:814
 msgid "已拉黑"
 msgstr "Blocked"
 
@@ -10636,7 +10636,8 @@ msgid "当前申请还在等待对方通过。"
 msgstr "This request is still waiting for approval."
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:94
-#: apps/app/src/routes/mobile-add-friend-page.tsx:800
+#: apps/app/src/routes/mobile-add-friend-page.tsx:731
+#: apps/app/src/routes/mobile-add-friend-page.tsx:806
 msgid "已发送"
 msgstr "Sent"
 
@@ -10690,7 +10691,7 @@ msgid "验证信息"
 msgstr "Verification message"
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:141
-#: apps/app/src/routes/mobile-add-friend-page.tsx:986
+#: apps/app/src/routes/mobile-add-friend-page.tsx:992
 msgid "请输入验证信息"
 msgstr "Enter your verification message"
 
@@ -27138,15 +27139,15 @@ msgstr "Enter a full Yinjie ID for an exact match, or search by character name o
 msgid "请检查隐界号是否完整，或者换个关键词试试。"
 msgstr "Make sure the Yinjie ID is complete, or try a different keyword."
 
-#: apps/app/src/routes/mobile-add-friend-page.tsx:853
+#: apps/app/src/routes/mobile-add-friend-page.tsx:859
 msgid "你好，我是{owner}，想把你添加到通讯录里。"
 msgstr "Hi, I'm {owner}. I'd like to add you to my contacts."
 
-#: apps/app/src/routes/mobile-add-friend-page.tsx:942
+#: apps/app/src/routes/mobile-add-friend-page.tsx:948
 msgid "好友申请"
 msgstr "Friend requests"
 
-#: apps/app/src/routes/mobile-add-friend-page.tsx:977
+#: apps/app/src/routes/mobile-add-friend-page.tsx:983
 msgid "发送验证申请，对方通过后即可成为朋友。"
 msgstr "Send a friend request. You'll become friends once they accept."
 
@@ -27332,7 +27333,7 @@ msgid "切换桌面笔记..."
 msgstr "Switching to desktop notes…"
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:995
-#: apps/app/src/routes/profile-info-avatar-page.tsx:291
+#: apps/app/src/routes/profile-info-avatar-page.tsx:300
 #: apps/app/src/routes/profile-info-name-page.tsx:116
 #: apps/app/src/routes/profile-info-signature-page.tsx:111
 msgid "保存中"
@@ -27728,63 +27729,67 @@ msgstr "Image is too large. Please compress it to under 1 MB and try again."
 msgid "这张图片是空文件，请换一张试试。"
 msgstr "This image is an empty file. Please try a different one."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:228
+#: apps/app/src/routes/profile-info-avatar-page.tsx:216
+msgid "只能选择图片文件。"
+msgstr "Only image files are allowed."
+
+#: apps/app/src/routes/profile-info-avatar-page.tsx:237
 msgid "读取图片失败，请换一张试试。"
 msgstr "Failed to load image. Please try another."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:267
+#: apps/app/src/routes/profile-info-avatar-page.tsx:276
 msgid "更换头像"
 msgstr "Change avatar"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:303
+#: apps/app/src/routes/profile-info-avatar-page.tsx:312
 msgid "点击下方更换"
 msgstr "Tap below to change"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:315
+#: apps/app/src/routes/profile-info-avatar-page.tsx:324
 msgid "本地图片"
 msgstr "Local image"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:328
+#: apps/app/src/routes/profile-info-avatar-page.tsx:337
 msgid "清除已选图片"
 msgstr "Clear selected image"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:343
+#: apps/app/src/routes/profile-info-avatar-page.tsx:352
 msgid "图片地址"
 msgstr "Image URL"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:357
+#: apps/app/src/routes/profile-info-avatar-page.tsx:366
 msgid "粘贴图片 URL 或留空"
 msgstr "Paste image URL or leave empty"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:364
+#: apps/app/src/routes/profile-info-avatar-page.tsx:373
 msgid "当前头像已存为本地图片。粘贴新 URL 或重新选择都会替换它。"
 msgstr "Current avatar is stored as a local image. Pasting a new URL or picking again will replace it."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:369
+#: apps/app/src/routes/profile-info-avatar-page.tsx:378
 msgid "需要是 http/https 开头的合法图片链接。"
 msgstr "Needs to be a valid image URL starting with http/https."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:374
+#: apps/app/src/routes/profile-info-avatar-page.tsx:383
 msgid "粘贴的图片超过 2MB 上限，请压缩或换个 URL。"
 msgstr "The pasted image exceeds the 2 MB limit. Please compress it or use a different URL."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:399
+#: apps/app/src/routes/profile-info-avatar-page.tsx:408
 msgid "从相册选择"
 msgstr "Select from album"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:402
+#: apps/app/src/routes/profile-info-avatar-page.tsx:411
 msgid "图片大小不超过 1MB"
 msgstr "Image must be under 1 MB"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:422
+#: apps/app/src/routes/profile-info-avatar-page.tsx:431
 msgid "正在恢复…"
 msgstr "Restoring…"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:423
+#: apps/app/src/routes/profile-info-avatar-page.tsx:432
 msgid "恢复默认头像"
 msgstr "Restore default avatar"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:426
+#: apps/app/src/routes/profile-info-avatar-page.tsx:435
 msgid "清掉自定义头像，换回系统默认。"
 msgstr "Clear the custom avatar and switch back to the system default."
 
