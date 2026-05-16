@@ -134,6 +134,14 @@ export function ContactDetailPane({
 
   useEffect(() => {
     setProfileNotice(null);
+    // 走查发现：updateProfileMutation.error 在 ContactDetailPane 实例上是持续的，
+    // 切联系人不会自动清。如果 Alice 上「备注」保存失败留下 .error，用户切到
+    // Bob → 点 Bob 的「备注」打开弹层，新加的 dialog.error 会把 Alice 那次的错
+    // 翻给 Bob，误导 Bob 改半天发现自己根本没出错。切角色时显式 reset。
+    updateProfileMutation.reset();
+    // updateProfileMutation 是 useMutation 实例，reset 引用每渲染都新，依赖列表
+    // 故意不放 reset 以免 character 不变也反复 fire；只关心 character.id。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [character?.id]);
 
   useEffect(() => {
