@@ -191,7 +191,6 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
     @objc func shareFile(_ call: CAPPluginCall) {
         guard let base64Data = normalize(call.getString("base64Data")),
               let fileName = normalize(call.getString("fileName")),
-              let fileData = Data(base64Encoded: base64Data, options: [.ignoreUnknownCharacters]),
               let presenter = bridge?.viewController else {
             call.reject("base64Data and fileName are required")
             return
@@ -199,30 +198,47 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
 
         let title = normalize(call.getString("title"))
 
-        guard let fileUrl = writeSharedFile(data: fileData, fileName: fileName) else {
-            call.reject("failed to prepare shared file")
-            return
-        }
-
-        DispatchQueue.main.async {
-            let controller = UIActivityViewController(activityItems: [fileUrl], applicationActivities: nil)
-            if let title, !title.isEmpty {
-                controller.setValue(title, forKey: "subject")
+        // 真机走查 R1：shareFile 的两笔重活——Data(base64Encoded:) 解码 +
+        // writeSharedFile 里 data.write(.atomic) 落盘——原来全在 main 线程
+        // 同步跑。saveRemoteFile 拉一张 10MB 照片 / saveGeneratedFile 出一个
+        // 50MB PDF 走这条路径时，base64 串本身 ~13MB / ~67MB，解码 + 写盘
+        // 加起来在真机 NAND 上能阻塞 main 100ms-700ms。WKWebView 整体卡顿，
+        // 用户点「保存到文件」之后看到 + 按钮高亮但好几百 ms 没反应才弹出
+        // 分享 sheet。Round 23 修过 pickFile 同款 disk I/O，但 share/openFile
+        // 这条出站路径没顾上。挪到 userInitiated 后台跑，跑完回 main 再
+        // present，跟 Round 23 一致。
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let fileData = Data(base64Encoded: base64Data, options: [.ignoreUnknownCharacters]) else {
+                DispatchQueue.main.async {
+                    call.reject("base64Data and fileName are required")
+                }
+                return
             }
-            self.configurePopoverPresentation(for: controller, presenter: presenter)
-            // 同 share()：present completion 是入场动画完成，不是分享完成。
-            // completionWithItemsHandler 才是用户挑完目标 / 取消时的回调。
-            controller.completionWithItemsHandler = { _, _, _, _ in
-                call.resolve()
+            guard let fileUrl = self.writeSharedFile(data: fileData, fileName: fileName) else {
+                DispatchQueue.main.async {
+                    call.reject("failed to prepare shared file")
+                }
+                return
             }
-            presenter.present(controller, animated: true)
+            DispatchQueue.main.async {
+                let controller = UIActivityViewController(activityItems: [fileUrl], applicationActivities: nil)
+                if let title, !title.isEmpty {
+                    controller.setValue(title, forKey: "subject")
+                }
+                self.configurePopoverPresentation(for: controller, presenter: presenter)
+                // 同 share()：present completion 是入场动画完成，不是分享完成。
+                // completionWithItemsHandler 才是用户挑完目标 / 取消时的回调。
+                controller.completionWithItemsHandler = { _, _, _, _ in
+                    call.resolve()
+                }
+                presenter.present(controller, animated: true)
+            }
         }
     }
 
     @objc func openFile(_ call: CAPPluginCall) {
         guard let base64Data = normalize(call.getString("base64Data")),
               let fileName = normalize(call.getString("fileName")),
-              let fileData = Data(base64Encoded: base64Data, options: [.ignoreUnknownCharacters]),
               let presenter = bridge?.viewController else {
             call.reject("base64Data and fileName are required")
             return
@@ -230,38 +246,51 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
 
         let title = normalize(call.getString("title"))
 
-        guard let fileUrl = writeSharedFile(data: fileData, fileName: fileName) else {
-            call.reject("failed to prepare preview file")
-            return
-        }
-
-        DispatchQueue.main.async {
-            let controller = UIDocumentInteractionController(url: fileUrl)
-            controller.delegate = self
-            if let fileType = UTType(filenameExtension: fileUrl.pathExtension)?.identifier {
-                controller.uti = fileType
-            }
-
-            self.activeDocumentInteractionController = controller
-
-            if controller.presentPreview(animated: true) {
-                call.resolve()
+        // 真机走查 R1：同 shareFile，openFile 的 base64 解码 + atomic 落盘
+        // 老在 main 跑。打开一份 30MB+ PDF 预览时，UIDocumentInteractionController
+        // 弹出来之前的 200-500ms 整个 WebView 卡死。挪到后台跑，回 main
+        // 再 present preview / options menu。
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let fileData = Data(base64Encoded: base64Data, options: [.ignoreUnknownCharacters]) else {
+                DispatchQueue.main.async {
+                    call.reject("base64Data and fileName are required")
+                }
                 return
             }
-
-            let presented =
-                controller.presentOptionsMenu(
-                    from: presenter.view.bounds,
-                    in: presenter.view,
-                    animated: true
-                )
-            if presented {
-                call.resolve()
+            guard let fileUrl = self.writeSharedFile(data: fileData, fileName: fileName) else {
+                DispatchQueue.main.async {
+                    call.reject("failed to prepare preview file")
+                }
                 return
             }
+            DispatchQueue.main.async {
+                let controller = UIDocumentInteractionController(url: fileUrl)
+                controller.delegate = self
+                if let fileType = UTType(filenameExtension: fileUrl.pathExtension)?.identifier {
+                    controller.uti = fileType
+                }
 
-            self.activeDocumentInteractionController = nil
-            call.reject(title != nil ? "failed to open \(title!)" : "failed to open file preview")
+                self.activeDocumentInteractionController = controller
+
+                if controller.presentPreview(animated: true) {
+                    call.resolve()
+                    return
+                }
+
+                let presented =
+                    controller.presentOptionsMenu(
+                        from: presenter.view.bounds,
+                        in: presenter.view,
+                        animated: true
+                    )
+                if presented {
+                    call.resolve()
+                    return
+                }
+
+                self.activeDocumentInteractionController = nil
+                call.reject(title != nil ? "failed to open \(title!)" : "failed to open file preview")
+            }
         }
     }
 
