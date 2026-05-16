@@ -30,6 +30,7 @@ type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { EmptyState } from "../components/empty-state";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { resolveAppMediaUrl } from "../lib/media-url";
 import {
   buildDesktopChannelsRouteHash,
   parseDesktopChannelsRouteHash,
@@ -642,10 +643,13 @@ function ChannelPostCover({ post }: { post: FeedPostListItem }) {
   const coverPresentation = resolveChannelPostCoverPresentation(t, post);
 
   if (post.coverUrl?.trim()) {
+    // 经 normalizeFeedPost 后 coverUrl 已是绝对 URL，但走 cloud-api 多租户反代时
+    // <img src> 这类标签拿不到 Authorization header，必须用 resolveAppMediaUrl
+    // 把 token 拼到 query string，否则 CloudClientAuthGuard 401，封面变破图。
     return (
       <div className="relative h-[8.75rem] w-[7rem] shrink-0 overflow-hidden rounded-[18px] bg-[#d8e5de]">
         <img
-          src={post.coverUrl}
+          src={resolveAppMediaUrl(post.coverUrl)}
           alt={post.title || post.authorName}
           className="h-full w-full object-cover"
         />

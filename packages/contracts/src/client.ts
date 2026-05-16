@@ -938,7 +938,7 @@ function normalizeFeedPost<T extends FeedPost>(post: T, baseUrl?: string): T {
     durationMs:
       typeof post.durationMs === "number"
         ? post.durationMs
-        : primaryMedia?.kind === "video"
+        : primaryMedia?.kind === "video" || primaryMedia?.kind === "audio"
           ? (primaryMedia.durationMs ?? null)
           : null,
     aspectRatio:

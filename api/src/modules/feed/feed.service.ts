@@ -3498,7 +3498,7 @@ export class FeedService implements OnModuleInit {
       ),
       durationMs:
         post.durationMs ??
-        (primaryMedia?.kind === 'video'
+        (primaryMedia?.kind === 'video' || primaryMedia?.kind === 'audio'
           ? (primaryMedia.durationMs ?? null)
           : null),
       aspectRatio:
