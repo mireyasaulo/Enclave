@@ -3698,13 +3698,21 @@ function MobileChannelCommentsSheet({
         <div className="border-t border-[color:var(--border-subtle)] bg-white px-4 pb-2 pt-3">
           {replyTarget ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-[12px] bg-[rgba(7,193,96,0.08)] px-3 py-2 text-[11px] text-[#166534]">
-              <div className="truncate">
+              {/*
+                走查 R1（本轮）：原 truncate 没有 min-w-0 + flex-1，flex item 默认
+                min-width:auto，超长 authorName（比如用户用户名 yuanzui0728_5999 +
+                "正在回复 " 前缀 ≈ 25 字、或者用户自定的中文长昵称）会按 nowrap 撑开
+                父级 flex 容器，把右侧"取消"按钮挤到屏外（移动端 < 380px 宽 chip 必现）。
+                给 truncate 那段加 min-w-0 + flex-1 让它在 flex 里能正常收缩、就位
+                truncate 省略号；shrink-0 把"取消"按钮锁死不被压扁。
+              */}
+              <div className="min-w-0 flex-1 truncate">
                 {t(msg`正在回复 ${replyTarget.authorName}`)}
               </div>
               <button
                 type="button"
                 onClick={onCancelReply}
-                className="text-[#166534] transition active:opacity-70"
+                className="shrink-0 text-[#166534] transition active:opacity-70"
               >
                 {t(msg`取消`)}
               </button>
