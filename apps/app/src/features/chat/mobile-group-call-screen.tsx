@@ -220,6 +220,17 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
       return;
     }
 
+    // 走查 Round 1：handleEndCall 先 setLeavingScreen(true) + leavingScreenRef
+    // → 再 navigate 到 /group/$id 把 hash 清掉。组件还没 unmount 那一帧里
+    // routeState 已经回 null（无 hash）→ callSessionKey 变 → init effect 再走
+    // 一次 body → panelOpenedReportedRef 被按 hasResumeCounts=false 重置；
+    // 下方 panel-opened effect 紧接着 fire syncCurrentStatus → 群里冒一条
+    // stray "画面进行中" 紧跟在 "已结束" 后头。leavingScreen 真值时
+    // handleEndCall 已经接管离屏流程，init 不该再重置任何 ref / state。
+    if (leavingScreenRef.current || leavingScreen) {
+      return;
+    }
+
     if (initializedSessionKeyRef.current === callSessionKey) {
       return;
     }
@@ -244,6 +255,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   }, [
     callSessionKey,
     hasResumeCounts,
+    leavingScreen,
     members,
     membersQuery.isLoading,
     mode,
@@ -386,7 +398,12 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
       !groupQuery.data ||
       membersQuery.isLoading ||
       isDesktopLayout ||
-      panelOpenedReportedRef.current
+      panelOpenedReportedRef.current ||
+      // 同 init effect：handleEndCall 触发离屏流程后 panelOpenedReportedRef
+      // 万一被某条 stale render 拨回 false，这里再加一道防线，避免 fire
+      // 一条 stray syncCurrentStatus → "画面进行中"。
+      leavingScreenRef.current ||
+      leavingScreen
     ) {
       return;
     }
@@ -396,6 +413,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   }, [
     groupQuery.data,
     isDesktopLayout,
+    leavingScreen,
     membersQuery.isLoading,
     resolvedGroupId,
     syncCurrentStatus,
