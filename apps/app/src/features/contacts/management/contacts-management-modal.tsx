@@ -102,8 +102,12 @@ export function ContactsManagementModal({
   // → 默认从顶部开始，符合预期。
   // R2 走查：handler 通过 ref 读 currentScreenKey，避免 screenKey 一变就把 listener
   // 拆掉重装；同一个 modal 生命周期里只 add 一次，scroll 60Hz 不会再来回挂钩子。
+  // 关键点：ref 必须在 paint 前同步到新值，否则下一行 useLayoutEffect 里
+  // container.scrollTop=saved 会触发一次 scroll 事件，handler 读到的还是旧
+  // screenKey → 拿"新屏的 0"覆盖了"旧屏的真实 scrollTop"。用 useLayoutEffect
+  // 在 paint 前更新 ref（执行顺序在下面 scrollTop 还原之前）。
   const currentScreenKeyRef = useRef(screenKey);
-  useEffect(() => {
+  useLayoutEffect(() => {
     currentScreenKeyRef.current = screenKey;
   }, [screenKey]);
 
