@@ -1998,6 +1998,12 @@ function ChannelAudioPictorial({
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const swipeHandledRef = useRef(false);
+  // 走查 R12：touchend 处理完 tap 后浏览器还会合成一次 click，原 handleClick
+  // 仅靠 touchStartXRef !== null 拦不住——touchend 里已经把它清成 null，
+  // 合成 click 跑下来又会再 handleTap() 一次，等于点一下 → 一次 pause→一次 play
+  // （或反之），用户 tap 想暂停永远暂停不下来，首次 tap 想解除静音也会立刻被
+  // 反向 toggle 回去。touchend 走过 tap 后把这个 flag 置 1，吞掉紧跟着的合成 click。
+  const suppressNextClickRef = useRef(false);
 
   // 进入 active 时播放，离开时暂停 + 复位（保证全局只有一条 audio 在响）。
   // 注意：userUnmuted 不是这里的依赖——否则用户主动暂停后再切静音，会被
@@ -2111,6 +2117,8 @@ function ChannelAudioPictorial({
     touchStartYRef.current = null;
     if (!wasSwipe) {
       // 纯点击：切播放/暂停（首次顺带解除静音）
+      // 标记：本次合成 click 要被吞掉，否则下面 handleClick 会再跑一次 handleTap
+      suppressNextClickRef.current = true;
       handleTap();
     }
     // swipeHandledRef 不在这里清——下面 onClick 还要看；改在 touchStart 重置
@@ -2118,11 +2126,13 @@ function ChannelAudioPictorial({
   // 桌面鼠标场景兜底：触屏 touchend 后浏览器仍会合成 click，但 swipe
   // 期间 click 多数浏览器会自动取消；这里只为非触屏鼠标点击服务。
   const handleClick = (event: React.MouseEvent) => {
-    // touch 设备已在 touchend 中调用 handleTap；这里检测纯鼠标事件
     if (event.detail === 0) return; // 由键盘等触发的 synthetic click 忽略
-    // touchstart 走过的话 touchEnd 已 handle 过；synthetic click 在 swipe 时浏览器会抑制
-    // 没法 100% 区分 — 简单办法：依据是否有 touchStartXRef 痕迹判断
-    if (touchStartXRef.current !== null || swipeHandledRef.current) return;
+    // touch 路径已经在 touchend 里跑过 handleTap；suppress flag 吃掉对应的合成 click。
+    if (suppressNextClickRef.current) {
+      suppressNextClickRef.current = false;
+      return;
+    }
+    if (swipeHandledRef.current) return;
     handleTap();
   };
 
