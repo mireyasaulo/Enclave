@@ -15,8 +15,49 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
   const suppressNextPendingCountRef = useRef(false);
   const isAtBottomRef = useRef(true);
   const lastUserGestureAtRef = useRef(0);
+  const pinFrameRef = useRef(0);
+  const pinUntilRef = useRef(0);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
+
+  const cancelPinToBottom = useEffectEvent(() => {
+    if (pinFrameRef.current !== 0 && typeof window !== "undefined") {
+      window.cancelAnimationFrame(pinFrameRef.current);
+    }
+    pinFrameRef.current = 0;
+    pinUntilRef.current = 0;
+  });
+
+  const startPinToBottomWindow = useEffectEvent((durationMs: number) => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    pinUntilRef.current = Math.max(
+      pinUntilRef.current,
+      performance.now() + durationMs,
+    );
+    if (pinFrameRef.current !== 0) {
+      return;
+    }
+    const tick = () => {
+      const current = ref.current;
+      if (!current) {
+        pinFrameRef.current = 0;
+        pinUntilRef.current = 0;
+        return;
+      }
+      // 把 scrollTop 顶到 scrollHeight，遇到乐观消息晚一帧上屏 / 图片加载完
+      // 撑高气泡 / 键盘收起后容器变高这些「scrollHeight 在 send 之后才长大」
+      // 的情况，会在窗口期内被持续重新对齐到底部。
+      current.scrollTop = current.scrollHeight;
+      if (performance.now() < pinUntilRef.current) {
+        pinFrameRef.current = window.requestAnimationFrame(tick);
+      } else {
+        pinFrameRef.current = 0;
+      }
+    };
+    pinFrameRef.current = window.requestAnimationFrame(tick);
+  });
 
   const syncBottomStateFromDom = useEffectEvent(() => {
     const element = ref.current;
@@ -54,17 +95,11 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       // Treat the upcoming scroll events as ours, not user-driven.
       lastUserGestureAtRef.current = 0;
 
-      // After the next paint, scrollHeight may have grown (e.g. message bubble
-      // finished laying out). Re-pin to bottom so we don't end up just short.
-      if (typeof window !== "undefined") {
-        window.requestAnimationFrame(() => {
-          const current = ref.current;
-          if (!current) {
-            return;
-          }
-          current.scrollTop = current.scrollHeight;
-        });
-      }
+      // 移动端按发送时，乐观消息上屏 / 图片完成布局 / 键盘收起重排都可能在
+      // 单帧之后才发生，scrollHeight 在那之后才长到「真正的最底」。开一段
+      // 窗口逐帧重新贴底，覆盖这些迟到的布局变化，避免「发了但页面没动 / 看不
+      // 到自己刚发的消息和后续回复」。用户真正的 touchmove/wheel 会立刻取消。
+      startPinToBottomWindow(POST_SCROLL_PIN_WINDOW_MS);
     },
   );
 
@@ -82,6 +117,13 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       lastUserGestureAtRef.current = performance.now();
     };
 
+    // 真正的拖动 / 滚轮表明用户想自己控制滚动位置，需要立刻退出贴底窗口。
+    // touchstart 不算 —— 用户可能只是点一下消息气泡，不应取消贴底。
+    const markUserDrag = () => {
+      lastUserGestureAtRef.current = performance.now();
+      cancelPinToBottom();
+    };
+
     const handleScroll = () => {
       const now = performance.now();
       // Only treat scroll events as authoritative when a user gesture happened
@@ -96,20 +138,26 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
     };
 
     element.addEventListener("scroll", handleScroll, { passive: true });
-    element.addEventListener("wheel", markUserGesture, { passive: true });
-    element.addEventListener("touchmove", markUserGesture, { passive: true });
+    element.addEventListener("wheel", markUserDrag, { passive: true });
+    element.addEventListener("touchmove", markUserDrag, { passive: true });
     element.addEventListener("touchstart", markUserGesture, { passive: true });
     element.addEventListener("mousedown", markUserGesture, { passive: true });
     element.addEventListener("keydown", markUserGesture);
     return () => {
       element.removeEventListener("scroll", handleScroll);
-      element.removeEventListener("wheel", markUserGesture);
-      element.removeEventListener("touchmove", markUserGesture);
+      element.removeEventListener("wheel", markUserDrag);
+      element.removeEventListener("touchmove", markUserDrag);
       element.removeEventListener("touchstart", markUserGesture);
       element.removeEventListener("mousedown", markUserGesture);
       element.removeEventListener("keydown", markUserGesture);
     };
-  }, [syncBottomStateFromDom]);
+  }, [cancelPinToBottom, syncBottomStateFromDom]);
+
+  useEffect(() => {
+    return () => {
+      cancelPinToBottom();
+    };
+  }, [cancelPinToBottom]);
 
   useLayoutEffect(() => {
     const previousItemCount = previousItemCountRef.current;
@@ -164,3 +212,4 @@ function isScrolledNearBottom(element: HTMLElement) {
 
 const SCROLL_BOTTOM_THRESHOLD = 72;
 const USER_SCROLL_WINDOW_MS = 500;
+const POST_SCROLL_PIN_WINDOW_MS = 900;
