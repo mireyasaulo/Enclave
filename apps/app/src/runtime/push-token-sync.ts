@@ -7,9 +7,25 @@ import {
   readNativePushToken,
 } from "./mobile-bridge";
 import { isIosPlatform } from "./adapters/ios";
+import { isAndroidPlatform } from "./adapters/android";
 import { getAppRuntimeConfig } from "./runtime-config-store";
 
 const SYNC_CACHE_KEY = "yinjie-push-token-sync-cache.v1";
+
+type SyncTarget = {
+  platform: "ios" | "android";
+  bundleIdDefault: string;
+};
+
+const IOS_TARGET: SyncTarget = {
+  platform: "ios",
+  bundleIdDefault: "com.yinjie.ios",
+};
+
+const ANDROID_TARGET: SyncTarget = {
+  platform: "android",
+  bundleIdDefault: "com.yinjie.mobile",
+};
 
 type CachedSyncRecord = {
   ownerId: string;
@@ -67,23 +83,37 @@ export type SyncIosPushTokenResult =
         | "network-error";
     };
 
-/**
- * 把 iOS 设备的 APNs device token 上报给后端 (POST /api/push/tokens)。
- * 调用时机：
- *   - bootstrapIos 兜底跑一次（只有用户已授权时才会真正上报）
- *   - 用户授权通知后立刻调一次（chat-details-page 等）
- *   - 登录成功后调一次（让换号也能立刻 attach）
- *   - APNs 重发新 token 时（onNativePushTokenChanged 监听后 force=true 重报）
- *
- * 缓存机制：localStorage 记 (ownerId + tokenHash)；相同则跳过避免每次启动都打接口。
- */
-export async function syncIosPushToken(options?: {
-  force?: boolean;
-}): Promise<SyncIosPushTokenResult> {
-  if (!isIosPlatform() || !isNativeMobileBridgeAvailable()) {
-    return { ok: false, reason: "not-ios" };
-  }
+export type SyncAndroidPushTokenResult =
+  | { ok: true; updated: boolean; reason?: never }
+  | {
+      ok: false;
+      reason:
+        | "not-android"
+        | "no-permission"
+        | "no-token"
+        | "no-owner"
+        | "skipped-cache"
+        | "request-failed"
+        | "network-error";
+    };
 
+type SyncCoreResult =
+  | { ok: true; updated: boolean }
+  | {
+      ok: false;
+      reason:
+        | "no-permission"
+        | "no-token"
+        | "no-owner"
+        | "skipped-cache"
+        | "request-failed"
+        | "network-error";
+    };
+
+async function syncNativePushTokenCore(
+  target: SyncTarget,
+  options?: { force?: boolean },
+): Promise<SyncCoreResult> {
   const permission = await getNativeNotificationPermissionState();
   if (permission !== "granted") {
     return { ok: false, reason: "no-permission" };
@@ -112,7 +142,7 @@ export async function syncIosPushToken(options?: {
 
   const runtimeConfig = getAppRuntimeConfig();
   const bundleId =
-    runtimeConfig.applicationId?.trim() || "com.yinjie.ios";
+    runtimeConfig.applicationId?.trim() || target.bundleIdDefault;
   const appVersion = runtimeConfig.appVersionName?.trim() || null;
   const environment =
     runtimeConfig.environment === "development" ? "development" : "production";
@@ -133,7 +163,7 @@ export async function syncIosPushToken(options?: {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        platform: "ios",
+        platform: target.platform,
         token,
         bundleId,
         environment,
@@ -166,6 +196,49 @@ export async function syncIosPushToken(options?: {
     console.warn("[push-token-sync] network error", error);
     return { ok: false, reason: "network-error" };
   }
+}
+
+/**
+ * 把 iOS 设备的 APNs device token 上报给后端 (POST /api/push/tokens)。
+ * 调用时机：
+ *   - bootstrapIos 兜底跑一次（只有用户已授权时才会真正上报）
+ *   - 用户授权通知后立刻调一次（chat-details-page 等）
+ *   - 登录成功后调一次（让换号也能立刻 attach）
+ *   - APNs 重发新 token 时（onNativePushTokenChanged 监听后 force=true 重报）
+ *
+ * 缓存机制：localStorage 记 (ownerId + tokenHash)；相同则跳过避免每次启动都打接口。
+ */
+export async function syncIosPushToken(options?: {
+  force?: boolean;
+}): Promise<SyncIosPushTokenResult> {
+  if (!isIosPlatform() || !isNativeMobileBridgeAvailable()) {
+    return { ok: false, reason: "not-ios" };
+  }
+  const result = await syncNativePushTokenCore(IOS_TARGET, options);
+  if (result.ok) {
+    return { ok: true, updated: result.updated };
+  }
+  return { ok: false, reason: result.reason };
+}
+
+/**
+ * 把 Android 设备的 FCM device token 上报给后端 (POST /api/push/tokens)。
+ * 同 iOS 的契约：调用时机 = bootstrapAndroid + 授权通知后 + 登录成功 / 换号。
+ * Android 的 FCM token 由 YinjieFirebaseMessagingService.onNewToken 写到
+ * SharedPreferences；JS 这里每次 sync 重新 readNativePushToken 抓最新值，
+ * token 轮换（reinstall / 清 app data）下次冷启自然会重报。
+ */
+export async function syncAndroidPushToken(options?: {
+  force?: boolean;
+}): Promise<SyncAndroidPushTokenResult> {
+  if (!isAndroidPlatform() || !isNativeMobileBridgeAvailable()) {
+    return { ok: false, reason: "not-android" };
+  }
+  const result = await syncNativePushTokenCore(ANDROID_TARGET, options);
+  if (result.ok) {
+    return { ok: true, updated: result.updated };
+  }
+  return { ok: false, reason: result.reason };
 }
 
 let listenerHandlePromise: Promise<unknown> | null = null;
@@ -225,8 +298,61 @@ export function startIosOwnerChangeListener() {
 }
 
 /**
+ * Android 端 owner 监听：跟 iOS 完全一样的契约，登录 / 换号 force resync、
+ * 登出清缓存。Android 没有 pushTokenChanged 事件（FCM SDK 把 onNewToken 直接
+ * 落到 SharedPreferences，JS 这边下次冷启读最新值即可），所以不开 push token
+ * listener，token 轮换走 bootstrap 路径。
+ */
+export function startAndroidOwnerChangeListener() {
+  if (!isAndroidPlatform() || !isNativeMobileBridgeAvailable()) {
+    return;
+  }
+  if (ownerSubscriptionStarted) {
+    return;
+  }
+  ownerSubscriptionStarted = true;
+
+  let lastOwnerId = useWorldOwnerStore.getState().id;
+  useWorldOwnerStore.subscribe((state) => {
+    const next = state.id;
+    if (next === lastOwnerId) {
+      return;
+    }
+    if (!next) {
+      clearCache();
+    } else {
+      void syncAndroidPushToken({ force: true });
+    }
+    lastOwnerId = next;
+  });
+}
+
+/**
  * 用户登出 / 切号时清缓存，下次 sync 必然会重报。
  */
 export function clearIosPushTokenSyncCache() {
   clearCache();
+}
+
+/**
+ * Android 端同样的缓存清理；登出 / 切号路径上调用。
+ */
+export function clearAndroidPushTokenSyncCache() {
+  clearCache();
+}
+
+/**
+ * 平台无关的同步入口：业务页（chat-details-page 等）授权通知后调一次，
+ * 内部按平台分发，非原生壳 / 非 iOS / 非 Android 都安全短路。
+ */
+export async function syncNativePushTokenAcrossPlatforms(options?: {
+  force?: boolean;
+}) {
+  if (isIosPlatform()) {
+    return syncIosPushToken(options);
+  }
+  if (isAndroidPlatform()) {
+    return syncAndroidPushToken(options);
+  }
+  return null;
 }

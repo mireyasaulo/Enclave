@@ -485,11 +485,13 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
         ? await requestNotificationPermission()
         : undefined;
       if (permission === "granted") {
-        // 用户刚授权通知 → 立刻把 APNs device token 同步给后端，避免要等下次启动
-        const { syncIosPushToken } = await import(
+        // 用户刚授权通知 → 立刻把 APNs / FCM device token 同步给后端，避免
+        // 要等下次启动。iOS 走 syncIos，Android 走 syncAndroid，
+        // syncNativePushTokenAcrossPlatforms 内部按平台分发，非原生壳安全短路。
+        const { syncNativePushTokenAcrossPlatforms } = await import(
           "../runtime/push-token-sync"
         );
-        void syncIosPushToken();
+        void syncNativePushTokenAcrossPlatforms();
       }
       return { conversation, enabled, permission };
     },

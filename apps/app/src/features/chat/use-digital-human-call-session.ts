@@ -207,7 +207,12 @@ export function useDigitalHumanCallSession({
     }
 
     autoSubmitRecordingRef.current = false;
-    void turnMutation.mutateAsync();
+    // 用 mutate() 而不是 mutateAsync()——这里不 await 结果，错误已经在
+    // turnMutation onError (line 147) 里设了 sessionState/sessionError，
+    // 消费者通过 mutation.error / sessionError 读；mutateAsync() 的 promise
+    // 在 mutationFn 抛错时会 reject，`void` 不接 → 落 window.unhandledrejection
+    // 污染 telemetry。
+    turnMutation.mutate();
   }, [speech.recordedAudio, speech.status, turnMutation]);
 
   const endSession = useCallback(async () => {

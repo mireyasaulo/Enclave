@@ -169,7 +169,13 @@ export function useVoiceCallSession({
     }
 
     autoSubmitRecordingRef.current = false;
-    void turnMutation.mutateAsync();
+    // 用 mutate() 而不是 mutateAsync()——这里不 await 结果，mutation.error 已经
+    // 被 useMutation 内部捕获并通过 mutation.error 暴露给消费者
+    // (mobile-ai-call-screen 在 line 730 读它显示「重试」状态条)；
+    // mutateAsync() 的 promise 在 mutationFn 抛错时会 reject，`void` 不接
+    // → 落 window.unhandledrejection 污染 telemetry（公网隧道 5xx / cloud token
+    // 过期重连时 createVoiceCallTurn 偶发 4xx/5xx，每次都会触发）。
+    turnMutation.mutate();
   }, [speech.recordedAudio, speech.status, turnMutation]);
 
   useEffect(() => {
