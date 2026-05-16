@@ -754,6 +754,14 @@ export function DesktopNotesWorkspace({
   }
 
   const handleSave = useCallback(async () => {
+    // 同一时间最多飞一次保存请求。"保存"按钮按 saveMutation.isPending 已禁用，
+    // 但 Ctrl+S 这条键盘快捷路径没挡——用户连按两下 Ctrl+S（或按住不放），
+    // useMutation.mutateAsync 会并发起两次请求；对新笔记（noteId 还没有）
+    // 这意味着后端落两条 createFavoriteNote → 收藏列表里冒出两条一模一样
+    // 的笔记。这里短路掉重复触发。
+    if (saveMutation.isPending) {
+      return null;
+    }
     // 不挡空保存的话，用户点保存按钮 / Ctrl+S，后端就会落一条
     // title=无标题笔记 contentText="" 的废笔记。挡的标准跟下方 requestSend
     // 的 hasSendableContent 对齐——只看正文或附件，标签无法独立成笔记。
