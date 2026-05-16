@@ -270,7 +270,12 @@ export function ChatBackgroundPage() {
     if (!file) {
       return;
     }
-    await uploadMutation.mutateAsync({ file });
+    // 用 mutate() 而不是 mutateAsync()——caller 是 onClick={() => openPicker(...)}
+    // fire-and-forget，没人接 rejection；uploadMutation.error 已通过 pageError
+    // (line 254-264) 渲染在页面上，业务上不需要 await。改成 mutate() 后 rejection
+    // 不再外泄到 window.unhandledrejection（公网隧道 / cloud token 过期重连时
+    // compressChatBackgroundImage 后端 5xx / 上传 4xx 会抛，每次都污染 telemetry）。
+    uploadMutation.mutate({ file });
   };
 
   const navigateToRouteStateReturn = () => {
