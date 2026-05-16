@@ -133,7 +133,8 @@ export function extractNoteTextFromHtml(value: string) {
     .replace(blockOpenPattern, "\n")
     .replace(blockClosePattern, "\n")
     .replace(/<[^>]+>/g, " ")
-    .replace(/ /g, " ")
+    // 把 &nbsp;(U+00A0) 归一成普通空格——之前直接在正则里写了字面量 NBSP, ESLint no-irregular-whitespace 在 lint:desktop-web 长期报红；改成 \u00A0 转义同语义，可视化清晰，过 lint。
+    .replace(/\u00A0/g, " ")
     .replace(/\r\n/g, "\n")
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n[ \t]+/g, "\n")
