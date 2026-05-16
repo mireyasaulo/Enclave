@@ -45,10 +45,14 @@ export function registerAndroidBackInterceptor(
   };
 }
 
-async function importCapacitorApp(): Promise<CapacitorAppPlugin | null> {
+// Capacitor 插件 Proxy 对任何属性访问都会响应（包括 `.then`），
+// 直接 await 一个解析到 Proxy 的 Promise 会触发 Promise 解析链路追 thenable，
+// Capacitor 实现里 then 没有 fulfill 路径就抛 "App.then() is not implemented on android"。
+// 把它套一层 plain object，Promise 解析就不会再追下去。
+async function importCapacitorApp(): Promise<{ app: CapacitorAppPlugin } | null> {
   try {
     const mod = (await import("@capacitor/app")) as { App: CapacitorAppPlugin };
-    return mod.App ?? null;
+    return mod.App ? { app: mod.App } : null;
   } catch {
     return null;
   }
@@ -146,10 +150,10 @@ function isAtRootRoute() {
   return (
     path === "" ||
     path === "/" ||
-    path === "/chat-list" ||
-    path === "/contacts" ||
-    path === "/discover" ||
-    path === "/me"
+    path === "/tabs/chat" ||
+    path === "/tabs/contacts" ||
+    path === "/tabs/discover" ||
+    path === "/tabs/profile"
   );
 }
 
@@ -170,19 +174,20 @@ async function handleBackPressed(
     return;
   }
 
-  // 3. 路由能 safe back → history.back
-  if (canSafelyNavigateBack()) {
-    window.history.back();
-    return;
-  }
-
-  // 4. 在根 tab：双击退出
+  // 3. 在根 tab（消息/通讯录/发现/我）：双击退出，不走 history.back
+  //    canSafelyNavigateBack 在 history.length>1 的根 tab 上仍是 true，
+  //    所以必须在 history.back 之前拦截，否则根 tab 上的 back 会
+  //    被劫持成往后导航。
   if (isAtRootRoute()) {
     const now = Date.now();
     if (now - lastBackPressAt < DOUBLE_TAP_EXIT_WINDOW_MS) {
       lastBackPressAt = 0;
       try {
-        await app.exitApp();
+        if (app.minimizeApp) {
+          await app.minimizeApp();
+        } else {
+          await app.exitApp();
+        }
       } catch {
         // ignore
       }
@@ -193,7 +198,13 @@ async function handleBackPressed(
     return;
   }
 
-  // 5. 兜底：能 minimize 就 minimize，否则 history.back
+  // 4. 非根 tab：能 safe back → history.back
+  if (canSafelyNavigateBack()) {
+    window.history.back();
+    return;
+  }
+
+  // 5. 兜底：minimize app
   try {
     if (app.minimizeApp) {
       await app.minimizeApp();
@@ -211,11 +222,12 @@ export async function registerAndroidBackButton() {
   if (registered || !isAndroidPlatform()) {
     return;
   }
-  const app = await importCapacitorApp();
-  if (!app) {
+  const loaded = await importCapacitorApp();
+  if (!loaded) {
     return;
   }
   registered = true;
+  const { app } = loaded;
   await app.addListener("backButton", (data) => {
     void handleBackPressed(app, data);
   });
@@ -237,11 +249,12 @@ export async function registerAndroidAppStateChange() {
   if (appStateRegistered || !isAndroidPlatform()) {
     return;
   }
-  const app = await importCapacitorApp();
-  if (!app) {
+  const loaded = await importCapacitorApp();
+  if (!loaded) {
     return;
   }
   appStateRegistered = true;
+  const { app } = loaded;
   type AppStatePlugin = CapacitorAppPlugin & {
     addListener: (
       event: "appStateChange",

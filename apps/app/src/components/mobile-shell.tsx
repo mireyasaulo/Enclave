@@ -77,17 +77,19 @@ export function MobileShell({ children }: PropsWithChildren) {
 
   const lastPersistedPathRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!isMobileWebRuntime(runtimeConfig.appPlatform)) {
-      return;
-    }
-
     const currentPath = `${pathname}${search}${hash}`;
     if (lastPersistedPathRef.current === currentPath) {
       return;
     }
     lastPersistedPathRef.current = currentPath;
+    // recordAppNavigation 喂给硬件 Back 键的 canSafelyNavigateBack；
+    // 原生壳（Capacitor android/ios）也要靠它判断"能不能 history.back"，
+    // 不只是 mobile web。所以无条件 record，但 persistMobileWebRoute 只
+    // 给 web 跑——后者是浏览器刷新场景下的路由恢复。
     recordAppNavigation(currentPath);
-    persistMobileWebRoute(currentPath);
+    if (isMobileWebRuntime(runtimeConfig.appPlatform)) {
+      persistMobileWebRoute(currentPath);
+    }
   }, [hash, pathname, runtimeConfig.appPlatform, search]);
 
   useEffect(() => {
