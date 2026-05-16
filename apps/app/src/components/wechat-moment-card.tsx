@@ -155,6 +155,13 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
     );
     const hasComments = visibleComments.length > 0;
     const showFooterBlock = hasLikes || hasComments;
+    // 评论行渲染时要按 replyToCommentId 反查 author 名字。原写法是 visibleComments
+    // .map 里再 moment.comments.find()——典型的 O(N²)。33 条评论 1k 次查表、
+    // 100 条评论 1w 次。一次过 Map 起来共享。
+    const commentAuthorById = new Map<string, string>();
+    for (const c of moment.comments) {
+      commentAuthorById.set(c.id, c.authorName);
+    }
 
     return (
       <article
@@ -335,9 +342,7 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
                 <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
                   {visibleComments.map((comment) => {
                     const replyToName = comment.replyToCommentId
-                      ? moment.comments.find(
-                          (item) => item.id === comment.replyToCommentId,
-                        )?.authorName ?? null
+                      ? commentAuthorById.get(comment.replyToCommentId) ?? null
                       : null;
                     const cleanCommentText = stripToolCallSyntax(comment.text);
                     return (
