@@ -1046,7 +1046,8 @@ function MobileNoteEditor({
                   handleTagCommit();
                 }}
                 placeholder={t(msg`输入标签后回车`)}
-                className="h-9 w-[160px] rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[13px] text-[color:var(--text-primary)] outline-none transition focus:border-[color:var(--brand-primary)]"
+                // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+                className="h-9 w-[160px] rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[16px] text-[color:var(--text-primary)] outline-none transition focus:border-[color:var(--brand-primary)]"
               />
               <Button
                 variant="secondary"
@@ -1077,7 +1078,9 @@ function MobileNoteEditor({
             onClick={handleEditorClick}
             className={cn(
               "min-h-[60vh] outline-none",
-              "text-[15px] leading-7 text-[color:var(--text-primary)]",
+              // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+              // contentEditable 也算 focusable form control，同样受影响。
+              "text-[16px] leading-7 text-[color:var(--text-primary)]",
               "[&_a[data-note-file='true']]:inline-flex [&_a[data-note-file='true']]:items-center [&_a[data-note-file='true']]:rounded-[12px] [&_a[data-note-file='true']]:border [&_a[data-note-file='true']]:border-[rgba(15,23,42,0.08)] [&_a[data-note-file='true']]:bg-[rgba(243,244,246,0.82)] [&_a[data-note-file='true']]:px-3 [&_a[data-note-file='true']]:py-2 [&_a[data-note-file='true']]:text-[13px] [&_a[data-note-file='true']]:text-[color:var(--text-primary)] [&_a[data-note-file='true']]:no-underline",
               "[&_img[data-note-image='true']]:my-2 [&_img[data-note-image='true']]:max-h-[60vw] [&_img[data-note-image='true']]:max-w-full [&_img[data-note-image='true']]:rounded-[14px] [&_img[data-note-image='true']]:border [&_img[data-note-image='true']]:border-[rgba(15,23,42,0.08)]",
               "[&_[data-note-checkbox='false']]:cursor-pointer [&_[data-note-checkbox='true']]:cursor-pointer [&_[data-note-checkbox='true']]:text-[color:var(--brand-primary)]",

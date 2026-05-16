@@ -133,7 +133,8 @@ export function MobileNoteSendSheet({
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder={t(msg`搜索最近会话`)}
               disabled={pending}
-              className="h-9 rounded-[10px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pl-9 text-[13px] shadow-none"
+              // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
+              className="h-9 rounded-[10px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pl-9 text-[16px] shadow-none"
             />
           </label>
         </div>
