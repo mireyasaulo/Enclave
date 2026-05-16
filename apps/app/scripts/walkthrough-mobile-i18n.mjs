@@ -185,9 +185,42 @@ async function visitRoute(page, baseUrl, route, locale) {
     // If the boot screen never goes away in 8s, the page itself is stuck —
     // record what we have and move on.
   }
+  // Scroll to bottom and back to render off-screen lazy content.
+  await page.evaluate(async () => {
+    const main = document.scrollingElement || document.body;
+    main.scrollTo({ top: main.scrollHeight, behavior: "instant" });
+    await new Promise((r) => setTimeout(r, 200));
+    main.scrollTo({ top: 0, behavior: "instant" });
+    await new Promise((r) => setTimeout(r, 100));
+  });
+  // For game pages: click any "Start / Play / 进入 / 开始 / 開始 / 시작 / 출발 / 开局"
+  // CTA we can find to render in-game UI strings as well.
+  if (route.includes("/games") || route.includes("game=")) {
+    await page.evaluate(() => {
+      const candidates = Array.from(
+        document.querySelectorAll("button, [role=button]"),
+      );
+      const triggers = [
+        // English
+        /^(Start|Play|Open|Launch|Begin|Continue|Go|Enter)\b/i,
+        // 中文
+        /^(开始|开局|出发|启动|进入|继续|开演|开张)/,
+        // 日本語
+        /^(開始|プレイ|開く|発車|出発|開店|開演|続行)/,
+        // 한국어
+        /^(시작|플레이|진입|출발|개시|영업|계속)/,
+      ];
+      const matched = candidates.find((el) => {
+        const t = el.textContent?.trim() ?? "";
+        return triggers.some((re) => re.test(t));
+      });
+      if (matched) (matched).click();
+    });
+    await page.waitForTimeout(700);
+  }
   const items = await page.evaluate(buildTextScraper());
   const leaks = items.filter((it) => isLeak(it.text, locale));
-  return { url, errors, totalNodes: items.length, leaks };
+  return { url, errors, totalNodes: items.length, items, leaks };
 }
 
 async function main() {
