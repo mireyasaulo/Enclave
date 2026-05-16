@@ -912,6 +912,127 @@ function ensurePluginTargetMembership() {
 
 ensurePluginTargetMembership();
 
+function optionalEnv(name) {
+  const value = (process.env[name] ?? "").trim();
+  return value || null;
+}
+
+function replaceBuildSetting(source, key, value) {
+  const pattern = new RegExp(
+    `(${key.replace(/[.*+?^${}()|[\\\\]]/g, "\\$&")}\\s*=\\s*)(\"[^\"\\n]*\"|[^;\\n]+)(;)`,
+    "g",
+  );
+  if (!pattern.test(source)) {
+    return source;
+  }
+
+  const formatted = /[^A-Za-z0-9_./-]/.test(value) ? `"${value}"` : value;
+  return source.replace(pattern, `$1${formatted}$3`);
+}
+
+function ensureBuildSettingPresent(source, key, value) {
+  const pattern = new RegExp(`${key}\\s*=`);
+  if (pattern.test(source)) {
+    return replaceBuildSetting(source, key, value);
+  }
+
+  // Insert key inside every "buildSettings = { ... };" block for the App target.
+  const formatted = /[^A-Za-z0-9_./-]/.test(value) ? `"${value}"` : value;
+  return source.replace(
+    /(buildSettings = \{\n)/g,
+    `$1\t\t\t\t${key} = ${formatted};\n`,
+  );
+}
+
+function applyReleaseBuildSettings() {
+  if (!fs.existsSync(xcodeProjectPath)) {
+    return;
+  }
+
+  const settings = {
+    PRODUCT_BUNDLE_IDENTIFIER: optionalEnv("YINJIE_IOS_BUNDLE_IDENTIFIER"),
+    MARKETING_VERSION: optionalEnv("YINJIE_IOS_MARKETING_VERSION"),
+    CURRENT_PROJECT_VERSION: optionalEnv("YINJIE_IOS_BUILD_NUMBER"),
+    DEVELOPMENT_TEAM: optionalEnv("YINJIE_IOS_DEVELOPMENT_TEAM"),
+    CODE_SIGN_STYLE: optionalEnv("YINJIE_IOS_CODE_SIGN_STYLE"),
+    PROVISIONING_PROFILE_SPECIFIER: optionalEnv(
+      "YINJIE_IOS_PROVISIONING_PROFILE_SPECIFIER",
+    ),
+    CODE_SIGN_IDENTITY: optionalEnv("YINJIE_IOS_CODE_SIGN_IDENTITY"),
+  };
+
+  const provided = Object.entries(settings).filter(([, value]) => value);
+  if (provided.length === 0) {
+    return;
+  }
+
+  let project = fs.readFileSync(xcodeProjectPath, "utf8");
+  const original = project;
+
+  for (const [key, value] of provided) {
+    if (key === "DEVELOPMENT_TEAM" ||
+        key === "PROVISIONING_PROFILE_SPECIFIER" ||
+        key === "CODE_SIGN_IDENTITY") {
+      project = ensureBuildSettingPresent(project, key, value);
+    } else {
+      project = replaceBuildSetting(project, key, value);
+    }
+  }
+
+  if (project !== original) {
+    fs.writeFileSync(xcodeProjectPath, project);
+    console.log("patched ios/App/App.xcodeproj/project.pbxproj build settings from release env");
+  }
+}
+
+function applyEntitlementsFromEnv() {
+  if (!fs.existsSync(entitlementsPath)) {
+    return;
+  }
+
+  const apsEnv = optionalEnv("YINJIE_IOS_APS_ENVIRONMENT");
+  const associatedDomain = optionalEnv("YINJIE_IOS_ASSOCIATED_DOMAIN");
+  const bundleId = optionalEnv("YINJIE_IOS_BUNDLE_IDENTIFIER");
+
+  if (!apsEnv && !associatedDomain && !bundleId) {
+    return;
+  }
+
+  let source = fs.readFileSync(entitlementsPath, "utf8");
+  const original = source;
+
+  if (apsEnv) {
+    source = source.replace(
+      /(<key>aps-environment<\/key>\s*<string>)[^<]*(<\/string>)/m,
+      `$1${apsEnv}$2`,
+    );
+  }
+
+  if (associatedDomain) {
+    if (!source.includes(`<string>${associatedDomain}</string>`)) {
+      source = source.replace(
+        /(<key>com\.apple\.developer\.associated-domains<\/key>\s*<array>\n)([\s\S]*?)(\n\s*<\/array>)/m,
+        `$1$2\n    <string>${associatedDomain}</string>$3`,
+      );
+    }
+  }
+
+  if (bundleId) {
+    source = source.replace(
+      /<string>\$\(AppIdentifierPrefix\)[^<]*<\/string>/m,
+      `<string>$(AppIdentifierPrefix)${bundleId}</string>`,
+    );
+  }
+
+  if (source !== original) {
+    fs.writeFileSync(entitlementsPath, source);
+    console.log("patched ios/App/App/App.entitlements from release env");
+  }
+}
+
+applyReleaseBuildSettings();
+applyEntitlementsFromEnv();
+
 const readmePath = path.join(pluginsRoot, "README.generated.txt");
 fs.writeFileSync(
   readmePath,
