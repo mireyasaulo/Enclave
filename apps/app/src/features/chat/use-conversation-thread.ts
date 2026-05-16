@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { parseTimestamp } from "../../lib/format";
 import {
   getConversationMessages,
   getConversations,
@@ -177,6 +178,7 @@ export function useConversationThread(conversationId: string) {
     [conversationId, syncConversationListCache],
   );
 
+  const lastClearedAt = activeConversation?.lastClearedAt;
   useEffect(() => {
     if (!messagesQuery.data) {
       return;
@@ -184,16 +186,41 @@ export function useConversationThread(conversationId: string) {
     // cache 是 server messages 的 source of truth。mergeDirectMessageWindow
     // 只追加不删除，会让"清空聊天记录 / 撤回 / 删除消息"后 cache 缩水时，
     // 本地 messages 还留着已经被清掉的消息 —— 用户在已清空的会话里继续看到
-    // 旧消息，直到切走再回来。这里改成：保留还没被服务端 echo 过的乐观消息
-    // (local_* id)，server 消息整体跟 cache 走；isMatchingOptimisticEcho
-    // 仍然能在 echo 到来时把 local_* 替换成 server 真消息。
+    // 旧消息，直到切走再回来。
+    //
+    // 改成：保留还没被服务端 echo 过的乐观消息 (local_* id) +
+    // 比 cache 最新 / lastClearedAt 还新的 server 消息（应对 mount refetch
+    // 在飞期间 socket 投递的新消息被 GET 响应覆盖掉的 race），其余 server
+    // 消息整体跟 cache 走；isMatchingOptimisticEcho 仍然能在 echo 到来时
+    // 把 local_* 替换成 server 真消息。
+    const incoming = messagesQuery.data;
+    const incomingIds = new Set(incoming.map((m) => m.id));
+    const incomingNewestTs = incoming.reduce((max, m) => {
+      const ts = parseTimestamp(m.createdAt) ?? 0;
+      return ts > max ? ts : max;
+    }, 0);
+    const lastClearedTs = lastClearedAt
+      ? (parseTimestamp(lastClearedAt) ?? 0)
+      : 0;
+    const cutoffTs = Math.max(incomingNewestTs, lastClearedTs);
     setMessages((current) => {
-      const pendingLocal = current.filter((message) =>
-        message.id.startsWith("local_"),
-      );
-      return mergeDirectMessageWindow(pendingLocal, messagesQuery.data!);
+      const survivors = current.filter((message) => {
+        if (message.id.startsWith("local_")) {
+          return true;
+        }
+        if (incomingIds.has(message.id)) {
+          // 交给 mergeDirectMessageWindow 用 cache 版本回填（撤回 → system 文本
+          // 这类同 id 替换走这条）。
+          return false;
+        }
+        // cache 里没有但比 cache 最新 / lastClearedAt 都新：大概率是 socket
+        // 在 refetch 在飞期间投递的真消息，保留住别丢。
+        const ts = parseTimestamp(message.createdAt) ?? 0;
+        return ts > cutoffTs;
+      });
+      return mergeDirectMessageWindow(survivors, incoming);
     });
-  }, [messagesQuery.data]);
+  }, [lastClearedAt, messagesQuery.data]);
 
   // messages 里还活着的乐观消息（local_* id）才需要留在 store 里；被服务端
   // 真消息 dedup 掉的就该从 store 移除，否则下次进入会重复出现。
