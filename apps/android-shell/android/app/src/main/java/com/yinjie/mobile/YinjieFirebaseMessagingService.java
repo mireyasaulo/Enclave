@@ -84,6 +84,10 @@ public class YinjieFirebaseMessagingService extends FirebaseMessagingService {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(body)
+            // showLocalNotification 给本地推送加了 BigTextStyle，FCM 走的这条
+            // 一直没加。聊天推送 body 超过 ~40 字时会在通知栏里硬截断，用户
+            // 在通知栏长按 / 下拉也展不开。本地 / 推送两条 builder 拉齐 style。
+            .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(contentIntent);
