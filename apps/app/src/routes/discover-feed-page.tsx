@@ -943,6 +943,26 @@ export function DiscoverFeedPage() {
     setShowCompose(false);
     setFullCommentsByPostId({});
     setLoadingFullCommentsPostId(null);
+    // 走查新 Round 5：账户切换时把残留的桌面端互动状态一并清掉。
+    // 历史 baseUrl 切换只 reset 了 composeDraft / commentDrafts / actionBubble
+    // / commentBarTarget / showCompose / fullComments，剩下 5 处 state 跨
+    // 账户残留：
+    //   1. desktopReplyTarget — 旧账户的 (postId, commentId)，新账户走 Reply
+    //      会把 reply 飞向旧 commentId，server 直接 404。
+    //   2. desktopAvatarPopover — 旧 render 的 anchorElement DOM 引用，新
+    //      render 后已 detach；虽然 popover 自己有 document.body.contains
+    //      自杀逻辑，但首帧能闪一下空头像卡。
+    //   3. shareCardPostId — 老账户的 postId，新账户 visiblePosts.find 返回
+    //      undefined，modal 渲一片空白卡死。
+    //   4. commentInflightPostIds / likeInflightPostIds — Round 4/5 加的并发
+    //      跟踪 Set；老账户 in-flight 请求其实会通过 onSettled 自清，但万一
+    //      请求因切账户被中途取消，onSettled 不一定走到，会留死 postId 让
+    //      新账户对应 row（极端情况下同 id 复用）永久卡"处理中..."。
+    setDesktopReplyTarget(null);
+    setDesktopAvatarPopover(null);
+    setShareCardPostId(null);
+    setCommentInflightPostIds((current) => (current.size > 0 ? new Set() : current));
+    setLikeInflightPostIds((current) => (current.size > 0 ? new Set() : current));
     // baseUrl 改变（切换账户）→ feedQuery 变成全新 query，但 ref 计数器是
     // 跨账户共享的：上一个账户已经把它打满到 cap 时，新账户的页 1 加载完
     // 后自动 prefetch 直接被卡住，只剩 20 条得用户自己滚才能再翻。
