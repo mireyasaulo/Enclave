@@ -2494,7 +2494,14 @@ function ChannelVideoSurface({
         </div>
       ) : null}
 
-      <MediaProgressBar mediaRef={videoRef} active={active} />
+      {/* 走查 新一轮 R4：<video> 用 key={videoUrl} 在 videoUrl 切换时强制
+          remount，但 MediaProgressBar 内部的 useEffect deps 是 [mediaRef]——
+          mediaRef 是稳定的 ref 对象、identity 不变，effect 不再 fire 给新
+          的 video element 绑 timeupdate / loadedmetadata / durationchange 监听。
+          老监听挂在已销毁的 element 上，新 element 没有监听，进度条卡死在 0%。
+          同步把 key 传给 MediaProgressBar 让它跟随 videoUrl 一起 remount，
+          effect 重跑、监听挂到新 element。 */}
+      <MediaProgressBar key={videoUrl ?? ""} mediaRef={videoRef} active={active} />
     </div>
   );
 }
