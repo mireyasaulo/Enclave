@@ -345,7 +345,7 @@ function DesktopFavoritesPage() {
     if (
       selectedFavoriteSourceId &&
       filteredFavorites.some(
-        (item) => item.sourceId === effectiveSelectedSourceId,
+        (item) => item.sourceId === selectedFavoriteSourceId,
       )
     ) {
       return selectedFavoriteSourceId;
