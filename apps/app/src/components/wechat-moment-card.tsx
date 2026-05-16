@@ -145,7 +145,15 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
     const hasText = Boolean(displayText);
     const hasMedia = moment.media.length > 0;
     const hasLikes = moment.likes.length > 0;
-    const hasComments = moment.comments.length > 0;
+    // visibleComments：filter 掉 stripToolCallSyntax 清成空串的「残骸」评论
+    // （LLM 漏出 [TOOL_CALL] / CoT prose 被 sanitize 掉的）。这样 hasComments /
+    // showFooterBlock 都跟着真实可显示的评论数走 —— 之前若一条 moment 只有一条
+    // 残骸评论，footer 仍然 render 一个空的 px-2.5 py-1.5 灰块，看起来像「评论
+    // 区暴露但里头空空」。
+    const visibleComments = moment.comments.filter(
+      (c) => stripToolCallSyntax(c.text).trim().length > 0,
+    );
+    const hasComments = visibleComments.length > 0;
     const showFooterBlock = hasLikes || hasComments;
 
     return (
@@ -314,7 +322,7 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
 
               {hasComments ? (
                 <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
-                  {moment.comments.map((comment) => {
+                  {visibleComments.map((comment) => {
                     const replyToName = comment.replyToCommentId
                       ? moment.comments.find(
                           (item) => item.id === comment.replyToCommentId,
