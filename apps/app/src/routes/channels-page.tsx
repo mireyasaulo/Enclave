@@ -1,6 +1,7 @@
 import {
   Suspense,
   lazy,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -73,6 +74,7 @@ import { normalizePathname } from "../lib/normalize-pathname";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const EMPTY_CHANNEL_POSTS: FeedPostListItem[] = [];
+const EMPTY_COMMENT_PREVIEW: FeedComment[] = [];
 const CHANNELS_PAGE_LIMIT = 20;
 const DesktopChannelsWorkspace = lazy(async () => {
   const mod =
@@ -2553,6 +2555,17 @@ type MobileChannelsViewportProps = {
   onVisiblePost: (postId: string) => void;
 };
 
+type MobileCardNullaryHandlers = {
+  onLike: () => void;
+  onOpenAuthor: () => void;
+  onOpenComments: () => void;
+  onNotInterested: () => void;
+  onShare: () => void;
+  onToggleFollowAuthor: () => void;
+  onToggleFavorite: () => void;
+  onUnlock: () => void;
+};
+
 function MobileChannelsViewport({
   activeSection,
   likePendingPostId,
@@ -2576,6 +2589,88 @@ function MobileChannelsViewport({
   const cardRefs = useRef(new Map<string, HTMLElement>());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  // 走查 新一轮 R1：MobileChannelsCard 之前没 memo，加上一堆内联箭头回调把
+  // 每张卡的 props identity 每次 ChannelsPage 渲染都翻新——用户在评论 sheet
+  // 里敲一个字 setCommentDrafts 会让全部 20 张卡跟着 re-render（含 audio /
+  // video media surface、ExpandableText、5 个 action 按钮、commentPreview 渲染），
+  // 慢机上一次输入肉眼可感 30-60ms 卡顿。下面用「ref 持最新 prop + Map 缓存
+  // 按 postId 稳定的 nullary handler」搭配 React.memo(MobileChannelsCard)，
+  // 让 post 数据没变 / active 没翻的卡完全跳过 render。
+  //
+  // 关键点：cardHandlersCacheRef 里的 handler 是 stable 引用（一辈子不变），
+  // 但执行时通过 latestRef.current.handlers 读取「当前最新」的 onLike / onShare，
+  // 通过 latestRef.current.postsById 拿到当前 post 对象——这样既稳定又不会
+  // 拿到 stale visiblePosts。
+  const latestHandlersRef = useRef({
+    onLike,
+    onOpenAuthor,
+    onOpenComments,
+    onNotInterested,
+    onShare,
+    onToggleFollowAuthor,
+    onToggleFavorite,
+  });
+  latestHandlersRef.current = {
+    onLike,
+    onOpenAuthor,
+    onOpenComments,
+    onNotInterested,
+    onShare,
+    onToggleFollowAuthor,
+    onToggleFavorite,
+  };
+  const postsByIdRef = useRef<Map<string, FeedPostListItem>>(new Map());
+  postsByIdRef.current = useMemo(() => {
+    const map = new Map<string, FeedPostListItem>();
+    posts.forEach((p) => map.set(p.id, p));
+    return map;
+  }, [posts]);
+  const cardHandlersCacheRef = useRef(
+    new Map<string, MobileCardNullaryHandlers>(),
+  );
+  const handleUnlock = useCallback(() => setUserUnmuted(true), []);
+  const getCardHandlers = (postId: string): MobileCardNullaryHandlers => {
+    let cached = cardHandlersCacheRef.current.get(postId);
+    if (!cached) {
+      cached = {
+        onLike: () => latestHandlersRef.current.onLike(postId),
+        onOpenAuthor: () => {
+          const p = postsByIdRef.current.get(postId);
+          if (p) latestHandlersRef.current.onOpenAuthor(p);
+        },
+        onOpenComments: () => {
+          const p = postsByIdRef.current.get(postId);
+          if (p) latestHandlersRef.current.onOpenComments(p);
+        },
+        onNotInterested: () => latestHandlersRef.current.onNotInterested(postId),
+        onShare: () => {
+          const p = postsByIdRef.current.get(postId);
+          if (p) latestHandlersRef.current.onShare(p);
+        },
+        onToggleFollowAuthor: () => {
+          const p = postsByIdRef.current.get(postId);
+          if (p) latestHandlersRef.current.onToggleFollowAuthor(p);
+        },
+        onToggleFavorite: () => {
+          const p = postsByIdRef.current.get(postId);
+          if (p) latestHandlersRef.current.onToggleFavorite(p);
+        },
+        onUnlock: handleUnlock,
+      };
+      cardHandlersCacheRef.current.set(postId, cached);
+    }
+    return cached;
+  };
+  // 跟 cardRefCallbacksRef 一样，posts 变了把已下线的 postId 清掉，
+  // 防 long-lived viewport 在多次 invalidate 后无限堆积。
+  useEffect(() => {
+    const liveIds = new Set(posts.map((p) => p.id));
+    cardHandlersCacheRef.current.forEach((_, key) => {
+      if (!liveIds.has(key)) {
+        cardHandlersCacheRef.current.delete(key);
+      }
+    });
+  }, [posts]);
 
   // 切 tab 时把滚动复位到顶部 + active 重置：之前用户在 推荐 tab 滚到第 5 张，
   // 切去 朋友 tab，如果 朋友 tab 有缓存（isLoading=false），viewport 不会 unmount，
@@ -2774,31 +2869,36 @@ function MobileChannelsViewport({
       ref={scrollContainerRef}
       className="h-[calc(100dvh-9.6rem)] snap-y snap-mandatory space-y-2 overflow-y-auto overscroll-contain scroll-pb-2 pb-2"
     >
-      {posts.map((post) => (
-        <MobileChannelsCard
-          key={post.id}
-          activeSection={activeSection}
-          active={activePostId === post.id}
-          favorite={Boolean(post.ownerState?.hasFavorited)}
-          likePending={likePendingPostId === post.id}
-          favoritePending={favoritePendingPostId === post.id}
-          followPending={followPendingAuthorId === post.authorId}
-          post={post}
-          commentsPreview={
-            commentsPreviewByPostId?.[post.id] ?? post.commentsPreview ?? []
-          }
-          setCardRef={getCardRefCallback(post.id)}
-          userUnmuted={userUnmuted}
-          onUnlock={() => setUserUnmuted(true)}
-          onLike={() => onLike(post.id)}
-          onOpenAuthor={() => onOpenAuthor(post)}
-          onOpenComments={() => onOpenComments(post)}
-          onNotInterested={() => onNotInterested(post.id)}
-          onShare={() => onShare(post)}
-          onToggleFollowAuthor={() => onToggleFollowAuthor(post)}
-          onToggleFavorite={() => onToggleFavorite(post)}
-        />
-      ))}
+      {posts.map((post) => {
+        const handlers = getCardHandlers(post.id);
+        return (
+          <MobileChannelsCard
+            key={post.id}
+            activeSection={activeSection}
+            active={activePostId === post.id}
+            favorite={Boolean(post.ownerState?.hasFavorited)}
+            likePending={likePendingPostId === post.id}
+            favoritePending={favoritePendingPostId === post.id}
+            followPending={followPendingAuthorId === post.authorId}
+            post={post}
+            commentsPreview={
+              commentsPreviewByPostId?.[post.id] ??
+              post.commentsPreview ??
+              EMPTY_COMMENT_PREVIEW
+            }
+            setCardRef={getCardRefCallback(post.id)}
+            userUnmuted={userUnmuted}
+            onUnlock={handlers.onUnlock}
+            onLike={handlers.onLike}
+            onOpenAuthor={handlers.onOpenAuthor}
+            onOpenComments={handlers.onOpenComments}
+            onNotInterested={handlers.onNotInterested}
+            onShare={handlers.onShare}
+            onToggleFollowAuthor={handlers.onToggleFollowAuthor}
+            onToggleFavorite={handlers.onToggleFavorite}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -2824,7 +2924,11 @@ type MobileChannelsCardProps = {
   onToggleFavorite: () => void;
 };
 
-function MobileChannelsCard({
+// 走查 新一轮 R1：memo 包裹。配合 viewport 里 ref + Map 缓存的 stable nullary
+// handler，让评论 sheet 里敲字 / 父级任意非 post 数据 re-render 时所有不变的卡
+// 完全跳过 render 树重算。default shallow compare 已够：post 对象在 home
+// invalidate / optimistic 才换 identity，那时确实需要 re-render。
+const MobileChannelsCard = memo(function MobileChannelsCard({
   activeSection,
   active,
   favorite,
@@ -3078,7 +3182,7 @@ function MobileChannelsCard({
       </div>
     </article>
   );
-}
+});
 
 function ActionRailButton({
   children,
