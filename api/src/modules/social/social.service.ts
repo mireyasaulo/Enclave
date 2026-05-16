@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, In, IsNull, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { AppError } from '../../common/app-error.exception';
 import { FriendshipEntity } from './friendship.entity';
 import { FriendRequestEntity } from './friend-request.entity';
@@ -36,6 +36,13 @@ import { InitialMessageService } from './initial-message.service';
 
 const ACTIVE_FRIENDSHIP_STATUSES = new Set(['friend', 'close', 'best']);
 export const DEFAULT_FRIENDSHIP_CHARACTER_IDS = [...DEFAULT_CHARACTER_IDS];
+
+// 走查 R1：场景相遇 trigger-scene 没有任何服务端节流，仅靠前端 2.5s 冷却兜底。
+// 直连接口可以无限造好友申请（每次还烧一次 AI greeting），跟"摇一摇" 12/day 形成
+// 明显不对等的攻击面。以下两条只限用户主动调（caller='user'）；scheduler 走 cron
+// 是系统行为，保留旁路。
+const SCENE_USER_DAILY_LIMIT = 30;
+const SCENE_USER_MIN_INTERVAL_MS = 1500;
 
 @Injectable()
 export class SocialService {
@@ -442,26 +449,83 @@ export class SocialService {
     }
   }
 
-  async triggerSceneFriendRequest(scene: string): Promise<{
+  async triggerSceneFriendRequest(
+    scene: string,
+    options?: { caller?: 'user' | 'scheduler' },
+  ): Promise<{
     request: FriendRequestEntity | null;
     matchSource: SceneMatchSource;
   }> {
-    const owner = await this.worldOwnerService.getOwnerOrThrow();
-
+    const caller = options?.caller ?? 'user';
+    // 走查 R1：直连接口曾接受 '' / null / undefined / 任意字符串，全部跌进
+    // fallback 路径并把垃圾值写到 friend_requests.triggerScene，DB 里堆出 ''
+    // 和 'invalid_scene_xxx' 这类脏行。统一在入口卡住非字符串/空串。
+    if (typeof scene !== 'string' || !scene.trim()) {
+      throw new AppError('SOCIAL_SCENE_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '请选择一个场景。',
+      });
+    }
     // 归一化场景 ID（cafe → coffee_shop 等）
     const normalizedScene: SceneId | null = normalizeScene(scene);
+    // 走查 R3：用户主动调时只接受 16 个已知场景或它们的同义词。否则 triggerScene
+    // 入库后会是 NULL，下面 daily-limit 查询的 `Not(IsNull())` 把这条漏掉，
+    // 攻击面：反复 POST 一个未知 scene 就能绕开 cooldown。scheduler 旁路保留
+    // 兼容（admin 可能把自定义场景塞进 sceneFriendRequestScenes，到时候归一不上
+    // 也只是落 fallback 文案，不影响节流）。
+    if (caller === 'user' && !normalizedScene) {
+      throw new AppError('SOCIAL_SCENE_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '请选择一个场景。',
+      });
+    }
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+
     const allPresets = listBuiltInCharacterPresets();
 
+    // 走查 R1：用户主动调时按天 cap + 最小间隔卡住直连接口的滥用。scheduler 旁路。
+    if (caller === 'user') {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const todayRequests = await this.friendRequestRepo.find({
+        where: {
+          ownerId: owner.id,
+          triggerScene: Not(IsNull()),
+          createdAt: MoreThanOrEqual(startOfDay),
+        },
+        select: ['id', 'createdAt'],
+        order: { createdAt: 'DESC' },
+      });
+      if (todayRequests.length >= SCENE_USER_DAILY_LIMIT) {
+        throw new AppError('SOCIAL_SCENE_DAILY_LIMIT', {
+          status: HttpStatus.TOO_MANY_REQUESTS,
+          legacyMessage: '今天的场景相遇次数已经用完，明天再试试。',
+        });
+      }
+      const lastRequest = todayRequests[0];
+      if (lastRequest) {
+        const last = new Date(lastRequest.createdAt).getTime();
+        const elapsed = Date.now() - last;
+        if (elapsed < SCENE_USER_MIN_INTERVAL_MS) {
+          throw new AppError('SOCIAL_SCENE_COOLDOWN', {
+            status: HttpStatus.TOO_MANY_REQUESTS,
+            legacyMessage: '别走太急，过一会再去下一个地方。',
+          });
+        }
+      }
+    }
+
     // 既要排除已经是好友的，也要排除已经有 pending 申请的（避免重复轰炸）。
-    const existingFriendships = await this.friendshipRepo.find({
-      where: { ownerId: owner.id },
-    });
+    // 两条 find 互不依赖，并行省一个 RT。
+    const [existingFriendships, pendingRequests] = await Promise.all([
+      this.friendshipRepo.find({ where: { ownerId: owner.id } }),
+      this.friendRequestRepo.find({
+        where: { ownerId: owner.id, status: 'pending' },
+      }),
+    ]);
     const friendIds = new Set(
       existingFriendships.map((friendship) => friendship.characterId),
     );
-    const pendingRequests = await this.friendRequestRepo.find({
-      where: { ownerId: owner.id, status: 'pending' },
-    });
     const pendingIds = new Set(pendingRequests.map((r) => r.characterId));
     const occupied = new Set([...friendIds, ...pendingIds]);
 
@@ -548,7 +612,10 @@ export class SocialService {
       characterId: char.id,
       characterName: char.name,
       characterAvatar: char.avatar,
-      triggerScene: normalizedScene ?? scene,
+      // 走查 R1：以前是 `normalizedScene ?? scene`，未知场景会把原始字符串原封不动
+      // 落库。统一只存归一化值（不认就丢空），避免 friend_requests.triggerScene 长出
+      // 'invalid_scene_xxx' 这种脏值。
+      triggerScene: normalizedScene ?? undefined,
       greeting,
       status: 'pending',
       expiresAt: tomorrow,

@@ -199,6 +199,15 @@ function MobileDiscoverScenePage() {
       const result = await triggerSceneFriendRequest({ scene }, baseUrl);
       return { ...result, scene };
     },
+    // 走查 R2：点新场景时把上一轮的成功 / 提示 notice 立刻清掉。否则在
+    // AI 出 greeting 那 4-20s 里，旧条目"X 在咖啡馆里注意到了你"还挂着，
+    // 等下方"正在前往健身房…"按钮 spinner 一起出现，用户分不清新一次是
+    // 真的在跑还是已经回来了；并且如果新这次后续 onError，错误条目会
+    // 叠在旧成功条目之下，UI 一团乱。
+    onMutate: () => {
+      setMessage(""); // i18n-ignore-line: clearing state
+      setLastRequestId(null);
+    },
     onSuccess: ({ request, matchSource, scene }) => {
       setCooldownUntil(Date.now() + COOLDOWN_MS);
       setNow(Date.now());
@@ -247,6 +256,9 @@ function MobileDiscoverScenePage() {
     setMessage(""); // i18n-ignore-line: clearing state
     setLastRequestId(null);
     setEncounterCount(loadEncounters(baseUrl).length);
+    // 走查 R2：切 world 时也要把冷却清掉。前 world 设置的 cooldownUntil 跟新
+    // world 没关系（服务端按 owner 维度独立限频），残留会让人无法立即试新 world。
+    setCooldownUntil(0);
   }, [baseUrl]);
 
   const handleGoToRequests = useCallback(() => {

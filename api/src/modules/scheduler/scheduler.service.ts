@@ -1283,7 +1283,9 @@ export class SchedulerService {
     const scenes = runtimeRules.sceneFriendRequestScenes;
     const scene = scenes[Math.floor(Math.random() * scenes.length)];
     const { request: req } =
-      await this.socialService.triggerSceneFriendRequest(scene);
+      await this.socialService.triggerSceneFriendRequest(scene, {
+        caller: 'scheduler',
+      });
     if (!req) {
       return {
         summary: renderTemplate(
