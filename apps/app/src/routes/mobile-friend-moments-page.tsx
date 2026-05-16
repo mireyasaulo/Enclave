@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
@@ -9,6 +9,7 @@ import {
   getCharacterMoments,
   getFriends,
   toggleMomentLike,
+  type Moment,
   type MomentComment,
   type MomentLike,
 } from "@yinjie/contracts";
@@ -160,57 +161,218 @@ export function MobileFriendMomentsPage() {
       // 避免拉回 GET /api/moments 全量 + 30+ media 条件请求 RTT。
     },
   });
-  const commentMutation = useMutation({
-    mutationFn: (momentId: string) => {
-      const text = commentDrafts[momentId]?.trim();
-      if (!text) {
-        throw new Error(t(msg`请先输入评论内容。`));
+  // mutationFn 不能再次读 commentDrafts 取文本：onMutate 里的 setCommentDrafts(clear)
+  // 会在 onMutate 返回的微任务边界被 React 18 flush 掉，等 TanStack Query 调
+  // mutationFn 时闭包里的 commentDrafts[momentId] 已经是空串。和 moments-page
+  // 主页一样：在 onMutate 里把 text/target 写进 ref，mutationFn 直接读 ref。
+  const commentSubmitArgsRef = useRef<
+    Record<
+      string,
+      {
+        text: string;
+        target: { commentId: string; authorId: string } | null;
       }
-
+    >
+  >({});
+  const commentMutation = useMutation({
+    // onMutate: optimistic 插入临时评论 + 清输入/回复目标 + 关闭评论条。公网隧道
+    // ~600ms RTT 下，原 onSuccess 才清/关会让用户体感"卡好几秒"。临时 id 以
+    // 'optimistic-comment-' 前缀打标，onSuccess 把它原地换成 server 真实 comment；
+    // onError 回滚整个 snapshot 并恢复 draft / commentBar，让用户能改后重发。
+    onMutate: async (momentId: string) => {
+      const text = commentDrafts[momentId]?.trim();
+      if (!text || !ownerId) {
+        return { skipped: true as const };
+      }
       const target =
         commentBarTarget?.momentId === momentId
           ? commentBarTarget.replyTo
           : null;
+      commentSubmitArgsRef.current[momentId] = {
+        text,
+        target: target
+          ? { commentId: target.commentId, authorId: target.authorId }
+          : null,
+      };
 
+      // 这页只用 character cache 做主显示，但点赞/评论后扁平 + paged 也得跟，
+      // 否则用户切到主朋友圈 / profile 还得等 600ms refetch 才看到新评论。
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-character", baseUrl, resolvedCharacterId],
+        }),
+        queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-paged", baseUrl],
+        }),
+      ]);
+
+      const characterSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-character", baseUrl],
+      });
+      const flatSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      const pagedSnapshots = queryClient.getQueriesData<unknown>({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
+
+      const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
+      const tempComment: MomentComment = {
+        id: tempId,
+        postId: momentId,
+        authorId: ownerId,
+        authorName: ownerUsername ?? t(msg`我`),
+        authorAvatar: ownerAvatar ?? "",
+        authorType: "user",
+        text,
+        replyToCommentId: target?.commentId ?? null,
+        replyToAuthorId: target?.authorId ?? null,
+        createdAt: new Date().toISOString(),
+      };
+      const appendComment = (moment: Moment): Moment =>
+        moment.id !== momentId
+          ? moment
+          : {
+              ...moment,
+              comments: [...moment.comments, tempComment],
+              commentCount: moment.commentCount + 1,
+            };
+
+      characterSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+      flatSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+      // paged 用 InfiniteData，结构稍复杂，独立处理避免 TS narrow 噪音。
+      pagedSnapshots.forEach(([key, raw]) => {
+        const data = raw as
+          | { pages: Array<{ items: Moment[] } & Record<string, unknown>>; pageParams: unknown[] }
+          | undefined;
+        if (!data) return;
+        queryClient.setQueryData(key, {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            items: page.items.map(appendComment),
+          })),
+        });
+      });
+
+      const savedDraft = commentDrafts[momentId] ?? "";
+      const savedBar =
+        commentBarTarget?.momentId === momentId ? commentBarTarget : null;
+      setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
+      setCommentBarTarget((current) =>
+        current?.momentId === momentId ? null : current,
+      );
+
+      return {
+        skipped: false as const,
+        characterSnapshots,
+        flatSnapshots,
+        pagedSnapshots,
+        tempId,
+        momentId,
+        savedDraft,
+        savedBar,
+      };
+    },
+    mutationFn: (momentId: string) => {
+      const args = commentSubmitArgsRef.current[momentId];
+      if (!args?.text) {
+        throw new Error(t(msg`请先输入评论内容。`));
+      }
       return addMomentComment(
         momentId,
         {
-          text,
-          replyToCommentId: target?.commentId,
-          replyToAuthorId: target?.authorId,
+          text: args.text,
+          replyToCommentId: args.target?.commentId,
+          replyToAuthorId: args.target?.authorId,
         },
         baseUrl,
       );
     },
-    onSuccess: (_, momentId) => {
-      setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
-      // 只在用户还停在「同一条 moment 的评论条」时关闭——pending 期间用户切到
-      // 另一条 moment 写评论的话，旧 onSuccess 不该把新评论条关掉。和
-      // moments-page 主页面的 onMutate 守卫等价。
-      setCommentBarTarget((current) =>
-        current?.momentId === momentId ? null : current,
-      );
+    onSuccess: (realComment, momentId, context) => {
+      delete commentSubmitArgsRef.current[momentId];
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      // fire-and-forget：await refetch 会让"发表"按钮一直 disabled，
-      // 公网隧道下感觉评论"卡好几秒"。让 invalidate 在后台跑就行。
-      // app-moments-character 是当前页用的 cache，必须 invalidate 才能让服务端
-      // 真实评论 ID 替换 optimistic 临时 ID；同时 paged / flat / mine 也 invalidate，
-      // 保证别的朋友圈页（主页 / profile）跨页一致。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-character", baseUrl, resolvedCharacterId],
-      });
-      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
-      });
+      // 把 optimistic temp（id=optimistic-comment-*）原地替换为 server 真实评论。
+      // 完全省掉一次 invalidate 触发的 GET /api/moments + paged refetch
+      // ——公网隧道下 refetch 会带回 30+ media 条件请求 RTT，是评论后体感
+      // "页面又卡一下"的主要原因。staleTime 期间用户拿不到其它 NPC 同时段写
+      // 的评论，但 pull-to-refresh / re-mount 都能补；可接受。
+      if (context && !context.skipped) {
+        const { tempId } = context;
+        const replaceComment = (moment: Moment): Moment =>
+          moment.id !== momentId
+            ? moment
+            : {
+                ...moment,
+                comments: moment.comments.map((c) =>
+                  c.id === tempId ? realComment : c,
+                ),
+              };
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments-character", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+        queryClient.setQueriesData(
+          { queryKey: ["app-moments-paged", baseUrl] },
+          (raw) => {
+            const data = raw as
+              | {
+                  pages: Array<
+                    { items: Moment[] } & Record<string, unknown>
+                  >;
+                  pageParams: unknown[];
+                }
+              | undefined;
+            if (!data) return data;
+            return {
+              ...data,
+              pages: data.pages.map((page) => ({
+                ...page,
+                items: page.items.map(replaceComment),
+              })),
+            };
+          },
+        );
+      }
     },
-    onError: (error) => {
-      // 失败也走顶 notice danger 红条 + 「评论失败：」前缀。不挂「重试」按钮：
-      // commentBar 在 onError 路径下没被关闭、草稿也保留，用户直接在评论框里
-      // 点「发送」就能再试，跟主朋友圈页的处理一致。
+    onError: (error, momentId, context) => {
+      delete commentSubmitArgsRef.current[momentId];
+      if (context && !context.skipped) {
+        context.characterSnapshots.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
+        });
+        context.flatSnapshots.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
+        });
+        context.pagedSnapshots.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
+        });
+        // 恢复 drafts / commentBar，让用户能改后重发。
+        setCommentDrafts((current) => ({
+          ...current,
+          [context.momentId]: context.savedDraft,
+        }));
+        if (context.savedBar) {
+          setCommentBarTarget(context.savedBar);
+        }
+      }
+      // 失败走顶 notice danger 红条 + 「评论失败：」前缀。不挂「重试」按钮：
+      // commentBar 已经被恢复到 onError 之前的状态，用户直接在评论框里点
+      // 「发送」就能再试，跟主朋友圈页处理一致。
       setNotice({
         tone: "danger",
         message:
