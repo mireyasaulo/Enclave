@@ -7,7 +7,7 @@ import {
   selectSquad,
   startRound,
   tick,
-  useSyncSkill,
+  applySyncSkill,
 } from "./signal-squad-engine";
 import {
   loadSignalSquadState,
@@ -40,7 +40,7 @@ function reducer(state: SignalSquadState, action: Action): SignalSquadState {
     case "respond":
       return respondToEvent(next, action.squadmateId, action.nowMs);
     case "use-sync":
-      return useSyncSkill(next, action.nowMs);
+      return applySyncSkill(next, action.nowMs);
     case "exit":
       return exitToIdle(next, action.nowMs);
   }

@@ -190,10 +190,17 @@ export function CharacterDetailPage() {
   // 使用。原来无条件 enabled 让每个名片打开都触发一次 /social/friend-requests
   // 全量查询，毫无价值地多一次后台往返。已确认是好友就 skip；friendsQuery 还在
   // loading / 报错时仍允许拉，保证非好友态下 UI 能拿到 inbound/outbound 状态。
+  //
+  // 走查 R2：上面那条改动留了个尾巴——冷启动时 friendsQuery 还在 loading，
+  // isAlreadyFriend 默认就是 false，friendRequestsQuery enabled 立刻成 true 直接发车。
+  // 之后 friendsQuery 拿到数据发现"其实是好友"再翻 enabled 已经晚了，这一次
+  // /social/friend-requests 已经空跑掉。改成：friendsQuery 还在 loading 阶段先
+  // 按住别发；等 friendsQuery 结束（成功或失败）再按 isAlreadyFriend 决策。
+  // 好友态下能彻底省一次后台往返；非好友态只比原来晚 ~一次 RTT，无感。
   const friendRequestsQuery = useQuery({
     queryKey: ["app-friend-requests", baseUrl, "all"],
     queryFn: () => getFriendRequests(baseUrl, { direction: "all" }),
-    enabled: !isAlreadyFriend,
+    enabled: !friendsQuery.isLoading && !isAlreadyFriend,
   });
   const blockedQuery = useQuery({
     queryKey: ["app-chat-details-blocked", baseUrl],
