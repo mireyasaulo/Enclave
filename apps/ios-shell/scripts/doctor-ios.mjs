@@ -265,6 +265,8 @@ const checks = [
         fileIncludesAll(privacyManifestPath, [
           "NSPrivacyTracking",
           "NSPrivacyCollectedDataTypes",
+          "NSPrivacyAccessedAPICategoryUserDefaults",
+          "CA92.1",
         ])) &&
       (!fs.existsSync(projectPath) ||
         fileIncludesAll(projectPath, [
