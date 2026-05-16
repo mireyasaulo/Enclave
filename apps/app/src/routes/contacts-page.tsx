@@ -1674,11 +1674,18 @@ export function ContactsPage() {
       icon: Star,
       iconClassName: "bg-[linear-gradient(135deg,#f59e0b,#d97706)]",
       onClick: () => {
+        // 已经在 starred-friends pane 里再点这个 shortcut 时，不要把 selection 强
+        // 行重置回 starredFriends[0]——用户可能已经在中间列表里选中了第 N 位，
+        // 这一下又把他甩回第一位。只在首次进入（或从别的 pane 切回）时才用首项
+        // 作为默认 id，已在该 pane 时保留 desktopSelection.id 原值。
+        const currentId =
+          desktopSelection?.kind === "starred-friends"
+            ? (desktopSelection.id ?? null)
+            : null;
+        const nextId = currentId ?? starredFriends[0]?.character.id ?? null;
         const nextSelection = {
           kind: "starred-friends",
-          ...(starredFriends[0]?.character.id
-            ? { id: starredFriends[0].character.id }
-            : {}),
+          ...(nextId ? { id: nextId } : {}),
         } satisfies DesktopSelection;
         setDesktopSelection(nextSelection);
         commitDesktopRouteState(nextSelection, showWorldCharacters);
