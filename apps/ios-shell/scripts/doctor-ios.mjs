@@ -235,6 +235,19 @@ const checks = [
       : "AppDelegate not found yet; run `pnpm ios:sync` first",
   },
   {
+    // Round 6 修了「AppDelegate 没实现 willPresent 导致前台收到通知直接被
+    // iOS 静默丢掉」。doctor 当时没加对应 check，万一谁手抖删掉 / Capacitor
+    // 升级把 AppDelegate 重新生成、忘记跑 configure，问题会悄无声息地复发。
+    // 这里盯死 willPresent 必须出现在 AppDelegate.swift 里。
+    label: "appdelegate-will-present",
+    ok:
+      !fs.existsSync(appDelegatePath) ||
+      fileIncludes(appDelegatePath, "willPresent notification: UNNotification"),
+    detail: fs.existsSync(appDelegatePath)
+      ? "AppDelegate implements userNotificationCenter(_:willPresent:withCompletionHandler:) — foreground 通知不会被 iOS 静默丢"
+      : "AppDelegate not found yet; run `pnpm ios:sync` first",
+  },
+  {
     label: "plugin-bridge-metadata",
     ok:
       (!fs.existsSync(runtimePluginPath) ||
