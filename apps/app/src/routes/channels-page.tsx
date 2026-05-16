@@ -720,16 +720,48 @@ export function ChannelsPage() {
       return { previousFullComments, previousDecorationsEntries };
     },
     onError: (error, input, context) => {
+      // 走查 R4：原回滚把 previousFullComments 整体 setQueryData 回去——
+      // 但用户连点 A → B 两条评论的点赞，B 的 onMutate 在 A 之后已经把 B 也
+      // 翻成 liked；如果 A 失败时直接整张快照覆盖回去，B 的 optimistic 翻动
+      // 也被一起抹掉，下一帧 invalidate 才补回 B 的真值，中间用户会看到 B
+      // 突然变回未赞又再变回已赞，体感像"我又被打回去了"。改成只回滚当前 input
+      // 这一条评论，其它评论按当前 cache（含后续乐观更新）继续保留。
       if (context) {
-        if (context.previousFullComments) {
-          queryClient.setQueryData(
-            ["app-feed-comments", baseUrl, input.postId],
-            context.previousFullComments,
-          );
-        }
-        context.previousDecorationsEntries.forEach(([key, data]) => {
-          if (data === undefined) return;
-          queryClient.setQueryData(key, data);
+        const previousFullComment = context.previousFullComments?.find(
+          (c) => c.id === input.commentId,
+        );
+        queryClient.setQueryData<FeedComment[]>(
+          ["app-feed-comments", baseUrl, input.postId],
+          (current) => {
+            if (!current) return current;
+            return current.map((c) =>
+              c.id === input.commentId ? (previousFullComment ?? c) : c,
+            );
+          },
+        );
+        context.previousDecorationsEntries.forEach(([key, prevData]) => {
+          if (prevData === undefined) return;
+          const previousPreviewComment = prevData.commentsPreviewByPostId?.[
+            input.postId
+          ]?.find((c) => c.id === input.commentId);
+          queryClient.setQueryData<{
+            commentsPreviewByPostId?: Record<string, FeedComment[]>;
+          }>(key, (current) => {
+            if (!current?.commentsPreviewByPostId) return current;
+            const preview = current.commentsPreviewByPostId[input.postId];
+            if (!preview) return current;
+            return {
+              ...current,
+              commentsPreviewByPostId: {
+                ...current.commentsPreviewByPostId,
+                [input.postId]: preview.map((c) =>
+                  c.id === input.commentId
+                    ? (previousPreviewComment ?? c)
+                    : c,
+                ),
+              },
+            };
+          });
         });
       }
       // 走查 R8: 跟 commentMutation 一样的兜底——用户点赞完后立刻关 sheet，

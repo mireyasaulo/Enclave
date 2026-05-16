@@ -2451,8 +2451,33 @@ export function DiscoverFeedPage() {
               // 非屏蔽内容。用户来不及反应就点了按钮跳走，后台的努力被抹掉。
               // 翻页还没结束（还在 fetch / 还有下一页 / 没命中错误）时换成
               // loading 文案，让用户知道在等什么；翻完了再降级到原始 CTA。
-              isFetchingNextFeedPage ||
-              (hasNextFeedPage && !isFetchNextFeedPageError) ? (
+              // 走查 Round 1：跟桌面 Round 4 (17447a60) 同坑——「全被屏蔽 + 翻
+              // 下一页报错」时下面的判断把 isFetchNextFeedPageError 也归到"已经
+              // 翻完"路径，直接渲"都被屏蔽 → 打开通讯录"，但实际上还有下一页
+              // 只是 fetch 挂了；底部「加载更多失败 · 点击重试」按钮又 gate 在
+              // `visiblePosts.length > 0` 上不显示，用户没回路。显式插一层"翻
+              // 下一页失败"空态，与桌面 desktop-feed-list.tsx L175 对齐。
+              hasNextFeedPage && isFetchNextFeedPageError ? (
+                <MobileFeedStatusCard
+                  badge={t(msg`广场`)}
+                  title={t(msg`加载更多失败`)}
+                  description={t(
+                    msg`当前 ${feedPosts.length} 条动态作者都在你的屏蔽名单里，向后端翻下一页找未屏蔽的居民动态时出错了。`,
+                  )}
+                  tone="danger"
+                  action={
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
+                      onClick={() => void fetchNextFeedPage()}
+                    >
+                      {t(msg`重试加载更多`)}
+                    </Button>
+                  }
+                />
+              ) : isFetchingNextFeedPage ||
+                (hasNextFeedPage && !isFetchNextFeedPageError) ? (
                 <MobileFeedStatusCard
                   badge={t(msg`广场`)}
                   title={t(msg`正在寻找未屏蔽的动态`)}
