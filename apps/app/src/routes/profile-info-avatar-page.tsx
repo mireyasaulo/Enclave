@@ -260,6 +260,7 @@ export function ProfileInfoAvatarPage() {
           </div>
           <TextField
             value={draft}
+            disabled={saveMutation.isPending}
             onChange={(event) => {
               userTouchedRef.current = true;
               setDraft(event.target.value);
@@ -268,7 +269,7 @@ export function ProfileInfoAvatarPage() {
             placeholder={t(msg`粘贴图片 URL 或留空`)}
             // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
             // tap 一下输入框整页抖一下。
-            className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] shadow-none focus:translate-y-0"
+            className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] shadow-none focus:translate-y-0 disabled:bg-[color:var(--bg-canvas)] disabled:text-[color:var(--text-muted)]"
           />
           {storedIsDataUrl ? (
             <div className="mt-2 text-[11px] leading-4 text-[color:var(--text-muted)]">
@@ -286,10 +287,16 @@ export function ProfileInfoAvatarPage() {
       <div className="mt-2 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
         <button
           type="button"
+          disabled={saveMutation.isPending}
           onClick={() => {
             void handlePickAvatar();
           }}
-          className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors active:bg-[color:var(--surface-card-hover)]"
+          // 保存进行中（按钮文案变「保存中」）但「从相册选择」还能点：用户点
+          // 完「完成」后趁着上传那几秒又选了张图，结果 save success → goBack
+          // 把页面退回 /profile/info，新选的图被一起带走没机会落库——用户白
+          // 选一遍且毫无提示。同样的窗口 URL 输入框也照理 disable，下面 TextField
+          // disabled={saveMutation.isPending}。
+          className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60 disabled:active:bg-transparent"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(7,193,96,0.10)] text-[#15803d]">
             <ImagePlus size={18} />
