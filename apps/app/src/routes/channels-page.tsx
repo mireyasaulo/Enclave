@@ -337,10 +337,11 @@ export function ChannelsPage() {
       setNoticeAction(null);
       if (!data) {
         // 后端跳过生成（MiniMax key 未配 / 视频额度今日用完 / 没有可发帖的角色）
-        // 时返回 null。原来还是显示"已生成"，但首页 refetch 完一条新内容都没有，
-        // 用户被骗一脸——直接告诉他暂时生成不了。
+        // 时统一返回 null。原来文案是"额度今日已用完, 明天再试"，但 key 未配 /
+        // 没有可发帖的角色 时根本不是额度问题，"明天再试"会误导用户白等一天。
+        // 改成中性"现在没法生成"，不锁死重试时间。
         setNoticeTone("info");
-        setNotice(t(msg`视频号生成额度今日已用完，明天再试。`));
+        setNotice(t(msg`现在没法生成新内容，稍后再试看看。`));
         return;
       }
       setNoticeTone("success");
