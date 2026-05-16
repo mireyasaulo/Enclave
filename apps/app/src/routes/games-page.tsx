@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
@@ -277,10 +277,15 @@ export function GamesPage() {
     selectedGameId,
   ]);
 
-  const featuredGames = resolveGames(gameCenterFeaturedGameIds);
+  // featuredGames 是模块静态常量 + 一次 getGameCenterGame 查表，模块加载后不变；
+  // 但 recentGames 依赖每次 storage 同步过来的 recentGameIds，所以放进 useMemo。
+  const featuredGames = useMemo(
+    () => resolveGames(gameCenterFeaturedGameIds),
+    [],
+  );
+  const recentGames = useMemo(() => resolveGames(recentGameIds), [recentGameIds]);
   const selectedGame =
     getGameCenterGame(selectedGameId) ?? featuredGames[0] ?? gameCenterGames[0];
-  const recentGames = resolveGames(recentGameIds);
   const myGames =
     recentGames.length > 0 ? recentGames : featuredGames.slice(0, 6);
   const bannerGame = featuredGames[0] ?? selectedGame;
@@ -535,9 +540,40 @@ export function GamesPage() {
   const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : null;
   const isEmbeddedActive =
     activeGameId === selectedGame.id && hasEmbeddedGame(activeGameId);
-  const friendActivities = gameCenterFriendActivities.filter((activity) =>
-    Boolean(getGameCenterGame(activity.gameId)),
+  // gameCenterFriendActivities 是模块常量，过滤结果也是常量。
+  const friendActivities = useMemo(
+    () =>
+      gameCenterFriendActivities.filter((activity) =>
+        Boolean(getGameCenterGame(activity.gameId)),
+      ),
+    [],
   );
+
+  // 嵌入式游戏 slot 渲染在 Banner 与「好友在玩」之间——用户从更深的列表
+  // （热门 / 新游）点「开始」时，slot 在屏幕外，看不到任何反馈。
+  // 检测到 embedded 激活且 slot 不在视口内时，把它滚到 viewport 顶部一点。
+  const embeddedSlotRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!isEmbeddedActive || isDesktopLayout) {
+      return;
+    }
+    const node = embeddedSlotRef.current;
+    if (!node) {
+      return;
+    }
+    // 用 rAF 避开同一帧的 layout，等 slot 真正挂到 DOM 之后再 scroll。
+    const id = window.requestAnimationFrame(() => {
+      const rect = node.getBoundingClientRect();
+      const viewportHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+      // 已经完全在视口内就不滚，避免抢用户当前阅读位置。
+      if (rect.top >= 0 && rect.bottom <= viewportHeight) {
+        return;
+      }
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [isEmbeddedActive, activeGameId, isDesktopLayout]);
 
   function handleSelectAndLaunch(gameId: string) {
     setSelectedGameId(gameId);
@@ -630,11 +666,19 @@ export function GamesPage() {
         ) : null}
 
         {isEmbeddedActive && activeGameId ? (
-          <div className="border-b border-[color:var(--border-faint)] bg-white px-4 py-3">
+          <div
+            ref={embeddedSlotRef}
+            className="border-b border-[color:var(--border-faint)] bg-white px-4 py-3"
+          >
             <div className="overflow-hidden rounded-[16px] border border-[color:var(--border-subtle)]">
               <EmbeddedGameSlot
                 gameId={activeGameId}
                 onExit={dismissActiveGame}
+                fallback={
+                  <div className="flex h-48 items-center justify-center text-[12px] text-[color:var(--text-muted)]">
+                    {t(msg`正在准备游戏…`)}
+                  </div>
+                }
               />
             </div>
           </div>
