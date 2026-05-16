@@ -105,19 +105,22 @@ public class YinjieMobileBridgePlugin extends Plugin {
         String text = normalize(call.getString("text"));
         String url = normalize(call.getString("url"));
 
-        // title 不能只塞 EXTRA_SUBJECT：那条只有邮件 app 会读，微信 / WhatsApp /
-        // Line / Telegram 这些聊天 app 全部忽略 EXTRA_SUBJECT 只看 EXTRA_TEXT，
-        // title 会被静默丢掉。iOS 壳那边把 title 作为 activityItem 一起喂进去，
-        // 渲染到分享内容里。Android 同步把 title 拼到 EXTRA_TEXT 头部，保证
-        // 聊天 app 拿到的内容跟 iOS 一致。
+        // navigator.share / native bridge 的 title 是「主题 / subject」语义，不是
+        // 正文。Round 13 当时把 title 顺手拼到 EXTRA_TEXT 头部本意是给聊天 app
+        // 兜底，可所有主要 caller 都已经把 title 又拼进了 text 里 ——
+        //   official-article-viewer: text=`${accountName}\n${article.title}`
+        //   official-account-article-page: text=`${article.account.name}\n${article.title}`
+        //   mobile-document-shell:    text=[title, summary, documentUrl].join('\n\n')
+        //   mini-programs-page:       text=`${miniProgram.name}\n${link}` + title=`${name} 入口`
+        //   games-page:               text=`${game.name}\n${link}` + title=`${name} 入口`
+        // 结果分享到微信 / WhatsApp / Line / Telegram 时正文里标题完整出现两遍，
+        // 分享到 Mail 还会再叠一遍 EXTRA_SUBJECT，总共出现三次（subject + 拼接
+        // 进来的 title + 拼接进来的 text 里那一份）。iOS 壳 Round 38 已经把同款
+        // 路径修过：title 只走 setValue(forKey:"subject") 落到邮件主题，activityItems
+        // 只放 text + url；caller 负责把要给聊天 app 看的内容自己拼进 text。
+        // Android 这边保持同一契约，title 不再 prepend 到 EXTRA_TEXT。
         StringBuilder payload = new StringBuilder();
-        if (title != null) {
-            payload.append(title);
-        }
         if (text != null) {
-            if (payload.length() > 0) {
-                payload.append("\n");
-            }
             payload.append(text);
         }
         if (url != null) {
@@ -136,7 +139,8 @@ public class YinjieMobileBridgePlugin extends Plugin {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, payload.toString());
         if (title != null) {
-            // 邮件 app 仍然走 EXTRA_SUBJECT 拿主题，不影响聊天 app。
+            // 邮件 app 走 EXTRA_SUBJECT 把 title 落到「邮件主题」一栏；聊天 app
+            // 忽略这条 extra，只看 EXTRA_TEXT，所以 title 不会出现两遍。
             shareIntent.putExtra(Intent.EXTRA_SUBJECT, title);
         }
 

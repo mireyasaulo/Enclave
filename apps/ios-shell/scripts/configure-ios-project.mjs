@@ -645,7 +645,37 @@ function ensureAppDelegatePushHooks() {
     );
   }
 
+  // Round 39 真机修复同款：已授权时每次冷启再调一次 registerForRemoteNotifications，
+  // 让 APNs 把可能轮换过的新 device token 推给我们（iCloud restore / iOS 大版本
+  // 升级 / SIM 换卡 / 删 reinstall 等场景会让旧 token 失效）。这条 patcher 与
+  // 真实 AppDelegate.swift / AppDelegatePush.example.swift 漂移过 —— 一旦谁手抖
+  // 删掉 ios/App/App/AppDelegate.swift 让 configure 走 vanilla Capacitor 模板
+  // 重新 patch，Round 39 修过的 token 轮换路径会悄无声息地复发。
+  if (!source.includes("UIApplication.shared.registerForRemoteNotifications()")) {
+    source = insertAfterMatch(
+      source,
+      /func application\([\s\S]*?didFinishLaunchingWithOptions[\s\S]*?\)\s*->\s*Bool\s*\{\n(?:\s*UNUserNotificationCenter\.current\(\)\.delegate = self\n)?(?:\s*cacheLaunchTarget\(from: launchOptions\?\[\.remoteNotification\][\s\S]*?\n)?/,
+      [
+        "        UNUserNotificationCenter.current().getNotificationSettings { settings in",
+        "            guard settings.authorizationStatus == .authorized ||",
+        "                    settings.authorizationStatus == .provisional else {",
+        "                return",
+        "            }",
+        "            DispatchQueue.main.async {",
+        "                UIApplication.shared.registerForRemoteNotifications()",
+        "            }",
+        "        }\n",
+      ].join("\n"),
+      "Failed to patch AppDelegate.swift cold-start register hook.",
+    );
+  }
+
   if (!source.includes("didRegisterForRemoteNotificationsWithDeviceToken")) {
+    // Round 20 修了「YinjieMobileBridgePlugin.load 注册的 YinjiePushTokenChanged
+    // listener 没人 post → JS 端永远拿不到 push token」。patcher 跟实际
+    // AppDelegate.swift 漂移过：少了 NotificationCenter.post 的两条 broadcast，
+    // YinjieMobileBridge.handlePushTokenChanged 听不到 token，最终 push token
+    // 永远走不通到 cloud-api 注册接口。这里跟 AppDelegatePush.example.swift 对齐。
     source = insertBeforeClassEnd(
       source,
       [
@@ -653,11 +683,21 @@ function ensureAppDelegatePushHooks() {
         "    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {",
         "        let token = deviceToken.map { String(format: \"%02.2hhx\", $0) }.joined()",
         "        UserDefaults.standard.set(token, forKey: \"YinjiePushToken\")",
+        "        NotificationCenter.default.post(",
+        "            name: Notification.Name(\"YinjiePushTokenChanged\"),",
+        "            object: nil,",
+        "            userInfo: [\"token\": token]",
+        "        )",
         "    }",
         "",
         "    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {",
         "        UserDefaults.standard.removeObject(forKey: \"YinjiePushToken\")",
         "        print(\"Yinjie push registration failed: \\(error.localizedDescription)\")",
+        "        NotificationCenter.default.post(",
+        "            name: Notification.Name(\"YinjiePushTokenChanged\"),",
+        "            object: nil,",
+        "            userInfo: [\"error\": error.localizedDescription]",
+        "        )",
         "    }",
       ].join("\n"),
     );

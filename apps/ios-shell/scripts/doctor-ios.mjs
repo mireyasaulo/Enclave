@@ -248,6 +248,36 @@ const checks = [
       : "AppDelegate not found yet; run `pnpm ios:sync` first",
   },
   {
+    // Round 20 修了「didRegister / didFail 漏 NotificationCenter.post →
+    // YinjieMobileBridge.handlePushTokenChanged listener 永远拿不到 push token，
+    // JS 端不会上报 token 给 cloud-api」。Round 31 又踩过一次（AppDelegatePush
+    // 模板缺 broadcast）。doctor 之前只盯了「方法名存在」（appdelegate-push-cache）
+    // 没盯实现里有没有真的 post 出来，万一谁删了 NotificationCenter.post / 让
+    // configure 走 vanilla 模板重新 patch，又能悄无声息复发。
+    label: "appdelegate-push-token-broadcast",
+    ok:
+      !fs.existsSync(appDelegatePath) ||
+      (fileIncludes(appDelegatePath, "YinjiePushTokenChanged") &&
+        fileIncludes(appDelegatePath, "NotificationCenter.default.post")),
+    detail: fs.existsSync(appDelegatePath)
+      ? "AppDelegate broadcasts YinjiePushTokenChanged so YinjieMobileBridge JS listeners can pick up APNs tokens"
+      : "AppDelegate not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    // Round 39 修了「冷启动时已授权情况下不再调一次 registerForRemoteNotifications
+    // → iCloud restore / iOS 大版本升级 / SIM 换卡 / 删 reinstall 后旧 device
+    // token 失效，APNs 不会主动推新 token，推送通道死掉」。盯死 cold-start
+    // register 还在 didFinishLaunchingWithOptions 里。
+    label: "appdelegate-cold-start-register",
+    ok:
+      !fs.existsSync(appDelegatePath) ||
+      (fileIncludes(appDelegatePath, "getNotificationSettings") &&
+        fileIncludes(appDelegatePath, "UIApplication.shared.registerForRemoteNotifications()")),
+    detail: fs.existsSync(appDelegatePath)
+      ? "AppDelegate re-registers for remote notifications on cold start when already authorized — APNs token rotations propagate"
+      : "AppDelegate not found yet; run `pnpm ios:sync` first",
+  },
+  {
     label: "plugin-bridge-metadata",
     ok:
       (!fs.existsSync(runtimePluginPath) ||
