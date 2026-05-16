@@ -5,6 +5,7 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice } from "@yinjie/ui";
 
 import { writeClipboardText } from "../runtime/native-clipboard";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 
 async function copyTextToClipboard(text: string): Promise<boolean> {
   if (!text) return false;
@@ -54,6 +55,19 @@ export function FeatureComingSoonDialog({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
+  // 原生壳硬件 Back：弹窗打开时拦掉，关弹窗不退页。和 desktop Escape 对齐。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
   }, [open, onClose]);
 
   useEffect(() => {
