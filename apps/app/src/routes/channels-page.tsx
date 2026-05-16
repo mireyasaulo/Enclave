@@ -556,7 +556,37 @@ export function ChannelsPage() {
   });
   const notInterestedMutation = useMutation({
     mutationFn: (postId: string) => markFeedPostNotInterested(postId, baseUrl),
-    onError: (error) => {
+    // 减少推荐：optimistic 把这条 post 从可见列表里抠掉。
+    // 没有这层，点完后要等 invalidate → 重拉 home (~150-400ms) 才消失，期间用户
+    // 还会盯着自己说"不感兴趣"的卡，可能再来一下导致重复请求。
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      const previousEntries: Array<{
+        key: readonly unknown[];
+        previousData: FeedChannelHomeResponse;
+      }> = [];
+      const snapshots = queryClient.getQueriesData<FeedChannelHomeResponse>({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) return;
+        previousEntries.push({ key, previousData: data });
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...data,
+          posts: data.posts.filter((post) => post.id !== postId),
+        });
+      });
+      return { previousEntries };
+    },
+    onError: (error, _postId, context) => {
+      // 回滚：失败时把 post 还原回去。这里整张 home 还原是安全的——
+      // notInterested 不在并发 mutate 范围内（用户不会连点不同 post 的"减少推荐"），
+      // 且其他乐观更新通常以 per-post 维度，这里 filter 只删一条，恢复就行。
+      context?.previousEntries.forEach(({ key, previousData }) => {
+        queryClient.setQueryData(key, previousData);
+      });
       setNoticeTone("info");
       setNoticeActionLabel(null);
       setNoticeAction(null);
