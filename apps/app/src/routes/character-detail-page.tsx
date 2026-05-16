@@ -2399,10 +2399,15 @@ function DetailInputField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
+        // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
+        // zoom-in。原本 compact (mobile) 给 text-[13px]、desktop 给 text-sm
+        // (14px) 都不够；mobile 走 DetailInputField 在角色详情页里铺了 10+ 处
+        // (备注名 / 备注标签 / 朋友圈权限 ...)，挨个点过去整页会反复弹缩。
+        // 移动端固定 16px；桌面端没有 zoom 问题继续用 14px 维持视觉密度。
         className={cn(
           "w-full border border-[color:var(--border-faint)] bg-white px-3 text-[color:var(--text-primary)] outline-none transition focus:border-[rgba(7,193,96,0.18)] focus:bg-white placeholder:text-[color:var(--text-dim)]",
           compact
-            ? "rounded-[11px] py-2.5 text-[13px]"
+            ? "rounded-[11px] py-2.5 text-[16px]"
             : "rounded-[12px] py-3 text-sm",
         )}
       />
