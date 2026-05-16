@@ -42,6 +42,27 @@ const template = readJsonIfExists(templatePath) ?? {};
 const baseRuntime = shellConfig.runtime ?? {};
 const localRuntime = localConfig.runtime ?? {};
 
+// 拦掉「用户照着 ios-shell.config.local.example.json / runtime-config.example.json
+// 复制了一份，没改 URL 就直接 build」的死法。Round 21/28/33 已经拦了「URL
+// 字段缺失」，但留了第二条暗坑：local 模板把 apiBaseUrl 写成 "https://your-
+// dev-host.example.com"、cloudApiBaseUrl 写成 "https://cloud.example.yinjie.app"
+// 之类占位，非空通过 guard，被一路 bake 进 IPA。装到真机后 DNS NXDOMAIN，
+// app 启动后所有请求 fail；日志只看到 NSURLErrorDomain，没人会想到是
+// runtime-config 里写错域名，调试要花几个小时。RFC 2606 保留了 .example.*
+// 顶级，加上仓库里所有 .example.* 占位 host pattern 一并 reject。
+const PLACEHOLDER_HOST_RE =
+  /(?:\.example\.com|\.example\.yinjie\.app|your-dev-host\.example\.com)(?:[\/:]|$)/i;
+
+function rejectPlaceholderUrl(label, value) {
+  if (!value) return;
+  if (PLACEHOLDER_HOST_RE.test(value)) {
+    console.error(
+      `${label}=${value} 看着像 ios-shell.config.local.example.json / runtime-config.example.json 里的占位（*.example.* / your-dev-host.example.com）。复制示例文件后必须把占位换成实际域名，否则 IPA 装到真机上所有请求 DNS NXDOMAIN 静默失败。`,
+    );
+    process.exit(1);
+  }
+}
+
 // 优先级：env > local > shell config（不再 fallback 到 template）。
 // runtime-config.example.json 里 apiBaseUrl 是 "https://api.example.yinjie.app"
 // 占位，跟 Round 21 的 cloudApiBaseUrl 同款陷阱：一旦 env / local / base 都没
@@ -88,6 +109,10 @@ if (!cloudApiBaseUrl) {
   );
   process.exit(1);
 }
+
+rejectPlaceholderUrl("apiBaseUrl", apiBaseUrl);
+rejectPlaceholderUrl("socketBaseUrl", socketBaseUrl);
+rejectPlaceholderUrl("cloudApiBaseUrl", cloudApiBaseUrl);
 
 const environment =
   pickEnv("YINJIE_IOS_ENVIRONMENT") ||
