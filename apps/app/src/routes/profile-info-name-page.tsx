@@ -3,11 +3,12 @@ import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { updateWorldOwner } from "@yinjie/contracts";
+import { isApiRequestError, updateWorldOwner } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, TextField, cn } from "@yinjie/ui";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { translateAppErrorCode } from "../lib/error-translate";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
@@ -102,10 +103,17 @@ export function ProfileInfoNamePage() {
     return null;
   }
 
-  const errorMessage =
-    saveMutation.isError && saveMutation.error instanceof Error
-      ? saveMutation.error.message
-      : null;
+  // backend 抛 AppError 时优先用 translateAppErrorCode 命中 KnownAppErrorCode
+  // 的 i18n（同一份 error-translate.ts 给非中文 locale 出本地化文案），
+  // miss 时回退 raw error.message（多半是后端塞的 legacyMessage 中文兜底）。
+  const errorMessage = (() => {
+    if (!saveMutation.isError) return null;
+    const err = saveMutation.error;
+    if (isApiRequestError(err)) {
+      return translateAppErrorCode(err) ?? err.message;
+    }
+    return err instanceof Error ? err.message : null;
+  })();
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">

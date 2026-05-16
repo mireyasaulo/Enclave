@@ -3,11 +3,12 @@ import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { updateWorldOwner } from "@yinjie/contracts";
+import { isApiRequestError, updateWorldOwner } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, TextAreaField, cn } from "@yinjie/ui";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { translateAppErrorCode } from "../lib/error-translate";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
@@ -76,10 +77,16 @@ export function ProfileInfoSignaturePage() {
     return null;
   }
 
-  const errorMessage =
-    saveMutation.isError && saveMutation.error instanceof Error
-      ? saveMutation.error.message
-      : null;
+  // 优先 translateAppErrorCode（命中 KnownAppErrorCode 出当前 locale 文案），
+  // miss 才退到 raw error.message。详见 profile-info-name-page 同款注释。
+  const errorMessage = (() => {
+    if (!saveMutation.isError) return null;
+    const err = saveMutation.error;
+    if (isApiRequestError(err)) {
+      return translateAppErrorCode(err) ?? err.message;
+    }
+    return err instanceof Error ? err.message : null;
+  })();
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">

@@ -3,13 +3,14 @@ import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ImagePlus, RotateCcw, X } from "lucide-react";
-import { updateWorldOwner } from "@yinjie/contracts";
+import { isApiRequestError, updateWorldOwner } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, TextField, cn } from "@yinjie/ui";
 import defaultOwnerAvatar from "../assets/default-owner-avatar.svg";
 import { AvatarChip } from "../components/avatar-chip";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { translateAppErrorCode } from "../lib/error-translate";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { pickImageFiles } from "../runtime/native-image-picker";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -310,12 +311,21 @@ export function ProfileInfoAvatarPage() {
     return null;
   }
 
+  // 跟 name / signature 页同款：先用 translateAppErrorCode 把后端 AppError
+  // 翻译到当前 locale；命中 LEGACY_ERROR / 未知 code 才退回 raw message。
+  // resetMutation 跟 saveMutation 同途同 backend，复用同一份翻译。
+  function translateMutationError(err: unknown): string | null {
+    if (isApiRequestError(err)) {
+      return translateAppErrorCode(err) ?? err.message;
+    }
+    return err instanceof Error ? err.message : null;
+  }
   const errorMessage =
     localError ??
-    (saveMutation.isError && saveMutation.error instanceof Error
-      ? saveMutation.error.message
-      : resetMutation.isError && resetMutation.error instanceof Error
-        ? resetMutation.error.message
+    (saveMutation.isError
+      ? translateMutationError(saveMutation.error)
+      : resetMutation.isError
+        ? translateMutationError(resetMutation.error)
         : null);
 
   return (
