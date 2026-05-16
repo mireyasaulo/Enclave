@@ -1455,23 +1455,10 @@ export function GroupChatThreadPanel({
                 />
               )
             ) : null}
-            {sendMutation.isError && sendMutation.error instanceof Error ? (
-              isDesktop ? (
-                <ErrorBlock message={sendMutation.error.message} />
-              ) : (
-                <InlineNotice
-                  tone="danger"
-                  className="rounded-[14px] border border-[color:var(--border-danger)] bg-[linear-gradient(180deg,rgba(255,245,245,0.96),rgba(254,242,242,0.94))] px-3 py-2 text-[11px] leading-[1.45] shadow-none"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 flex-1">
-                      {sendMutation.error.message}
-                    </span>
-                    {renderStatusBackAction()}
-                  </div>
-                </InlineNotice>
-              )
-            ) : null}
+            {/* sendMutation.error 已经透传给 <ChatComposer error={sendError}>，
+                由 composer 的 MobileComposerStatusRail / desktopComposerStatus
+                渲染在输入框上方。这里再叠一张同样文案、同样 tone="danger" 的
+                banner 在消息列表顶部纯属重复（参见单聊 Round 8 同款修复）。 */}
 
             <ChatMessageList
               messages={renderableMessages}
