@@ -687,7 +687,17 @@ function MobileChatListPage() {
     const unregister = registerAndroidBackInterceptor((event) => {
       if (pendingHideConversation) {
         event.preventDefault();
-        handleUndoHideConversation();
+        // 直接 inline 撤销逻辑（原来调用的 handleUndoHideConversation 是组件内
+        // function declaration，每次 render 重建一次，按 exhaustive-deps 必须
+        // 进 deps 才不会拿到旧闭包；inline 后 ref / 稳定 setter 直接捕获，
+        // effect 也不必跟着 handler ref 抖动）。
+        if (hideTimeoutRef.current !== null) {
+          window.clearTimeout(hideTimeoutRef.current);
+          hideTimeoutRef.current = null;
+        }
+        pendingHideRef.current = null;
+        setPendingHideConversation(null);
+        setNotice({ message: t(msg`已撤销删除。`), tone: "info" });
         return true;
       }
       if (openSwipeConversationId) {
@@ -708,6 +718,7 @@ function MobileChatListPage() {
     isQuickMenuOpen,
     openSwipeConversationId,
     pendingHideConversation,
+    t,
   ]);
 
   useEffect(() => {
