@@ -1152,11 +1152,48 @@ export function MomentsPage() {
             );
           }}
           onRefresh={() => {
-            resetMomentsToFirstPage();
-            void momentsQuery.refetch();
-            if (ownerId) {
-              void blockedQuery.refetch();
-            }
+            // 桌面手动刷新：只换 page 1，保留 page 2+ 在原位
+            // —— 之前一律 resetMomentsToFirstPage() 把已加载的 N 页砍回 1 页 +
+            // refetch()，scroll viewport scrollHeight 瞬间从 ~15k → ~1.5k，用户
+            // 被甩到列表底，auto-prefetch 再一页一页串行串到 ~7s 才把内容堆回来，
+            // 体感"刷新一下整页失踪"。mobile MobileMomentsView.onRefresh 一直
+            // 用换 page 1 in-place 的模式，桌面跟齐；momentsData 的 id 去重
+            // useMemo 兜底新 page 1 末尾跟旧 page 2 起点的潜在重复。
+            //
+            // 只有真正"帖子数量变化"路径（createMutation/deleteMutation onSuccess）
+            // 还走 resetMomentsToFirstPage —— 那里 invalidate 多页 refetch 会
+            // 命中分页边界偏移导致中间漏一条。
+            const key = ["app-moments-paged", baseUrl];
+            void Promise.all([
+              getMomentsPage({ page: 1, limit: 20 }, baseUrl)
+                .then((freshFirstPage) => {
+                  queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
+                    key,
+                    (current) => {
+                      if (!current || current.pages.length === 0) {
+                        return { pages: [freshFirstPage], pageParams: [1] };
+                      }
+                      return {
+                        pages: [freshFirstPage, ...current.pages.slice(1)],
+                        pageParams: current.pageParams,
+                      };
+                    },
+                  );
+                })
+                .catch((error: unknown) => {
+                  // 刷新失败：danger notice 通道（toolbar 已在 Round 1 接好 tone），
+                  // 跟 like/comment/delete 失败处理对齐。
+                  setNoticeTone("danger");
+                  setNoticeActionLabel(null);
+                  setNoticeAction(null);
+                  setNotice(
+                    error instanceof Error
+                      ? t(msg`刷新失败：${error.message}`)
+                      : t(msg`刷新失败，请稍后重试。`),
+                  );
+                }),
+              ownerId ? blockedQuery.refetch() : Promise.resolve(null),
+            ]);
           }}
           onTextChange={composeDraft.setText}
           onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
