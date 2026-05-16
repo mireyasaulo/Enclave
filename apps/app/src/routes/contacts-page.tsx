@@ -835,8 +835,11 @@ export function ContactsPage() {
     // 拒绝成功，actionError 里那条旧的"接受失败"红字还会卡在面板顶端。
     // 同时把"点击时是否在 new-friends 面板"快照成 context，避免 onSuccess
     // 里再读 desktopSelection 时用户已经手动切到别处，被 auto-navigate 拽回来。
+    // 还要清掉上一条 success 提示——否则新动作刚开始 pending 时 banner 里还
+    // 挂着上次的"已通过/已忽略"，用户会以为"咦我刚点的已经成了？"。
     onMutate: () => {
       declineFriendRequestMutation.reset();
+      setFriendRequestSuccessState(null);
       return {
         wasOnNewFriendsPane: desktopSelection?.kind === "new-friends",
       };
@@ -883,6 +886,7 @@ export function ContactsPage() {
     mutationFn: (requestId: string) => declineFriendRequest(requestId, baseUrl),
     onMutate: () => {
       acceptFriendRequestMutation.reset();
+      setFriendRequestSuccessState(null);
     },
     onSuccess: async () => {
       setNotice(t(msg`已忽略好友申请。`));
