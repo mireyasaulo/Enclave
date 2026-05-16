@@ -1,4 +1,5 @@
 import Foundation
+import AVFoundation
 import Capacitor
 import PhotosUI
 import UniformTypeIdentifiers
@@ -244,6 +245,28 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
 
         guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
             call.reject("camera is unavailable")
+            return
+        }
+
+        // 真机走查时发现：用户上次在「设置 > 隐私 > 相机」里拒绝过相机权限的话，
+        // 直接 present UIImagePickerController(sourceType:.camera) iOS 行为不一：
+        //   - 部分 iOS 版本：黑屏 + 一个小 alert，按 cancel 走 didCancel
+        //   - 部分版本：picker 直接闪一下又关掉，走 didCancel
+        // 两种情况上层 JS 拿到的都是「asset: null」，跟用户主动点取消区分不开，
+        // 没法判断「该弹『去设置』引导」还是「就是不想拍了」。
+        //
+        // 提前查 AVCaptureDevice.authorizationStatus(for: .video)：
+        //   - .denied / .restricted → 直接 reject 带 PERMISSION_DENIED code，
+        //     JS 拿到这条就可以调 openAppSettings() 引导用户去开
+        //   - .notDetermined → 让 picker 自己弹系统授权 alert，跟 iOS 默认流程
+        //     一致，保持「第一次点拍照才请权限」的体感
+        //   - .authorized → 直接进入
+        let cameraAuth = AVCaptureDevice.authorizationStatus(for: .video)
+        if cameraAuth == .denied || cameraAuth == .restricted {
+            call.reject(
+                "camera permission denied — open Settings to grant access",
+                "PERMISSION_DENIED"
+            )
             return
         }
 
