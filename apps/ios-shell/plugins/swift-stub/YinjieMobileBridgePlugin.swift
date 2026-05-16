@@ -235,7 +235,23 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         }
         pendingImagePickerCall = call
 
-        var configuration = PHPickerConfiguration(photoLibrary: .shared())
+        // Round 46：不要 PHPickerConfiguration(photoLibrary: .shared()) ——
+        // 我们 loadImageAsset 全程只用 result.itemProvider 拷 file representation，
+        // 从来没碰过 PHAsset（result.assetIdentifier 也没读）。带 .shared() 等于
+        // 声明「我要 PhotoKit 访问选中的资产」，会让 iOS 把这条 PHPicker 跟 app
+        // 的 photo-library access 绑起来：
+        //   1. iOS 14+ 「Selected Photos」/「Limited Library Access」机制下，
+        //      App Privacy Report 里我们就被列为「访问过 Photos」，但实际只是
+        //      pick 一张图，跟 user 的预期错位；
+        //   2. App Store privacy 审查（Privacy Manifest）会要求我们声明 Photos
+        //      数据收集，相比 pick-only 路径多写一条没必要的 nutrition label；
+        //   3. 如果将来真正用 PHAsset，要再过一次 PHPhotoLibrary 授权弹窗，跟
+        //      pick 的「点哪个用哪个」体感分裂。
+        // PHPicker 不带 photoLibrary 时是纯 item-based：用户在 picker UI 里仍然
+        // 能看到全部照片（picker 自己跑在独立 process 里、不走 app 的 PhotoKit
+        // 通道），返回的 itemProvider 也照旧能 loadFileRepresentation。我们不需
+        // 要 PHAsset，所以这条参数完全是负累。
+        var configuration = PHPickerConfiguration()
         configuration.filter = .images
         configuration.selectionLimit = call.getBool("multiple", false) ? 0 : 1
         // Round 7 想用 loadFileRepresentation(public.jpeg) 拉 PhotoKit 自动

@@ -434,6 +434,29 @@ const checks = [
       : "secure storage plugin not found yet; run `pnpm ios:sync` first",
   },
   {
+    // Round 46: PHPickerConfiguration(photoLibrary: .shared()) 把 PHPicker 跟
+    // PhotoKit 访问绑起来，我们 loadImageAsset 全程只用 itemProvider 不读
+    // PHAsset，带 .shared() 会让 app 在 iOS Privacy Report 里被标「访问过
+    // Photos」、App Store privacy 审查也得多写一条 Photos 数据收集。盯死
+    // PHPickerConfiguration 不能再带 photoLibrary 参数（含 .shared 在内）。
+    label: "phpicker-no-photolibrary",
+    ok:
+      !fs.existsSync(mobileBridgePluginPath) ||
+      // 用 "= PHPickerConfiguration(" 这种实际赋值形式做 anchor，避免误命中
+      // 用作"不要这样写"反例的解释注释里残留的 PHPickerConfiguration(photoLibrary:。
+      (fileMatches(
+        mobileBridgePluginPath,
+        /=\s*PHPickerConfiguration\(\s*\)/m,
+      ) &&
+        !fileMatches(
+          mobileBridgePluginPath,
+          /=\s*PHPickerConfiguration\(photoLibrary:/m,
+        )),
+    detail: fs.existsSync(mobileBridgePluginPath)
+      ? "PHPickerConfiguration is built without photoLibrary — pick-only path, no PhotoKit access footprint"
+      : "mobile bridge plugin not found yet; run `pnpm ios:sync` first",
+  },
+  {
     label: "runtime-plugin-sync",
     ok:
       !fs.existsSync(runtimePluginPath) ||
