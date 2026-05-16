@@ -66,11 +66,23 @@ const socketBaseUrl =
 // cloud-api（多租户反代入口）。原生壳的 origin 是 capacitor://localhost，
 // 没真实 HTTP 服务，apps/app/src/lib/runtime-config.ts 在 isInsideCapacitorShell()
 // 时显式不允许 origin 回落，所以这里必须显式注入。
+//
+// 注意：不要 fallback 到 template.cloudApiBaseUrl —— runtime-config.example.json
+// 里写的是 "https://cloud.example.yinjie.app" 示例域名。一旦没在 env/local/base
+// 任一处显式配置，template 会把这条示例 URL 静默注入打包产物，装到真机后
+// worlds 列表 / cloud session refresh / push token 注册 / 反馈上传等所有
+// cloud-api 入口都会 DNS-fail，且日志看不出原因（看似配置成功了）。
 const cloudApiBaseUrl =
   pickEnv("YINJIE_IOS_CLOUD_API_BASE_URL") ||
   normalizeOptionalString(localRuntime.cloudApiBaseUrl) ||
-  normalizeOptionalString(baseRuntime.cloudApiBaseUrl) ||
-  normalizeOptionalString(template.cloudApiBaseUrl);
+  normalizeOptionalString(baseRuntime.cloudApiBaseUrl);
+
+if (!cloudApiBaseUrl) {
+  console.error(
+    "Missing cloudApiBaseUrl. Set runtime.cloudApiBaseUrl in ios-shell.config.json (or ios-shell.config.local.json) or export YINJIE_IOS_CLOUD_API_BASE_URL. Native shell cannot fall back to window.location.origin (capacitor://localhost).",
+  );
+  process.exit(1);
+}
 
 const environment =
   pickEnv("YINJIE_IOS_ENVIRONMENT") ||

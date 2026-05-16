@@ -51,6 +51,18 @@ function resolveConfiguredApiBaseUrl() {
   if (baseValue) return { value: baseValue, source: "ios-shell.config.json" };
   return { value: null, source: null };
 }
+
+function resolveConfiguredCloudApiBaseUrl() {
+  const envValue = (process.env.YINJIE_IOS_CLOUD_API_BASE_URL ?? "").trim();
+  if (envValue) return { value: envValue, source: "env" };
+  const local = readJsonIfExists(shellLocalConfigPath);
+  const localValue = (local?.runtime?.cloudApiBaseUrl ?? "").trim();
+  if (localValue) return { value: localValue, source: "ios-shell.config.local.json" };
+  const base = readJsonIfExists(shellConfigPath);
+  const baseValue = (base?.runtime?.cloudApiBaseUrl ?? "").trim();
+  if (baseValue) return { value: baseValue, source: "ios-shell.config.json" };
+  return { value: null, source: null };
+}
 const infoPlistStringLocalizations = ["zh-Hans", "en", "ja", "ko"];
 const requiredInfoPlistStringKeys = [
   "CFBundleDisplayName",
@@ -363,6 +375,20 @@ const checks = [
       detail: resolved.value
         ? `apiBaseUrl=${resolved.value} (source: ${resolved.source})`
         : "apiBaseUrl not set anywhere — set runtime.apiBaseUrl in ios-shell.config.json (or ios-shell.config.local.json) or export YINJIE_IOS_CORE_API_BASE_URL; otherwise `pnpm ios:sync` will fail",
+    };
+  })(),
+  (() => {
+    // 不接 template fallback：runtime-config.example.json 写了示例域名
+    // "https://cloud.example.yinjie.app"，不配置就会被静默注入打包产物，
+    // 真机起来后 cloud-api 全 DNS-fail，日志里看不出原因（看着配置成功）。
+    // inject-runtime-config.mjs 已经把这条 fallback 拆了，doctor 同步盯。
+    const resolved = resolveConfiguredCloudApiBaseUrl();
+    return {
+      label: "cloud-api-base-url",
+      ok: Boolean(resolved.value),
+      detail: resolved.value
+        ? `cloudApiBaseUrl=${resolved.value} (source: ${resolved.source})`
+        : "cloudApiBaseUrl not set anywhere — set runtime.cloudApiBaseUrl in ios-shell.config.json (or ios-shell.config.local.json) or export YINJIE_IOS_CLOUD_API_BASE_URL; capacitor:// origin can't fall back to window.location",
     };
   })(),
   {

@@ -292,26 +292,37 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
                     size={13}
                     className="mt-1 shrink-0 fill-[#576B95] text-[#576B95]"
                   />
-                  <div className="flex flex-wrap gap-x-1">
-                    {moment.likes.map((like, index) => (
-                      <span key={like.id ?? `${like.authorId}-${index}`}>
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            onLikeAuthorTap?.(like);
-                          }}
-                          className="text-left hover:opacity-80"
-                          style={{ color: WECHAT_LINK_COLOR }}
-                          data-no-doubletap
+                  <div className="flex min-w-0 flex-wrap gap-x-1">
+                    {moment.likes
+                      // 空名字（数据脏 / 角色被删）的 liker 不渲染：否则 button 是空的
+                      // 还残留一个 "," 在新行上。
+                      .filter((like) => (like.authorName ?? "").trim() !== "")
+                      .map((like, index, arr) => (
+                        <span
+                          key={like.id ?? `${like.authorId}-${index}`}
+                          className="inline-flex min-w-0 max-w-full items-baseline"
                         >
-                          {like.authorName}
-                        </button>
-                        {index < moment.likes.length - 1 ? (
-                          <span style={{ color: WECHAT_LINK_COLOR }}>,</span>
-                        ) : null}
-                      </span>
-                    ))}
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              onLikeAuthorTap?.(like);
+                            }}
+                            // 群标题之类很长的 liker（"走查测试群讨论时，你们对某个方法问题
+                            // 有不同的理解" 那种）会按字宽 wrap，把后面挂的 "," 推到下一行
+                            // 形成「孤儿逗号」。max-w + truncate 把单条 liker 收敛到一行。
+                            className="max-w-[200px] truncate text-left align-baseline hover:opacity-80"
+                            style={{ color: WECHAT_LINK_COLOR }}
+                            data-no-doubletap
+                            title={like.authorName}
+                          >
+                            {like.authorName}
+                          </button>
+                          {index < arr.length - 1 ? (
+                            <span style={{ color: WECHAT_LINK_COLOR }}>,</span>
+                          ) : null}
+                        </span>
+                      ))}
                   </div>
                 </div>
               ) : null}
@@ -341,13 +352,24 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
                         style={{ color: WECHAT_TEXT_COLOR }}
                         data-no-doubletap
                       >
-                        <span style={{ color: WECHAT_LINK_COLOR }}>
+                        {/* 长名字（群标题／角色被改成超长 displayName）会按字宽
+                            wrap，把后面的「：评论正文」推到下一行甚至撞断句。
+                            inline-block + truncate 让单名字最多占一行，超出 …。 */}
+                        <span
+                          className="inline-block max-w-[160px] truncate align-bottom"
+                          style={{ color: WECHAT_LINK_COLOR }}
+                          title={comment.authorName}
+                        >
                           {comment.authorName}
                         </span>
                         {replyToName ? (
                           <>
                             <span> {t(msg`回复`)} </span>
-                            <span style={{ color: WECHAT_LINK_COLOR }}>
+                            <span
+                              className="inline-block max-w-[160px] truncate align-bottom"
+                              style={{ color: WECHAT_LINK_COLOR }}
+                              title={replyToName}
+                            >
                               {replyToName}
                             </span>
                           </>
