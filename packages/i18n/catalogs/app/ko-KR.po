@@ -2151,6 +2151,7 @@ msgid "起止时间"
 msgstr "기간"
 
 #: apps/app/src/components/chat-message-list.tsx:5733
+#: apps/app/src/features/chat/group-call-presentation.ts:21
 msgid "进行中"
 msgstr "진행 중"
 
@@ -2182,6 +2183,8 @@ msgstr "그룹 영상 통화"
 #: apps/app/src/components/chat-message-list.tsx:5971
 #: apps/app/src/components/chat-message-list.tsx:6191
 #: apps/app/src/features/chat/direct-call-card.ts:14
+#: apps/app/src/features/chat/group-call-presentation.ts:20
+#: apps/app/src/features/chat/group-call-presentation.ts:28
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:85
 #: apps/app/src/routes/live-companion-page.tsx:741
 msgid "已结束"
@@ -4776,18 +4779,22 @@ msgid "数字人在线"
 msgstr "디지털 휴먼 온라인"
 
 #: apps/app/src/features/chat/direct-call-card.ts:19
+#: apps/app/src/features/chat/group-call-presentation.ts:30
 msgid "画面已接通"
 msgstr "화면이 연결되었습니다"
 
 #: apps/app/src/features/chat/direct-call-card.ts:20
+#: apps/app/src/features/chat/group-call-presentation.ts:30
 msgid "已接通"
 msgstr "연결됨"
 
 #: apps/app/src/features/chat/direct-call-card.ts:24
+#: apps/app/src/features/chat/group-call-presentation.ts:32
 msgid "等待接入画面"
 msgstr "화면 연결 대기"
 
 #: apps/app/src/features/chat/direct-call-card.ts:25
+#: apps/app/src/features/chat/group-call-presentation.ts:32
 msgid "等待接听"
 msgstr "응답 대기"
 
@@ -4943,6 +4950,63 @@ msgstr "{0}의 그룹 통화 상태 보기"
 #: apps/app/src/features/chat/group-call-card.ts:91
 msgid "开始于 {startedAt} · 结束于 {endedAt}"
 msgstr "시작: {startedAt} · 종료: {endedAt}"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:21
+msgid "画面进行中"
+msgstr "영상 통화 중"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:45
+msgid "当前设备"
+msgstr "현재 기기"
+
+#. placeholder {0}: input.counts.activeCount
+#. placeholder {1}: input.counts.totalCount
+#. placeholder {2}: input.counts.waitingCount
+#: apps/app/src/features/chat/group-call-presentation.ts:51
+msgid "最终在线 {0}/{1} 人，仍有 {2} 人未加入。"
+msgstr "최종 접속 {0}/{1}명, {2}명이 아직 참여하지 않았습니다."
+
+#. placeholder {0}: input.counts.activeCount
+#. placeholder {1}: input.counts.totalCount
+#: apps/app/src/features/chat/group-call-presentation.ts:54
+msgid "最终在线 {0}/{1} 人，本轮成员已全部完成加入。"
+msgstr "최종 접속 {0}/{1}명, 이번 라운드의 모든 멤버가 참여했습니다."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:56
+msgid "当前没有保留完整在线人数快照。"
+msgstr "전체 접속 인원 스냅샷이 저장되지 않았습니다."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:60
+msgid "本轮群视频通话已结束，{countsSummary}"
+msgstr "이번 그룹 영상 통화가 종료되었습니다. {countsSummary}"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:61
+msgid "如需再次发起，请重新打开当前群聊顶部的群视频通话面板。"
+msgstr "다시 시작하려면 이 그룹 채팅 상단의 그룹 영상 통화 패널을 다시 열어 주세요."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:65
+msgid "本轮群语音通话已结束，{countsSummary}"
+msgstr "이번 그룹 음성 통화가 종료되었습니다. {countsSummary}"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:66
+msgid "如需再次发起，请重新打开当前群聊顶部的群语音通话面板。"
+msgstr "다시 시작하려면 이 그룹 채팅 상단의 그룹 음성 통화 패널을 다시 열어 주세요."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:73
+msgid "已从 {sourceLabel} 发起群视频通话，当前工作台会继续同步在线人数和加入状态。"
+msgstr "{sourceLabel}에서 그룹 영상 통화를 시작했습니다. 이 작업판이 접속 인원과 참여 상태를 계속 동기화합니다."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:76
+msgid "如需继续邀请成员、切回聊天或转到其他设备，请回到当前群聊顶部的群视频通话面板。"
+msgstr "추가 멤버 초대, 채팅 복귀, 다른 기기로 전환은 이 그룹 채팅 상단의 그룹 영상 통화 패널로 돌아가서 진행하세요."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:82
+msgid "已从 {sourceLabel} 发起群语音通话，当前工作台会继续同步在线人数和加入状态。"
+msgstr "{sourceLabel}에서 그룹 음성 통화를 시작했습니다. 이 작업판이 접속 인원과 참여 상태를 계속 동기화합니다."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:85
+msgid "如需继续邀请成员、切回聊天或转到其他设备，请回到当前群聊顶部的群语音通话面板。"
+msgstr "추가 멤버 초대, 채팅 복귀, 다른 기기로 전환은 이 그룹 채팅 상단의 그룹 음성 통화 패널로 돌아가서 진행하세요."
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:323
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:342
@@ -5926,15 +5990,15 @@ msgid "当前为移动群通话工作台"
 msgstr "현재 모바일 그룹 통화 워크스페이스입니다"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
+#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
+msgid "解除静音"
+msgstr "음소거 해제"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:486
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
 msgid "静音麦克风"
 msgstr "마이크 음소거"
-
-#: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
-#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
-msgid "解除静音"
-msgstr "음소거 해제"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:860
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:498
@@ -12817,16 +12881,16 @@ msgid "买了种子"
 msgstr "씨앗 구매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
+msgid "卖了"
+msgstr "판매 완료"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
 msgid "作物"
 msgstr "작물"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
-msgid "卖了"
-msgstr "판매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -14204,17 +14268,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "본진을 지키고 적 탱크 20대를 격파하라."
 
 #: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "2P"
-
-#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "픽셀"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "액션"
+
+#: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "2P"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"

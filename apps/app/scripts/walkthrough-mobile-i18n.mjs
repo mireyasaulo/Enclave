@@ -104,7 +104,13 @@ function buildTextScraper() {
 }
 
 function parseArgs(argv) {
-  const opts = { locales: ["en-US", "ja-JP", "ko-KR"], routes: extendedRoutePaths, outDir: null };
+  const opts = {
+    locales: ["en-US", "ja-JP", "ko-KR"],
+    routes: extendedRoutePaths,
+    outDir: null,
+    viewport: "mobile",
+    clickEvery: 6, // click up to N buttons per page in turn, scraping after each.
+  };
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === "--locale") opts.locales = argv[++i].split(",").map((s) => s.trim()).filter(Boolean);
@@ -113,6 +119,10 @@ function parseArgs(argv) {
     else if (a.startsWith("--route=")) opts.routes = a.slice("--route=".length).split(",").map((s) => s.trim()).filter(Boolean);
     else if (a === "--out") opts.outDir = argv[++i];
     else if (a.startsWith("--out=")) opts.outDir = a.slice("--out=".length);
+    else if (a === "--viewport") opts.viewport = argv[++i];
+    else if (a.startsWith("--viewport=")) opts.viewport = a.slice("--viewport=".length);
+    else if (a === "--click-every") opts.clickEvery = Number(argv[++i]);
+    else if (a.startsWith("--click-every=")) opts.clickEvery = Number(a.slice("--click-every=".length));
   }
   return opts;
 }
@@ -154,7 +164,7 @@ function isLeak(text, locale) {
   return false;
 }
 
-async function visitRoute(page, baseUrl, route, locale) {
+async function visitRoute(page, baseUrl, route, locale, clickBudget) {
   const url = `${baseUrl}${route}?locale=${encodeURIComponent(locale)}`;
   const errors = [];
   page.removeAllListeners("pageerror");
@@ -173,8 +183,6 @@ async function visitRoute(page, baseUrl, route, locale) {
   await page.waitForLoadState("networkidle", { timeout: routeIdleTimeoutMs }).catch(() => undefined);
   await page.waitForTimeout(routeSettleMs);
   // Wait up to 8s for the bootstrap screen to disappear (catalog hydrate).
-  // The bootstrap screen renders raw zh-CN text by design — if we measure
-  // before it disappears we'll falsely flag the source strings.
   try {
     await page.waitForFunction(
       () => !document.querySelector(".boot-logo"),
@@ -193,34 +201,95 @@ async function visitRoute(page, baseUrl, route, locale) {
     main.scrollTo({ top: 0, behavior: "instant" });
     await new Promise((r) => setTimeout(r, 100));
   });
-  // For game pages: click any "Start / Play / 进入 / 开始 / 開始 / 시작 / 출발 / 开局"
-  // CTA we can find to render in-game UI strings as well.
-  if (route.includes("/games") || route.includes("game=")) {
-    await page.evaluate(() => {
-      const candidates = Array.from(
-        document.querySelectorAll("button, [role=button]"),
-      );
-      const triggers = [
-        // English
-        /^(Start|Play|Open|Launch|Begin|Continue|Go|Enter)\b/i,
-        // 中文
-        /^(开始|开局|出发|启动|进入|继续|开演|开张)/,
-        // 日本語
-        /^(開始|プレイ|開く|発車|出発|開店|開演|続行)/,
-        // 한국어
-        /^(시작|플레이|진입|출발|개시|영업|계속)/,
-      ];
-      const matched = candidates.find((el) => {
-        const t = el.textContent?.trim() ?? "";
-        return triggers.some((re) => re.test(t));
-      });
-      if (matched) (matched).click();
-    });
-    await page.waitForTimeout(700);
+  const allItems = [];
+  const seenTexts = new Set();
+  const addItems = (items) => {
+    for (const it of items) {
+      const k = it.text + "|" + it.tag;
+      if (seenTexts.has(k)) continue;
+      seenTexts.add(k);
+      allItems.push(it);
+    }
+  };
+  addItems(await page.evaluate(buildTextScraper()));
+
+  // Try clicking up to clickBudget unique buttons in sequence, scraping text
+  // between each. This exposes modals, panels, in-game UI etc. that don't
+  // appear in the landing state. We deliberately skip anchor tags / role=link
+  // to stay on-route. Also skip the language picker — clicking a locale there
+  // switches the app locale mid-audit and pollutes subsequent scrapes.
+  const isGameRoute = route.includes("/games") || route.includes("game=");
+  const isLocalePickerRoute = route.startsWith("/profile/settings");
+  if (isLocalePickerRoute) {
+    // Render landing state only; do not interact (avoids triggering locale change).
+    const leaks = allItems.filter((it) => isLeak(it.text, locale));
+    return { url, errors, totalNodes: allItems.length, items: allItems, leaks };
   }
-  const items = await page.evaluate(buildTextScraper());
-  const leaks = items.filter((it) => isLeak(it.text, locale));
-  return { url, errors, totalNodes: items.length, items, leaks };
+  const budget = isGameRoute ? Math.max(clickBudget, 6) : clickBudget;
+  for (let i = 0; i < budget; i += 1) {
+    const clicked = await page.evaluate(
+      ({ skipIndex, isGameRoute }) => {
+        const buttons = Array.from(
+          document.querySelectorAll("button, [role=button]"),
+        ).filter((el) => {
+          const r = el.getBoundingClientRect();
+          if (r.width === 0 || r.height === 0) return false;
+          // Skip nav-style tabs and back buttons so we stay on this route.
+          const ariaLabel = (el.getAttribute("aria-label") || "").toLowerCase();
+          const text = (el.textContent || "").trim();
+          if (
+            /back|close|关闭|返回|戻る|닫기|뒤로|キャンセル|cancel|取消|취소/i.test(
+              ariaLabel + " " + text,
+            )
+          ) {
+            return false;
+          }
+          // For non-game routes, also avoid tab bar buttons (they switch tabs).
+          if (!isGameRoute && el.closest("[data-tab-bar],[role=tablist]")) {
+            return false;
+          }
+          return true;
+        });
+        if (skipIndex >= buttons.length) return null;
+        const btn = buttons[skipIndex];
+        try {
+          btn.click();
+        } catch {
+          return null;
+        }
+        return btn.textContent?.trim().slice(0, 60) ?? "";
+      },
+      { skipIndex: i, isGameRoute },
+    );
+    if (clicked === null) break;
+    await page.waitForTimeout(350);
+    // If the click navigated away or somehow changed the locale, restore and
+    // abort the click loop to keep this run scoped to the requested route+locale.
+    const stateBroken = await page.evaluate(
+      ({ expectedLocale }) => {
+        const stored = localStorage.getItem("yinjie-i18n-locale:app");
+        return stored !== expectedLocale;
+      },
+      { expectedLocale: locale },
+    );
+    if (stateBroken) {
+      // Restore locale and skip remaining clicks.
+      await page.evaluate(
+        ({ expectedLocale }) => {
+          localStorage.setItem("yinjie-i18n-locale:app", expectedLocale);
+        },
+        { expectedLocale: locale },
+      );
+      break;
+    }
+    addItems(await page.evaluate(buildTextScraper()));
+    // Close any dialog opened (Escape) so the next click can target fresh elements.
+    await page.keyboard.press("Escape").catch(() => undefined);
+    await page.waitForTimeout(120);
+  }
+
+  const leaks = allItems.filter((it) => isLeak(it.text, locale));
+  return { url, errors, totalNodes: allItems.length, items: allItems, leaks };
 }
 
 async function main() {
@@ -237,14 +306,24 @@ async function main() {
   try {
     const browser = await chromium.launch({ headless: true });
     try {
+      const viewportConfig =
+        opts.viewport === "desktop"
+          ? {
+              viewport: { width: 1280, height: 800 },
+              isMobile: false,
+              hasTouch: false,
+              userAgent:
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
+            }
+          : {
+              viewport: { width: 375, height: 812 },
+              isMobile: true,
+              hasTouch: true,
+              userAgent:
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1",
+            };
       for (const locale of opts.locales) {
-        const context = await browser.newContext({
-          viewport: { width: 375, height: 812 },
-          isMobile: true,
-          hasTouch: true,
-          userAgent:
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1",
-        });
+        const context = await browser.newContext(viewportConfig);
         const runtimeConfig = { ...runtimeConfigTemplate, apiBaseUrl: server.baseUrl, socketBaseUrl: server.baseUrl };
         await seedAuditLocalStorage(context, runtimeConfig);
         await context.addInitScript((targetLocale) => {
@@ -255,7 +334,7 @@ async function main() {
         await installApiMocks(page, systemStatus);
 
         for (const route of opts.routes) {
-          const result = await visitRoute(page, server.baseUrl, route, locale);
+          const result = await visitRoute(page, server.baseUrl, route, locale, opts.clickEvery);
           totalLeaks += result.leaks.length;
           summary.results.push({ locale, route, ...result });
           if (result.leaks.length || result.errors.length) {

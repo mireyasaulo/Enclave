@@ -2151,6 +2151,7 @@ msgid "起止时间"
 msgstr "期間"
 
 #: apps/app/src/components/chat-message-list.tsx:5733
+#: apps/app/src/features/chat/group-call-presentation.ts:21
 msgid "进行中"
 msgstr "進行中"
 
@@ -2182,6 +2183,8 @@ msgstr "グループビデオ通話"
 #: apps/app/src/components/chat-message-list.tsx:5971
 #: apps/app/src/components/chat-message-list.tsx:6191
 #: apps/app/src/features/chat/direct-call-card.ts:14
+#: apps/app/src/features/chat/group-call-presentation.ts:20
+#: apps/app/src/features/chat/group-call-presentation.ts:28
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:85
 #: apps/app/src/routes/live-companion-page.tsx:741
 msgid "已结束"
@@ -4776,18 +4779,22 @@ msgid "数字人在线"
 msgstr "デジタルヒューマンオンライン"
 
 #: apps/app/src/features/chat/direct-call-card.ts:19
+#: apps/app/src/features/chat/group-call-presentation.ts:30
 msgid "画面已接通"
 msgstr "画面が接続されました"
 
 #: apps/app/src/features/chat/direct-call-card.ts:20
+#: apps/app/src/features/chat/group-call-presentation.ts:30
 msgid "已接通"
 msgstr "接続済み"
 
 #: apps/app/src/features/chat/direct-call-card.ts:24
+#: apps/app/src/features/chat/group-call-presentation.ts:32
 msgid "等待接入画面"
 msgstr "画面接続待ち"
 
 #: apps/app/src/features/chat/direct-call-card.ts:25
+#: apps/app/src/features/chat/group-call-presentation.ts:32
 msgid "等待接听"
 msgstr "応答待ち"
 
@@ -4943,6 +4950,63 @@ msgstr "{0} のグループ通話状態を表示"
 #: apps/app/src/features/chat/group-call-card.ts:91
 msgid "开始于 {startedAt} · 结束于 {endedAt}"
 msgstr "{startedAt} に開始 ・{endedAt} に終了"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:21
+msgid "画面进行中"
+msgstr "映像通話中"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:45
+msgid "当前设备"
+msgstr "現在のデバイス"
+
+#. placeholder {0}: input.counts.activeCount
+#. placeholder {1}: input.counts.totalCount
+#. placeholder {2}: input.counts.waitingCount
+#: apps/app/src/features/chat/group-call-presentation.ts:51
+msgid "最终在线 {0}/{1} 人，仍有 {2} 人未加入。"
+msgstr "最終オンライン {0}/{1} 人、{2} 人がまだ参加していません。"
+
+#. placeholder {0}: input.counts.activeCount
+#. placeholder {1}: input.counts.totalCount
+#: apps/app/src/features/chat/group-call-presentation.ts:54
+msgid "最终在线 {0}/{1} 人，本轮成员已全部完成加入。"
+msgstr "最終オンライン {0}/{1} 人、今回のメンバーは全員参加済みです。"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:56
+msgid "当前没有保留完整在线人数快照。"
+msgstr "完全なオンライン人数のスナップショットは保存されていません。"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:60
+msgid "本轮群视频通话已结束，{countsSummary}"
+msgstr "今回のグループビデオ通話が終了しました。{countsSummary}"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:61
+msgid "如需再次发起，请重新打开当前群聊顶部的群视频通话面板。"
+msgstr "もう一度発信する場合は、グループチャット上部のグループビデオ通話パネルを再度開いてください。"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:65
+msgid "本轮群语音通话已结束，{countsSummary}"
+msgstr "今回のグループ音声通話が終了しました。{countsSummary}"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:66
+msgid "如需再次发起，请重新打开当前群聊顶部的群语音通话面板。"
+msgstr "もう一度発信する場合は、グループチャット上部のグループ音声通話パネルを再度開いてください。"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:73
+msgid "已从 {sourceLabel} 发起群视频通话，当前工作台会继续同步在线人数和加入状态。"
+msgstr "{sourceLabel} からグループビデオ通話を開始しました。本ワークスペースはオンライン人数と参加状況を継続的に同期します。"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:76
+msgid "如需继续邀请成员、切回聊天或转到其他设备，请回到当前群聊顶部的群视频通话面板。"
+msgstr "メンバーの追加招待、チャットへの復帰、または他のデバイスへの切り替えは、グループチャット上部のグループビデオ通話パネルから操作してください。"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:82
+msgid "已从 {sourceLabel} 发起群语音通话，当前工作台会继续同步在线人数和加入状态。"
+msgstr "{sourceLabel} からグループ音声通話を開始しました。本ワークスペースはオンライン人数と参加状況を継続的に同期します。"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:85
+msgid "如需继续邀请成员、切回聊天或转到其他设备，请回到当前群聊顶部的群语音通话面板。"
+msgstr "メンバーの追加招待、チャットへの復帰、または他のデバイスへの切り替えは、グループチャット上部のグループ音声通話パネルから操作してください。"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:323
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:342
@@ -5926,15 +5990,15 @@ msgid "当前为移动群通话工作台"
 msgstr "現在はモバイルグループ通話ワークスペースです"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
+#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
+msgid "解除静音"
+msgstr "ミュート解除"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:486
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
 msgid "静音麦克风"
 msgstr "マイクをミュート"
-
-#: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
-#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
-msgid "解除静音"
-msgstr "ミュート解除"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:860
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:498
@@ -12817,16 +12881,16 @@ msgid "买了种子"
 msgstr "種を購入しました"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
+msgid "卖了"
+msgstr "売りました"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
 msgid "作物"
 msgstr "作物"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
-msgid "卖了"
-msgstr "売りました"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -14204,17 +14268,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "基地を守り、敵戦車20両を撃破せよ。"
 
 #: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "2P"
-
-#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "ピクセル"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "アクション"
+
+#: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "2P"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"

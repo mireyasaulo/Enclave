@@ -37,11 +37,11 @@ import {
   buildMobileGroupRouteHash,
   parseMobileGroupRouteState,
 } from "./mobile-group-route-state";
+import { buildGroupCallInviteMessage } from "./group-call-message";
 import {
-  buildGroupCallInviteMessage,
-  buildGroupCallSummaryLines,
-  formatGroupCallStatusLabel,
-} from "./group-call-message";
+  buildGroupCallWorkspaceSummaryLines,
+  getGroupCallStatusLabel,
+} from "./group-call-presentation";
 import { parseMobileGroupCallRouteHash } from "./mobile-group-call-route-state";
 import { buildChatCallReturnSearch } from "./chat-compose-shortcut-route";
 
@@ -178,13 +178,13 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   const groupName = groupQuery.data?.name ?? t(msg`群聊`);
   const callTitle =
     mode === "voice" ? t(msg`群语音通话`) : t(msg`群视频通话`);
-  const statusTitle = formatGroupCallStatusLabel(mode, "ongoing");
+  const statusTitle = getGroupCallStatusLabel(mode, "ongoing");
   const hasSyncedStatus =
     lastPublishedCounts?.activeCount === activeCount &&
     lastPublishedCounts?.totalCount === totalCount;
   const showWorkspacePrimer = !callTipsDismissed && !hasResumeCounts;
   const showResumeHint = hasResumeCounts && !callTipsDismissed;
-  const workspaceSummaryLines = buildGroupCallSummaryLines({
+  const workspaceSummaryLines = buildGroupCallWorkspaceSummaryLines({
     kind: mode,
     status: "ongoing",
     sourceLabel,

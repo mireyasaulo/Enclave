@@ -134,6 +134,7 @@ export function parseDirectCallInviteMessage(text: string) {
   }
 
   const timestampLabel = parseCallInviteTimestamp(lines[3]);
+  const recordedAt = parseCallInviteTimestampValue(lines[3]);
   const durationLabel = parseCallInviteDuration(lines[timestampLabel ? 4 : 3]);
   const sourceLabel = parseCallInviteSource(
     lines[3 + Number(Boolean(timestampLabel)) + Number(Boolean(durationLabel))],
@@ -152,6 +153,7 @@ export function parseDirectCallInviteMessage(text: string) {
     title: lines[1] || "当前聊天",
     connectionStatus: parseDirectCallStatus(lines[2]),
     timestampLabel,
+    recordedAt,
     durationLabel,
     source,
     sourceLabel,
@@ -161,6 +163,7 @@ export function parseDirectCallInviteMessage(text: string) {
     title: string;
     connectionStatus: DirectCallInviteStatus | null;
     timestampLabel: string | null;
+    recordedAt: string | null;
     durationLabel: string | null;
     source: DirectCallInviteSource | null;
     sourceLabel: string | null;

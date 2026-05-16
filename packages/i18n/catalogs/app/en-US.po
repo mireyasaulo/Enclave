@@ -2151,6 +2151,7 @@ msgid "起止时间"
 msgstr "Duration"
 
 #: apps/app/src/components/chat-message-list.tsx:5733
+#: apps/app/src/features/chat/group-call-presentation.ts:21
 msgid "进行中"
 msgstr "In progress"
 
@@ -2182,6 +2183,8 @@ msgstr "Group video call"
 #: apps/app/src/components/chat-message-list.tsx:5971
 #: apps/app/src/components/chat-message-list.tsx:6191
 #: apps/app/src/features/chat/direct-call-card.ts:14
+#: apps/app/src/features/chat/group-call-presentation.ts:20
+#: apps/app/src/features/chat/group-call-presentation.ts:28
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:85
 #: apps/app/src/routes/live-companion-page.tsx:741
 msgid "已结束"
@@ -4776,18 +4779,22 @@ msgid "数字人在线"
 msgstr "Digital human online"
 
 #: apps/app/src/features/chat/direct-call-card.ts:19
+#: apps/app/src/features/chat/group-call-presentation.ts:30
 msgid "画面已接通"
 msgstr "Video connected"
 
 #: apps/app/src/features/chat/direct-call-card.ts:20
+#: apps/app/src/features/chat/group-call-presentation.ts:30
 msgid "已接通"
 msgstr "Connected"
 
 #: apps/app/src/features/chat/direct-call-card.ts:24
+#: apps/app/src/features/chat/group-call-presentation.ts:32
 msgid "等待接入画面"
 msgstr "Waiting for video"
 
 #: apps/app/src/features/chat/direct-call-card.ts:25
+#: apps/app/src/features/chat/group-call-presentation.ts:32
 msgid "等待接听"
 msgstr "Waiting for answer"
 
@@ -4943,6 +4950,63 @@ msgstr "View {0}'s group call status"
 #: apps/app/src/features/chat/group-call-card.ts:91
 msgid "开始于 {startedAt} · 结束于 {endedAt}"
 msgstr "Started {startedAt} · Ended {endedAt}"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:21
+msgid "画面进行中"
+msgstr "Video in progress"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:45
+msgid "当前设备"
+msgstr "Current device"
+
+#. placeholder {0}: input.counts.activeCount
+#. placeholder {1}: input.counts.totalCount
+#. placeholder {2}: input.counts.waitingCount
+#: apps/app/src/features/chat/group-call-presentation.ts:51
+msgid "最终在线 {0}/{1} 人，仍有 {2} 人未加入。"
+msgstr "Final online: {0}/{1}; {2} still haven't joined."
+
+#. placeholder {0}: input.counts.activeCount
+#. placeholder {1}: input.counts.totalCount
+#: apps/app/src/features/chat/group-call-presentation.ts:54
+msgid "最终在线 {0}/{1} 人，本轮成员已全部完成加入。"
+msgstr "Final online: {0}/{1}; all members joined this round."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:56
+msgid "当前没有保留完整在线人数快照。"
+msgstr "No complete online-count snapshot was kept."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:60
+msgid "本轮群视频通话已结束，{countsSummary}"
+msgstr "This group video call has ended. {countsSummary}"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:61
+msgid "如需再次发起，请重新打开当前群聊顶部的群视频通话面板。"
+msgstr "To start it again, reopen the group video-call panel at the top of this group chat."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:65
+msgid "本轮群语音通话已结束，{countsSummary}"
+msgstr "This group voice call has ended. {countsSummary}"
+
+#: apps/app/src/features/chat/group-call-presentation.ts:66
+msgid "如需再次发起，请重新打开当前群聊顶部的群语音通话面板。"
+msgstr "To start it again, reopen the group voice-call panel at the top of this group chat."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:73
+msgid "已从 {sourceLabel} 发起群视频通话，当前工作台会继续同步在线人数和加入状态。"
+msgstr "Started a group video call from {sourceLabel}; this workspace will keep syncing the online count and join status."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:76
+msgid "如需继续邀请成员、切回聊天或转到其他设备，请回到当前群聊顶部的群视频通话面板。"
+msgstr "To invite more members, return to the chat, or switch devices, go back to the group video-call panel at the top of this group chat."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:82
+msgid "已从 {sourceLabel} 发起群语音通话，当前工作台会继续同步在线人数和加入状态。"
+msgstr "Started a group voice call from {sourceLabel}; this workspace will keep syncing the online count and join status."
+
+#: apps/app/src/features/chat/group-call-presentation.ts:85
+msgid "如需继续邀请成员、切回聊天或转到其他设备，请回到当前群聊顶部的群语音通话面板。"
+msgstr "To invite more members, return to the chat, or switch devices, go back to the group voice-call panel at the top of this group chat."
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:323
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:342
@@ -5926,15 +5990,15 @@ msgid "当前为移动群通话工作台"
 msgstr "Currently the mobile group call workspace"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
+#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
+msgid "解除静音"
+msgstr "Unmute"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:486
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
 msgid "静音麦克风"
 msgstr "Mute microphone"
-
-#: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
-#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
-msgid "解除静音"
-msgstr "Unmute"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:860
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:498
@@ -12817,16 +12881,16 @@ msgid "买了种子"
 msgstr "Bought seeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
+msgid "卖了"
+msgstr "Sold"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
 msgid "作物"
 msgstr "Crops"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
-msgid "卖了"
-msgstr "Sold"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -14204,17 +14268,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "Hold the base and wipe out 20 enemy tanks."
 
 #: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "Co-op"
-
-#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "Pixel"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "Action"
+
+#: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "Co-op"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"

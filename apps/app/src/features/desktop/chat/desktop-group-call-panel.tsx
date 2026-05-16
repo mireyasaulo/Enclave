@@ -17,7 +17,7 @@ import { AvatarChip } from "../../../components/avatar-chip";
 import { GroupAvatarChip } from "../../../components/group-avatar-chip";
 import type { DesktopChatCallKind } from "./desktop-chat-header-actions";
 import { formatDetailedMessageTimestamp } from "../../../lib/format";
-import { buildGroupCallSummaryLines } from "../../chat/group-call-message";
+import { buildGroupCallWorkspaceSummaryLines } from "../../chat/group-call-presentation";
 
 type DesktopGroupCallPanelProps = {
   kind: DesktopChatCallKind;
@@ -92,7 +92,7 @@ export function DesktopGroupCallPanel({
   const hasSyncedStatus =
     lastSyncedCounts?.activeCount === activeCount &&
     lastSyncedCounts?.totalCount === members.length;
-  const workspaceSummaryLines = buildGroupCallSummaryLines({
+  const workspaceSummaryLines = buildGroupCallWorkspaceSummaryLines({
     kind,
     status: "ongoing",
     sourceLabel: t(msg`桌面端`),

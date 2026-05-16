@@ -146,10 +146,10 @@ import { useMessageReminders } from "../features/chat/use-message-reminders";
 import { useDigitalHumanEntryGuard } from "../features/chat/use-digital-human-entry-guard";
 import {
   parseDirectCallInviteMessage,
-  formatGroupCallStatusLabel,
   parseGroupCallInviteMessage,
   type CallInviteSource,
 } from "../features/chat/group-call-message";
+import { getGroupCallStatusLabel } from "../features/chat/group-call-presentation";
 import {
   resolveGroupRelayCompletionBadge,
   resolveGroupRelayCompletionTime,
@@ -5986,13 +5986,21 @@ function GroupCallInviteMessage({
       <div className={isDesktop ? "mt-3 space-y-2" : "mt-2.5 space-y-1.5"}>
         <ResultCardMetric
           label={translateRuntimeMessage(msg`当前状态`)}
-          value={formatGroupCallStatusLabel(invite.kind, invite.status)}
+          value={getGroupCallStatusLabel(invite.kind, invite.status)}
           variant={variant}
         />
         {invite.timestampLabel ? (
           <ResultCardMetric
-            label={translateRuntimeMessage(msg`时间`)}
-            value={invite.timestampLabel}
+            label={
+              invite.status === "ended"
+                ? translateRuntimeMessage(msg`结束于`)
+                : translateRuntimeMessage(msg`发起于`)
+            }
+            value={
+              invite.recordedAt
+                ? formatDetailedMessageTimestamp(invite.recordedAt)
+                : invite.timestampLabel
+            }
             variant={variant}
           />
         ) : null}
@@ -6198,8 +6206,16 @@ function DirectCallInviteMessage({
         ) : null}
         {invite.timestampLabel ? (
           <ResultCardMetric
-            label={translateRuntimeMessage(msg`时间`)}
-            value={invite.timestampLabel}
+            label={
+              invite.connectionStatus === "ended"
+                ? translateRuntimeMessage(msg`结束于`)
+                : translateRuntimeMessage(msg`发起于`)
+            }
+            value={
+              invite.recordedAt
+                ? formatDetailedMessageTimestamp(invite.recordedAt)
+                : invite.timestampLabel
+            }
             variant={variant}
           />
         ) : null}
