@@ -1134,8 +1134,12 @@ const pendingLikePostId = likeMutation.isPending
   // 闸门齐全：依赖 blockedQuery 已经 ready（visiblePosts 是 feedPosts -
   // blocked，blocked 还没回来时 visiblePosts 可能虚为空 → 不要拉），
   // hasNext + !isFetching + !isFetchNextPageError 一票否决。
+  // Round 3 桌面端走查：原本 `if (isDesktopLayout) return;` 直接跳过——桌面
+  // auto-prefetch 三页打满后若全是屏蔽角色，DesktopFeedList 会渲染「广场还没
+  // 有新动态 / 发广场动态」CTA，后台 200+ 条非屏蔽内容用户看不到也不知道在哪
+  // 找。把 effect 同样下放给桌面：桌面没有触底 sentinel observer 兜底，
+  // 更需要这一层"全被过滤就自动翻页"。
   useEffect(() => {
-    if (isDesktopLayout) return;
     if (visiblePosts.length > 0) return;
     if (feedPosts.length === 0) return;
     if (blockedQuery.isPending) return;
@@ -1143,7 +1147,6 @@ const pendingLikePostId = likeMutation.isPending
     if (isFetchNextFeedPageError) return;
     void fetchNextFeedPage();
   }, [
-    isDesktopLayout,
     visiblePosts.length,
     feedPosts.length,
     blockedQuery.isPending,
@@ -1389,6 +1392,7 @@ const pendingLikePostId = likeMutation.isPending
           hasNextPage={feedQuery.hasNextPage}
           isFetchingNextPage={feedQuery.isFetchingNextPage}
           isFetchNextPageError={isFetchNextFeedPageError}
+          rawLoadedCount={feedPosts.length}
           imageDrafts={composeDraft.imageDrafts}
           isLoading={feedQuery.isLoading}
           serverTotal={

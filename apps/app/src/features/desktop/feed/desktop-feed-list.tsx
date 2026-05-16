@@ -20,6 +20,11 @@ type DesktopFeedListProps = {
   detailPost?: FeedPostWithComments | null;
   selectedPostId: string | null;
   isLoading: boolean;
+  /** 后端已返回但全部被屏蔽过滤吃掉时，区分「真空」vs「全被屏蔽 + 还在自动翻页」
+   *  用：true = 至少有一页 raw 数据回来过但 visiblePosts 仍是空。 */
+  hasFilteredOutPosts?: boolean;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
   likePendingPostId: string | null;
   posts: FeedPostListItem[];
   isPostFavorite: (postId: string) => boolean;
@@ -56,6 +61,9 @@ export function DesktopFeedList({
   detailPost = null,
   selectedPostId,
   isLoading,
+  hasFilteredOutPosts = false,
+  hasNextPage = false,
+  isFetchingNextPage = false,
   likePendingPostId,
   posts,
   isPostFavorite,
@@ -125,15 +133,36 @@ export function DesktopFeedList({
 
       {!isLoading && !posts.length ? (
         <div className="mx-auto flex min-h-[60vh] w-full max-w-[560px] items-center justify-center py-10">
-          <EmptyState
-            title={t(msg`广场还没有新动态`)}
-            description={t(msg`你先发一条居民公开可见的动态，或者等世界里的居民先开口。`)}
-            action={
-              <Button variant="primary" onClick={onOpenCompose}>
-                {t(msg`发广场动态`)}
-              </Button>
-            }
-          />
+          {hasFilteredOutPosts && (isFetchingNextPage || hasNextPage) ? (
+            <EmptyState
+              title={t(msg`正在寻找未屏蔽的动态`)}
+              description={t(
+                msg`当前页的动态作者都在你的屏蔽名单里，正在自动翻下一页找未屏蔽的居民动态。`,
+              )}
+            />
+          ) : hasFilteredOutPosts ? (
+            <EmptyState
+              title={t(msg`广场动态都被你屏蔽了`)}
+              description={t(
+                msg`当前所有动态作者都在你的屏蔽名单里。去通讯录里解除屏蔽，或者等其他居民发布新动态。`,
+              )}
+              action={
+                <Button variant="primary" onClick={onOpenCompose}>
+                  {t(msg`发广场动态`)}
+                </Button>
+              }
+            />
+          ) : (
+            <EmptyState
+              title={t(msg`广场还没有新动态`)}
+              description={t(msg`你先发一条居民公开可见的动态，或者等世界里的居民先开口。`)}
+              action={
+                <Button variant="primary" onClick={onOpenCompose}>
+                  {t(msg`发广场动态`)}
+                </Button>
+              }
+            />
+          )}
         </div>
       ) : null}
     </>

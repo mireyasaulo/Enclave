@@ -43,6 +43,9 @@ type DesktopFeedWorkspaceProps = {
   ownerAvatar?: string | null;
   ownerUsername?: string | null;
   posts: FeedPostListItem[];
+  /** 后端给的 raw 条数（含被屏蔽过滤掉的）。posts.length=0 但 rawLoadedCount>0
+   *  时区分「真空」vs「全被屏蔽 + 还在自动翻页」，用于专门的 loading 空态。 */
+  rawLoadedCount?: number;
   /** 服务端汇报的广场总数；不传或 <= posts.length 时按已加载条数显示。 */
   serverTotal?: number;
   onRequestMore?: () => void;
@@ -105,6 +108,7 @@ export function DesktopFeedWorkspace({
   ownerAvatar,
   ownerUsername,
   posts,
+  rawLoadedCount = 0,
   serverTotal,
   onRequestMore,
   onRetryNextPage,
@@ -317,6 +321,11 @@ export function DesktopFeedWorkspace({
                 detailPost={detailQuery.data ?? null}
                 selectedPostId={selectedPostId}
                 isLoading={isLoading}
+                hasFilteredOutPosts={
+                  posts.length === 0 && rawLoadedCount > 0
+                }
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
                 likePendingPostId={likePendingPostId}
                 posts={posts}
                 isPostFavorite={isPostFavorite}
