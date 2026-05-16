@@ -291,6 +291,7 @@ export function ContactsPage() {
   const t = useRuntimeTranslator();
   const pageRef = useRef<HTMLDivElement | null>(null);
   const desktopDirectoryScrollRef = useRef<HTMLDivElement | null>(null);
+  const quickMenuContainerRef = useRef<HTMLDivElement | null>(null);
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const pathname = useRouterState({
@@ -967,6 +968,31 @@ export function ContactsPage() {
     });
     return unregister;
   }, [isDesktopLayout, isQuickMenuOpen, bulkMode, exitBulkMode]);
+
+  // + 快捷菜单点空白收起：之前用 fixed inset-0 z-30 的全屏 button 接 onClick
+  // 来关菜单。问题是这块 overlay 也盖住了底部 MobileShell 的 4 个 tab，用户在
+  // 菜单展开时点 "我" 之类的底部 tab，第一下被 overlay 吃掉只关菜单、第二下
+  // 才真的导航。改用 document pointerdown 监听 + 容器 ref，菜单外侧任何位置
+  // 的点击都正常落到目标元素（tab/链接/按钮），同时也把菜单收起。
+  useEffect(() => {
+    if (isDesktopLayout || !isQuickMenuOpen) {
+      return;
+    }
+    const onPointerDown = (event: PointerEvent) => {
+      const container = quickMenuContainerRef.current;
+      if (!container) {
+        return;
+      }
+      if (event.target instanceof Node && container.contains(event.target)) {
+        return;
+      }
+      setIsQuickMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [isDesktopLayout, isQuickMenuOpen]);
 
   useEffect(() => {
     if (normalizedSearchText || !friendSections.length) {
@@ -1756,6 +1782,12 @@ export function ContactsPage() {
                       >
                         {t(msg`清空搜索`)}
                       </Button>
+                    ) : showWorldCharacters ? (
+                      // 世界角色目录已经在下面展开（且为空态时通讯录里没好友），
+                      // 这里再点「浏览世界角色」会调 handleOpenWorldCharacters，因为
+                      // 它是 toggle —— 第二次按反而把下面已展开的角色列表收起来，
+                      // 用户看着像「按下按钮内容消失了」。已经展开就别再给按钮。
+                      null
                     ) : (
                       <Button
                         variant="secondary"
@@ -2170,15 +2202,6 @@ export function ContactsPage() {
   return (
     <div ref={pageRef}>
       <AppPage className="relative min-h-full space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
-        {isQuickMenuOpen ? (
-          <button
-            type="button"
-            aria-label={t(msg`关闭快捷菜单`)}
-            onClick={() => setIsQuickMenuOpen(false)}
-            className="fixed inset-0 z-30 bg-black/[0.03]"
-          />
-        ) : null}
-
         <TabPageTopBar
           title={t(msg`通讯录`)}
           titleAlign="center"
@@ -2195,7 +2218,10 @@ export function ContactsPage() {
                 {t(msg`取消`)}
               </Button>
             ) : (
-            <div className="relative flex items-center gap-1">
+            <div
+              ref={quickMenuContainerRef}
+              className="relative flex items-center gap-1"
+            >
               <Button
                 type="button"
                 variant="ghost"
