@@ -3544,10 +3544,17 @@ function MobileChannelCommentsSheet({
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 text-[11px]">
-                    <span className="truncate font-medium text-[#111827]">
+                    {/*
+                      走查 R2（本轮）：跟评论 sheet 底部"正在回复 X" chip 同款问题。
+                      authorName 单纯 truncate 没有 min-w-0 / flex-1，flex item 默认
+                      按内容宽度伸展、不收缩，超长 authorName 会把右侧时间戳挤到
+                      comment 卡外。给名字加 min-w-0 + flex-1 让 truncate 真生效，
+                      时间戳 shrink-0 锁住宽度不被压。
+                    */}
+                    <span className="min-w-0 flex-1 truncate font-medium text-[#111827]">
                       {comment.authorName}
                     </span>
-                    <span className="text-[#9ca3af]">
+                    <span className="shrink-0 text-[#9ca3af]">
                       {formatTimestamp(comment.createdAt)}
                     </span>
                   </div>
