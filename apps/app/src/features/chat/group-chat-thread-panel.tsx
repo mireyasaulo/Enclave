@@ -63,6 +63,7 @@ import { useScrollAnchor } from "../../hooks/use-scroll-anchor";
 import { getFriendDisplayName } from "../contacts/contact-utils";
 import { formatTimestamp, parseTimestamp } from "../../lib/format";
 import { isPersistedGroupConversation } from "../../lib/conversation-route";
+import { isMissingGroupError } from "../../lib/group-route-fallback";
 import {
   joinConversationRoom,
   onChatMessage,
@@ -308,6 +309,24 @@ export function GroupChatThreadPanel({
       mergeGroupMessageWindow(current, messagesQuery.data ?? []),
     );
   }, [messagesQuery.data]);
+
+  // 群不存在时，本来 thread 页就是个死页：retry 也是同款 404，用户除了
+  // 手动 back / 重新输 URL 没出路。和姊妹子页 details / edit / announcement /
+  // background / member-picker 对齐，自动 replace 跳到 /tabs/chat（或
+  // routeContext 提供的 returnPath），不要把用户卡在 stuck error state。
+  // 桌面布局走另一条路径（直接 redirect 到 desktop workspace），不在此处。
+  useEffect(() => {
+    if (isDesktop) {
+      return;
+    }
+    if (
+      groupQuery.isLoading ||
+      !isMissingGroupError(groupQuery.error, groupId)
+    ) {
+      return;
+    }
+    void navigate({ to: "/tabs/chat", replace: true });
+  }, [groupId, groupQuery.error, groupQuery.isLoading, isDesktop, navigate]);
 
   useEffect(() => {
     if (isDesktop || !routeMobileShortcutAction) {
