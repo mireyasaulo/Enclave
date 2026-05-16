@@ -1085,7 +1085,20 @@ export function DesktopNotesWorkspace({
             <button
               type="button"
               onClick={() => setDeleteDialogOpen(true)}
-              disabled={deleteMutation.isPending}
+              // 保存 / 发送 button 都已经在对方 pending 时互相挡，删除 trigger 一直
+              // 漏了 saveMutation.isPending 这条。漏的后果：用户点完"保存"看到按钮
+              // 转 "保存中..."（saveMutation.onSuccess 里 await invalidateQueries
+              // 让 isPending 撑到 ~500ms），这中间他点"删除"→ 弹层→ 确认 删除，
+              // deleteMutation 跟 saveMutation 同时在飞向同一个 noteId：
+              //   - save 还在 await invalidate 期间，onSuccess 早就跑了 setQueryData
+              //     把 savedNote 写回 app-favorites / favorite-notes / favorite-note;
+              //   - 这之后才到 delete.onSuccess 的 setQueryData filter 出去。
+              //   - 如果 delete 先到、save 后到 → save 的 setQueryData 把被删的 note
+              //     又写回 cache，favorites 列表里"幽灵复活"一帧，等下一轮 invalidate
+              //     refetch 才彻底清掉。
+              // 跟 sendMutation 同款逻辑：保存中 disable 删除 trigger，让用户等保存
+              // 落地再决定要不要删。
+              disabled={deleteMutation.isPending || saveMutation.isPending}
               className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[13px] text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--state-danger-text)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Trash2 size={15} />
