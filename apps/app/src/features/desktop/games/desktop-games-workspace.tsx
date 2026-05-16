@@ -395,7 +395,9 @@ function DesktopGameAvatar({
     size === "md"
       ? "h-10 w-10 rounded-[10px] text-[15px]"
       : "h-8 w-8 rounded-[8px] text-[13px]";
-  const initial = [...game.name][0] ?? "?";
+  // 用 game.id 的首字符做 avatar，跟 locale 无关。早前 [...game.name][0]
+  // 在 en/ja/ko locale 也会落到中文，因为 game.name 是模块加载时算好的。
+  const initial = (game.id[0] ?? "?").toUpperCase();
   return (
     <div
       className={cn(

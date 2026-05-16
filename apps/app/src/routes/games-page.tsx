@@ -294,7 +294,22 @@ export function GamesPage() {
     launchGame(gameId);
     setSelectedGameId(gameId);
     if (gameId === "yinjie-farm") {
-      void navigate({ to: "/tabs/games/yinjie-farm" });
+      // farm 是独立路由 /tabs/games/yinjie-farm。
+      // 用 safeReturnPath（用户真正的来源）；若没有，从 /discover/games 进
+      //   farm 时 fallback 到 /tabs/discover，避免 farm → 返回 → /tabs/games
+      //   → 返回 → history.back 又跳回 farm 形成死循环。
+      const farmReturnPath =
+        safeReturnPath ??
+        (normalizedPathname === "/discover/games" ? "/tabs/discover" : undefined);
+      void navigate({
+        to: "/tabs/games/yinjie-farm",
+        search: farmReturnPath
+          ? {
+              returnPath: farmReturnPath,
+              ...(safeReturnHash ? { returnHash: safeReturnHash } : {}),
+            }
+          : undefined,
+      });
       return;
     }
     if (hasEmbeddedGame(gameId)) {
@@ -748,7 +763,10 @@ function GameAvatar({
       : size === "lg"
         ? "h-14 w-14 rounded-[14px] text-[20px]"
         : "h-[52px] w-[52px] rounded-[14px] text-[18px]";
-  const initial = [...game.name][0] ?? "?";
+  // 用 game.id 的首字符做 avatar，跟 locale 无关。早前用 [...game.name][0]
+  // 在非中文 locale 也会撞到中文（gameCenterGames 在模块加载时就把
+  // t(msg`...`) 求好值并冻住，locale 后续切换不会重译）。
+  const initial = (game.id[0] ?? "?").toUpperCase();
   return (
     <div
       className={cn(
