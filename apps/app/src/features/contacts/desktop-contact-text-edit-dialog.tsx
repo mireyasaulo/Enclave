@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { X } from "lucide-react";
-import { Button, TextField } from "@yinjie/ui";
+import { Button, ErrorBlock, TextField } from "@yinjie/ui";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
 type DesktopContactTextEditDialogProps = {
@@ -13,6 +13,10 @@ type DesktopContactTextEditDialogProps = {
   submitLabel?: ReactNode;
   closeLabel?: string;
   pending?: boolean;
+  /** 上一次 onConfirm 抛错时的提示。模板用法：把外部 mutation.error.message
+   *  传进来，弹层内部把它渲染在确认按钮上方——保存失败时弹层不关，外面 section
+   *  里的 ErrorBlock 会被弹层 backdrop 遮住，用户根本看不到失败原因。 */
+  error?: ReactNode;
   onClose: () => void;
   onConfirm: (value: string) => void;
 };
@@ -26,6 +30,7 @@ export function DesktopContactTextEditDialog({
   submitLabel,
   closeLabel,
   pending = false,
+  error = null,
   onClose,
   onConfirm,
 }: DesktopContactTextEditDialogProps) {
@@ -132,6 +137,8 @@ export function DesktopContactTextEditDialog({
             <span>{t(msg`支持留空保存`)}</span>
             <span>{t(msg`${normalizedDraft.length} 字`)}</span>
           </div>
+
+          {error ? <ErrorBlock message={error} /> : null}
 
           <div className="flex items-center justify-end gap-3">
             <Button

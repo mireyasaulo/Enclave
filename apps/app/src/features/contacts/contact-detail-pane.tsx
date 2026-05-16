@@ -483,7 +483,24 @@ export function ContactDetailPane({
           placeholder={currentEditDialog.placeholder}
           initialValue={currentEditDialog.initialValue}
           pending={updateProfileMutation.isPending}
-          onClose={() => setEditingField(null)}
+          // 走查发现：保存失败时 await mutateAsync 抛错 → setEditingField(null)
+          // 不会执行 → 弹层保持打开。下方 section 里的 ErrorBlock 被弹层
+          // backdrop 整个遮掉，用户看不到失败原因，只看到「保存」按钮恢复可点，
+          // 以为自己没点中按钮。把错误一起塞进弹层内显示，用户立刻知道哪儿挂了
+          // + 可以原地改完再点保存。
+          error={
+            updateProfileMutation.isError &&
+            updateProfileMutation.error instanceof Error
+              ? updateProfileMutation.error.message
+              : null
+          }
+          onClose={() => {
+            // 用户主动关弹层（Esc / Cancel / X / backdrop）时，把上一次失败的
+            // mutation.error 也一并清掉。否则关弹层后 section 里的 ErrorBlock 会
+            // 把错误又翻出来一次（弹层里已经看过了），需要切走再切回联系人才能消。
+            updateProfileMutation.reset();
+            setEditingField(null);
+          }}
           onConfirm={(value) => {
             void currentEditDialog.onConfirm(value);
           }}
