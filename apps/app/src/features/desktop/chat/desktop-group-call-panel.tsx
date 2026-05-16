@@ -72,6 +72,10 @@ export function DesktopGroupCallPanel({
     buildInitialJoinedMemberIds(members),
   );
 
+  // 仅在群/通话类型切换时重置全部本地状态。原来把 `members` 列进 deps，
+  // 但 members 是 useQuery 的数组：每次 refetch 都换新引用（即便数据一样），
+  // 用户点了「拉某成员下线」之后下一次 30s 轮询会把 joinedMemberIds 全部
+  // 重置回初始集，操作消失。改成只在 groupId/kind 变更时重置。
   useEffect(() => {
     setMuted(false);
     setCameraEnabled(kind === "video");
@@ -79,7 +83,21 @@ export function DesktopGroupCallPanel({
     setStartedAt(new Date().toISOString());
     setPanelOpenedReported(false);
     setJoinedMemberIds(buildInitialJoinedMemberIds(members));
-  }, [groupId, kind, members]);
+    // members 故意不进 deps：仅 groupId/kind 切换时初始化一次；后续 members
+    // refetch 不能踩用户已有的 join/leave 状态。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, kind]);
+
+  // members refetch 时只「修剪」已不存在的成员，避免引用变化但内容相同时
+  // 把用户已有的 join/leave 切换被覆盖。新成员不会自动 join——保持初始
+  // owner/user/前 3 个的启发式只在群/通话切换时生效。
+  useEffect(() => {
+    setJoinedMemberIds((current) => {
+      const memberIdSet = new Set(members.map((member) => member.memberId));
+      const next = current.filter((id) => memberIdSet.has(id));
+      return next.length === current.length ? current : next;
+    });
+  }, [members]);
 
   const activeMembers = useMemo(
     () => members.filter((member) => joinedMemberIds.includes(member.memberId)),

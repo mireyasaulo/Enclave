@@ -264,9 +264,10 @@ export function DesktopCreateGroupDialog({
       return;
     }
 
-    window.requestAnimationFrame(() => {
+    const frameId = window.requestAnimationFrame(() => {
       searchInputRef.current?.focus();
     });
+    return () => window.cancelAnimationFrame(frameId);
   }, [open]);
 
   useEffect(() => {
