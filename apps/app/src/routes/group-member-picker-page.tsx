@@ -8,6 +8,7 @@ import {
   getGroup,
   getGroupMembers,
   removeGroupMember,
+  SELF_CHARACTER_ID,
 } from "@yinjie/contracts";
 import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import { ArrowLeft, Check, Search, X } from "lucide-react";
@@ -176,9 +177,18 @@ function MobileGroupMemberPickerPage({
 
   const allCandidateItems = useMemo(() => {
     if (mode === "add") {
+      // 再次走查 Round 1：getFriends 服务端把 char-default-self（"我自己"
+      // 自我镜像）作为默认好友 intimacy=100 塞回好友列表；create-group-page
+      // 早就在 R2 注释过同样的事，过滤掉了 SELF。这里"添加群成员"漏掉，
+      // 用户能把"我自己" 作为 character member 加进去——服务端会落一条
+      // memberType=character 的成员记录，加上原来 memberType=user 的群主
+      // 就变成"你自己和你自己同时在群里"两条；后续 typing/atMe 走 character
+      // 路径也会出现"我自己 正在回复..."这种诡异提示。
       return createFriendDirectoryItems(
         (friendsQuery.data ?? []).filter(
-          (item) => !memberIds.has(item.character.id),
+          (item) =>
+            item.character.id !== SELF_CHARACTER_ID &&
+            !memberIds.has(item.character.id),
         ),
       ).map((item) => ({
         id: item.character.id,
@@ -224,9 +234,12 @@ function MobileGroupMemberPickerPage({
     }
 
     if (mode === "add") {
+      // 同上：搜索分支也得把 SELF 过掉，否则用户输入"我"还是能在搜索结果里
+      // 看到"我自己"被勾选添加进群。
       return createFriendDirectoryItems(
         (friendsQuery.data ?? []).filter(
           (item) =>
+            item.character.id !== SELF_CHARACTER_ID &&
             !memberIds.has(item.character.id) &&
             matchesFriendSearch(item, normalizedKeyword),
         ),
