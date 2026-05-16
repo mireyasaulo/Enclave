@@ -2933,6 +2933,9 @@ function MobileChannelCommentsSheet({
 }) {
   const t = useRuntimeTranslator();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const hasAutoScrolledRef = useRef(false);
+  const previousCommentCountRef = useRef(0);
   const commentAuthorNameMap = useMemo(() => {
     const map = new Map<string, string>();
     comments.forEach((comment) => {
@@ -2953,6 +2956,15 @@ function MobileChannelCommentsSheet({
     };
   }, [open]);
 
+  // Sheet 关闭时重置自动滚动 flag，下次再打开重新跑一次。previousCommentCountRef
+  // 也复位以便下次打开时不会把首次 0→N 数据到位误判成"用户刚刚发了一条评论"。
+  useEffect(() => {
+    if (!open) {
+      hasAutoScrolledRef.current = false;
+      previousCommentCountRef.current = 0;
+    }
+  }, [open]);
+
   useEffect(() => {
     if (!open) {
       return;
@@ -2962,6 +2974,42 @@ function MobileChannelCommentsSheet({
       textareaRef.current?.focus();
     });
   }, [open, replyTarget?.commentId]);
+
+  // 视频号评论按 createdAt ASC 排（最老的在最上面，回复链路顺着对话读起来才连贯），
+  // 但 yuanzui0728 这条 post 已经积了 142 条评论：用户打开评论面板第一眼看到的
+  // 是 5 天前的旧评论，要手动滑到底部才能看到刚刚的对话。WeChat 视频号 / TikTok
+  // 都是默认把视图落到「最新」位置。
+  //  - 打开 sheet 且 comments 第一次到位（hasAutoScrolledRef）→ 跳到底部
+  //  - 用户在 sheet 里发了新评论（commentCount 变大）→ 也跟着滚到底，体感对齐"发送即看到"
+  // 用 scrollTop = scrollHeight 而不是 scrollIntoView 末条，避免在 sheet 容器
+  // 之外（外层 body）产生连带滚动。
+  useEffect(() => {
+    if (!open || isLoading) {
+      return;
+    }
+    if (!comments.length) {
+      previousCommentCountRef.current = 0;
+      return;
+    }
+
+    const node = scrollContainerRef.current;
+    if (!node) return;
+
+    const previousCount = previousCommentCountRef.current;
+    const growth = comments.length > previousCount;
+    if (!hasAutoScrolledRef.current || growth) {
+      hasAutoScrolledRef.current = true;
+      previousCommentCountRef.current = comments.length;
+      // RAF 一次：确保 list 已经 layout，scrollHeight 取到稳定值
+      window.requestAnimationFrame(() => {
+        if (!scrollContainerRef.current) return;
+        scrollContainerRef.current.scrollTop =
+          scrollContainerRef.current.scrollHeight;
+      });
+    } else {
+      previousCommentCountRef.current = comments.length;
+    }
+  }, [open, comments, isLoading]);
 
   if (!open || !post) {
     return null;
@@ -3010,7 +3058,10 @@ function MobileChannelCommentsSheet({
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+        <div
+          ref={scrollContainerRef}
+          className="min-h-0 flex-1 overflow-y-auto px-4 pb-4"
+        >
           {errorMessage ? (
             <InlineNotice
               tone="warning"
