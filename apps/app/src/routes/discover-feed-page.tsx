@@ -366,53 +366,90 @@ export function DiscoverFeedPage() {
     },
     onMutate: async (postId) => {
       await queryClient.cancelQueries({ queryKey: ["app-feed-paged", baseUrl] });
-      const snapshots = queryClient.getQueriesData<
-        InfiniteData<FeedListResponse>
-      >({
-        queryKey: ["app-feed-paged", baseUrl],
-      });
-      snapshots.forEach(([key, data]) => {
-        if (!data) {
-          return;
-        }
-        queryClient.setQueryData<InfiniteData<FeedListResponse>>(key, {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.map((post) => {
-              if (post.id !== postId) return post;
-              const alreadyLiked = post.ownerState?.hasLiked ?? false;
-              return {
-                ...post,
-                likeCount: Math.max(
-                  0,
-                  post.likeCount + (alreadyLiked ? -1 : 1),
-                ),
-                ownerState: {
-                  ...(post.ownerState ?? {
-                    hasLiked: false,
-                    hasFavorited: false,
-                    isFollowingAuthor: false,
-                    isNotInterested: false,
-                    hasViewed: false,
-                    hasShared: false,
-                    lastViewedAt: null,
-                    watchProgressSeconds: null,
-                    completed: false,
-                  }),
-                  hasLiked: !alreadyLiked,
-                },
-              };
-            }),
-          })),
-        });
-      });
-      return { snapshots };
+      // 直接 setQueriesData 翻 hasLiked/likeCount，不再 capture full snapshot
+      // —— onError 用反向 toggle 回滚（见下方 onError 注释）。
+      queryClient.setQueriesData<InfiniteData<FeedListResponse>>(
+        { queryKey: ["app-feed-paged", baseUrl] },
+        (current) => {
+          if (!current) return current;
+          return {
+            ...current,
+            pages: current.pages.map((page) => ({
+              ...page,
+              posts: page.posts.map((post) => {
+                if (post.id !== postId) return post;
+                const alreadyLiked = post.ownerState?.hasLiked ?? false;
+                return {
+                  ...post,
+                  likeCount: Math.max(
+                    0,
+                    post.likeCount + (alreadyLiked ? -1 : 1),
+                  ),
+                  ownerState: {
+                    ...(post.ownerState ?? {
+                      hasLiked: false,
+                      hasFavorited: false,
+                      isFollowingAuthor: false,
+                      isNotInterested: false,
+                      hasViewed: false,
+                      hasShared: false,
+                      lastViewedAt: null,
+                      watchProgressSeconds: null,
+                      completed: false,
+                    }),
+                    hasLiked: !alreadyLiked,
+                  },
+                };
+              }),
+            })),
+          };
+        },
+      );
     },
-    onError: (_error, _postId, context) => {
-      context?.snapshots.forEach(([key, data]) => {
-        queryClient.setQueryData(key, data);
-      });
+    onError: (_error, postId) => {
+      // 之前用 full-snapshot rollback：snapshot 在本 mutation 的 onMutate 时拍，
+      // 不含其他 post 在期间产生的乐观更新。串发场景下（点 A 还在飞就点 B）
+      // B 成功 + A 失败时，A 的 onError 拿 snapshotA 一把全覆盖回去，B 的乐观
+      // 状态也跟着被冲掉。
+      // 改成"只对出错那条 post 反向 toggle"：onMutate 把 hasLiked 翻了一下，
+      // 这里再翻回去就行，不碰其他 post。
+      queryClient.setQueriesData<InfiniteData<FeedListResponse>>(
+        { queryKey: ["app-feed-paged", baseUrl] },
+        (current) => {
+          if (!current) return current;
+          return {
+            ...current,
+            pages: current.pages.map((page) => ({
+              ...page,
+              posts: page.posts.map((post) => {
+                if (post.id !== postId) return post;
+                const currentHasLiked = post.ownerState?.hasLiked ?? false;
+                return {
+                  ...post,
+                  likeCount: Math.max(
+                    0,
+                    post.likeCount + (currentHasLiked ? -1 : 1),
+                  ),
+                  ownerState: {
+                    ...(post.ownerState ?? {
+                      hasLiked: false,
+                      hasFavorited: false,
+                      isFollowingAuthor: false,
+                      isNotInterested: false,
+                      hasViewed: false,
+                      hasShared: false,
+                      lastViewedAt: null,
+                      watchProgressSeconds: null,
+                      completed: false,
+                    }),
+                    hasLiked: !currentHasLiked,
+                  },
+                };
+              }),
+            })),
+          };
+        },
+      );
     },
     onSuccess: () => {
       setNoticeTone("success");
