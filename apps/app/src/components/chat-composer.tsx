@@ -52,6 +52,7 @@ import { MobileMentionPickerSheet } from "../features/chat/mobile-mention-picker
 import { useSpeechInput } from "../features/chat/use-speech-input";
 import {
   buildFavoriteShareText,
+  computeDesktopFavoritesFingerprint,
   hydrateDesktopFavoritesFromNative,
   mergeDesktopFavoriteRecords,
   readDesktopFavorites,
@@ -1017,7 +1018,10 @@ export function ChatComposer({
           favoritesQuery.data ?? [],
           readDesktopFavorites(),
         );
-        return JSON.stringify(current) === JSON.stringify(nextRecords)
+        // 跟 favorites-page 一致：focus/visibilitychange + storage 事件触发频繁，
+        // JSON.stringify(700 项) 换成 sourceId+collectedAt 指纹。
+        return computeDesktopFavoritesFingerprint(current) ===
+          computeDesktopFavoritesFingerprint(nextRecords)
           ? current
           : nextRecords;
       });
