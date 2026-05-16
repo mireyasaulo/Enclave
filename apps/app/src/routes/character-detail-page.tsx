@@ -691,6 +691,13 @@ export function CharacterDetailPage() {
         tone: "success",
         message: blocked ? t(msg`已移出黑名单。`) : t(msg`已加入黑名单。`),
       });
+      // 走查 R3：blockCharacter 后端把 friendship.status 改成 'blocked' 且
+      // 把 isStarred 一并清掉，getFriends() 此后不再返回这条 friendship。但
+      // 这里 onSuccess 只 invalidate 黑名单相关三条 query，app-friends/
+      // app-conversations 都没动。结果：用户在好友名片上点「加入黑名单」之后页
+      // 面仍按"朋友"状态渲染（顶部"朋友信息" / 底部"发消息+音视频通话" / 星标
+      // 还亮着），要离开再进来才修。unblock 非 default 居民时友谊行被整行 remove，
+      // 同样会留下脏的 friendsQuery 缓存。一起 invalidate 进来。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-chat-details-blocked", baseUrl],
@@ -700,6 +707,12 @@ export function CharacterDetailPage() {
         }),
         queryClient.invalidateQueries({
           queryKey: ["app-chat-blocked-characters", baseUrl],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-friends", baseUrl],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-conversations", baseUrl],
         }),
       ]);
     },
