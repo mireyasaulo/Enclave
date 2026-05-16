@@ -78,6 +78,13 @@ export function ProfileInfoSignaturePage() {
   const sanitized = sanitizeOwnerSignature(draft);
   // 跟 sanitized 对齐 baseline，避免 legacy 多行 signature 一打开就 dirty=true。
   const dirty = sanitized !== sanitizeOwnerSignature(signature);
+  // 防御性 length gate：textarea maxLength=30 只挡 user input/paste，挡不住
+  // 程序设值 / legacy DB 里 >30 字符的旧数据。后者用户再编辑（dirty=true）时
+  // 「完成」会发出超长 payload 被服务端 400 拒掉，错误条挂在底部毫无头绪。
+  // 客户端 length 超限直接 disable 「完成」，counter 同步显示 sanitized.length
+  // 让用户先看到红色 overflow 数字、自己删字。
+  const overLimit = sanitized.length > SIGNATURE_MAX_LENGTH;
+  const canSave = dirty && !overLimit;
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -124,11 +131,11 @@ export function ProfileInfoSignaturePage() {
         rightActions={
           <button
             type="button"
-            disabled={!dirty || saveMutation.isPending}
+            disabled={!canSave || saveMutation.isPending}
             onClick={() => saveMutation.mutate()}
             className={cn(
               "rounded-full px-3 py-1 text-[13px] font-medium transition-colors",
-              !dirty || saveMutation.isPending
+              !canSave || saveMutation.isPending
                 ? "text-[color:var(--text-dim)]"
                 : "text-[#07c160] active:bg-black/[0.05]",
             )}
@@ -167,9 +174,9 @@ export function ProfileInfoSignaturePage() {
             }
             if (event.key === "Enter") {
               // textarea 默认 Enter 插入 \n，但单行字段不要换行。挡掉 → onChange
-              // 也不会拿到 \n。如果 dirty 且 not pending，按 Enter 直接 submit。
+              // 也不会拿到 \n。如果 canSave 且 not pending，按 Enter 直接 submit。
               event.preventDefault();
-              if (dirty && !saveMutation.isPending) {
+              if (canSave && !saveMutation.isPending) {
                 saveMutation.mutate();
               }
             }
@@ -184,7 +191,14 @@ export function ProfileInfoSignaturePage() {
           className="min-h-[5.5rem] resize-none rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] leading-6 shadow-none focus:translate-y-0 disabled:bg-[color:var(--bg-canvas)] disabled:text-[color:var(--text-muted)]"
         />
         <div
-          className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]"
+          className={cn(
+            "mt-1.5 text-right text-[11px]",
+            // overLimit 时 counter 染红 → 跟 disabled「完成」按钮一起给用户两个
+            // 视觉信号：知道「为什么不让我保存」。
+            overLimit
+              ? "text-[color:var(--state-danger-text)]"
+              : "text-[color:var(--text-dim)]",
+          )}
           data-i18n-skip="true"
         >
           {/* 显示 sanitized.length 而非 draft.length——用户粘了 "line1\n\nline2"

@@ -82,7 +82,13 @@ export function ProfileInfoNamePage() {
   const sanitized = sanitizeOwnerName(draft);
   const baselineUsername = sanitizeOwnerName(username ?? "");
   const dirty = sanitized !== baselineUsername;
-  const canSave = sanitized.length >= NAME_MIN_LENGTH && dirty;
+  // input maxLength=20 只挡 user input/paste，挡不住 legacy DB 里 >20 字符的
+  // 旧 username（之前几版没卡上限）。这种用户编辑（dirty=true）时点「完成」
+  // 会发出超长 payload 被服务端 400 拒掉。客户端 length 超限直接 disable，
+  // 跟「至少 2 字符」同语义放在 canSave 里。
+  const overLimit = sanitized.length > NAME_MAX_LENGTH;
+  const canSave =
+    sanitized.length >= NAME_MIN_LENGTH && !overLimit && dirty;
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -187,7 +193,16 @@ export function ProfileInfoNamePage() {
           //   见 profile-info-avatar-page 同款修法（commit 5fe4e7e3）。
           className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] shadow-none focus:translate-y-0 disabled:bg-[color:var(--bg-canvas)] disabled:text-[color:var(--text-muted)]"
         />
-        <div className="mt-1.5 text-right text-[11px] text-[color:var(--text-dim)]" data-i18n-skip="true">
+        <div
+          className={cn(
+            "mt-1.5 text-right text-[11px]",
+            // overLimit 时 counter 染红，让用户跟「完成」灰按钮对上原因。
+            overLimit
+              ? "text-[color:var(--state-danger-text)]"
+              : "text-[color:var(--text-dim)]",
+          )}
+          data-i18n-skip="true"
+        >
           {sanitized.length}/{NAME_MAX_LENGTH}
         </div>
       </div>
