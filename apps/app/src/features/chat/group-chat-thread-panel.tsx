@@ -1376,8 +1376,10 @@ export function GroupChatThreadPanel({
         ) : (
           <div
             ref={scrollAnchorRef}
+            // overscroll-contain：移动端聊天滚到边继续拖时不冒泡给外层 shell，
+            // 避免在 iOS Safari 上误触发顶部导航条收放 / 系统手势抢焦。
             className={`relative flex h-full flex-col overflow-auto ${
-              isDesktop ? "px-7 py-5" : "px-3 py-3.5"
+              isDesktop ? "px-7 py-5" : "overscroll-contain px-3 py-3.5"
             }`}
             onScrollCapture={handleDismissRouteContextNotice}
           >

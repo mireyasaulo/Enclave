@@ -673,7 +673,10 @@ export function ConversationThreadPanel({
             className={
               isDesktop
                 ? "relative flex h-full flex-col space-y-4 overflow-auto px-7 py-5"
-                : "relative flex h-full flex-col overflow-auto px-3 py-3.5"
+                : // overscroll-contain：web 移动端 iOS Safari 在聊天滚动到顶/
+                  // 底继续拖时不再把滚动冒泡给外层 mobile-shell viewport pane，
+                  // 避免误触发"页面整体下拽 / 顶部导航条收放"的浏览器手势。
+                  "relative flex h-full flex-col overflow-auto overscroll-contain px-3 py-3.5"
             }
             onScrollCapture={handleDismissRouteContextNotice}
           >
