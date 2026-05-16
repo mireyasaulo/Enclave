@@ -559,14 +559,21 @@ export function ChatMessageList({
     }
 
     const closeMenu = () => setContextMenuState(null);
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    };
     window.addEventListener("pointerdown", closeMenu);
     window.addEventListener("resize", closeMenu);
     window.addEventListener("scroll", closeMenu, true);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("pointerdown", closeMenu);
       window.removeEventListener("resize", closeMenu);
       window.removeEventListener("scroll", closeMenu, true);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [contextMenuState]);
 
