@@ -219,6 +219,16 @@ function MobileAddFriend() {
       // null（被拉黑 / 权限受限时后端会返回空），漏 null 守护会让
       // navigate 取 .id 时 throw。
       if (!conversation) {
+        // 静默 return 会让按钮从「打开中...」直接闪回「发消息」，用户看不到
+        // 任何反馈，以为「点了没反应」会再点一次。给一条 info 提示告诉用户
+        // 当前打不开的可能原因（多半是对方刚被拉黑 / 权限变了），避免无脑
+        // 重试。
+        setNotice({
+          tone: "info",
+          message: t(
+            msg`暂时无法打开会话，对方可能已被屏蔽或权限受限，稍后再试。`,
+          ),
+        });
         return;
       }
       void navigate({

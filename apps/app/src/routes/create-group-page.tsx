@@ -214,6 +214,26 @@ export function CreateGroupPage() {
     sortedFriendItems.length,
   ]);
 
+  // 走查 R1：friendsQuery staleTime=15s 期间用户在另一 tab / 另一设备删了某个
+  // 好友 → 后台 refetch 进来后 friendship.status='removed' 被 friendItems filter
+  // 掉，selectedFriendMap 也丢掉这条；但 selectedIds 仍然攒着这个 stale id ——
+  // 横滚「已选联系人」里看不到（selectedFriends 已经按 selectedFriendMap.get
+  // 过滤），点「确定」时 createGroup 的 memberIds 里仍带它，后端要么静默剔除
+  // 要么 400，用户在 UI 上无任何方式取消这个隐形选择。selectedFriendMap 一旦
+  // 重建就 reconcile：丢掉 map 里不再存在的 id。friendsQuery.data 还没回来时
+  // (initial null) 不动 selectedIds，免得把 seed/已选当 stale 一刀切。
+  useEffect(() => {
+    if (!friendsQuery.data) {
+      return;
+    }
+    setSelectedIds((current) => {
+      if (current.every((id) => selectedFriendMap.has(id))) {
+        return current;
+      }
+      return current.filter((id) => selectedFriendMap.has(id));
+    });
+  }, [friendsQuery.data, selectedFriendMap]);
+
   const filteredFriends = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
     if (!keyword) {

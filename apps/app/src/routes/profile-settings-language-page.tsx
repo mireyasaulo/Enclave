@@ -55,6 +55,11 @@ export function ProfileSettingsLanguagePage() {
       />
 
       <div
+        // 跟 profile-settings-page 桌面端 tab/legal radiogroup（line 449/621）
+        // 对齐：移动端这条 list 也是单选语义，加 role=radiogroup + aria-label，
+        // SR/键盘用户才能感知到「这是单选」而不是一组独立 button。
+        role="radiogroup"
+        aria-label={t(msg`界面语言`)}
         data-i18n-skip="true"
         className={cn(
           "mt-1 divide-y divide-[color:var(--border-faint)] border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]",
@@ -67,6 +72,8 @@ export function ProfileSettingsLanguagePage() {
             <button
               key={locale}
               type="button"
+              role="radio"
+              aria-checked={selected}
               onClick={() => setLocale(locale)}
               className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] active:bg-black/[0.04]"
             >

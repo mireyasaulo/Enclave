@@ -295,13 +295,13 @@ export function AccountSecurityPanel() {
       </form>
 
       {feedback ? (
-        // role=status + aria-live=polite 让屏幕阅读器在 feedback 变化时朗读
-        // 「验证码已发送...」「修改密码失败...」之类的状态；之前 InlineNotice 是
-        // 裸 div，盲用键盘用户只能看到 disabled 状态切换没有上下文。
+        // 让屏幕阅读器在 feedback 变化时朗读「验证码已发送...」「修改密码失败...」
+        // 等状态。danger 用 role=alert（隐含 aria-live=assertive，立即打断当前朗读），
+        // success/info 用 role=status（隐含 polite，待空隙）。之前 InlineNotice 是
+        // 裸 div，盲用/键盘用户只能从 disabled 状态推断结果，没有上下文。
         <InlineNotice
           tone={feedback.tone}
-          role="status"
-          aria-live={feedback.tone === "danger" ? "assertive" : "polite"}
+          role={feedback.tone === "danger" ? "alert" : "status"}
         >
           {feedback.message}
         </InlineNotice>

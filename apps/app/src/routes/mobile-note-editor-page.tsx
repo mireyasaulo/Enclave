@@ -682,59 +682,77 @@ function MobileNoteEditor({
 
     try {
       const createdAssets: FavoriteNoteAsset[] = [];
+      const failedFiles: string[] = [];
 
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const result = await uploadChatAttachment(formData, baseUrl);
-        const attachment = result.attachment;
-        const assetId =
-          typeof crypto !== "undefined" &&
-          typeof crypto.randomUUID === "function"
-            ? crypto.randomUUID()
-            : `${attachment.kind}-${Date.now()}`;
+      // 走查 R1：原来 upload loop 是「整体 try - 任一 await 抛就 break loop +
+      // 跳到 outer catch」—— 假设 3 个文件传第 2 个挂了：第 1 个的 <img> 已经
+      // 用 document.execCommand 插进了 editor DOM，但 outer catch 直接跳过下面
+      // 「mergeNoteAssets → setEditorState」一段，editorState.assets 里没有第 1
+      // 个的 asset record。结果 editor DOM 有 <img data-note-asset-id="xxx">
+      // 但 editorState.assets 没 xxx 这条 → filterAssetsByHtml 后续把这条孤儿
+      // 图当 stale 清掉，下次 syncEditorStateFromDom 又把 DOM 里这张图保留但
+      // assets 缺失 —— 保存到 server 时 attachment 数据缺一半。改成 per-file
+      // try/catch，单个失败不影响其它已成功 upload 的 state 提交；外层只兜底
+      // 兜不到的硬异常（DOM 操作之类）。
+      // 同时把 fallback assetId 的 `${kind}-${Date.now()}` 改成带 index，免得
+      // 同一毫秒上传两张图碰到 randomUUID 不可用的老浏览器走 fallback 时拿到
+      // 同一个 id。
+      for (const [index, file] of files.entries()) {
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+          const result = await uploadChatAttachment(formData, baseUrl);
+          const attachment = result.attachment;
+          const assetId =
+            typeof crypto !== "undefined" &&
+            typeof crypto.randomUUID === "function"
+              ? crypto.randomUUID()
+              : `${attachment.kind}-${Date.now()}-${index}`;
 
-        if (attachment.kind === "image") {
-          createdAssets.push({
-            id: assetId,
-            kind: "image",
-            fileName: attachment.fileName,
-            url: attachment.url,
-            mimeType: attachment.mimeType,
-            sizeBytes: attachment.size,
-            width: attachment.width,
-            height: attachment.height,
-          });
-          focusEditorAtEnd();
-          document.execCommand(
-            "insertHTML",
-            false,
-            `<p><img data-note-image="true" data-note-asset-id="${assetId}" src="${escapeHtmlAttribute(
-              attachment.url,
-            )}" alt="${escapeHtmlAttribute(attachment.fileName)}" /></p><p><br></p>`,
-          );
-          continue;
-        }
+          if (attachment.kind === "image") {
+            createdAssets.push({
+              id: assetId,
+              kind: "image",
+              fileName: attachment.fileName,
+              url: attachment.url,
+              mimeType: attachment.mimeType,
+              sizeBytes: attachment.size,
+              width: attachment.width,
+              height: attachment.height,
+            });
+            focusEditorAtEnd();
+            document.execCommand(
+              "insertHTML",
+              false,
+              `<p><img data-note-image="true" data-note-asset-id="${assetId}" src="${escapeHtmlAttribute(
+                attachment.url,
+              )}" alt="${escapeHtmlAttribute(attachment.fileName)}" /></p><p><br></p>`,
+            );
+            continue;
+          }
 
-        if (attachment.kind === "file") {
-          createdAssets.push({
-            id: assetId,
-            kind: "file",
-            fileName: attachment.fileName,
-            url: attachment.url,
-            mimeType: attachment.mimeType,
-            sizeBytes: attachment.size,
-          });
-          focusEditorAtEnd();
-          document.execCommand(
-            "insertHTML",
-            false,
-            `<p><a data-note-file="true" data-note-asset-id="${assetId}" href="${escapeHtmlAttribute(
-              attachment.url,
-            )}" target="_blank" rel="noreferrer">📎 ${escapeHtml(
-              attachment.fileName,
-            )}</a></p><p><br></p>`,
-          );
+          if (attachment.kind === "file") {
+            createdAssets.push({
+              id: assetId,
+              kind: "file",
+              fileName: attachment.fileName,
+              url: attachment.url,
+              mimeType: attachment.mimeType,
+              sizeBytes: attachment.size,
+            });
+            focusEditorAtEnd();
+            document.execCommand(
+              "insertHTML",
+              false,
+              `<p><a data-note-file="true" data-note-asset-id="${assetId}" href="${escapeHtmlAttribute(
+                attachment.url,
+              )}" target="_blank" rel="noreferrer">📎 ${escapeHtml(
+                attachment.fileName,
+              )}</a></p><p><br></p>`,
+            );
+          }
+        } catch {
+          failedFiles.push(file.name || `#${index + 1}`);
         }
       }
 
@@ -749,11 +767,29 @@ function MobileNoteEditor({
         tags: editorState.tags,
         assets: filterAssetsByHtml(nextHtml, nextAssets),
       });
-      setNotice({
-        tone: "success",
-        message: t(msg`附件已插入到笔记。`),
-      });
+
+      if (failedFiles.length === 0) {
+        setNotice({
+          tone: "success",
+          message: t(msg`附件已插入到笔记。`),
+        });
+      } else if (createdAssets.length === 0) {
+        setNotice({
+          tone: "danger",
+          message: t(msg`附件上传失败：${failedFiles.join("、")}`),
+        });
+      } else {
+        setNotice({
+          tone: "danger",
+          message: t(
+            msg`已插入 ${createdAssets.length} 个附件，${failedFiles.length} 个失败：${failedFiles.join("、")}`,
+          ),
+        });
+      }
     } catch (error) {
+      // outer catch 兜底「state 同步本身抛」的极少数硬异常（DOM 操作崩、
+      // editorRef 突然不在等），网络/单文件失败上面 per-file try/catch 已经
+      // 在 failedFiles 里记账并 notice 过了。
       setNotice({
         tone: "danger",
         message:
