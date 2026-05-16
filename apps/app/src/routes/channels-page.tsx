@@ -40,6 +40,7 @@ import {
   replyFeedComment,
   unfavoriteFeedPost,
   unfollowChannelAuthor,
+  unlikeFeedPost,
   viewFeedPost,
   type FeedChannelHomeResponse,
   type FeedChannelHomeSection,
@@ -171,9 +172,15 @@ export function ChannelsPage() {
     [commentsPreviewByPostId],
   );
 
+  // 点赞改成 toggle：原来只 POST /like、不调 DELETE，但 aria-label 和
+  // 实心 ThumbsUp 都暗示用户可以"取消点赞"。后端早就支持 unlike，UI 没接。
+  // 现在 input 带 hasLiked，按需走 like / unlike，optimistic 也按 toggle 翻。
   const likeMutation = useMutation({
-    mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
-    onMutate: async (postId) => {
+    mutationFn: (input: { postId: string; hasLiked: boolean }) =>
+      input.hasLiked
+        ? unlikeFeedPost(input.postId, baseUrl)
+        : likeFeedPost(input.postId, baseUrl),
+    onMutate: async (input) => {
       await queryClient.cancelQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
@@ -187,10 +194,12 @@ export function ChannelsPage() {
         queryClient.setQueryData<FeedChannelHomeResponse>(key, {
           ...data,
           posts: data.posts.map((post) =>
-            post.id === postId && !post.ownerState?.hasLiked
+            post.id === input.postId
               ? {
                   ...post,
-                  likeCount: post.likeCount + 1,
+                  likeCount: input.hasLiked
+                    ? Math.max(0, post.likeCount - 1)
+                    : post.likeCount + 1,
                   ownerState: {
                     ...(post.ownerState ?? {
                       hasLiked: false,
@@ -203,7 +212,7 @@ export function ChannelsPage() {
                       watchProgressSeconds: null,
                       completed: false,
                     }),
-                    hasLiked: true,
+                    hasLiked: !input.hasLiked,
                   },
                 }
               : post,
@@ -212,10 +221,20 @@ export function ChannelsPage() {
       });
       return { snapshots };
     },
-    onError: (_error, _postId, context) => {
+    onError: (error, _postId, context) => {
       context?.snapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
+      // 失败时给一行 info 通知；不要把单条点赞失败升级成"视频号暂时不可用"
+      // 大状态卡——home 列表其实还能用。
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(
+        error instanceof Error
+          ? t(msg`点赞失败：${error.message}`)
+          : t(msg`点赞失败，请稍后重试。`),
+      );
     },
     onSuccess: () => {
       setNoticeTone("success");
@@ -373,10 +392,18 @@ export function ChannelsPage() {
       });
       return { snapshots };
     },
-    onError: (_error, _input, context) => {
+    onError: (error, _input, context) => {
       context?.snapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(
+        error instanceof Error
+          ? t(msg`收藏失败：${error.message}`)
+          : t(msg`收藏失败，请稍后重试。`),
+      );
     },
     onSuccess: async (_, input) => {
       setNoticeTone("success");
@@ -437,10 +464,18 @@ export function ChannelsPage() {
       });
       return { snapshots };
     },
-    onError: (_error, _input, context) => {
+    onError: (error, _input, context) => {
       context?.snapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(
+        error instanceof Error
+          ? t(msg`关注失败：${error.message}`)
+          : t(msg`关注失败，请稍后重试。`),
+      );
     },
     onSuccess: async (_, input) => {
       setNoticeTone("success");
@@ -462,6 +497,16 @@ export function ChannelsPage() {
   });
   const notInterestedMutation = useMutation({
     mutationFn: (postId: string) => markFeedPostNotInterested(postId, baseUrl),
+    onError: (error) => {
+      setNoticeTone("info");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(
+        error instanceof Error
+          ? t(msg`减少推荐失败：${error.message}`)
+          : t(msg`减少推荐失败，请稍后重试。`),
+      );
+    },
     onSuccess: async () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
@@ -605,33 +650,21 @@ export function ChannelsPage() {
       ],
     [decorationsQuery.data?.sections, channelsQuery.data?.sections, t],
   );
+  // 只把"拉首屏数据"和"按 URL 定位帖"这两种"读"失败放进 errorMessage——
+  // 这才是真正的 "视频号暂时不可用"。点赞 / 收藏 / 关注 / 减少推荐 / 评论
+  // 这些点操作失败时整个 home 还能用，不应该让大状态卡盖住推荐流；它们的
+  // 错误通过下方 setNotice 给一行轻量提示就好。
+  // commentMutation 在评论面板里另有 inlineNotice 兜底，桌面端 errorMessage
+  // 还会把 commentPanel 错单独拎出，这里也不重复进。
+  // generateMutation 一直就显式排除——它失败 home 仍然能用。
   const errorMessage =
     (channelsQuery.isError && channelsQuery.error instanceof Error
       ? channelsQuery.error.message
       : null) ??
-    (likeMutation.isError && likeMutation.error instanceof Error
-      ? likeMutation.error.message
-      : null) ??
-    (favoriteMutation.isError && favoriteMutation.error instanceof Error
-      ? favoriteMutation.error.message
-      : null) ??
-    (followMutation.isError && followMutation.error instanceof Error
-      ? followMutation.error.message
-      : null) ??
-    (notInterestedMutation.isError &&
-    notInterestedMutation.error instanceof Error
-      ? notInterestedMutation.error.message
-      : null) ??
-    // 注意：generateMutation.isError 不要进这里——它会让"视频号暂时不可用"
-    // 大状态卡冒出来盖住下面的推荐流（home 数据其实拉到了）。换一批
-    // 自己的失败已经在 generateMutation.onError 里走 setNotice 轻量提示。
     (desktopMissingRoutePostId &&
     desktopMissingRoutePostQuery.isError &&
     desktopMissingRoutePostQuery.error instanceof Error
       ? desktopMissingRoutePostQuery.error.message
-      : null) ??
-    (commentMutation.isError && commentMutation.error instanceof Error
-      ? commentMutation.error.message
       : null);
   const mobileCommentSheetErrorMessage =
     (mobileCommentsQuery.isError && mobileCommentsQuery.error instanceof Error
@@ -692,7 +725,7 @@ export function ChannelsPage() {
       ? commentMutation.error.message
       : null);
   const pendingLikePostId = likeMutation.isPending
-    ? likeMutation.variables
+    ? (likeMutation.variables?.postId ?? null)
     : null;
   const pendingCommentPostId = commentMutation.isPending
     ? (commentMutation.variables?.postId ?? null)
@@ -748,9 +781,15 @@ export function ChannelsPage() {
       return;
     }
 
-    // 关注 tab 空态：用户没关注任何作者，"换一批" 没意义（生成不会
-    // 自动产生关注），改成切回推荐 tab 让用户去那边点 +关注。
-    if (activeSection === "following") {
+    // 这些 tab 的空态点"去推荐看看"才有意义——generateChannelPost 走
+    // characters.findAllVisibleToOwner 随机一位 feedFrequency>0 的角色，
+    // 既不保证落到通讯录里的朋友（friends tab）、也不会生成直播（live tab）、
+    // 当然也不会自动产生关注（following tab）。统一切回推荐。
+    if (
+      activeSection === "following" ||
+      activeSection === "friends" ||
+      activeSection === "live"
+    ) {
       handleSectionChange("recommended");
       return;
     }
@@ -918,9 +957,13 @@ export function ChannelsPage() {
   // 视频号转发：点击转发按钮 → 弹好友选择器 → 用户选完调
   // forwardFeedPostToChat（在 ChannelsForwardPicker 内部完成）。
   function handleSharePost(post: (typeof visiblePosts)[number]) {
+    // 卡片正文那边都用 stripToolCallSyntax 过滤了 <tool_call> / <bracket> 残留；
+    // 转发面板顶部的摘要也要过一遍，不然某些 AI 生成贴的原文里夹的工具调用语法
+    // 会原样塞进转发预览，看着像乱码。
+    const cleanText = stripToolCallSyntax(post.text ?? "");
     setForwardPickerPost({
       id: post.id,
-      excerpt: `${post.authorName}：${post.text ?? ""}`.slice(0, 80),
+      excerpt: `${post.authorName}：${cleanText}`.slice(0, 80),
     });
   }
 
@@ -1132,7 +1175,11 @@ export function ChannelsPage() {
           }
           onLike={(postId) => {
             if (!ensureCommentPostCanInteract(postId)) return;
-            likeMutation.mutate(postId);
+            const post = desktopWorkspacePosts.find((p) => p.id === postId);
+            likeMutation.mutate({
+              postId,
+              hasLiked: Boolean(post?.ownerState?.hasLiked),
+            });
           }}
           onRefresh={() => generateMutation.mutate()}
           refreshPending={generateMutation.isPending}
@@ -1349,13 +1396,15 @@ export function ChannelsPage() {
                 size="sm"
                 className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
                 disabled={
-                  activeSection !== "following" && generateMutation.isPending
+                  activeSection === "recommended" && generateMutation.isPending
                 }
                 onClick={handleEmptyStateAction}
               >
                 {safeReturnPath
                   ? t(msg`返回上一页`)
-                  : activeSection === "following"
+                  : activeSection === "following" ||
+                      activeSection === "friends" ||
+                      activeSection === "live"
                     ? t(msg`去推荐看看`)
                     : generateMutation.isPending
                       ? t(msg`生成中...`)
@@ -1373,7 +1422,11 @@ export function ChannelsPage() {
             routeSelectedPostId={routeSelectedPostId}
             onLike={(postId) => {
               if (!ensureCommentPostCanInteract(postId)) return;
-              likeMutation.mutate(postId);
+              const post = visiblePosts.find((p) => p.id === postId);
+              likeMutation.mutate({
+                postId,
+                hasLiked: Boolean(post?.ownerState?.hasLiked),
+              });
             }}
             onOpenAuthor={(post) =>
               openChannelAuthor(post.authorId, { sourcePostId: post.id })
@@ -1508,6 +1561,32 @@ function MobileChannelMediaSurface({
       <ChannelVideoSurface
         videoUrl={rawVideoUrl}
         posterUrl={rawPosterUrl}
+        active={active}
+        userUnmuted={userUnmuted}
+        onUnlock={onUnlock}
+      />
+    );
+  }
+
+  // 图集帖：mediaType=image 后端确实在 inferFeedMediaType 里会返回。
+  // 之前直接走兜底"暂无可播放内容"黑屏；现在复用 audio 的 pictorial 视图
+  // 走多图滑动，关掉音频。封面优先用 post.coverUrl，其次第一张 image。
+  const imageAssets = (post.media ?? []).filter(
+    (asset): asset is Extract<typeof asset, { kind: "image" }> =>
+      asset.kind === "image",
+  );
+  if (
+    post.mediaType === "image" &&
+    (imageAssets.length > 0 || post.coverUrl || post.mediaUrl)
+  ) {
+    const fallbackPoster =
+      post.coverUrl ?? imageAssets[0]?.url ?? post.mediaUrl ?? null;
+    return (
+      <ChannelAudioPictorial
+        title={post.title ?? post.authorName}
+        audioUrl=""
+        images={imageAssets.map((asset) => asset.url)}
+        fallbackPosterUrl={fallbackPoster}
         active={active}
         userUnmuted={userUnmuted}
         onUnlock={onUnlock}
@@ -1854,8 +1933,9 @@ function ChannelAudioPictorial({
         </>
       ) : null}
 
-      {/* 暂停状态指示：居中大 Play 图标 */}
-      {active && userUnmuted && !isPlaying ? (
+      {/* 暂停状态指示：居中大 Play 图标。
+          图集帖（audioUrl=""）没有播放/暂停语义，否则用户点一下解除静音后就一直挂着 Play 图标。 */}
+      {audioUrl && active && userUnmuted && !isPlaying ? (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
           <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-black/45 backdrop-blur-sm">
             <Play size={32} className="text-white" fill="white" />
@@ -1897,7 +1977,10 @@ function ChannelAudioPictorial({
         className="hidden"
       />
 
-      <MediaProgressBar mediaRef={audioRef} active={active} />
+      {/* 图集帖（audioUrl="") 没东西可 seek，进度条会一直停在 0% 又占点击区——直接不渲染。 */}
+      {audioUrl ? (
+        <MediaProgressBar mediaRef={audioRef} active={active} />
+      ) : null}
     </div>
   );
 }
@@ -2153,28 +2236,58 @@ function MobileChannelsViewport({
     }
   };
 
+  // 进入页面时按 URL 的 #postId 把指定卡滚到顶部一次。
+  // 不要把 posts 当 deps：home 一刷新（点赞 invalidate / generate / decorations）
+  // posts 数组身份就变，这个 effect 会重跑 scrollIntoView，把用户从他正在看的位置
+  // 拽回 routeSelectedPostId。只在 routeSelectedPostId 变化时滚一次。
+  // 注意：refs 可能还没注册——卡片首次挂载晚于这个 effect。轮询 RAF 直到找到
+  // 节点或 routeSelectedPostId 变了为止。
+  const scrolledRouteIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (!routeSelectedPostId) {
+      scrolledRouteIdRef.current = null;
+      return;
+    }
+    if (scrolledRouteIdRef.current === routeSelectedPostId) {
       return;
     }
 
-    const targetNode = cardRefs.current.get(routeSelectedPostId);
-    if (!targetNode) {
-      return;
-    }
+    let cancelled = false;
+    let attempts = 0;
+    const tryScroll = () => {
+      if (cancelled) return;
+      const targetNode = cardRefs.current.get(routeSelectedPostId);
+      if (targetNode) {
+        targetNode.scrollIntoView({ behavior: "smooth", block: "start" });
+        setActivePostId(routeSelectedPostId);
+        scrolledRouteIdRef.current = routeSelectedPostId;
+        return;
+      }
+      attempts += 1;
+      // ~20 帧（≈330ms）兜底，避开"卡片还没挂载"的渲染窗
+      if (attempts < 20) {
+        window.requestAnimationFrame(tryScroll);
+      }
+    };
+    window.requestAnimationFrame(tryScroll);
+    return () => {
+      cancelled = true;
+    };
+  }, [routeSelectedPostId]);
 
-    window.requestAnimationFrame(() => {
-      targetNode.scrollIntoView({ behavior: "smooth", block: "start" });
-      setActivePostId(routeSelectedPostId);
-    });
-  }, [routeSelectedPostId, posts]);
-
+  // 视频号是 snap-y 短视频流，用户经常一甩划过 5-10 张卡。原来 activePostId
+  // 一变就立刻 POST /feed/:id/view，背后会做 owner-interaction findOneBy + 落库
+  // + （首次）viewCount/watchCount 自增，rapid swipe 时实测一秒能打掉 6-8 次没人
+  // 真在看的"观看"。加 600ms 防抖：用户在某条上停留够久才算 view，扫过的卡不发。
   useEffect(() => {
     if (!activePostId) {
       return;
     }
-
-    onVisiblePost(activePostId);
+    const postId = activePostId;
+    const timer = window.setTimeout(() => {
+      onVisiblePost(postId);
+    }, 600);
+    return () => window.clearTimeout(timer);
   }, [activePostId, onVisiblePost]);
 
   return (
