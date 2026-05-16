@@ -105,8 +105,19 @@ public class YinjieMobileBridgePlugin extends Plugin {
         String text = normalize(call.getString("text"));
         String url = normalize(call.getString("url"));
 
+        // title 不能只塞 EXTRA_SUBJECT：那条只有邮件 app 会读，微信 / WhatsApp /
+        // Line / Telegram 这些聊天 app 全部忽略 EXTRA_SUBJECT 只看 EXTRA_TEXT，
+        // title 会被静默丢掉。iOS 壳那边把 title 作为 activityItem 一起喂进去，
+        // 渲染到分享内容里。Android 同步把 title 拼到 EXTRA_TEXT 头部，保证
+        // 聊天 app 拿到的内容跟 iOS 一致。
         StringBuilder payload = new StringBuilder();
+        if (title != null) {
+            payload.append(title);
+        }
         if (text != null) {
+            if (payload.length() > 0) {
+                payload.append("\n");
+            }
             payload.append(text);
         }
         if (url != null) {
@@ -125,6 +136,7 @@ public class YinjieMobileBridgePlugin extends Plugin {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, payload.toString());
         if (title != null) {
+            // 邮件 app 仍然走 EXTRA_SUBJECT 拿主题，不影响聊天 app。
             shareIntent.putExtra(Intent.EXTRA_SUBJECT, title);
         }
 
