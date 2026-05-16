@@ -539,7 +539,48 @@ function MobileChatListPage() {
         : action === "read"
           ? markConversationRead(conversationId, baseUrl)
           : markConversationUnread(conversationId, baseUrl),
-    onError: (error, variables) => {
+    // 标已读是日常超高频动作，公网隧道 RTT ~600ms 期间未读 badge 不消失，
+    // 用户会以为点击没生效（pin/mute 已经做了 optimistic，这里没做留了一个
+    // 一致性缺口）。优先 patch "read"→ unreadCount=0 + lastReadAt=now；
+    // "unread" 因为服务端语义（重置到上一条消息前）不好本地纯计算，先不动。
+    onMutate: async (variables) => {
+      if (variables.action !== "read") {
+        return undefined;
+      }
+      const now = new Date().toISOString();
+      let previousUnreadCount: number | undefined;
+      let previousLastReadAt: string | null | undefined;
+      const cached = queryClient.getQueriesData<ConversationListItem[]>({
+        queryKey: ["app-conversations", baseUrl],
+      });
+      for (const [, data] of cached) {
+        if (!data) continue;
+        const found = data.find((item) => item.id === variables.conversationId);
+        if (found) {
+          previousUnreadCount = found.unreadCount;
+          previousLastReadAt = found.lastReadAt ?? null;
+          break;
+        }
+      }
+      await patchConversationCache(variables.conversationId, (item) => ({
+        ...item,
+        unreadCount: 0,
+        lastReadAt: now,
+      }));
+      return { previousUnreadCount, previousLastReadAt };
+    },
+    onError: (error, variables, context) => {
+      if (
+        variables.action === "read" &&
+        context &&
+        context.previousUnreadCount !== undefined
+      ) {
+        void patchConversationCache(variables.conversationId, (item) => ({
+          ...item,
+          unreadCount: context.previousUnreadCount!,
+          lastReadAt: context.previousLastReadAt ?? undefined,
+        }));
+      }
       setNoticeError(
         error instanceof Error && error.message
           ? error.message
