@@ -848,7 +848,21 @@ export function DesktopNotesWorkspace({
     // 走 push 会把编辑器 URL 留在 history 里，浏览器 back → 又回到编辑器 → 再 push → 死循环。
     navigateBackOrFallback(
       () => {
-        void navigate({ to: fallbackPath, replace: true });
+        // returnTo 可能带 hash（openInlineNoteEditor 把当前 URL 整段塞过来：
+        // "/tabs/favorites#category=notes&sourceId=X"）。TanStack navigate 的
+        // `to` 只接受 pathname，把 # 后那一段一起塞进去会被 URL-encode 成
+        // %23category%3Dnotes... 真去访问 /tabs/favorites%23... 是 404，
+        // 用户从深链开的编辑器点返回就掉到错误页。拆 hash 单独喂。
+        const hashIndex = fallbackPath.indexOf("#");
+        if (hashIndex < 0) {
+          void navigate({ to: fallbackPath, replace: true });
+          return;
+        }
+        void navigate({
+          to: fallbackPath.slice(0, hashIndex),
+          hash: fallbackPath.slice(hashIndex + 1),
+          replace: true,
+        });
       },
       fallbackPath,
     );
