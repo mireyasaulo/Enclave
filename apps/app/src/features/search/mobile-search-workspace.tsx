@@ -149,21 +149,30 @@ export function MobileSearchWorkspace({
   // chip 行不主动滚动，活动 chip 经常在右侧屏外，用户点完看不到 active chip，
   // 以为没生效。activeCategory 变化时把当前 active chip 滚到可视区，只滚 chip
   // 行自己（横向），不滚外层页面（纵向）。
+  //
+  // 用 getBoundingClientRect 拿屏幕坐标差：之前用 chip.offsetLeft 直接对比
+  // container.scrollLeft，但 chip 的 offsetParent 是外层 sticky 顶栏（chipsRef
+  // 容器没设 position:relative，offsetLeft 会回溯到下一个 positioned 祖先），
+  // 实际拿到的是包含 sticky 顶栏 px-4 padding 的偏移量；和 container.scrollLeft
+  // 不在同一原点，靠右的 chip 会被多 scroll 16+8px，靠左 chip 永远判不到"超出
+  // 左边"分支。
   useEffect(() => {
     const chip = chipRefs.current[activeCategory];
     const container = chipsRef.current;
     if (!chip || !container) {
       return;
     }
-    const chipLeft = chip.offsetLeft;
-    const chipRight = chipLeft + chip.offsetWidth;
+    const chipRect = chip.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const chipLocalLeft = chipRect.left - containerRect.left + container.scrollLeft;
+    const chipLocalRight = chipLocalLeft + chipRect.width;
     const viewLeft = container.scrollLeft;
     const viewRight = viewLeft + container.clientWidth;
-    if (chipLeft < viewLeft) {
-      container.scrollTo({ left: chipLeft - 8, behavior: "smooth" });
-    } else if (chipRight > viewRight) {
+    if (chipLocalLeft < viewLeft) {
+      container.scrollTo({ left: Math.max(0, chipLocalLeft - 8), behavior: "smooth" });
+    } else if (chipLocalRight > viewRight) {
       container.scrollTo({
-        left: chipRight - container.clientWidth + 8,
+        left: chipLocalRight - container.clientWidth + 8,
         behavior: "smooth",
       });
     }

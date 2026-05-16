@@ -1,5 +1,5 @@
-import { useDeferredValue, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   getConversations,
   getFeed,
@@ -89,14 +89,16 @@ export function useSearchIndex(
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const localMessageActionState = useLocalChatMessageActionState();
-  const deferredSearchText = useDeferredValue(searchText);
-  const normalizedSearchText = normalizeSearchKeyword(deferredSearchText);
+  // 上游 search-page 已经对 input 做过 useDeferredValue（移动端实时绑定每键），
+  // 这里再 deferred 一次只会让 normalizedSearchText 比 UI 滞后一帧、卡片高亮跟
+  // 命中条目错位。直接用 prop 值参与 query / filter 即可。
+  const normalizedSearchText = normalizeSearchKeyword(searchText);
   const {
     favoriteSearchResults,
     miniProgramSearchResults,
     recentFavorites,
     recentMiniPrograms,
-  } = useSearchQuickLinks(deferredSearchText, isDesktopLayout);
+  } = useSearchQuickLinks(searchText, isDesktopLayout);
 
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
@@ -136,21 +138,22 @@ export function useSearchIndex(
     () => officialAccountsQuery.data ?? [],
     [officialAccountsQuery.data],
   );
+  // 之前把 lastActivityAt 拼进 queryKey：用户正在输入搜索词时，任一会话来一条
+  // 新消息 → lastActivityAt 翻新 → conversationsSearchKey 翻新 → 74 个会话的
+  // /message-search 全部 invalidate，整个搜索结果列表瞬时被丢弃。新增的那条
+  // 消息走完整 chat-list refetch 链路就够了，搜索结果不需要跟着 churn。只用
+  // source:id 当稳定的"搜索集合"指纹。
   const conversationsSearchKey = useMemo(
     () =>
       conversations
-        .map(
-          (item) =>
-            `${item.source ?? item.type}:${item.id}:${item.lastActivityAt}`,
-        )
+        .map((item) => `${item.source ?? item.type}:${item.id}`)
         .join("|"),
     [conversations],
   );
+  // 公众号文章索引同理：lastPublishedAt 变了不应该把"keyword 命中的旧搜索"
+  // 整批 invalidate，只用 account.id 当指纹。
   const officialAccountsSearchKey = useMemo(
-    () =>
-      officialAccounts
-        .map((item) => `${item.id}:${item.lastPublishedAt ?? "none"}`)
-        .join("|"),
+    () => officialAccounts.map((item) => item.id).join("|"),
     [officialAccounts],
   );
 
@@ -163,6 +166,12 @@ export function useSearchIndex(
     ],
     enabled: Boolean(normalizedSearchText) && conversations.length > 0,
     staleTime: 60_000,
+    // 没有 placeholderData：每次用户多打一个字 normalizedSearchText 变 →
+    // queryKey 变 → useQuery.data 退回 undefined → globalMessageResults 整段
+    // 清空 → 界面上"聊天记录"分组瞬时消失再回填，重复输入 / 拼音输入法选字
+    // 阶段尤其抖。keepPreviousData 让上一次命中条目保留在屏幕上、用 staleness
+    // 暗示用户结果在追赶。
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const settledResults = await Promise.allSettled(
         conversations.map(async (conversation) => {
@@ -210,6 +219,9 @@ export function useSearchIndex(
     ],
     enabled: Boolean(normalizedSearchText) && officialAccounts.length > 0,
     staleTime: 60_000,
+    // 同 messageSearchIndexQuery：keyword 一变 queryKey 变，没 placeholderData
+    // 的话上一批文章命中瞬时消失。
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const settledResults = await Promise.allSettled(
         officialAccounts.map(async (account) => {
@@ -805,8 +817,12 @@ export function useSearchIndex(
     recentFavorites,
     recentMiniPrograms,
     retryLoad,
+    // 加了 placeholderData 之后 isLoading 在拿到首次数据后就一直是 false（react
+    // -query v5：data 存在即非 isPending）；只有 isFetching 才忠实反映"当前
+    // keyword 是否还在背景里重跑"。banner「正在补全全局聊天记录索引」依赖这条
+    // 才能在每一次 keyword 变更期间正确出现。
     searchingMessages:
-      Boolean(normalizedSearchText) && messageSearchIndexQuery.isLoading,
+      Boolean(normalizedSearchText) && messageSearchIndexQuery.isFetching,
     scopeCounts: loading ? emptySearchScopeCounts : scopeCounts,
   };
 }
