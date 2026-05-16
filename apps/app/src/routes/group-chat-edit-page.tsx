@@ -387,7 +387,13 @@ function MobileGroupChatEditPage({
         </div>
       ) : null}
 
-      {groupQuery.data ? (
+      {/* 走查 Round 2：nickname 模式下 groupQuery.data 先到、membersQuery 还在
+          loading 时，原版 {groupQuery.data ? <input /> : null} 会先把输入框露
+          出来。draftInit effect 此时仍 early-return（membersQuery.isLoading=
+          true），用户能打字 → 等 membersQuery 加载完成 effect 才触发
+          setDraft(initialValue) 把用户输入覆盖回服务端值。把表单门槛拉到"该
+          模式所需的全部 query 都 ready"，和 draftInit 守门口径一致。 */}
+      {groupQuery.data && (mode === "name" || !membersQuery.isLoading) ? (
         <>
           <ChatDetailsSection
             title={mode === "name" ? t(msg`新的群聊名称`) : t(msg`新的群昵称`)}

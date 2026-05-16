@@ -2042,13 +2042,34 @@ export function ContactsPage() {
                     ? friendsQuery.error.message
                     : null
                 }
-                actionError={
-                  startChatMutation.error instanceof Error
-                    ? startChatMutation.error.message
-                    : setStarredMutation.error instanceof Error
-                      ? setStarredMutation.error.message
-                      : null
-                }
+                actionError={(() => {
+                  // startChatMutation / setStarredMutation 在 friend / world /
+                  // tags / starred 四个 pane 之间共用一个 mutation 实例：用户在
+                  // friend pane 给 Alice 点「发消息」失败后切到 starred pane，
+                  // mutation.error 还挂着，actionError 会把那条 Alice 的错误
+                  // 翻在这里——但 Alice 可能根本不在星标列表里，提示和操作
+                  // 完全对不上。按 variables.characterId 过滤：只显示当前
+                  // 还是星标朋友的那条错误，其它（已删除 / 已取消星标 /
+                  // 来自别的 pane）当作脏状态忽略。
+                  const isInStarred = (characterId: string | undefined) =>
+                    !!characterId &&
+                    starredFriends.some(
+                      (item) => item.character.id === characterId,
+                    );
+                  if (
+                    startChatMutation.error instanceof Error &&
+                    isInStarred(startChatMutation.variables)
+                  ) {
+                    return startChatMutation.error.message;
+                  }
+                  if (
+                    setStarredMutation.error instanceof Error &&
+                    isInStarred(setStarredMutation.variables?.characterId)
+                  ) {
+                    return setStarredMutation.error.message;
+                  }
+                  return null;
+                })()}
                 startChatPendingId={pendingCharacterId}
                 starPendingId={
                   setStarredMutation.isPending

@@ -41,6 +41,7 @@ import type {
   LocationCardAttachment,
   NoteCardAttachment,
   StickerAttachment,
+  VoiceAttachment,
 } from './chat.types';
 
 @Controller('conversations')
@@ -783,6 +784,12 @@ export class GroupController {
   async sendGroupMessage(
     @Param('id') id: string,
     @Body()
+    // 走查 Round 2：原版漏掉 `voice` 这条 union 分支——group.service 的
+    // SendGroupMessageInput 与 contracts SendGroupMessageRequest 两边都有
+    // voice，但 controller 的 @Body() 类型把它收窄成 never，前端发语音消息时
+    // body.type === 'voice' 在 TS 视角下不可达。运行时 ValidationPipe / nestjs
+    // 不做 union narrowing 所以还能 work，但任何 future class-validator 收紧
+    // 都会把语音消息整条拦掉；先把类型补齐。
     body:
       | { type?: 'text'; text: string }
       | {
@@ -794,6 +801,11 @@ export class GroupController {
           type: 'file';
           text?: string;
           attachment: FileAttachment;
+        }
+      | {
+          type: 'voice';
+          text?: string;
+          attachment: VoiceAttachment;
         }
       | {
           type: 'contact_card';
