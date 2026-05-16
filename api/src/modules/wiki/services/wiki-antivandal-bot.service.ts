@@ -82,6 +82,16 @@ export class WikiAntivandalBotService {
   private async evaluate(
     rev: CharacterRevisionEntity,
   ): Promise<string | null> {
+    // soft_delete / restore 是生命周期修订，contentSnapshot 故意被压成
+    // {name:'', bio:reason, expertDomains:[], ...} 作为标记，并不是 content
+    // vandalism。早先 evaluate 不看 operation 一律按 content rule 跑，
+    // 导致合法 soft_delete 被 critical_field_cleared 命中后 bot revert 到上
+    // 一个 approved，把已经"应删除"的 page 又翻回 active；rapid_repeated_edits
+    // 同理也会把生命周期改动当成"高频内容编辑"撤回。这两个操作本身已经走
+    // wiki review 的 high-risk patroller 通道，不需要 antivandal 复审。
+    if (rev.operation === 'soft_delete' || rev.operation === 'restore') {
+      return null;
+    }
     // Rule 1: critical content fields cleared (bio/personality/name shrunk to <5 chars)
     const c = rev.contentSnapshot;
     if (
