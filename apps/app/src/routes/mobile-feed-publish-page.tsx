@@ -53,6 +53,26 @@ export function MobileFeedPublishPage() {
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
+  // 走查新 Round 1：handleBack 在 createMutation.isPending=true 时直接 performBack，
+  // 整个 publish 页就 unmount 了。react-query 的 useMutation 不会跟着 unmount
+  // 取消请求 — 5s 慢网下用户 back 出来去了 /tabs/discover / 别的 tab 阅读，
+  // 5s 后 onSuccess 仍然跑 `navigate({to: safeReturnPath ?? "/discover/feed",
+  // replace:true})`，把用户从他们正在看的内容硬拽回广场。draftStillMatchesPublish
+  // snapshot 只防"用户重开 publish 页改了草稿"那一支，没防"用户已经离开 publish
+  // 页"那一支（composeDraft.text 仍 === input.text，因为没人 reset 过）。
+  // ref 跟踪 mount 状态，unmount 后只静默写 flash + cache，不再去抢路由。
+  // 注意：React.StrictMode dev 下 effect 会跑两次（mount → cleanup → mount）。
+  // 必须每次 mount body 都把 ref=true 拨回去，否则第一次 strict mode cleanup
+  // 把它打成 false 后第二次 mount 不再恢复 → 整个 publish 流程下来 onSuccess
+  // 永远认为 unmount 不 navigate，用户卡在 publish 页发完帖不会自动回广场。
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const createMutation = useMutation({
     // 再走查 R1：mutationFn 之前直接闭包读 composeDraft.* 字段，onSuccess 无脑
     // 调 composeDraft.reset() + navigate(/discover/feed)。慢网下用户路径：
@@ -129,6 +149,12 @@ export function MobileFeedPublishPage() {
         return;
       }
       composeDraft.reset();
+      // 组件已经 unmount（用户 back 出去看别的）就不要再 navigate 把他们拽回广场。
+      // flash 已经写了，下次他们自然进 /discover/feed 时就能看到成功提示；
+      // cache 也已经 prepend，那一刻无缝看到新 post。
+      if (!isMountedRef.current) {
+        return;
+      }
       void navigate({
         to: safeReturnPath ?? "/discover/feed",
         ...(safeReturnHash ? { hash: safeReturnHash } : {}),
