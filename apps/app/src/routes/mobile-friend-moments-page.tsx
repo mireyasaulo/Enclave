@@ -526,6 +526,14 @@ export function MobileFriendMomentsPage() {
   }
 
   function openLikerCharacterDetail(like: MomentLike) {
+    if (like.authorType === "user") {
+      // 用户自己点赞过的帖子，点击赞列表里自己的名字 — 之前 silently no-op，
+      // 链接样式 (蓝色 + 下划线 hover) 又把名字渲染成可点击的按钮，看起来像
+      // 一个坏掉的按钮。带到 /profile/moments（我的朋友圈），跟点击角色名字
+      // 跳角色资料的语义对齐 ——「点谁的名字看谁的朋友圈」。
+      void navigate({ to: "/profile/moments" });
+      return;
+    }
     if (like.authorType !== "character") {
       return;
     }

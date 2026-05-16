@@ -1230,6 +1230,14 @@ export function MomentsPage() {
         }
       }}
       onLikeAuthorTap={(like) => {
+        if (like.authorType === "user") {
+          // 用户自己点过赞的帖子，赞列表里自己的名字之前 silently no-op，
+          // 链接样式又把它渲染成蓝色可点击按钮，看起来像个坏按钮。带到
+          // /profile/moments（我的朋友圈），跟点角色名字跳角色资料的语义
+          // 对齐——「点谁的名字看谁的朋友圈」。
+          void navigate({ to: "/profile/moments" });
+          return;
+        }
         if (like.authorType === "character") {
           openCharacterDetail(like.authorId);
         }
