@@ -1429,6 +1429,19 @@ export function DiscoverFeedPage() {
     if (targetLoaded) {
       return;
     }
+    // 走查再 Round 5：目标 post 已经落到 feedPosts 但被 blockedCharacterIds 过滤
+    // 掉时 — 旧逻辑只看 visiblePosts，于是会一路翻页找永远不会出现的目标，
+    // 直到 hasNextFeedPage 翻成 false 才停（最坏 ~10 个无意义 RTT）。block
+    // 是用户主动表态，分享链接 / 收藏跳进来的目标作者若在屏蔽名单里就别强
+    // 行拉了，跟下面 L1405-1420 「全被屏蔽 → 自动翻页找非屏蔽内容」是相反
+    // 的意图：那条是为了让用户看到下一组非屏蔽，这条不该绕开屏蔽找单条。
+    // feedPosts 命中即视为"已经加载但被你屏蔽"，安静收手。
+    const targetLoadedButBlocked = feedPosts.some(
+      (post) => post.id === routeSelectedPostId,
+    );
+    if (targetLoadedButBlocked) {
+      return;
+    }
     if (!hasNextFeedPage || isFetchingNextFeedPage) {
       return;
     }
@@ -1443,6 +1456,7 @@ export function DiscoverFeedPage() {
     isDesktopLayout,
     routeSelectedPostId,
     visiblePosts,
+    feedPosts,
     hasNextFeedPage,
     isFetchingNextFeedPage,
     isFetchNextFeedPageError,
