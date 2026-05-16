@@ -56,7 +56,7 @@ import {
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 
 const CHAT_DETAILS_REPORT_REASON = "chat_details_report";
 const CHAT_DETAILS_BLOCK_REASON = "chat_details_block";
@@ -66,7 +66,10 @@ export function ChatDetailsPage() {
     from: "/chat/$conversationId/details",
   });
   const isDesktopLayout = useDesktopLayout();
-  const t = translateRuntimeMessage;
+  // useRuntimeTranslator() 而非 translateRuntimeMessage —— 后者是稳定全局
+  // fn，组件不会因 locale 切换重渲染，桌面 redirect shell 的标题描述会卡在
+  // 上个 locale 直到别的 state 推一把。
+  const t = useRuntimeTranslator();
 
   if (isDesktopLayout) {
     return (
@@ -84,7 +87,13 @@ export function ChatDetailsPage() {
 }
 
 function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
-  const t = translateRuntimeMessage;
+  // useRuntimeTranslator() 而非 translateRuntimeMessage —— 下方 contactSummary
+  // useMemo (line 303) 在 body 调 t(msg`联系人`/`通讯录朋友`/`世界联系人`/
+  // `${name} 的隐界名片`)，但 deps 没列 t。translateRuntimeMessage 是稳定
+  // 全局 fn，把它当 dep 也不会因 locale 切换换引用 → 名片摘要的多语言一直
+  // 卡在 mount 时的 locale。useRuntimeTranslator 的回调引用会随
+  // activationVersion+locale 重新生成，加进 contactSummary deps 后跟着重算。
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const queryClient = useQueryClient();
@@ -337,6 +346,7 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
     conversationId,
     friendship?.remarkName,
     isFriend,
+    t,
     targetCharacter?.name,
     targetCharacter?.relationship,
     targetCharacterId,
