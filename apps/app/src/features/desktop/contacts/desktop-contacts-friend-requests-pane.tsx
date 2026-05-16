@@ -133,7 +133,10 @@ export function DesktopContactsFriendRequestsPane({
 
                       <div
                         className={cn(
-                          "mt-4 rounded-[16px] bg-[rgba(245,247,247,0.92)] px-4 py-3 text-[14px] leading-7 text-[color:var(--text-secondary)]",
+                          // whitespace-pre-line：好友申请的招呼语可能多行（角色 AI
+                          // 生成的偶尔会换行），不加这条会全部压成一行；break-words：
+                          // 极长 token（URL、纯英文 100 字符）才不会把卡片撑爆横向。
+                          "mt-4 whitespace-pre-line break-words rounded-[16px] bg-[rgba(245,247,247,0.92)] px-4 py-3 text-[14px] leading-7 text-[color:var(--text-secondary)]",
                           expired ? "opacity-70" : undefined,
                         )}
                       >
@@ -151,7 +154,7 @@ export function DesktopContactsFriendRequestsPane({
                           {declinePendingId === request.id
                             ? expired
                               ? t(msg`清除中...`)
-                              : t(msg`处理中...`)
+                              : t(msg`拒绝中...`)
                             : expired
                               ? t(msg`清除`)
                               : t(msg`拒绝`)}
