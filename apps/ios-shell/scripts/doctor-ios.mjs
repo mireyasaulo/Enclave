@@ -517,6 +517,21 @@ const checks = [
       : "Info.plist not found yet; run `pnpm ios:sync` first",
   },
   {
+    // Round 14 让 LaunchScreen.storyboard 走 #070c14 深蓝；Round 27 把
+    // WKWebView 自身的 background 也对齐。少了这条，splash 隐藏到 React
+    // 首屏渲染之间会闪一帧白底。
+    label: "capacitor-config-ios-background",
+    ok:
+      !fs.existsSync(capacitorConfigPath) ||
+      fileMatches(
+        capacitorConfigPath,
+        /ios\s*:\s*\{[\s\S]*?backgroundColor\s*:\s*["']#070c14["']/m,
+      ),
+    detail: fs.existsSync(capacitorConfigPath)
+      ? "capacitor.config.ts sets ios.backgroundColor=#070c14 (aligns WKWebView底色 with LaunchScreen + splash)"
+      : "capacitor.config.ts not found",
+  },
+  {
     label: "capacitor-config-ipad-mobile",
     ok:
       !fs.existsSync(capacitorConfigPath) ||
