@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -113,6 +113,18 @@ export function MobileReminderToastHost() {
     };
   }, []);
 
+  // 已经触发过 showLocalNotification 的 messageId —— 防 effect 在
+  // notifiedAt 真正落库前因为别的原因再 re-run 时重复弹通知。
+  // 原写法：deps=[activeReminder, documentVisibility, notifyReminder]，但：
+  //   - useMessageReminders 返回的 notifyReminder 是 function declaration，每
+  //     次 render 换引用 → 任何无关 setState 都会重跑这个 effect。
+  //   - activeReminder 通过 useChatReminderEntries 派生，reminders refetch
+  //     30s 一次 + 窗口聚焦也刷新，每次得到的也是新对象引用即使 messageId 同。
+  //   - notifyReminder 是异步 mutation，落库前 activeReminder.notifiedAt 还是
+  //     null，期间任何 re-render 都会再次走到 showLocalNotification → 同一条
+  //     提醒在锁屏通知中心刷两遍 / 推 2 次 markNotified API。
+  // 用 ref 集合按 messageId 兜底，整页生命周期内同一条提醒只推一次。
+  const notifiedMessageIdsRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (
       !activeReminder ||
@@ -122,6 +134,12 @@ export function MobileReminderToastHost() {
       return;
     }
 
+    if (notifiedMessageIdsRef.current.has(activeReminder.messageId)) {
+      return;
+    }
+    notifiedMessageIdsRef.current.add(activeReminder.messageId);
+
+    const targetMessageId = activeReminder.messageId;
     void showLocalNotification({
       id: `chat-reminder-${activeReminder.messageId}`,
       title: activeReminder.title,
@@ -138,10 +156,13 @@ export function MobileReminderToastHost() {
       source: "local_reminder",
     }).then((shown) => {
       if (!shown) {
+        // showLocalNotification 没真正弹（权限被拒 / OS 静默），不算"已通知"，
+        // 释放标记让下一次条件再满足时可以重试。
+        notifiedMessageIdsRef.current.delete(targetMessageId);
         return;
       }
 
-      void notifyReminder(activeReminder.messageId);
+      void notifyReminder(targetMessageId);
     });
   }, [activeReminder, documentVisibility, notifyReminder]);
 
