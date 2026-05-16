@@ -389,13 +389,25 @@ export function GroupChatThreadPanel({
         const memberName = membersQuery.data?.find(
           (member) => member.memberId === characterId,
         )?.memberName;
-        const messageName = [...messages]
-          .reverse()
-          .find(
-            (message) =>
-              message.senderType === "character" &&
-              message.senderId === characterId,
-          )?.senderName;
+        // 走查 Round 4：原版 [...messages].reverse().find() 每次都先把整个
+        // messages 拷一份再 reverse 再 find；活跃群 200 条消息 × 多个角色
+        // typing × 每秒多次 typing event 触发 useMemo 重算时挺烫手——而且
+        // 绝大多数情况下 memberName 直接拿得到，根本不需要回退查 messages。
+        // 只在 memberName 真为空时倒序循环找最近一条该 character 的消息，
+        // 命中即 break。
+        let messageName: string | undefined;
+        if (!memberName?.trim()) {
+          for (let index = messages.length - 1; index >= 0; index -= 1) {
+            const message = messages[index];
+            if (
+              message?.senderType === "character" &&
+              message.senderId === characterId
+            ) {
+              messageName = message.senderName;
+              break;
+            }
+          }
+        }
 
         return {
           characterId,
