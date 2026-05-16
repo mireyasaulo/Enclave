@@ -1,6 +1,11 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Camera } from "lucide-react";
 import {
@@ -11,6 +16,7 @@ import {
   type Moment,
   type MomentComment,
   type MomentLike,
+  type MomentsPageResponse,
 } from "@yinjie/contracts";
 import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import {
@@ -264,12 +270,18 @@ export function ProfileMomentsPage() {
   const deleteMutation = useMutation({
     mutationFn: (momentId: string) => deleteMoment(momentId, baseUrl),
     onMutate: async (momentId) => {
-      // 同时 cancel + snapshot 两把 cache：本页绑 mine（删完要立刻消失），
-      // 全量 flat 不影响也得回滚以保持其它页面一致。
+      // 同步 cancel + snapshot 三把 cache：本页绑 mine（删完要立刻消失），
+      // 全量 flat 给 search 索引 / share 用，paged 给 /tabs/moments 用 ——
+      // 之前漏了 paged：用户在 /profile/moments 删一条自己的动态后立刻切到
+      // /tabs/moments，那条已删的帖子在 paged 里还挂着 ~600ms 直到 onSuccess
+      // 的 invalidate refetch 走完。跟 moments-page Round 4 同模板。
       await Promise.all([
         queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] }),
         queryClient.cancelQueries({
           queryKey: ["app-moments-mine", baseUrl],
+        }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-paged", baseUrl],
         }),
       ]);
       const flatSnapshots = queryClient.getQueriesData<Moment[]>({
@@ -277,6 +289,11 @@ export function ProfileMomentsPage() {
       });
       const mineSnapshots = queryClient.getQueriesData<Moment[]>({
         queryKey: ["app-moments-mine", baseUrl],
+      });
+      const pagedSnapshots = queryClient.getQueriesData<
+        InfiniteData<MomentsPageResponse>
+      >({
+        queryKey: ["app-moments-paged", baseUrl],
       });
       const snapshots = [...flatSnapshots, ...mineSnapshots];
       snapshots.forEach(([key, data]) => {
@@ -288,13 +305,26 @@ export function ProfileMomentsPage() {
           data.filter((item) => item.id !== momentId),
         );
       });
-      return { snapshots };
+      pagedSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(key, {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            items: page.items.filter((item) => item.id !== momentId),
+          })),
+        });
+      });
+      return { snapshots, pagedSnapshots };
     },
     onError: (error, _momentId, context) => {
-      // 先回滚 optimistic（被删的 moment 在 flat cache 里恢复），再给用户一个
-      // 红条提示——否则用户只会看到"删过的 moment 又自己冒出来"，没法判断
-      // 是网络 / 权限 / 还是被服务端拒了。
+      // 先回滚 optimistic（被删的 moment 在 flat / mine / paged cache 里恢复），
+      // 再给用户一个红条提示——否则用户只会看到"删过的 moment 又自己冒出来"，
+      // 没法判断是网络 / 权限 / 还是被服务端拒了。
       context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context?.pagedSnapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
       setNotice({
