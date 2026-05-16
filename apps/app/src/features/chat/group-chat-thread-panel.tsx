@@ -243,6 +243,14 @@ export function GroupChatThreadPanel({
   // dedup 会被前置历史误触发，按末尾 id 才能区分"新消息追加"和"历史前置"。
   // socket 撑长（AI 回声追加在尾部）时末尾 id 变化仍能正常触发。
   const lastMarkedReadNewestIdRef = useRef<string | null>(null);
+  // 走查 Round 4：发送按钮 `disabled={composerPending}` 兜底，但 composerPending
+  // 是 sendMutation.isPending 经 React commit 才更新；handleSubmit 进入时
+  // `const submittedText = text` 也是闭包读 state——同帧连点 2 次发送，
+  // 两次都看到 isPending=false + 同一份 text，两份相同的群消息同时投到群里。
+  // 实测移动端在公网慢网下双击发送，群里出 2 条一模一样的消息。submittingRef
+  // 同步赋值不走 React render，第一次 click 把它翻 true 之后同帧后续 click
+  // 都被早返。await 完整跑完后 finally 解锁。
+  const sendingTextRef = useRef(false);
 
   const groupQuery = useQuery({
     queryKey: ["app-group", baseUrl, groupId],
@@ -941,20 +949,31 @@ export function GroupChatThreadPanel({
   };
 
   const handleSubmit = async () => {
+    if (sendingTextRef.current) {
+      return;
+    }
     const submittedText = text;
+    if (!submittedText.trim()) {
+      return;
+    }
+    sendingTextRef.current = true;
     const hadReply = Boolean(replyDraft);
     setText("");
     setReplyDraft(null);
-    await submitOutgoingGroupMessage({
-      text: replyDraft ? encodeChatReplyText(submittedText, replyDraft) : submittedText.trim(),
-    });
-    track("chat_message_sent", {
-      conversationKind: "group",
-      kind: "text",
-      hasReply: hadReply,
-      textLength: submittedText.length,
-    });
-    scrollToBottom("smooth");
+    try {
+      await submitOutgoingGroupMessage({
+        text: replyDraft ? encodeChatReplyText(submittedText, replyDraft) : submittedText.trim(),
+      });
+      track("chat_message_sent", {
+        conversationKind: "group",
+        kind: "text",
+        hasReply: hadReply,
+        textLength: submittedText.length,
+      });
+      scrollToBottom("smooth");
+    } finally {
+      sendingTextRef.current = false;
+    }
   };
 
   const retryMessage = useCallback(
