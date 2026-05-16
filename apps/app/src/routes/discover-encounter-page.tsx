@@ -14,6 +14,7 @@ import { RouteRedirectState } from "../components/route-redirect-state";
 import { parseMobileDiscoverToolRouteState } from "../features/discover/mobile-discover-tool-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { useShakeDetector } from "../hooks/use-shake-detector";
+import { translateAppErrorCode } from "../lib/error-translate";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -245,7 +246,16 @@ function MobileDiscoverEncounterPage() {
           tone="danger"
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="min-w-0 flex-1">{shakeMutation.error.message}</span>
+            <span className="min-w-0 flex-1">
+              {/* 走查 Round 3：跟 profile-info-* 同款——后端 AppError 优先走
+                  translateAppErrorCode 出当前 locale 文案，miss 时回退 raw
+                  error.message（一般是 legacyMessage 的中文兜底）。否则
+                  en-US/ja-JP/ko-KR 用户摇出 SHAKE_DAILY_LIMIT 等会看到原样
+                  「今日摇一摇次数已达到上限。」。*/}
+              {(isApiRequestError(shakeMutation.error)
+                ? translateAppErrorCode(shakeMutation.error)
+                : null) ?? shakeMutation.error.message}
+            </span>
             <div className="flex shrink-0 items-center gap-1.5">
               {/* 走查 Round 2：SHAKE_DAILY_LIMIT / SHAKE_DISABLED / SHAKE_CYBER_AVATAR_NO_SIGNAL
                   在本次访问内不会因重试变好，再点一次只会拿到同一份 error；隐掉「重试摇
