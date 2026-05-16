@@ -420,9 +420,15 @@ public class YinjieMobileBridgePlugin extends Plugin {
 
     @PluginMethod
     public void requestNotificationPermission(PluginCall call) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || getPermissionState("notifications") == PermissionState.GRANTED) {
+        // pre-Tiramisu 没 runtime permission，但用户可能已经在系统设置里关掉了
+        // 应用通知；之前直接 return "granted"，JS 拿到 granted 去 notify 系统照样
+        // 静默丢消息。复用 readNotificationPermissionState 拿真实状态（areNotificationsEnabled
+        // + permission 两层）。Tiramisu+ 在 permission=GRANTED 时也走这条直接返回真实状态，
+        // 不再二次弹系统授权 dialog。
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+            || getPermissionState("notifications") == PermissionState.GRANTED) {
             JSObject result = new JSObject();
-            result.put("state", "granted");
+            result.put("state", readNotificationPermissionState());
             call.resolve(result);
             return;
         }
