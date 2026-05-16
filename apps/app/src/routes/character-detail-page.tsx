@@ -1897,7 +1897,12 @@ export function CharacterDetailPage() {
       </div>
 
       {!isDesktopLayout && character ? (
-        <div className="shrink-0 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-4 pb-3 pt-3 backdrop-blur-xl">
+        // 走查再 R2：/character/$id 不走 MobileShell 的 safeBottom，AppPage 自己也
+        // 没补 safe-area。原来 pb-3=12px 在 iPhone X+ 34pt 的 home indicator 下
+        // "发消息 / 音视频通话 / 添加到通讯录"会被横条盖到一半。和
+        // chat-message-list / message-quote-selection-sheet 已经在用的写法对齐，
+        // pb 走 env(safe-area-inset-bottom)。
+        <div className="shrink-0 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-4 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-3 backdrop-blur-xl">
           <div
             className={cn(
               "grid gap-2",
