@@ -52,6 +52,14 @@ export function ChannelsForwardPicker({
 }: ChannelsForwardPickerProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // 走查 R3（本轮）：handlePick await mutateAsync 期间，用户可能已经手动关 picker、
+  // 再为另一条 post 重开 picker（postId 切到 B）。此时 A 的 mutation 完成 →
+  // 进入 try 分支的 onClose() → 把刚开的 B 的 picker 也一起关掉，用户莫名其妙
+  // 「我刚开的 picker 自己关了」。用 ref 现读最新 postId，对照 handlePick 开始
+  // 时 capture 的 initialPostId，只在还停在同一条 post 时才主动关闭。
+  const latestPostIdRef = useRef(postId);
+  latestPostIdRef.current = postId;
+
   // Reset error when opened/closed
   useEffect(() => {
     if (!open) setErrorMessage(null);
@@ -116,6 +124,9 @@ export function ChannelsForwardPicker({
 
   async function handlePick(target: FriendListItem) {
     setErrorMessage(null);
+    // 走查 R3（本轮）：抓住开始 forward 这一刻的 postId，await 期间用户可能
+    // 关 picker / 重开为其他 post（latestPostIdRef 反映 props 实时值）。
+    const initialPostId = postId;
     try {
       await forwardMutation.mutateAsync({
         targetCharacterId: target.character.id,
@@ -124,7 +135,11 @@ export function ChannelsForwardPicker({
         characterId: target.character.id,
         name: target.character.name,
       });
-      onClose();
+      // 只在 picker 仍然停在同一条 post 时主动关闭——用户已经切换到别的 post
+      // 时 onClose 等于强关人家刚开的新 picker。
+      if (latestPostIdRef.current === initialPostId) {
+        onClose();
+      }
     } catch (error) {
       const code =
         (error as { code?: string; message?: string })?.code ??
