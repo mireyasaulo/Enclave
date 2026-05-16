@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useId, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { registerAndroidBackInterceptor } from "../../runtime/android-back-button";
@@ -30,6 +30,8 @@ export function MobileDetailsActionSheet({
   onClose,
 }: MobileDetailsActionSheetProps) {
   const t = translateRuntimeMessage;
+  const titleId = useId();
+  const descriptionId = useId();
 
   // 原生壳硬件 Back 键：sheet 打开时先关 sheet，不让 BACK 同时 history.back
   // 把用户从 chat-details / group-chat-details / group-member-picker 带回上
@@ -74,16 +76,34 @@ export function MobileDetailsActionSheet({
         aria-label={t(msg`关闭操作菜单`)}
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 overflow-hidden rounded-t-[18px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-1.5 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
+      {/* 走查 R(re)1：sheet 没有 role="dialog" / aria-modal / aria-labelledby，
+          屏幕阅读器（iOS VoiceOver / Android TalkBack）不会把它当 modal 念，
+          盲人用户从 character-detail 进来后听不到「音视频通话/加入黑名单/删除联系人」
+          这些 sheet 标题，只听到"按钮 取消"。和 desktop-chat-history-dialog 对齐补全。 */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={description ? descriptionId : undefined}
+        className="absolute inset-x-0 bottom-0 overflow-hidden rounded-t-[18px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-1.5 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]"
+      >
         <div className="flex justify-center pb-1">
           <div className="h-1 w-9 rounded-full bg-[rgba(148,163,184,0.45)]" />
         </div>
 
         <div className="overflow-hidden rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
           <div className="border-b border-[color:var(--border-subtle)] px-5 py-2.5 text-center">
-            <div className="text-[14px] font-medium text-[#111827]">{title}</div>
+            <div
+              id={titleId}
+              className="text-[14px] font-medium text-[#111827]"
+            >
+              {title}
+            </div>
             {description ? (
-              <div className="mt-0.5 text-[11px] leading-[18px] text-[#8c8c8c]">
+              <div
+                id={descriptionId}
+                className="mt-0.5 text-[11px] leading-[18px] text-[#8c8c8c]"
+              >
                 {description}
               </div>
             ) : null}
