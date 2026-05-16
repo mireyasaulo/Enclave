@@ -995,10 +995,25 @@ export function DiscoverFeedPage() {
   // 橡皮筋反弹 + 串行 fetchNextPage 把内容堆回来；新发布的内容若把老 page 2
   // 起点往下挤，由 feedPosts 的 id 去重 useMemo 兜底。和 moments-page 对齐。
   const handlePullRefresh = async () => {
-    const key = ["app-feed-paged", baseUrl];
+    // 走查新一轮 Round 4：钉 refreshBaseUrl 防 mid-flight 切账户脏写。
+    // 用户在 A 账户 scrollTop=0 下拉刷新 → getFeed(1, 20, A) 飞 → 期间切到
+    // B 账户 → baseUrl 翻成 B → React render 跑完 → 旧 fresh 回来：
+    //   1. setQueryData(["app-feed-paged", A], ...) — key 已经 pin 到 A，
+    //      A 的 cache 正确收到 fresh，B 不会被脏写；这条原版就对的。
+    //   2. catch 路径 setNotice 弹"广场刷新失败"到当前 toolbar — 旧版无脑
+    //      setNotice，B 账户的 toolbar 出现一条莫名其妙的 A 的失败提示，
+    //      B 啥也没做。
+    //   3. hasNextFeedPage / isFetchNextFeedPageError 这两个标记都来自当前
+    //      render 的 feedQuery（B 的），无脑判定后 void fetchNextFeedPage()
+    //      会去翻 B 的下一页 — 但用户的初衷是"刷新 A"，把 B 顺手翻一页是
+    //      预期外副作用。
+    // mutationBaseUrl 同模式 gate UI 反馈 / 后续 fetchNextPage 调用：仅在
+    // 切换没发生时（refreshBaseUrl === baseUrlRef.current）才做。
+    const refreshBaseUrl = baseUrl;
+    const key = ["app-feed-paged", refreshBaseUrl];
     try {
       await Promise.all([
-        getFeed(1, 20, baseUrl).then((fresh) => {
+        getFeed(1, 20, refreshBaseUrl).then((fresh) => {
           queryClient.setQueryData<InfiniteData<FeedListResponse>>(
             key,
             (current) => {
@@ -1020,10 +1035,18 @@ export function DiscoverFeedPage() {
       // 整张 feed 还在抖。pull-refresh 成功通常意味着网络也恢复了，顺手再
       // 试一次 fetchNextPage，成功就把错误位清掉、observer 也能继续自动加载；
       // 失败就维持原状让用户继续走「点击重试」路径。
-      if (hasNextFeedPage && isFetchNextFeedPageError) {
+      if (
+        refreshBaseUrl === baseUrlRef.current &&
+        hasNextFeedPage &&
+        isFetchNextFeedPageError
+      ) {
         void fetchNextFeedPage();
       }
     } catch (error) {
+      // mid-flight 切账户的话错误条不该弹到新账户的 toolbar — 新账户没下拉。
+      if (refreshBaseUrl !== baseUrlRef.current) {
+        return;
+      }
       setNoticeTone("info");
       setNoticeActionLabel(null);
       setNoticeAction(null);
