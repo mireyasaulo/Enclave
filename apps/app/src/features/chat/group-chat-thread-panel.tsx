@@ -252,6 +252,14 @@ export function GroupChatThreadPanel({
   // 同步赋值不走 React render，第一次 click 把它翻 true 之后同帧后续 click
   // 都被早返。await 完整跑完后 finally 解锁。
   const sendingTextRef = useRef(false);
+  // 走查 Round 2 同款问题：失败消息上的"重试"按钮 (line ~1690 onRetryMessage)
+  // 本身没 pending 状态，retryMessage() 入口虽然校验 message.localStatus ===
+  // "failed"，但 setMessages(markSending) 是 React state，同帧第二次 click 时
+  // messages 还是 failed → 两份相同的 POST /groups/$id/messages 同时打出去，
+  // 服务端 echo 回来都是新 msg id（localMessageId 替换只命中第一份，第二份
+  // 服务端消息会作为新增 server 消息进 cache），群里冒出 2 条一样的消息。
+  // 按 messageId 上锁，不同 failed 消息互不影响。
+  const retryingMessageIdsRef = useRef<Set<string>>(new Set());
 
   const groupQuery = useQuery({
     queryKey: ["app-group", baseUrl, groupId],
@@ -328,6 +336,7 @@ export function GroupChatThreadPanel({
     highlightedWindowRequestRef.current = null;
     failedHighlightRef.current.clear();
     lastMarkedReadNewestIdRef.current = null;
+    retryingMessageIdsRef.current.clear();
   }, [baseUrl, groupId]);
 
   useEffect(() => {
@@ -1025,6 +1034,12 @@ export function GroupChatThreadPanel({
 
   const retryMessage = useCallback(
     async (messageId: string) => {
+      // 同帧双击同一条 failed 消息的"重试"按钮：setMessages(markSending) 还没
+      // commit，下一次 click 仍看到 localStatus==="failed" → 飞两份相同 POST。
+      // 按 messageId 上锁，finally 解锁；不同 failed 消息互不影响。
+      if (retryingMessageIdsRef.current.has(messageId)) {
+        return;
+      }
       const failedMessage = messages.find(
         (message) =>
           message.id === messageId && message.localStatus === "failed",
@@ -1038,6 +1053,7 @@ export function GroupChatThreadPanel({
         throw new Error(t(msg`这条消息暂时无法重试发送。`));
       }
 
+      retryingMessageIdsRef.current.add(messageId);
       setMessages((current) => markThreadMessageSending(current, messageId));
       // 同上：mutateAsync 抛错落到 unhandledrejection。message-list 调
       // retryMessage 时是 `(message) => retryMessage(message.id)` 不 await
@@ -1049,6 +1065,8 @@ export function GroupChatThreadPanel({
         });
       } catch {
         // onError 已处理
+      } finally {
+        retryingMessageIdsRef.current.delete(messageId);
       }
     },
     // t 必须进 deps：上方 throw new Error(t(msg`这条消息暂时无法重试...`))
