@@ -159,7 +159,14 @@ function MobileGroupContactsPage() {
     [groupsQuery.data],
   );
   const filteredGroups = useFilteredGroups(visibleGroups, deferredSearchText);
-  const hasSearchText = searchText.trim().length > 0;
+  // 走查 Round 9：filteredGroups 是按 deferredSearchText 算的，但 hasSearchText
+  // 早先跟 searchText 走——清空搜索框那一帧，searchText 已经 "" 但
+  // deferredSearchText 还是上一个关键字，filteredGroups 还是 0 条。这时空态判定
+  // `!filteredGroups.length` 命中、但 hasSearchText=false，落到了「还没有群聊 /
+  // 发起群聊」分支：用户明明只是清空搜索、群也都在，却闪一下「群被清空、要不要
+  // 发起新群」的引导，肉眼可见的误导。让 hasSearchText 也跟 deferredSearchText
+  // 同步，空态文案永远跟当前列表口径一致。
+  const hasSearchText = deferredSearchText.trim().length > 0;
 
   function navigateToRouteStateReturn() {
     if (!safeReturnPath) {
