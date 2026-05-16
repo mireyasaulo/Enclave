@@ -2022,7 +2022,16 @@ export function DiscoverFeedPage() {
               tone="loading"
             />
           ) : null}
-          {feedQuery.isError && feedQuery.error instanceof Error ? (
+          {feedQuery.isError &&
+          feedPosts.length === 0 &&
+          feedQuery.error instanceof Error ? (
+            // 走查 Round 1：之前 gate 只看 isError —— window-focus / refetchOnMount 触
+            // 发的"后台刷新"在 staleTime(30s) 过后失败时 tanstack 的 status 会翻成
+            // 'error' 但 data 仍保留上次成功的 cache，结果是 60 条 post 完整渲染 +
+            // 顶部还挂一张「广场动态暂时不可用」的红色 danger 卡，用户看着是"列表
+            // 有内容但平台又说不可用"。后台刷新失败属于不可操作的 transient 状态
+            // （tanstack 自动会重试 / pull-refresh 走 try-catch 弹 notice），用户已
+            // 经有的 cache 该看就看，danger 卡只对"完全没数据"那条路径才有意义。
             <MobileFeedStatusCard
               badge={t(msg`读取失败`)}
               title={t(msg`广场动态暂时不可用`)}
@@ -2158,12 +2167,19 @@ export function DiscoverFeedPage() {
                   // 以及 AI 角色把整段 CoT prose 当评论存进来（gpt-4.1 等非推理模型，
                   // 没 <think> 包裹，server 兜不住）。两种都经 stripToolCallSyntax 后
                   // 变 ""，渲染层一起过掉，否则会渲出 "w：" 只剩冒号的空评论占位。
+                  // 走查 Round 1 (perf)：旧实现 filter 里跑一遍 stripToolCallSyntax，
+                  // 渲染时（L2207）每条 comment 再跑一遍，60 post × ≤3 preview × 2
+                  // = 360 次 regex 重复。展开「查看全部」体量上百时更夸张。一次性
+                  // 落成 { comment, cleanText } 形态，filter / render 同读 cleanText，
+                  // 同时 commentById 也只存清洗过的版本免得下游再算。
                   const renderedComments = (
                     expandedComments ?? post.commentsPreview
-                  ).filter(
-                    (comment) =>
-                      stripToolCallSyntax(comment.text).trim().length > 0,
-                  );
+                  )
+                    .map((comment) => ({
+                      comment,
+                      cleanText: stripToolCallSyntax(comment.text),
+                    }))
+                    .filter((entry) => entry.cleanText.trim().length > 0);
                   // preview 里全是被过滤掉的脏评论（gpt-4.1 等模型把 CoT prose 当
                   // 广场评论存进来 → stripToolCallSyntax 后变 ""），但 commentCount
                   // 仍 > 0：之前 return null 把「查看全部 N 条评论」也一并吞掉，
@@ -2188,12 +2204,15 @@ export function DiscoverFeedPage() {
                   // 字符串比较，每次父组件 setState（如点赞气泡）整张广场重渲都会重算。
                   // 落成 Map 一次 O(N) 建好，每条 O(1) 命中。
                   const commentById = new Map(
-                    renderedComments.map((item) => [item.id, item]),
+                    renderedComments.map((entry) => [
+                      entry.comment.id,
+                      entry.comment,
+                    ]),
                   );
                   return (
                     <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">
                       <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
-                        {renderedComments.map((comment) => {
+                        {renderedComments.map(({ comment, cleanText }) => {
                           const replyToComment = comment.replyToCommentId
                             ? commentById.get(comment.replyToCommentId) ?? null
                             : null;
@@ -2204,7 +2223,6 @@ export function DiscoverFeedPage() {
                             replyToComment?.authorName ??
                             comment.replyToAuthorName ??
                             null;
-                          const cleanCommentText = stripToolCallSyntax(comment.text);
                           const openReply = () => {
                             if (!post.canInteract) return;
                             setCommentBarTarget({
@@ -2224,19 +2242,41 @@ export function DiscoverFeedPage() {
                             comment.authorType === "character";
                           const replyAuthorIsCharacter =
                             replyToComment?.authorType === "character";
+                          // 走查 Round 1：post.canInteract=false（被屏蔽 / 不可互动）
+                          // 时旧实现依然渲 role="button" + cursor-pointer + active 按下
+                          // 灰底，整条评论看着可点，但 openReply 早返一行直接 noop。
+                          // 用户视感是"按下去有反馈但啥也没发生"，又跟卡片底下 actions
+                          // 区不显示「更多操作」按钮（line 2153 已 gate 在 canInteract）
+                          // 不一致：能不能互动这一条信号被分裂。canInteract=false 这条
+                          // 路径直接渲成 div + 普通文字，无 button 角色、无 cursor、无
+                          // active 反馈，让用户一眼看清"这条不能回复"。
+                          const commentInteractive = post.canInteract;
                           return (
                             <div
                               key={comment.id}
-                              role="button"
-                              tabIndex={0}
-                              onClick={openReply}
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === " ") {
-                                  event.preventDefault();
-                                  openReply();
-                                }
-                              }}
-                              className="block w-full cursor-pointer text-left text-[#1A1A1A] active:bg-[#EFEFEF]"
+                              {...(commentInteractive
+                                ? {
+                                    role: "button" as const,
+                                    tabIndex: 0,
+                                    onClick: openReply,
+                                    onKeyDown: (
+                                      event: import("react").KeyboardEvent<HTMLDivElement>,
+                                    ) => {
+                                      if (
+                                        event.key === "Enter" ||
+                                        event.key === " "
+                                      ) {
+                                        event.preventDefault();
+                                        openReply();
+                                      }
+                                    },
+                                  }
+                                : {})}
+                              className={
+                                commentInteractive
+                                  ? "block w-full cursor-pointer text-left text-[#1A1A1A] active:bg-[#EFEFEF]"
+                                  : "block w-full text-left text-[#1A1A1A]"
+                              }
                             >
                               {/* 长名字（wiki 走查角色叫 "走查词条_1778866835578221688"、
                                   群里改备注成一句话等）会按字宽 wrap，把后面的
@@ -2295,7 +2335,7 @@ export function DiscoverFeedPage() {
                                   )}
                                 </>
                               ) : null}
-                              <span>：{cleanCommentText}</span>
+                              <span>：{cleanText}</span>
                             </div>
                           );
                         })}
