@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Search, X } from "lucide-react";
-import { getFriends } from "@yinjie/contracts";
+import { getFriends, SELF_CHARACTER_ID } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { InlineNotice } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
@@ -45,8 +45,17 @@ export function ManagementPermissionsScreen({
   // 排序，O(n log n)）和 filter+buildContactSections 放在同一个 useMemo 里，依赖
   // normalizedSearch，每个键都会让目录从零重排一次。对齐 contacts-page 的拆分
   // 后，directoryItems 只随 friendsQuery.data 重算；输入框敲字时只跑 O(n) filter。
+  // SELF 过滤：char-default-self（"我自己"）是用户的自我镜像，对自己设
+  // "不让 TA 看我朋友圈" / "仅聊天的朋友" 这类权限毫无意义（TA 就是你）。
+  // 已经在 add-friend search 按 relationshipType==='self' 过滤掉了，这里
+  // 对齐处理，避免"朋友权限"列表里冒出"我自己"诱导用户做自反操作。
   const directoryItems = useMemo(
-    () => createFriendDirectoryItems(friendsQuery.data ?? []),
+    () =>
+      createFriendDirectoryItems(
+        (friendsQuery.data ?? []).filter(
+          (item) => item.character.id !== SELF_CHARACTER_ID,
+        ),
+      ),
     [friendsQuery.data],
   );
   const sections = useMemo(() => {

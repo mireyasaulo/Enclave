@@ -618,6 +618,24 @@ export class SocialService {
       initiator?: 'user' | 'character' | 'system';
     },
   ): Promise<FriendRequestEntity> {
+    const initiator =
+      options?.initiator === 'character'
+        ? 'character'
+        : options?.initiator === 'system'
+          ? 'system'
+          : 'user';
+    // 走查 Round 1：自我镜像 char-default-self 不能由用户主动加好友。
+    // 前端 add-friend search 已按 relationshipType==='self' 过滤掉这一条结果，
+    // 但直接打 /api/social/friend-requests/send 时后端会照样创建一条 pending
+    // 请求（acceptAt 还会延迟自动通过），活成"自我加自我好友"的诡异 audit 行。
+    // initiator==='user' 时拒绝；initiator==='character'/'system' 仍允许，因为
+    // 系统初始化阶段会写入跟 self 的 friendship 行。
+    if (characterId === SELF_CHARACTER_ID && initiator === 'user') {
+      throw new AppError('SOCIAL_CANNOT_ADD_SELF', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Cannot send friend request to self mirror character',
+      });
+    }
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     // 预设角色首次添加好友时自动写入 DB；已在 DB 的角色（含管理员改过的）直接返回
     const char =
@@ -629,13 +647,6 @@ export class SocialService {
         status: HttpStatus.NOT_FOUND,
         legacyMessage: 'Character not found',
       });
-
-    const initiator =
-      options?.initiator === 'character'
-        ? 'character'
-        : options?.initiator === 'system'
-          ? 'system'
-          : 'user';
 
     const existing = await this.friendRequestRepo.findOneBy({
       ownerId: owner.id,
@@ -706,9 +717,14 @@ export class SocialService {
       characterId,
       characterName: char.name,
       characterAvatar: char.avatar,
-      triggerScene:
-        options?.triggerScene?.trim() ||
-        (options?.autoAccept ? 'manual_add' : 'shake'),
+      // 走查 Round 1：/api/social/friend-requests/send 是用户在 + → 添加朋友 里
+      // 主动搜索后点"添加"的入口，controller 不会传 triggerScene。原默认值在
+      // !autoAccept 分支落到 'shake'，让这条 outbound 记录在 admin / debug 视图、
+      // friend-request-scene-label 等所有 surface 都被打成「来自摇一摇」。摇一摇
+      // 已经有自己的 shake-discovery.service 显式传 triggerScene='shake_keep'；
+      // 这里 user-initiated send 的默认应该是 manual_add，跟 autoAccept 分支
+      // 保持一致。
+      triggerScene: options?.triggerScene?.trim() || 'manual_add',
       greeting,
       status: options?.autoAccept ? 'accepted' : 'pending',
       expiresAt: options?.autoAccept ? null : (options?.expiresAt ?? tomorrow),
@@ -883,6 +899,17 @@ ${personaSummary || '（暂无更多信息）'}
     createdAt: Date;
   }> {
     void reason;
+    // 走查 Round 1：char-default-self 是用户在隐界里的"自我镜像"角色，本质上
+    // 就是用户自己。允许拉黑会让自己跟自己的聊天 / 朋友圈链路全废（chatOnly /
+    // 朋友圈拉黑等过滤都跟着启效），unblock 之后还要走完整 friend 状态恢复。
+    // 走 add-friend search 时前端已按 relationshipType==='self' 过滤掉，
+    // 但 /api/social/block 端口没拦，后端兜底拒绝。
+    if (characterId === SELF_CHARACTER_ID) {
+      throw new AppError('SOCIAL_CANNOT_BLOCK_SELF', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Cannot block self mirror character',
+      });
+    }
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const existing = await this.friendshipRepo.findOneBy({
       ownerId: owner.id,
