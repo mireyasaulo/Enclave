@@ -21,8 +21,11 @@ const NAME_MIN_LENGTH = 2;
 // 会出现「foo↵bar」断行 / 制表位空白，profile-page 头部 truncate
 // 又会让它看起来像 "foo bar"（实际数据有 \n），用户根本看不出哪里坏。
 // 保存前折叠掉所有 ASCII / Unicode 控制字符（U+0000..U+001F、U+007F、U+0080..U+009F），
-// 内部的连续空白合并成一个普通空格。
+// 内部的连续空白合并成一个普通空格。跟 api/.../world-owner.service.ts 同款
+// server-side 兜底口径对齐。eslint no-control-regex 故意 disable —— 这里就是
+// 要拿控制字符 codepoint 范围做 sanitize，不是误写。
 const CONTROL_CHAR_PATTERN = new RegExp(
+  // eslint-disable-next-line no-control-regex
   "[\\u0000-\\u001f\\u007f-\\u009f]+",
   "g",
 );
