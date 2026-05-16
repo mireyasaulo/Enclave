@@ -1186,7 +1186,12 @@ export function StickerPanel({
     clearDeleteTransitionTimer(stickerKey);
     const timer = window.setTimeout(() => {
       deleteTransitionTimerRefs.current.delete(stickerKey);
-      void deleteMutation.mutateAsync({
+      // 用 mutate() 而不是 mutateAsync()——这里在 setTimeout 内 fire-and-forget，
+      // deleteMutation.onError 已经把错挂到 onError?.() 让外层 chat-composer
+      // 的 attachmentError 渲染出来；mutateAsync 的 promise 在 deleteCustomSticker
+      // 后端 4xx/5xx 时会 reject，`void` 不接 → 落 window.unhandledrejection
+      // 污染 telemetry。
+      deleteMutation.mutate({
         stickerId: input.sticker.stickerId,
         stickerKey,
         label: input.sticker.label,
@@ -3073,7 +3078,10 @@ export function StickerPanel({
           onChange={(event) => {
             const files = Array.from(event.currentTarget.files ?? []);
             if (files.length) {
-              void uploadMutation.mutateAsync(files);
+              // 用 mutate() 而不是 mutateAsync()——同上 deleteMutation 的理由：
+              // uploadMutation.onError 已经把错挂出来，mutateAsync 的 rejection
+              // 在 onChange handler 里 `void` 不接会落 unhandledrejection。
+              uploadMutation.mutate(files);
             }
             event.currentTarget.value = "";
           }}
