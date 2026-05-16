@@ -2519,6 +2519,11 @@ function MobileChannelsCard({
                   ? t(msg`取消点赞，当前 ${post.likeCount} 赞`)
                   : t(msg`点赞，当前 ${post.likeCount} 赞`)
               }
+              // 视频号点赞改成 toggle 后，rapid click 容易让多个 mutation 并发：
+              // 点 → unlike → 点 → like → 点 → unlike，三条请求并行回 server，
+              // 谁先成功谁先落库，最终状态可能跟用户最后一次点击的"意图"对不上。
+              // 锁住按钮直到当前 mutation 落地，避免叠死。
+              disabled={likePending}
               onClick={onLike}
             >
               <ThumbsUp
@@ -2710,20 +2715,23 @@ function ActionRailButton({
   label,
   ariaLabel,
   active = false,
+  disabled = false,
   onClick,
 }: {
   children: ReactNode;
   label: string;
   ariaLabel?: string;
   active?: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       aria-label={ariaLabel ?? label}
-      className="flex flex-col items-center gap-1 text-white transition-transform active:scale-[0.97]"
+      className="flex flex-col items-center gap-1 text-white transition-transform active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-70"
     >
       <span
         className={cn(
