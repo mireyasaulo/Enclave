@@ -80,6 +80,19 @@ function getCategoryLabels(): Array<{
 
 export function FavoritesPage() {
   const isDesktopLayout = useDesktopLayout();
+
+  // 之前 desktop 专用的 useMemo / useQuery / 6 个 useEffect 都跑在 mobile 渲染
+  // 路径上（700 项 filter + reduce + find 在每次 mobile FavoritesPage 渲染里
+  // 白跑一遍），然后才走到 `return <MobileFavoritesPage />`。把桌面分支拆成
+  // 独立组件，mobile 直接早退，从源头省掉这堆白做的活。
+  if (!isDesktopLayout) {
+    return <MobileFavoritesPage />;
+  }
+
+  return <DesktopFavoritesPage />;
+}
+
+function DesktopFavoritesPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
@@ -105,19 +118,16 @@ export function FavoritesPage() {
   const favoritesQuery = useQuery({
     queryKey: ["app-favorites", baseUrl],
     queryFn: () => getFavorites(baseUrl),
-    enabled: isDesktopLayout,
   });
   const favoriteNotesQuery = useQuery({
     queryKey: ["favorite-notes", baseUrl],
     queryFn: () => getFavoriteNotes(baseUrl),
-    enabled: isDesktopLayout,
   });
   const noteEditorRouteState = routeState.noteEditor;
   const workspaceRouteState = routeState.workspace;
   const desktopFavoritesPath = "/tabs/favorites";
   const normalizedPathname = normalizePathname(pathname);
-  const desktopPathMismatch =
-    isDesktopLayout && normalizedPathname !== desktopFavoritesPath;
+  const desktopPathMismatch = normalizedPathname !== desktopFavoritesPath;
 
   const normalizedSearchText = deferredSearchText.trim().toLowerCase();
   const favoriteNoteSummaryMap = useMemo(() => {
@@ -309,31 +319,33 @@ export function FavoritesPage() {
     });
   }, [activeCategory, favoriteNoteSummaryMap, favorites, normalizedSearchText]);
 
-  useEffect(() => {
+  // 之前是 useEffect + setSelectedFavoriteSourceId 兜底"当前选中已被过滤掉就
+  // 顺到第一条"，导致切分类时一帧里：路由 sync effect 先按旧 selectedId 写 hash、
+  // 接着 auto-select effect 把 selectedId 改成 filtered[0]、再触发第二轮 hash sync
+  // 写正确 hash。两次 navigate() 直接被用户感知成 URL 闪一下，回退时还可能被
+  // TanStack 截到第一条 hash。改成 derived，render 期就给出正确值，
+  // 路由 sync 单次写入。
+  const effectiveSelectedSourceId = useMemo(() => {
     if (
       selectedFavoriteSourceId &&
       filteredFavorites.some(
-        (item) => item.sourceId === selectedFavoriteSourceId,
+        (item) => item.sourceId === effectiveSelectedSourceId,
       )
     ) {
-      return;
+      return selectedFavoriteSourceId;
     }
 
-    setSelectedFavoriteSourceId(filteredFavorites[0]?.sourceId ?? null);
+    return filteredFavorites[0]?.sourceId ?? null;
   }, [filteredFavorites, selectedFavoriteSourceId]);
 
   useEffect(() => {
-    if (
-      !isDesktopLayout ||
-      normalizedPathname !== desktopFavoritesPath ||
-      noteEditorRouteState
-    ) {
+    if (normalizedPathname !== desktopFavoritesPath || noteEditorRouteState) {
       return;
     }
 
     const nextHash = buildDesktopFavoritesWorkspaceRouteHash({
       category: activeCategory,
-      sourceId: selectedFavoriteSourceId ?? undefined,
+      sourceId: effectiveSelectedSourceId ?? undefined,
     });
     const normalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
 
@@ -349,17 +361,16 @@ export function FavoritesPage() {
   }, [
     activeCategory,
     desktopFavoritesPath,
+    effectiveSelectedSourceId,
     hash,
-    isDesktopLayout,
     navigate,
     noteEditorRouteState,
     normalizedPathname,
-    selectedFavoriteSourceId,
   ]);
 
   const selectedFavorite =
     filteredFavorites.find(
-      (item) => item.sourceId === selectedFavoriteSourceId,
+      (item) => item.sourceId === effectiveSelectedSourceId,
     ) ?? null;
   const selectedFavoriteNavigationTarget = useMemo(
     () =>
@@ -396,10 +407,6 @@ export function FavoritesPage() {
     return next;
   }, [favorites]);
 
-  if (!isDesktopLayout) {
-    return <MobileFavoritesPage />;
-  }
-
   function openInlineNoteEditor(input?: {
     noteId?: string;
     draftId?: string;
@@ -411,7 +418,7 @@ export function FavoritesPage() {
     });
     const workspaceHash = buildDesktopFavoritesWorkspaceRouteHash({
       category: activeCategory,
-      sourceId: selectedFavoriteSourceId ?? undefined,
+      sourceId: effectiveSelectedSourceId ?? undefined,
     });
     const fallbackReturnTo = `${desktopFavoritesPath}${
       workspaceHash ? `#${workspaceHash}` : ""
@@ -752,11 +759,11 @@ export function FavoritesPage() {
                   key={item.id}
                   type="button"
                   role="option"
-                  aria-selected={item.sourceId === selectedFavoriteSourceId}
+                  aria-selected={item.sourceId === effectiveSelectedSourceId}
                   onClick={() => setSelectedFavoriteSourceId(item.sourceId)}
                   className={cn(
                     "flex w-full items-start gap-4 rounded-[14px] border px-4 py-4 text-left transition",
-                    item.sourceId === selectedFavoriteSourceId
+                    item.sourceId === effectiveSelectedSourceId
                       ? "border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] shadow-[var(--shadow-soft)]"
                       : "border-[color:var(--border-faint)] bg-white hover:bg-[rgba(255,255,255,0.92)]",
                   )}
