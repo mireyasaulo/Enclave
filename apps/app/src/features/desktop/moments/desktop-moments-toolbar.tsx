@@ -9,7 +9,12 @@ type DesktopMomentsToolbarProps = {
   errors?: string[];
   likeErrorMessage?: string | null;
   successNotice?: string;
-  totalCount: number;
+  /** 当前已加载到前端的动态数（visibleMoments.length） */
+  loadedCount: number;
+  /** 服务端 MomentsPageResponse.total。null = 首页还没拿到 */
+  totalCount?: number | null;
+  /** auto-prefetch 已经把所有页拉完。完成后只显示「共 N 条」 */
+  isFullyLoaded?: boolean;
   onBackToTop: () => void;
   onOpenCompose: () => void;
   onRefresh: () => void;
@@ -21,7 +26,9 @@ export function DesktopMomentsToolbar({
   errors = [],
   likeErrorMessage,
   successNotice,
-  totalCount,
+  loadedCount,
+  totalCount = null,
+  isFullyLoaded = true,
   onBackToTop,
   onOpenCompose,
   onRefresh,
@@ -55,7 +62,14 @@ export function DesktopMomentsToolbar({
 
         <div className="mt-4 flex items-center justify-end">
           <div className="text-[12px] text-[color:var(--text-muted)]">
-            {t(msg`当前共 ${totalCount} 条动态`)}
+            {/* 之前一律 "当前共 X 条动态"，但 auto-prefetch 中途 X 还在涨，
+                用户读着以为 X 就是总数 ——「我才 100 条朋友圈？」其实有 240。
+                未跑完时拿服务端 total 当上限显示「已加载 100 / 共 240」；跑完后
+                回到客户端 visible count（loadedCount）—— 服务端 total 没扣黑名单
+                过滤的角色 moments，跑完显示 240 但客户端只能看 235 会反过来误导。 */}
+            {!isFullyLoaded && totalCount !== null && totalCount > loadedCount
+              ? t(msg`已加载 ${loadedCount} / 共 ${totalCount} 条动态`)
+              : t(msg`共 ${loadedCount} 条动态`)}
           </div>
         </div>
 

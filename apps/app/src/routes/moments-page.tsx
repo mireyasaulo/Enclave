@@ -204,6 +204,10 @@ export function MomentsPage() {
   const momentsIsFetchingNextPage = momentsQuery.isFetchingNextPage;
   const momentsIsFetchNextPageError = momentsQuery.isFetchNextPageError;
   const momentsFetchNextPage = momentsQuery.fetchNextPage;
+  // 服务端 total（来自首页响应）—— toolbar 之前一律显示 moments.length 当总数,
+  // auto-prefetch 中途 100/240 时显示「共 100 条」会误导用户以为只剩 100。
+  // 用第一页响应的 total 作为权威总数，hasNextPage=false 时退回纯 length（兜底）。
+  const momentsServerTotal = momentsQuery.data?.pages[0]?.total ?? null;
   // 桌面工作区不挂触底 sentinel：mount 后自动连续 prefetch 把所有页悄悄填上。
   // 移动端用 sentinel + IntersectionObserver 按需触发。
   // fetchNextPageError 期间停止自动 prefetch——否则 isFetchingNextPage 翻 false
@@ -1047,6 +1051,8 @@ export function MomentsPage() {
           }
           likePendingMomentId={pendingLikeMomentId}
           moments={visibleMoments}
+          totalCount={momentsServerTotal}
+          isFullyLoaded={!momentsHasNextPage}
           ownerAvatar={ownerAvatar}
           ownerId={ownerId}
           ownerUsername={ownerUsername}

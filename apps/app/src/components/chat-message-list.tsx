@@ -3810,6 +3810,7 @@ export function ChatMessageList({
       />
       <MobileMessageReminderSheet
         open={Boolean(reminderTargetMessage)}
+        variant={variant}
         previewText={
           reminderTargetMessage
             ? buildClipboardText(t, reminderTargetMessage)

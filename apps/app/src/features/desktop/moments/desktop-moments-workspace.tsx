@@ -33,6 +33,12 @@ type DesktopMomentsWorkspaceProps = {
   likeErrorMessage?: string | null;
   likePendingMomentId: string | null;
   moments: Moment[];
+  /**
+   * 服务端 MomentsPageResponse.total —— auto-prefetch 没跑完时 moments.length
+   * 只是「已加载」，不能当总数显示。null 表示还没拿到首页响应。
+   */
+  totalCount?: number | null;
+  isFullyLoaded?: boolean;
   ownerAvatar?: string | null;
   ownerId?: string | null;
   ownerUsername?: string | null;
@@ -86,6 +92,8 @@ export function DesktopMomentsWorkspace({
   likeErrorMessage,
   likePendingMomentId,
   moments,
+  totalCount = null,
+  isFullyLoaded = true,
   ownerAvatar,
   ownerId,
   ownerUsername,
@@ -166,7 +174,9 @@ export function DesktopMomentsWorkspace({
             errors={errors}
             likeErrorMessage={likeErrorMessage}
             successNotice={successNotice}
-            totalCount={moments.length}
+            loadedCount={moments.length}
+            totalCount={totalCount}
+            isFullyLoaded={isFullyLoaded}
             onBackToTop={() => {
               scrollViewportRef.current?.scrollTo({
                 top: 0,
