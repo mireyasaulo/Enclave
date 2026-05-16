@@ -155,9 +155,29 @@ function renderExportOptions(envForRender) {
     );
 
     // Uncomment the manual signing block when style=manual.
+    //
+    // 老实现拿 `<!--\s*[\s\S]*?<key>signingCertificate</key>...<\/dict>\s*-->`
+    // 起头匹配「第一个 <!-- 一直延伸到 signingCertificate 那行所在的 -->」，
+    // 但模板文件最顶上还有一段「method options」中文 doc 注释、其后又有一段
+    // 「手动签名时取消下面 4 行注释」中文小注释 —— 正则的 `<!--` 命中的是
+    // 最顶上的 method options 注释，`[\s\S]*?` 一路吃到 signingCertificate
+    // 块。然后 replace 里 `^\s*<!--\s*` / `-->\s*$` 也只剥最外层的一对，
+    // 导致：
+    //   1. method options 中文 doc 注释失去外壳，变成裸露在 <dict> 下的
+    //      raw XML 文本，xcodebuild 解析 plist 直接 syntax-error；
+    //   2. signingCertificate 块本身的 <!-- ... --> 内层注释还在，依旧整段
+    //      被注释掉，xcodebuild manual 导出缺 signingCertificate /
+    //      provisioningProfiles 必死。
+    //
+    // CI workflow ios-release.yml job-level env 写死 CODE_SIGN_STYLE=Manual，
+    // 这条路径就是 CI 跑 export 的唯一通路 —— 任何一次 manual 签名导出都
+    // 会撞这个 bug，目前从没人在 CI 上把 IPA 真正出过。
+    //
+    // 改成精确匹配「signingCertificate 块自己的 <!-- ... -->」+ 捕获内层
+    // 内容做 single-pass 替换，不会再误伤前面的中文 doc 注释。
     rendered = rendered.replace(
-      /<!--\s*[\s\S]*?<key>signingCertificate<\/key>[\s\S]*?<\/dict>\s*-->/m,
-      (match) => match.replace(/^\s*<!--\s*/m, "").replace(/-->\s*$/m, ""),
+      /<!--\s*(<key>signingCertificate<\/key>[\s\S]*?<\/dict>)\s*-->/m,
+      "$1",
     );
   }
 
