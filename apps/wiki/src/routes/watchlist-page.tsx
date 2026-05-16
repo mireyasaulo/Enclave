@@ -37,7 +37,13 @@ export function WatchlistPage() {
         description={t(msg`登录后即可关注词条并查看最新动态。`)}
       >
         <Card className="p-6 text-sm">
-          <Trans>请先登录。</Trans>
+          <Trans>
+            请先{" "}
+            <Link to="/login" className="font-medium underline">
+              登录
+            </Link>{" "}
+            后再使用此功能。
+          </Trans>
         </Card>
       </PageShell>
     );

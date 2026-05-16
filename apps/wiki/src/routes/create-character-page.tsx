@@ -10,7 +10,7 @@
 import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
@@ -101,7 +101,13 @@ export function CreateCharacterPage() {
     return (
       <PageShell eyebrow={t(msg`编辑`)} title={t(msg`创建世界角色`)}>
         <Card className="p-6 text-sm">
-          <Trans>请先登录后再创建角色。</Trans>
+          <Trans>
+            请先{" "}
+            <Link to="/login" className="font-medium underline">
+              登录
+            </Link>{" "}
+            后再创建角色。
+          </Trans>
         </Card>
       </PageShell>
     );

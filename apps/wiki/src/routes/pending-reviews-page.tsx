@@ -66,7 +66,13 @@ export function PendingReviewsPage() {
     return (
       <PageShell eyebrow={t(msg`审核`)} title={t(msg`待审编辑`)}>
         <Card className="p-6 text-sm">
-          <Trans>请先登录。</Trans>
+          <Trans>
+            请先{" "}
+            <Link to="/login" className="font-medium underline">
+              登录
+            </Link>{" "}
+            后再访问待审编辑队列。
+          </Trans>
         </Card>
       </PageShell>
     );
