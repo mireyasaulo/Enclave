@@ -118,6 +118,31 @@ export function sanitizeDisplayedChatText(text: string): string {
   return sanitizeAssistantText(body);
 }
 
+// 服务端 recall 把消息 senderType/type 改成 'system' 并塞硬编码中文 text
+// "你撤回了一条消息"。en/ja/ko locale 用户从 cache（refresh / 重新进会话）/
+// socket echo 拿到的撤回提示会原样显示中文。客户端需要识别这串 marker text
+// 然后用 i18n 翻译版本去渲染。chat.service.ts:506 + group.service.ts:579 是
+// 数据源；老库已有数据全是中文文本，不能光改服务端，必须在客户端识别。
+//
+// 这是 owner 自己撤回 → 翻译要走"你"actor 分支（buildRecalledMessageNotice
+// 里 senderType === "user" 这条），因为服务端 recall 在 chat-only-own
+// guard 后才允许写入，能落到这条 marker 上的一定是 owner 自己撤回的。
+export const SERVER_RECALL_MARKER_TEXT = "你撤回了一条消息";
+
+export function isServerRecalledSystemMessage(message: {
+  senderType?: string | null;
+  type?: string | null;
+  text: string;
+}): boolean {
+  if (!message) {
+    return false;
+  }
+  if (message.senderType !== "system" && message.type !== "system") {
+    return false;
+  }
+  return message.text === SERVER_RECALL_MARKER_TEXT;
+}
+
 export function extractChatReplyMetadata(text: string): {
   reply?: ChatReplyMetadata;
   body: string;

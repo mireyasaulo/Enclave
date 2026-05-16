@@ -105,6 +105,7 @@ import { resolveAppMediaUrl } from "../lib/media-url";
 import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import {
   extractChatReplyMetadata,
+  isServerRecalledSystemMessage,
   sanitizeDisplayedChatText,
   splitChatTextSegments,
 } from "../lib/chat-text";
@@ -2980,6 +2981,11 @@ export function ChatMessageList({
           message.senderType === "user" && recalledMessageIdSet.has(message.id);
         const isSystem =
           message.type === "system" || message.senderType === "system";
+        // 服务端 recall（chat.service.ts:506 / group.service.ts:579）把消息
+        // 整段重写成 senderType=system + 中文 text "你撤回了一条消息"，refresh
+        // 后或 socket echo 路径都拿到的是这个原文。en/ja/ko locale 用户会原样
+        // 看到中文。客户端识别 marker，仍走 buildRecalledMessageNotice 翻译输出。
+        const isServerSideRecalled = isServerRecalledSystemMessage(message);
         const isHighlighted = message.id === resolvedHighlightedMessageId;
         const isSelected = selectedMessageIdSet.has(message.id);
         const continuesMessageRun =
@@ -3042,7 +3048,7 @@ export function ChatMessageList({
                   }
                 />
               ) : null}
-              {sharedHistorySummary && !isRecalled ? (
+              {sharedHistorySummary && !isRecalled && !isServerSideRecalled ? (
                 <SharedHistorySummaryNotice
                   id={`chat-message-${message.id}`}
                   summary={sharedHistorySummary}
@@ -3061,7 +3067,14 @@ export function ChatMessageList({
                 >
                   {isRecalled
                     ? buildRecalledMessageNotice(t, message)
-                    : displayText}
+                    : isServerSideRecalled
+                      ? // 服务端 recall 是 owner-only：能落到这个 marker 的一定是
+                        // 用户自己撤回的。actor 走"你"分支，复用同款翻译。
+                        buildRecalledMessageNotice(t, {
+                          ...message,
+                          senderType: "user",
+                        })
+                      : displayText}
                 </InlineNotice>
               )}
             </div>

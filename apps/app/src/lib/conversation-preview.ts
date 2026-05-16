@@ -3,6 +3,7 @@ import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { LocalChatMessageActionState } from "../features/chat/local-chat-message-actions";
 import { shouldHideSearchableChatMessage } from "../features/chat/local-chat-message-actions";
+import { isServerRecalledSystemMessage } from "./chat-text";
 import {
   getConversationThreadLabel,
   isPersistedGroupConversation,
@@ -61,6 +62,22 @@ export function getConversationPreviewParts(
       text: conversation.lastMessage
         ? getConversationOpenFallback(conversation)
         : (options?.emptyText ?? getConversationOpenFallback(conversation)),
+    };
+  }
+
+  // 服务端 recall（chat.service.ts:506 / group.service.ts:579）把消息整段
+  // 重写成 senderType=system + 中文 marker text。conversation 列表第二行
+  // 直接走 resolveMessageSemanticPreview 会把中文原样返回；en/ja/ko locale
+  // 看到的就是中文。先拦下来走 i18n 撤回提示。owner-only recall guard 保证
+  // 这里能命中 marker 的就是 user 自己撤回的，所以构造一个 user 视角的
+  // lastMessage 喂进 getConversationRecalledPreviewText。
+  if (isServerRecalledSystemMessage(lastMessage)) {
+    return {
+      prefix: "",
+      text: getConversationRecalledPreviewText(conversation, {
+        ...lastMessage,
+        senderType: "user",
+      }),
     };
   }
 
