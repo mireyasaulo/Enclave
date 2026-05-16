@@ -23,6 +23,24 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
+// 之前 URL 输入框完全不校验，用户输 "abc"、"https//x"（漏冒号）这种
+// 也能 disable 不掉「完成」一路提交到服务端落库，AvatarChip 加载失败
+// 静默回落到 fallback。用户以为头像改好了，profile 里却是 initials —
+// 拍照 / 重新进来 / 等等几个入口都看不出哪里错了，毫无反馈。
+// 跟 profile-settings 校验 customApiBase 同样的逻辑：trim + 用 URL
+// 构造器 try / catch 一下，只放行 http(s) 和 data:image/。
+function isValidAvatarUrlInput(value: string): boolean {
+  if (!value) return true; // 空 = 不打算改，由 canSave 单独 gate
+  if (/^data:image\//i.test(value)) return true;
+  let parsed: URL | null = null;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return false;
+  }
+  return parsed.protocol === "http:" || parsed.protocol === "https:";
+}
+
 export function ProfileInfoAvatarPage() {
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
@@ -88,7 +106,10 @@ export function ProfileInfoAvatarPage() {
   const valueToSave = pickedLocal?.dataUrl || trimmed;
   const baseline = hasCustomAvatar ? avatar.trim() : "";
   const dirty = valueToSave !== baseline;
-  const canSave = valueToSave.length > 0 && dirty;
+  // pickedLocal 是 FileReader 给的 data URL，肯定合法；只有用户手敲的
+  // draft 才需要 URL validity gate。
+  const urlInputValid = pickedLocal != null || isValidAvatarUrlInput(trimmed);
+  const canSave = valueToSave.length > 0 && dirty && urlInputValid;
   const previewSrc =
     pickedLocal?.dataUrl ||
     trimmed ||
@@ -237,6 +258,11 @@ export function ProfileInfoAvatarPage() {
           {storedIsDataUrl ? (
             <div className="mt-2 text-[11px] leading-4 text-[color:var(--text-muted)]">
               {t(msg`当前头像已存为本地图片。粘贴新 URL 或重新选择都会替换它。`)}
+            </div>
+          ) : null}
+          {trimmed && !urlInputValid ? (
+            <div className="mt-2 text-[11px] leading-4 text-[#92400e]">
+              {t(msg`需要是 http/https 开头的合法图片链接。`)}
             </div>
           ) : null}
         </div>
