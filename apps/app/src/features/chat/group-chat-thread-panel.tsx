@@ -397,21 +397,14 @@ export function GroupChatThreadPanel({
       // 直接把消息写进 cache：本地 state 已经有新消息，但 cache 没动；
       // 用户离开再回来时 useQuery 在移动端 staleTime=60s 内不会 refetch，
       // 看不到这条群消息。setQueriesData 直接合并进所有 messageLimit 变体
-      // 的 cache，下次挂载立刻就在，不依赖 refetch RTT。
+      // 的 cache，下次挂载立刻就在，不依赖 refetch RTT。同时 cache 长度
+      // 会增加，下方"messages 长度变化时标已读 + 刷会话列表"的 effect 会
+      // 自动触发——不在这里重复调，避免每条群消息打两次 markGroupRead 和
+      // 两次 conversations refetch（公网隧道 ~600ms RTT 下会肉眼可见）。
       queryClient.setQueriesData<GroupMessage[]>(
         { queryKey: ["app-group-messages", baseUrl, groupId] },
         (current) => upsertServerMessageInCache(current, payload),
       );
-      // 标已读：用户正活跃在群聊页面，收到新消息时主动同步
-      // 后端读位。要是不调，会话列表的未读会一直涨——本地 messages 在 socket
-      // 推送时长，但 messagesQuery.data 不变，下方"messages 长度变化时标已读"
-      // 的 effect 不会因 socket 增量触发。这里和单聊
-      // use-conversation-thread.ts#onChatMessage 的 markActiveConversationRead
-      // 对齐。自己发的消息也调 → 服务端 no-op，无副作用。
-      void markGroupRead(groupId, baseUrl);
-      void queryClient.invalidateQueries({
-        queryKey: ["app-conversations", baseUrl],
-      });
     });
 
     const offTypingStart = onTypingStart((payload) => {
