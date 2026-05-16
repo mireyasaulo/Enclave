@@ -720,12 +720,13 @@ export function CharacterDetailPage() {
         message: blocked ? t(msg`已移出黑名单。`) : t(msg`已加入黑名单。`),
       });
       // 走查 R3：blockCharacter 后端把 friendship.status 改成 'blocked' 且
-      // 把 isStarred 一并清掉，getFriends() 此后不再返回这条 friendship。但
-      // 这里 onSuccess 只 invalidate 黑名单相关三条 query，app-friends/
-      // app-conversations 都没动。结果：用户在好友名片上点「加入黑名单」之后页
-      // 面仍按"朋友"状态渲染（顶部"朋友信息" / 底部"发消息+音视频通话" / 星标
-      // 还亮着），要离开再进来才修。unblock 非 default 居民时友谊行被整行 remove，
-      // 同样会留下脏的 friendsQuery 缓存。一起 invalidate 进来。
+      // 把 isStarred 一并清掉，getFriends() 此后不再返回这条 friendship。
+      // 走查 R9：moments.service.getFeed 用 ownerFriendCharacterIds 判断
+      // canOwnerViewPost，加入黑名单后这个 character 的 moments / 广场动态都该
+      // 从结果里消失。但 onSuccess 没动 app-moments-paged / app-feed-paged，
+      // 用户拉黑后回 /tabs/discover/moments 仍然看到这位被拉黑用户的旧 post
+      // 直到 query stale。改用 invalidateFriendDisplayQueries 覆盖 friend /
+      // conversation / moments / feed / individual post 全套缓存。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-chat-details-blocked", baseUrl],
@@ -736,24 +737,19 @@ export function CharacterDetailPage() {
         queryClient.invalidateQueries({
           queryKey: ["app-chat-blocked-characters", baseUrl],
         }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-friends", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        }),
+        invalidateFriendDisplayQueries(queryClient, baseUrl),
       ]);
     },
   });
   const deleteFriendMutation = useMutation({
     mutationFn: () => deleteFriend(characterId, baseUrl),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-friends", baseUrl] }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        }),
-      ]);
+      // 走查 R9：deleteFriend 把 friendship.status 改成 'removed'，跟 block 一样
+      // 让 canOwnerViewPost 把对方过往的 moments / feed post 全过滤掉。原来只
+      // invalidate app-friends + app-conversations，moments / feed 这两条
+      // surface 上的脏 post 要等下一次 staleTime 才更新。用 invalidateFriend-
+      // DisplayQueries 一并覆盖。
+      await invalidateFriendDisplayQueries(queryClient, baseUrl);
       if (navigateToRouteStateReturn({ replace: true })) {
         return;
       }
