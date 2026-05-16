@@ -198,6 +198,14 @@ export function MobileFeedPublishPage() {
 
   useEffect(() => {
     resetComposeDraft();
+    // 走查 Round 4：切账户后旧账户的 createMutation.isError 状态会被旧 render 闭
+    // 包带到新账户，publish 页一打开就顶着一条「发布失败 · {error.message}」红
+    // 色 InlineNotice，但新账户什么都没做。跟 discover-feed-page R11 同模式：
+    // mutation.reset() 只清 UI 状态、不取消 in-flight 请求，即使 mid-flight 切
+    // 账户也安全——前面 Round 2 的 onSuccess 已经按 mutationBaseUrl gate 住，
+    // 切走后的 success/error 反馈也不会落到新账户身上。
+    createMutation.reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseUrl, resetComposeDraft]);
 
   useEffect(() => {

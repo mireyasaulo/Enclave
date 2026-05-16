@@ -2062,8 +2062,14 @@ export function DiscoverFeedPage() {
 
           {visiblePosts.map((post) => {
             const displayText = stripToolCallSyntax(post.text);
-            const postSummaryText = getFeedSummaryText(post);
-            const summaryText = displayText ? "" : postSummaryText;
+            // 走查 Round 4 (perf)：旧版无脑 getFeedSummaryText(post) → 内部 *又*
+            // 跑一遍 stripToolCallSyntax(post.text)；displayText 已经 strip 过的
+            // 路径下完全是浪费。绝大多数 post 都有正文（displayText 非空），
+            // summaryText 落到 ""，postSummaryText 算出来也没用。60 条 post 每
+            // 次评论 / 点赞 / pull-refresh / typing 触发的整页 re-render 都跑这
+            // 60 次没用的 regex。Lazy 一下：displayText 非空时直接 ""，空了才
+            // 调 getFeedSummaryText 走"分享了 X 张图片"那条 media 兜底。
+            const summaryText = displayText ? "" : getFeedSummaryText(post);
 
             return (
               <div key={post.id} className="yj-list-item-virtual-card">
