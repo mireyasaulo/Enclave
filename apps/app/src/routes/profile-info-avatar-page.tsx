@@ -78,7 +78,9 @@ function isRelativeAvatarPath(value: string): boolean {
 function looksLikePreviewableImageUrl(value: string): boolean {
   if (!value) return false;
   if (/^data:image\//i.test(value)) {
-    return value.length > "data:image/x;,".length;
+    // 跟 checkAvatarUrlInput 同口径：太短的 data URL（光 MIME 头）解码不出像素，
+    // preview 也别去尝试，省得 <img> onError → fallback → loadFailed=true 一通副作用。
+    return value.length >= MIN_AVATAR_DATA_URL_LENGTH;
   }
   if (isRelativeAvatarPath(value)) {
     // /a 已经够当 path 用，但 / 单独不行
