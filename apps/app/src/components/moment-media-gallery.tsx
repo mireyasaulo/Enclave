@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
 import {
   type MomentAudioAsset,
@@ -534,7 +535,11 @@ function MomentImageViewerOverlay({
 }) {
   const isMobile = variant === "mobile";
 
-  return (
+  // 朋友圈页用 transform: translateY(...) 包裹整个内容做下拉刷新（moments-page.tsx
+  // ~1572 行）。一旦祖先有 transform / filter / perspective，CSS 规范里 fixed
+  // 定位的 containing block 就从 viewport 收缩到那个祖先 → 全屏 viewer 会落在帖子
+  // 卡片大小的盒子里而不是全屏。portal 到 document.body 跳出 transform 笼子。
+  const overlay = (
     <div className="fixed inset-0 z-50 bg-[rgba(15,23,42,0.92)] backdrop-blur-sm">
       <button
         type="button"
@@ -590,6 +595,9 @@ function MomentImageViewerOverlay({
       ) : null}
     </div>
   );
+
+  if (typeof document === "undefined") return overlay;
+  return createPortal(overlay, document.body);
 }
 
 function MomentVideoViewerOverlay({
@@ -626,7 +634,8 @@ function MomentVideoViewerOverlay({
     }
   };
 
-  return (
+  // 同图片 viewer，朋友圈页 transform 祖先会把 fixed 困在 post 卡片里。portal 出去。
+  const overlay = (
     <div className="fixed inset-0 z-50 bg-[rgba(15,23,42,0.94)] backdrop-blur-sm">
       <button
         type="button"
@@ -681,6 +690,9 @@ function MomentVideoViewerOverlay({
       </div>
     </div>
   );
+
+  if (typeof document === "undefined") return overlay;
+  return createPortal(overlay, document.body);
 }
 
 function WeChatGridCell({

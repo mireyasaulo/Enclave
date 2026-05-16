@@ -183,7 +183,11 @@ export function AudioCard({
           </span>
         </div>
       </div>
-      <audio ref={audioRef} src={resolvedAudioUrl} preload="metadata" />
+      {/* preload="none"：feed 上一屏出现多张 audio_card（朋友圈一次拉 20 条，
+          有 18 条 audio_card 时 metadata 探针就是 18 个 HTTP；Chromium / Safari 对
+          短 mp3 还会把整文件抓回来）。我们已经从 moment 数据里拿到 durationMs，
+          首屏不需要再去探 metadata。第一次 play 时再开始拉流。 */}
+      <audio ref={audioRef} src={resolvedAudioUrl} preload="none" />
     </div>
   );
 }
