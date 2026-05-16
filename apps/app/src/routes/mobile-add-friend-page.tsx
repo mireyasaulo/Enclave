@@ -163,9 +163,13 @@ function MobileAddFriend() {
     staleTime: 15_000,
   });
 
+  // 用 direction=all 拿全集：默认 inbound-only 拿不到用户主动发出的 outbound
+  // 请求，导致用户已经申请过的角色行还显示「可添加」可以再点一次（后端会
+  // 静默 dedupe，但 UI 上误导用户以为可以再加）。和 character-detail-page 用
+  // 同一个 ['app-friend-requests', baseUrl, 'all'] key 共享 react-query 缓存。
   const friendRequestsQuery = useQuery({
-    queryKey: ["app-friend-requests", baseUrl],
-    queryFn: () => getFriendRequests(baseUrl),
+    queryKey: ["app-friend-requests", baseUrl, "all"],
+    queryFn: () => getFriendRequests(baseUrl, { direction: "all" }),
   });
 
   const blockedQuery = useQuery({
@@ -242,7 +246,18 @@ function MobileAddFriend() {
     () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
     [blockedQuery.data],
   );
-  const pendingRequestCount = pendingRequestMap.size;
+  // 右上角 "新的朋友" badge 只算需要用户处理的 inbound 请求（acceptAt=null
+  // 是角色主动发起、等用户决定）；outbound 那些是用户已经发出去、等角色
+  // 自动通过的，不应该在 badge 上提醒用户去 /friend-requests 操作。
+  const pendingRequestCount = useMemo(() => {
+    let count = 0;
+    for (const request of friendRequestsQuery.data ?? []) {
+      if (request.status === "pending" && !request.acceptAt) {
+        count += 1;
+      }
+    }
+    return count;
+  }, [friendRequestsQuery.data]);
 
   const trimmedKeyword = submittedKeyword.trim();
   const normalizedKeyword = trimmedKeyword.toLowerCase();
