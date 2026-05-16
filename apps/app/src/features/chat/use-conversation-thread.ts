@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateRuntimeMessage } from "@yinjie/i18n";
@@ -487,15 +487,20 @@ export function useConversationThread(conversationId: string) {
   // mutationFn 抛错（socket-disconnected 等）后 onError 已把消息标 failed，
   // 调用方只是用 await 做顺序控制（追踪/滚动），不需要看到 rejection。
   // 不吞会落到 unhandledrejection → 污染 telemetry errors 列表。
-  const runSendMutation = async (
-    input: Parameters<typeof sendMutation.mutateAsync>[0],
-  ) => {
-    try {
-      await sendMutation.mutateAsync(input);
-    } catch {
-      // onError 已处理
-    }
-  };
+  // sendMutation.mutateAsync 在 react-query 里是稳定的（mutation.mutateAsync ref
+  // 跨 render 不变），用 useCallback 把 runSendMutation 也固化，让 retryMessage
+  // 的 useCallback 真正能稳定下来。
+  const sendMutationAsync = sendMutation.mutateAsync;
+  const runSendMutation = useCallback(
+    async (input: Parameters<typeof sendMutation.mutateAsync>[0]) => {
+      try {
+        await sendMutationAsync(input);
+      } catch {
+        // onError 已处理
+      }
+    },
+    [sendMutationAsync],
+  );
 
   const sendTextMessage = async (overrideText?: string) => {
     const trimmed = (overrideText ?? text).trim();
@@ -704,10 +709,13 @@ export function useConversationThread(conversationId: string) {
         retryMessageId: messageId,
       });
     },
-    [conversationId, messages, ownerId, participants, sendMutation],
+    // sendMutation 整个对象每次 render 都换引用，不要塞进 deps —— retryMessage 会
+    // 跟着每次 render 重建，把它当作"稳定回调"挂在子组件 onClick 上的语义就破了。
+    // runSendMutation 已经被 useCallback 固化在稳定 mutateAsync 之上，足够。
+    [conversationId, messages, ownerId, participants, runSendMutation],
   );
 
-  const renderedMessages = useMemo(() => messages, [messages]);
+  const renderedMessages = messages;
 
   const loadOlderMessages = useCallback(async () => {
     if (messagesQuery.isFetching || !hasOlderMessages) {

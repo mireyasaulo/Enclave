@@ -482,11 +482,17 @@ export function GroupChatThreadPanel({
       return;
     }
 
-    void markGroupRead(groupId, baseUrl).then(() => {
-      void queryClient.invalidateQueries({
-        queryKey: ["app-conversations", baseUrl],
+    // 公网隧道偶发超时 / cloud token 过期重连那几百 ms 都会让 markGroupRead 抛
+     // —— 不 catch 直接落到 unhandledrejection，污染 telemetry。与 direct
+     // 版本 (use-conversation-thread.ts) 对齐：吞掉错误，下次消息长度变化时
+     // effect 会重跑、自动重试。finally 仍然 invalidate 让列表 badge 同步。
+    void markGroupRead(groupId, baseUrl)
+      .catch(() => {})
+      .finally(() => {
+        void queryClient.invalidateQueries({
+          queryKey: ["app-conversations", baseUrl],
+        });
       });
-    });
   }, [
     baseUrl,
     groupId,

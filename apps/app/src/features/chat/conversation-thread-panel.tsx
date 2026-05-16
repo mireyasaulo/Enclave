@@ -208,12 +208,12 @@ export function ConversationThreadPanel({
     conversationType === "direct" && participants[0] === REMINDER_CHARACTER_ID;
   const subtitle =
     conversationType === "group"
-      ? t(msg`${participants.length || 0} 人群聊`)
+      ? t(msg`${participants.length} 人群聊`)
       : typingState?.stage === "image_generation"
         ? t(msg`对方正在生成图片...`)
         : typingState
           ? t(msg`对方正在回复...`)
-        : undefined;
+          : undefined;
 
   const hasHighlightedMessage = renderedMessages.some(
     (message) => message.id === highlightedMessageId,
@@ -400,9 +400,14 @@ export function ConversationThreadPanel({
 
   const [callUnavailableKind, setCallUnavailableKind] =
     useState<DesktopChatCallKind | null>(null);
-  const handleDesktopCallAction = (kind: DesktopChatCallKind) => {
-    setCallUnavailableKind(kind);
-  };
+  // 必须 useCallback：下方 useEffect deps 用了它，不固化每次 render 都换引用 →
+  // effect 每个 render 都跑一遍（token guard 是兜底，不是节流）。
+  const handleDesktopCallAction = useCallback(
+    (kind: DesktopChatCallKind) => {
+      setCallUnavailableKind(kind);
+    },
+    [],
+  );
 
   const handleDismissRouteContextNotice = () => {
     routeContextNotice?.onDismiss?.();
