@@ -151,10 +151,10 @@ function ChangeRow({
           </Trans>
         </div>
         {rev.editSummary && (
-          <div className="text-sm leading-6">{rev.editSummary}</div>
+          <div className="break-words text-sm leading-6">{rev.editSummary}</div>
         )}
         {rev.diffFromParent?.changed && (
-          <div className="text-xs text-[color:var(--text-muted)]">
+          <div className="break-words text-xs text-[color:var(--text-muted)]">
             <Trans>字段：{rev.diffFromParent.changed.join(", ")}</Trans>
           </div>
         )}

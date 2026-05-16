@@ -423,15 +423,22 @@ function UserMenu({
     };
   }, [open]);
 
+  const initial = user.username?.[0]?.toUpperCase() ?? "?";
   return (
     <div ref={wrapRef} className="relative">
       <button
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-label={user.username}
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-white px-3 py-1.5 text-left text-xs leading-tight transition-colors hover:bg-[color:var(--surface-card-hover)]"
+        className="flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-white py-1.5 text-left text-xs leading-tight transition-colors hover:bg-[color:var(--surface-card-hover)] sm:px-3"
       >
+        {/* 移动端：只显示首字母 avatar 圆点（用户名挪到下拉菜单顶部）。
+            ≥sm 显示用户名 + 角色双行。这样窄屏 header 不会被长用户名顶出右边界。 */}
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-[image:var(--brand-gradient)] text-xs font-semibold text-[color:var(--text-on-brand)] sm:hidden">
+          {initial}
+        </span>
         <div className="hidden md:block">
           <div className="font-medium text-[color:var(--text-primary)]">
             {user.username}
@@ -440,18 +447,27 @@ function UserMenu({
             {roleLabel(user.role)}
           </div>
         </div>
-        <span className="font-medium text-[color:var(--text-primary)] md:hidden">
+        <span className="hidden font-medium text-[color:var(--text-primary)] sm:inline md:hidden">
           {user.username}
         </span>
-        <span aria-hidden className="text-[10px] text-[color:var(--text-muted)]">
+        <span aria-hidden className="hidden pr-1 text-[10px] text-[color:var(--text-muted)] sm:inline">
           ▾
         </span>
       </button>
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-40 mt-2 w-44 overflow-hidden rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-overlay)] shadow-lg"
+          className="absolute right-0 top-full z-40 mt-2 w-52 overflow-hidden rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-overlay)] shadow-lg"
         >
+          {/* 移动端 chip 只显示首字母，把用户名和角色挪进下拉菜单顶部。 */}
+          <div className="border-b border-[color:var(--border-subtle)] px-4 py-2.5 sm:hidden">
+            <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
+              {user.username}
+            </div>
+            <div className="truncate text-xs text-[color:var(--text-muted)]">
+              {roleLabel(user.role)}
+            </div>
+          </div>
           <button
             type="button"
             role="menuitem"
