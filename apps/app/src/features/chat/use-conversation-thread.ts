@@ -287,12 +287,27 @@ export function useConversationThread(conversationId: string) {
     });
 
     const offTypingStart = onTypingStart((payload) => {
-      if (payload.conversationId === conversationId) {
-        setTypingState({
+      if (payload.conversationId !== conversationId) {
+        return;
+      }
+      // typing_start 在 AI 回复期间会按几秒一次的节奏持续 emit（reply 整段
+      // 加上 image_generation 阶段可能跨 30-60s）。同 characterId + 同 stage
+      // 时硬塞新对象 → ConversationThreadPanel + ChatMessageList +
+      // ChatComposer 跟着无效 re-render，长聊天 60+ 消息每次重渲染都是浪费。
+      // 内容相等时复用旧引用，跳过这条无意义的 re-render 链；watchdog 那个
+      // [typingState] effect 也跟着不会重挂 120s 定时器。
+      setTypingState((current) => {
+        if (
+          current?.characterId === payload.characterId &&
+          current?.stage === payload.stage
+        ) {
+          return current;
+        }
+        return {
           characterId: payload.characterId,
           stage: payload.stage,
-        });
-      }
+        };
+      });
     });
 
     const offTypingStop = onTypingStop((payload) => {
