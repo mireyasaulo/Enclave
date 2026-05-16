@@ -764,11 +764,32 @@ public class YinjieMobileBridgePlugin extends Plugin {
             return;
         }
 
-        String kind = normalizeStatic(intent.getStringExtra(EXTRA_TARGET_KIND));
-        String route = normalizeStatic(intent.getStringExtra(EXTRA_TARGET_ROUTE));
-        String conversationId = normalizeStatic(intent.getStringExtra(EXTRA_CONVERSATION_ID));
-        String groupId = normalizeStatic(intent.getStringExtra(EXTRA_GROUP_ID));
-        String source = normalizeStatic(intent.getStringExtra(EXTRA_TARGET_SOURCE));
+        // FCM 在 app 处于 background 时，对带 notification 字段的 message 走
+        // 系统通知栏，根本不进 onMessageReceived；用户点击后系统直接拉起
+        // launcher activity，把 data payload 当 intent extras 透传。这条路径上
+        // 我们 applyLaunchTargetExtras 写的 yinjie_* 前缀 key 全没有，只有
+        // 后端原样发的 conversationId / groupId / route / kind。两套 key 都
+        // 试一下，否则 background 收推送点开会回首页而不是目标会话。
+        String kind = firstNonNull(
+            normalizeStatic(intent.getStringExtra(EXTRA_TARGET_KIND)),
+            normalizeStatic(intent.getStringExtra("kind"))
+        );
+        String route = firstNonNull(
+            normalizeStatic(intent.getStringExtra(EXTRA_TARGET_ROUTE)),
+            normalizeStatic(intent.getStringExtra("route"))
+        );
+        String conversationId = firstNonNull(
+            normalizeStatic(intent.getStringExtra(EXTRA_CONVERSATION_ID)),
+            normalizeStatic(intent.getStringExtra("conversationId"))
+        );
+        String groupId = firstNonNull(
+            normalizeStatic(intent.getStringExtra(EXTRA_GROUP_ID)),
+            normalizeStatic(intent.getStringExtra("groupId"))
+        );
+        String source = firstNonNull(
+            normalizeStatic(intent.getStringExtra(EXTRA_TARGET_SOURCE)),
+            normalizeStatic(intent.getStringExtra("source"))
+        );
 
         if (kind == null) {
             if (conversationId != null) {
@@ -815,5 +836,9 @@ public class YinjieMobileBridgePlugin extends Plugin {
 
         String normalized = value.trim();
         return normalized.isEmpty() ? null : normalized;
+    }
+
+    private static String firstNonNull(String primary, String fallback) {
+        return primary != null ? primary : fallback;
     }
 }
