@@ -68,6 +68,7 @@ import { buildContactTagGroups } from "../features/contacts/contact-tag-groups";
 import {
   buildContactSections,
   buildDesktopFriendSections,
+  compareStarredFriends,
   createFriendDirectoryItems,
   createWorldCharacterDirectoryItems,
   matchesCharacterSearch,
@@ -634,7 +635,14 @@ export function ContactsPage() {
   );
   const desktopDefaultFriendItem = desktopFriendSections[0]?.items[0] ?? null;
   const starredFriends = useMemo(
-    () => (friendsQuery.data ?? []).filter((item) => item.friendship.isStarred),
+    // 排序逻辑跟移动 starred-friends-page 共用：starredAt DESC → 显示名 → id。
+    // 没排序时桌面星标列表的顺序就是 getFriends() 落库顺序，刚加星标的好友常常
+    // 排到中间或末尾，用户找不到自己刚操作的那条；mobile 早就是 starredAt DESC，
+    // 桌面这边一直没补。
+    () =>
+      (friendsQuery.data ?? [])
+        .filter((item) => item.friendship.isStarred)
+        .sort(compareStarredFriends),
     [friendsQuery.data],
   );
   const starredCommonGroupsByCharacterId = useMemo(() => {

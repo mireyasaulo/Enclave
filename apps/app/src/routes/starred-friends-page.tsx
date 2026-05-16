@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import { ArrowLeft, Search, Star, Tag } from "lucide-react";
-import { getFriends, type FriendListItem } from "@yinjie/contracts";
+import { getFriends } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
@@ -19,6 +19,7 @@ import {
   parseMobileContactDirectoryRouteState,
 } from "../features/contacts/mobile-contact-directory-route-state";
 import {
+  compareStarredFriends,
   getFriendDisplayName,
   matchesFriendSearch,
 } from "../features/contacts/contact-utils";
@@ -361,35 +362,6 @@ function MobileStarredFriendsPage() {
       </div>
     </AppPage>
   );
-}
-
-function compareStarredFriends(left: FriendListItem, right: FriendListItem) {
-  const starredAtDelta =
-    getSortableTimestamp(right.friendship.starredAt) -
-    getSortableTimestamp(left.friendship.starredAt);
-
-  if (starredAtDelta !== 0) {
-    return starredAtDelta;
-  }
-
-  const nameDiff = getFriendDisplayName(left).localeCompare(
-    getFriendDisplayName(right),
-    "zh-CN",
-  );
-  if (nameDiff !== 0) {
-    return nameDiff;
-  }
-
-  return left.character.id.localeCompare(right.character.id);
-}
-
-function getSortableTimestamp(value?: string) {
-  if (!value) {
-    return 0;
-  }
-
-  const time = new Date(value).getTime();
-  return Number.isFinite(time) ? time : 0;
 }
 
 function MobileStarredFriendsStatusCard({
