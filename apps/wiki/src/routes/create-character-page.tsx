@@ -210,18 +210,26 @@ export function CreateCharacterPage() {
           </button>
         </InlineNotice>
       )}
-      {draftId && draftQ.isError && (
-        <InlineNotice tone="warning" className="mb-3">
-          <Trans>该草稿已不存在（可能已被删除），按空白表单继续。</Trans>{" "}
-          <button
-            type="button"
-            className="ml-2 font-medium underline"
-            onClick={() => void navigate({ to: "/create", search: {} })}
-          >
-            <Trans>清掉 URL 中的 draftId</Trans>
-          </button>
-        </InlineNotice>
-      )}
+      {/*
+        draftQ.isError 只在 retry 用尽后才转 true；中间 paused / pending+fetchFailureCount>0
+        的状态下 isError 仍是 false，警告条不会渲染，用户看到的还是空白创建页 + 残留的
+        ?draftId=xxx —— 这正是这个修复想避免的"silent"。所以这里同时看 fetchFailureCount
+        作为兜底信号：只要至少 fetch 失败过一次且没拿到 data，就提示"草稿不存在"。
+      */}
+      {draftId &&
+        !draftQ.data &&
+        (draftQ.isError || draftQ.failureCount > 0) && (
+          <InlineNotice tone="warning" className="mb-3">
+            <Trans>该草稿已不存在（可能已被删除），按空白表单继续。</Trans>{" "}
+            <button
+              type="button"
+              className="ml-2 font-medium underline"
+              onClick={() => void navigate({ to: "/create", search: {} })}
+            >
+              <Trans>清掉 URL 中的 draftId</Trans>
+            </button>
+          </InlineNotice>
+        )}
       <CharacterEditForm
         mode="create"
         scope="world"
