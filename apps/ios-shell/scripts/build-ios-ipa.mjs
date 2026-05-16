@@ -95,25 +95,41 @@ function ensurePod() {
   }
 }
 
-// Xcode 15+ uses new method names; xcodebuild on Xcode <15 still wants legacy names.
+// Xcode 15+ uses new method names; xcodebuild on Xcode <15 only accepts the
+// legacy names. 老实现注释 / ios-release.env.example doc 一直在说「脚本会
+// auto-translate 到 legacy names」，工作流 workflow_dispatch 的 choices 也
+// 只列了新名字 —— 但实际函数从来没翻译过，直接 return method 原样塞给
+// xcodebuild。CI 跑 macos-14（含 Xcode 15）撑住了，但本地 dev 还在 Xcode 14
+// 的（或 self-hosted runner / 私有 CI 没升级）一旦 env 里写新名字，xcodebuild
+// 直接报 "Unsupported method" 死在 export 阶段。
+//
+// Apple 在 Xcode 15+ 把 legacy 名字标 deprecated 但保留了向后兼容，所以
+// 「永远 emit legacy」是跨版本通吃的最稳路径：用户 env 写新名字 →
+// 翻译成 legacy → xcodebuild on Xcode 14 / 15+ 都接受。
 function resolveExportMethod(method) {
-  const known = new Set([
-    "app-store-connect",
-    "release-testing",
-    "debugging",
-    "enterprise",
+  const NEW_TO_LEGACY = {
+    "app-store-connect": "app-store",
+    "release-testing": "ad-hoc",
+    debugging: "development",
+    enterprise: "enterprise",
+  };
+  const LEGACY_NAMES = new Set([
     "app-store",
     "ad-hoc",
     "development",
+    "enterprise",
   ]);
 
-  if (!known.has(method)) {
-    fail(
-      `YINJIE_IOS_EXPORT_METHOD must be one of: app-store-connect, release-testing, debugging, enterprise (current value: "${method}")`,
-    );
+  if (Object.hasOwn(NEW_TO_LEGACY, method)) {
+    return NEW_TO_LEGACY[method];
+  }
+  if (LEGACY_NAMES.has(method)) {
+    return method;
   }
 
-  return method;
+  fail(
+    `YINJIE_IOS_EXPORT_METHOD must be one of: app-store-connect, release-testing, debugging, enterprise (or legacy app-store / ad-hoc / development) — current value: "${method}"`,
+  );
 }
 
 function renderExportOptions(envForRender) {
