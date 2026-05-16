@@ -1581,10 +1581,14 @@ export function MomentsPage() {
         // 1) 旧逻辑把 N 页砍回 1 页 → 列表瞬间变短、撑不满视口 → iOS 上滑橡皮筋反弹
         //    + IntersectionObserver 串行一页一页 fetchNextPage 把内容堆回来，体感很慢；
         // 2) 顶部新发布的内容若把老 page 2 起点往下挤，由 momentsData 的 id 去重 useMemo 兜底重复。
-        const key = ["app-moments-paged", baseUrl];
+        // 钉住触发时刻的 baseUrl —— mid-flight 切账户后 catch 里别把 A 账户的失败
+        // 弹成 B 账户的「刷新失败」红条；fetch 本身和 setQueryData 都按 OLD baseUrl
+        // 走，这是对的（OLD 账户的 page 1 缓存刷新好，下次切回 A 第一帧就能看到）。
+        const refreshBaseUrl = baseUrl;
+        const key = ["app-moments-paged", refreshBaseUrl];
         try {
           await Promise.all([
-            getMomentsPage({ page: 1, limit: 20 }, baseUrl).then((freshFirstPage) => {
+            getMomentsPage({ page: 1, limit: 20 }, refreshBaseUrl).then((freshFirstPage) => {
               queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
                 key,
                 (current) => {
@@ -1601,6 +1605,11 @@ export function MomentsPage() {
             ownerId ? blockedQuery.refetch() : Promise.resolve(null),
           ]);
         } catch (error) {
+          if (refreshBaseUrl !== mutationBaseUrlRef.current) {
+            // mid-flight 切走：A 的 refresh 失败不该弹到 B 账户的 notice 通道。
+            // 跟 like/comment/delete 的 baseUrl-guard 同思路。
+            return;
+          }
           // 下拉刷新失败之前完全沉默——指示器走完一遍消失，但用户根本不知道
           // 列表没换。冒到 notice 通道 2.4s 自动收，跟点赞/删除失败一致。
           setNoticeTone("danger");
