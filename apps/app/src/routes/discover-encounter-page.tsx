@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import { Compass, Sparkles } from "lucide-react";
-import { keepShakeSession, shake } from "@yinjie/contracts";
+import { isApiRequestError, keepShakeSession, shake } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   Button,
@@ -48,6 +48,23 @@ export function DiscoverEncounterPage() {
   }
 
   return <MobileDiscoverEncounterPage />;
+}
+
+const NON_RETRYABLE_SHAKE_ERROR_CODES = new Set([
+  "SHAKE_DAILY_LIMIT",
+  "SHAKE_DISABLED",
+  "SHAKE_CYBER_AVATAR_NO_SIGNAL",
+]);
+
+function isShakeErrorRetryable(error: Error) {
+  if (!isApiRequestError(error)) {
+    return true;
+  }
+  const code = error.code ?? error.errorCode;
+  if (!code) {
+    return true;
+  }
+  return !NON_RETRYABLE_SHAKE_ERROR_CODES.has(code);
 }
 
 function MobileDiscoverEncounterPage() {
@@ -230,13 +247,19 @@ function MobileDiscoverEncounterPage() {
           <div className="flex items-center justify-between gap-2">
             <span className="min-w-0 flex-1">{shakeMutation.error.message}</span>
             <div className="flex shrink-0 items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => shakeMutation.mutate()}
-                className="rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
-              >
-                {t(msg`重试摇一摇`)}
-              </button>
+              {/* 走查 Round 2：SHAKE_DAILY_LIMIT / SHAKE_DISABLED / SHAKE_CYBER_AVATAR_NO_SIGNAL
+                  在本次访问内不会因重试变好，再点一次只会拿到同一份 error；隐掉「重试摇
+                  一摇」按钮，留「回发现页」让用户体面退出。COOLDOWN / AI 暂时性失败 /
+                  网络错误等仍保留重试。 */}
+              {isShakeErrorRetryable(shakeMutation.error) ? (
+                <button
+                  type="button"
+                  onClick={() => shakeMutation.mutate()}
+                  className="rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
+                >
+                  {t(msg`重试摇一摇`)}
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={handleErrorNoticeBack}
