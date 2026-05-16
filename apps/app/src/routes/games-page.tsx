@@ -108,6 +108,11 @@ export function GamesPage() {
     message: string;
     onAction: () => void;
   } | null>(null);
+  // hasLaunchedThisSession / embeddedSlotRef 必须放在所有早 return（isDesktopLayout
+  // 分支、!selectedGame 分支）之前，否则视口在桌面↔移动之间切换会触发
+  // "Rendered more/fewer hooks than during the previous render" 整页崩。
+  const [hasLaunchedThisSession, setHasLaunchedThisSession] = useState(false);
+  const embeddedSlotRef = useRef<HTMLDivElement | null>(null);
   const normalizedPathname = normalizePathname(pathname);
   const isDesktopGamesRoute =
     normalizedPathname === "/tabs/games" ||
@@ -310,6 +315,52 @@ export function GamesPage() {
   // 否则它会从整张移动端列表上消失。
   const featuredRest =
     recentGames.length > 0 ? featuredGames : featuredGames.slice(1);
+  // 移动端不像 desktop 有 preview pane——embedded slot 是 inline 的"正在玩"
+  // 区块，跟 selectedGameId（被点选 / 被预览的那个游戏）无关。
+  // 原来要求 activeGameId === selectedGame.id：用户点另一行卡片本体
+  // （onSelect 而不是绿色"开始"）会让 selectedGameId 改掉，正在玩的
+  // embedded 游戏被悄悄 unmount——这是 bug。
+  // 但单纯改成 hasEmbeddedGame(activeGameId) 又有副作用：disk 上 activeGameId
+  // 可能是上次会话的尾巴 / fixture default ("signal-squad")，新用户一进来
+  // 就被自动塞个 embedded slot 进来，跟 invite 链路 (`?invite=...`) 也对不上
+  // （URL 里说要去 night-market 邀约页，slot 却预热 signal-squad）。
+  // 折中：本次 mount 内用户没有显式 launch 过，就尊重 OLD 等式逻辑；
+  // 一旦 launchGame 过一次，slot 就完全跟 activeGameId 走，跟 selectedGameId
+  // 解耦——这样 tap 另一行卡片本体不会再把游戏视觉上踢飞。
+  const isEmbeddedActive = hasEmbeddedGame(activeGameId)
+    && (hasLaunchedThisSession || activeGameId === (selectedGame?.id ?? ""));
+  // gameCenterFriendActivities 是模块常量，过滤结果也是常量。
+  const friendActivities = useMemo(
+    () =>
+      gameCenterFriendActivities.filter((activity) =>
+        Boolean(getGameCenterGame(activity.gameId)),
+      ),
+    [],
+  );
+  // 嵌入式游戏 slot 渲染在 Banner 与「好友在玩」之间——用户从更深的列表
+  // （热门 / 新游）点「开始」时，slot 在屏幕外，看不到任何反馈。
+  // 检测到 embedded 激活且 slot 不在视口内时，把它滚到 viewport 顶部一点。
+  useEffect(() => {
+    if (!isEmbeddedActive || isDesktopLayout) {
+      return;
+    }
+    const node = embeddedSlotRef.current;
+    if (!node) {
+      return;
+    }
+    // 用 rAF 避开同一帧的 layout，等 slot 真正挂到 DOM 之后再 scroll。
+    const id = window.requestAnimationFrame(() => {
+      const rect = node.getBoundingClientRect();
+      const viewportHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+      // 已经完全在视口内就不滚，避免抢用户当前阅读位置。
+      if (rect.top >= 0 && rect.bottom <= viewportHeight) {
+        return;
+      }
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [isEmbeddedActive, activeGameId, isDesktopLayout]);
 
   function handleLaunchGame(gameId: string) {
     const game = getGameCenterGame(gameId);
@@ -556,55 +607,6 @@ export function GamesPage() {
   }
 
   const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : null;
-  // 移动端不像 desktop 有 preview pane——embedded slot 是 inline 的"正在玩"
-  // 区块，跟 selectedGameId（被点选 / 被预览的那个游戏）无关。
-  // 原来要求 activeGameId === selectedGame.id：用户点另一行卡片本体
-  // （onSelect 而不是绿色"开始"）会让 selectedGameId 改掉，正在玩的
-  // embedded 游戏被悄悄 unmount——这是 bug。
-  // 但单纯改成 hasEmbeddedGame(activeGameId) 又有副作用：disk 上 activeGameId
-  // 可能是上次会话的尾巴 / fixture default ("signal-squad")，新用户一进来
-  // 就被自动塞个 embedded slot 进来，跟 invite 链路 (`?invite=...`) 也对不上
-  // （URL 里说要去 night-market 邀约页，slot 却预热 signal-squad）。
-  // 折中：本次 mount 内用户没有显式 launch 过，就尊重 OLD 等式逻辑；
-  // 一旦 launchGame 过一次，slot 就完全跟 activeGameId 走，跟 selectedGameId
-  // 解耦——这样 tap 另一行卡片本体不会再把游戏视觉上踢飞。
-  const [hasLaunchedThisSession, setHasLaunchedThisSession] = useState(false);
-  const isEmbeddedActive = hasEmbeddedGame(activeGameId)
-    && (hasLaunchedThisSession || activeGameId === selectedGame.id);
-  // gameCenterFriendActivities 是模块常量，过滤结果也是常量。
-  const friendActivities = useMemo(
-    () =>
-      gameCenterFriendActivities.filter((activity) =>
-        Boolean(getGameCenterGame(activity.gameId)),
-      ),
-    [],
-  );
-
-  // 嵌入式游戏 slot 渲染在 Banner 与「好友在玩」之间——用户从更深的列表
-  // （热门 / 新游）点「开始」时，slot 在屏幕外，看不到任何反馈。
-  // 检测到 embedded 激活且 slot 不在视口内时，把它滚到 viewport 顶部一点。
-  const embeddedSlotRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!isEmbeddedActive || isDesktopLayout) {
-      return;
-    }
-    const node = embeddedSlotRef.current;
-    if (!node) {
-      return;
-    }
-    // 用 rAF 避开同一帧的 layout，等 slot 真正挂到 DOM 之后再 scroll。
-    const id = window.requestAnimationFrame(() => {
-      const rect = node.getBoundingClientRect();
-      const viewportHeight =
-        window.innerHeight || document.documentElement.clientHeight;
-      // 已经完全在视口内就不滚，避免抢用户当前阅读位置。
-      if (rect.top >= 0 && rect.bottom <= viewportHeight) {
-        return;
-      }
-      node.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-    return () => window.cancelAnimationFrame(id);
-  }, [isEmbeddedActive, activeGameId, isDesktopLayout]);
 
   function handleSelectAndLaunch(gameId: string) {
     setSelectedGameId(gameId);
