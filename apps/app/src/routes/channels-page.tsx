@@ -613,13 +613,85 @@ export function ChannelsPage() {
   const likeCommentMutation = useMutation({
     mutationFn: (input: { commentId: string; postId: string }) =>
       likeFeedComment(input.commentId, baseUrl),
+    // optimistic：评论点赞 RTT ~200ms 期间按钮一直显示「处理中」，count 也不动，
+    // 公网下点完一秒钟才看到点赞数 +1，体感像点了没生效。后端 likeOwnerComment
+    // 对已 liked 是 no-op，没有 unlike 路径，所以 toggle 永远只往 +1 走，
+    // optimistic 安全。
+    // 缓存两处都翻：
+    //   - app-feed-comments：评论面板里整条 list
+    //   - app-channels-home-decorations.commentsPreviewByPostId：home 卡底"最近评论"
+    onMutate: async (input) => {
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: ["app-feed-comments", baseUrl, input.postId],
+        }),
+        queryClient.cancelQueries({
+          queryKey: ["app-channels-home-decorations", baseUrl],
+        }),
+      ]);
+
+      const previousFullComments = queryClient.getQueryData<FeedComment[]>([
+        "app-feed-comments",
+        baseUrl,
+        input.postId,
+      ]);
+      const previousDecorationsEntries = queryClient.getQueriesData<{
+        commentsPreviewByPostId?: Record<string, FeedComment[]>;
+      }>({
+        queryKey: ["app-channels-home-decorations", baseUrl],
+      });
+
+      const flipComment = (c: FeedComment): FeedComment =>
+        c.id === input.commentId && !c.likedByOwner
+          ? {
+              ...c,
+              likedByOwner: true,
+              likeCount: c.likeCount + 1,
+            }
+          : c;
+
+      if (previousFullComments) {
+        queryClient.setQueryData<FeedComment[]>(
+          ["app-feed-comments", baseUrl, input.postId],
+          previousFullComments.map(flipComment),
+        );
+      }
+      previousDecorationsEntries.forEach(([key, data]) => {
+        if (!data?.commentsPreviewByPostId) return;
+        const preview = data.commentsPreviewByPostId[input.postId];
+        if (!preview) return;
+        queryClient.setQueryData(key, {
+          ...data,
+          commentsPreviewByPostId: {
+            ...data.commentsPreviewByPostId,
+            [input.postId]: preview.map(flipComment),
+          },
+        });
+      });
+
+      return { previousFullComments, previousDecorationsEntries };
+    },
+    onError: (_error, input, context) => {
+      if (!context) return;
+      if (context.previousFullComments) {
+        queryClient.setQueryData(
+          ["app-feed-comments", baseUrl, input.postId],
+          context.previousFullComments,
+        );
+      }
+      context.previousDecorationsEntries.forEach(([key, data]) => {
+        if (data === undefined) return;
+        queryClient.setQueryData(key, data);
+      });
+    },
     onSuccess: (_, input) => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`评论互动已更新。`));
       // fire-and-forget：await 会让 like-comment 按钮一直 disabled。
-      // 评论点赞数嵌在 commentsPreview 里，要刷 decorations 才能让卡底"最近评论"翻新。
+      // optimistic 已经翻了 likedByOwner/likeCount，invalidate 让 server 真值兜底
+      // 一次（防止极端情况下两边 state drift）。
       void queryClient.invalidateQueries({
         queryKey: ["app-channels-home-decorations", baseUrl],
       });
