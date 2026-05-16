@@ -39,6 +39,14 @@ export class WikiAiGenerateRateLimitGuard implements CanActivate {
       });
     }
 
+    // admin 完全跳过 hourly 配额：本项目里 admin 是运营/项目维护者
+    // (yuanzui0728_5999) + wiki 系统机器人 (antivandal / admin_sync)。
+    // 运营自己测 prompt / 演示需要不被卡；机器人不调 AI 生成，给也无害。
+    // 不增 bucket count，否则 admin 把所有用户共用的 LLM 配额提前打满。
+    if (user.role === 'admin') {
+      return true;
+    }
+
     const now = Date.now();
     let bucket = this.buckets.get(user.id);
     if (!bucket || now - bucket.windowStart >= WINDOW_MS) {
