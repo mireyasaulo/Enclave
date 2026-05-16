@@ -236,7 +236,6 @@ function MobileChatListPage() {
   const [openSwipeConversationId, setOpenSwipeConversationId] = useState<
     string | null
   >(null);
-  const [swipeResetVersion, setSwipeResetVersion] = useState(0);
   const [pendingHideConversation, setPendingHideConversation] =
     useState<PendingHideConversation | null>(null);
   const hideTimeoutRef = useRef<number | null>(null);
@@ -565,8 +564,14 @@ function MobileChatListPage() {
       return;
     }
 
+    // 之前这里还 setSwipeResetVersion((c) => c + 1)，并且把 version 拼进
+    // <ConversationListItemLink key=...>。结果每次进 /tabs/chat（包括首次
+    // 挂载！）都会把所有会话行整体 unmount + remount —— 一遍正常 render
+    // 用 key "0:id" 挂上去，紧接着 effect 立刻把 version 推到 1 又重挂一次。
+    // 行内 ChatItem 已经把 open prop 同步到内部 swipeOffset（参见 useEffect
+    // [open, swipeActionWidth]），父组件这里 setOpenSwipeConversationId(null)
+    // 就够了，不需要再用 key 强制全表重挂。
     setOpenSwipeConversationId(null);
-    setSwipeResetVersion((current) => current + 1);
   }, [isActiveTab]);
 
   // 「聊天已置顶」「已开启消息免打扰」这类成功提示之前没有 auto-dismiss——
@@ -1245,7 +1250,7 @@ function MobileChatListPage() {
 
               {visibleConversations.map((conversation, index) => (
                 <ConversationListItemLink
-                  key={`${swipeResetVersion}:${conversation.id}`}
+                  key={conversation.id}
                   conversation={conversation}
                   localMessageActionState={localMessageActionState}
                   open={openSwipeConversationId === conversation.id}
