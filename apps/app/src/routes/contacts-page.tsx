@@ -697,13 +697,20 @@ export function ContactsPage() {
     for (const conversation of conversations) {
       const isGroup = isPersistedGroupConversation(conversation);
       if (isGroup) {
+        // participants 是 string[] 没去重保证：万一同一 starred 好友在同一群
+        // participants 里出现两次（如服务端 join 漏 distinct），老 .filter()
+        // 语义只算一条；这里 inner-loop 不加 seen 集合会重复 push 同一群。
+        // 用一个轻量 Set 守住「同一 conversation 内对同一 participant 只算一次」。
+        const seen = new Set<string>();
         for (const participantId of conversation.participants) {
-          if (starredIdSet.has(participantId)) {
-            commonGroupsMap[participantId]!.push({
-              id: conversation.id,
-              name: conversation.title,
-            });
+          if (!starredIdSet.has(participantId) || seen.has(participantId)) {
+            continue;
           }
+          seen.add(participantId);
+          commonGroupsMap[participantId]!.push({
+            id: conversation.id,
+            name: conversation.title,
+          });
         }
         continue;
       }
