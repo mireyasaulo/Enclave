@@ -1269,6 +1269,20 @@ const pendingLikePostId = likeMutation.isPending
   const handleRowCancelCommentReply = useCallback(() => {
     setDesktopReplyTarget(null);
   }, []);
+  // popover 走"查看资料"/"朋友圈"进 character 详情 / friend-moments 时，
+  // 必须把 returnPath 显式塞成 /tabs/feed，否则 DesktopMessageAvatarPopover
+  // 内置默认 profileReturnPath = momentsReturnPath = "/tabs/chat" — 广场上
+  // 的用户点头像看完资料按返回会被踹进聊天 tab，刚滑了 4 页找到的 post
+  // 位置和选中态全丢。
+  const buildFeedAvatarNavigationContext = useCallback((postId: string) => {
+    const returnHash = buildFeedRouteHash({ postId }) || undefined;
+    return {
+      profileReturnPath: "/tabs/feed",
+      profileReturnHash: returnHash,
+      momentsReturnPath: "/tabs/feed",
+      momentsReturnHash: returnHash,
+    };
+  }, []);
   const handleRowSelectCommentAuthor = useCallback(
     (event: ReactMouseEvent<HTMLButtonElement>, comment: FeedComment) => {
       if (comment.authorType === "character") {
@@ -1278,6 +1292,7 @@ const pendingLikePostId = likeMutation.isPending
           characterId: comment.authorId,
           fallbackAvatar: comment.authorAvatar,
           fallbackName: comment.authorName,
+          navigationContext: buildFeedAvatarNavigationContext(comment.postId),
         });
       } else if (comment.authorType === "user") {
         setDesktopAvatarPopover({
@@ -1286,7 +1301,7 @@ const pendingLikePostId = likeMutation.isPending
         });
       }
     },
-    [],
+    [buildFeedAvatarNavigationContext],
   );
   const handleRowSelectPostAuthor = useCallback(
     ({
@@ -1305,6 +1320,7 @@ const pendingLikePostId = likeMutation.isPending
           characterId: post.authorId,
           fallbackAvatar: post.authorAvatar,
           fallbackName: post.authorName,
+          navigationContext: buildFeedAvatarNavigationContext(post.id),
         });
       } else if (post.authorType === "user") {
         setDesktopAvatarPopover({
@@ -1313,7 +1329,7 @@ const pendingLikePostId = likeMutation.isPending
         });
       }
     },
-    [],
+    [buildFeedAvatarNavigationContext],
   );
   const handleRowShare = useCallback((postId: string) => {
     setShareCardPostId(postId);
