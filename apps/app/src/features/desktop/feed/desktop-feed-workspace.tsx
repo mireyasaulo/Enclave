@@ -89,6 +89,10 @@ type DesktopFeedWorkspaceProps = {
   onRemoveImage: (id: string) => void;
   onRemoveVideo: () => void;
   onRefresh: () => void;
+  /** 顶部 toolbar 错误条上的「重试发送」回调；与移动端 InlineNotice 行为对齐。 */
+  onRetryComment?: () => void;
+  /** 顶部 toolbar 错误条上的「重试点赞」回调。 */
+  onRetryLike?: () => void;
   /** 可选 — 点击行内「分享图卡」时上抛 postId，由 page 弹出 modal。 */
   onShare?: (postId: string) => void;
   onTextChange: (value: string) => void;
@@ -143,6 +147,8 @@ export function DesktopFeedWorkspace({
   onRemoveImage,
   onRemoveVideo,
   onRefresh,
+  onRetryComment,
+  onRetryLike,
   onShare,
   onTextChange,
   onToggleFavorite,
@@ -317,6 +323,8 @@ export function DesktopFeedWorkspace({
             hasNextPage={hasNextPage}
             onBackToTop={handleBackToTop}
             onOpenCompose={handleOpenCompose}
+            onRetryComment={onRetryComment}
+            onRetryLike={onRetryLike}
             onRefresh={onRefresh}
           />
 

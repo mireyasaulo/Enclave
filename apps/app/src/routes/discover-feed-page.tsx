@@ -450,19 +450,35 @@ export function DiscoverFeedPage() {
     },
   });
 
+  // 走查 Round 1：mutationFn 历史上闭包读 feedPosts 来判断 alreadyLiked，但
+  // onMutate 是 async（先 await cancelQueries），等 mutationFn 真跑时
+  // setQueriesData 已经把 hasLiked 翻过去 + React 已重渲一次，最新一帧的
+  // feedPosts 已经是乐观状态，alreadyLiked 读出来反了 → POST /like 被发到一条
+  // 已经 liked 的 post，后端 INSERT OR IGNORE 静默吞掉，UI 上"取消赞"按完
+  // DB 里没任何变化。改成 onMutate 第一时间读 cache、把 BEFORE 状态钉进
+  // likeBeforeStateRef，mutationFn 直接读 ref，绕开 cache 已被翻动的窗口期。
+  const likeBeforeStateRef = useRef<Map<string, boolean>>(new Map());
   const likeMutation = useMutation({
-    // 微信样式气泡的「赞 / 取消」必须真双向：原本只 POST /feed/:id/like，
-    // bubble 上「取消」按下后没有 unlike 端点 → 后端 INSERT OR IGNORE 静默忽略，
-    // 用户看到 toast 成功但红心和计数没变。改成根据当前 hasLiked 状态走
-    // POST 或 DELETE。
     mutationFn: (postId: string) => {
-      const currentPost = feedPosts.find((post) => post.id === postId);
-      const alreadyLiked = currentPost?.ownerState?.hasLiked ?? false;
-      return alreadyLiked
+      const wasLiked = likeBeforeStateRef.current.get(postId) ?? false;
+      return wasLiked
         ? unlikeFeedPost(postId, baseUrl)
         : likeFeedPost(postId, baseUrl);
     },
     onMutate: async (postId) => {
+      // 钉 BEFORE 状态先于一切 cache 改动 —— cancelQueries 之后立刻读，
+      // 这样 await 期间 React 即使被打断重渲，本次 mutationFn 也按这条记录走。
+      const beforeData = queryClient.getQueryData<InfiniteData<FeedListResponse>>([
+        "app-feed-paged",
+        baseUrl,
+      ]);
+      const beforePost = beforeData?.pages
+        .flatMap((page) => page.posts)
+        .find((post) => post.id === postId);
+      likeBeforeStateRef.current.set(
+        postId,
+        beforePost?.ownerState?.hasLiked ?? false,
+      );
       await queryClient.cancelQueries({ queryKey: ["app-feed-paged", baseUrl] });
       setLikeInflightPostIds((current) => {
         if (current.has(postId)) return current;
@@ -556,6 +572,9 @@ export function DiscoverFeedPage() {
       );
     },
     onSettled: (_data, _error, postId) => {
+      // ref 记的 BEFORE 状态用完即弃 —— 留着会让"用户先点 A 再 unlike，又点 A
+      // 再 like，第二次 onMutate 还没来得及覆盖前就读到第一次的旧值"。
+      likeBeforeStateRef.current.delete(postId);
       setLikeInflightPostIds((current) => {
         if (!current.has(postId)) return current;
         const next = new Set(current);
@@ -1618,6 +1637,33 @@ export function DiscoverFeedPage() {
           }}
           onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
           onRemoveVideo={() => composeDraft.clearVideoDraft()}
+          onRetryLike={() => {
+            // 桌面 toolbar 顶部点赞失败条上的「重试点赞」回放最后一次 mutate；
+            // 与移动端 InlineNotice (line 2096-2124) 同样的语义：variables=null
+            // 时（mutation 已经 reset 过）就把错误条直接收掉，否则回放。
+            const targetPostId = likeMutation.variables;
+            if (targetPostId) {
+              likeMutation.mutate(targetPostId);
+            } else {
+              likeMutation.reset();
+            }
+          }}
+          onRetryComment={() => {
+            // 同上：评论失败回放 variables，但 text 现读当前 commentDrafts —
+            // 用户在错误条挂着的时候大概率已经把过长的草稿改短，旧 text 强发
+            // 一遍只会再撞同一个 server 限制。
+            const variables = commentMutation.variables;
+            if (!variables) {
+              commentMutation.reset();
+              return;
+            }
+            const currentDraft =
+              commentDrafts[variables.postId] ?? variables.text;
+            commentMutation.mutate({
+              ...variables,
+              text: currentDraft,
+            });
+          }}
           onRefresh={() => {
             resetFeedToFirstPage();
             void feedQuery.refetch();
