@@ -79,6 +79,17 @@ export function ChannelsForwardPicker({
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
+  // 锁背景滚动：picker 弹出时如果不锁，移动端两指滚 / 桌面滚轮会把底下的
+  // 视频号 home 也滚走，picker 自身却 fixed 不动，看着像两层在打架。
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
   const friendList: FriendListItem[] = useMemo(() => {
     const rows = friendsQuery.data ?? [];
     return [...rows]
