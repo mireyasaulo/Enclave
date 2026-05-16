@@ -2067,7 +2067,11 @@ function MobileMomentsView({
                   className="h-1 w-full"
                   aria-hidden="true"
                 />
-                {isFetchingNextPage ? (
+                {/* hasFilteredOutMoments 状态下，下方空态卡片已经显示
+                    "正在寻找未屏蔽的动态" 同义文案 + 解释——这里再加
+                    "正在加载更多…" 就是两条 loading 叠着重复说同一件事。
+                    仅在有可见 moment 时显示这条 sentinel 文案。 */}
+                {isFetchingNextPage && !hasFilteredOutMoments ? (
                   <div className="py-4 text-center text-[12px] text-[#9A9A9A]">
                     {t(msg`正在加载更多…`)}
                   </div>
