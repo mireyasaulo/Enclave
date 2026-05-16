@@ -326,6 +326,10 @@ export function DiscoverFeedPage() {
       setNotice(t(msg`广场动态已发布，世界居民公开可见。`));
       // 立刻把新 post prepend 到 paged 头部 + 平铺 flat cache，本页就能马上看到刚发的内容；
       // 顺便把已加载的多页砍回 1 页（发布后分页边界后移，避免 page 1 末尾和 page 2 开头重复）。
+      // 砍页等价于 resetFeedToFirstPage，但走的不是那个 helper，所以 prefetch
+      // 计数器要同步重置，否则发布前已经打满 cap 时新账户 / 当前账户都拉不出
+      // 后续页，sentinel 救不到底端外。
+      resetDesktopAutoPrefetchCounter();
       const newListItem = { ...newPost, commentsPreview: [] };
       queryClient.setQueryData<InfiniteData<FeedListResponse>>(
         ["app-feed-paged", baseUrl],
