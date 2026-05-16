@@ -1100,9 +1100,6 @@ export function DiscoverFeedPage() {
 
     openMobileFeedPublishPage();
   }
-  const interactionActionLabel = safeReturnPath
-    ? t(msg`返回上一页`)
-    : t(msg`重试读取`);
 
   useEffect(() => {
     setDesktopAvatarPopover(null);
@@ -2209,14 +2206,21 @@ export function DiscoverFeedPage() {
                   >
                     {t(msg`重试读取`)}
                   </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
-                    onClick={handleStatusBack}
-                  >
-                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
-                  </Button>
+                  {/* 走查新一轮 R1：safeReturnPath 缺失时 handleStatusBack 也只
+                      会走 refetch（和 handleRetryLoad 完全同行为），label 也回
+                      落到"重试读取"——并排两枚字面相同、动作相同的按钮，用户
+                      看着像渲染 bug。只在真有上一页路径时才显示这枚副按钮做
+                      "返回上一页"。 */}
+                  {safeReturnPath ? (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
+                      onClick={handleStatusBack}
+                    >
+                      {t(msg`返回上一页`)}
+                    </Button>
+                  ) : null}
                 </div>
               }
             />
