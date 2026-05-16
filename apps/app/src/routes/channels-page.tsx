@@ -1814,6 +1814,7 @@ export function ChannelsPage() {
       </div>
       <MobileChannelCommentsSheet
         comments={mobileCommentsQuery.data ?? []}
+        commentsArePlaceholder={mobileCommentsQuery.isPlaceholderData}
         draft={
           mobileCommentSheetPost
             ? (commentDrafts[mobileCommentSheetPost.id] ?? "")
@@ -3361,6 +3362,7 @@ function ActionRailButton({
 
 function MobileChannelCommentsSheet({
   comments,
+  commentsArePlaceholder,
   draft,
   errorActionLabel,
   errorMessage,
@@ -3379,6 +3381,7 @@ function MobileChannelCommentsSheet({
   onSubmit,
 }: {
   comments: FeedComment[];
+  commentsArePlaceholder: boolean;
   draft: string;
   errorActionLabel?: string;
   errorMessage?: string | null;
@@ -3497,8 +3500,20 @@ function MobileChannelCommentsSheet({
     const shouldAutoScroll =
       !hasAutoScrolledRef.current || (growth && isNearBottom);
     if (shouldAutoScroll) {
-      hasAutoScrolledRef.current = true;
-      previousCommentCountRef.current = comments.length;
+      // 走查 R3（新一轮）：mobileCommentsQuery 用 decorations 里 ≤3 条 commentsPreview
+      // 作 placeholderData，sheet 首次打开会先拿到 placeholder（comments.length 很小）。
+      // 原代码这里无条件把 hasAutoScrolledRef 翻 true + previousCount=3，等真数据
+      // (例如 143 条) 到位时再跑下面 effect，shouldAutoScroll 走 (growth && isNearBottom)，
+      // 但 placeholder 滚到底时 scrollHeight=200/clientHeight=500 → isNearBottom=true，
+      // 真数据到位后新增 ~140 条把 scrollHeight 干到 15000，scrollTop 仍 ≈ 200 →
+      // 远不是 isNearBottom，shouldAutoScroll=false，sheet 卡在最老评论的顶上。
+      // 用户重现：评论数 50+ 的 post 打开 sheet → 看到 5 天前的最早评论。
+      // placeholder 阶段照常跑 RAF 滚到底（让 ≤3 条也对齐 WeChat 默认体验），但
+      // **不消费 first-scroll 标志 / 不更新 previousCount**，留给真数据到位时再用一次。
+      if (!commentsArePlaceholder) {
+        hasAutoScrolledRef.current = true;
+        previousCommentCountRef.current = comments.length;
+      }
       // RAF 一次：确保 list 已经 layout，scrollHeight 取到稳定值
       window.requestAnimationFrame(() => {
         if (!scrollContainerRef.current) return;
@@ -3508,7 +3523,7 @@ function MobileChannelCommentsSheet({
     } else {
       previousCommentCountRef.current = comments.length;
     }
-  }, [open, comments, isLoading]);
+  }, [open, comments, isLoading, commentsArePlaceholder]);
 
   // 走查 新一轮 R2：把评论 list JSX 整段 useMemo，deps 不含 draft/submitPending/
   // replyTarget——这些只影响底部 textarea，敲字时直接返回上轮缓存的 element 树，
@@ -3741,7 +3756,10 @@ function MobileChannelCommentsSheet({
               // 红条，已经粘贴/打字写好的内容要手动删一段。maxLength 让浏览器
               // 在输入阶段就硬截断，移动端原生输入法也会跟着不再让用户多敲。
               maxLength={500}
-              className="min-h-[72px] flex-1 rounded-[16px] border-[color:var(--border-subtle)] bg-[#f7f7f7] px-3 py-2 text-[13px] shadow-none focus:border-[rgba(7,193,96,0.2)] focus:bg-white"
+              // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
+              // zoom-in。视频号评论 sheet 是常用功能，原本 text-[13px] 每次写
+              // 评论都让整页放大、回弹时还要双指捏才能回正。
+              className="min-h-[72px] flex-1 rounded-[16px] border-[color:var(--border-subtle)] bg-[#f7f7f7] px-3 py-2 text-[16px] shadow-none focus:border-[rgba(7,193,96,0.2)] focus:bg-white"
             />
             <Button
               variant="primary"
