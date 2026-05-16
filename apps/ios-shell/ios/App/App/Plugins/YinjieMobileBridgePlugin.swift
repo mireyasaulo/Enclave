@@ -228,6 +228,21 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         configuration.filter = .images
         configuration.selectionLimit = call.getBool("multiple", false) ? 0 : 1
+        // Round 7 想用 loadFileRepresentation(public.jpeg) 拉 PhotoKit 自动
+        // 转 HEIC→JPEG，但下面 loadImageAsset 的判断逻辑用
+        // provider.hasItemConformingToTypeIdentifier("public.jpeg") 先 gate：
+        // HEIC item 的 registeredTypeIdentifiers 只挂 public.heic / public.heif /
+        // public.image，没 public.jpeg —— 这个 check 直接返 false，落到
+        // "public.image" 分支拿回 HEIC 原片。Round 7 自以为修了，实际只在原本
+        // 就是 JPEG 的 item 上生效，HEIC 一张没修。
+        //
+        // 正解是把转码任务交给 PHPicker 自己，preferredAssetRepresentationMode
+        // 设 .compatible：iOS 在用户点「使用」之前已经把 HEIC / ProRAW 等私有
+        // 编码转成 JPEG（或对 PNG / GIF 这种本来就通用的格式保持原样），
+        // 后面 loadFileRepresentation 拿到的 url 直接就是 .jpg / .png / .gif。
+        // 实测 iPhone 15 Pro 用 HEIC 拍的相册照走这条会收到 JPEG，
+        // 跨 Android / 安卓 Web / 旧 iOS / 多数浏览器全部能解开。
+        configuration.preferredAssetRepresentationMode = .compatible
 
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
