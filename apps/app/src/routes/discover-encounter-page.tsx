@@ -189,12 +189,24 @@ function MobileDiscoverEncounterPage() {
     return true;
   }
 
-  const handleErrorNoticeBack = () => {
-    if (navigateToRouteStateReturn()) {
-      return;
-    }
+  // 走查 Round 1（2 次会话）：错误条上的"返回上一页 / 回发现页"按钮直接 navigate
+  // 到 routeState.returnPath / /tabs/discover，是 push 不是 pop——用户点完落到
+  // discover 后再按系统返回，又会被弹回 encounter 错误页。跟顶栏的 onBack 一样
+  // 走 navigateBackOrFallback：能 history.back() 就 pop，落不到 same-origin 才
+  // 走 fallback。
+  const handleBack = () => {
+    navigateBackOrFallback(
+      () => {
+        if (navigateToRouteStateReturn()) {
+          return;
+        }
 
-    void navigate({ to: "/tabs/discover" });
+        void navigate({ to: "/tabs/discover" });
+      },
+      (routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
+        ? routeState.returnPath
+        : undefined) ?? "/tabs/discover",
+    );
   };
 
   return (
@@ -225,20 +237,7 @@ function MobileDiscoverEncounterPage() {
           </InlineNotice>
         ) : null
       }
-      onBack={() =>
-        navigateBackOrFallback(
-          () => {
-            if (navigateToRouteStateReturn()) {
-              return;
-            }
-
-            void navigate({ to: "/tabs/discover" });
-          },
-          (routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
-            ? routeState.returnPath
-            : undefined) ?? "/tabs/discover",
-        )
-      }
+      onBack={handleBack}
     >
       {shakeMutation.isError && shakeMutation.error instanceof Error ? (
         <InlineNotice
@@ -272,7 +271,7 @@ function MobileDiscoverEncounterPage() {
               ) : null}
               <button
                 type="button"
-                onClick={handleErrorNoticeBack}
+                onClick={handleBack}
                 className="rounded-full border border-[rgba(220,38,38,0.14)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
               >
                 {routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
