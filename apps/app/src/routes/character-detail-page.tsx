@@ -448,6 +448,20 @@ export function CharacterDetailPage() {
     resetEntryGuard();
   }, [characterId, resetEntryGuard]);
 
+  // 走查 R7：success notice 没有自动消失定时器 —— 用户点「设为星标朋友 / 加入
+  // 黑名单 / 添加到通讯录 / 朋友资料已更新」之后那条绿色横幅会一直挂着，直到
+  // 用户跳页 / 触发下一个 mutation 才会被替换。桌面 ContactDetailPane 的
+  // profileNotice 早就加过 2.4s 兜底（contact-detail-pane.tsx L147-L153），这
+  // 边只给 success 加同款（info 自带"重试 / 返回上一页"按钮，需要用户主动确认；
+  // warning 是失败提示，留着让用户看见错误原因）。
+  useEffect(() => {
+    if (!notice || notice.tone !== "success") {
+      return;
+    }
+    const timer = window.setTimeout(() => setNotice(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
   // 走查 Round 1：friendship.tags 是数组，每次 friendsQuery 重新拉就换一份引用，
   // 之前把 tags 作为 deps 直接放进上面的 effect → 后台刷新时 setNotice(null) 把
   // updateProfileMutation onSuccess 刚弹的"朋友资料已更新"瞬间吃掉，正在编辑的
