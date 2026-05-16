@@ -410,13 +410,17 @@ export function DesktopFriendMomentsWorkspace({
                 </div>
               ) : null}
 
-              {likeErrorMessage ? (
+              {/* danger notice 在屏时 mutation 错误已经在顶部红条 + 「重试...」按钮覆盖了，
+                  下面再渲染同文 ErrorBlock 会变两条红条同屏；跟 toolbar / profile workspace
+                  的 Round 3 修复对齐：danger notice 期间藏 type-specific ErrorBlock，
+                  notice 2.4s 自清后 ErrorBlock 再现做持久指示。 */}
+              {likeErrorMessage && !(notice && noticeTone === "danger") ? (
                 <div className="mb-4">
                   <ErrorBlock message={likeErrorMessage} />
                 </div>
               ) : null}
 
-              {commentErrorMessage ? (
+              {commentErrorMessage && !(notice && noticeTone === "danger") ? (
                 <div className="mb-4">
                   <ErrorBlock message={commentErrorMessage} />
                 </div>

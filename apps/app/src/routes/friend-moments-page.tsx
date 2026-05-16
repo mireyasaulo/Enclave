@@ -91,7 +91,16 @@ export function FriendMomentsPage() {
     postId: string;
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
-  const [notice, setNotice] = useState("");
+  // 失败也得走 notice 通道，不然之前点赞失败一律落到 ErrorBlock + 上一条
+  // success 「朋友圈互动已更新。」绿条还挂着，用户同屏看到一红一绿两条提示
+  // ——跟 contacts Round 3 (d61672ed)、mobile-friend-moments-page 同类 bug。
+  // 用 tone-aware 状态，配合 workspace 已经支持的 noticeTone/noticeAction props。
+  const [notice, setNotice] = useState<{
+    tone: "success" | "info" | "danger";
+    message: string;
+    actionLabel?: string | null;
+    action?: (() => void) | null;
+  } | null>(null);
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
   const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<
     | {
@@ -154,7 +163,7 @@ export function FriendMomentsPage() {
     onSuccess: (newMoment) => {
       composeDraft.reset();
       setShowCompose(false);
-      setNotice(t(msg`朋友圈已发布。`));
+      setNotice({ tone: "success", message: t(msg`朋友圈已发布。`) });
       // 立刻 prepend 到共享 flat / paged / mine 三套 cache：本页按好友 characterId 过滤
       // 不显示用户自己的动态，但用户随手切到 /tabs/moments、/profile/moments 时应该
       // 能直接看到刚发的内容。
@@ -187,9 +196,24 @@ export function FriendMomentsPage() {
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
     onMutate: optimisticLike.onMutate,
-    onError: optimisticLike.onError,
+    onError: (error, momentId, context) => {
+      optimisticLike.onError(error, momentId, context);
+      // 失败统一走 danger notice + 重试按钮——之前只回滚 cache 不更新 notice，
+      // 上一条 success "朋友圈互动已更新。" 还挂着 2.4s，新失败的 likeErrorMessage
+      // 落到下方 ErrorBlock 显示成红条，一红一绿同屏。跟 mobile-friend-moments-page
+      // (Round 5) / moments-page / chat Round 6 / contacts Round 3 同类 bug。
+      setNotice({
+        tone: "danger",
+        message:
+          error instanceof Error
+            ? t(msg`点赞失败：${error.message}`)
+            : t(msg`点赞失败，请稍后重试。`),
+        actionLabel: t(msg`重试点赞`),
+        action: () => likeMutation.mutate(momentId),
+      });
+    },
     onSuccess: () => {
-      setNotice(t(msg`朋友圈互动已更新。`));
+      setNotice({ tone: "success", message: t(msg`朋友圈互动已更新。`) });
       // 点赞 toggle 是 boolean，optimistic 已把 likes 切对。完全省掉 invalidate，
       // 避免拉回 GET /api/moments 全量 + 30+ media 条件请求 RTT。
     },
@@ -216,12 +240,24 @@ export function FriendMomentsPage() {
         baseUrl,
       );
     },
+    onError: (error) => {
+      // 评论失败：danger notice，跟 like 失败同色调，避免红 ErrorBlock + 绿 notice 同屏。
+      // 不挂「重试评论」按钮——composer 框还在显示（onError 没清 commentDrafts），
+      // 用户直接在框里点「发送」就能再试。
+      setNotice({
+        tone: "danger",
+        message:
+          error instanceof Error
+            ? t(msg`评论失败：${error.message}`)
+            : t(msg`评论失败，请稍后重试。`),
+      });
+    },
     onSuccess: (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setDesktopReplyTarget((current) =>
         current?.postId === momentId ? null : current,
       );
-      setNotice(t(msg`朋友圈互动已更新。`));
+      setNotice({ tone: "success", message: t(msg`朋友圈互动已更新。`) });
       // fire-and-forget：await 会让"发表"按钮一直 disabled，公网隧道下感觉评论卡几秒。
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
@@ -280,7 +316,7 @@ export function FriendMomentsPage() {
     resetComposeDraft();
     setCommentDrafts({});
     setShowCompose(false);
-    setNotice(""); // i18n-ignore-line
+    setNotice(null);
   }, [baseUrl, characterId, resetComposeDraft]);
 
   useEffect(() => {
@@ -339,7 +375,7 @@ export function FriendMomentsPage() {
       return;
     }
 
-    const timer = window.setTimeout(() => setNotice(""), 2400); // i18n-ignore-line
+    const timer = window.setTimeout(() => setNotice(null), 2400);
     return () => window.clearTimeout(timer);
   }, [notice]);
 
@@ -570,7 +606,10 @@ export function FriendMomentsPage() {
         scrollToMomentId={routeSelectedMomentId}
         showCompose={showCompose}
         signature={signature}
-        notice={notice}
+        notice={notice?.message}
+        noticeTone={notice?.tone}
+        noticeActionLabel={notice?.actionLabel ?? null}
+        onNoticeAction={notice?.action ?? null}
         text={composeDraft.text}
         videoDraft={composeDraft.videoDraft}
         isMomentFavorite={(momentId) =>
