@@ -404,10 +404,17 @@ export function DesktopCreateGroupDialog({
       }
 
       if (searchTerm.trim()) {
+        event.preventDefault();
+        event.stopPropagation();
         clearSearch();
         return;
       }
 
+      // 该 dialog 多数情况下是从右侧"聊天信息"侧栏的"发起群聊"打开。
+      // Esc 关 dialog 时阻止冒泡，否则 workspace 的 dismissSidePanel 会
+      // 把背后的详情侧栏也关掉。
+      event.preventDefault();
+      event.stopPropagation();
       onClose();
     }
 

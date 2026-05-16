@@ -99,7 +99,10 @@ export function DesktopMessageForwardDialog({
       if (event.key !== "Escape" || event.defaultPrevented) {
         return;
       }
+      // 转发弹层是 modal 层；Esc 应只关掉它，避免冒泡到 workspace
+      // dismissSidePanel 把背后的详情/查找记录侧栏也一并关掉。
       event.preventDefault();
+      event.stopPropagation();
       onClose();
     };
 
