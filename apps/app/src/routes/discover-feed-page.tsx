@@ -1042,6 +1042,11 @@ export function DiscoverFeedPage() {
     taken: false,
     value: null,
   });
+  // 走查再 Round 2：跟 publishFlashRef 配套，区分 StrictMode 双跑（baseUrl 相同）
+  // 跟真切账户（baseUrl 变化）。详见下方 effect 注释。runtimeConfig.apiBaseUrl
+  // 类型本身是 string | undefined（env / injected / persisted 可全空），sentinel
+  // 用 undefined 表示"还没观察过"。
+  const lastBaseUrlRef = useRef<string | undefined>(undefined);
   const isDesktopLayoutAtMountRef = useRef(isDesktopLayout);
   // baseUrl 第一次 effect 跑就等于"初次挂载"，里面 setDesktopSelectedPostId(null)
   // 必须跳过——否则 URL 上合法的 #post=<id> 深链会被一进来就被这层 reset 抹掉。
@@ -1116,13 +1121,29 @@ export function DiscoverFeedPage() {
     // 后自动 prefetch 直接被卡住，只剩 20 条得用户自己滚才能再翻。
     resetDesktopAutoPrefetchCounter();
 
-    if (!publishFlashRef.current.taken) {
+    // 走查再 Round 2：原版只用 publishFlashRef.taken+value 防 StrictMode 双跑把
+    // notice 清掉，没考虑「baseUrl 真切换」也会让本 effect 重新跑——
+    //   1. 用户在世界 A 发完动态 → flash "广场动态已发布..." 进 sessionStorage
+    //   2. 用户进 /tabs/feed → 首次 effect 取走 flash，notice 展示，
+    //      publishFlashRef.value 留下副本以备 StrictMode 二次 setup 复用
+    //   3. 2.4s 后 notice 自然 dismiss
+    //   4. 用户切到世界 B → baseUrl 变 → effect 重跑：taken=true 不再 consume，
+    //      但 publishFlashRef.value 还是那条 flash 字符串 → if(flash) 又把"广场
+    //      动态已发布..."贴到 B 账户的 toolbar。B 看着像自己发了，但 B 啥也没做。
+    // 真切换需要 cookie-cutter 跟 StrictMode 双跑区分：StrictMode 第二次 setup
+    // 的 baseUrl 跟第一次完全相同，真切换则 baseUrl 一定不同。落 lastBaseUrlRef
+    // 比一比就行。
+    const previousBaseUrl = lastBaseUrlRef.current;
+    lastBaseUrlRef.current = baseUrl;
+    const isBaseUrlSwitch =
+      previousBaseUrl !== undefined && previousBaseUrl !== baseUrl;
+    if (!isBaseUrlSwitch && !publishFlashRef.current.taken) {
       publishFlashRef.current.taken = true;
       publishFlashRef.current.value = isDesktopLayoutAtMountRef.current
         ? null
         : consumeFeedPublishFlash();
     }
-    const flash = publishFlashRef.current.value;
+    const flash = isBaseUrlSwitch ? null : publishFlashRef.current.value;
     if (flash) {
       setNoticeTone("success");
       setNoticeActionLabel(null);
