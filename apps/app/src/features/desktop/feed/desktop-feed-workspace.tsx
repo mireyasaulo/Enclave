@@ -5,11 +5,13 @@ import {
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import {
   getFeedPost,
   type FeedComment,
   type FeedPostListItem,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { DesktopFeedComposePanel } from "./desktop-feed-compose-panel";
 import { DesktopFeedList } from "./desktop-feed-list";
 import { DesktopFeedToolbar } from "./desktop-feed-toolbar";
@@ -29,6 +31,8 @@ type DesktopFeedWorkspaceProps = {
   composeErrorMessage?: string | null;
   createPending: boolean;
   errors?: string[];
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
   imageDrafts: MomentImageDraft[];
   isLoading: boolean;
   likeErrorMessage?: string | null;
@@ -36,6 +40,7 @@ type DesktopFeedWorkspaceProps = {
   ownerAvatar?: string | null;
   ownerUsername?: string | null;
   posts: FeedPostListItem[];
+  onRequestMore?: () => void;
   onSelectedPostChange?: (postId: string | null) => void;
   routeSelectedPostId?: string | null;
   showCompose: boolean;
@@ -80,6 +85,8 @@ export function DesktopFeedWorkspace({
   composeErrorMessage,
   createPending,
   errors = [],
+  hasNextPage = false,
+  isFetchingNextPage = false,
   imageDrafts,
   isLoading,
   likeErrorMessage,
@@ -87,6 +94,7 @@ export function DesktopFeedWorkspace({
   ownerAvatar,
   ownerUsername,
   posts,
+  onRequestMore,
   onSelectedPostChange,
   routeSelectedPostId = null,
   showCompose,
@@ -113,10 +121,33 @@ export function DesktopFeedWorkspace({
   onToggleFavorite,
   onVideoFileSelected,
 }: DesktopFeedWorkspaceProps) {
+  const t = useRuntimeTranslator();
   const [selectedPostId, setSelectedPostId] = useState<string | null>(
     routeSelectedPostId,
   );
   const scrollViewportRef = useRef<HTMLDivElement | null>(null);
+  const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // 滚到接近底部时调用 onRequestMore（page 层 fetchNextFeedPage）。
+  // root=scrollViewportRef 让观察器跟桌面滚动容器对齐而不是 window；rootMargin
+  // 320px 提前触发避免触底空等。
+  useEffect(() => {
+    if (!onRequestMore) return;
+    if (!hasNextPage || isFetchingNextPage) return;
+    const sentinel = loadMoreSentinelRef.current;
+    const root = scrollViewportRef.current;
+    if (!sentinel || !root) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          onRequestMore();
+        }
+      },
+      { root, rootMargin: "320px 0px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, onRequestMore]);
 
   useEffect(() => {
     setSelectedPostId((current) =>
@@ -243,6 +274,24 @@ export function DesktopFeedWorkspace({
                 onSelectPostAuthor={onSelectPostAuthor}
                 onToggleFavorite={onToggleFavorite}
               />
+              {posts.length > 0 ? (
+                <>
+                  <div
+                    ref={loadMoreSentinelRef}
+                    className="h-1 w-full"
+                    aria-hidden="true"
+                  />
+                  {isFetchingNextPage ? (
+                    <div className="py-4 text-center text-[12px] text-[color:var(--text-muted)]">
+                      {t(msg`正在加载更多…`)}
+                    </div>
+                  ) : !hasNextPage ? (
+                    <div className="py-4 text-center text-[12px] text-[color:var(--text-muted)]">
+                      {t(msg`已经到底了`)}
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
             </div>
           </div>
         </div>

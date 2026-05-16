@@ -84,17 +84,30 @@ export function DesktopFeedRow({
   const hasText = Boolean(displayText);
   const hasMedia = post.media.length > 0;
   const mediaSummaryText = hasText ? "" : getFeedSummaryText(post);
-  // 服务端 /feed/:id/like 只支持加，没有取消（跟 moments 不一样），所以已点赞
-  // 之后按钮要么 disabled 要么强标"已赞"——之前一直显示"点赞"，用户根本不
-  // 知道自己点没点过。
+  // 服务端 /feed/:id/like 现在双向：POST 加赞，DELETE 取消（与移动端 likeMutation
+  // 对齐）。之前桌面端按钮 disabled={likeLoading || liked} 把已赞行整条 disable，
+  // 用户点过一次就再也取消不掉；改成只在 likeLoading 时 disable，已赞状态由
+  // 文案 + 图标填色 + onClick 触发反向 toggle 表达。
   const liked = Boolean(post.ownerState?.hasLiked);
 
+  // 历史 DB 里可能残留 text="" 的鬼影评论（后端校验前 curl 直发的），以及 AI
+  // 角色把整段 CoT prose 当评论存进来（gpt-4.1 这类非推理模型没 <think> 包裹）。
+  // 两种都经 stripToolCallSyntax 后变 ""——之前桌面端直接渲染，列表里会冒出
+  // 「{authorName}：」后面只有冒号的空评论占位；与移动端 discover-feed-page
+  // 的过滤行为对齐。
   const commentsForDisplay = useMemo(() => {
-    if (detailPost) {
-      return detailPost.comments;
-    }
-    return post.commentsPreview;
+    const source = detailPost ? detailPost.comments : post.commentsPreview;
+    return source.filter(
+      (comment) => stripToolCallSyntax(comment.text).trim().length > 0,
+    );
   }, [detailPost, post.commentsPreview]);
+  // detailPost 展开后若全部评论都是脏评论被过滤掉，但 commentCount > 0：
+  // 用户点了「查看全部 N 条」拉到 detailPost，列表却变空，看不到任何东西也
+  // 没解释——给一行兜底提示，跟移动端 expandedAllFiltered 对齐。
+  const expandedAllFiltered =
+    Boolean(detailPost) &&
+    commentsForDisplay.length === 0 &&
+    post.commentCount > 0;
 
   const commentsById = useMemo(
     () =>
@@ -245,9 +258,9 @@ export function DesktopFeedRow({
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                disabled={likeLoading || liked}
+                disabled={likeLoading}
                 onClick={onLike}
-                title={liked ? t(msg`你已经为这条动态点过赞`) : undefined}
+                title={liked ? t(msg`再点一次取消赞`) : undefined}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-[12px] transition-[background-color,color,border-color] disabled:opacity-55",
                   liked
@@ -321,6 +334,12 @@ export function DesktopFeedRow({
               </div>
             ) : null}
 
+            {expandedAllFiltered ? (
+              <div className="mt-3 text-[12px] text-[color:var(--text-muted)]">
+                {t(msg`评论暂时无法显示`)}
+              </div>
+            ) : null}
+
             {commentsForDisplay.length > 0 ? (
               <div className="mt-3 space-y-1.5">
                 {commentsForDisplay.map((comment) => {
@@ -391,7 +410,10 @@ export function DesktopFeedRow({
                   );
                 })}
               </div>
-            ) : !detailLoading ? (
+            ) : !detailLoading && post.commentCount === 0 ? (
+              // commentCount > 0 但 commentsForDisplay 全空只说明 preview 全是
+              // 脏评论；这时另有 showLoadMore 让用户翻全量 + expandedAllFiltered
+              // 兜底，不要再喊"还没有评论"。
               <div className="mt-3 text-[12px] text-[color:var(--text-muted)]">
                 {t(msg`还没有评论，你可以成为第一个回应的人。`)}
               </div>

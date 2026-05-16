@@ -1,6 +1,7 @@
 import {
   Suspense,
   lazy,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -235,15 +236,58 @@ export function DiscoverFeedPage() {
     return () => observer.disconnect();
   }, [fetchNextFeedPage, hasNextFeedPage, isFetchingNextFeedPage]);
 
-  // 桌面端没有触底 sentinel：mount 后自动连续 prefetch，把后续页悄悄填上，
-  // 保证用户在桌面工作区也能看到全部动态（首屏仍只渲染第一页，省时间）。
+  // 桌面端没有触底 sentinel，但旧版无脑递归 prefetch 把所有页一路串行拉到底——
+  // 广场总量 200+ 时光首屏就要排 10+ RTT，把后端拉爆且白白下载用户没滚到的页。
+  // 改成「自动 prefetch 头 N 页避免空白」+「DesktopFeedWorkspace 内滚动接近底
+  // 时再调用 onRequestMore 加载下一页」。这里的自动 prefetch 上限取 3（=60 条），
+  // 兼顾首屏不会一直只有 20 条 vs 不要拉光所有 page。
+  const desktopAutoPrefetchPages = useRef(0);
+  const DESKTOP_AUTO_PREFETCH_PAGE_CAP = 3;
   useEffect(() => {
     if (!isDesktopLayout) return;
+    if (!hasNextFeedPage || isFetchingNextFeedPage) return;
+    if (desktopAutoPrefetchPages.current >= DESKTOP_AUTO_PREFETCH_PAGE_CAP) {
+      return;
+    }
+    desktopAutoPrefetchPages.current += 1;
+    void fetchNextFeedPage();
+  }, [
+    isDesktopLayout,
+    hasNextFeedPage,
+    isFetchingNextFeedPage,
+    fetchNextFeedPage,
+  ]);
+  // 用户主动刷新（resetFeedToFirstPage 后 refetch）会把 page 回 1，此时
+  // 自动 prefetch 计数器也要重置，否则刷新后只剩 1 页用户得自己滚。
+  function resetDesktopAutoPrefetchCounter() {
+    desktopAutoPrefetchPages.current = 0;
+  }
+  // 给 DesktopFeedWorkspace 用的稳定 callback：避免每次 page render 都把
+  // workspace 内 IntersectionObserver 拆掉重建。useCallback 依赖 fetchNextPage
+  // 的稳定引用（react-query useInfiniteQuery 内部 memo）+ hasNextPage/isFetchingNextPage
+  // 标记（这两个值变化时本来就该重建 observer 决定是否要观测）。
+  const desktopRequestMore = useCallback(() => {
     if (hasNextFeedPage && !isFetchingNextFeedPage) {
       void fetchNextFeedPage();
     }
+  }, [hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage]);
+  // 深链 /tabs/feed#post=<id> 落到桌面但目标 post 在第 4 页以后：Round 1 把
+  // 自动 prefetch 上限砍到 3 页（=60 条）防止 200+ 条广场把后端拉爆，副作用
+  // 是 deep-link 找不到目标只能枯坐。这里独立加一层「目标驱动」拉页：仅当
+  // routeSelectedPostId 存在且尚未在 visiblePosts 里时绕开 cap 继续翻，直到
+  // 找到或没有下一页；与移动端 line ~870 的等价 effect 对齐。
+  // 注意 useEffect deps 用 feedPosts 而不是 visiblePosts，避免 blockedQuery 还
+  // 没回来时 visiblePosts 空导致循环 fetch；feedPosts 跟着 cache 增量更新即可。
+  useEffect(() => {
+    if (!isDesktopLayout) return;
+    if (!routeSelectedPostId) return;
+    if (feedPosts.some((post) => post.id === routeSelectedPostId)) return;
+    if (!hasNextFeedPage || isFetchingNextFeedPage) return;
+    void fetchNextFeedPage();
   }, [
     isDesktopLayout,
+    routeSelectedPostId,
+    feedPosts,
     hasNextFeedPage,
     isFetchingNextFeedPage,
     fetchNextFeedPage,
@@ -527,6 +571,7 @@ const pendingLikePostId = likeMutation.isPending
             }
           : current,
     );
+    resetDesktopAutoPrefetchCounter();
   }
 
   function handleStatusBack() {
@@ -1003,6 +1048,8 @@ const pendingLikePostId = likeMutation.isPending
           }
           createPending={createMutation.isPending}
           errors={errors}
+          hasNextPage={feedQuery.hasNextPage}
+          isFetchingNextPage={feedQuery.isFetchingNextPage}
           imageDrafts={composeDraft.imageDrafts}
           isLoading={feedQuery.isLoading}
           likeErrorMessage={
@@ -1014,6 +1061,7 @@ const pendingLikePostId = likeMutation.isPending
           ownerAvatar={ownerAvatar}
           ownerUsername={ownerUsername}
           posts={visiblePosts}
+          onRequestMore={desktopRequestMore}
           onSelectedPostChange={setDesktopSelectedPostId}
           routeSelectedPostId={routeSelectedPostId}
           showCompose={showCompose}
@@ -1279,7 +1327,6 @@ const pendingLikePostId = likeMutation.isPending
           ) : null}
 
           {visiblePosts.map((post) => {
-            const sourceId = `feed-${post.id}`;
             const displayText = stripToolCallSyntax(post.text);
             const postSummaryText = getFeedSummaryText(post);
             const summaryText = displayText ? "" : postSummaryText;
