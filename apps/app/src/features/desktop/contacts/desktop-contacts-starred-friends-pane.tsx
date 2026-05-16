@@ -89,6 +89,16 @@ export function DesktopContactsStarredFriendsPane({
     null;
 
   useEffect(() => {
+    // loading 期间 filteredFriends 必然是 []，此时如果立刻把 selectedCharacterId
+    // 清成 null，会把用户深链分享的 `#characterId=X` 在 friendsQuery 落库前抹掉，
+    // 等数据回来后 effect 再补一个首项（不是原 URL 上那位）；最终结果是分享 URL
+    // 直接打开的人看到的是别的朋友，原始目标完全丢了。loading 时直接 return，
+    // 让 selectedCharacterId 维持原样；loading 转 false 时 filteredFriends 引用
+    // 会变，effect 会自动重跑做合法性校验。
+    if (loading) {
+      return;
+    }
+
     if (
       selectedCharacterId &&
       filteredFriends.some((item) => item.character.id === selectedCharacterId)
@@ -107,7 +117,7 @@ export function DesktopContactsStarredFriendsPane({
       return;
     }
     onSelectCharacter(nextId);
-  }, [filteredFriends, onSelectCharacter, selectedCharacterId]);
+  }, [filteredFriends, loading, onSelectCharacter, selectedCharacterId]);
 
   return (
     <div className="flex h-full min-h-0">
