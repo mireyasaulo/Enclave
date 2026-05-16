@@ -1613,7 +1613,20 @@ const pendingLikePostId = likeMutation.isPending
                     ) : (
                       <button
                         type="button"
-                        onClick={handleStatusBack}
+                        onClick={() => {
+                          // 副按钮触发 handleStatusBack（refetch 整张 feed 或
+                          // navigateToRouteStateReturn），但旧实现没顺手清掉这
+                          // 条 InlineNotice。下拉刷新失败 → 用户点「重试读取」
+                          // → refetch 成功 → 列表回归正常但顶上"广场刷新失败"
+                          // 红条还挂着，下次 setNotice 之前永不消失。先把
+                          // notice 收掉再走 handleStatusBack；refetch 又失败的
+                          // 话 feedQuery.isError 走单独的 danger card 路径，
+                          // 不会跟 notice 撞。
+                          setNotice(""); // i18n-ignore-line
+                          setNoticeActionLabel(null);
+                          setNoticeAction(null);
+                          handleStatusBack();
+                        }}
                         className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                       >
                         {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
