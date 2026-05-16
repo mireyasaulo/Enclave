@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -21,6 +21,15 @@ import {
 } from "./local-chat-message-actions";
 
 type SetMessageReminderInput = CreateMessageReminderRequest;
+
+// 模块级互斥，跨 hook 实例共享。一次 mobile 渲染树通常同时有 4 处 useMessageReminders
+// (mobile-shell / chat-list-page / chat-message-list / mobile-reminder-toast-host)，
+// 每个实例自己的 useRef 互不知情；任意一个有"本地遗留 reminder 没同步过来"时，
+// 4 个实例的 migration effect 在同一 tick 里都看到 ref.current === false → 4 份
+// 并发的 createMessageReminder 同时往 server 灌同一个 messageId，server 端没幂等
+// 就会得到 4 条重复记录，下次 refetch 用户看到同一个提醒列了 4 行。
+// 改成 module-level let，谁先抢到谁去 migrate，其他实例等下一轮。
+let migrationInFlight = false;
 
 function buildLegacyReminderRecord(
   reminder: LocalChatMessageReminderRecord,
@@ -61,7 +70,6 @@ export function useMessageReminders() {
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const { reminders: localReminders } = useLocalChatMessageActionState();
-  const migrationInFlightRef = useRef(false);
 
   const remindersQuery = useQuery({
     queryKey: ["app-message-reminders", baseUrl],
@@ -144,7 +152,7 @@ export function useMessageReminders() {
       !baseUrl ||
       !remindersQuery.isSuccess ||
       !localReminders.length ||
-      migrationInFlightRef.current
+      migrationInFlight
     ) {
       return;
     }
@@ -168,7 +176,7 @@ export function useMessageReminders() {
       return;
     }
 
-    migrationInFlightRef.current = true;
+    migrationInFlight = true;
     void Promise.allSettled(
       pendingMigrationReminders.map((reminder) =>
         createMessageReminder(
@@ -220,7 +228,7 @@ export function useMessageReminders() {
           failedMessageIds.has(reminder.messageId),
         ),
       );
-      migrationInFlightRef.current = false;
+      migrationInFlight = false;
     });
   }, [
     baseUrl,
