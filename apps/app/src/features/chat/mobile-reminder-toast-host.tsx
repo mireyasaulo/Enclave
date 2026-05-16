@@ -162,7 +162,15 @@ export function MobileReminderToastHost() {
         return;
       }
 
-      void notifyReminder(targetMessageId);
+      // notifyReminder 走 markNotifiedMutation.mutateAsync，markMessageReminderNotified
+      // 后端 4xx/5xx / cloud token 过期重连都会让它 reject；用 .catch 释放
+      // ref 标记让下次 effect 再满足条件时可以重试，同时避免 rejection 冒到
+      // window.unhandledrejection 污染 telemetry。落 catch 之前 markNotified
+      // 尝试已经完成（mutation onError 也会记录 mutation.error），失败不阻塞
+      // UI——下一轮 refetch 拿到 notifiedAt=null 自然又会进这条分支重试。
+      notifyReminder(targetMessageId).catch(() => {
+        notifiedMessageIdsRef.current.delete(targetMessageId);
+      });
     });
   }, [activeReminder, documentVisibility, notifyReminder]);
 
