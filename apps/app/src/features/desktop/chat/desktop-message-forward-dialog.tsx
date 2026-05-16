@@ -87,6 +87,26 @@ export function DesktopMessageForwardDialog({
     return () => mediaQuery.removeEventListener("change", syncViewport);
   }, [variant]);
 
+  // 转发还在 pending 的时候不能用 Esc 强制关掉——服务端那一发已经在
+  // 飞，弹层一关 pending state 就消失，用户拿不到任何成功/失败反馈。
+  // 等 mutation 落地后由 onClose 自然处理。
+  useEffect(() => {
+    if (!open || pending) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) {
+        return;
+      }
+      event.preventDefault();
+      onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, open, pending]);
+
   const filteredConversations = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
     const ordered = [...conversations].sort(
