@@ -99,22 +99,34 @@ async function seed(context) {
   );
 }
 
-function attachErrorListeners(page, label) {
+function attachErrorListeners(page) {
   const consoleErrors = [];
+  const consoleWarns = [];
   const pageErrors = [];
   page.on("console", (msg) => {
-    if (msg.type() !== "error") return;
     const text = msg.text();
-    if (
-      text.includes("/socket.io/") &&
-      text.includes("WebSocket connection")
-    )
+    if (msg.type() === "error") {
+      if (
+        text.includes("/socket.io/") &&
+        text.includes("WebSocket connection")
+      )
+        return;
+      if (text.includes("Failed to load resource")) return; // 跟 fetch 失败重叠
+      consoleErrors.push(text);
       return;
-    if (text.includes("Failed to load resource")) return; // 跟 fetch 失败重叠
-    consoleErrors.push(text);
+    }
+    if (msg.type() === "warning") {
+      // 过滤掉 vite hmr / source map / 三方 lib 的常见噪音
+      if (text.includes("[vite]")) return;
+      if (text.includes("source map")) return;
+      if (text.includes("DevTools")) return;
+      // React 17/18 strict-mode dedupe 复述会以 console.error("Warning: ...") 出，
+      // 这里只关注真正的 warning channel。
+      consoleWarns.push(text);
+    }
   });
   page.on("pageerror", (err) => pageErrors.push(err.message));
-  return { consoleErrors, pageErrors, label };
+  return { consoleErrors, consoleWarns, pageErrors };
 }
 
 async function loadGamesPage(page) {
@@ -164,9 +176,53 @@ const ALL_GAMES = [
   { name: "隐界农场", id: "yinjie-farm", embedded: false }, // 独立路由
 ];
 
+async function snapshotListenerCounts(page) {
+  // playwright + Chrome 没有直接的 listener API；用 Performance / WindowProxy 的
+  // 副作用来 fingerprint 大致泄露趋势：count 已注册到 window/document 的
+  // EventTarget._yinjieCount（由 instrumentListenerTracking 提前装上的 patch）。
+  return await page.evaluate(() => {
+    const w = window;
+    const d = document;
+    return {
+      window: w.__yinjieListenerCount ?? -1,
+      document: d.__yinjieListenerCount ?? -1,
+    };
+  });
+}
+
+async function instrumentListenerTracking(context) {
+  // 在 page 加载前把 window/document.addEventListener 包一层计数器。
+  // 不动 returned removeEventListener，因为 React 拿到的是 wrapper 引用，
+  // remove 时 wrapper 一致才能解绑——为了避免破坏，只在 once: false 时累加，
+  // 并在 remove 时减回。 wrapping 后行为对 listener 影响 minimal。
+  await context.addInitScript(() => {
+    const wrap = (target, label) => {
+      const origAdd = target.addEventListener.bind(target);
+      const origRemove = target.removeEventListener.bind(target);
+      target.__yinjieListenerCount = 0;
+      target.addEventListener = function (type, listener, options) {
+        target.__yinjieListenerCount++;
+        return origAdd(type, listener, options);
+      };
+      target.removeEventListener = function (type, listener, options) {
+        target.__yinjieListenerCount = Math.max(
+          0,
+          target.__yinjieListenerCount - 1,
+        );
+        return origRemove(type, listener, options);
+      };
+      void label;
+    };
+    wrap(window, "window");
+    wrap(document, "document");
+  });
+}
+
 async function launchEmbedded(page, target, listeners) {
   const beforeConsole = listeners.consoleErrors.length;
   const beforePage = listeners.pageErrors.length;
+  const beforeWarns = listeners.consoleWarns.length;
+  const beforeListeners = await snapshotListenerCounts(page);
 
   // 在精选 / 热门 / 新游 / 我的游戏 任一处找一行
   const row = page
@@ -221,10 +277,37 @@ async function launchEmbedded(page, target, listeners) {
 
   const newConsole = listeners.consoleErrors.slice(beforeConsole);
   const newPage = listeners.pageErrors.slice(beforePage);
+  const newWarns = listeners.consoleWarns.slice(beforeWarns);
   for (const m of newConsole)
     record("console.error-after-launch", `${target.name}: ${m}`);
   for (const m of newPage)
     record("pageerror-after-launch", `${target.name}: ${m}`);
+  for (const m of newWarns)
+    record("console.warn-after-launch", `${target.name}: ${m}`);
+
+  // 退出后 listener count 应基本回到 launch 前 ±2 以内（runtime 本身有
+  // 异步 telemetry / route 切换会留 1-2 个）；只在 embedded 模式做这件事
+  // —— yinjie-farm 是独立路由整页 unmount，window 上的 hook 跟列表页不一致。
+  if (target.embedded) {
+    const afterListeners = await snapshotListenerCounts(page);
+    const winDiff = afterListeners.window - beforeListeners.window;
+    const docDiff = afterListeners.document - beforeListeners.document;
+    // 单个游戏内的 launch+dismiss 不应让 window 残留 > 5 个 listener，
+    // 不然每次进出叠加很快变成几十上百，长会话内存涨；阈值 5 给 React 内部
+    // 异步重连留点余量。
+    if (winDiff > 5) {
+      record(
+        "listener-leak-window",
+        `${target.name}: launch+exit 后 window listener +${winDiff}（before=${beforeListeners.window} after=${afterListeners.window}）`,
+      );
+    }
+    if (docDiff > 5) {
+      record(
+        "listener-leak-document",
+        `${target.name}: launch+exit 后 document listener +${docDiff}（before=${beforeListeners.document} after=${afterListeners.document}）`,
+      );
+    }
+  }
 }
 
 async function main() {
@@ -237,6 +320,7 @@ async function main() {
     userAgent:
       "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1",
   });
+  await instrumentListenerTracking(context);
   await seed(context);
 
   const page = await context.newPage();
@@ -569,6 +653,61 @@ async function main() {
       );
     }
   }
+
+  // === 12.5. 同会话内连续 launch 5 个不同 embedded 游戏 —— 不重 load page
+  //   ＝ 复现"用户反复换游戏"路径，捕捉 cumulative listener leak / 状态错乱。
+  note("step 12.5: rapid game switch (no page reload) → cumulative leak check");
+  await loadGamesPage(page);
+  const switchTargets = [
+    "信号小队",
+    "夜市合伙人",
+    "天空竞速",
+    "像素擂台",
+    "云上农场",
+  ];
+  const switchBeforeListeners = await snapshotListenerCounts(page);
+  const switchBeforeErr = listeners.consoleErrors.length;
+  const switchBeforePage = listeners.pageErrors.length;
+  for (const name of switchTargets) {
+    const row = page
+      .locator("li", { hasText: name })
+      .filter({ has: page.locator('button:text-is("开始")') })
+      .first();
+    if ((await row.count()) === 0) {
+      record("switch-row-missing", name);
+      continue;
+    }
+    await row.locator('button:text-is("开始")').click();
+    // 等新 embedded slot 出现（exit btn 仍是同一个 aria-label，所以等到该游戏对应
+    // 的内容稳定就靠 200ms 时间窗）
+    await page.waitForTimeout(400);
+  }
+  // 全部跑完后 dismiss
+  const finalExit = page.locator('button[aria-label="退出游戏"]').first();
+  if (await finalExit.isVisible().catch(() => false)) {
+    await finalExit.click().catch(() => {});
+    await page.waitForTimeout(500);
+  }
+  const switchAfter = await snapshotListenerCounts(page);
+  const winDelta = switchAfter.window - switchBeforeListeners.window;
+  const docDelta = switchAfter.document - switchBeforeListeners.document;
+  // 5 次切换 → 单次切换平均 = delta/5；window 平均 < 3 才算健康
+  if (winDelta > 15) {
+    record(
+      "rapid-switch-window-leak",
+      `5 次连切后 window listener +${winDelta}（平均 +${(winDelta / 5).toFixed(1)} / 切换）`,
+    );
+  }
+  if (docDelta > 15) {
+    record(
+      "rapid-switch-document-leak",
+      `5 次连切后 document listener +${docDelta}（平均 +${(docDelta / 5).toFixed(1)} / 切换）`,
+    );
+  }
+  const newErr = listeners.consoleErrors.slice(switchBeforeErr);
+  const newPage = listeners.pageErrors.slice(switchBeforePage);
+  for (const m of newErr) record("rapid-switch-console-error", m);
+  for (const m of newPage) record("rapid-switch-pageerror", m);
 
   // === 12. 小屏 320 宽（iPhone SE）排版不溢出 ===
   note("step 12: 320 viewport doesn't overflow");
