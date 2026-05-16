@@ -1350,11 +1350,16 @@ const pendingLikePostId = likeMutation.isPending
                 }
                 secondary={(() => {
                   const expandedComments = fullCommentsByPostId[post.id] ?? null;
-                  // 历史 DB 里可能残留 text="" 的鬼影评论（后端校验之前 curl 直发的）。
-                  // 渲染层兜底过滤，否则会渲出 "w：" 这种只剩冒号的空评论占位。
+                  // 历史 DB 里可能残留 text="" 的鬼影评论（后端校验之前 curl 直发的），
+                  // 以及 AI 角色把整段 CoT prose 当评论存进来（gpt-4.1 等非推理模型，
+                  // 没 <think> 包裹，server 兜不住）。两种都经 stripToolCallSyntax 后
+                  // 变 ""，渲染层一起过掉，否则会渲出 "w：" 只剩冒号的空评论占位。
                   const renderedComments = (
                     expandedComments ?? post.commentsPreview
-                  ).filter((comment) => comment.text.trim().length > 0);
+                  ).filter(
+                    (comment) =>
+                      stripToolCallSyntax(comment.text).trim().length > 0,
+                  );
                   if (renderedComments.length === 0) return null;
                   return (
                     <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">

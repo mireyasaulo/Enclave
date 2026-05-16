@@ -24,7 +24,26 @@ export function stripToolCallSyntax(input: string): string {
   out = out.replace(/\[TOOL_CALL\][\s\S]*$/i, "");
   // 孤立闭合标签（前面已经被吃掉了开头的）
   out = out.replace(/<\/tool_call>/gi, "").replace(/<\/tool>/gi, "");
-  return out.trim();
+  // gpt-4.1 等非推理模型在生成"广场评论"时，偶尔把整段 CoT prose 当成回复发出来
+  // （没有 <think> 标签包裹，sanitizeAiText 抓不到）：
+  //   "用户让我以 Andrej Karpathy 的身份，对一条...动态进行评论...
+  //    我需要用一句话自然地评论...
+  //    Andrej Karpathy 的风格是：- 简洁..."
+  //   "用户要求我作为沈砚角色...沈砚的风格是：- 稳、低..."
+  // 共性：开头是 "用户" / "我需要" / "让我" 这种第三人称叙述任务的 prose +
+  // 多段落 + > ~80 字。正常评论是 < 30 字的单句。命中模式直接清空，下游用
+  // emptyTextFallback 兜底；DB 里已经存进去的脏评论在 render 层一并过掉。
+  const trimmed = out.trim();
+  if (
+    trimmed.length > 80 &&
+    /^(用户(让|要求|希望|给|需要)|我需要|让我(想|数|考虑)|我应该|我可以)/.test(
+      trimmed,
+    ) &&
+    /\n/.test(trimmed)
+  ) {
+    return "";
+  }
+  return trimmed;
 }
 
 export function describeMomentMediaContent(
