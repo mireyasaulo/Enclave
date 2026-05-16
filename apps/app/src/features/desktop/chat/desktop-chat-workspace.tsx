@@ -678,9 +678,20 @@ export function DesktopChatWorkspace({
     subscriptionInboxActive,
   ]);
 
+  // 这里只依赖会话 id，不要把 activeConversation 整对象塞进去。
+  // conversationsQuery 每 60s 轮询 / onWindowFocus / socket 推消息时都会拿到
+  // 新的 conversation 对象引用，整 effect 会跟着重跑：
+  //   - setDetailsActionRequest 用 Date.now() 现刷 token →
+  //     DesktopChatDetailsPanel 那个 [actionRequest] effect 把 member-search /
+  //     announcement / nickname 等动作再回放一次（已经在编辑的弹层被重新打开）
+  //   - setHistoryPanelFocusKey(Date.now()) → DesktopChatHistoryPanel 那个
+  //     [focusRequestKey] effect 把搜索框 focus + select 再来一遍，用户在
+  //     查找记录里搜到一半时，下一次轮询会把已经输入的关键词全选高亮，
+  //     下一个按键直接覆盖掉
+  const activeConversationId = activeConversation?.id ?? null;
   useEffect(() => {
     if (
-      !activeConversation ||
+      !activeConversationId ||
       !selectedSidePanelMode ||
       subscriptionInboxActive ||
       officialAccountsActive ||
@@ -703,7 +714,7 @@ export function DesktopChatWorkspace({
       setHistoryPanelFocusKey(Date.now());
     }
   }, [
-    activeConversation,
+    activeConversationId,
     officialAccountsActive,
     selectedDetailsAction,
     selectedSidePanelMode,
