@@ -866,6 +866,48 @@ export function DiscoverFeedPage() {
       ),
     [feedPosts, blockedCharacterIds],
   );
+  // 走查新一轮 Round 2 (perf)：mobile 路径直接 visiblePosts.map 展 JSX，
+  // 没有 row 级别的 React.memo 边界。用户在 WeChatCommentBar 里敲一下键 →
+  // setCommentDrafts → 整页 re-render → 60 条 post 的 stripToolCallSyntax(
+  // post.text) + 60 × ≤3 条 commentsPreview 各跑一次 stripToolCallSyntax +
+  // filter +常逛 wiki 同人 cluster 时 expanded 全量 100+ 条 — 每敲一下键
+  // 至少 240 次正则 + 一遍 Map 建表。Round 4 (a21a4e2a) 修过 summary 那
+  // 一支的重复 strip，但 displayText 本体和 comment cleanText 仍然现算。
+  // 把 strip 结果按 [visiblePosts, fullCommentsByPostId] 提一层 useMemo：
+  // 只有数据真变（cache 写入、自然 refetch、expand 完成）才重算，
+  // commentDrafts / inflightSets / actionBubble / pull-refresh state 这些
+  // 高频 setState 都不触发 strip。
+  const processedPosts = useMemo(() => {
+    return visiblePosts.map((post) => {
+      const displayText = stripToolCallSyntax(post.text);
+      const summaryText = displayText ? "" : getFeedSummaryText(post);
+      return { post, displayText, summaryText };
+    });
+  }, [visiblePosts]);
+  const processedCommentsByPostId = useMemo(() => {
+    const result = new Map<
+      string,
+      {
+        comments: Array<{ comment: FeedComment; cleanText: string }>;
+        byId: Map<string, FeedComment>;
+      }
+    >();
+    for (const post of visiblePosts) {
+      const expanded = fullCommentsByPostId[post.id] ?? null;
+      const source = expanded ?? post.commentsPreview;
+      const cleaned = source
+        .map((comment) => ({
+          comment,
+          cleanText: stripToolCallSyntax(comment.text),
+        }))
+        .filter((entry) => entry.cleanText.trim().length > 0);
+      const byId = new Map(
+        cleaned.map((entry) => [entry.comment.id, entry.comment]),
+      );
+      result.set(post.id, { comments: cleaned, byId });
+    }
+    return result;
+  }, [visiblePosts, fullCommentsByPostId]);
   // 收藏命中查每条 row 一次走 includes：100 条 post × 50 个收藏 ≈ O(N×M)
   // 数组扫，每次 page render 都重做。落成 Set + useCallback 一举两得 ——
   // 查询 O(1)，闭包引用稳定不再让 workspace 因为 isPostFavorite prop 变天
@@ -2157,16 +2199,11 @@ export function DiscoverFeedPage() {
             />
           ) : null}
 
-          {visiblePosts.map((post) => {
-            const displayText = stripToolCallSyntax(post.text);
-            // 走查 Round 4 (perf)：旧版无脑 getFeedSummaryText(post) → 内部 *又*
-            // 跑一遍 stripToolCallSyntax(post.text)；displayText 已经 strip 过的
-            // 路径下完全是浪费。绝大多数 post 都有正文（displayText 非空），
-            // summaryText 落到 ""，postSummaryText 算出来也没用。60 条 post 每
-            // 次评论 / 点赞 / pull-refresh / typing 触发的整页 re-render 都跑这
-            // 60 次没用的 regex。Lazy 一下：displayText 非空时直接 ""，空了才
-            // 调 getFeedSummaryText 走"分享了 X 张图片"那条 media 兜底。
-            const summaryText = displayText ? "" : getFeedSummaryText(post);
+          {processedPosts.map(({ post, displayText, summaryText }) => {
+            // displayText / summaryText 来自 processedPosts useMemo（见上方 Round
+            // 2 perf 注释）。Round 4 (a21a4e2a) 把 summary 那一支 lazy 化的判定
+            // 一并迁进 useMemo：displayText 非空时 summaryText="" 不再调
+            // getFeedSummaryText 走 media 兜底正则。
 
             return (
               <div key={post.id} className="yj-list-item-virtual-card">
@@ -2270,19 +2307,10 @@ export function DiscoverFeedPage() {
                   // 以及 AI 角色把整段 CoT prose 当评论存进来（gpt-4.1 等非推理模型，
                   // 没 <think> 包裹，server 兜不住）。两种都经 stripToolCallSyntax 后
                   // 变 ""，渲染层一起过掉，否则会渲出 "w：" 只剩冒号的空评论占位。
-                  // 走查 Round 1 (perf)：旧实现 filter 里跑一遍 stripToolCallSyntax，
-                  // 渲染时（L2207）每条 comment 再跑一遍，60 post × ≤3 preview × 2
-                  // = 360 次 regex 重复。展开「查看全部」体量上百时更夸张。一次性
-                  // 落成 { comment, cleanText } 形态，filter / render 同读 cleanText，
-                  // 同时 commentById 也只存清洗过的版本免得下游再算。
-                  const renderedComments = (
-                    expandedComments ?? post.commentsPreview
-                  )
-                    .map((comment) => ({
-                      comment,
-                      cleanText: stripToolCallSyntax(comment.text),
-                    }))
-                    .filter((entry) => entry.cleanText.trim().length > 0);
+                  // 走查新一轮 Round 2 (perf)：strip + filter + Map 一次性 useMemo
+                  // 出来（见上方 processedCommentsByPostId），高频 setState 不重算。
+                  const cached = processedCommentsByPostId.get(post.id);
+                  const renderedComments = cached?.comments ?? [];
                   // preview 里全是被过滤掉的脏评论（gpt-4.1 等模型把 CoT prose 当
                   // 广场评论存进来 → stripToolCallSyntax 后变 ""），但 commentCount
                   // 仍 > 0：之前 return null 把「查看全部 N 条评论」也一并吞掉，
@@ -2302,16 +2330,10 @@ export function DiscoverFeedPage() {
                   ) {
                     return null;
                   }
-                  // 展开「查看全部 N 条评论」后 renderedComments 体量可能上百。
-                  // 旧逻辑给每条评论都 .find 一遍找被回复评论 → O(N²)，100 条 = 1 万次
-                  // 字符串比较，每次父组件 setState（如点赞气泡）整张广场重渲都会重算。
-                  // 落成 Map 一次 O(N) 建好，每条 O(1) 命中。
-                  const commentById = new Map(
-                    renderedComments.map((entry) => [
-                      entry.comment.id,
-                      entry.comment,
-                    ]),
-                  );
+                  // commentById 同样从 processedCommentsByPostId 取 — 用展开后
+                  // 上百评论时旧 O(N²) find 已经在 useMemo 里收敛到 O(N) 建表 +
+                  // O(1) 命中；高频 setState 也不重建。
+                  const commentById = cached?.byId ?? new Map<string, FeedComment>();
                   return (
                     <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">
                       <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
