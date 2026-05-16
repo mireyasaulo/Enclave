@@ -136,9 +136,31 @@ const NATIVE_LOCALE_LABELS = new Set([
   "English",
 ]);
 
-function isLeak(text, locale) {
+// CSS class names on the bootstrap splash. BootstrapScreen renders raw zh-CN
+// source while waiting for the i18n catalog to hydrate (by design — translation
+// macros can't resolve until the catalog loads). Any text node inside one of
+// these classes is a splash artifact, not a leak in the actual app UI.
+const BOOTSTRAP_CLASSES = new Set([
+  "boot-logo",
+  "boot-title",
+  "boot-copy",
+  "boot-step-value",
+  "boot-notice",
+]);
+
+function isBootstrapNode(item) {
+  if (!item.cls) return false;
+  for (const cls of BOOTSTRAP_CLASSES) {
+    if (item.cls.includes(cls)) return true;
+  }
+  return false;
+}
+
+function isLeak(text, locale, item) {
   // Native language picker labels are not leaks.
   if (NATIVE_LOCALE_LABELS.has(text.trim())) return false;
+  // Bootstrap splash copy renders raw zh-CN by design.
+  if (item && isBootstrapNode(item)) return false;
   // CJK ideograph range
   const CJK = /[㐀-䶿一-鿿]/;
   const KANA = /[぀-ヿ]/;
@@ -245,12 +267,14 @@ async function visitRoute(page, baseUrl, route, locale, clickBudget) {
   const isLocalePickerRoute = route.startsWith("/profile/settings");
   if (isLocalePickerRoute) {
     // Render landing state only; do not interact (avoids triggering locale change).
-    const leaks = allItems.filter((it) => isLeak(it.text, locale));
+    const leaks = allItems.filter((it) => isLeak(it.text, locale, it));
     return { url, errors, totalNodes: allItems.length, items: allItems, leaks };
   }
   const budget = isGameRoute ? Math.max(clickBudget, 6) : clickBudget;
   for (let i = 0; i < budget; i += 1) {
-    const clicked = await page.evaluate(
+    let clicked;
+    try {
+      clicked = await page.evaluate(
       ({ skipIndex, isGameRoute }) => {
         const buttons = Array.from(
           document.querySelectorAll("button, [role=button]"),
@@ -283,7 +307,11 @@ async function visitRoute(page, baseUrl, route, locale, clickBudget) {
         return btn.textContent?.trim().slice(0, 60) ?? "";
       },
       { skipIndex: i, isGameRoute },
-    );
+      );
+    } catch {
+      // Page navigated during the click evaluate; stop this route's click loop.
+      break;
+    }
     if (clicked === null) break;
     await page.waitForTimeout(350);
     // If the click navigated away or destroyed the execution context (e.g., a
@@ -325,7 +353,7 @@ async function visitRoute(page, baseUrl, route, locale, clickBudget) {
     await page.waitForTimeout(120);
   }
 
-  const leaks = allItems.filter((it) => isLeak(it.text, locale));
+  const leaks = allItems.filter((it) => isLeak(it.text, locale, it));
   return { url, errors, totalNodes: allItems.length, items: allItems, leaks };
 }
 
@@ -367,10 +395,12 @@ async function main() {
           localStorage.setItem("yinjie-i18n-locale:app", targetLocale);
         }, locale);
 
-        const page = await context.newPage();
-        await installApiMocks(page, systemStatus);
-
         for (const route of opts.routes) {
+          // Use a fresh page per route so prior-route click side effects
+          // (saved drafts, retry queues, error toasts in zustand store) don't
+          // bleed into subsequent route's scrape and produce spurious leaks.
+          const page = await context.newPage();
+          await installApiMocks(page, systemStatus);
           const result = await visitRoute(page, server.baseUrl, route, locale, opts.clickEvery);
           totalLeaks += result.leaks.length;
           summary.results.push({ locale, route, ...result });
@@ -384,8 +414,8 @@ async function main() {
           } else {
             console.log(`[${locale} ${route}] OK (${result.totalNodes} text nodes)`);
           }
+          await page.close();
         }
-        await page.close();
         await context.close();
       }
     } finally {
