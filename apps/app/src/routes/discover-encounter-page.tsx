@@ -55,6 +55,10 @@ const NON_RETRYABLE_SHAKE_ERROR_CODES = new Set([
   "SHAKE_DAILY_LIMIT",
   "SHAKE_DISABLED",
   "SHAKE_CYBER_AVATAR_NO_SIGNAL",
+  // 走查 Round 1：cooldown 是时间窗口，立刻重试只会再次拿到同一个 SHAKE_COOLDOWN。
+  // legacyMessage 已经告诉用户「请至少间隔 X 分钟」，再放个「重试摇一摇」按钮等于
+  // 鼓励用户撞同一面墙；归到 non-retryable，只留「回发现页」让用户体面退出。
+  "SHAKE_COOLDOWN",
 ]);
 
 function isShakeErrorRetryable(error: Error) {
@@ -155,7 +159,10 @@ function MobileDiscoverEncounterPage() {
       case "denied":
         return t(msg`已拒绝动作传感器授权，可在系统设置开启，或点下方按钮手动触发相遇。`);
       default:
-        return t(msg`每次摇一摇都会先生成一个新的相遇结果；当前页面会直接保留这次结果，并把对方加入你的通讯录。`);
+        // 走查 Round 1：'unsupported'（设备没有动作传感器 / 桌面浏览器 / WebView 屏蔽）
+        // 走兜底分支，但兜底文案完全没提到「点按钮」也能摇一摇——用户看不到怎么触发。
+        // 与 'denied' 分支对齐，明确告诉用户：只能点按钮。
+        return t(msg`当前设备不支持晃动触发，点下方按钮手动触发相遇，每次结果都会直接加入你的通讯录。`);
     }
   })();
 
