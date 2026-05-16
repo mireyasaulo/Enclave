@@ -426,7 +426,10 @@ export function ProfileInfoAvatarPage() {
 
       <div className="mt-1 flex flex-col items-center gap-2 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-6">
         <AvatarChip
-          name={username?.trim() || "avatar"}
+          // username 没 hydrate 出来时之前传裸 "avatar"，AvatarChip alt / aria-label
+          // 直出英文给非中文用户也不会本地化；这里跟 profile-info-page 同款走
+          // i18n 文案 "世界主人"。
+          name={username?.trim() || t(msg`世界主人`)}
           src={previewSrc}
           size="xl"
         />

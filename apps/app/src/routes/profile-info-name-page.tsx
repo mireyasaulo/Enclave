@@ -216,9 +216,16 @@ export function ProfileInfoNamePage() {
       {/* 名字短于下限时（legacy 1 字用户进入页面也是这种情况），把 disabled
           「完成」的原因显式告诉用户；之前 trimmed.length===0 完全不提示，用户
           清空输入后只看到「完成」灰着，毫无线索，以为是 bug。这里改成：
-          ① 1 字符 → 文案 "至少 N 字符"
-          ② 0 字符 → 文案 "请输入名字"  */}
-      {sanitized.length === 0 && draft.length > 0 ? (
+          ① 0 字符 → 文案 "请输入名字"（之前 gate 在 draft.length>0 上漏掉了
+            「用户把名字完全清空」这条最常见的路径——清空后只看到「完成」灰着，
+            没有任何文字说明，跟「以为是 bug」的描述一致；R1 走查实测）
+          ② 全空白/控制字符 → 文案 "请输入有效的名字（不能只有空白或换行符）"
+          ③ 1 字符 → 文案 "至少 N 字符"  */}
+      {sanitized.length === 0 && draft.length === 0 ? (
+        <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
+          {t(msg`请输入名字。`)}
+        </div>
+      ) : sanitized.length === 0 && draft.length > 0 ? (
         <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
           {t(msg`请输入有效的名字（不能只有空白或换行符）。`)}
         </div>
