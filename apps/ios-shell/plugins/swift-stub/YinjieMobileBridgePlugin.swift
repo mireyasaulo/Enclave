@@ -533,6 +533,7 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         let call = pendingFilePickerCall
         pendingFilePickerCall = nil
+        let sourceUrl = urls.first
 
         DispatchQueue.main.async {
             controller.dismiss(animated: true) {
@@ -540,17 +541,31 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                     return
                 }
 
-                guard let sourceUrl = urls.first,
-                      let asset = self.copyFileAsset(from: sourceUrl) else {
+                guard let sourceUrl else {
                     call.resolve([
                         "asset": NSNull()
                     ])
                     return
                 }
 
-                call.resolve([
-                    "asset": asset
-                ])
+                // 不要在 dismiss completion 里同步跑 copyItem：UIDocumentPicker 用
+                // asCopy:true 时 iOS 先把 iCloud Drive / Files / 第三方 provider
+                // 里选中的文件 copy 进我们的 sandbox tempDir，sourceUrl 就是那个
+                // 副本。我们再 copyItem 到 yinjie-documents/ 是为了把命名 / 生命
+                // 周期收回自己手里，但这是真盘 I/O —— 100MB 以上的 PDF / zip 在
+                // 真机 NAND 上同步 copyItem 能阻塞主线程数秒，picker 关闭后整个
+                // WebView 卡死，用户感受为「点完文件 app 假死」。挪到
+                // userInitiated 后台线程跑，结果回主线程 resolve。
+                DispatchQueue.global(qos: .userInitiated).async {
+                    let asset = self.copyFileAsset(from: sourceUrl)
+                    DispatchQueue.main.async {
+                        if let asset {
+                            call.resolve(["asset": asset])
+                        } else {
+                            call.resolve(["asset": NSNull()])
+                        }
+                    }
+                }
             }
         }
     }
