@@ -129,6 +129,32 @@ function DesktopFavoritesPage() {
   const normalizedPathname = normalizePathname(pathname);
   const desktopPathMismatch = normalizedPathname !== desktopFavoritesPath;
 
+  // 切账号 / 切世界（baseUrl 翻面）时清掉旧世界残留的 UI 状态。跟
+  // mobile-add-friend-page be28800c 同套思路：queryKey 已经含 baseUrl，
+  // react-query 会自动按新 key 拉数据，但 component 本地 state 不会跟着
+  // 翻面：
+  // 1) 旧 favorites state 继续显示前一个世界的列表，新数据到达前的
+  //    ~200ms 用户看的是上个世界的收藏；
+  // 2) selectedFavoriteSourceId 指向旧世界某条 favorite，新世界 filter
+  //    可能没有 → effective 兜底到 filtered[0]，但底层 state 还吊着旧
+  //    sourceId，回到旧世界时还会"复活"；
+  // 3) searchText="abc" 残留到新世界继续 filter；
+  // 4) notice "X 已加入收藏。" 2.4s 自清 timer 还跑着，新世界吊着跟自己
+  //    无关的旧成功提示。
+  // 在 baseUrl 翻面那一刻整体复位，favorites 立即回到 local-only 兜底，
+  // remote 拉回来后由 effect 139 再 merge 上。
+  const previousBaseUrlRef = useRef(baseUrl);
+  useEffect(() => {
+    if (previousBaseUrlRef.current === baseUrl) {
+      return;
+    }
+    previousBaseUrlRef.current = baseUrl;
+    setFavorites(mergeDesktopFavoriteRecords([], readDesktopFavorites()));
+    setSearchText("");
+    setSelectedFavoriteSourceId(null);
+    setNotice(null);
+  }, [baseUrl]);
+
   const normalizedSearchText = deferredSearchText.trim().toLowerCase();
   const favoriteNoteSummaryMap = useMemo(() => {
     return new Map(
