@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
 import { Heart, MessageCircle, Share2, Star } from "lucide-react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 
 const t = translateRuntimeMessage;
 
@@ -75,6 +76,18 @@ export function WeChatActionBubble({
       window.removeEventListener("resize", handleScroll);
       window.removeEventListener("keydown", handleKey);
     };
+  }, [open, onClose]);
+
+  // Android 硬件 Back：气泡打开时按 Back 应该收气泡而不是退整页。pointerdown /
+  // scroll / resize / ESC 四条都覆盖了，但 Android Back 自成一路（capacitor 桥
+  // 不会派 keydown），用户在小气泡上想"退一步"时整个 feed 页被弹掉很意外。
+  useEffect(() => {
+    if (!open) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
   }, [open, onClose]);
 
   useLayoutEffect(() => {
