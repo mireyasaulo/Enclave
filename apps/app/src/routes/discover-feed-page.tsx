@@ -1136,17 +1136,43 @@ export function DiscoverFeedPage() {
     setNotice(""); // i18n-ignore-line
   }, [baseUrl, resetComposeDraft]);
 
+  // 走查 Round 1：钉 baseUrlRef 是为了让 expandFullComments 的 async 路径
+  // 在 await listFeedComments 期间被 mid-flight 切账户时识别出来——
+  // 旧路径直接 setFullCommentsByPostId 把 A 账户的评论塞进 B 账户的 state，
+  // 又因为本 effect 上面那条「切账户 reset」效应里 setFullCommentsByPostId({})
+  // 早就跑完了，B 账户的 fullCommentsByPostId 凭空冒出 [X]: A 的评论。若两个
+  // 账户碰巧共享 wiki post X（同人 cluster / 两个账号互跟），用户进 B 点开 X
+  // 就会读到 A 账户的评论列表；不共享则成为永远 dangling 的脏 entry，下一次
+  // 切回 A 又被覆盖一遍。同理 commentMutation / likeMutation R10 的 mutation-
+  // BaseUrl gate 也是这套思路，只是 expand 不走 useMutation 所以没沾上。
+  const baseUrlRef = useRef(baseUrl);
+  useEffect(() => {
+    baseUrlRef.current = baseUrl;
+  }, [baseUrl]);
+
   async function expandFullComments(postId: string) {
     if (loadingFullCommentsPostId === postId) return;
     if (fullCommentsByPostId[postId]) return;
+    const expandBaseUrl = baseUrl;
     setLoadingFullCommentsPostId(postId);
     try {
-      const all = await listFeedComments(postId, baseUrl);
+      const all = await listFeedComments(postId, expandBaseUrl);
+      // mid-flight 切账户：丢弃这次结果，让 B 账户的 state 保持干净。
+      // setLoadingFullCommentsPostId 的 finally 也照样按 expandBaseUrl 上锁的
+      // postId 来释放——current === postId 比较是 string 比较，跨账户安全。
+      if (expandBaseUrl !== baseUrlRef.current) {
+        return;
+      }
       setFullCommentsByPostId((current) => ({
         ...current,
         [postId]: all,
       }));
     } catch (error) {
+      // 同样的 mid-flight 切账户判定：A 账户的错误别落到 B 账户的 toolbar
+      // notice 上（B 看着像自己读 X 的评论失败，但 B 啥也没做）。
+      if (expandBaseUrl !== baseUrlRef.current) {
+        return;
+      }
       setNoticeTone("info");
       setNoticeActionLabel(t(msg`重试`));
       setNoticeAction(() => () => {
@@ -2606,6 +2632,17 @@ export function DiscoverFeedPage() {
         }
         onLike={() => {
           if (!actionBubble) return;
+          // 走查 Round 1：bubble 没 pending 概念，点完「赞」会立刻 onClose。用户
+          // 重开 bubble（再点 ⋯）时 cache 已经按 optimistic 翻成 hasLiked=true，
+          // bubble 现 "取消" 字样；用户再点一下 → 第二条 mutation 在第一条还没
+          // 回来时飞向 server (likeFeedPost vs unlikeFeedPost)。两条并发 HTTP
+          // 撞到 server，谁先 commit 谁说了算：unlike 先到 → DB 留 hasLiked=true，
+          // 但 cache 已经按 optimistic 翻成 false → DB / UI 不一致直到下一次
+          // 自然 refetch。同款问题前几轮已经给桌面 row 的 commentInflight /
+          // likeInflight Set 处理过；mobile action bubble 这一条之前漏了。
+          // inflight 命中就静默吃掉这次 tap，bubble 仍 onClose 关掉避免用户视
+          // 觉卡死；想真重置就等 mutation 回来再开 bubble。
+          if (likeInflightPostIds.has(actionBubble.postId)) return;
           likeMutation.mutate(actionBubble.postId);
         }}
         onComment={() => {
