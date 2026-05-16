@@ -423,6 +423,14 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         }
     }
 
+    private func normalize(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
+            return nil
+        }
+
+        return value
+    }
+
     private func mapAuthorizationStatus(_ status: UNAuthorizationStatus) -> String {
         switch status {
         case .authorized, .provisional, .ephemeral:

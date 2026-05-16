@@ -750,4 +750,12 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         popover.sourceView = presenter.view
         popover.sourceRect = presenter.view.bounds
     }
+
+    private func normalize(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
+            return nil
+        }
+
+        return value
+    }
 }
