@@ -2118,58 +2118,54 @@ export function ContactsPage() {
                   // startChatMutation / setStarredMutation / pinMutation /
                   // muteMutation / blockMutation / deleteFriendMutation 在
                   // friend / world / tags / starred 四个 pane 之间共用同一份
-                  // mutation 实例：用户在 friend pane 给 Alice 点「发消息」失败
-                  // 后切到 starred pane，mutation.error 还挂着，actionError 会把
-                  // 那条 Alice 的错误翻在这里——但 Alice 可能根本不在星标列表
-                  // 里，提示和操作完全对不上。按 variables.characterId 过滤：
-                  // 只显示当前还是星标朋友的那条错误，其它（已删除 / 已取消
-                  // 星标 / 来自别的 pane）当作脏状态忽略。
-                  //
-                  // 走查 Round 1：原先只翻 startChat / setStarred 两条错。但
-                  // 右栏 ContactDetailPane 上「置顶聊天 / 消息免打扰 / 加入
-                  // 黑名单 / 删除联系人」都在这个 pane 里直接触发；当 pin /
-                  // mute / block / delete 失败时，对应错误只能在最左侧的
-                  // workspace errors 区显示——用户刚在最右栏点过按钮，根本
-                  // 不会回头去最左栏找。把这四条 mutation 也纳入过滤，让错误
-                  // 出现在用户实际操作的 pane 中。
-                  const isInStarred = (characterId: string | undefined) =>
-                    !!characterId &&
-                    starredFriends.some(
-                      (item) => item.character.id === characterId,
-                    );
+                  // mutation 实例。原先只翻 startChat / setStarred 两条错；
+                  // Round 1 把 pin/mute/block/delete 也纳入显示——但只按
+                  // 「目标当前仍是 starred 好友」过滤，不够：用户给 Alice 点
+                  // 「置顶聊天」失败 → 错误条挂在中间侧栏 → 切到 Bob（也是
+                  // starred 好友），错误条没消，看起来像 Bob 的「置顶」出错。
+                  // 进一步绑到「当前选中的那位」：mutation.variables.characterId
+                  // 必须就是 selectedCharacterId，错误才在这个 pane 显示。
+                  // 切走那位 → 错误隐藏；切回去 → 又出现。最左侧 workspace
+                  // errors 区仍然保留全量错误兜底，不会丢。
+                  const targetId = desktopSelection.id;
+                  if (!targetId) {
+                    return null;
+                  }
+                  const isCurrent = (characterId: string | undefined) =>
+                    !!characterId && characterId === targetId;
                   if (
                     startChatMutation.error instanceof Error &&
-                    isInStarred(startChatMutation.variables)
+                    isCurrent(startChatMutation.variables)
                   ) {
                     return startChatMutation.error.message;
                   }
                   if (
                     setStarredMutation.error instanceof Error &&
-                    isInStarred(setStarredMutation.variables?.characterId)
+                    isCurrent(setStarredMutation.variables?.characterId)
                   ) {
                     return setStarredMutation.error.message;
                   }
                   if (
                     pinMutation.error instanceof Error &&
-                    isInStarred(pinMutation.variables?.characterId)
+                    isCurrent(pinMutation.variables?.characterId)
                   ) {
                     return pinMutation.error.message;
                   }
                   if (
                     muteMutation.error instanceof Error &&
-                    isInStarred(muteMutation.variables?.characterId)
+                    isCurrent(muteMutation.variables?.characterId)
                   ) {
                     return muteMutation.error.message;
                   }
                   if (
                     blockMutation.error instanceof Error &&
-                    isInStarred(blockMutation.variables?.characterId)
+                    isCurrent(blockMutation.variables?.characterId)
                   ) {
                     return blockMutation.error.message;
                   }
                   if (
                     deleteFriendMutation.error instanceof Error &&
-                    isInStarred(deleteFriendMutation.variables)
+                    isCurrent(deleteFriendMutation.variables)
                   ) {
                     return deleteFriendMutation.error.message;
                   }
