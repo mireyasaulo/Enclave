@@ -130,6 +130,17 @@ export function ProfileInfoNamePage() {
             // 红字 banner 清掉，免得新尝试还挂着旧 attempt 的失败说明。
             saveMutation.reset();
           }}
+          onKeyDown={(event) => {
+            // 跟 welcome-page.tsx ownerName 输入框对齐（line 1417）：iOS / 安卓
+            // 软键盘点 Done 默认只 blur，外面没 form 包，回车也不会触发任何
+            // submit；用户要再戳一下右上「完成」按钮才能保存。手动接 Enter 在
+            // canSave 时调 mutate，路径短一步。
+            if (event.key === "Enter" && canSave && !saveMutation.isPending) {
+              event.preventDefault();
+              saveMutation.mutate();
+            }
+          }}
+          enterKeyHint="done"
           maxLength={NAME_MAX_LENGTH}
           placeholder={t(msg`输入名字`)}
           // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。

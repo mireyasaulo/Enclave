@@ -373,6 +373,16 @@ export function ProfileInfoAvatarPage() {
               saveMutation.reset();
               resetMutation.reset();
             }}
+            onKeyDown={(event) => {
+              // 跟 profile-info-name-page 同款：粘完 URL 习惯性按回车直接
+              // submit，外面没 <form> 不会自动触发；手动接一下，可保存就走
+              // saveMutation。
+              if (event.key === "Enter" && canSave && !isSaving) {
+                event.preventDefault();
+                saveMutation.mutate();
+              }
+            }}
+            enterKeyHint="done"
             placeholder={t(msg`粘贴图片 URL 或留空`)}
             // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
             // tap 一下输入框整页抖一下。
