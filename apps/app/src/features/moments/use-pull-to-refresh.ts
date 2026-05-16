@@ -70,6 +70,16 @@ export function usePullToRefresh({
   // 导致 iOS Safari 把整段手势锁成"非滚动"，用户上滑就划不动了。
   const refreshingRef = useRef(false);
   const safetyTimerRef = useRef<number | null>(null);
+  // onRefresh 在调用方多数是 inline 箭头（() => Promise.all([...refetch()])），
+  // 每次父组件 re-render 引用都新——若 handleTouchEnd 直接依赖它，useEffect
+  // 会在每次重渲都先 removeEventListener×4 再 addEventListener×4，输入评论
+  // 草稿那种高频 setState 下白白来回拆装监听。把 onRefresh 兜到 ref 里，
+  // handler 闭包稳定就能让 useEffect 只在 enabled / 真正的内部 handler 切换
+  // 时才动监听。
+  const onRefreshRef = useRef(onRefresh);
+  useEffect(() => {
+    onRefreshRef.current = onRefresh;
+  }, [onRefresh]);
   const [state, setState] = useState<PullState>({
     pulling: false,
     refreshing: false,
@@ -168,7 +178,7 @@ export function usePullToRefresh({
       }
       if (prev.offset >= TRIGGER_DISTANCE) {
         refreshingRef.current = true;
-        const result = onRefresh();
+        const result = onRefreshRef.current();
         Promise.resolve(result).finally(() => {
           window.setTimeout(finishRefresh, 250);
         });
@@ -193,7 +203,7 @@ export function usePullToRefresh({
         progress: 0,
       };
     });
-  }, [finishRefresh, onRefresh]);
+  }, [finishRefresh]);
 
   useEffect(() => {
     const node = containerRef.current;
