@@ -232,7 +232,16 @@ function MobileChatListPage() {
   const quickMenuRef = useRef<HTMLDivElement | null>(null);
   const [isNotifiedReminderGroupExpanded, setIsNotifiedReminderGroupExpanded] =
     useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  // 失败 toast 必须能跟成功 toast 在样式上区分（红 vs 蓝），不然
+  // pin/mute/markRead/delete 出错时用户看到的"操作失败请稍后再试"和成功
+  // 提示用同一个 info 蓝条，肉眼几乎无差别 —— 用户以为操作生效了。
+  const [notice, setNotice] = useState<
+    { message: string; tone: "info" | "danger" } | null
+  >(null);
+  const setNoticeInfo = (message: string) =>
+    setNotice({ message, tone: "info" });
+  const setNoticeError = (message: string) =>
+    setNotice({ message, tone: "danger" });
   const [openSwipeConversationId, setOpenSwipeConversationId] = useState<
     string | null
   >(null);
@@ -292,7 +301,10 @@ function MobileChatListPage() {
     navigateToReminder: (entry) => {
       void navigate(buildChatReminderNavigation(entry));
     },
-    onNoticeChange: setNotice,
+    // useChatReminderActions 不区分 info/danger，统一当 info 蓝条；reminder
+    // 完成/出错回执都不是 mutation 级别的 hard fail，info 已经够提示。
+    onNoticeChange: (message) =>
+      message ? setNoticeInfo(message) : setNotice(null),
     onCompleteReminder: clearReminder,
   });
   const visibleConversations = useMemo(
@@ -397,7 +409,7 @@ function MobileChatListPage() {
       // optimistic 已回滚，但用户看不到任何反馈：列表里 pin 状态默默闪回原样。
       // 公网隧道偶发超时 / cloud token 过期重连那几百 ms 都会触发，必须给个 toast，
       // 否则用户以为"系统忽略了我的点击"。
-      setNotice(
+      setNoticeError(
         error instanceof Error && error.message
           ? error.message
           : variables.pinned
@@ -406,7 +418,7 @@ function MobileChatListPage() {
       );
     },
     onSuccess: async (_, variables) => {
-      setNotice(
+      setNoticeInfo(
         variables.pinned ? t(msg`聊天已置顶。`) : t(msg`聊天已取消置顶。`),
       );
       await Promise.all([
@@ -446,7 +458,7 @@ function MobileChatListPage() {
     },
     onError: (error, variables, context) => {
       if (context?.snapshots) restoreConversationCache(context.snapshots);
-      setNotice(
+      setNoticeError(
         error instanceof Error && error.message
           ? error.message
           : variables.muted
@@ -455,7 +467,7 @@ function MobileChatListPage() {
       );
     },
     onSuccess: async (_, variables) => {
-      setNotice(
+      setNoticeInfo(
         variables.muted
           ? t(msg`已开启消息免打扰。`)
           : t(msg`已关闭消息免打扰。`),
@@ -488,7 +500,7 @@ function MobileChatListPage() {
           ? markConversationRead(conversationId, baseUrl)
           : markConversationUnread(conversationId, baseUrl),
     onError: (error, variables) => {
-      setNotice(
+      setNoticeError(
         error instanceof Error && error.message
           ? error.message
           : variables.action === "read"
@@ -497,7 +509,7 @@ function MobileChatListPage() {
       );
     },
     onSuccess: async (_, variables) => {
-      setNotice(
+      setNoticeInfo(
         variables.action === "read"
           ? t(msg`已标记为已读。`)
           : t(msg`已标记为未读。`),
@@ -525,10 +537,10 @@ function MobileChatListPage() {
       }
 
       if (showSuccessNotice) {
-        setNotice(t(msg`聊天已从列表移除。`));
+        setNoticeInfo(t(msg`聊天已从列表移除。`));
       }
     } catch (error) {
-      setNotice(
+      setNoticeError(
         error instanceof Error
           ? error.message
           : t(msg`聊天移除失败，请稍后再试。`),
@@ -798,7 +810,7 @@ function MobileChatListPage() {
     clearPendingHideTimer();
     pendingHideRef.current = null;
     setPendingHideConversation(null);
-    setNotice(t(msg`已撤销删除。`));
+    setNoticeInfo(t(msg`已撤销删除。`));
   }
 
   async function handleClearReminderGroup(
@@ -811,9 +823,9 @@ function MobileChatListPage() {
 
     try {
       await clearReminders(messageIds);
-      setNotice(getChatReminderGroupClearNotice(status, messageIds.length));
+      setNoticeInfo(getChatReminderGroupClearNotice(status, messageIds.length));
     } catch (error) {
-      setNotice(
+      setNoticeError(
         error instanceof Error
           ? error.message
           : getChatReminderGroupClearErrorMessage(status),
@@ -954,10 +966,15 @@ function MobileChatListPage() {
         ) : notice ? (
           <div className="px-3 pt-2">
             <InlineNotice
-              tone="info"
-              className="rounded-[11px] border-[rgba(96,165,250,0.16)] px-2.5 py-1.5 text-[10px] leading-4 shadow-none"
+              tone={notice.tone}
+              className={cn(
+                "rounded-[11px] px-2.5 py-1.5 text-[10px] leading-4 shadow-none",
+                notice.tone === "info"
+                  ? "border-[rgba(96,165,250,0.16)]"
+                  : undefined,
+              )}
             >
-              {notice}
+              {notice.message}
             </InlineNotice>
           </div>
         ) : null}
