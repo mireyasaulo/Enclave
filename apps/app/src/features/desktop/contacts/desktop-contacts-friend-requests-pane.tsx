@@ -75,16 +75,20 @@ export function DesktopContactsFriendRequestsPane({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-auto px-8 py-6">
-        {actionError ? (
-          <div className="mb-4">
+      {actionError || actionSuccess ? (
+        // 把 banner 放在 header 和 scroll content 之间（非 scroll 容器的子节点），
+        // 用户滚到列表底部接受一条好友申请时 banner 仍然挂在顶上可见的 2.4s，
+        // 不会随列表滚出视区被错过。
+        <div className="border-b border-[color:var(--border-faint)] bg-white/82 px-8 py-3 backdrop-blur-xl">
+          {actionError ? (
             <InlineNotice tone="danger">{actionError}</InlineNotice>
-          </div>
-        ) : actionSuccess ? (
-          <div className="mb-4">
+          ) : (
             <InlineNotice tone="success">{actionSuccess}</InlineNotice>
-          </div>
-        ) : null}
+          )}
+        </div>
+      ) : null}
+
+      <div className="flex min-h-0 flex-1 flex-col overflow-auto px-8 py-6">
 
         {loading ? (
           // 用 flex-1 而不是 h-full，避免和上方 banner 叠加后撑爆容器引出冗余滚动条
