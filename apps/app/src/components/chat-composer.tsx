@@ -894,9 +894,18 @@ export function ChatComposer({
         setStickerPanelOpen(false);
       }
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setStickerPanelOpen(false);
+      }
+    };
 
     window.addEventListener("pointerdown", handlePointerDown);
-    return () => window.removeEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [isDesktop, stickerPanelOpen]);
 
   // 原生壳硬件 Back：移动端 sticker / plus 面板展开时按 BACK 应当先收起面
@@ -970,9 +979,18 @@ export function ChatComposer({
         setDesktopPlusMenuOpen(false);
       }
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDesktopPlusMenuOpen(false);
+      }
+    };
 
     window.addEventListener("pointerdown", handlePointerDown);
-    return () => window.removeEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [desktopPlusMenuOpen, isDesktop]);
 
   useEffect(() => {
