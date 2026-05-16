@@ -68,7 +68,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        // 真机走查 R3：APNs 后端推消息时通常带 badge 计数（"5 条未读"），iOS 在
+        // app 图标上画 "5"。我们打开 app 读了所有消息后，badge 不会自动清 ——
+        // 老代码这里啥都没干，iOS 唯一回收 badge 的途径是「用户在 Settings 里
+        // 关掉 badge 权限」，正常使用场景下 "5" 一直挂在桌面上。
+        //
+        // 用户体感：「我读完了但角标还显示 5」 →「我再点进去看」→「没有新消息」
+        // →「角标坏了」。真机连续两轮 (2026-05-16 / 2026-05-17) 都没人 catch
+        // 到，因为模拟器测试时 badge 一般是 0 看不出来；真机收 push 后才暴雷。
+        //
+        // applicationDidBecomeActive 在每次 app 切回前台都会调用（冷启 +
+        // background→foreground 都覆盖）。这里把 badge 一次性清零是最稳的位置：
+        // 用户看到的 Notification Center 历史条目保留（很多人靠它回顾错过的群
+        // 通知），但桌面角标重置归零。
+        //
+        // setBadgeCount 是 iOS 16.0+ 的新 API（async + 上 UN 通知中心一并刷新）；
+        // iOS 14 / 15 还得走 deprecated 的 applicationIconBadgeNumber，跟我们
+        // IPHONEOS_DEPLOYMENT_TARGET = 14.0 对齐。
+        if #available(iOS 16.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(0) { _ in }
+        } else {
+            application.applicationIconBadgeNumber = 0
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

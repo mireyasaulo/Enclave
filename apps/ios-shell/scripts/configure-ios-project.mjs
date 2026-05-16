@@ -823,6 +823,31 @@ function ensureAppDelegatePushHooks() {
     );
   }
 
+  // Round R3 真机走查：applicationDidBecomeActive 默认是空的，APNs 后端推消息
+  // 时设的 badge 永远不会自然清，app 图标上 "5" 之类的角标会一直挂在桌面上
+  // 即使用户已经读完所有消息。这里把 vanilla Capacitor 模板里那个只有「Restart
+  // any tasks...」英文注释的空 applicationDidBecomeActive 替换成清零 badge 的
+  // 实现；已经写过 setBadgeCount(0) / applicationIconBadgeNumber = 0 的 case
+  // 跳过，保留开发者手写的其它定制。
+  if (
+    !source.includes("setBadgeCount(0)") &&
+    !source.includes("applicationIconBadgeNumber = 0")
+  ) {
+    const vanillaPattern = /func applicationDidBecomeActive\(_ application: UIApplication\) \{\n\s*\/\/ Restart any tasks[^\n]*\n\s*\}/;
+    if (vanillaPattern.test(source)) {
+      const replacement = [
+        "func applicationDidBecomeActive(_ application: UIApplication) {",
+        "        if #available(iOS 16.0, *) {",
+        "            UNUserNotificationCenter.current().setBadgeCount(0) { _ in }",
+        "        } else {",
+        "            application.applicationIconBadgeNumber = 0",
+        "        }",
+        "    }",
+      ].join("\n");
+      source = source.replace(vanillaPattern, replacement);
+    }
+  }
+
   if (source !== original) {
     fs.writeFileSync(appDelegatePath, source);
     console.log("patched ios/App/App/AppDelegate.swift");
