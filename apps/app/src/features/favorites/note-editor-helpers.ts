@@ -347,3 +347,17 @@ export function escapeHtml(value: string) {
 export function escapeHtmlAttribute(value: string) {
   return escapeHtml(value);
 }
+
+// 笔记附件 URL 在 chat-message-list 里被直接喂给 <a href> / <img src>。后端
+// R1/R3 已经拦了 javascript:/vbscript:/data:text 协议，FE 再加一层
+// defense-in-depth：老数据 / 被 DevTools 注入的 localStorage 兜不住时，
+// 至少别让链接在 UI 上可点。
+const DANGEROUS_FAVORITE_URL_PROTOCOL =
+  /^\s*(?:javascript|vbscript|data:(?:text|application))/i;
+
+export function isSafeFavoriteAssetUrl(
+  url: string | undefined | null,
+): boolean {
+  if (!url) return false;
+  return !DANGEROUS_FAVORITE_URL_PROTOCOL.test(url);
+}

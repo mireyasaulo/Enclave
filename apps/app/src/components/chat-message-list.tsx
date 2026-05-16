@@ -94,7 +94,10 @@ import {
   removeDesktopFavorite,
   upsertDesktopFavorite,
 } from "../features/favorites/favorites-storage";
-import { isFavoriteNoteMissingError } from "../features/favorites/note-editor-helpers";
+import {
+  isFavoriteNoteMissingError,
+  isSafeFavoriteAssetUrl,
+} from "../features/favorites/note-editor-helpers";
 import { buildMobileNoteEditorRouteHash } from "../features/notes/mobile-note-editor-route-state";
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { buildDesktopChannelsRouteHash } from "../features/channels/channels-route-state";
@@ -6839,11 +6842,14 @@ function NoteViewerOverlay({
   );
   const title = (document?.title || attachment.title || "").trim() || translateRuntimeMessage(msg`未命名笔记`);
   const tags = document?.tags?.length ? document.tags : attachment.tags;
+  // 防御性 URL 过滤：后端 R1/R3 已经在 normalizeFavoriteNoteAssets 里拦了
+  // javascript:/vbscript:/data:text。这里再加一层，覆盖老数据 + 透传给
+  // <a href> / <img src> 时绝不会带危险协议。
   const fileAssets = (document?.assets ?? attachment.assets).filter(
-    (asset) => asset.kind === "file",
+    (asset) => asset.kind === "file" && isSafeFavoriteAssetUrl(asset.url),
   );
   const imageAssetsFallback = (document?.assets ?? attachment.assets).filter(
-    (asset) => asset.kind === "image",
+    (asset) => asset.kind === "image" && isSafeFavoriteAssetUrl(asset.url),
   );
   const hasContentHtml = Boolean(document?.contentHtml?.trim());
 
@@ -7143,7 +7149,10 @@ function resolveNotePreviewImageUrl(
   attachment: Extract<MessageAttachment, { kind: "note_card" }>,
   resolveAttachmentUrl: (url: string) => string,
 ) {
-  const previewImage = attachment.assets.find((asset) => asset.kind === "image");
+  // 跟 fileAssets/imageAssetsFallback 一样过滤危险协议——封面图也走同一关。
+  const previewImage = attachment.assets.find(
+    (asset) => asset.kind === "image" && isSafeFavoriteAssetUrl(asset.url),
+  );
   return previewImage?.url ? resolveAttachmentUrl(previewImage.url) : null;
 }
 
