@@ -1799,6 +1799,7 @@ export function ContactsPage() {
                 onClearSelection={() => setBulkSelectedIds(new Set())}
                 onDone={exitBulkMode}
                 setNotice={setNotice}
+                setNoticeError={setNoticeError}
               />
             ) : null
           }
@@ -2559,6 +2560,7 @@ export function ContactsPage() {
             onClearSelection={() => setBulkSelectedIds(new Set())}
             onDone={exitBulkMode}
             setNotice={setNotice}
+            setNoticeError={setNoticeError}
           />
         ) : null}
 

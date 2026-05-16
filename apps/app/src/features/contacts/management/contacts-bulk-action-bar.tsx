@@ -18,6 +18,9 @@ type Props = {
   onClearSelection: () => void;
   onDone: () => void;
   setNotice?: (message: string | null) => void;
+  // setNoticeError 走 danger tone（同一个 notice slot 上层渲染时切红字 + 长一点
+  // 的自动消失时间），方便用户区分"批量删除完成"和"批量删除挂了"。
+  setNoticeError?: (message: string | null) => void;
   desktop?: boolean;
 };
 
@@ -28,6 +31,7 @@ export function ContactsBulkActionBar({
   onClearSelection,
   onDone,
   setNotice,
+  setNoticeError,
   desktop = false,
 }: Props) {
   const t = useRuntimeTranslator();
@@ -65,19 +69,23 @@ export function ContactsBulkActionBar({
   }, [showTagDialog, showDeleteDialog, bulk.isPending]);
 
   const flushNotice = (success: boolean, action: string) => {
-    if (!setNotice) return;
-    setNotice(success ? `${action}${t(msg`：操作成功`)}` : t(msg`部分操作失败`));
+    // 部分失败也是错——走 danger tone 才能跟"操作成功"区分。这条以前 setNotice
+    // 走 info tone，结果"部分操作失败"画成蓝条，跟"打标签：操作成功"长得一样。
+    if (success) {
+      setNotice?.(`${action}${t(msg`：操作成功`)}`);
+      return;
+    }
+    setNoticeError?.(t(msg`部分操作失败`));
   };
 
   // 整条 mutation 直接 reject（网络抖断 / 401 / 500）时之前没有 UI 反馈：bar 不
   // 退出、按钮卡在 pending 看着像点击没生效。这里统一兜一条 danger notice，错误
-  // 详情交给上层 setNotice 渲染；同时不调 onDone()，保留批量选择让用户重试。
+  // 详情交给上层 setNoticeError 渲染；同时不调 onDone()，保留批量选择让用户重试。
   const flushError = (action: string, error: unknown) => {
-    if (!setNotice) return;
     const reason = error instanceof Error && error.message.trim()
       ? `：${error.message.trim()}`
       : "";
-    setNotice(`${action}${t(msg`：操作失败`)}${reason}`);
+    setNoticeError?.(`${action}${t(msg`：操作失败`)}${reason}`);
   };
 
   const runStar = (starred: boolean) => {

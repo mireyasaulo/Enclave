@@ -50,7 +50,7 @@ export type DesktopContactsWorkspaceProps = {
   shortcutList: ReactNode;
   indexList?: ReactNode;
   directoryScrollRef?: RefObject<HTMLDivElement | null>;
-  notice?: string | null;
+  notice?: { message: string; tone: "info" | "danger" } | null;
   errors?: string[];
   loading: boolean;
   friendSections: ContactSection<FriendDirectoryItem>[];
@@ -189,10 +189,14 @@ export function DesktopContactsWorkspace({
                 {notice ? (
                   <div className="px-3 pb-2">
                     <InlineNotice
-                      tone="info"
-                      className="border-[rgba(0,0,0,0.06)] bg-white text-xs"
+                      tone={notice.tone}
+                      className={
+                        notice.tone === "danger"
+                          ? "border-[rgba(220,38,38,0.18)] bg-white text-xs"
+                          : "border-[rgba(0,0,0,0.06)] bg-white text-xs"
+                      }
                     >
-                      {notice}
+                      {notice.message}
                     </InlineNotice>
                   </div>
                 ) : null}

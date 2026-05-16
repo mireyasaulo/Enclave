@@ -112,11 +112,13 @@ export function DesktopContactsFriendRequestsPane({
                   className="rounded-[22px] border border-[color:var(--border-faint)] bg-white px-5 py-5 shadow-[var(--shadow-soft)]"
                 >
                   <div className="flex items-start gap-4">
-                    <AvatarChip
-                      name={request.characterName}
-                      src={request.characterAvatar}
-                      size="wechat"
-                    />
+                    <div className={expired ? "opacity-70" : undefined}>
+                      <AvatarChip
+                        name={request.characterName}
+                        src={request.characterAvatar}
+                        size="wechat"
+                      />
+                    </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
@@ -128,14 +130,19 @@ export function DesktopContactsFriendRequestsPane({
                           >
                             {request.characterName}
                           </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[color:var(--text-muted)]">
-                            <span className={expired ? "opacity-70" : undefined}>
+                          <div
+                            className={cn(
+                              "mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[color:var(--text-muted)]",
+                              expired ? "opacity-70" : undefined,
+                            )}
+                          >
+                            <span>
                               {t(getFriendRequestSourceLabel(
                                 request.triggerScene,
                               ))}
                             </span>
-                            <span className={expired ? "opacity-70" : undefined}>·</span>
-                            <span className={expired ? "opacity-70" : undefined}>
+                            <span>·</span>
+                            <span>
                               {formatFriendRequestDate(request.createdAt, t)}
                             </span>
                           </div>
