@@ -47,20 +47,46 @@ export function AccountSecurityPanel() {
     tone: "success" | "danger";
     message: string;
   } | null>(null);
+  // 之前用 setInterval 每秒 -1 一个 state；后台 tab 节流会把 1Hz 拉到 1/min，
+  // 倒计时显示和后端实际 retry-after 拉开十几倍。改成存 endsAt 绝对时间戳，
+  // 每秒从 Date.now() 重算剩余秒，回前台立刻对齐真实剩余。
+  const [resendEndsAt, setResendEndsAt] = useState(0);
   const [resendCountdown, setResendCountdown] = useState(0);
 
   useEffect(() => {
-    if (resendCountdown <= 0) return;
-    const timer = setInterval(() => {
-      setResendCountdown((prev) => Math.max(0, prev - 1));
-    }, 1000);
+    if (resendEndsAt <= 0) {
+      setResendCountdown(0);
+      return;
+    }
+    const tick = () => {
+      const remaining = Math.max(
+        0,
+        Math.ceil((resendEndsAt - Date.now()) / 1000),
+      );
+      setResendCountdown(remaining);
+      if (remaining <= 0) {
+        setResendEndsAt(0);
+      }
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [resendCountdown]);
+  }, [resendEndsAt]);
+
+  const startResendCooldown = (seconds: number) => {
+    if (seconds <= 0) {
+      setResendEndsAt(0);
+      return;
+    }
+    setResendEndsAt(Date.now() + seconds * 1000);
+  };
 
   const sendCodeMutation = useMutation({
     mutationFn: async () => {
       if (!accessToken) {
-        throw new Error("Missing cloud access token.");
+        // 走到这里说明 disabled 兜底没拦住（理论不该发生），仍要把错误文案 t() 化，
+        // 不要让 en/ja/ko 用户在弹回的 feedback 里看到裸的英文 stacktrace。
+        throw new Error(t(msg`云账号会话已失效，请重新登录后再试。`));
       }
       return sendCloudChangePasswordCode(
         accessToken,
@@ -77,7 +103,7 @@ export function AccountSecurityPanel() {
       if (result.debugCode) {
         setCode(result.debugCode);
       }
-      setResendCountdown(RESEND_COOLDOWN_SECONDS);
+      startResendCooldown(RESEND_COOLDOWN_SECONDS);
     },
     onError: (error) => {
       const description = describeRequestError(
@@ -87,7 +113,7 @@ export function AccountSecurityPanel() {
       setFeedback({ tone: "danger", message: description });
       // 429 时把按钮 lock 住，否则用户读完报错连点 → 又一条 429，反复打到后端节流。
       if (isApiRequestError(error) && error.statusCode === 429) {
-        setResendCountdown(resolveRateLimitCooldown(error.message));
+        startResendCooldown(resolveRateLimitCooldown(error.message));
       }
     },
   });
@@ -95,7 +121,7 @@ export function AccountSecurityPanel() {
   const changePasswordMutation = useMutation({
     mutationFn: async () => {
       if (!accessToken) {
-        throw new Error("Missing cloud access token.");
+        throw new Error(t(msg`云账号会话已失效，请重新登录后再试。`));
       }
       return changeCloudPassword(
         { code: code.trim(), newPassword },
@@ -269,7 +295,16 @@ export function AccountSecurityPanel() {
       </form>
 
       {feedback ? (
-        <InlineNotice tone={feedback.tone}>{feedback.message}</InlineNotice>
+        // role=status + aria-live=polite 让屏幕阅读器在 feedback 变化时朗读
+        // 「验证码已发送...」「修改密码失败...」之类的状态；之前 InlineNotice 是
+        // 裸 div，盲用键盘用户只能看到 disabled 状态切换没有上下文。
+        <InlineNotice
+          tone={feedback.tone}
+          role="status"
+          aria-live={feedback.tone === "danger" ? "assertive" : "polite"}
+        >
+          {feedback.message}
+        </InlineNotice>
       ) : null}
     </div>
   );

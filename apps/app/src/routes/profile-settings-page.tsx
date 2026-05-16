@@ -35,6 +35,7 @@ import {
   clearCloudRuntimeSession,
   shouldShowCloudAccountControls,
 } from "../lib/cloud-session";
+import { navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../store/cloud-session-store";
 import {
@@ -315,7 +316,17 @@ export function ProfileSettingsPage() {
           className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
           leftActions={
             <Button
-              onClick={() => void navigate({ to: "/tabs/profile" })}
+              onClick={() =>
+                // 与其他 /profile/* 子页保持同款返回逻辑（navigateBackOrFallback）：
+                // history.back() 优先以保留 /tabs/profile 滚动位置；否则降级到 navigate。
+                // 之前直接 navigate({to:"/tabs/profile"}) 会向 history 推一格，从 settings
+                // 退回 profile 后再按浏览器/Android Back 又会回到 settings。
+                navigateBackOrFallback(
+                  () =>
+                    void navigate({ to: "/tabs/profile", replace: true }),
+                  "/tabs/profile",
+                )
+              }
               variant="ghost"
               size="icon"
               className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none active:bg-black/[0.05]"
