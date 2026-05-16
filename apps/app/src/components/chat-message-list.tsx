@@ -565,6 +565,12 @@ export function ChatMessageList({
     const closeMenu = () => setContextMenuState(null);
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
+        // 不 preventDefault：desktop-chat-workspace 那条 window keydown
+        // microtask 兜底（line 919）会接着跑 dismissSidePanel。用户在
+        // 桌面单聊开着「聊天信息」侧栏然后右键消息打开 contextMenu，按
+        // Esc 会同时把 contextMenu 和背后的侧栏一起关掉。和 image
+        // viewer / dialog 同款修法。
+        event.preventDefault();
         closeMenu();
       }
     };
