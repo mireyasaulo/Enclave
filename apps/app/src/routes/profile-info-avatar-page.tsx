@@ -170,7 +170,14 @@ export function ProfileInfoAvatarPage() {
       goBack();
     },
   });
-  const isSaving = saveMutation.isPending || resetMutation.isPending;
+  // FileReader 异步 readAsDataURL 期间：pickedLocal 还是 null，draft 还是
+  // 旧 URL。如果此刻用户已经把 draft 改成了非旧 baseline、canSave 又是 true
+  // （改 URL 又紧接着选图的极端情况），点「完成」会把那个 URL 而不是刚选的图
+  // 落库。reader.onload 之后 pickedLocal 才出来、setDraft("") 才执行，但已经
+  // 晚了。用一个 isReadingFile 标志在读图期间锁住「完成」/「恢复默认」。
+  const [isReadingFile, setIsReadingFile] = useState(false);
+  const isSaving =
+    saveMutation.isPending || resetMutation.isPending || isReadingFile;
 
   // 防 race：用户连点「从相册选择」两次时，FileReader 是各自独立的，且
   // 不保证 readAsDataURL 完成顺序——大文件 A 先开始读、小文件 B 后开始
@@ -192,13 +199,24 @@ export function ProfileInfoAvatarPage() {
       return;
     }
     setLocalError(null);
+    setIsReadingFile(true);
     const reader = new FileReader();
+    const finish = () => {
+      // 只有最新 pickId 才负责把 reading 状态关掉，避免被 stale onload
+      // 提前 clear（race 时旧文件的 onload 比新文件早到）。
+      if (pickId === latestPickIdRef.current) {
+        setIsReadingFile(false);
+      }
+    };
     reader.onerror = () => {
       if (pickId !== latestPickIdRef.current) return;
       setLocalError(t(msg`读取图片失败，请换一张试试。`));
+      finish();
     };
     reader.onload = () => {
-      if (pickId !== latestPickIdRef.current) return;
+      if (pickId !== latestPickIdRef.current) {
+        return;
+      }
       const result = reader.result;
       if (typeof result === "string") {
         userTouchedRef.current = true;
@@ -206,6 +224,7 @@ export function ProfileInfoAvatarPage() {
         // 选了本地图后，URL 输入框里的旧 URL 不再适用，先清掉
         setDraft("");
       }
+      finish();
     };
     reader.readAsDataURL(file);
   }
