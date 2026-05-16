@@ -1483,6 +1483,11 @@ export function DiscoverFeedPage() {
           isFetchingNextPage={feedQuery.isFetchingNextPage}
           isFetchNextPageError={isFetchNextFeedPageError}
           rawLoadedCount={feedPosts.length}
+          feedErrorMessage={
+            feedQuery.isError && feedQuery.error instanceof Error
+              ? feedQuery.error.message
+              : null
+          }
           imageDrafts={composeDraft.imageDrafts}
           isLoading={feedQuery.isLoading}
           serverTotal={

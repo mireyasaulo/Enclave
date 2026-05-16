@@ -50,6 +50,8 @@ type DesktopFeedWorkspaceProps = {
   /** 后端给的 raw 条数（含被屏蔽过滤掉的）。posts.length=0 但 rawLoadedCount>0
    *  时区分「真空」vs「全被屏蔽 + 还在自动翻页」，用于专门的 loading 空态。 */
   rawLoadedCount?: number;
+  /** feedQuery 首屏失败的错误信息；空 = 没失败。空态优先渲「重试读取」。 */
+  feedErrorMessage?: string | null;
   /** 服务端汇报的广场总数；不传或 <= posts.length 时按已加载条数显示。 */
   serverTotal?: number;
   onRequestMore?: () => void;
@@ -113,6 +115,7 @@ export function DesktopFeedWorkspace({
   ownerUsername,
   posts,
   rawLoadedCount = 0,
+  feedErrorMessage = null,
   serverTotal,
   onRequestMore,
   onRetryNextPage,
@@ -330,6 +333,8 @@ export function DesktopFeedWorkspace({
                 }
                 hasNextPage={hasNextPage}
                 isFetchingNextPage={isFetchingNextPage}
+                feedErrorMessage={feedErrorMessage}
+                onRetryFeed={onRefresh}
                 likePendingPostIds={likePendingPostIds}
                 posts={posts}
                 isPostFavorite={isPostFavorite}

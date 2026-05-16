@@ -26,6 +26,10 @@ type DesktopFeedListProps = {
   hasFilteredOutPosts?: boolean;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  /** feedQuery 首屏失败时的错误信息；空 = 没失败。posts.length===0 时优先
+   *  渲染「广场动态暂时不可用 + 重试读取」而不是误导性的「发广场动态」CTA。 */
+  feedErrorMessage?: string | null;
+  onRetryFeed?: () => void;
   /** Round 5：跨 row 并发追踪，Set 让每条 row 各查 .has(post.id)。 */
   likePendingPostIds: ReadonlySet<string>;
   posts: FeedPostListItem[];
@@ -66,6 +70,8 @@ export function DesktopFeedList({
   hasFilteredOutPosts = false,
   hasNextPage = false,
   isFetchingNextPage = false,
+  feedErrorMessage = null,
+  onRetryFeed,
   likePendingPostIds,
   posts,
   isPostFavorite,
@@ -135,7 +141,24 @@ export function DesktopFeedList({
 
       {!isLoading && !posts.length ? (
         <div className="mx-auto flex min-h-[60vh] w-full max-w-[560px] items-center justify-center py-10">
-          {hasFilteredOutPosts && (isFetchingNextPage || hasNextPage) ? (
+          {feedErrorMessage ? (
+            // 新 Round 2：feedQuery 首屏失败且没有任何缓存 post 时，旧版仍渲
+            // 「广场还没有新动态 / 发广场动态」CTA，把"服务端读取失败"包装成
+            // "广场是空的，你去发一条"，用户被引导去发动态填补"空 feed"——
+            // 但其实再发也填不进来。这里跟移动端 MobileFeedStatusCard
+            // tone=danger 对齐，把「重试读取」按钮直接放在空态中央。
+            <EmptyState
+              title={t(msg`广场动态暂时不可用`)}
+              description={feedErrorMessage}
+              action={
+                onRetryFeed ? (
+                  <Button variant="primary" onClick={onRetryFeed}>
+                    {t(msg`重试读取`)}
+                  </Button>
+                ) : undefined
+              }
+            />
+          ) : hasFilteredOutPosts && (isFetchingNextPage || hasNextPage) ? (
             <EmptyState
               title={t(msg`正在寻找未屏蔽的动态`)}
               description={t(
