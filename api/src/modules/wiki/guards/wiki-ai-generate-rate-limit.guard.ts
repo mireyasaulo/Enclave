@@ -18,7 +18,7 @@ import type { AuthenticatedRequest } from '../../auth/jwt-auth.guard';
  *
  * 内存令牌桶仅在单进程内有效。多进程部署后续应换 Redis（同 WikiRateLimitGuard）。
  */
-const HOURLY_QUOTA = 15;
+const HOURLY_QUOTA = 50;
 const WINDOW_MS = 60 * 60 * 1000;
 
 type Bucket = { count: number; windowStart: number };
