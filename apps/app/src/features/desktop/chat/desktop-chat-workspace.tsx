@@ -285,6 +285,7 @@ export function DesktopChatWorkspace({
   const quickMenuRef = useRef<HTMLDivElement | null>(null);
   const sidePanelRef = useRef<HTMLElement | null>(null);
   const desktopHeaderActionsRef = useRef<HTMLDivElement | null>(null);
+  const threadSectionRef = useRef<HTMLElement | null>(null);
   const handledRouteCallActionKeyRef = useRef<string | null>(null);
   const desktopSearchLauncher = useDesktopSearchLauncher({
     keyword: searchTerm,
@@ -599,6 +600,17 @@ export function DesktopChatWorkspace({
         return;
       }
 
+      // 不要把 thread 区（消息列表 / composer / 图片预览等）当成"点击外部"。
+      // 详情侧栏开着时给中间 section 加了 xl:pr-[352px]，pointerdown 阶段
+      // dismiss 一关 panel 整栏 padding 立刻消失，composer 右半边（含发送按钮）
+      // 整体往右移；用户原 mousedown 落点上的 DOM 节点已经换走，pointerup
+      // 命中不到原按钮，click 根本不 fire。结果就是「点了发送但没发出去 +
+      // 侧栏被偷偷关掉」。thread 区交互的 dismiss 由 Esc / 关闭按钮 / 切会话
+      // 各自处理，pointer 兜底只覆盖左侧会话列表 / 头像菜单这种远端区域。
+      if (threadSectionRef.current?.contains(target)) {
+        return;
+      }
+
       dismissSidePanel();
     },
     [dismissSidePanel, rightPanelMode],
@@ -907,6 +919,14 @@ export function DesktopChatWorkspace({
       }
 
       if (desktopHeaderActionsRef.current?.contains(target)) {
+        return;
+      }
+
+      // 同 handleWorkspacePointerDownCapture：thread 区交互（消息列表 /
+      // composer / 图片预览等）不算"点击外部"——否则 details 侧栏开着时
+      // 点发送按钮会先 dismiss 让 section padding 收回去，composer 整栏右
+      // 移，原 mousedown 落点上的 DOM 已经换人，click 不 fire，消息没发出。
+      if (threadSectionRef.current?.contains(target)) {
         return;
       }
 
@@ -1871,6 +1891,7 @@ export function DesktopChatWorkspace({
           (1066~1418) 区域里看不见，发送按钮也躲在 panel 后面点不到。查找记录
           走中央弹窗，不进这条 padding。 */}
       <section
+        ref={threadSectionRef}
         className={cn(
           "min-w-0 flex-1",
           rightPanelMode === "details" ? "xl:pr-[352px]" : "",
