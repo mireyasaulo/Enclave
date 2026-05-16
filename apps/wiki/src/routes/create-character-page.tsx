@@ -204,6 +204,18 @@ export function CreateCharacterPage() {
           </button>
         </InlineNotice>
       )}
+      {draftId && draftQ.isError && (
+        <InlineNotice tone="warning" className="mb-3">
+          <Trans>该草稿已不存在（可能已被删除），按空白表单继续。</Trans>{" "}
+          <button
+            type="button"
+            className="ml-2 font-medium underline"
+            onClick={() => void navigate({ to: "/create", search: {} })}
+          >
+            <Trans>清掉 URL 中的 draftId</Trans>
+          </button>
+        </InlineNotice>
+      )}
       <CharacterEditForm
         mode="create"
         scope="world"
