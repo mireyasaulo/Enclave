@@ -63,6 +63,7 @@ import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
+import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { getMomentSummaryText } from "../features/moments/moment-content";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
@@ -295,69 +296,21 @@ export function MomentsPage() {
     },
   });
 
+  // 共享 optimistic helper —— 同时 toggle paged / flat / mine 三套 cache。
+  // 之前本页 onMutate 只动 paged：用户在 /tabs/moments 给自己的帖子点心，切到
+  // /profile/moments 时 mine cache 还显示未点状态，要 ~600ms 等 refetch 才追上。
+  // 切换后又一致：本页跟 friend/profile/mobile 同一套 cache 维护规则。
+  const optimisticLike = useOptimisticMomentLikeHandlers({
+    baseUrl,
+    ownerId,
+    ownerUsername,
+    ownerAvatar,
+  });
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
-    onMutate: async (momentId) => {
-      if (!ownerId) {
-        return {
-          snapshots: [] as Array<
-            [readonly unknown[], InfiniteData<MomentsPageResponse> | undefined]
-          >,
-        };
-      }
-      await queryClient.cancelQueries({ queryKey: ["app-moments-paged", baseUrl] });
-      const snapshots = queryClient.getQueriesData<
-        InfiniteData<MomentsPageResponse>
-      >({
-        queryKey: ["app-moments-paged", baseUrl],
-      });
-      snapshots.forEach(([key, data]) => {
-        if (!data) {
-          return;
-        }
-        queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(key, {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            items: page.items.map((moment) => {
-              if (moment.id !== momentId) {
-                return moment;
-              }
-              const alreadyLiked = moment.likes.some(
-                (like) => like.authorId === ownerId,
-              );
-              const nextLikes = alreadyLiked
-                ? moment.likes.filter((like) => like.authorId !== ownerId)
-                : [
-                    ...moment.likes,
-                    {
-                      id: `optimistic-${ownerId}-${moment.id}`,
-                      postId: moment.id,
-                      authorId: ownerId,
-                      authorName: ownerUsername ?? t(msg`我`),
-                      authorAvatar: ownerAvatar ?? "",
-                      authorType: "user" as const,
-                      createdAt: new Date().toISOString(),
-                    },
-                  ];
-              return {
-                ...moment,
-                likes: nextLikes,
-                likeCount: Math.max(
-                  0,
-                  moment.likeCount + (alreadyLiked ? -1 : 1),
-                ),
-              };
-            }),
-          })),
-        });
-      });
-      return { snapshots };
-    },
+    onMutate: optimisticLike.onMutate,
     onError: (error, momentId, context) => {
-      context?.snapshots.forEach(([key, data]) => {
-        queryClient.setQueryData(key, data);
-      });
+      optimisticLike.onError(error, momentId, context);
       // 之前 error 只回滚 cache、UI 沉默到底部那块 likeError 一直挂着不消失。
       // 把错误冒到顶 notice 通道，2.4s 自动收 + 给个「重试点赞」按钮。
       setNoticeTone("info");
