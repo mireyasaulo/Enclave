@@ -122,19 +122,23 @@ export function DesktopMomentsToolbar({
           </div>
         ) : null}
 
-        {likeErrorMessage ? (
+        {/* mutation 失败时 moments-page 同时打开两路：danger notice（带「重试点赞/删除」按钮，
+            2.4s 自清）+ 这里的 ErrorBlock（粘到下一次 mutation 才走）。两条红条同文显示
+            一段时间，用户看着像"系统连发两次错误"。先级 notice：danger 在屏时把
+            type-specific ErrorBlock 藏起来；notice 自清后 ErrorBlock 还能粘住做持久指示。 */}
+        {likeErrorMessage && !(notice && noticeTone === "danger") ? (
           <div className="mt-4">
             <ErrorBlock message={likeErrorMessage} />
           </div>
         ) : null}
 
-        {commentErrorMessage ? (
+        {commentErrorMessage && !(notice && noticeTone === "danger") ? (
           <div className="mt-4">
             <ErrorBlock message={commentErrorMessage} />
           </div>
         ) : null}
 
-        {deleteErrorMessage ? (
+        {deleteErrorMessage && !(notice && noticeTone === "danger") ? (
           <div className="mt-4">
             <ErrorBlock message={deleteErrorMessage} />
           </div>

@@ -304,19 +304,23 @@ export function DesktopProfileMomentsWorkspace({
                 </div>
               ) : null}
 
-              {likeErrorMessage ? (
+              {/* profile-moments-page 失败时同时打开两路：notice.tone="danger" 红条 + 这里
+                  的 ErrorBlock。两条红条同文显示让用户感觉"系统连发两次错误"。先级
+                  danger notice：在屏时把 type-specific ErrorBlock 藏起来；notice 自清后
+                  ErrorBlock 仍可做持久指示。 */}
+              {likeErrorMessage && !(notice && noticeTone === "danger") ? (
                 <div className="mb-4">
                   <ErrorBlock message={likeErrorMessage} />
                 </div>
               ) : null}
 
-              {commentErrorMessage ? (
+              {commentErrorMessage && !(notice && noticeTone === "danger") ? (
                 <div className="mb-4">
                   <ErrorBlock message={commentErrorMessage} />
                 </div>
               ) : null}
 
-              {deleteErrorMessage ? (
+              {deleteErrorMessage && !(notice && noticeTone === "danger") ? (
                 <div className="mb-4">
                   <ErrorBlock message={deleteErrorMessage} />
                 </div>
