@@ -104,8 +104,13 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
     }
 
     @objc func openExternalUrl(_ call: CAPPluginCall) {
-        guard let rawUrl = call.getString("url"),
-              let url = URL(string: rawUrl.trimmingCharacters(in: .whitespacesAndNewlines)) else {
+        guard let rawUrl = call.getString("url") else {
+            call.reject("url is required")
+            return
+        }
+
+        let trimmed = rawUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let url = parseExternalUrl(trimmed) else {
             call.reject("url is required")
             return
         }
@@ -157,7 +162,7 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         if let text, !text.isEmpty {
             items.append(text)
         }
-        if let urlString, !urlString.isEmpty, let url = URL(string: urlString) {
+        if let urlString, !urlString.isEmpty, let url = parseExternalUrl(urlString) {
             items.append(url)
         }
 
@@ -599,6 +604,34 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         }
 
         return value
+    }
+
+    // 真机走查 R1：URL(string:) 走 RFC 3986 严格解析，对非 ASCII 字符（中文、
+    // 日文、韩文、emoji 等）直接返 nil。而我们用户主要是中文场景：
+    //   - openExternalUrl：聊天 / 文章正文里的 URL 链接里夹中文（公众号文章 path
+    //     带「帖子」「文章」「专栏」等中文段、知乎 / B 站搜索结果 URL、
+    //     用户分享微博 / 小红书短链跳转回的中文 URL 都常见）；
+    //   - share()：用户分享文章时附带链接，链接里夹中文章节名。
+    // 两条路径之前都是 URL(string:) 失败 → 静默 reject / 静默丢弃 url，用户看到
+    // 「打开链接失败」/ 分享出去 sheet 里只有正文没有链接，根因不易察觉。
+    //
+    // 兜一层 percent-encoding 兜底：第一次 URL(string:) 失败，把原串按
+    // .urlQueryAllowed 重 encode 一遍再 parse。.urlQueryAllowed 保留 `:` `/` `?`
+    // `=` `&` `%` 等 URL 结构符 + 把非 ASCII 全 %XX 化，能覆盖：
+    //   - 含中文 path：https://example.com/帖子/123 → /%E5%B8%96%E5%AD%90/123
+    //   - 已 encoded URL：%E5... 保留（% 在允许集里、不会被双编）
+    //   - 带空格的 query：?q=hello world → ?q=hello%20world
+    // 真有奇形怪状 parse 不出来的串才走 reject，比 URL(string:) 全 or-nothing
+    // 宽容得多。
+    private func parseExternalUrl(_ raw: String) -> URL? {
+        if let url = URL(string: raw) {
+            return url
+        }
+        if let encoded = raw.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+           let url = URL(string: encoded) {
+            return url
+        }
+        return nil
     }
 
     private func mapAuthorizationStatus(_ status: UNAuthorizationStatus) -> String {
