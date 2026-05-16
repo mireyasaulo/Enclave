@@ -5,6 +5,7 @@ import type { FarmCropId, FarmPlot } from "@yinjie/contracts";
 
 const t = translateRuntimeMessage;
 import { FARM_CROP_CATALOG } from "@yinjie/contracts";
+import { AvatarChip } from "../../../../components/avatar-chip";
 import { translateExpertDomains } from "../../../../lib/character-i18n";
 import {
   useFarmNeighborDetail,
@@ -101,20 +102,11 @@ export function NeighborFarmModal({
           <>
             <header className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 overflow-hidden rounded-full bg-stone-200">
-                  {detailQuery.data.characterAvatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={detailQuery.data.characterAvatar}
-                      alt={detailQuery.data.characterName}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center text-xs text-stone-500">
-                      {detailQuery.data.characterName.slice(0, 1)}
-                    </span>
-                  )}
-                </div>
+                <AvatarChip
+                  name={detailQuery.data.characterName}
+                  src={detailQuery.data.characterAvatar}
+                  size="sm"
+                />
                 <div>
                   <div className="text-sm font-semibold">
                     {detailQuery.data.characterName} {t(msg`的农场`)}
