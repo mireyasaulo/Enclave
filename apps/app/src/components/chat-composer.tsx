@@ -793,6 +793,22 @@ export function ChatComposer({
     closeMobileSpeechSheet();
   }, [closeMobileSpeechSheet, showSpeechEntry]);
 
+  // 卸载时 revoke 还挂着的图片附件预览 URL。原写法只在每次 set 新 draft
+  // 前 revoke 上一份，对「贴图但没发送就切会话/退页」这种场景，外层 key
+  // 变化把整个 composer 一起 unmount 掉时，旧 draft.items[*].previewUrl
+  // 永远不会被 revoke，多张图反复来回切聊天会渐进式堆积 blob:URL 引用。
+  // 用 ref 拿最新 draft，避免每次 state 变都跑一次双重 revoke。
+  const attachmentDraftCleanupRef = useRef<AttachmentDraft | null>(null);
+  attachmentDraftCleanupRef.current = attachmentDraft;
+  const desktopScreenshotDraftCleanupRef = useRef<ImageDraft | null>(null);
+  desktopScreenshotDraftCleanupRef.current = desktopScreenshotDraft;
+  useEffect(() => {
+    return () => {
+      releaseAttachmentDraft(attachmentDraftCleanupRef.current);
+      releaseImageDraft(desktopScreenshotDraftCleanupRef.current);
+    };
+  }, []);
+
   useEffect(() => {
     if (isDesktop || typeof document === "undefined") {
       return;
