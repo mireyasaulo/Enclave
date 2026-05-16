@@ -87,6 +87,13 @@ export function useConversationThread(conversationId: string) {
     scrollHeight: number;
     scrollTop: number;
   } | null>(null);
+  // 进入聊天时 mark-read effect 的 deps 同一拍里会被 unreadSnapshotReady
+  // (false→true) 和 messagesQuery.data?.length (undefined→60) 各触发一次，
+  // 结果 POST /read + invalidate conversations 重复打两次（公网隧道
+  // RTT ~600ms × 2 + 三次 GET /conversations）。用 ref 记最近一次 mark
+  // 时的 cache length，相同跳过；conversationId 切换时随其他 state 一起
+  // 重置，下次进入正常触发。socket 撑高 length（AI 回声）时仍会触发。
+  const lastMarkedReadLengthRef = useRef<number | null>(null);
 
   const messagesQuery = useQuery({
     queryKey: [
@@ -191,6 +198,7 @@ export function useConversationThread(conversationId: string) {
     setInitialUnreadCount(0);
     setInitialUnreadCutoff(null);
     setUnreadSnapshotReady(false);
+    lastMarkedReadLengthRef.current = null;
   }, [conversationId]);
 
   useEffect(() => {
@@ -397,10 +405,23 @@ export function useConversationThread(conversationId: string) {
   // 挂载 + 每次 messagesQuery cache 长度变化时统一标已读一次。和
   // group-chat-thread-panel 的处理一致；socket 收到 character 消息后
   // setQueriesData 会撑高 cache 长度，自动触发这里。
+  //
+  // dedup：data 尚未加载（length === undefined）时不打——避免和
+  // unreadSnapshotReady 各触发一次造成入口双 POST + 三次 GET /conversations。
+  // 同一 length 跳过；socket 撑长后差值变化才打。
   useEffect(() => {
     if (!conversationId || !unreadSnapshotReady) {
       return;
     }
+
+    const length = messagesQuery.data?.length;
+    if (length === undefined) {
+      return;
+    }
+    if (lastMarkedReadLengthRef.current === length) {
+      return;
+    }
+    lastMarkedReadLengthRef.current = length;
 
     const readAt = new Date().toISOString();
     syncActiveConversationReadState(readAt);

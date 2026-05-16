@@ -747,7 +747,14 @@ export function ConversationThreadPanel({
               onReplyMessage={handleReplyMessage}
               onRetryMessage={(message) => retryMessage(message.id)}
               onOpenDirectCallInvite={(input) => {
-                handleDesktopCallAction(input.kind);
+                // mobile 有真实的 /voice-call & /video-call 路由；之前一刀切
+                // 走 handleDesktopCallAction 让移动端用户点"通话开始/结束"卡片
+                // 也吃到桌面端那张"功能开发中"对话框，明明能拨却报开发中。
+                if (isDesktop) {
+                  handleDesktopCallAction(input.kind);
+                  return;
+                }
+                startDirectCall(input.kind);
               }}
               onSelectionModeChange={setSelectionModeActive}
               errorActionLabel={
