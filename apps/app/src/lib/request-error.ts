@@ -35,6 +35,19 @@ export function describeRequestError(error: unknown, fallback?: string) {
       );
     }
 
+    // 后端把 JSON 接口路径配错 / 走到 SPA index.html / nginx 回了 HTML
+    // 错误页时，调用方 JSON.parse 抛 SyntaxError "Unexpected token <"。
+    // 这种错对终端用户没意义，统一翻成"服务地址异常"。
+    if (
+      error.name === "SyntaxError" ||
+      /^Unexpected token/.test(message) ||
+      /is not valid JSON/i.test(message)
+    ) {
+      return translateRuntimeMessage(
+        msg`服务返回异常响应，请检查世界地址是否正确或稍后重试。`,
+      );
+    }
+
     return message || resolvedFallback;
   }
 

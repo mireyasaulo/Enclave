@@ -426,6 +426,9 @@ function buildReleaseEnvShellConfigOverride(env = process.env) {
   const socketBaseUrl = normalizeOptionalString(
     env.YINJIE_ANDROID_SOCKET_BASE_URL,
   );
+  const cloudApiBaseUrl = normalizeOptionalString(
+    env.YINJIE_ANDROID_CLOUD_API_BASE_URL,
+  );
   const appId = normalizeOptionalString(env.YINJIE_ANDROID_APP_ID);
   const appName = normalizeOptionalString(env.YINJIE_ANDROID_APP_NAME);
   const versionName = normalizeOptionalString(env.YINJIE_ANDROID_VERSION_NAME);
@@ -456,7 +459,7 @@ function buildReleaseEnvShellConfigOverride(env = process.env) {
     override.allowCleartextTraffic = allowCleartextTraffic;
   }
 
-  if (runtimeEnvironment || apiBaseUrl || socketBaseUrl) {
+  if (runtimeEnvironment || apiBaseUrl || socketBaseUrl || cloudApiBaseUrl) {
     override.runtime = {};
   }
 
@@ -470,6 +473,10 @@ function buildReleaseEnvShellConfigOverride(env = process.env) {
 
   if (socketBaseUrl) {
     override.runtime.socketBaseUrl = socketBaseUrl;
+  }
+
+  if (cloudApiBaseUrl) {
+    override.runtime.cloudApiBaseUrl = cloudApiBaseUrl;
   }
 
   return override;
@@ -524,6 +531,9 @@ function normalizeShellConfig(rawConfig) {
   const socketBaseUrl = normalizeOptionalString(
     rawConfig.runtime?.socketBaseUrl,
   );
+  const cloudApiBaseUrl = normalizeOptionalString(
+    rawConfig.runtime?.cloudApiBaseUrl,
+  );
 
   if (!appId) {
     throw new Error("android-shell config requires a non-empty appId");
@@ -557,6 +567,7 @@ function normalizeShellConfig(rawConfig) {
       environment,
       apiBaseUrl,
       socketBaseUrl,
+      cloudApiBaseUrl,
     },
   };
 }
@@ -644,6 +655,10 @@ function buildBundledAppRuntimeConfig(config) {
     config.runtime.socketBaseUrl || config.runtime.apiBaseUrl;
   if (socketBaseUrl) {
     nextRuntimeConfig.socketBaseUrl = socketBaseUrl;
+  }
+
+  if (config.runtime.cloudApiBaseUrl) {
+    nextRuntimeConfig.cloudApiBaseUrl = config.runtime.cloudApiBaseUrl;
   }
 
   return nextRuntimeConfig;

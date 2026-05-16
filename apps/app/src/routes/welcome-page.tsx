@@ -1577,7 +1577,7 @@ export function WelcomePage() {
         ) : null}
         {sendCodeMutation.isError && sendCodeMutation.error instanceof Error ? (
           isDesktopLayout ? (
-            <ErrorBlock message={sendCodeMutation.error.message} />
+            <ErrorBlock message={describeRequestError(sendCodeMutation.error)} />
           ) : (
             <MobileWelcomeNotice
               tone="danger"
@@ -1593,13 +1593,13 @@ export function WelcomePage() {
                 ) : undefined
               }
             >
-              {sendCodeMutation.error.message}
+              {describeRequestError(sendCodeMutation.error)}
             </MobileWelcomeNotice>
           )
         ) : null}
         {sendEmailCodeMutation.isError && sendEmailCodeMutation.error instanceof Error ? (
           isDesktopLayout ? (
-            <ErrorBlock message={sendEmailCodeMutation.error.message} />
+            <ErrorBlock message={describeRequestError(sendEmailCodeMutation.error)} />
           ) : (
             <MobileWelcomeNotice
               tone="danger"
@@ -1615,13 +1615,13 @@ export function WelcomePage() {
                 ) : undefined
               }
             >
-              {sendEmailCodeMutation.error.message}
+              {describeRequestError(sendEmailCodeMutation.error)}
             </MobileWelcomeNotice>
           )
         ) : null}
         {cloudAccessSessionQuery.isError && cloudAccessSessionQuery.error instanceof Error ? (
           isDesktopLayout ? (
-            <ErrorBlock message={cloudAccessSessionQuery.error.message} />
+            <ErrorBlock message={describeRequestError(cloudAccessSessionQuery.error)} />
           ) : (
             <MobileWelcomeNotice
               tone="danger"
@@ -1639,7 +1639,7 @@ export function WelcomePage() {
                 ) : undefined
               }
             >
-              {cloudAccessSessionQuery.error.message}
+              {describeRequestError(cloudAccessSessionQuery.error)}
             </MobileWelcomeNotice>
           )
         ) : null}

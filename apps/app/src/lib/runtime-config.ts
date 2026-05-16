@@ -24,6 +24,19 @@ function fallbackBrowserBaseUrl() {
   return null;
 }
 
+// Capacitor (Android/iOS) 把 webview 的 origin 设为 https://localhost（或
+// capacitor://localhost），这个 origin 上没有任何 HTTP 服务，把它当 baseUrl
+// 会让 fetch 命中本地 SPA 资源服务器返回 index.html，调用方再 JSON.parse
+// 就会摔出 'Unexpected token <' 抛给用户。原生壳必须显式配置后端地址，
+// 这里检测到 Capacitor 时不允许 origin 回落。
+function isInsideCapacitorShell() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  const capacitor = (window as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return Boolean(capacitor?.isNativePlatform?.());
+}
+
 // 浏览器同源回落分两类：
 // - 本地直连（localhost / 127.x / 私网 IP / 内网域名 / 桌面壳的 file://）：
 //   允许 baseUrl = ${origin}，请求直接打到本机 api(3000)，无鉴权 = 单租户本地开发场景。
@@ -99,6 +112,11 @@ export function configureContractsRuntime() {
     const runtimeConfig = getAppRuntimeConfig();
     if (runtimeConfig.cloudApiBaseUrl) {
       return runtimeConfig.cloudApiBaseUrl;
+    }
+    // 原生壳（Capacitor）的 origin 是 https://localhost，没有真实后端，必须靠
+    // 打包注入的 cloudApiBaseUrl。回落只用于浏览器 / desktop。
+    if (isInsideCapacitorShell()) {
+      return null;
     }
     // 浏览器同源回落：用户从 vicp.fun 等远程域名访问时，localhost:3001 会打到用户设备本机；
     // 此时 vite dev / 反代会把 /cloud/* 转发到真实的 cloud-api。
