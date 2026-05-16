@@ -173,6 +173,44 @@ export class WikiFieldProtectionService implements OnModuleInit {
     id: string,
     patch: Partial<WikiFieldProtectionEntity>,
   ): Promise<WikiFieldProtectionEntity> {
+    // create() 校验过的字段在这里也得校验，否则 admin PATCH 一个非法
+    // minRoleToEdit (e.g. "banana") 后整条策略变成"任何角色都不匹配"，
+    // assertCanEditPaths 永远算不出最严格保护，全员 bypass。R3 走查发现。
+    if (
+      patch.minRoleToEdit !== undefined &&
+      (typeof patch.minRoleToEdit !== 'string' ||
+        !(patch.minRoleToEdit in WIKI_ROLE_RANK))
+    ) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: {
+          detail:
+            'minRoleToEdit 必须是 newcomer / autoconfirmed / patroller / admin 之一',
+        },
+        legacyMessage:
+          'minRoleToEdit 必须是 newcomer / autoconfirmed / patroller / admin 之一',
+      });
+    }
+    if (
+      patch.fieldPath !== undefined &&
+      (typeof patch.fieldPath !== 'string' || !patch.fieldPath.trim())
+    ) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { detail: 'fieldPath 不能为空' },
+        legacyMessage: 'fieldPath 不能为空',
+      });
+    }
+    if (
+      patch.characterId !== undefined &&
+      (typeof patch.characterId !== 'string' || !patch.characterId.trim())
+    ) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { detail: 'characterId 不能为空（用 "*" 表示全局）' },
+        legacyMessage: 'characterId 不能为空（用 "*" 表示全局）',
+      });
+    }
     await this.repo.update({ id }, patch);
     const next = await this.repo.findOne({ where: { id } });
     if (!next) throw new AppError('WIKI_PAGE_NOT_FOUND', {
