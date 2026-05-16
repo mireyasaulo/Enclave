@@ -94,6 +94,58 @@
         </service>
     </application>
 
+    <!--
+        Round 27：Android 11 (API 30) 起 package visibility 默认是「看不见任何
+        别的 app」。我们 targetSdk=35，所以 PackageManager.resolveActivity 对
+        任何隐式 intent 都会返回 null，哪怕用户手机上有装相机 / 浏览器 / 邮件 /
+        电话 app 也认不到。直接症状：
+          - YinjieMobileBridgePlugin.captureImage 里
+              intent.resolveActivity(getContext().getPackageManager()) == null
+            一律成立 → reject("camera app is unavailable")，用户在朋友圈 /
+            头像 / 聊天附件「拍照」这条路全断。
+          - openExternalUrl 对 tel: / mailto: / sms: 还能借系统隐式 visibility
+            走通（这些 scheme 走 Android 自带 dialer/mail/messages），但 https
+            链接在没有默认 browser 的设备上 startActivity 会抛
+            ActivityNotFoundException，被 catch 静默成 reject。
+        声明 <queries> 把我们 plugin 真实用到的 intent 全部列出来，让 Android
+        package visibility 给我们 grant 这些目标 app 的可见性。
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="smsto" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="*/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="*/*" />
+        </intent>
+    </queries>
+
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />

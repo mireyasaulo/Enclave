@@ -1042,6 +1042,33 @@ if (command === "doctor") {
       ),
     ]);
 
+    // Round 27：Android 11+ package visibility 强制要求 manifest 声明
+    // <queries>，否则 resolveActivity 一律返回 null（捏死 captureImage 这条
+    // 路径），startActivity 对部分 scheme / mimeType 也会 ActivityNotFoundException。
+    // 这些条目跟 plugin 真实用到的 intent 一一对应。
+    checks.push([
+      "manifest queries declared",
+      /<queries>[\s\S]*?<\/queries>/.test(androidManifest),
+    ]);
+    checks.push([
+      "manifest queries IMAGE_CAPTURE",
+      /<queries>[\s\S]*?android\.media\.action\.IMAGE_CAPTURE[\s\S]*?<\/queries>/.test(
+        androidManifest,
+      ),
+    ]);
+    checks.push([
+      "manifest queries tel scheme",
+      /<queries>[\s\S]*?android:scheme="tel"[\s\S]*?<\/queries>/.test(
+        androidManifest,
+      ),
+    ]);
+    checks.push([
+      "manifest queries mailto scheme",
+      /<queries>[\s\S]*?android:scheme="mailto"[\s\S]*?<\/queries>/.test(
+        androidManifest,
+      ),
+    ]);
+
     // Hardening: manifest cleartext must be a build-variant placeholder, not
     // a hardcoded literal that can drift in tracked git history.
     checks.push([

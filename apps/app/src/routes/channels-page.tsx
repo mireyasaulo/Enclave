@@ -2463,18 +2463,28 @@ function MobileChannelsViewport({
   }, [posts]);
 
   // 进入页面时按 URL 的 #postId 把指定卡滚到顶部一次。
-  // 不要把 posts 当 deps：home 一刷新（点赞 invalidate / generate / decorations）
+  // 不要把 posts 整体当 deps：home 一刷新（点赞 invalidate / generate / decorations）
   // posts 数组身份就变，这个 effect 会重跑 scrollIntoView，把用户从他正在看的位置
-  // 拽回 routeSelectedPostId。只在 routeSelectedPostId 变化时滚一次。
-  // 注意：refs 可能还没注册——卡片首次挂载晚于这个 effect。轮询 RAF 直到找到
-  // 节点或 routeSelectedPostId 变了为止。
+  // 拽回 routeSelectedPostId。只在 routeSelectedPostId 变化、或目标 post 刚刚出现
+  // 在 posts 里时滚一次。
+  // 用 hasRouteTargetInPosts 而不是 posts.length / posts：channelsQuery 慢（公网
+  // 隧道下 500-800ms）时，effect 第一次跑 cardRefs 为空，原来的 20 RAF (~330ms)
+  // 轮询会兜底失败 → routeSelectedPostId 没变后续永不重跑。改成 posts 里出现目标
+  // 时（hasTarget false→true）就再触发一次，覆盖 API 慢的场景。
   const scrolledRouteIdRef = useRef<string | null>(null);
+  const hasRouteTargetInPosts = routeSelectedPostId
+    ? posts.some((post) => post.id === routeSelectedPostId)
+    : false;
   useEffect(() => {
     if (!routeSelectedPostId) {
       scrolledRouteIdRef.current = null;
       return;
     }
     if (scrolledRouteIdRef.current === routeSelectedPostId) {
+      return;
+    }
+    if (!hasRouteTargetInPosts) {
+      // 目标还没在 posts 里——别 RAF 浪费帧，等下次 hasRouteTargetInPosts 翻 true 再跑。
       return;
     }
 
@@ -2490,7 +2500,7 @@ function MobileChannelsViewport({
         return;
       }
       attempts += 1;
-      // ~20 帧（≈330ms）兜底，避开"卡片还没挂载"的渲染窗
+      // ~20 帧（≈330ms）兜底，避开"卡片刚 mount 但 ref 还没注册"的渲染窗
       if (attempts < 20) {
         window.requestAnimationFrame(tryScroll);
       }
@@ -2499,7 +2509,7 @@ function MobileChannelsViewport({
     return () => {
       cancelled = true;
     };
-  }, [routeSelectedPostId]);
+  }, [routeSelectedPostId, hasRouteTargetInPosts]);
 
   // 视频号是 snap-y 短视频流，用户经常一甩划过 5-10 张卡。原来 activePostId
   // 一变就立刻 POST /feed/:id/view，背后会做 owner-interaction findOneBy + 落库
