@@ -91,9 +91,11 @@ export function useConversationThread(conversationId: string) {
   // (false→true) 和 messagesQuery.data?.length (undefined→60) 各触发一次，
   // 结果 POST /read + invalidate conversations 重复打两次（公网隧道
   // RTT ~600ms × 2 + 三次 GET /conversations）。用 ref 记最近一次 mark
-  // 时的 cache length，相同跳过；conversationId 切换时随其他 state 一起
-  // 重置，下次进入正常触发。socket 撑高 length（AI 回声）时仍会触发。
-  const lastMarkedReadLengthRef = useRef<number | null>(null);
+  // 时的"末尾消息 id"——按 length dedup 会被「查看更多消息」(60→100) 误
+  // 触发多打一次 mark-read，按末尾 id 才能区分"新消息追加"和"历史前置"。
+  // conversationId 切换时随其他 state 一起重置；socket 撑长（AI 回声）时
+  // 末尾 id 变化仍会触发。
+  const lastMarkedReadNewestIdRef = useRef<string | null>(null);
 
   const messagesQuery = useQuery({
     queryKey: [
@@ -198,7 +200,7 @@ export function useConversationThread(conversationId: string) {
     setInitialUnreadCount(0);
     setInitialUnreadCutoff(null);
     setUnreadSnapshotReady(false);
-    lastMarkedReadLengthRef.current = null;
+    lastMarkedReadNewestIdRef.current = null;
   }, [conversationId]);
 
   useEffect(() => {
@@ -402,26 +404,27 @@ export function useConversationThread(conversationId: string) {
     return () => window.clearTimeout(timer);
   }, [typingState]);
 
-  // 挂载 + 每次 messagesQuery cache 长度变化时统一标已读一次。和
-  // group-chat-thread-panel 的处理一致；socket 收到 character 消息后
-  // setQueriesData 会撑高 cache 长度，自动触发这里。
+  // 挂载 + 每次 messagesQuery cache "末尾消息" 变化时统一标已读一次。
+  // 和 group-chat-thread-panel 的处理一致；socket 收到 character 消息后
+  // setQueriesData 会撑高 cache + 换末尾 id，自动触发这里。
   //
-  // dedup：data 尚未加载（length === undefined）时不打——避免和
-  // unreadSnapshotReady 各触发一次造成入口双 POST + 三次 GET /conversations。
-  // 同一 length 跳过；socket 撑长后差值变化才打。
+  // dedup：data 尚未加载或为空时不打——避免和 unreadSnapshotReady 各触发
+  // 一次造成入口双 POST + 三次 GET /conversations。同一末尾 id 跳过——
+  // 「查看更多消息」(60→100, 前置历史) 末尾 id 不变，不再误打 mark-read。
   useEffect(() => {
     if (!conversationId || !unreadSnapshotReady) {
       return;
     }
 
-    const length = messagesQuery.data?.length;
-    if (length === undefined) {
+    const data = messagesQuery.data;
+    if (!data || data.length === 0) {
       return;
     }
-    if (lastMarkedReadLengthRef.current === length) {
+    const newestId = data[data.length - 1]?.id ?? null;
+    if (!newestId || lastMarkedReadNewestIdRef.current === newestId) {
       return;
     }
-    lastMarkedReadLengthRef.current = length;
+    lastMarkedReadNewestIdRef.current = newestId;
 
     const readAt = new Date().toISOString();
     syncActiveConversationReadState(readAt);
@@ -436,7 +439,7 @@ export function useConversationThread(conversationId: string) {
   }, [
     baseUrl,
     conversationId,
-    messagesQuery.data?.length,
+    messagesQuery.data,
     queryClient,
     syncActiveConversationReadState,
     unreadSnapshotReady,
