@@ -50,10 +50,24 @@ type UrlInputError = "format" | "too_large" | "unsafe_scheme" | null;
 // gate：URL 得「看起来够完整」才进 preview——data:image/ 直接放行；
 // http(s) 必须既能 parse、又得有 pathname 段（不是裸 host 起步）或 query。
 // 这条件不挑剔到「必须含 .png」，因为很多 CDN 图片 URL 无扩展名。
+// 同源相对路径：跟后端 isSafeAvatarValue 一致，允许 "/xxx" 但拒 "//xxx"
+// （后者是协议相对 URL，可能漂到其他 origin）。世界角色 / 预设头像（fixed-world-
+// character-presets.ts）落库就是 /api/character-assets/foo.svg 这种相对路径，
+// 且 AvatarChip.resolveAvatarSource 也走 resolveAppMediaUrl 拼前缀正常展示。
+// 客户端不识别会让这类用户打开「更换头像」就看到错误条「需要是 http/https」，
+// 但实际他们的头像渲染正常——明显的客户端校验跟服务端 / 实际渲染口径打架。
+function isRelativeAvatarPath(value: string): boolean {
+  return value.startsWith("/") && !value.startsWith("//");
+}
+
 function looksLikePreviewableImageUrl(value: string): boolean {
   if (!value) return false;
   if (/^data:image\//i.test(value)) {
     return value.length > "data:image/x;,".length;
+  }
+  if (isRelativeAvatarPath(value)) {
+    // /a 已经够当 path 用，但 / 单独不行
+    return value.length > 1;
   }
   let parsed: URL | null = null;
   try {
@@ -73,6 +87,13 @@ function checkAvatarUrlInput(value: string): UrlInputError {
   // 提早判 image data URL：合法 data:image/png;... 走 length gate
   if (/^data:image\//i.test(value)) {
     // 粘贴的 data URL 也要校长度，不然超 2MB 的话要等上传完才被服务端拒
+    return value.length > MAX_AVATAR_INPUT_LENGTH ? "too_large" : null;
+  }
+  // 同源相对路径放行（跟后端 isSafeAvatarValue 同 gate）：预设角色头像
+  // 经常是 /api/character-assets/foo.svg，旧账号 / 测试脚本设的 owner.avatar
+  // 也可能是这种形态。落库后端不挡、AvatarChip 也能渲染，唯独这里挡掉 →
+  // 一打开页面错误条钉死，没有任何修复路径（用户想改成正常 URL 也得先看错）。
+  if (isRelativeAvatarPath(value)) {
     return value.length > MAX_AVATAR_INPUT_LENGTH ? "too_large" : null;
   }
   // scheme sniff：在 try-parse 前先看冒号前缀。new URL("javascript:alert(1)")
