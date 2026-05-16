@@ -4943,6 +4943,8 @@ function renderTextWithMentions(text: string): ReactNode {
           src={segment.src}
           alt={segment.label}
           draggable={false}
+          loading="lazy"
+          decoding="async"
           className="inline-block h-7 w-7 align-[-0.45em] object-contain"
         />
       );
@@ -5257,6 +5259,8 @@ function NoteCardMessage({
           <img
             src={previewImage.url}
             alt={title}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         </div>
@@ -5369,6 +5373,8 @@ function FeedPostCardMessage({
           <img
             src={cover}
             alt={attachment.title ?? attachment.authorName}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         </div>
@@ -6381,6 +6387,8 @@ function StickerMessage({
       alt={label}
       width={maxSize}
       height={maxSize}
+      loading="lazy"
+      decoding="async"
       onError={() => setLoadFailed(true)}
       onLoad={onMediaReady}
       className="rounded-[18px] bg-white/70 object-contain shadow-none"
