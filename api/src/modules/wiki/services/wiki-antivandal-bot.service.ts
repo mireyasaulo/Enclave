@@ -93,27 +93,33 @@ export class WikiAntivandalBotService {
       return null;
     }
     // Rule 1: critical content fields cleared (bio/personality/name shrunk to <5 chars)
+    // 必须"同字段对比"——之前用 OR 跨字段，结果 personality 一直为空的角色，
+    // 只要 parent.bio>50 或 parent.name>5（绝大多数 wiki 词条都是），随便编辑
+    // 别的字段都会触发 critical_field_cleared 把合法 edit revert 掉。
     const c = rev.contentSnapshot;
-    if (
-      (typeof c.name === 'string' && c.name.trim().length < 2) ||
-      (typeof c.bio === 'string' && c.bio.trim().length < 5) ||
-      (typeof c.personality === 'string' && c.personality.trim().length < 5)
-    ) {
-      // Look up parent to confirm we're shrinking from > 50 to < 5
-      if (rev.parentRevisionId) {
-        const parent = await this.revisionRepo.findOne({
-          where: { id: rev.parentRevisionId },
-        });
-        if (parent) {
-          const before = parent.contentSnapshot;
-          if (
-            (typeof before.bio === 'string' && before.bio.length > 50) ||
-            (typeof before.personality === 'string' &&
-              before.personality.length > 50) ||
-            (typeof before.name === 'string' && before.name.length > 5)
-          ) {
-            return 'critical_field_cleared';
-          }
+    if (rev.parentRevisionId) {
+      const parent = await this.revisionRepo.findOne({
+        where: { id: rev.parentRevisionId },
+      });
+      if (parent) {
+        const before = parent.contentSnapshot;
+        const shrunkName =
+          typeof c.name === 'string' &&
+          c.name.trim().length < 2 &&
+          typeof before.name === 'string' &&
+          before.name.length > 5;
+        const shrunkBio =
+          typeof c.bio === 'string' &&
+          c.bio.trim().length < 5 &&
+          typeof before.bio === 'string' &&
+          before.bio.length > 50;
+        const shrunkPersonality =
+          typeof c.personality === 'string' &&
+          c.personality.trim().length < 5 &&
+          typeof before.personality === 'string' &&
+          before.personality.length > 50;
+        if (shrunkName || shrunkBio || shrunkPersonality) {
+          return 'critical_field_cleared';
         }
       }
     }
