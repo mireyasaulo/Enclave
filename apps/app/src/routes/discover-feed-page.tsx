@@ -2795,6 +2795,17 @@ export function DiscoverFeedPage() {
             ? isCommentPendingForPost(commentBarTarget.postId)
             : false
         }
+        errorMessage={
+          // 新一轮 Round 6：mutation 失败的错误透传进 bar 内，列表里那条
+          // InlineNotice 还会照常显示，但用户在 bar 全屏 overlay 后面看不
+          // 到。同时只在 bar 真在当前 mutate 的 post 上打开时才显示——
+          // 用户已经切到别的 post 上的 bar 时显示旧错误反而误导。
+          commentMutation.isError &&
+          commentMutation.error instanceof Error &&
+          commentMutation.variables?.postId === commentBarTarget?.postId
+            ? commentMutation.error.message
+            : null
+        }
         onSubmit={() => {
           if (!commentBarTarget) return;
           submitComment(commentBarTarget.postId, {
