@@ -1076,6 +1076,11 @@ function buildFavoriteNotePresentation(contentText: string) {
   };
 }
 
+// 单个 tag 最长。走查 R3 抓到 tags=['x'*1000] 也能进库，UI 上一个 tag 撑爆
+// 整行。32 字符给 #中文长标签 + 英文短词都够用，超出截断不报错（跟 dedupe
+// 保持"宽松接受"的语义）。
+const MAX_FAVORITE_NOTE_TAG_CHARS = 32;
+
 function normalizeFavoriteNoteTags(value: string[] | undefined) {
   if (!Array.isArray(value)) {
     return [];
@@ -1083,7 +1088,7 @@ function normalizeFavoriteNoteTags(value: string[] | undefined) {
 
   const seen = new Set<string>();
   return value
-    .map((tag) => tag.trim())
+    .map((tag) => tag.trim().slice(0, MAX_FAVORITE_NOTE_TAG_CHARS))
     .filter(Boolean)
     .filter((tag) => {
       if (seen.has(tag)) {
