@@ -57,22 +57,26 @@ export function DesktopNoteSendDialog({
     setSearchTerm("");
   }, [open]);
 
-  const filteredConversations = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase();
-    const ordered = [...conversations].sort(
+  // 之前 sort + filter 合在一个 useMemo 里，[conversations, searchTerm] 同时
+  // 是 deps：每次按键都重新 sort 一遍（O(N log N)），即使会话列表压根没动。
+  // 拆成两段：sort 只在 conversations 变化时做，按键时只做 filter。
+  const orderedConversations = useMemo(() => {
+    return [...conversations].sort(
       (left, right) =>
         (parseTimestamp(right.lastActivityAt) ?? 0) -
         (parseTimestamp(left.lastActivityAt) ?? 0),
     );
+  }, [conversations]);
 
+  const filteredConversations = useMemo(() => {
+    const keyword = searchTerm.trim().toLowerCase();
     if (!keyword) {
-      return ordered;
+      return orderedConversations;
     }
-
-    return ordered.filter((conversation) =>
+    return orderedConversations.filter((conversation) =>
       conversation.title.toLowerCase().includes(keyword),
     );
-  }, [conversations, searchTerm]);
+  }, [orderedConversations, searchTerm]);
 
   if (!open || !note) {
     return null;
