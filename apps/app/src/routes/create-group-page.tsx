@@ -68,9 +68,15 @@ export function CreateGroupPage() {
       : undefined;
   const safeReturnHash = safeReturnPath ? routeState.returnHash : undefined;
 
+  // 走查 R1：原本用独立 cache key ["app-group-friends"]，结果跟 contacts-page /
+  // mobile-add-friend-page 同样的 getFriends() 数据各自维护一份缓存，用户从通讯录
+  // 点 + → 发起群聊 → 又重新拉一次 /api/social/friends。统一到 ["app-friends",
+  // baseUrl] 直接复用主页面的缓存；配 15s staleTime 跟兄弟页保持一致，bulk /
+  // accept-friend / character-detail 等 mutation 已经在显式 invalidate 这条 key。
   const friendsQuery = useQuery({
-    queryKey: ["app-group-friends", baseUrl],
+    queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    staleTime: 15_000,
   });
 
   // 走查 Round 2：char-default-self 是用户的自我镜像，本质就是你自己；createGroup

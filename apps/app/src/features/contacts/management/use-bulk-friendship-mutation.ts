@@ -13,6 +13,7 @@ export function useBulkFriendshipMutation(onDone?: () => void) {
     mutationFn: (payload: BulkFriendshipRequest) =>
       bulkFriendshipAction(payload, baseUrl),
     onSuccess: () => {
+      // 走查 R1：app-friends-quick-start / app-group-friends 全代码库无 useQuery 订阅。
       void queryClient.invalidateQueries({
         predicate: (query) => {
           const k = String(query.queryKey?.[0] ?? "");
@@ -21,8 +22,6 @@ export function useBulkFriendshipMutation(onDone?: () => void) {
             k === "app-friend-requests" ||
             k === "app-contacts-blocked" ||
             k === "app-conversations" ||
-            k === "app-friends-quick-start" ||
-            k === "app-group-friends" ||
             k === "app-chat-details-blocked" ||
             k === "app-chat-blocked-characters"
           );

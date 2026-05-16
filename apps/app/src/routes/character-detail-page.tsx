@@ -541,18 +541,15 @@ export function CharacterDetailPage() {
           ? t(msg`好友申请已发送。`)
           : t(msg`已添加到通讯录。`),
       });
+      // 走查 R1：app-friends-quick-start 全代码库无 useQuery 订阅，纯死 invalidate；
+      // app-group-friends 在 create-group-page 已经统一到 app-friends，这里同样无订阅。
+      // 都删掉，留下真正在用的三条。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-friend-requests", baseUrl],
         }),
         queryClient.invalidateQueries({
           queryKey: ["app-friends", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-friends-quick-start", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-group-friends", baseUrl],
         }),
         queryClient.invalidateQueries({
           queryKey: ["app-conversations", baseUrl],

@@ -575,18 +575,13 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
         tone: "success",
         message: t(msg`已添加到通讯录。`),
       });
+      // 走查 R1：app-friends-quick-start / app-group-friends 都无 useQuery 订阅。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-friend-requests", baseUrl],
         }),
         queryClient.invalidateQueries({
           queryKey: ["app-friends", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-friends-quick-start", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-group-friends", baseUrl],
         }),
         queryClient.invalidateQueries({
           queryKey: ["app-conversations", baseUrl],

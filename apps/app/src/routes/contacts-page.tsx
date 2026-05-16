@@ -892,17 +892,13 @@ export function ContactsPage() {
 
       setNotice(t(msg`已通过好友申请。`));
       setFriendRequestSuccess(t(msg`已通过好友申请。`));
+      // 走查 R1：app-friends-quick-start 全代码库 0 个 useQuery 订阅；app-group-friends
+      // 在 create-group-page 已统一到 app-friends。两条 invalidate 都是死代码。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-friend-requests", baseUrl],
         }),
         queryClient.invalidateQueries({ queryKey: ["app-friends", baseUrl] }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-friends-quick-start", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-group-friends", baseUrl],
-        }),
         queryClient.invalidateQueries({
           queryKey: ["app-conversations", baseUrl],
         }),

@@ -92,17 +92,12 @@ function MobileFriendRequestsPage() {
     mutationFn: (requestId: string) => acceptFriendRequest(requestId, baseUrl),
     onSuccess: async () => {
       setSuccessNotice(t(msg`已通过好友申请。`));
+      // 走查 R1：app-friends-quick-start / app-group-friends 都是无订阅者的死 key。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-friend-requests", baseUrl],
         }),
         queryClient.invalidateQueries({ queryKey: ["app-friends", baseUrl] }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-friends-quick-start", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-group-friends", baseUrl],
-        }),
         queryClient.invalidateQueries({
           queryKey: ["app-conversations", baseUrl],
         }),
