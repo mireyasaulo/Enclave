@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { Mic, Square, WandSparkles, X } from "lucide-react";
 import { msg } from "@lingui/macro";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import type { SpeechInputStatus } from "../features/chat/speech-input-types";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 
 type Translator = ReturnType<typeof useRuntimeTranslator>;
 
@@ -106,6 +108,22 @@ export function MobileSpeechInputSheet({
   canCommit,
 }: MobileSpeechInputSheetProps) {
   const t = useRuntimeTranslator();
+
+  // 原生壳硬件 Back 键：sheet 打开时优先关 sheet（前提是手指没在按住录音），
+  // 不让 BACK 同时 history.back 把用户从聊天页带回 chat list。和
+  // mobile-message-action-sheet.tsx 对齐。
+  useEffect(() => {
+    if (!open || holding) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [holding, onClose, open]);
+
   if (!open) {
     return null;
   }

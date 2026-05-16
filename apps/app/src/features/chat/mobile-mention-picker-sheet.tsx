@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AvatarChip } from "../../components/avatar-chip";
+import { registerAndroidBackInterceptor } from "../../runtime/android-back-button";
 
 const t = translateRuntimeMessage;
 
@@ -26,6 +28,20 @@ export function MobileMentionPickerSheet({
   onClose,
   onSelect,
 }: MobileMentionPickerSheetProps) {
+  // 原生壳硬件 Back 键：sheet 打开时优先关 sheet，不让 BACK 同时 history.back
+  // 把用户从群聊页带回 chat list。和 mobile-message-action-sheet.tsx 对齐。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [open, onClose]);
+
   if (!open) {
     return null;
   }
