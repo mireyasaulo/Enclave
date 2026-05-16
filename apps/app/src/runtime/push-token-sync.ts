@@ -204,7 +204,8 @@ async function syncNativePushTokenCore(
  *   - bootstrapIos 兜底跑一次（只有用户已授权时才会真正上报）
  *   - 用户授权通知后立刻调一次（chat-details-page 等）
  *   - 登录成功后调一次（让换号也能立刻 attach）
- *   - APNs 重发新 token 时（onNativePushTokenChanged 监听后 force=true 重报）
+ *   - APNs 重发新 token 时（onNativePushTokenChanged 监听 → 走 cache 短路，
+ *     token 真换了 cache miss 再 POST；走查 R7 把这里 force:true 去掉了）
  *
  * 缓存机制：localStorage 记 (ownerId + tokenHash)；相同则跳过避免每次启动都打接口。
  */
