@@ -435,6 +435,25 @@ const checks = [
         : "PrivacyInfo.xcprivacy not seeded yet; run `pnpm ios:configure` to prepare App Store privacy defaults",
   },
   {
+    // 走查 R2 用 contentModificationDateKey / URLResourceValues 算 tmp file mtime
+    // 决定该不该 purge，触发 Apple 的 Required Reason API: FileTimestamp 申报要
+    // 求；不在 PrivacyInfo.xcprivacy 声明这条会被 App Store 「Missing API
+    // Declaration: File Timestamp」打回（自 2024-05 Apple 强制施行）。守门
+    // NSPrivacyAccessedAPICategoryFileTimestamp + 一条合法 reason 同时出现。
+    // C617.1 = "Access file timestamps to implement features that require
+    // timestamp data" — 我们用 mtime 来 decide GC，符合这条理由。
+    label: "privacy-manifest-file-timestamp",
+    ok:
+      !fs.existsSync(privacyManifestPath) ||
+      fileIncludesAll(privacyManifestPath, [
+        "NSPrivacyAccessedAPICategoryFileTimestamp",
+        "C617.1",
+      ]),
+    detail: fs.existsSync(privacyManifestPath)
+      ? "PrivacyInfo.xcprivacy declares FileTimestamp API + C617.1 reason (matches contentModificationDateKey usage in YinjieMobileBridge tmp purge)"
+      : "PrivacyInfo.xcprivacy not found yet; run `pnpm ios:configure` first",
+  },
+  {
     // YinjieSecureStoragePlugin 之前直接拿 OSStatus 当 Result.Failure，也直接
     // 塞给 call.reject(_:_:_:Error?)。OSStatus 是 Int32 的 typealias，Swift
     // 标准库不 conform Error，Result.Failure 必须 : Error —— 这条会让整个 iOS
