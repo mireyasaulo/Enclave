@@ -283,13 +283,14 @@ const checks = [
     ok:
       !fs.existsSync(runtimePluginPath) ||
       (fileIncludes(runtimePluginPath, "bundledConfig[\"apiBaseUrl\"]") &&
+        fileIncludes(runtimePluginPath, "bundledConfig[\"cloudApiBaseUrl\"]") &&
         fileIncludes(runtimePluginPath, "worldAccessMode") &&
         fileIncludes(runtimePluginPath, "configStatus") &&
         fileIncludes(runtimePluginPath, "object(forInfoDictionaryKey: \"YinjiePublicAppName\")") &&
         fileIncludes(runtimePluginPath, "preferredLocales") &&
         fileIncludes(runtimePluginPath, "Locale.preferredLanguages")),
     detail: fs.existsSync(runtimePluginPath)
-      ? "YinjieRuntime prefers bundled runtime-config.json, exposes sync status, and reads localized app metadata plus preferred locale fields"
+      ? "YinjieRuntime prefers bundled runtime-config.json (includes cloudApiBaseUrl), exposes sync status, and reads localized app metadata plus preferred locale fields"
       : "runtime plugin not found yet; run `pnpm ios:sync` first",
   },
   (() => {
