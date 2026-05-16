@@ -1915,6 +1915,29 @@ function ChannelAudioPictorial({
     if (!active) setImageIndex(0);
   }, [active]);
 
+  // tab 切到后台时主动 pause，回前台时按"切走前是否在播"决定是否 resume——
+  // desktop Chrome 默认背景标签里 HTML5 audio 不会自动暂停，视频号 BGM 会
+  // 一直跟着用户去别的标签里响，电池/数据/隐私都不友好。
+  // 只对当前 active 卡处理；非 active 卡反正已经 pause 了。
+  useEffect(() => {
+    if (!active || !audioUrl) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+    let wasPlayingBeforeHide = false;
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        wasPlayingBeforeHide = !audio.paused;
+        if (wasPlayingBeforeHide) audio.pause();
+      } else if (wasPlayingBeforeHide) {
+        audio.play().catch(() => undefined);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [active, audioUrl]);
+
   const canSwipe = displayImages.length > 1;
 
   const goNext = () => {
@@ -2141,6 +2164,26 @@ function ChannelVideoSurface({
     const video = videoRef.current;
     if (video) video.muted = !userUnmuted;
   }, [userUnmuted]);
+
+  // 同 audio：tab 切到后台时主动 pause，回前台按切走前状态恢复。
+  useEffect(() => {
+    if (!active || !videoUrl) return;
+    const video = videoRef.current;
+    if (!video) return;
+    let wasPlayingBeforeHide = false;
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        wasPlayingBeforeHide = !video.paused;
+        if (wasPlayingBeforeHide) video.pause();
+      } else if (wasPlayingBeforeHide) {
+        video.play().catch(() => undefined);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [active, videoUrl]);
 
   const handleTap = () => {
     const video = videoRef.current;
