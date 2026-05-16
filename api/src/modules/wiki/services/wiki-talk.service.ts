@@ -70,6 +70,15 @@ export class WikiTalkService {
         legacyMessage: `角色 ${characterId} 不存在`,
       });
     }
+    // 已删除的 page 不允许开新讨论 —— 旧 thread 还能读以保留历史，但
+    // 新 thread 让"已删除"卡片底下不停冒新讨论，UX 上很怪。R4 走查发现。
+    if (page.isDeleted) {
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '该词条已被删除，无法开新讨论' },
+        legacyMessage: '该词条已被删除，无法开新讨论',
+      });
+    }
     await this.assertCanTalk(user, characterId);
     // typeof 守：客户端传 {"title":{"a":1}} 时 (x ?? '').trim() 会抛 TypeError → 500。
     const title =
