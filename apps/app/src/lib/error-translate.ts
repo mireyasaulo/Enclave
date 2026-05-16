@@ -122,6 +122,16 @@ export function translateAppErrorCode(
       );
     case "MOMENTS_IMAGES_TYPE_ONLY":
       return translateRuntimeMessage(msg`图片朋友圈当前只支持图片资源。`);
+    case "MOMENTS_COMMENT_EMPTY":
+      return translateRuntimeMessage(msg`评论内容不能为空。`);
+    case "MOMENTS_COMMENT_TOO_LONG":
+      return translateRuntimeMessage(
+        msg`评论最多 ${String(params.max ?? 500)} 字。`,
+      );
+    case "MOMENTS_COMMENT_REPLY_TARGET_INVALID":
+      return translateRuntimeMessage(msg`被回复的评论不存在或已被删除。`);
+    case "MOMENTS_DELETE_FORBIDDEN":
+      return translateRuntimeMessage(msg`只能删除自己发布的朋友圈。`);
     case "REMINDER_LIMIT_INVALID":
       return translateRuntimeMessage(msg`limit 必须是正整数。`);
     case "REMINDER_ONLY_ACTIVE_COMPLETE":
@@ -491,6 +501,28 @@ export function translateAppErrorCode(
         msg`世界主人昵称至少 ${minLength} 个字。`,
       );
     }
+    case "WORLD_OWNER_NAME_TOO_LONG": {
+      const maxLength =
+        typeof params.maxLength === "number" ? params.maxLength : 64;
+      return translateRuntimeMessage(
+        msg`世界主人昵称最多 ${maxLength} 个字符。`,
+      );
+    }
+    case "WORLD_OWNER_SIGNATURE_TOO_LONG": {
+      const maxLength =
+        typeof params.maxLength === "number" ? params.maxLength : 300;
+      return translateRuntimeMessage(
+        msg`个性签名最多 ${maxLength} 个字符。`,
+      );
+    }
+    case "WORLD_OWNER_AVATAR_TOO_LARGE":
+      return translateRuntimeMessage(
+        msg`头像图片超过 2MB 上限，请压缩后再试。`,
+      );
+    case "WORLD_OWNER_AVATAR_UNSAFE_URL":
+      return translateRuntimeMessage(
+        msg`头像链接必须是 http/https 图片地址，或 data:image/ 开头的图片数据。`,
+      );
     case "OFFICIAL_ACCOUNT_FOLLOW_NOT_FOUND":
       return translateRuntimeMessage(msg`公众号关注关系不存在。`);
     case "OFFICIAL_ACCOUNT_PUSH_NOT_FOUND":
