@@ -621,6 +621,9 @@ export function DesktopNotesWorkspace({
             height: attachment.height,
           });
           focusEditorAtEnd();
+          // 收藏笔记可能塞二三十张图，loading=lazy + decoding=async 避免重新打开
+          // 这条笔记时一次性同步解码全部 img；编辑器内即时插入的图也走一遍
+          // 异步解码，不阻塞 contentEditable 主循环。
           document.execCommand(
             "insertHTML",
             false,
@@ -628,7 +631,7 @@ export function DesktopNotesWorkspace({
               attachment.url,
             )}" alt="${escapeHtmlAttribute(
               attachment.fileName,
-            )}" /></p><p><br></p>`,
+            )}" loading="lazy" decoding="async" /></p><p><br></p>`,
           );
           continue;
         }
