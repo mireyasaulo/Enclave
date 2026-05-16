@@ -1180,7 +1180,29 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             return
         }
 
+        // 真机走查 R1：UIActivityViewController 在 iPad（TARGETED_DEVICE_FAMILY
+        // 里 "1,2" 都开了）上 iOS 强制走 popover —— UIKit 没有给 iPad 改成
+        // sheet 的开关。老实现把 sourceRect 设成整个 presenter.view.bounds 让
+        // iOS 自己挑位置：实测出来 popover 一定带一个箭头指向屏幕中央上 / 上
+        // 边缘的某个不存在的「按钮」，看着像在锚定某个具体 UI 元素但实际什么
+        // 都没指，跟 capacitor preferredContentMode=mobile 模式下的 iPhone-style
+        // mobile UI 视觉冲突明显。
+        //
+        // Web 层不暴露 share 按钮在屏幕上的坐标，Swift 也拿不到 tap location
+        // 没法精确锚到按钮位置。最稳的退路是「让 popover 居中浮窗、不要乱指
+        // 一个箭头」：sourceRect 缩成 view 中心一个零大小点 + permittedArrowDirections
+        // 设空（[]）。iOS 看到无可允许的箭头方向就把 popover 渲染成无箭头的
+        // 居中浮层，跟 .pageSheet 视觉一致，没有误导性指向。
+        //
+        // iPhone（compact size class）上 popoverPresentationController 是 nil，
+        // 函数早早 return；这条改动只影响 iPad / iPad Multitasking 大宽度的场景。
         popover.sourceView = presenter.view
-        popover.sourceRect = presenter.view.bounds
+        popover.sourceRect = CGRect(
+            x: presenter.view.bounds.midX,
+            y: presenter.view.bounds.midY,
+            width: 0,
+            height: 0
+        )
+        popover.permittedArrowDirections = []
     }
 }
