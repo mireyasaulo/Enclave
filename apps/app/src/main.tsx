@@ -58,6 +58,32 @@ function shouldRecoverFromStaleAssets() {
   }
 }
 
+function isCapacitorNativeShell() {
+  if (typeof window === "undefined") return false;
+  const capacitor = (window as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return Boolean(capacitor?.isNativePlatform?.());
+}
+
+function recoverFromStaleAssets() {
+  if (!shouldRecoverFromStaleAssets()) {
+    return;
+  }
+
+  // Capacitor 原生壳的 chunk 全打包在 .ipa / .apk 里，理论上不会 "stale"，
+  // 但万一 OS/WKWebView 缓存抽风触发了 dynamic import 失败，window.location
+  // .reload() 在深路径下会变成灾难：当前 URL 形如 capacitor://localhost/
+  // tabs/chat，Capacitor router 的 SPA fallback 把 index.html 内容塞回去，
+  // 但 document URL 还停在 /tabs/chat —— index.html 里的 ./assets/xxx.js
+  // 相对 URL 解到 /tabs/assets/xxx.js，router 看 .js 后缀直接 404，整个 app
+  // 加载不出来，用户只能强杀重开。改成跳回根再载入即可避开。
+  if (isCapacitorNativeShell()) {
+    window.location.replace("/");
+    return;
+  }
+
+  window.location.reload();
+}
+
 function installStaleAssetRecovery() {
   if (typeof window === "undefined") {
     return;
@@ -65,11 +91,7 @@ function installStaleAssetRecovery() {
 
   window.addEventListener("vite:preloadError", (event) => {
     event.preventDefault();
-    if (!shouldRecoverFromStaleAssets()) {
-      return;
-    }
-
-    window.location.reload();
+    recoverFromStaleAssets();
   });
 
   window.addEventListener("error", (event) => {
@@ -81,11 +103,7 @@ function installStaleAssetRecovery() {
       return;
     }
 
-    if (!shouldRecoverFromStaleAssets()) {
-      return;
-    }
-
-    window.location.reload();
+    recoverFromStaleAssets();
   });
 }
 
