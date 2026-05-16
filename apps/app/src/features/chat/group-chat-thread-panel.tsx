@@ -236,6 +236,13 @@ export function GroupChatThreadPanel({
   // 记下"这个 highlight 已经走过 anchor 兜底翻页都没找到"，下次不再翻。
   const failedHighlightRef = useRef<Set<string>>(new Set());
   const handledDesktopCallRequestTokenRef = useRef<number | null>(null);
+  // 走查 Round 4：和 use-conversation-thread 对单聊已修的同款问题——下面
+  // 「mark group read」effect 之前用 messagesQuery.data?.length 做 dedup，
+  // 「查看更多消息」加 60→100 时 length 变化误判成「新消息追加」又打一次
+  // POST /read + invalidate conversations。改用"末尾消息 id"——按 length
+  // dedup 会被前置历史误触发，按末尾 id 才能区分"新消息追加"和"历史前置"。
+  // socket 撑长（AI 回声追加在尾部）时末尾 id 变化仍能正常触发。
+  const lastMarkedReadNewestIdRef = useRef<string | null>(null);
 
   const groupQuery = useQuery({
     queryKey: ["app-group", baseUrl, groupId],
@@ -311,6 +318,7 @@ export function GroupChatThreadPanel({
     loadMoreRequestRef.current = null;
     highlightedWindowRequestRef.current = null;
     failedHighlightRef.current.clear();
+    lastMarkedReadNewestIdRef.current = null;
   }, [baseUrl, groupId]);
 
   useEffect(() => {
@@ -540,9 +548,23 @@ export function GroupChatThreadPanel({
       return;
     }
 
+    // dedup：messages 未到 / 空时不打。按"末尾消息 id"去重——「查看更多
+    // 消息」(60→100, 前置历史) 末尾 id 不变，不再误打 mark-read；socket
+    // 撑长（AI 回声追加在尾部）时末尾 id 变化仍能正常触发。和单聊
+    // (use-conversation-thread) Round 1 同款修法。
+    const data = messagesQuery.data;
+    if (!data || data.length === 0) {
+      return;
+    }
+    const newestId = data[data.length - 1]?.id ?? null;
+    if (!newestId || lastMarkedReadNewestIdRef.current === newestId) {
+      return;
+    }
+    lastMarkedReadNewestIdRef.current = newestId;
+
     // 公网隧道偶发超时 / cloud token 过期重连那几百 ms 都会让 markGroupRead 抛
      // —— 不 catch 直接落到 unhandledrejection，污染 telemetry。与 direct
-     // 版本 (use-conversation-thread.ts) 对齐：吞掉错误，下次消息长度变化时
+     // 版本 (use-conversation-thread.ts) 对齐：吞掉错误，下次末尾 id 变化时
      // effect 会重跑、自动重试。finally 仍然 invalidate 让列表 badge 同步。
     void markGroupRead(groupId, baseUrl)
       .catch(() => {})
@@ -554,7 +576,7 @@ export function GroupChatThreadPanel({
   }, [
     baseUrl,
     groupId,
-    messagesQuery.data?.length,
+    messagesQuery.data,
     queryClient,
     unreadSnapshotReady,
   ]);
