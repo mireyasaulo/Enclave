@@ -980,6 +980,17 @@ export function ContactsPage() {
     }
 
     previousBaseUrlRef.current = baseUrl;
+    // 切世界 / 切账号会让所有 character/friendship ID 整套换掉，bulk 选中的
+    // characterIds 在新世界基本对不上号；如果不清，用户在 bulk 模式下切 world
+    // 之后点删除 → bulkFriendshipAction 拿一堆"上个世界 ID"打过去，server 全
+    // 部 SOCIAL_FRIEND_NOT_FOUND，看上去像批量删除整条挂掉。同理管理 modal /
+    // + 快捷菜单 / 搜索框 / 提示条都是"上个世界的 UI 状态"，一并复位。
+    setBulkMode(false);
+    setBulkSelectedIds(new Set());
+    setManagementOpen(false);
+    setIsQuickMenuOpen(false);
+    setSearchText("");
+    _setNotice(null);
     startChatResetRef.current();
   }, [baseUrl]);
 
