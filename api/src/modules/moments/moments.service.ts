@@ -638,12 +638,18 @@ export class MomentsService implements OnModuleInit {
     await mkdir(storageDir, { recursive: true });
     await writeFile(path.join(storageDir, storedFileName), file.buffer);
 
+    // 关键：存相对 URL（`/api/moments/media/...`）而非拼了 PUBLIC_API_BASE_URL 的绝对 URL。
+    // 历史 bug：上传时把当时的公网入口（含端口、含已废弃域名）固化到 mediaPayload 里，
+    // 之后入口换端口/换协议（http→https 或 port migration），这些老帖的 URL 就永远 404。
+    // minimax-asset.storage.ts 之前因为同一类 bug 已经改成相对路径，moments 这条上传通道
+    // 漏了。前端 contracts/client.ts 的 normalizeAttachmentAssetUrl 会在渲染时基于当前
+    // apiBaseUrl + /cloud/world-api 反代前缀正确 absolutize。
     if (isImage) {
       const asset: MomentImageAsset = {
         id: storedFileName,
         kind: 'image',
-        url: `${this.resolvePublicApiBaseUrl()}/api/moments/media/${storedFileName}`,
-        thumbnailUrl: `${this.resolvePublicApiBaseUrl()}/api/moments/media/${storedFileName}`,
+        url: `/api/moments/media/${storedFileName}`,
+        thumbnailUrl: `/api/moments/media/${storedFileName}`,
         mimeType: normalizedMimeType,
         fileName: displayName,
         size: file.size,
@@ -656,7 +662,7 @@ export class MomentsService implements OnModuleInit {
     const asset: MomentVideoAsset = {
       id: storedFileName,
       kind: 'video',
-      url: `${this.resolvePublicApiBaseUrl()}/api/moments/media/${storedFileName}`,
+      url: `/api/moments/media/${storedFileName}`,
       mimeType: normalizedMimeType,
       fileName: displayName,
       size: file.size,
@@ -1845,13 +1851,6 @@ export class MomentsService implements OnModuleInit {
 
   private resolveMomentMediaStorageDir(): string {
     return resolvePrimaryMomentMediaStorageDir();
-  }
-
-  private resolvePublicApiBaseUrl(): string {
-    return (
-      process.env.PUBLIC_API_BASE_URL?.trim() ||
-      `http://localhost:${process.env.PORT ?? 3000}`
-    ).replace(/\/+$/, '');
   }
 
   /**
