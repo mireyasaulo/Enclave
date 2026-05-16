@@ -326,11 +326,33 @@ export function MomentsPage() {
     ownerUsername,
     ownerAvatar,
   });
+  // 跟 mutation 闭包同步的 baseUrl ref —— 用来在 onError 里判断"这条 mutation
+  // 当初挂在哪个账户"。直接读 baseUrl state 是新值，跟 mutation 触发时的旧值
+  // 不一定一样，比对就没意义。
+  const mutationBaseUrlRef = useRef(baseUrl);
+  useEffect(() => {
+    mutationBaseUrlRef.current = baseUrl;
+  }, [baseUrl]);
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
-    onMutate: optimisticLike.onMutate,
+    onMutate: (momentId: string) => {
+      // 把 onMutate 时刻的 baseUrl 钉进 context，onError 比对——切账户的话
+      // 这条 mutation 属于上一个账户，UI 不应该再冒红条。
+      const mutationBaseUrl = baseUrl;
+      const inner = optimisticLike.onMutate(momentId);
+      return Promise.resolve(inner).then((snapshots) => ({
+        ...snapshots,
+        mutationBaseUrl,
+      }));
+    },
     onError: (error, momentId, context) => {
       optimisticLike.onError(error, momentId, context);
+      // mid-flight 切账户：当时的 momentId 在新账户里不存在，弹"点赞失败"红条 +
+      // 重试按钮（重试还会再用旧 momentId 去新账户的 API → 又 404）只会
+      // 把用户搞糊涂。和 R7/R8/R9 mid-flight 关 sheet 失败时静默吞错同思路。
+      if (context && context.mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
       // 之前 error 只回滚 cache、UI 沉默到底部那块 likeError 一直挂着不消失。
       // 把错误冒到顶 notice 通道，2.4s 自动收 + 给个「重试点赞」按钮。
       // tone="danger" 红条——之前用 tone="info" 蓝条，色调和「朋友圈互动已更新。」
@@ -487,6 +509,9 @@ export function MomentsPage() {
           : null;
       const savedMobileReply =
         commentBarTarget?.momentId === momentId ? commentBarTarget : null;
+      // 钉住 mutation 触发时刻的 baseUrl ——切账户后 onError 比对，旧账户的失败
+      // 不该 reopen 新账户里根本没这条 moment 的 commentBar / 弹红条。
+      const mutationBaseUrl = baseUrl;
 
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setDesktopReplyTarget((current) =>
@@ -507,6 +532,7 @@ export function MomentsPage() {
         savedDraft,
         savedDesktopReply,
         savedMobileReply,
+        mutationBaseUrl,
       };
     },
     mutationFn: (momentId: string) => {
@@ -530,6 +556,12 @@ export function MomentsPage() {
       delete commentSubmitArgsRef.current[momentId];
       if (!context || context.skipped) {
         // skipped 是 onMutate 自己拒绝（空文本/未登录），不算用户期望的提交，不报。
+        return;
+      }
+      // mid-flight 切账户：旧账户的失败不该在新账户里 reopen 一个指着不存在
+      // 帖子的 commentBar，也不该弹"评论失败"红条。和 likeMutation 同思路；
+      // cache 回滚也跳过——旧 baseUrl 的 cache 用户已经看不到了。
+      if (context.mutationBaseUrl !== mutationBaseUrlRef.current) {
         return;
       }
       context.flatSnapshots.forEach(([key, data]) => {
@@ -669,9 +701,22 @@ export function MomentsPage() {
           data.filter((item) => item.id !== momentId),
         );
       });
-      return { pagedSnapshots, flatSnapshots, mineSnapshots };
+      return {
+        pagedSnapshots,
+        flatSnapshots,
+        mineSnapshots,
+        // 钉住触发时刻的 baseUrl —— mid-flight 切账户后 onError 比对，旧账户的
+        // "删除失败"红条不要冒到新账户，"重试删除"按钮的闭包也指着旧 momentId。
+        mutationBaseUrl: baseUrl,
+      };
     },
     onError: (error, momentId, context) => {
+      // mid-flight 切账户：旧账户的失败不该在新账户里冒"删除失败"红条 +
+      // 重试按钮（重试还会用旧 momentId 走新账户 → 又 404）。cache 也跳过回滚——
+      // 旧 baseUrl 的 cache 用户已经看不到了。
+      if (context && context.mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
       context?.pagedSnapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
@@ -861,6 +906,19 @@ export function MomentsPage() {
     resetComposeDraft();
     setCommentDrafts({});
     setShowCompose(false);
+    // baseUrl 切换（账户切换）时，所有挂在「上一个 baseUrl」的交互态都得清，
+    // 否则用户在 A 账户点开 ⋯ 弹出 actionBubble、或正在写评论 → 切到 B 账户
+    // 后这些弹层还浮在屏幕上、anchorRect 还指着上一个账户的卡片位置；
+    // 点 like / 评论会用旧 momentId 走 mutation → 在新账户里 404 → 弹红条
+    // "点赞失败" 把人搞糊涂。配合 mid-flight onError 的 baseUrl-guard 一起兜底。
+    // 与桌面端 60a8edb0 (走查新 Round 5) 同模式：跨 baseUrl 不要让交互态泄漏。
+    setActionBubble(null);
+    setCommentBarTarget(null);
+    setDesktopReplyTarget(null);
+    // 待发评论 args：onError/onSuccess 会清掉自己那条，但如果切账户时还有
+    // mid-flight，旧 args 残留在内存。每次切账户都会堆，长期跑就是泄漏；
+    // 顺手 wipe 防御。
+    commentSubmitArgsRef.current = {};
     const flashNotice = consumeMomentPublishFlash();
     if (flashNotice) {
       setNoticeTone("success");
@@ -1334,6 +1392,9 @@ export function MomentsPage() {
   return (
     <MobileMomentsView
       isDiscoverSubPage={isDiscoverSubPage}
+      // baseUrl 透到子里仅用于内部 useEffect 在切账户时清 shareMomentId —— 这块
+      // local state 留在 MobileMomentsView，免得 share modal 的开关穿四五层 prop。
+      baseUrl={baseUrl}
       ownerId={ownerId}
       ownerAvatar={ownerAvatar}
       ownerUsername={ownerUsername}
@@ -1494,6 +1555,7 @@ export function MomentsPage() {
 
 type MobileMomentsViewProps = {
   isDiscoverSubPage: boolean;
+  baseUrl: string | undefined;
   ownerId: string | null;
   ownerAvatar: string | null;
   ownerUsername: string | null;
@@ -1539,6 +1601,7 @@ type MobileMomentsViewProps = {
 
 function MobileMomentsView({
   isDiscoverSubPage,
+  baseUrl,
   ownerId,
   ownerAvatar,
   ownerUsername,
@@ -1637,6 +1700,13 @@ function MobileMomentsView({
   // 「分享图卡」目标。点 ⋯ → 「分享」时把当时 actionBubble 的 momentId 存下来，
   // 用 id 而不是整个 moment 对象 — 这样 visibleMoments 后续刷新时预览图也跟着新。
   const [shareMomentId, setShareMomentId] = useState<string | null>(null);
+  // 切账户时清 shareMomentId —— 否则在账户 A 开着分享卡片切到 B：B 的 visibleMoments
+  // 里找不到 A 的那条 → modal 暂时隐藏；一旦返回 A 重新进朋友圈，shareMoment 又能 find
+  // 到，modal 自动重开，体验是「我没点为啥又冒出来」。和上层 actionBubble /
+  // commentBarTarget 的 baseUrl-reset 配套。
+  useEffect(() => {
+    setShareMomentId(null);
+  }, [baseUrl]);
   const shareMoment = shareMomentId
     ? visibleMoments.find((moment) => moment.id === shareMomentId) ?? null
     : null;

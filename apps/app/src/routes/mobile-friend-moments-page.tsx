@@ -133,15 +133,39 @@ export function MobileFriendMomentsPage() {
     ownerUsername,
     ownerAvatar,
   });
+  // mutation 闭包外的 ref，用来在 onError 里判断 mid-flight 是否切走（切账户 /
+  // 切角色）。和 moments-page 主页 mutationBaseUrlRef 同模式 —— 切走后旧账户
+  // 的失败不要在新页面冒红条 / 挂重试按钮（按钮闭包指着旧 momentId，重试会 404）。
+  const mutationGuardRef = useRef({ baseUrl, characterId: resolvedCharacterId });
+  useEffect(() => {
+    mutationGuardRef.current = { baseUrl, characterId: resolvedCharacterId };
+  }, [baseUrl, resolvedCharacterId]);
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
-    onMutate: optimisticLike.onMutate,
+    onMutate: (momentId: string) => {
+      const inner = optimisticLike.onMutate(momentId);
+      const captured = {
+        baseUrl,
+        characterId: resolvedCharacterId,
+      };
+      return Promise.resolve(inner).then((snapshots) => ({
+        ...snapshots,
+        ...captured,
+      }));
+    },
     onError: (error, momentId, context) => {
       optimisticLike.onError(error, momentId, context);
-      // 失败走顶 notice 通道——之前在底部挂一条 tone="info" 蓝条直接显示
-      // raw error.message，色调跟「朋友圈互动已更新。」成功提示一样，
-      // 加上没有「点赞失败：」前缀，用户根本看不出是失败。和 chat Round 6
-      // (78b6a272) / 主朋友圈页处理方式对齐：danger 红条 + 失败前缀 + 重试按钮。
+      // mid-flight 切到别的角色 / 切账户：当时点赞那条帖子在新页面不存在，
+      // 红条 + 「重试点赞」按钮（按钮闭包还指着旧 momentId → 重试也是 404）
+      // 只会把用户搞糊涂。和 R7/R8/R9 mid-flight 关 sheet 失败时静默吞错同思路。
+      const guard = mutationGuardRef.current;
+      if (
+        context &&
+        (context.baseUrl !== guard.baseUrl ||
+          context.characterId !== guard.characterId)
+      ) {
+        return;
+      }
       setNotice({
         tone: "danger",
         message:
@@ -265,6 +289,10 @@ export function MobileFriendMomentsPage() {
       const savedDraft = commentDrafts[momentId] ?? "";
       const savedBar =
         commentBarTarget?.momentId === momentId ? commentBarTarget : null;
+      // 钉住触发时刻的 baseUrl / characterId —— mid-flight 切走时 onError 比对，
+      // 旧 context 不要 reopen 一个指着别的角色 / 别的账户帖子的 commentBar。
+      const mutationBaseUrl = baseUrl;
+      const mutationCharacterId = resolvedCharacterId;
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setCommentBarTarget((current) =>
         current?.momentId === momentId ? null : current,
@@ -279,6 +307,8 @@ export function MobileFriendMomentsPage() {
         momentId,
         savedDraft,
         savedBar,
+        mutationBaseUrl,
+        mutationCharacterId,
       };
     },
     mutationFn: (momentId: string) => {
@@ -351,6 +381,21 @@ export function MobileFriendMomentsPage() {
     },
     onError: (error, momentId, context) => {
       delete commentSubmitArgsRef.current[momentId];
+      // mid-flight 切角色 / 切账户：当时 reply 的那条帖子在新页面不存在，
+      // 既不能 reopen commentBar（弹出来悬空指向不存在的 moment），也不该弹
+      // 「评论失败」红条 —— 用户已经离开当时的对话语境了，把红条递到新页面
+      // 上跟当前操作完全不相干。和 R7 (e9b10ad8) 同模式：mid-flight 关 sheet
+      // 失败时静默吞错。cache 回滚也跳过 —— 旧 baseUrl/character cache 用户
+      // 已经看不到了，恢复回 optimistic 之前没意义。
+      const guard = mutationGuardRef.current;
+      if (
+        context &&
+        !context.skipped &&
+        (context.mutationBaseUrl !== guard.baseUrl ||
+          context.mutationCharacterId !== guard.characterId)
+      ) {
+        return;
+      }
       if (context && !context.skipped) {
         context.characterSnapshots.forEach(([key, data]) => {
           queryClient.setQueryData(key, data);
