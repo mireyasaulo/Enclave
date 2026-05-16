@@ -39,6 +39,7 @@ import {
 import { ReplyLogicRulesService } from '../ai/reply-logic-rules.service';
 import { sanitizeAiText } from '../ai/ai-text-sanitizer';
 import { CharactersService } from '../characters/characters.service';
+import { SELF_CHARACTER_ID } from '../characters/default-characters';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { WorldLanguageService } from '../config/world-language.service';
 import { ChatGateway } from './chat.gateway';
@@ -169,7 +170,19 @@ export class GroupService {
 
   async createGroup(dto: CreateGroupDto): Promise<Group> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
-    const memberIds = dedupeIds(dto.memberIds);
+    // 走查 Round 2：dedupe 之后再剔除 char-default-self —— 用户自身就是
+    // owner role=owner 这一条 member 行；如果把"我自己"也作为 character member 加进群，
+    // 你跟自己同时在群里、还能跟自己 @、自己回复自己。空 memberIds 同样不允许：
+    // 创建只剩 owner 一个真人 + 0 个角色的孤儿群在 UI 里看着像 crash。
+    const memberIds = dedupeIds(dto.memberIds).filter(
+      (id) => id !== SELF_CHARACTER_ID,
+    );
+    if (!memberIds.length) {
+      throw new AppError('GROUP_REQUIRES_AT_LEAST_ONE_MEMBER', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Group requires at least one character member',
+      });
+    }
 
     const characterProfiles = await Promise.all(
       memberIds.map(async (memberId) => {

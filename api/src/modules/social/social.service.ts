@@ -1030,6 +1030,17 @@ ${personaSummary || '（暂无更多信息）'}
   }
 
   async deleteFriend(characterId: string): Promise<{ success: true }> {
+    // 走查 Round 2：char-default-self（"我自己" 自我镜像）是默认好友，
+    // ensureDefaultFriendships 只对 friendship 不存在时补行、status='removed'
+    // 的旧行不会被还原。如果用户在批量管理里全选 + 删除把 self 一起带进 deleteFriend，
+    // 自己的镜像永久变 status='removed'，通讯录目录 / 朋友圈自己页 / 自我对谈
+    // 全部链路断开且不会自愈。后端兜底拒绝。
+    if (characterId === SELF_CHARACTER_ID) {
+      throw new AppError('SOCIAL_CANNOT_DELETE_SELF', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Cannot delete self mirror character from contacts',
+      });
+    }
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const existing = await this.friendshipRepo.findOneBy({
       ownerId: owner.id,

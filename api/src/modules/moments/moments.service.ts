@@ -415,7 +415,13 @@ export class MomentsService implements OnModuleInit {
     },
   ): Promise<MomentCommentEntity> {
     const replyToCommentId = replyTo?.replyToCommentId?.trim() || null;
-    let replyToAuthorId = replyTo?.replyToAuthorId?.trim() || null;
+    // replyToAuthorId 必须有 replyToCommentId 才有意义——只有 reply-to-author 没有
+    // reply-to-comment 是脏数据（前端绝不该这么发，但 curl / 第三方客户端能伪造）。
+    // DB 里留着这种半残状态会让 visibleComments 上 reply 显示半残「回复 X：正文」
+    // 但点过去找不到原评论的目标。trim 后纯空白也归零。
+    let replyToAuthorId = replyToCommentId
+      ? replyTo?.replyToAuthorId?.trim() || null
+      : null;
     if (replyToCommentId && !replyToAuthorId) {
       const target = await this.commentRepo.findOneBy({ id: replyToCommentId });
       replyToAuthorId = target?.authorId ?? null;
