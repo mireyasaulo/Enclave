@@ -390,6 +390,16 @@ export function MobileFeedPublishPage() {
               // 后端 FEED_TEXT_TOO_LONG 兜底；UI 卡完用户不会再误传几 MB 长文
               // 把 SocialPostCard 撑爆。
               maxLength={2000}
+              // 走查 Round 3：跟 mobile-moments-publish-page R2 (c1578083) 同坑—
+              // mutationFn 闭包读"按下发表"那一刻的 composeDraft.text 快照，
+              // pending 期间用户继续往输入框敲下的内容并不会跟着发出去；
+              // onSuccess 若发现 draftStillMatchesPublish === false（Round 1 已加
+              // 的 snapshot 校验）会跳过 reset+navigate 留下用户新内容当草稿—
+              // 但用户视感是"我发了一条完整的话，怎么只发了前半段"。
+              // X 移除图/视频按钮和发表按钮都已经按 isPending 禁用，textarea 是
+              // 唯一漏网；readOnly 比 disabled 更合适，disabled 会把已敲内容置
+              // 灰看起来像出错，readOnly 视觉一致、又能让 IME 把候选窗压下去。
+              readOnly={createMutation.isPending}
               className="min-h-[11rem] resize-none rounded-[18px] border-0 bg-[color:var(--surface-console)] px-4 py-3.5 text-[16px] leading-7 shadow-none"
               autoFocus
             />
