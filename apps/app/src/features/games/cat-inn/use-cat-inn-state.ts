@@ -314,8 +314,11 @@ export function useCatInnState() {
     return () => saveState(stateRef.current);
   }, []);
 
+  // tick reducer 在 idle/ended 也会 cloneState + setState 触发重渲。
+  // 只 running 才需要 1Hz 推进 remainingMs。
   useEffect(() => {
     const id = window.setInterval(() => {
+      if (stateRef.current.status !== "running") return;
       dispatch({ type: "tick", nowMs: Date.now() });
     }, 1000);
     return () => window.clearInterval(id);

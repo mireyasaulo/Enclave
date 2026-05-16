@@ -366,8 +366,11 @@ export function useForestTrainState() {
     return () => saveState(stateRef.current);
   }, []);
 
+  // tick reducer 在 idle/ended 也会 cloneState + setState 触发重渲。
+  // 只 running 才需要 500ms 推进站台。
   useEffect(() => {
     const id = window.setInterval(() => {
+      if (stateRef.current.status !== "running") return;
       dispatch({ type: "tick", nowMs: Date.now() });
     }, 500);
     return () => window.clearInterval(id);

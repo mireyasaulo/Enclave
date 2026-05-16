@@ -167,6 +167,23 @@ jobs:
           INPUT_VERSION='${{ inputs.marketingVersion }}'
           INPUT_BUILD='${{ inputs.buildNumber }}'
           if [ -z "$INPUT_VERSION" ]; then
+            # 真机走查：tag push (refs/tags/app-vX.Y.Z) 触发时优先从 tag 名提取
+            # marketing version。老实现直接 fallback 到 ios-shell.config.json
+            # 里硬编码的 1.0.0 —— 用户 git push tag app-v1.0.1 之后看到 workflow
+            # 跑成功了，下载 IPA 装到真机一查 CFBundleShortVersionString 还是
+            # 1.0.0，App Store Connect 也认成「重传 1.0.0」直接 reject。
+            REF='${{ github.ref }}'
+            if [[ "$REF" == refs/tags/app-v* ]]; then
+              TAG_VERSION="${REF#refs/tags/app-v}"
+              if [[ "$TAG_VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+                INPUT_VERSION="$TAG_VERSION"
+                echo "info  derived marketingVersion=$INPUT_VERSION from tag $REF"
+              else
+                echo "::warning::tag $REF does not match app-vX.Y or app-vX.Y.Z; falling back to ios-shell.config.json"
+              fi
+            fi
+          fi
+          if [ -z "$INPUT_VERSION" ]; then
             INPUT_VERSION=$(node -e "console.log(require('./apps/ios-shell/ios-shell.config.json').marketingVersion ?? '1.0.0')")
           fi
           if [ -z "$INPUT_BUILD" ]; then

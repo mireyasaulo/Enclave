@@ -97,8 +97,11 @@ export function useNightMarketState() {
     };
   }, []);
 
+  // tick reducer 在 idle/ended 也会 cloneState (JSON 深拷) + setState 触发重渲。
+  // 用户停在选品 / 结算页就是纯空转，只 running 才需要 500ms 推进客流。
   useEffect(() => {
     const id = window.setInterval(() => {
+      if (stateRef.current.status !== "running") return;
       dispatch({ type: "tick", nowMs: Date.now() });
     }, 500);
     return () => window.clearInterval(id);
