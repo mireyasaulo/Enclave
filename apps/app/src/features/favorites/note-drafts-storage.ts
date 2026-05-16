@@ -97,7 +97,14 @@ function parseDesktopNoteDraftRecords(raw: string | null | undefined) {
     return parsed
       .map((item) => normalizeDesktopNoteDraftRecord(item))
       .filter((item): item is DesktopNoteDraftRecord => Boolean(item))
-      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+      // ISO 字符串走原生字典序，跟 favorites-storage / note-editor-helpers 对齐。
+      .sort((left, right) =>
+        right.updatedAt < left.updatedAt
+          ? -1
+          : right.updatedAt > left.updatedAt
+            ? 1
+            : 0,
+      );
   } catch {
     return [] as DesktopNoteDraftRecord[];
   }
