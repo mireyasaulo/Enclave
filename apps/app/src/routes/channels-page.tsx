@@ -175,6 +175,10 @@ export function ChannelsPage() {
   // 点赞改成 toggle：原来只 POST /like、不调 DELETE，但 aria-label 和
   // 实心 ThumbsUp 都暗示用户可以"取消点赞"。后端早就支持 unlike，UI 没接。
   // 现在 input 带 hasLiked，按需走 like / unlike，optimistic 也按 toggle 翻。
+  //
+  // 失败回滚 per-post 而不是整缓存：用户连点 A→B 两条 like，A 失败的时候
+  // 不能 setQueryData(整张老快照)，否则会把 B 的乐观更新一起抹掉。只把 A 这条
+  // 的 likeCount/hasLiked 恢复成"被点之前那条"，其他 post 用当前缓存。
   const likeMutation = useMutation({
     mutationFn: (input: { postId: string; hasLiked: boolean }) =>
       input.hasLiked
@@ -184,6 +188,10 @@ export function ChannelsPage() {
       await queryClient.cancelQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
+      const previousEntries: Array<{
+        key: readonly unknown[];
+        previousPost: FeedPostListItem | null;
+      }> = [];
       const snapshots = queryClient.getQueriesData<FeedChannelHomeResponse>({
         queryKey: ["app-channels-home", baseUrl],
       });
@@ -191,6 +199,9 @@ export function ChannelsPage() {
         if (!data?.posts) {
           return;
         }
+        const previousPost =
+          data.posts.find((post) => post.id === input.postId) ?? null;
+        previousEntries.push({ key, previousPost });
         queryClient.setQueryData<FeedChannelHomeResponse>(key, {
           ...data,
           posts: data.posts.map((post) =>
@@ -219,11 +230,21 @@ export function ChannelsPage() {
           ),
         });
       });
-      return { snapshots };
+      return { previousEntries };
     },
-    onError: (error, _postId, context) => {
-      context?.snapshots.forEach(([key, data]) => {
-        queryClient.setQueryData(key, data);
+    onError: (error, input, context) => {
+      // 只回滚被点的这条 post——拿当前缓存（已经包含后来的乐观更新）做底，
+      // 仅把 input.postId 还原成失败前那条。
+      context?.previousEntries.forEach(({ key, previousPost }) => {
+        const current =
+          queryClient.getQueryData<FeedChannelHomeResponse>(key);
+        if (!current?.posts) return;
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...current,
+          posts: current.posts.map((post) =>
+            post.id === input.postId ? (previousPost ?? post) : post,
+          ),
+        });
       });
       // 失败时给一行 info 通知；不要把单条点赞失败升级成"视频号暂时不可用"
       // 大状态卡——home 列表其实还能用。
@@ -357,11 +378,19 @@ export function ChannelsPage() {
       await queryClient.cancelQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
+      // 同 likeMutation：失败回滚 per-post，避免并发 mutate 互相覆盖。
+      const previousEntries: Array<{
+        key: readonly unknown[];
+        previousPost: FeedPostListItem | null;
+      }> = [];
       const snapshots = queryClient.getQueriesData<FeedChannelHomeResponse>({
         queryKey: ["app-channels-home", baseUrl],
       });
       snapshots.forEach(([key, data]) => {
         if (!data?.posts) return;
+        const previousPost =
+          data.posts.find((post) => post.id === input.postId) ?? null;
+        previousEntries.push({ key, previousPost });
         queryClient.setQueryData<FeedChannelHomeResponse>(key, {
           ...data,
           posts: data.posts.map((post) =>
@@ -390,11 +419,19 @@ export function ChannelsPage() {
           ),
         });
       });
-      return { snapshots };
+      return { previousEntries };
     },
-    onError: (error, _input, context) => {
-      context?.snapshots.forEach(([key, data]) => {
-        queryClient.setQueryData(key, data);
+    onError: (error, input, context) => {
+      context?.previousEntries.forEach(({ key, previousPost }) => {
+        const current =
+          queryClient.getQueryData<FeedChannelHomeResponse>(key);
+        if (!current?.posts) return;
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...current,
+          posts: current.posts.map((post) =>
+            post.id === input.postId ? (previousPost ?? post) : post,
+          ),
+        });
       });
       setNoticeTone("info");
       setNoticeActionLabel(null);
@@ -432,11 +469,23 @@ export function ChannelsPage() {
       await queryClient.cancelQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
+      // 同 likeMutation：per-author 记录失败前的所有相关 post，回滚也只动这些。
+      const previousEntries: Array<{
+        key: readonly unknown[];
+        previousPosts: Map<string, FeedPostListItem>;
+      }> = [];
       const snapshots = queryClient.getQueriesData<FeedChannelHomeResponse>({
         queryKey: ["app-channels-home", baseUrl],
       });
       snapshots.forEach(([key, data]) => {
         if (!data?.posts) return;
+        const previousPosts = new Map<string, FeedPostListItem>();
+        data.posts.forEach((post) => {
+          if (post.authorId === input.authorId) {
+            previousPosts.set(post.id, post);
+          }
+        });
+        previousEntries.push({ key, previousPosts });
         queryClient.setQueryData<FeedChannelHomeResponse>(key, {
           ...data,
           posts: data.posts.map((post) =>
@@ -462,11 +511,21 @@ export function ChannelsPage() {
           ),
         });
       });
-      return { snapshots };
+      return { previousEntries };
     },
-    onError: (error, _input, context) => {
-      context?.snapshots.forEach(([key, data]) => {
-        queryClient.setQueryData(key, data);
+    onError: (error, input, context) => {
+      context?.previousEntries.forEach(({ key, previousPosts }) => {
+        const current =
+          queryClient.getQueryData<FeedChannelHomeResponse>(key);
+        if (!current?.posts) return;
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...current,
+          posts: current.posts.map((post) =>
+            post.authorId === input.authorId
+              ? (previousPosts.get(post.id) ?? post)
+              : post,
+          ),
+        });
       });
       setNoticeTone("info");
       setNoticeActionLabel(null);

@@ -24,8 +24,12 @@ type DesktopFeedListProps = {
   posts: FeedPostListItem[];
   isPostFavorite: (postId: string) => boolean;
   onCancelCommentReply?: () => void;
+  // 这一组 callback 全部按 (postId, ...) 维度往下传 — 不再在 map 里包一层
+  // `() => onLike(post.id)` 闭包；row 内部用 useCallback 绑 post.id。
+  // 这样配 row 的 React.memo 才能起效：commentDrafts 变只让那条 row 重渲。
   onCommentChange: (postId: string, value: string) => void;
-  onCommentSubmit: (postId: string) => void;
+  // text 入参：row 把 commentDraft 顺手传上来，page 不用闭包到 commentDrafts。
+  onCommentSubmit: (postId: string, text: string) => void;
   onLoadFullComments: (postId: string) => void;
   onLike: (postId: string) => void;
   onOpenCompose: () => void;
@@ -104,23 +108,15 @@ export function DesktopFeedList({
                 likeLoading={likePendingPostId === post.id}
                 post={post}
                 onCancelCommentReply={onCancelCommentReply}
-                onCommentChange={(value) => onCommentChange(post.id, value)}
-                onCommentSubmit={() => onCommentSubmit(post.id)}
-                onLoadFullComments={() => onLoadFullComments(post.id)}
-                onLike={() => onLike(post.id)}
-                onShare={onShare ? () => onShare(post.id) : undefined}
+                onCommentChange={onCommentChange}
+                onCommentSubmit={onCommentSubmit}
+                onLoadFullComments={onLoadFullComments}
+                onLike={onLike}
+                onShare={onShare}
                 onStartCommentReply={onStartCommentReply}
                 onSelectCommentAuthor={onSelectCommentAuthor}
-                onSelectAuthor={
-                  onSelectPostAuthor
-                    ? (event) =>
-                        onSelectPostAuthor({
-                          anchorElement: event.currentTarget,
-                          post,
-                        })
-                    : undefined
-                }
-                onToggleFavorite={() => onToggleFavorite(post.id)}
+                onSelectPostAuthor={onSelectPostAuthor}
+                onToggleFavorite={onToggleFavorite}
               />
             );
           })}

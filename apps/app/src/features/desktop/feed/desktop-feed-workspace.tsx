@@ -54,7 +54,10 @@ type DesktopFeedWorkspaceProps = {
   setShowCompose: (nextValue: boolean) => void;
   onCancelCommentReply?: () => void;
   onCommentChange: (postId: string, value: string) => void;
-  onCommentSubmit: (postId: string) => void;
+  // (postId, text)：row 把 commentDraft 顺手传上来给 page，page 的回调不再
+  // 闭包 commentDrafts state → 键盘敲一下 onCommentSubmit identity 不变，
+  // DesktopFeedRow 的 React.memo 才不会被穿透。
+  onCommentSubmit: (postId: string, text: string) => void;
   onCreate: () => void;
   onStartCommentReply?: (comment: FeedComment) => void;
   onSelectCommentAuthor?: (
@@ -281,7 +284,17 @@ export function DesktopFeedWorkspace({
                 onCancelCommentReply={onCancelCommentReply}
                 onCommentChange={onCommentChange}
                 onCommentSubmit={onCommentSubmit}
-                onLoadFullComments={(postId) => setSelectedPostId(postId)}
+                onLoadFullComments={(postId) => {
+                  // 已经选中同一条 post 时 setState 是 no-op：React 跳过更新 →
+                  // useQuery 不会重跑。detailQuery 上一次失败、ErrorBlock 已经
+                  // 渲染出来时，用户点「查看全部」想重试，过去只能刷新整个页面。
+                  // 这里显式 refetch，让那条 button 真当"重试入口"用。
+                  if (selectedPostId === postId && detailQuery.isError) {
+                    void detailQuery.refetch();
+                    return;
+                  }
+                  setSelectedPostId(postId);
+                }}
                 onLike={onLike}
                 onOpenCompose={() => setShowCompose(true)}
                 onShare={onShare}

@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
 import { msg } from "@lingui/macro";
@@ -266,6 +267,12 @@ export function DiscoverFeedPage() {
   useEffect(() => {
     if (!isDesktopLayout) return;
     if (!hasNextFeedPage || isFetchingNextFeedPage) return;
+    // Round 18 移动端补的 isFetchNextPageError 闸门，桌面端这三条自动拉页
+    // 路径（auto-prefetch / on-demand requestMore / deep-link 目标驱动）当时
+    // 没顺手补上。fetch 失败后 isFetchingNextFeedPage 翻回 false → 每个依赖
+    // 它的 effect 立刻又触发一次 fetchNextPage，counter 一路烧到 cap=3 才
+    // 停，把刚抖动的服务端继续打。
+    if (isFetchNextFeedPageError) return;
     if (desktopAutoPrefetchPages.current >= DESKTOP_AUTO_PREFETCH_PAGE_CAP) {
       return;
     }
@@ -275,6 +282,7 @@ export function DiscoverFeedPage() {
     isDesktopLayout,
     hasNextFeedPage,
     isFetchingNextFeedPage,
+    isFetchNextFeedPageError,
     fetchNextFeedPage,
   ]);
   // 用户主动刷新（resetFeedToFirstPage 后 refetch）会把 page 回 1，此时
@@ -287,10 +295,16 @@ export function DiscoverFeedPage() {
   // 的稳定引用（react-query useInfiniteQuery 内部 memo）+ hasNextPage/isFetchingNextPage
   // 标记（这两个值变化时本来就该重建 observer 决定是否要观测）。
   const desktopRequestMore = useCallback(() => {
+    if (isFetchNextFeedPageError) return;
     if (hasNextFeedPage && !isFetchingNextFeedPage) {
       void fetchNextFeedPage();
     }
-  }, [hasNextFeedPage, isFetchingNextFeedPage, fetchNextFeedPage]);
+  }, [
+    hasNextFeedPage,
+    isFetchingNextFeedPage,
+    isFetchNextFeedPageError,
+    fetchNextFeedPage,
+  ]);
   // 深链 /tabs/feed#post=<id> 落到桌面但目标 post 在第 4 页以后：Round 1 把
   // 自动 prefetch 上限砍到 3 页（=60 条）防止 200+ 条广场把后端拉爆，副作用
   // 是 deep-link 找不到目标只能枯坐。这里独立加一层「目标驱动」拉页：仅当
@@ -303,6 +317,7 @@ export function DiscoverFeedPage() {
     if (!routeSelectedPostId) return;
     if (feedPosts.some((post) => post.id === routeSelectedPostId)) return;
     if (!hasNextFeedPage || isFetchingNextFeedPage) return;
+    if (isFetchNextFeedPageError) return;
     void fetchNextFeedPage();
   }, [
     isDesktopLayout,
@@ -310,6 +325,7 @@ export function DiscoverFeedPage() {
     feedPosts,
     hasNextFeedPage,
     isFetchingNextFeedPage,
+    isFetchNextFeedPageError,
     fetchNextFeedPage,
   ]);
 
@@ -603,12 +619,16 @@ export function DiscoverFeedPage() {
         commentId: string;
         postId: string;
       } | null;
+      // 由调用方显式给出 text — 桌面 row 内 useCallback 把 commentDraft 通过
+      // prop 直传上来，避免 page 层闭包 commentDrafts state 让所有 row 的
+      // onSubmit 引用每个键码变换。移动端仍走 commentDrafts[postId] 兜底。
+      text?: string;
     },
   ) {
     commentMutation.mutate({
       postId,
       replyTarget: options?.replyTarget ?? null,
-      text: commentDrafts[postId] ?? "",
+      text: options?.text ?? commentDrafts[postId] ?? "",
     });
   }
 
@@ -1069,6 +1089,12 @@ const pendingLikePostId = likeMutation.isPending
     if (!hasNextFeedPage || isFetchingNextFeedPage) {
       return;
     }
+    // Round 19：fetchNextPage 失败时这条 effect 仍会在每次 visiblePosts /
+    // isFetchingNextFeedPage flip 时再触发——继续打后端、永远找不到目标。
+    // 命中错误就让位给底部的「点击重试」按钮，由用户决定要不要再跳。
+    if (isFetchNextFeedPageError) {
+      return;
+    }
     void fetchNextFeedPage();
   }, [
     isDesktopLayout,
@@ -1076,6 +1102,7 @@ const pendingLikePostId = likeMutation.isPending
     visiblePosts,
     hasNextFeedPage,
     isFetchingNextFeedPage,
+    isFetchNextFeedPageError,
     fetchNextFeedPage,
   ]);
 
@@ -1149,6 +1176,110 @@ const pendingLikePostId = likeMutation.isPending
       );
     }
   }
+
+  // 桌面 row 用 React.memo 来跳过非自己条目的 re-render，前提是 page 传下去的
+  // 回调引用要稳。这些 callback 历史上都是内联 `(...args) => setX(...)`，每次
+  // 渲染都换 identity → workspace → list → row 一路穿透 memo，敲一下评论框 80
+  // 条 row 全跑一遍 stripToolCallSyntax / Map 构建 / MomentMediaGallery 协调。
+  // 在这里收敛成 useCallback：只有真依赖（commentMutation.mutate /
+  // desktopReplyTarget / likeMutation.mutate）变了才换 identity。setState 类
+  // setter 本身是 stable 的，依赖列表里都不用写。
+  const commentMutationMutate = commentMutation.mutate;
+  const likeMutationMutate = likeMutation.mutate;
+  const createMutationMutate = createMutation.mutate;
+  const handleRowCommentChange = useCallback(
+    (postId: string, value: string) => {
+      setCommentDrafts((current) => ({ ...current, [postId]: value }));
+    },
+    [],
+  );
+  const handleRowCommentSubmit = useCallback(
+    (postId: string, text: string) => {
+      // text 由 row 顺手传上来 — 不再读 commentDrafts，page callback 跨键码稳定。
+      commentMutationMutate({
+        postId,
+        replyTarget:
+          desktopReplyTarget?.postId === postId ? desktopReplyTarget : null,
+        text,
+      });
+    },
+    [commentMutationMutate, desktopReplyTarget],
+  );
+  const handleRowLike = useCallback(
+    (postId: string) => {
+      likeMutationMutate(postId);
+    },
+    [likeMutationMutate],
+  );
+  const handleRowToggleFavorite = useCallback(
+    (postId: string) => {
+      toggleFavoriteByPostId(postId);
+    },
+    // toggleFavoriteByPostId 闭包了 visiblePosts/favoriteSourceIdSet — 这两个
+    // 只在真数据变（fetch / 收藏切换）时换，键盘敲字不会重生成。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [visiblePosts, favoriteSourceIdSet],
+  );
+  const handleRowStartCommentReply = useCallback((comment: FeedComment) => {
+    setDesktopReplyTarget({
+      authorId: comment.authorId,
+      authorName: comment.authorName,
+      commentId: comment.id,
+      postId: comment.postId,
+    });
+  }, []);
+  const handleRowCancelCommentReply = useCallback(() => {
+    setDesktopReplyTarget(null);
+  }, []);
+  const handleRowSelectCommentAuthor = useCallback(
+    (event: ReactMouseEvent<HTMLButtonElement>, comment: FeedComment) => {
+      if (comment.authorType === "character") {
+        setDesktopAvatarPopover({
+          anchorElement: event.currentTarget,
+          kind: "character",
+          characterId: comment.authorId,
+          fallbackAvatar: comment.authorAvatar,
+          fallbackName: comment.authorName,
+        });
+      } else if (comment.authorType === "user") {
+        setDesktopAvatarPopover({
+          anchorElement: event.currentTarget,
+          kind: "owner",
+        });
+      }
+    },
+    [],
+  );
+  const handleRowSelectPostAuthor = useCallback(
+    ({
+      anchorElement,
+      post,
+    }: {
+      anchorElement: HTMLButtonElement;
+      post: typeof visiblePosts[number];
+    }) => {
+      // 跟 desktop-moments-feed 对齐：post 作者头像/名字也得能点；之前
+      // 只评论里的作者可点，post 头部却只有 div，找居民资料只能去通讯录。
+      if (post.authorType === "character") {
+        setDesktopAvatarPopover({
+          anchorElement,
+          kind: "character",
+          characterId: post.authorId,
+          fallbackAvatar: post.authorAvatar,
+          fallbackName: post.authorName,
+        });
+      } else if (post.authorType === "user") {
+        setDesktopAvatarPopover({
+          anchorElement,
+          kind: "owner",
+        });
+      }
+    },
+    [],
+  );
+  const handleRowShare = useCallback((postId: string) => {
+    setShareCardPostId(postId);
+  }, []);
 
   if (isDesktopLayout) {
     const errors: string[] = [];
@@ -1233,72 +1364,17 @@ const pendingLikePostId = likeMutation.isPending
             setShowCompose(next);
           }}
           commentReplyTarget={desktopReplyTarget}
-          onCancelCommentReply={() => setDesktopReplyTarget(null)}
-          onCommentChange={(postId, value) =>
-            setCommentDrafts((current) => ({
-              ...current,
-              [postId]: value,
-            }))
-          }
-          onCommentSubmit={(postId) =>
-            // desktopReplyTarget 是 page 级单值，绑在用户最后一次点击「回复某条
-            // 评论」的那条 post 上。如果用户随后切到另一条 post 的评论框直接
-            // 输入提交，replyTarget 是 stale 的，会让这条文本被错发为对前一条
-            // post 评论的回复。提交时按 postId 比对，跨 post 一律按普通评论走。
-            submitComment(postId, {
-              replyTarget:
-                desktopReplyTarget?.postId === postId
-                  ? desktopReplyTarget
-                  : null,
-            })
-          }
-          onStartCommentReply={(comment: FeedComment) =>
-            setDesktopReplyTarget({
-              authorId: comment.authorId,
-              authorName: comment.authorName,
-              commentId: comment.id,
-              postId: comment.postId,
-            })
-          }
-          onSelectCommentAuthor={(event, comment) => {
-            if (comment.authorType === "character") {
-              setDesktopAvatarPopover({
-                anchorElement: event.currentTarget,
-                kind: "character",
-                characterId: comment.authorId,
-                fallbackAvatar: comment.authorAvatar,
-                fallbackName: comment.authorName,
-              });
-            } else if (comment.authorType === "user") {
-              setDesktopAvatarPopover({
-                anchorElement: event.currentTarget,
-                kind: "owner",
-              });
-            }
-          }}
-          onSelectPostAuthor={({ anchorElement, post }) => {
-            // 跟 desktop-moments-feed 对齐：post 作者头像/名字也得能点；之前
-            // 只评论里的作者可点，post 头部却只有 div，找居民资料只能去通讯录。
-            if (post.authorType === "character") {
-              setDesktopAvatarPopover({
-                anchorElement,
-                kind: "character",
-                characterId: post.authorId,
-                fallbackAvatar: post.authorAvatar,
-                fallbackName: post.authorName,
-              });
-            } else if (post.authorType === "user") {
-              setDesktopAvatarPopover({
-                anchorElement,
-                kind: "owner",
-              });
-            }
-          }}
-          onCreate={() => createMutation.mutate()}
+          onCancelCommentReply={handleRowCancelCommentReply}
+          onCommentChange={handleRowCommentChange}
+          onCommentSubmit={handleRowCommentSubmit}
+          onStartCommentReply={handleRowStartCommentReply}
+          onSelectCommentAuthor={handleRowSelectCommentAuthor}
+          onSelectPostAuthor={handleRowSelectPostAuthor}
+          onCreate={() => createMutationMutate()}
           onImageFilesSelected={(files) => {
             void handleImageFilesSelected(files);
           }}
-          onLike={(postId) => likeMutation.mutate(postId)}
+          onLike={handleRowLike}
           onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
           onRemoveVideo={() => composeDraft.clearVideoDraft()}
           onRefresh={() => {
@@ -1309,8 +1385,8 @@ const pendingLikePostId = likeMutation.isPending
             }
           }}
           onTextChange={composeDraft.setText}
-          onToggleFavorite={(postId) => toggleFavoriteByPostId(postId)}
-          onShare={(postId) => setShareCardPostId(postId)}
+          onToggleFavorite={handleRowToggleFavorite}
+          onShare={handleRowShare}
           onVideoFileSelected={(file) => {
             void handleVideoFileSelected(file);
           }}

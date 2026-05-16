@@ -1,4 +1,10 @@
-import { useMemo, useRef, type MouseEvent as ReactMouseEvent } from "react";
+import {
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import { msg } from "@lingui/macro";
 import {
   type FeedComment,
@@ -38,26 +44,35 @@ type DesktopFeedRowProps = {
   likeLoading: boolean;
   post: FeedPostListItem;
   onCancelCommentReply?: () => void;
-  onCommentChange: (value: string) => void;
-  onCommentSubmit: () => void;
-  onLoadFullComments?: () => void;
-  onLike: () => void;
+  // 这些 callback 全部按 (postId, ...) 维度传 — Row 内部用 useCallback 绑定到
+  // 当前 post.id 再下传给子节点。之前 list 层做 `() => onLike(post.id)` 的内联
+  // 闭包，每次 list re-render 都换 identity → 即便 Row 被 memo 也照样穿透重渲，
+  // 用户在任一评论框敲一下键，80 条 Row 全跑一遍渲染 + MomentMediaGallery 跟着
+  // 重新协调。改成 stable 入参 + Row 内绑定，memo 才有意义。
+  onCommentChange: (postId: string, value: string) => void;
+  // 接 text 入参 — row 把 commentDraft 顺手传上去；这样 page 层 onCommentSubmit
+  // 不用闭包到 commentDrafts state，键盘每敲一下也不会让它的 identity 变。
+  onCommentSubmit: (postId: string, text: string) => void;
+  onLoadFullComments?: (postId: string) => void;
+  onLike: (postId: string) => void;
   /** 可选 — 触发"分享图卡"。 */
-  onShare?: () => void;
+  onShare?: (postId: string) => void;
   onStartCommentReply?: (comment: FeedComment) => void;
   /** 点击评论里的作者/回复对象名 → 打开对应用户的资料/头像卡。 */
   onSelectCommentAuthor?: (
     event: ReactMouseEvent<HTMLButtonElement>,
     comment: FeedComment,
   ) => void;
-  /** 点击 post 作者头像/名字 → 打开对应居民/世界主人卡片。 */
-  onSelectAuthor?: (
-    event: ReactMouseEvent<HTMLButtonElement>,
-  ) => void;
-  onToggleFavorite: () => void;
+  /** 点击 post 作者头像/名字 → 打开对应居民/世界主人卡片。
+   *  入参 post 让 Row 不用把 post 提进闭包再上抛，list 层不再做 wrapping。 */
+  onSelectPostAuthor?: (input: {
+    anchorElement: HTMLButtonElement;
+    post: FeedPostListItem;
+  }) => void;
+  onToggleFavorite: (postId: string) => void;
 };
 
-export function DesktopFeedRow({
+function DesktopFeedRowInner({
   commentDraft,
   commentLoading,
   commentReplyTarget = null,
@@ -75,11 +90,51 @@ export function DesktopFeedRow({
   onShare,
   onStartCommentReply,
   onSelectCommentAuthor,
-  onSelectAuthor,
+  onSelectPostAuthor,
   onToggleFavorite,
 }: DesktopFeedRowProps) {
   const t = useRuntimeTranslator();
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
+  // 把 (postId, ...) 形 callback 绑死到当前 post.id 一次，下面 JSX 直接用 stable
+  // 引用。deps 列入回调本身保证它们换了能跟着重生成；post.id 几乎永不变（被
+  // optimistic update 替整条 post 时 id 仍稳）。
+  const postId = post.id;
+  const handleCommentChange = useCallback(
+    (value: string) => onCommentChange(postId, value),
+    [onCommentChange, postId],
+  );
+  const handleCommentSubmit = useCallback(
+    () => onCommentSubmit(postId, commentDraft),
+    [onCommentSubmit, postId, commentDraft],
+  );
+  const handleLike = useCallback(
+    () => onLike(postId),
+    [onLike, postId],
+  );
+  const handleToggleFavorite = useCallback(
+    () => onToggleFavorite(postId),
+    [onToggleFavorite, postId],
+  );
+  const handleLoadFullComments = useMemo(
+    () =>
+      onLoadFullComments ? () => onLoadFullComments(postId) : undefined,
+    [onLoadFullComments, postId],
+  );
+  const handleShare = useMemo(
+    () => (onShare ? () => onShare(postId) : undefined),
+    [onShare, postId],
+  );
+  const handleSelectAuthor = useMemo(
+    () =>
+      onSelectPostAuthor
+        ? (event: ReactMouseEvent<HTMLButtonElement>) =>
+            onSelectPostAuthor({
+              anchorElement: event.currentTarget,
+              post,
+            })
+        : undefined,
+    [onSelectPostAuthor, post],
+  );
   const displayText = stripToolCallSyntax(post.text);
   const hasText = Boolean(displayText);
   const hasMedia = post.media.length > 0;
@@ -179,10 +234,10 @@ export function DesktopFeedRow({
       className="rounded-[16px] border border-[color:var(--border-faint)] bg-white px-4 py-4 shadow-[var(--shadow-section)]"
     >
       <div className="flex items-start gap-3">
-        {onSelectAuthor ? (
+        {handleSelectAuthor ? (
           <button
             type="button"
-            onClick={(event) => onSelectAuthor(event)}
+            onClick={handleSelectAuthor}
             className="shrink-0 rounded-[18px] transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(7,193,96,0.34)] focus-visible:ring-offset-1"
             aria-label={t(msg`查看 ${post.authorName} 的资料`)}
           >
@@ -205,10 +260,10 @@ export function DesktopFeedRow({
         <div className="min-w-0 flex-1">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              {onSelectAuthor ? (
+              {handleSelectAuthor ? (
                 <button
                   type="button"
-                  onClick={(event) => onSelectAuthor(event)}
+                  onClick={handleSelectAuthor}
                   className="truncate text-left text-[15px] font-semibold text-[color:var(--text-primary)] hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(7,193,96,0.34)] focus-visible:ring-offset-1"
                 >
                   {post.authorName}
@@ -267,7 +322,7 @@ export function DesktopFeedRow({
               <button
                 type="button"
                 disabled={likeLoading}
-                onClick={onLike}
+                onClick={handleLike}
                 title={liked ? t(msg`再点一次取消赞`) : undefined}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-[12px] transition-[background-color,color,border-color] disabled:opacity-55",
@@ -294,7 +349,7 @@ export function DesktopFeedRow({
               </button>
               <button
                 type="button"
-                onClick={onToggleFavorite}
+                onClick={handleToggleFavorite}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-[12px] transition-[background-color,color,border-color]",
                   favorite
@@ -305,10 +360,10 @@ export function DesktopFeedRow({
                 <Star size={14} className={favorite ? "fill-current" : ""} />
                 {favorite ? t(msg`已收藏`) : t(msg`收藏`)}
               </button>
-              {onShare ? (
+              {handleShare ? (
                 <button
                   type="button"
-                  onClick={onShare}
+                  onClick={handleShare}
                   aria-label={t(msg`生成分享图卡`)}
                   className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
                 >
@@ -427,15 +482,21 @@ export function DesktopFeedRow({
               </div>
             ) : null}
 
-            {showLoadMore && onLoadFullComments ? (
+            {showLoadMore && handleLoadFullComments ? (
               <button
                 type="button"
-                onClick={onLoadFullComments}
+                onClick={handleLoadFullComments}
                 className="mt-3 text-[12px] font-medium text-[color:var(--brand-primary)]"
               >
                 {detailLoading
                   ? t(msg`正在读取...`)
-                  : t(msg`查看全部 ${post.commentCount} 条评论`)}
+                  : detailErrorMessage
+                    ? // detailQuery 失败时 workspace 已渲染 ErrorBlock，但 button 文案
+                      // 仍是"查看全部 N 条评论"，看不出再点是"重试"。改个明示语；
+                      // workspace 内 onLoadFullComments 撞到同一 postId 时会走
+                      // detailQuery.refetch() 做真重试。
+                      t(msg`重试读取全部评论`)
+                    : t(msg`查看全部 ${post.commentCount} 条评论`)}
               </button>
             ) : null}
 
@@ -467,8 +528,8 @@ export function DesktopFeedRow({
             <div className="mt-3 border-t border-[color:var(--border-faint)] pt-3">
               <MomentCommentComposer
                 value={commentDraft}
-                onChange={onCommentChange}
-                onSubmit={onCommentSubmit}
+                onChange={handleCommentChange}
+                onSubmit={handleCommentSubmit}
                 pending={commentLoading}
                 inputRef={composerInputRef}
                 placeholder={
@@ -541,3 +602,9 @@ function CommentLine({
     </span>
   );
 }
+
+// 用 React.memo 兜底：父级 list 现在传 stable 回调（按 postId 维度），row 内部
+// 用 useCallback 绑定 post.id，于是 props 几乎只在那条 post 自己的 state（commentDraft、
+// likeLoading、commentReplyTarget 等）真变时才 fail shallow compare。用户在任一
+// 评论框敲键只有那条 row 重渲，不再 80 条全跟着抖。
+export const DesktopFeedRow = memo(DesktopFeedRowInner);
