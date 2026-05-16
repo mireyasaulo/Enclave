@@ -3315,6 +3315,11 @@ function MobileChannelCommentsSheet({
                   ? t(msg`回复 ${replyTarget.authorName}...`)
                   : t(msg`说点什么...`)
               }
+              // 走查 R11：服务端 assertCommentText 上限 500 字（UTF-16 length），
+              // 之前 textarea 没卡，用户写 600 字提交才看到「评论最多 500 字。」
+              // 红条，已经粘贴/打字写好的内容要手动删一段。maxLength 让浏览器
+              // 在输入阶段就硬截断，移动端原生输入法也会跟着不再让用户多敲。
+              maxLength={500}
               className="min-h-[72px] flex-1 rounded-[16px] border-[color:var(--border-subtle)] bg-[#f7f7f7] px-3 py-2 text-[13px] shadow-none focus:border-[rgba(7,193,96,0.2)] focus:bg-white"
             />
             <Button

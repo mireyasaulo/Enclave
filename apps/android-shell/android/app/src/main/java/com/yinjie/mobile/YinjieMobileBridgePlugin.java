@@ -63,6 +63,10 @@ public class YinjieMobileBridgePlugin extends Plugin {
     private static final String EXTRA_TARGET_SOURCE = "yinjie_target_source";
     private static final String CHANNEL_ID = YinjieNotificationChannels.MESSAGES_CHANNEL_ID;
     private Uri pendingCameraCaptureUri;
+    // Round 34：cancel 分支里要删的是 cacheDir 里那个实际文件，captureUri 是
+    // FileProvider 包出来的 content:// URI（getPath() 不是真实路径），按 scheme
+    // 判 "file" 永远进不到清理；把真实 File 引用拽出来，cancel 时直接 delete。
+    private File pendingCameraCaptureFile;
 
     @PluginMethod
     public void openExternalUrl(PluginCall call) {
@@ -394,7 +398,9 @@ public class YinjieMobileBridgePlugin extends Plugin {
         response.put("asset", JSObject.NULL);
 
         Uri capturedUri = pendingCameraCaptureUri;
+        File capturedFile = pendingCameraCaptureFile;
         pendingCameraCaptureUri = null;
+        pendingCameraCaptureFile = null;
 
         if (call == null) {
             return;
@@ -405,11 +411,12 @@ public class YinjieMobileBridgePlugin extends Plugin {
             result.getResultCode() != Activity.RESULT_OK ||
             capturedUri == null
         ) {
-            if (capturedUri != null && "file".equalsIgnoreCase(capturedUri.getScheme())) {
-                File cleanupFile = new File(capturedUri.getPath());
-                if (cleanupFile.exists()) {
-                    cleanupFile.delete();
-                }
+            // Round 34：旧实现按 capturedUri.getScheme()=="file" 删，但
+            // FileProvider URI 永远是 content://，这条 cleanup 进不到，每次
+            // 用户取消相机就会在 cacheDir 里留一个 yinjie-camera-xxxx.jpg
+            // 0-byte / 空白文件。这里直接拿 pendingCameraCaptureFile 删。
+            if (capturedFile != null && capturedFile.exists()) {
+                capturedFile.delete();
             }
             call.resolve(response);
             return;
@@ -563,15 +570,22 @@ public class YinjieMobileBridgePlugin extends Plugin {
             return;
         }
 
+        File captureFile;
         Uri captureUri;
         try {
-            captureUri = createTemporaryImageUri();
+            captureFile = createTemporaryImageFile();
+            captureUri = FileProvider.getUriForFile(
+                getContext(),
+                getContext().getPackageName() + ".fileprovider",
+                captureFile
+            );
         } catch (IOException exception) {
             call.reject("failed to prepare camera capture", exception);
             return;
         }
 
         pendingCameraCaptureUri = captureUri;
+        pendingCameraCaptureFile = captureFile;
         intent.putExtra(MediaStore.EXTRA_OUTPUT, captureUri);
         // Round 33：FLAG_GRANT_READ/WRITE_URI_PERMISSION 按 Android 文档只对
         // intent.getData() 那条 URI 生效，**不会**自动传递给 extras 里的
@@ -594,17 +608,11 @@ public class YinjieMobileBridgePlugin extends Plugin {
         startActivityForResult(call, intent, "captureImageResult");
     }
 
-    private Uri createTemporaryImageUri() throws IOException {
-        File imageFile = File.createTempFile(
+    private File createTemporaryImageFile() throws IOException {
+        return File.createTempFile(
             "yinjie-camera-",
             ".jpg",
             getContext().getCacheDir()
-        );
-
-        return FileProvider.getUriForFile(
-            getContext(),
-            getContext().getPackageName() + ".fileprovider",
-            imageFile
         );
     }
 
