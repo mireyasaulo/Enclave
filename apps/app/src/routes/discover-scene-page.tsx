@@ -21,7 +21,7 @@ import {
   Trees,
   Utensils,
 } from "lucide-react";
-import { triggerSceneFriendRequest } from "@yinjie/contracts";
+import { isApiRequestError, triggerSceneFriendRequest } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   InlineNotice,
@@ -31,6 +31,7 @@ import {
 type MessageDescriptor = Parameters<ReturnType<typeof useRuntimeTranslator>>[0];
 import { MobileDiscoverToolShell } from "../components/mobile-discover-tool-shell";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { translateAppErrorCode } from "../lib/error-translate";
 import { buildMobileFriendRequestsRouteHash } from "../features/contacts/mobile-friend-requests-route-state";
 import { parseMobileDiscoverToolRouteState } from "../features/discover/mobile-discover-tool-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
@@ -393,9 +394,28 @@ function MobileDiscoverScenePage() {
           tone="danger"
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="min-w-0 flex-1">{sceneMutation.error.message}</span>
+            {/*
+              走查 R5：以前直接显示 error.message，但 AppError 抛出来的
+              SOCIAL_SCENE_COOLDOWN / SOCIAL_SCENE_DAILY_LIMIT 的 legacyMessage
+              是硬编码中文。en-US 用户看到的就是一段中文。统一走 translateAppErrorCode
+              命中已知 code → 本地化文案；命中不到才退到 message。
+            */}
+            <span className="min-w-0 flex-1">
+              {(isApiRequestError(sceneMutation.error)
+                ? translateAppErrorCode(sceneMutation.error)
+                : null) ?? sceneMutation.error.message}
+            </span>
             <div className="flex shrink-0 items-center gap-1.5">
-              {sceneMutation.variables ? (
+              {/*
+                走查 R6：DAILY_LIMIT 是"今天用完"的硬墙，立即重试只会再吃一次
+                429 闪一下错误条目，明天再来才有意义；这一种情况不应出"重试"
+                按钮，避免用户疯点。其它错误（网络/cooldown/服务异常）保留重试。
+              */}
+              {sceneMutation.variables &&
+              !(
+                isApiRequestError(sceneMutation.error) &&
+                sceneMutation.error.errorCode === "SOCIAL_SCENE_DAILY_LIMIT"
+              ) ? (
                 <button
                   type="button"
                   onClick={() => sceneMutation.mutate(sceneMutation.variables)}

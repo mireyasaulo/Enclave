@@ -202,6 +202,12 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`摇一摇生成失败，请稍后重试。`);
     case "SHAKE_AI_GENERATION_FAILED":
       return translateRuntimeMessage(msg`摇一摇生成失败，请稍后重试。`);
+    case "SOCIAL_SCENE_INVALID":
+      return translateRuntimeMessage(msg`请选择一个场景。`);
+    case "SOCIAL_SCENE_COOLDOWN":
+      return translateRuntimeMessage(msg`别走太急，过一会再去下一个地方。`);
+    case "SOCIAL_SCENE_DAILY_LIMIT":
+      return translateRuntimeMessage(msg`今天的场景相遇次数已经用完，明天再试试。`);
     case "AUTH_USERNAME_PASSWORD_REQUIRED":
       return translateRuntimeMessage(msg`用户名与密码不能为空。`);
     case "AUTH_USERNAME_TAKEN":
