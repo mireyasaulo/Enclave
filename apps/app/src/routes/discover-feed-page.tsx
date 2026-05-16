@@ -156,6 +156,15 @@ export function DiscoverFeedPage() {
         characterId: string;
         fallbackAvatar?: string | null;
         fallbackName: string;
+        // 让 popover 走"查看资料"/"朋友圈"时拿 /tabs/feed 当 returnPath，
+        // 否则掉进 popover 默认的 /tabs/chat — 在广场上点头像，看完资料回来
+        // 直接被踹到聊天 tab。
+        navigationContext?: {
+          profileReturnPath?: string;
+          profileReturnHash?: string;
+          momentsReturnPath?: string;
+          momentsReturnHash?: string;
+        };
       }
     | {
         anchorElement: HTMLButtonElement;
@@ -1438,6 +1447,7 @@ const pendingLikePostId = likeMutation.isPending
                 characterId={desktopAvatarPopover.characterId}
                 fallbackAvatar={desktopAvatarPopover.fallbackAvatar}
                 fallbackName={desktopAvatarPopover.fallbackName}
+                navigationContext={desktopAvatarPopover.navigationContext}
                 onClose={() => setDesktopAvatarPopover(null)}
               />
             ) : (
