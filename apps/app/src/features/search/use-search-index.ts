@@ -804,12 +804,18 @@ export function useSearchIndex(
     [indexedResults, normalizedSearchText],
   );
 
+  // 走查 R6：原来非「全部」分类时再调一次 filterSearchResults(indexedResults, ...)
+  // 整轮重跑「关键词匹配 + 排序」，但 allMatchedResults 已经把 indexedResults 按
+  // keyword 过完且全量排序一遍了——同分类内相对顺序由 sortSearchResults 决定，
+  // 跨分类先 categoryDelta 再排其它；按 category 过滤已排序好的 allMatchedResults
+  // 跟重新 filter+sort 一遍得到的次序一致，省下 indexedResults.length 次
+  // matchesSearchKeyword（含每行 4 次 toLowerCase）+ 一次 N·logN sort。
   const filteredResults = useMemo(
     () =>
       activeCategory === "all"
         ? allMatchedResults
-        : filterSearchResults(indexedResults, normalizedSearchText, activeCategory),
-    [activeCategory, allMatchedResults, indexedResults, normalizedSearchText],
+        : allMatchedResults.filter((item) => item.category === activeCategory),
+    [activeCategory, allMatchedResults],
   );
 
   const groupedResults = useMemo(
