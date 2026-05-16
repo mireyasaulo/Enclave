@@ -223,7 +223,10 @@ export function ProfileFeedbackPage() {
               if (notice?.tone === "danger") setNotice(null);
             }}
             placeholder={t(msg`一句话描述问题`)}
-            className="w-full rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[14px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] focus:border-[#15803d]"
+            // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
+            // zoom-in；反馈页又是一句话标题 + 一大段详情两连敲，缩放完用户
+            // 还要双指捏才能回到原大小，几乎肯定会放弃。
+            className="w-full rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] focus:border-[#15803d]"
           />
         </section>
 
@@ -245,7 +248,9 @@ export function ProfileFeedbackPage() {
               msg`说说你看到了什么、期望是什么，越具体越好，比如：在哪个页面、怎么复现、希望的结果`,
             )}
             rows={8}
-            className="w-full resize-none rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[14px] leading-6 text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] focus:border-[#15803d]"
+            // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
+            // zoom-in，详情这种长文本框 zoom 完用户基本看不到提交按钮。
+            className="w-full resize-none rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[16px] leading-6 text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] focus:border-[#15803d]"
           />
         </section>
 

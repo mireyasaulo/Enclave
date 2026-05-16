@@ -350,7 +350,10 @@ function MobileWorldCharactersPage() {
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               placeholder={t(msg`搜索世界角色`)}
-              className="min-w-0 flex-1 bg-transparent text-[12px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
+              // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
+              // zoom-in，用户敲一下"搜索"立刻整页放大、回弹时还要双指捏才能回到
+              // 正常视窗。跟 mobile-add-friend-page 已修过的搜索框对齐。
+              className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
             {searchText ? (
               <button

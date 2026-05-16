@@ -233,7 +233,9 @@ function MobileTagsPage() {
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               placeholder={t(msg`搜索标签或联系人`)}
-              className="min-w-0 flex-1 bg-transparent text-[12px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
+              // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
+              // zoom-in。跟 mobile-add-friend-page 已修过的搜索框对齐。
+              className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
         </div>
