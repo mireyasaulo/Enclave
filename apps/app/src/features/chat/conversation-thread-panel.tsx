@@ -34,7 +34,6 @@ import { DesktopDirectCallPanel } from "./direct-call-panel-shell";
 import { type DesktopChatCallAction } from "../desktop/chat/desktop-chat-route-state";
 import { buildChatBackgroundStyle } from "./backgrounds/chat-background-helpers";
 import { type ChatComposeShortcutAction } from "./chat-compose-shortcut-route";
-import { DigitalHumanEntryNotice } from "./digital-human-entry-notice";
 import { type ChatComposerAttachmentPayload } from "./chat-plus-types";
 import {
   buildDirectCallInviteMessage,
@@ -47,7 +46,6 @@ import { findFirstUnreadMessageId } from "./chat-unread-marker";
 import { useConversationBackground } from "./backgrounds/use-conversation-background";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { useConversationThread } from "./use-conversation-thread";
-import { useDigitalHumanEntryGuard } from "./use-digital-human-entry-guard";
 import { useThreadEntryScrollToBottom } from "./use-thread-entry-scroll-to-bottom";
 import { REMINDER_CHARACTER_ID } from "@yinjie/contracts";
 import {
@@ -185,12 +183,6 @@ export function ConversationThreadPanel({
     ) : null;
   const highlightedWindowRequestRef = useRef<string | null>(null);
   const handledDesktopCallRequestTokenRef = useRef<number | null>(null);
-  // clearEntryNotice / guardVideoEntry 在本文件没用到——上层 panel 只展示
-   // entryNotice、并在切会话时 reset。dead destructure 让 eslint 抱怨。
-  const { entryNotice, resetEntryGuard } = useDigitalHumanEntryGuard({
-    baseUrl,
-    enabled: conversationType === "direct",
-  });
   const {
     ref: scrollAnchorRef,
     isAtBottom,
@@ -416,8 +408,7 @@ export function ConversationThreadPanel({
   useEffect(() => {
     setDesktopCallPanelState(null);
     setMobileShortcutRequest(null);
-    resetEntryGuard();
-  }, [conversationId, resetEntryGuard]);
+  }, [conversationId]);
 
   useEffect(() => {
     if (isDesktop || !routeMobileShortcutAction) {
@@ -574,35 +565,6 @@ export function ConversationThreadPanel({
           </InlineNotice>
         </div>
       ) : null}
-      {entryNotice ? (
-        <div
-          className={
-            isDesktop
-              ? "border-b border-[color:var(--border-faint)] bg-[rgba(249,251,250,0.92)] px-6 py-3"
-              : "border-b border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-2.5 py-1"
-          }
-        >
-          <DigitalHumanEntryNotice
-            tone={entryNotice.tone}
-            message={entryNotice.message}
-            continueLabel={entryNotice.continueLabel}
-            onDismiss={() => {
-              resetEntryGuard();
-            }}
-            voiceLabel={entryNotice.voiceLabel}
-            onContinue={() => {
-              resetEntryGuard();
-              startDirectCall("video");
-            }}
-            onSwitchToVoice={() => {
-              resetEntryGuard();
-              startDirectCall("voice");
-            }}
-            compact={!isDesktop}
-          />
-        </div>
-      ) : null}
-
       <div
         className={`relative flex-1 overflow-hidden ${
           isDesktop ? "bg-[#e9e9e9]" : "bg-[color:var(--bg-canvas)]"
