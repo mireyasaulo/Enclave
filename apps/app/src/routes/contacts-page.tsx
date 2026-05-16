@@ -407,36 +407,49 @@ export function ContactsPage() {
     });
   }, [desktopContactsPath, desktopPathMismatch, hash, isDesktopLayout, navigate]);
 
+  // 新一轮走查：通讯录主页是 tab bar 第二格，用户在 tabs/chat / tabs/contacts /
+  // tabs/discover / tabs/me 之间频繁来回切，每次切回 /tabs/contacts 都把 4-6 条
+  // query 全部 background refetch（staleTime 默认 0 → 进入立即 stale）。在弱网真机
+  // 上 4 条并发请求 ≈ 400-800ms 无谓流量，电池/数据双费。所有 mutation 都
+  // 显式 invalidate 这几条 key，跨会话变更交给 focus refetch 兜底即可，因此用
+  // staleTime: 15-30s 配合 mobile-add-friend-page 同名 query 的窗口，让 tab
+  // 切换在 15s 内复用缓存。
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    staleTime: 15_000,
   });
 
   const charactersQuery = useQuery({
     queryKey: ["app-characters", baseUrl],
     queryFn: () => listCharacters(baseUrl),
+    staleTime: 30_000,
   });
 
   const friendRequestsQuery = useQuery({
     queryKey: ["app-friend-requests", baseUrl],
     queryFn: () => getFriendRequests(baseUrl),
+    staleTime: 15_000,
   });
 
   const contactGroupsQuery = useQuery({
     queryKey: ["app-contact-groups", baseUrl],
     queryFn: () => getGroups(baseUrl),
+    staleTime: 30_000,
   });
 
   const blockedCharactersQuery = useQuery({
     queryKey: ["app-contacts-blocked", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: isDesktopLayout,
+    staleTime: 30_000,
   });
 
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: isDesktopLayout,
+    staleTime: 15_000,
   });
 
   const startChatMutation = useMutation({
