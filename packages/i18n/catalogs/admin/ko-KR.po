@@ -8478,13 +8478,13 @@ msgid "撤销修改"
 msgstr ""
 
 #: apps/admin/src/routes/digital-human-page.tsx:310
-msgid "保存中…"
-msgstr ""
-
-#: apps/admin/src/routes/digital-human-page.tsx:310
 #: apps/admin/src/routes/inference-page.tsx:1028
 msgid "保存"
 msgstr "저장"
+
+#: apps/admin/src/routes/digital-human-page.tsx:310
+msgid "保存中…"
+msgstr ""
 
 #: apps/admin/src/routes/digital-human-page.tsx:325
 msgid "内置舞台（mock_stage）"
@@ -11373,13 +11373,13 @@ msgid "批量动作"
 msgstr "일괄 작업"
 
 #: apps/admin/src/routes/inference-page.tsx:1478
-msgid "目标已选择"
-msgstr "대상 선택됨"
-
-#: apps/admin/src/routes/inference-page.tsx:1478
 #: apps/admin/src/routes/reply-logic-page.tsx:559
 msgid "未选择目标"
 msgstr "대상이 선택되지 않음"
+
+#: apps/admin/src/routes/inference-page.tsx:1478
+msgid "目标已选择"
+msgstr "대상 선택됨"
 
 #: apps/admin/src/routes/inference-page.tsx:1485
 msgid "目标 Provider"

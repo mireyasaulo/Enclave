@@ -366,14 +366,10 @@ export function ProfileSubscriptionPage() {
     planName: string;
   }>({ open: false, hint: "", contact: "", planName: "" }); // i18n-ignore-line
 
-  useEffect(() => {
-    if (accessToken) {
-      return;
-    }
-
+  const handleGoLogin = useCallback(() => {
     clearCloudRuntimeSession();
     void navigate({ to: "/welcome", replace: true });
-  }, [accessToken, navigate]);
+  }, [navigate]);
 
   const profileQuery = useQuery({
     queryKey: ["cloud-profile", accessToken],
@@ -454,13 +450,74 @@ export function ProfileSubscriptionPage() {
       "/tabs/profile",
     );
 
+  // local-world / 还没登过云账号的世界主人会落到这里：原本直接 navigate(/welcome)
+  // 把整个壳替换成登录页，用户看到的是「我明明已经登录世界主人，为什么被踢出来？」。
+  // 改成留在 /profile/subscription 内显示一条提示卡 + 跳转按钮，让用户主动选择是否
+  // 去做云端登录，不破坏当前导航上下文。
   if (!accessToken) {
-    return null;
+    return (
+      <AppPage
+        className="bg-[color:var(--bg-canvas)] px-4 pt-6"
+        style={{
+          paddingBottom: "max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1.5rem))",
+        }}
+      >
+        {!isDesktopLayout ? (
+          <TabPageTopBar
+            title={t(msg`会员中心`)}
+            titleAlign="center"
+            leftActions={
+              <Button
+                onClick={goBack}
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none active:bg-black/[0.05]"
+                aria-label={t(msg`返回`)}
+              >
+                <ArrowLeft size={17} />
+              </Button>
+            }
+          />
+        ) : null}
+        <AppSection className="mx-auto max-w-3xl space-y-3 px-5 py-6">
+          <InlineNotice tone="info">
+            {t(msg`会员中心需要登录隐界云账号。当前只登录了本地世界，无法查看订阅与邀请信息。`)}
+          </InlineNotice>
+          <Button onClick={handleGoLogin} className="w-full">
+            {t(msg`去登录云账号`)}
+          </Button>
+        </AppSection>
+      </AppPage>
+    );
   }
+
+  // 移动端 loading/error 不再裸渲染——之前没有 TopBar，公网隧道下任意一个
+  // query 卡几秒就让用户停在「正在加载会员信息…」无路可走，只能软件层
+  // 退出 app。给个返回按钮，至少能滚回上一级。
+  const mobileTopBar = !isDesktopLayout ? (
+    <TabPageTopBar
+      title={t(msg`会员中心`)}
+      titleAlign="center"
+      leftActions={
+        <Button
+          onClick={goBack}
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none active:bg-black/[0.05]"
+          aria-label={t(msg`返回`)}
+        >
+          <ArrowLeft size={17} />
+        </Button>
+      }
+    />
+  ) : null;
 
   if (loading) {
     return (
-      <AppPage className="px-4 py-6">
+      <AppPage className="bg-[color:var(--bg-canvas)] px-4 pt-6">
+        {/* TabPageTopBar 内部用 -mx-4 -mt-6 把自己撑到屏幕边——AppPage 必须给
+            `px-4 pt-6`，否则 TopBar 把 inset 溢出页面外。和数据态保持一致。 */}
+        {mobileTopBar}
         <AppSection className="mx-auto max-w-3xl">
           <LoadingBlock label={t(msg`正在加载会员信息…`)} />
         </AppSection>
@@ -470,7 +527,8 @@ export function ProfileSubscriptionPage() {
 
   if (error) {
     return (
-      <AppPage className="px-4 py-6">
+      <AppPage className="bg-[color:var(--bg-canvas)] px-4 pt-6">
+        {mobileTopBar}
         <AppSection className="mx-auto max-w-3xl">
           <ErrorBlock message={describeRequestError(error)} />
         </AppSection>

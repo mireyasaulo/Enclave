@@ -307,7 +307,7 @@ msgstr "전송에 실패했습니다. 잠시 후 다시 시도하세요."
 
 #: apps/app/src/components/chat-composer.tsx:2804
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:42
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1143
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1161
 #: apps/app/src/i18n/static-dom-seed.ts:836
 msgid "正在请求麦克风权限..."
 msgstr "마이크 권한 요청 중..."
@@ -399,7 +399,7 @@ msgstr "스티커"
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:306
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:372
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:273
-#: apps/app/src/features/search/desktop-search-launcher.tsx:876
+#: apps/app/src/features/search/desktop-search-launcher.tsx:894
 #: apps/app/src/features/search/desktop-search-workspace.tsx:126
 #: apps/app/src/features/search/mobile-search-workspace.tsx:94
 #: apps/app/src/features/search/mobile-search-workspace.tsx:456
@@ -1482,7 +1482,7 @@ msgstr "삭제 중..."
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:983
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1155
 #: apps/app/src/features/search/mobile-search-workspace.tsx:384
-#: apps/app/src/routes/chat-list-page.tsx:1776
+#: apps/app/src/routes/chat-list-page.tsx:1787
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1149
 msgid "删除"
 msgstr "삭제"
@@ -1508,7 +1508,7 @@ msgstr "전체 선택 해제"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:198
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:212
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:215
-#: apps/app/src/features/search/desktop-search-launcher.tsx:864
+#: apps/app/src/features/search/desktop-search-launcher.tsx:882
 #: apps/app/src/features/search/desktop-search-workspace.tsx:120
 #: apps/app/src/features/search/mobile-search-workspace.tsx:80
 #: apps/app/src/features/search/mobile-search-workspace.tsx:455
@@ -1535,7 +1535,7 @@ msgstr "{0} 프로필 보기"
 #: apps/app/src/components/chat-message-list.tsx:3165
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:618
 #: apps/app/src/features/desktop/chat/desktop-chat-side-panel.tsx:87
-#: apps/app/src/features/search/desktop-search-launcher.tsx:858
+#: apps/app/src/features/search/desktop-search-launcher.tsx:876
 #: apps/app/src/features/search/desktop-search-workspace.tsx:114
 #: apps/app/src/features/search/mobile-search-workspace.tsx:73
 #: apps/app/src/features/search/search-types.ts:79
@@ -1712,8 +1712,8 @@ msgstr "첨부파일 저장"
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:976
 #: apps/app/src/features/shell/desktop-nav-matching.ts:34
 #: apps/app/src/features/shell/desktop-nav-matching.ts:35
-#: apps/app/src/routes/chat-list-page.tsx:879
-#: apps/app/src/routes/chat-list-page.tsx:1389
+#: apps/app/src/routes/chat-list-page.tsx:890
+#: apps/app/src/routes/chat-list-page.tsx:1400
 #: apps/app/src/routes/desktop-mobile-page.tsx:119
 #: apps/app/src/routes/desktop-mobile-page.tsx:165
 #: apps/app/src/routes/favorites-page.tsx:72
@@ -2394,8 +2394,9 @@ msgstr "제목 없는 메모"
 #: apps/app/src/routes/profile-moments-page.tsx:606
 #: apps/app/src/routes/profile-settings-account-security-page.tsx:49
 #: apps/app/src/routes/profile-settings-language-page.tsx:50
-#: apps/app/src/routes/profile-subscription-page.tsx:474
-#: apps/app/src/routes/profile-subscription-page.tsx:540
+#: apps/app/src/routes/profile-subscription-page.tsx:475
+#: apps/app/src/routes/profile-subscription-page.tsx:507
+#: apps/app/src/routes/profile-subscription-page.tsx:573
 #: apps/app/src/routes/subscription-inbox-page.tsx:193
 #: apps/app/src/routes/welcome-page.tsx:1464
 msgid "返回"
@@ -2942,7 +2943,7 @@ msgstr "문서 요약 복사에 실패했습니다. 나중에 다시 시도하�
 #: apps/app/src/components/mobile-document-shell.tsx:131
 #: apps/app/src/i18n/static-dom-seed.ts:620
 #: apps/app/src/i18n/static-dom-seed.ts:885
-#: apps/app/src/routes/profile-subscription-page.tsx:594
+#: apps/app/src/routes/profile-subscription-page.tsx:627
 msgid "返回设置"
 msgstr "설정으로 돌아가기"
 
@@ -3260,7 +3261,7 @@ msgstr "이미지를 갤러리에 저장한 뒤 X / 샤오훙수 / 웨이보에 
 #: apps/app/src/features/favorites/official-account-favorite-records.ts:28
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:246
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:736
-#: apps/app/src/features/search/desktop-search-launcher.tsx:611
+#: apps/app/src/features/search/desktop-search-launcher.tsx:629
 #: apps/app/src/features/search/use-search-index.ts:395
 #: apps/app/src/features/search/use-search-index.ts:411
 #: apps/app/src/i18n/static-dom-seed.ts:415
@@ -3279,7 +3280,7 @@ msgstr "서비스 계정"
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1350
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:420
 #: apps/app/src/features/favorites/official-account-favorite-records.ts:28
-#: apps/app/src/features/search/desktop-search-launcher.tsx:611
+#: apps/app/src/features/search/desktop-search-launcher.tsx:629
 #: apps/app/src/features/search/use-search-index.ts:395
 #: apps/app/src/features/search/use-search-index.ts:411
 #: apps/app/src/i18n/static-dom-seed.ts:412
@@ -3305,7 +3306,7 @@ msgstr "팔로우 중"
 #: apps/app/src/components/official-accounts-entry-card.tsx:26
 #: apps/app/src/features/desktop/chat/desktop-message-entry-types.ts:60
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:657
-#: apps/app/src/features/search/desktop-search-launcher.tsx:870
+#: apps/app/src/features/search/desktop-search-launcher.tsx:888
 #: apps/app/src/features/search/desktop-search-workspace.tsx:132
 #: apps/app/src/features/search/mobile-search-workspace.tsx:87
 #: apps/app/src/features/search/mobile-search-workspace.tsx:458
@@ -3328,7 +3329,7 @@ msgstr "공식 계정"
 #: apps/app/src/components/official-article-card.tsx:68
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1399
 #: apps/app/src/i18n/static-dom-seed.ts:919
-#: apps/app/src/routes/chat-list-page.tsx:1734
+#: apps/app/src/routes/chat-list-page.tsx:1745
 #: apps/app/src/routes/subscription-inbox-page.tsx:406
 msgid "置顶"
 msgstr "고정"
@@ -3440,7 +3441,7 @@ msgstr "방금"
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:119
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:500
 #: apps/app/src/routes/chat-details-page.tsx:1057
-#: apps/app/src/routes/chat-list-page.tsx:1638
+#: apps/app/src/routes/chat-list-page.tsx:1649
 #: apps/app/src/routes/group-chat-details-page.tsx:806
 msgid "消息免打扰"
 msgstr "알림 끄기"
@@ -3801,7 +3802,7 @@ msgstr "구름 종이 여백"
 #: apps/app/src/routes/character-detail-page.tsx:265
 #: apps/app/src/routes/chat-details-page.tsx:297
 #: apps/app/src/routes/group-chat-details-page.tsx:859
-#: apps/app/src/routes/profile-subscription-page.tsx:520
+#: apps/app/src/routes/profile-subscription-page.tsx:553
 msgid "未设置"
 msgstr "설정되지 않음"
 
@@ -4021,7 +4022,7 @@ msgstr "채팅 기록 찾기"
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:473
 #: apps/app/src/features/shell/desktop-nav-matching.ts:98
 #: apps/app/src/features/shell/desktop-shell.tsx:647
-#: apps/app/src/routes/chat-list-page.tsx:978
+#: apps/app/src/routes/chat-list-page.tsx:989
 #: apps/app/src/routes/contacts-page.tsx:2375
 #: apps/app/src/routes/contacts-page.tsx:2449
 #: apps/app/src/routes/create-group-page.tsx:422
@@ -4100,7 +4101,7 @@ msgstr "전체 멤버"
 #: apps/app/src/routes/character-detail-page.tsx:291
 #: apps/app/src/routes/chat-background-page.tsx:334
 #: apps/app/src/routes/chat-details-page.tsx:840
-#: apps/app/src/routes/chat-list-page.tsx:1056
+#: apps/app/src/routes/chat-list-page.tsx:1067
 #: apps/app/src/routes/contacts-page.tsx:2437
 #: apps/app/src/routes/create-group-page.tsx:434
 #: apps/app/src/routes/discover-feed-page.tsx:1443
@@ -4150,8 +4151,8 @@ msgstr "채팅 기록을 일시적으로 사용할 수 없습니다"
 #: apps/app/src/routes/chat-background-page.tsx:391
 #: apps/app/src/routes/chat-background-page.tsx:459
 #: apps/app/src/routes/chat-details-page.tsx:211
-#: apps/app/src/routes/chat-list-page.tsx:1046
-#: apps/app/src/routes/chat-list-page.tsx:1081
+#: apps/app/src/routes/chat-list-page.tsx:1057
+#: apps/app/src/routes/chat-list-page.tsx:1092
 #: apps/app/src/routes/contacts-page.tsx:1617
 #: apps/app/src/routes/contacts-page.tsx:1627
 #: apps/app/src/routes/contacts-page.tsx:1644
@@ -4713,8 +4714,8 @@ msgstr "렌더링 상태: {renderStatusLabel}"
 #: apps/app/src/features/subscription/subscription-panel.tsx:541
 #: apps/app/src/features/subscription/subscription-panel.tsx:639
 #: apps/app/src/i18n/static-dom-seed.ts:121
-#: apps/app/src/routes/profile-subscription-page.tsx:579
-#: apps/app/src/routes/profile-subscription-page.tsx:685
+#: apps/app/src/routes/profile-subscription-page.tsx:612
+#: apps/app/src/routes/profile-subscription-page.tsx:718
 msgid "状态"
 msgstr "상태"
 
@@ -6204,7 +6205,7 @@ msgstr "알림 결과 안내 닫기"
 
 #: apps/app/src/features/chat/mobile-reminder-toast-host.tsx:236
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1605
-#: apps/app/src/routes/chat-list-page.tsx:1092
+#: apps/app/src/routes/chat-list-page.tsx:1103
 msgid "消息提醒"
 msgstr "메시지 알림"
 
@@ -7434,7 +7435,7 @@ msgstr "연락처 정보를 업데이트했습니다."
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:59
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:197
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:377
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1414
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1432
 #: apps/app/src/features/search/use-search-index.ts:348
 #: apps/app/src/routes/character-detail-page.tsx:1499
 #: apps/app/src/routes/chat-details-page.tsx:297
@@ -7453,7 +7454,7 @@ msgstr "닉네임: {0}"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:213
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:60
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:168
-#: apps/app/src/features/search/desktop-search-launcher.tsx:882
+#: apps/app/src/features/search/desktop-search-launcher.tsx:900
 #: apps/app/src/routes/character-detail-page.tsx:267
 #: apps/app/src/routes/contacts-page.tsx:1545
 #: apps/app/src/routes/discover-encounter-page.tsx:93
@@ -7735,7 +7736,7 @@ msgstr "즐겨찾는 친구"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1616
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:113
 #: apps/app/src/routes/chat-details-page.tsx:1063
-#: apps/app/src/routes/chat-list-page.tsx:1663
+#: apps/app/src/routes/chat-list-page.tsx:1674
 #: apps/app/src/routes/group-chat-details-page.tsx:844
 msgid "置顶聊天"
 msgstr "채팅 고정"
@@ -8411,7 +8412,7 @@ msgid "回复 {replyTargetName}"
 msgstr "{replyTargetName}에게 답장"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1819
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1377
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1395
 #: apps/app/src/routes/channels-page.tsx:2273
 #: apps/app/src/routes/channels-page.tsx:2711
 msgid "处理中"
@@ -9465,18 +9466,18 @@ msgid "当前浏览器不支持语音输入"
 msgstr "현재 브라우저는 음성 입력을 지원하지 않습니다"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1543
-#: apps/app/src/routes/chat-list-page.tsx:892
+#: apps/app/src/routes/chat-list-page.tsx:903
 #: apps/app/src/routes/contacts-page.tsx:2288
 msgid "打开快捷菜单"
 msgstr "빠른 메뉴 열기"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1671
-#: apps/app/src/routes/chat-list-page.tsx:1160
+#: apps/app/src/routes/chat-list-page.tsx:1171
 msgid "展开已通知提醒"
 msgstr "알림 완료 항목 펼치기"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1672
-#: apps/app/src/routes/chat-list-page.tsx:1161
+#: apps/app/src/routes/chat-list-page.tsx:1172
 msgid "收起已通知提醒"
 msgstr "알림 완료 항목 접기"
 
@@ -9582,7 +9583,7 @@ msgid "在独立窗口打开"
 msgstr "별도 창에서 열기"
 
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:113
-#: apps/app/src/routes/chat-list-page.tsx:1734
+#: apps/app/src/routes/chat-list-page.tsx:1745
 msgid "取消置顶"
 msgstr "고정 해제"
 
@@ -10917,7 +10918,7 @@ msgstr "친구 요청 불러오는 중..."
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:133
 #: apps/app/src/features/subscription/subscription-panel.tsx:485
 #: apps/app/src/routes/friend-requests-page.tsx:362
-#: apps/app/src/routes/profile-subscription-page.tsx:518
+#: apps/app/src/routes/profile-subscription-page.tsx:551
 msgid "已过期"
 msgstr "만료됨"
 
@@ -12260,7 +12261,7 @@ msgstr "기사"
 
 #: apps/app/src/features/desktop/official-accounts/desktop-official-article-window-route-state.ts:86
 #: apps/app/src/features/favorites/official-account-favorite-records.ts:52
-#: apps/app/src/features/search/desktop-search-launcher.tsx:633
+#: apps/app/src/features/search/desktop-search-launcher.tsx:651
 #: apps/app/src/features/search/use-search-index.ts:438
 #: apps/app/src/routes/desktop-mobile-page.tsx:592
 #: apps/app/src/routes/desktop-official-article-window-page.tsx:337
@@ -12335,7 +12336,7 @@ msgstr "잠시만요, 이 구독 기사를 준비하고 있습니다."
 #: apps/app/src/routes/chat-details-page.tsx:864
 #: apps/app/src/routes/chat-details-page.tsx:877
 #: apps/app/src/routes/chat-details-page.tsx:890
-#: apps/app/src/routes/chat-list-page.tsx:1066
+#: apps/app/src/routes/chat-list-page.tsx:1077
 #: apps/app/src/routes/create-group-page.tsx:444
 #: apps/app/src/routes/discover-feed-page.tsx:1451
 #: apps/app/src/routes/friend-requests-page.tsx:256
@@ -13182,13 +13183,13 @@ msgid "h 成熟"
 msgstr "h 성숙"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ 봉지, 판매가"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ 개"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ 봉지, 판매가"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -14326,17 +14327,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "본진을 지키고 적 탱크 20대를 격파하라."
 
 #: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "2P"
+
+#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "픽셀"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "액션"
-
-#: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "2P"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -16457,7 +16458,7 @@ msgid "打开后先承接一组本地待办，让这个面板不只是一次\"�
 msgstr "열면 로컬 할 일 묶음을 인계하여 이 패널이 단순히 \"한 번 열림\" 기록이 되지 않도록 합니다."
 
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:257
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1378
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1396
 #: apps/app/src/features/search/desktop-search-workspace.tsx:1740
 #: apps/app/src/i18n/static-dom-seed.ts:272
 #: apps/app/src/i18n/static-dom-seed.ts:908
@@ -16466,7 +16467,7 @@ msgstr "완료"
 
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:280
 #: apps/app/src/i18n/static-dom-seed.ts:909
-#: apps/app/src/routes/chat-list-page.tsx:1001
+#: apps/app/src/routes/chat-list-page.tsx:1012
 msgid "撤销"
 msgstr "실행 취소"
 
@@ -17707,94 +17708,94 @@ msgstr "동기화 재시도"
 
 #. placeholder {0}: getConversationThreadLabel(conversation)
 #. placeholder {1}: conversation.participants.length
-#: apps/app/src/features/search/desktop-search-launcher.tsx:428
+#: apps/app/src/features/search/desktop-search-launcher.tsx:446
 msgid "{0} · {1} 位参与者"
 msgstr "{0} · 참여자 {1}명"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:487
+#: apps/app/src/features/search/desktop-search-launcher.tsx:505
 #: apps/app/src/features/search/use-search-index.ts:194
 #: apps/app/src/features/search/use-search-index.ts:290
 msgid "这条消息没有可展示文本。"
 msgstr "이 메시지에는 표시할 수 있는 텍스트가 없습니다."
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:553
+#: apps/app/src/features/search/desktop-search-launcher.tsx:571
 #: apps/app/src/features/search/use-search-index.ts:314
 msgid "群聊记录"
 msgstr "그룹 채팅 기록"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:553
+#: apps/app/src/features/search/desktop-search-launcher.tsx:571
 #: apps/app/src/features/search/use-search-index.ts:315
 msgid "单聊记录"
 msgstr "1:1 채팅 기록"
 
 #. placeholder {0}: formatMessageTimestamp(message.createdAt)
-#: apps/app/src/features/search/desktop-search-launcher.tsx:559
+#: apps/app/src/features/search/desktop-search-launcher.tsx:577
 #: apps/app/src/features/search/use-search-index.ts:293
 msgid "聊天记录 · {0}"
 msgstr "채팅 기록 · {0}"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:618
+#: apps/app/src/features/search/desktop-search-launcher.tsx:636
 msgid "打开公众号主页与最近文章。"
 msgstr "공식 계정 홈과 최근 게시물을 엽니다."
 
 #. placeholder {0}: account.name
-#: apps/app/src/features/search/desktop-search-launcher.tsx:631
+#: apps/app/src/features/search/desktop-search-launcher.tsx:649
 msgid "来自 {0} 的最近文章"
 msgstr "{0}의 최근 게시물"
 
 #. placeholder {0}: account.name
-#: apps/app/src/features/search/desktop-search-launcher.tsx:632
+#: apps/app/src/features/search/desktop-search-launcher.tsx:650
 msgid "公众号文章 · {0}"
 msgstr "공식 계정 게시물 · {0}"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:846
+#: apps/app/src/features/search/desktop-search-launcher.tsx:864
 msgid "打开资料卡后可发起好友申请"
 msgstr "프로필 카드를 열면 친구 신청을 보낼 수 있습니다"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1145
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1163
 msgid "正在听你说，完成后再点一次语音图标。"
 msgstr "듣고 있습니다. 완료되면 음성 아이콘을 한 번 더 누르세요."
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1147
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1165
 msgid "正在整理语音内容..."
 msgstr "음성 콘텐츠 정리 중..."
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1149
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1167
 msgid "识别结果：{speechDisplayText}"
 msgstr "인식 결과: {speechDisplayText}"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1150
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1168
 #: apps/app/src/i18n/static-dom-seed.ts:741
 msgid "语音输入已完成。"
 msgstr "음성 입력이 완료되었습니다."
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1162
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1180
 msgid "搜索输入"
 msgstr "검색 입력"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1170
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1188
 msgid "正在整理结果..."
 msgstr "결과 처리 중…"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1176
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1194
 msgid "搜索建议暂时读取失败，请按 Enter 进入完整搜索。"
 msgstr "검색 제안을 불러오지 못했습니다. Enter를 눌러 전체 검색으로 이동하세요."
 
 #. placeholder {0}: config.entries.length
 #. placeholder {1}: config.title
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1213
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1231
 msgid "查看更多 {0} 条 {1} →"
 msgstr "{1} {0}개 더 보기 →"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1227
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1245
 msgid "没有直接命中的结果，按 Enter 进入完整搜索。"
 msgstr "직접 일치하는 결과가 없습니다. Enter를 눌러 전체 검색으로 이동하세요."
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1238
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1256
 msgid "搜索历史"
 msgstr "검색 기록"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1371
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1389
 #: apps/app/src/features/search/desktop-search-workspace.tsx:1735
 #: apps/app/src/i18n/static-dom-seed.ts:73
 #: apps/app/src/i18n/static-dom-seed.ts:210
@@ -17803,17 +17804,17 @@ msgstr "검색 기록"
 msgid "异常"
 msgstr "오류"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1373
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1391
 #: apps/app/src/features/search/desktop-search-workspace.tsx:1739
 #: apps/app/src/features/search/mobile-search-workspace.tsx:491
 msgid "无结果"
 msgstr "결과 없음"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1375
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1393
 msgid "录音中"
 msgstr "녹음 중"
 
-#: apps/app/src/features/search/desktop-search-launcher.tsx:1422
+#: apps/app/src/features/search/desktop-search-launcher.tsx:1440
 msgid "打开联系人资料"
 msgstr "연락처 프로필 열기"
 
@@ -18626,7 +18627,7 @@ msgstr "복사에 실패했습니다. 직접 선택해 복사해 주세요."
 
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:153
 #: apps/app/src/features/subscription/subscription-panel.tsx:603
-#: apps/app/src/routes/profile-subscription-page.tsx:649
+#: apps/app/src/routes/profile-subscription-page.tsx:682
 msgid "联系开通"
 msgstr "문의하여 활성화"
 
@@ -18754,32 +18755,32 @@ msgid "邀请码生成中，请稍后刷新页面。"
 msgstr "초대 코드를 생성 중입니다. 잠시 후 페이지를 새로 고치세요."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:414
-#: apps/app/src/routes/profile-subscription-page.tsx:415
+#: apps/app/src/routes/profile-subscription-page.tsx:411
 msgid "已提交开通申请，请联系运营完成支付。"
 msgstr "활성화 요청을 제출했습니다. 운영팀에 문의해 결제를 완료하세요."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:429
-#: apps/app/src/routes/profile-subscription-page.tsx:426
+#: apps/app/src/routes/profile-subscription-page.tsx:422
 msgid "提交开通申请失败，请稍后重试。"
 msgstr "활성화 요청 전송에 실패했습니다. 잠시 후 다시 시도하세요."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:460
-#: apps/app/src/routes/profile-subscription-page.tsx:489
+#: apps/app/src/routes/profile-subscription-page.tsx:522
 msgid "正在加载会员信息…"
 msgstr "멤버십 정보를 불러오는 중…"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:483
-#: apps/app/src/routes/profile-subscription-page.tsx:516
+#: apps/app/src/routes/profile-subscription-page.tsx:549
 msgid "生效中"
 msgstr "활성"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:486
-#: apps/app/src/routes/profile-subscription-page.tsx:519
+#: apps/app/src/routes/profile-subscription-page.tsx:552
 msgid "未开通"
 msgstr "미활성"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:512
-#: apps/app/src/routes/profile-subscription-page.tsx:556
+#: apps/app/src/routes/profile-subscription-page.tsx:589
 msgid "订阅"
 msgstr "구독"
 
@@ -18787,92 +18788,93 @@ msgstr "구독"
 #: apps/app/src/routes/profile-page.tsx:197
 #: apps/app/src/routes/profile-settings-page.tsx:73
 #: apps/app/src/routes/profile-settings-page.tsx:679
-#: apps/app/src/routes/profile-subscription-page.tsx:466
-#: apps/app/src/routes/profile-subscription-page.tsx:532
-#: apps/app/src/routes/profile-subscription-page.tsx:559
+#: apps/app/src/routes/profile-subscription-page.tsx:467
+#: apps/app/src/routes/profile-subscription-page.tsx:499
+#: apps/app/src/routes/profile-subscription-page.tsx:565
+#: apps/app/src/routes/profile-subscription-page.tsx:592
 msgid "会员中心"
 msgstr "멤버십 센터"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:531
-#: apps/app/src/routes/profile-subscription-page.tsx:569
+#: apps/app/src/routes/profile-subscription-page.tsx:602
 msgid "账号"
 msgstr "계정"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:532
-#: apps/app/src/routes/profile-subscription-page.tsx:570
+#: apps/app/src/routes/profile-subscription-page.tsx:603
 msgid "邮箱账号"
 msgstr "이메일 계정"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:537
-#: apps/app/src/routes/profile-subscription-page.tsx:575
+#: apps/app/src/routes/profile-subscription-page.tsx:608
 #: apps/app/src/routes/welcome-page.tsx:1073
 msgid "手机号"
 msgstr "전화번호"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:543
-#: apps/app/src/routes/profile-subscription-page.tsx:581
+#: apps/app/src/routes/profile-subscription-page.tsx:614
 msgid "当前套餐"
 msgstr "현재 플랜"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:544
-#: apps/app/src/routes/profile-subscription-page.tsx:582
+#: apps/app/src/routes/profile-subscription-page.tsx:615
 msgid "无"
 msgstr "없음"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:546
-#: apps/app/src/routes/profile-subscription-page.tsx:584
+#: apps/app/src/routes/profile-subscription-page.tsx:617
 msgid "到期时间"
 msgstr "만료 일시"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:563
-#: apps/app/src/routes/profile-subscription-page.tsx:609
+#: apps/app/src/routes/profile-subscription-page.tsx:642
 msgid "可购套餐"
 msgstr "구매 가능한 플랜"
 
 #. placeholder {0}: plan.durationDays
 #: apps/app/src/features/subscription/subscription-panel.tsx:583
-#: apps/app/src/routes/profile-subscription-page.tsx:629
+#: apps/app/src/routes/profile-subscription-page.tsx:662
 msgid "时长 {0} 天"
 msgstr "{0}일"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:602
 #: apps/app/src/routes/profile-feedback-page.tsx:284
-#: apps/app/src/routes/profile-subscription-page.tsx:648
+#: apps/app/src/routes/profile-subscription-page.tsx:681
 msgid "提交中…"
 msgstr "제출 중…"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:611
-#: apps/app/src/routes/profile-subscription-page.tsx:657
+#: apps/app/src/routes/profile-subscription-page.tsx:690
 msgid "云端管理后台暂未开放可购套餐。"
 msgstr "클라우드 관리에서 아직 구매 가능한 플랜이 열려 있지 않습니다."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:622
-#: apps/app/src/routes/profile-subscription-page.tsx:668
+#: apps/app/src/routes/profile-subscription-page.tsx:701
 msgid "最近邀请记录"
 msgstr "최근 초대 기록"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:628
-#: apps/app/src/routes/profile-subscription-page.tsx:674
+#: apps/app/src/routes/profile-subscription-page.tsx:707
 msgid "已发放"
 msgstr "지급 완료"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:629
-#: apps/app/src/routes/profile-subscription-page.tsx:675
+#: apps/app/src/routes/profile-subscription-page.tsx:708
 msgid "已拒绝"
 msgstr "거부됨"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:642
-#: apps/app/src/routes/profile-subscription-page.tsx:688
+#: apps/app/src/routes/profile-subscription-page.tsx:721
 msgid "创建时间"
 msgstr "생성 시간"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:647
-#: apps/app/src/routes/profile-subscription-page.tsx:693
+#: apps/app/src/routes/profile-subscription-page.tsx:726
 msgid "拒绝原因"
 msgstr "거부 사유"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:655
-#: apps/app/src/routes/profile-subscription-page.tsx:701
+#: apps/app/src/routes/profile-subscription-page.tsx:734
 msgid "暂无邀请记录。"
 msgstr "아직 초대 기록이 없습니다."
 
@@ -23414,78 +23416,79 @@ msgstr ""
 msgid "聊天移除失败，请稍后再试。"
 msgstr "채팅을 제거하지 못했습니다. 잠시 후 다시 시도해 주세요."
 
-#: apps/app/src/routes/chat-list-page.tsx:853
+#: apps/app/src/routes/chat-list-page.tsx:700
+#: apps/app/src/routes/chat-list-page.tsx:864
 msgid "已撤销删除。"
 msgstr "삭제를 취소했습니다."
 
-#: apps/app/src/routes/chat-list-page.tsx:892
+#: apps/app/src/routes/chat-list-page.tsx:903
 #: apps/app/src/routes/contacts-page.tsx:2288
 msgid "关闭快捷菜单"
 msgstr "빠른 메뉴 닫기"
 
-#: apps/app/src/routes/chat-list-page.tsx:971
+#: apps/app/src/routes/chat-list-page.tsx:982
 #: apps/app/src/routes/contacts-page.tsx:2372
 msgid "打开搜一搜"
 msgstr "검색 열기"
 
 #. placeholder {0}: pendingHideConversation.title
-#: apps/app/src/routes/chat-list-page.tsx:993
+#: apps/app/src/routes/chat-list-page.tsx:1004
 msgid "{0} 已从列表移除，5 秒内可撤销。"
 msgstr "{0} 항목이 목록에서 제거되었습니다. 5초 안에 취소할 수 있습니다."
 
-#: apps/app/src/routes/chat-list-page.tsx:1029
+#: apps/app/src/routes/chat-list-page.tsx:1040
 msgid "订阅号与服务号入口暂时没有刷新成功。"
 msgstr "구독 계정과 서비스 계정 항목을 새로고침하지 못했습니다."
 
-#: apps/app/src/routes/chat-list-page.tsx:1037
+#: apps/app/src/routes/chat-list-page.tsx:1048
 msgid "查看公众号"
 msgstr "공식 계정 보기"
 
-#: apps/app/src/routes/chat-list-page.tsx:1057
+#: apps/app/src/routes/chat-list-page.tsx:1068
 msgid "正在刷新消息列表"
 msgstr "메시지 목록 새로고침 중"
 
-#: apps/app/src/routes/chat-list-page.tsx:1058
+#: apps/app/src/routes/chat-list-page.tsx:1069
 msgid "稍等一下，正在同步最近会话和消息入口。"
 msgstr "최근 대화와 메시지 항목을 동기화하는 중입니다. 잠시만 기다려 주세요."
 
-#: apps/app/src/routes/chat-list-page.tsx:1067
+#: apps/app/src/routes/chat-list-page.tsx:1078
 msgid "消息页暂时不可用"
 msgstr "메시지 페이지를 잠시 사용할 수 없습니다"
 
-#: apps/app/src/routes/chat-list-page.tsx:1390
+#: apps/app/src/routes/chat-list-page.tsx:1401
 msgid "还没有新消息"
 msgstr "아직 새 메시지가 없습니다"
 
-#: apps/app/src/routes/chat-list-page.tsx:1392
+#: apps/app/src/routes/chat-list-page.tsx:1403
 msgid "等角色、群聊或服务号开始发消息后，这里会显示最近会话。"
 msgstr "캐릭터, 그룹 채팅 또는 서비스 계정에서 메시지를 보내면 최근 대화가 여기에 표시됩니다."
 
-#: apps/app/src/routes/chat-list-page.tsx:1403
+#: apps/app/src/routes/chat-list-page.tsx:1414
 msgid "去通讯录看看"
 msgstr "연락처 보기"
 
-#: apps/app/src/routes/chat-list-page.tsx:1503
+#: apps/app/src/routes/chat-list-page.tsx:1514
 msgid "标已读"
 msgstr "읽음"
 
-#: apps/app/src/routes/chat-list-page.tsx:1503
+#: apps/app/src/routes/chat-list-page.tsx:1514
 msgid "标未读"
 msgstr "안 읽음"
 
-#: apps/app/src/routes/chat-list-page.tsx:1521
+#: apps/app/src/routes/chat-list-page.tsx:1532
 msgid "从这里开始第一句问候"
 msgstr "여기에서 첫 인사를 시작하세요"
 
-#: apps/app/src/routes/chat-list-page.tsx:1645
+#: apps/app/src/routes/chat-list-page.tsx:1656
 msgid "有未读消息"
 msgstr "읽지 않은 메시지 있음"
 
-#: apps/app/src/routes/chat-list-page.tsx:1749
+#: apps/app/src/routes/chat-list-page.tsx:1760
 msgid "取消免打扰"
 msgstr "알림 켜기"
 
-#: apps/app/src/routes/chat-list-page.tsx:1749
+#: apps/app/src/routes/chat-list-page.tsx:1760
 msgid "免打扰"
 msgstr "알림 끄기"
 
@@ -27757,39 +27760,39 @@ msgstr "선택한 이미지 지우기"
 msgid "图片地址"
 msgstr "이미지 URL"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:366
+#: apps/app/src/routes/profile-info-avatar-page.tsx:376
 msgid "粘贴图片 URL 或留空"
 msgstr "이미지 URL을 붙여넣거나 비워두세요"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:373
+#: apps/app/src/routes/profile-info-avatar-page.tsx:383
 msgid "当前头像已存为本地图片。粘贴新 URL 或重新选择都会替换它。"
 msgstr "현재 아바타는 로컬 이미지로 저장되어 있습니다. 새 URL을 붙여넣거나 다시 선택하면 교체됩니다."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:378
+#: apps/app/src/routes/profile-info-avatar-page.tsx:388
 msgid "需要是 http/https 开头的合法图片链接。"
 msgstr "http/https로 시작하는 유효한 이미지 URL이어야 합니다."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:383
+#: apps/app/src/routes/profile-info-avatar-page.tsx:393
 msgid "粘贴的图片超过 2MB 上限，请压缩或换个 URL。"
 msgstr "붙여넣은 이미지가 2 MB 제한을 초과합니다. 압축하거나 다른 URL을 사용하세요."
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:408
+#: apps/app/src/routes/profile-info-avatar-page.tsx:418
 msgid "从相册选择"
 msgstr "앨범에서 선택"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:411
+#: apps/app/src/routes/profile-info-avatar-page.tsx:421
 msgid "图片大小不超过 1MB"
 msgstr "이미지는 1MB 이하여야 합니다"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:431
+#: apps/app/src/routes/profile-info-avatar-page.tsx:441
 msgid "正在恢复…"
 msgstr "복원 중…"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:432
+#: apps/app/src/routes/profile-info-avatar-page.tsx:442
 msgid "恢复默认头像"
 msgstr "기본 아바타로 되돌리기"
 
-#: apps/app/src/routes/profile-info-avatar-page.tsx:435
+#: apps/app/src/routes/profile-info-avatar-page.tsx:445
 msgid "清掉自定义头像，换回系统默认。"
 msgstr "사용자 지정 아바타를 지우고 시스템 기본값으로 되돌립니다."
 
@@ -28118,6 +28121,14 @@ msgstr "현재 세계와 관련된 약관 및 커뮤니티 가이드라인을 �
 #: apps/app/src/routes/profile-settings-page.tsx:738
 msgid "设置分类"
 msgstr "설정 분류"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:484
+msgid "会员中心需要登录隐界云账号。当前只登录了本地世界，无法查看订阅与邀请信息。"
+msgstr ""
+
+#: apps/app/src/routes/profile-subscription-page.tsx:487
+msgid "去登录云账号"
+msgstr ""
 
 #: apps/app/src/routes/search-page.tsx:490
 msgid "正在打开桌面搜索"
