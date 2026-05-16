@@ -36,6 +36,11 @@ export function ProfileInfoPage() {
     if (!toast) return;
     const timer = window.setTimeout(() => setToast(null), 1600);
     return () => window.clearTimeout(timer);
+    // dep 钉在 toast?.key 上不是 toast：showToast 每次都自增 key，新 toast 一定有
+    // 新 key，所以 key 一变就触发 effect；同时跳过「toast 从 null 进入 null 时
+    // 多触发一次 effect 又立刻 early return」的无用 re-run。react-hooks/exhaustive-deps
+    // 看不出这条意图，disable 抑制误报。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toast?.key]);
 
   useEffect(() => {
