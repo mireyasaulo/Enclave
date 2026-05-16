@@ -52,7 +52,20 @@ export class WikiProtectionService {
     const oldLevel = page.protectionLevel;
     const newLevel = input.level;
     const nextReviewPolicy = input.reviewPolicy ?? page.reviewPolicy;
-    const expiresAt = input.expiresAt ? new Date(input.expiresAt) : null;
+    let expiresAt: Date | null = null;
+    if (input.expiresAt) {
+      const parsed = new Date(input.expiresAt);
+      if (Number.isNaN(parsed.getTime())) {
+        // 不挡的话 setProtection 静默把 expiresAt 落成 null（永久保护），
+        // admin 看返回的 protectionExpiresAt: null 才发现自己的日期格式被丢了。
+        // 跟 wiki-block.service 同样的 expiresAt 校验。
+        throw new AppError('WIKI_VALIDATION_FAILED', {
+          params: { detail: 'expiresAt 不是有效时间' },
+          legacyMessage: 'expiresAt 不是有效时间',
+        });
+      }
+      expiresAt = parsed;
+    }
 
     await this.dataSource.transaction(async (manager) => {
       await manager.update(
