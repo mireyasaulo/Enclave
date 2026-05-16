@@ -148,9 +148,13 @@ function DesktopMomentRowInner({
   const displayText = stripToolCallSyntax(moment.text);
   const hasText = Boolean(displayText);
   const canSelectAuthor = Boolean(onSelectAuthor);
-  const canReply = Boolean(onStartCommentReply);
+  // 必须串上 moment.canInteract：父 workspace 无条件传 onStartCommentReply，
+  // 但非好友角色的 moment 评论框是「加为好友后才能评论」placeholder ——
+  // 之前 canReply 还是 true，评论行变成 button、点了能把 reply target 写入
+  // state、UI 弹出"正在回复 X"，但下面没有 composer 可发送，用户卡死。
+  const canReply = Boolean(onStartCommentReply) && moment.canInteract;
   const activeReply =
-    commentReplyTarget && commentReplyTarget.postId === moment.id
+    canReply && commentReplyTarget && commentReplyTarget.postId === moment.id
       ? commentReplyTarget
       : null;
   const activeActionClassName =
@@ -473,7 +477,11 @@ function DesktopMomentRowInner({
               </div>
             ) : (
               <div className="mt-3 text-[12px] text-[color:var(--text-muted)]">
-                {t(msg`还没有评论，你可以成为第一个回应的人。`)}
+                {/* canInteract=false 的角色 moment 底下评论框被换成「加为好友才能评论」， */}
+                {/* 上面挂「成为第一个回应的人」会撞车 —— 用户读着像在被催促互动，结果发不出。 */}
+                {moment.canInteract
+                  ? t(msg`还没有评论，你可以成为第一个回应的人。`)
+                  : t(msg`还没有评论。`)}
               </div>
             )}
 
