@@ -59,7 +59,7 @@ export function DesktopRuntimeGuard() {
     // 窗口尽快被探到恢复；之后退到 10s，再之后 30s。
     refetchInterval: (query) => {
       if (query.state.status !== "error") return 30_000;
-      const failures = query.state.failureCount;
+      const failures = query.state.fetchFailureCount;
       if (failures <= 3) return 3_000;
       if (failures <= 10) return 10_000;
       return 30_000;
