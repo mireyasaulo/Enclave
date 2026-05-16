@@ -8,7 +8,17 @@ type DesktopMomentsToolbarProps = {
   deleteErrorMessage?: string | null;
   errors?: string[];
   likeErrorMessage?: string | null;
-  successNotice?: string;
+  /**
+   * 顶部状态条文案。tone 由 noticeTone 决定 —— 之前 toolbar 永远写死 tone="success"，
+   * mutation 失败（点赞/评论/删除/刷新失败）走同一个 notice 通道时也被渲成绿色"成功"，
+   * 用户看着像操作生效了。mobile MomentsView 一直把 tone+action 透传过来，桌面这边
+   * 漏掉了，跟 chat Round 6 同类 bug。
+   */
+  notice?: string;
+  noticeTone?: "success" | "info" | "danger";
+  /** danger notice 上的重试按钮文案（点赞/删除失败时 moments-page 会塞「重试点赞」/「重试删除」）。 */
+  noticeActionLabel?: string | null;
+  onNoticeAction?: (() => void) | null;
   /** 当前已加载到前端的动态数（visibleMoments.length） */
   loadedCount: number;
   /** 服务端 MomentsPageResponse.total。null = 首页还没拿到 */
@@ -25,7 +35,10 @@ export function DesktopMomentsToolbar({
   deleteErrorMessage,
   errors = [],
   likeErrorMessage,
-  successNotice,
+  notice,
+  noticeTone = "success",
+  noticeActionLabel,
+  onNoticeAction,
   loadedCount,
   totalCount = null,
   isFullyLoaded = true,
@@ -77,13 +90,26 @@ export function DesktopMomentsToolbar({
           )}
         </div>
 
-        {successNotice ? (
+        {notice ? (
           <div className="mt-4">
             <InlineNotice
-              tone="success"
+              tone={noticeTone}
               className="border-[color:var(--border-faint)] bg-white"
             >
-              {successNotice}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="min-w-0 flex-1">{notice}</span>
+                {noticeActionLabel && onNoticeAction ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={onNoticeAction}
+                    className="shrink-0 border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
+                  >
+                    {noticeActionLabel}
+                  </Button>
+                ) : null}
+              </div>
             </InlineNotice>
           </div>
         ) : null}

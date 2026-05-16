@@ -6,7 +6,7 @@ import { ArrowLeft, Camera } from "lucide-react";
 import {
   addMomentComment,
   deleteMoment,
-  getMoments,
+  getOwnMoments,
   toggleMomentLike,
   type Moment,
   type MomentComment,
@@ -118,15 +118,20 @@ export function ProfileMomentsPage() {
   >(null);
   const composeDraft = useMomentComposeDraft();
 
+  // 服务端按 authorType='user' AND authorId=owner.id 过滤；前端不再做 filter，
+  // 也不复用 "app-moments" 这把全量 key——后者会拉 248+ 条 ~960KB 全表去
+  // 找自己那几条。
   const momentsQuery = useQuery({
-    queryKey: ["app-moments", baseUrl],
-    queryFn: () => getMoments(baseUrl),
+    queryKey: ["app-moments-mine", baseUrl],
+    queryFn: () => getOwnMoments(baseUrl),
   });
 
   const ownMoments = useMemo(() => {
     if (!momentsQuery.data || !ownerId) {
       return [];
     }
+    // 服务端已 where 过 authorId=owner.id，这里防御性再过一遍——避免老 cache
+    // 在 ownerId 切换那一帧把别人的 moment 漏给「我的朋友圈」。
     return momentsQuery.data.filter(
       (moment) => moment.authorType === "user" && moment.authorId === ownerId,
     );
@@ -205,6 +210,11 @@ export function ProfileMomentsPage() {
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
       });
+      // 本页 source-of-truth 是 mine 这把 key——别忘了刷新它，否则评论数
+      // 在「我的朋友圈」要等下一次 refetch 才更新。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", baseUrl],
+      });
     },
     onError: (error) => {
       // 评论失败：先把 sheet 关掉（草稿留在 commentDrafts 里，下次打开还在），
@@ -232,14 +242,21 @@ export function ProfileMomentsPage() {
         tone: "success",
         message: t(msg`朋友圈已发布。`),
       });
-      // 立刻 prepend 到 flat cache，本页（按 ownerId 过滤）也能马上看到刚发布的；
-      // 后台 invalidate 再合并服务端最新状态（其它共享 cache 的页面同步）。
+      // 立刻 prepend 到 flat cache + mine cache，本页直接绑 mine，必须把
+      // mine 同步 prepend 否则用户发完看不到（要等 invalidate refetch）。
       queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
         current ? [newMoment, ...current] : current,
+      );
+      queryClient.setQueryData<Moment[]>(
+        ["app-moments-mine", baseUrl],
+        (current) => (current ? [newMoment, ...current] : current),
       );
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", baseUrl],
       });
     },
   });
@@ -247,10 +264,21 @@ export function ProfileMomentsPage() {
   const deleteMutation = useMutation({
     mutationFn: (momentId: string) => deleteMoment(momentId, baseUrl),
     onMutate: async (momentId) => {
-      await queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] });
-      const snapshots = queryClient.getQueriesData<Moment[]>({
+      // 同时 cancel + snapshot 两把 cache：本页绑 mine（删完要立刻消失），
+      // 全量 flat 不影响也得回滚以保持其它页面一致。
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-mine", baseUrl],
+        }),
+      ]);
+      const flatSnapshots = queryClient.getQueriesData<Moment[]>({
         queryKey: ["app-moments", baseUrl],
       });
+      const mineSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-mine", baseUrl],
+      });
+      const snapshots = [...flatSnapshots, ...mineSnapshots];
       snapshots.forEach(([key, data]) => {
         if (!data) {
           return;
@@ -283,6 +311,9 @@ export function ProfileMomentsPage() {
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", baseUrl],
       });
     },
   });
@@ -432,7 +463,8 @@ export function ProfileMomentsPage() {
           ownerId={ownerId ?? null}
           ownerName={displayName}
           showCompose={showCompose}
-          successNotice={notice?.message}
+          notice={notice?.message}
+          noticeTone={notice?.tone}
           text={composeDraft.text}
           videoDraft={composeDraft.videoDraft}
           isMomentFavorite={(momentId) =>

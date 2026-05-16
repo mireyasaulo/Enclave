@@ -547,7 +547,7 @@ export function FriendMomentsPage() {
         scrollToMomentId={routeSelectedMomentId}
         showCompose={showCompose}
         signature={signature}
-        successNotice={notice}
+        notice={notice}
         text={composeDraft.text}
         videoDraft={composeDraft.videoDraft}
         isMomentFavorite={(momentId) =>

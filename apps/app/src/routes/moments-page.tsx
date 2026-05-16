@@ -1058,7 +1058,10 @@ export function MomentsPage() {
           ownerUsername={ownerUsername}
           scrollToMomentId={routeSelectedMomentId}
           showCompose={showCompose}
-          successNotice={notice}
+          notice={notice}
+          noticeTone={noticeTone}
+          noticeActionLabel={noticeActionLabel}
+          onNoticeAction={noticeAction}
           text={composeDraft.text}
           videoDraft={composeDraft.videoDraft}
           isMomentFavorite={(momentId) =>

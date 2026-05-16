@@ -44,7 +44,12 @@ type DesktopMomentsWorkspaceProps = {
   ownerUsername?: string | null;
   scrollToMomentId?: string | null;
   showCompose: boolean;
-  successNotice?: string;
+  /** 状态条文案 + tone + 可选「重试」按钮。之前桌面只接收纯字符串，
+   * mutation 失败走 danger tone 时被 toolbar 写死的 success 颜色冒充成「已生效」。 */
+  notice?: string;
+  noticeTone?: "success" | "info" | "danger";
+  noticeActionLabel?: string | null;
+  onNoticeAction?: (() => void) | null;
   text: string;
   videoDraft: MomentVideoDraft | null;
   isMomentFavorite: (momentId: string) => boolean;
@@ -99,7 +104,10 @@ export function DesktopMomentsWorkspace({
   ownerUsername,
   scrollToMomentId = null,
   showCompose,
-  successNotice,
+  notice,
+  noticeTone = "success",
+  noticeActionLabel = null,
+  onNoticeAction = null,
   text,
   videoDraft,
   isMomentFavorite,
@@ -173,7 +181,10 @@ export function DesktopMomentsWorkspace({
             deleteErrorMessage={deleteErrorMessage}
             errors={errors}
             likeErrorMessage={likeErrorMessage}
-            successNotice={successNotice}
+            notice={notice}
+            noticeTone={noticeTone}
+            noticeActionLabel={noticeActionLabel}
+            onNoticeAction={onNoticeAction}
             loadedCount={moments.length}
             totalCount={totalCount}
             isFullyLoaded={isFullyLoaded}

@@ -45,7 +45,11 @@ type DesktopFriendMomentsWorkspaceProps = {
   scrollToMomentId?: string | null;
   showCompose: boolean;
   signature: string;
-  successNotice?: string;
+  /** 顶部状态条文案 + tone + 可选「重试」按钮。 */
+  notice?: string;
+  noticeTone?: "success" | "info" | "danger";
+  noticeActionLabel?: string | null;
+  onNoticeAction?: (() => void) | null;
   text: string;
   videoDraft: MomentVideoDraft | null;
   isMomentFavorite: (momentId: string) => boolean;
@@ -101,7 +105,10 @@ export function DesktopFriendMomentsWorkspace({
   scrollToMomentId = null,
   showCompose,
   signature,
-  successNotice,
+  notice,
+  noticeTone = "success",
+  noticeActionLabel = null,
+  onNoticeAction = null,
   text,
   videoDraft,
   isMomentFavorite,
@@ -371,13 +378,26 @@ export function DesktopFriendMomentsWorkspace({
             className="min-h-0 flex-1 overflow-auto px-7 py-6"
           >
             <div className="mx-auto w-full max-w-[760px]">
-              {successNotice ? (
+              {notice ? (
                 <div className="mb-4">
                   <InlineNotice
-                    tone="success"
+                    tone={noticeTone}
                     className="border-[color:var(--border-faint)] bg-white"
                   >
-                    {successNotice}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span className="min-w-0 flex-1">{notice}</span>
+                      {noticeActionLabel && onNoticeAction ? (
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={onNoticeAction}
+                          className="shrink-0 border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
+                        >
+                          {noticeActionLabel}
+                        </Button>
+                      ) : null}
+                    </div>
                   </InlineNotice>
                 </div>
               ) : null}
