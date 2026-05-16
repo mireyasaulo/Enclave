@@ -260,6 +260,10 @@ export type ApiCallObservation = {
   durationMs: number;
   ok: boolean;
   errorCode?: string | null;
+  // 请求是否带上了 Authorization header。consumer（analytics bridge）用这个
+  // 标签把"用户还没登录 / cloud session 还没 rehydrate"导致的 401 滤掉，避免
+  // boot 期的预期 401 灌进 cloud-console 的错误率视图。
+  hadAuth?: boolean;
 };
 
 let apiCallObserver: ((observation: ApiCallObservation) => void) | null = null;
@@ -408,6 +412,7 @@ async function request<T>(
       headers.set("Authorization", `Bearer ${token}`);
     }
   }
+  const hadAuth = headers.has("Authorization");
 
   const method = (init?.method ?? "GET").toUpperCase();
   const startedAt =
@@ -428,6 +433,7 @@ async function request<T>(
       durationMs: Math.round(currentTime() - startedAt),
       ok: false,
       errorCode: "network_error",
+      hadAuth,
     });
     throw networkError;
   }
@@ -484,6 +490,7 @@ async function request<T>(
       durationMs: Math.round(currentTime() - startedAt),
       ok: false,
       errorCode: error.errorCode,
+      hadAuth,
     });
 
     throw error;
@@ -496,6 +503,7 @@ async function request<T>(
     durationMs: Math.round(currentTime() - startedAt),
     ok: true,
     errorCode: null,
+    hadAuth,
   });
 
   return (rawBody ? (JSON.parse(rawBody) as T) : undefined) as T;

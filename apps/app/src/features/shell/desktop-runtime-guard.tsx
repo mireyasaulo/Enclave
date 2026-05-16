@@ -53,10 +53,17 @@ export function DesktopRuntimeGuard() {
       !needsRemoteConfiguration,
     // 一次性网络抖动不该立刻判定后端死了，先 retry 一次再说。
     retry: 1,
-    // 成功时 30s 兜底；失败 / 正在恢复时缩到 3s 轮询，让 cloud-api / world api
-    // 重启的 2-5s 窗口能尽快被探到恢复，覆盖层尽快消失。
-    refetchInterval: (query) =>
-      query.state.status === "error" ? 3_000 : 30_000,
+    // 成功时 30s 兜底；失败时分段退避，避免某个 world child 长时间不可用时
+    // 一个会话每分钟灌 20 条 502/503 telemetry（历史最高 1 session × 10min 出
+    // 过 293 条）。前 3 次失败保持 3s 让 cloud-api / world-api 的 2-5s 重启
+    // 窗口尽快被探到恢复；之后退到 10s，再之后 30s。
+    refetchInterval: (query) => {
+      if (query.state.status !== "error") return 30_000;
+      const failures = query.state.failureCount;
+      if (failures <= 3) return 3_000;
+      if (failures <= 10) return 10_000;
+      return 30_000;
+    },
     refetchOnWindowFocus: true,
   });
 
