@@ -182,16 +182,33 @@ async function visitRoute(page, baseUrl, route, locale, clickBudget) {
   }
   await page.waitForLoadState("networkidle", { timeout: routeIdleTimeoutMs }).catch(() => undefined);
   await page.waitForTimeout(routeSettleMs);
-  // Wait up to 8s for the bootstrap screen to disappear (catalog hydrate).
+  // Wait up to 20s for the bootstrap screen to disappear (catalog hydrate).
+  // Catalog is ~106KB gzipped — on a cold cache run plus Vite hot-compile,
+  // hydration plus first paint can occasionally exceed 10s.
+  let stillBootstrapping = false;
   try {
     await page.waitForFunction(
       () => !document.querySelector(".boot-logo"),
       null,
-      { timeout: 8000 },
+      { timeout: 20000 },
     );
   } catch {
-    // If the boot screen never goes away in 8s, the page itself is stuck —
-    // record what we have and move on.
+    stillBootstrapping = await page
+      .evaluate(() => !!document.querySelector(".boot-logo"))
+      .catch(() => false);
+  }
+  // If the page is *still* stuck on bootstrap copy, the audit env failed to
+  // hydrate — don't pollute the leak report with raw zh-CN source strings
+  // from the bootstrap screen (which renders raw msg.message when catalog
+  // is not yet ready, by design).
+  if (stillBootstrapping) {
+    return {
+      url,
+      errors: [...errors, "bootstrap-screen-never-hydrated"],
+      totalNodes: 0,
+      items: [],
+      leaks: [],
+    };
   }
   // Scroll to bottom and back to render off-screen lazy content.
   await page.evaluate(async () => {
@@ -263,26 +280,40 @@ async function visitRoute(page, baseUrl, route, locale, clickBudget) {
     );
     if (clicked === null) break;
     await page.waitForTimeout(350);
-    // If the click navigated away or somehow changed the locale, restore and
-    // abort the click loop to keep this run scoped to the requested route+locale.
-    const stateBroken = await page.evaluate(
-      ({ expectedLocale }) => {
-        const stored = localStorage.getItem("yinjie-i18n-locale:app");
-        return stored !== expectedLocale;
-      },
-      { expectedLocale: locale },
-    );
-    if (stateBroken) {
-      // Restore locale and skip remaining clicks.
-      await page.evaluate(
+    // If the click navigated away or destroyed the execution context (e.g., a
+    // link click), our subsequent page.evaluate calls will throw "Execution
+    // context was destroyed". Treat any such failure as "state broken" and abort.
+    let stateBroken = false;
+    try {
+      stateBroken = await page.evaluate(
         ({ expectedLocale }) => {
-          localStorage.setItem("yinjie-i18n-locale:app", expectedLocale);
+          const stored = localStorage.getItem("yinjie-i18n-locale:app");
+          return stored !== expectedLocale;
         },
         { expectedLocale: locale },
       );
+    } catch {
+      stateBroken = true;
+    }
+    if (stateBroken) {
+      try {
+        await page.evaluate(
+          ({ expectedLocale }) => {
+            localStorage.setItem("yinjie-i18n-locale:app", expectedLocale);
+          },
+          { expectedLocale: locale },
+        );
+      } catch {
+        // page may still be navigating; nothing to restore.
+      }
       break;
     }
-    addItems(await page.evaluate(buildTextScraper()));
+    try {
+      addItems(await page.evaluate(buildTextScraper()));
+    } catch {
+      // Page navigated mid-scrape; stop the click loop for this route.
+      break;
+    }
     // Close any dialog opened (Escape) so the next click can target fresh elements.
     await page.keyboard.press("Escape").catch(() => undefined);
     await page.waitForTimeout(120);
