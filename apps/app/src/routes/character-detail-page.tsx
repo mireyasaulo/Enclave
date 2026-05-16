@@ -425,16 +425,30 @@ export function CharacterDetailPage() {
     </Button>
   );
 
+  // 切角色才清状态；如果只是同一角色的 friendship 重新拉回来，不要把刚弹出的
+  // 成功提示和正在编辑的备注/标签输入框一并冲掉。
   useEffect(() => {
     setNotice(null);
     setMobileSheetAction(null);
     setIsEditingProfile(false);
     resetEntryGuard();
+  }, [characterId, resetEntryGuard]);
+
+  // 走查 Round 1：friendship.tags 是数组，每次 friendsQuery 重新拉就换一份引用，
+  // 之前把 tags 作为 deps 直接放进上面的 effect → 后台刷新时 setNotice(null) 把
+  // updateProfileMutation onSuccess 刚弹的"朋友资料已更新"瞬间吃掉，正在编辑的
+  // 备注/标签输入框也被强行关闭并清空。改成只在非编辑态时把表单同步成服务器值，
+  // 同时把 tags 数组扁平成字符串当 dep，避免引用抖动。
+  const friendshipTagsKey = friendship?.tags?.join("，") ?? "";
+  useEffect(() => {
+    if (isEditingProfile) {
+      return;
+    }
     setProfileForm({
       remarkName: friendship?.remarkName ?? "",
-      tags: friendship?.tags?.join("，") ?? "",
+      tags: friendshipTagsKey,
     });
-  }, [characterId, friendship?.remarkName, friendship?.tags, resetEntryGuard]);
+  }, [characterId, friendship?.remarkName, friendshipTagsKey, isEditingProfile]);
 
   const startChatMutation = useMutation({
     mutationFn: async () => {

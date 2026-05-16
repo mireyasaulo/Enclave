@@ -125,6 +125,15 @@ function MobileGroupChatEditPage({
   // 一次"，之后用户控制 draft。
   const draftInitializedRef = useRef(false);
 
+  // 走查 Round 2：name/nickname 模式切换、或在两个群 edit 页之间切（routeparam
+  // 改但组件不重挂），draftInitializedRef 仍为 true → 下方 seed-effect 直接
+  // return，输入框继续显示上一个上下文的值。与 group-chat-background-page
+  // 已实施的方案对齐，强制重置 ref + draft，等下一轮源数据到达再 seed。
+  useEffect(() => {
+    draftInitializedRef.current = false;
+    setDraft("");
+  }, [baseUrl, groupId, mode]);
+
   useEffect(() => {
     if (draftInitializedRef.current) {
       return;

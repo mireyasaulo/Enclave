@@ -46,6 +46,22 @@ export function MobileDetailsActionSheet({
     return unregister;
   }, [open, onClose]);
 
+  // 走查 Round 1：sheet 打开时按 Esc 没反应——桌面 web / 模拟器 / 自动化都拍不
+  // 掉。这里加一个 keydown 监听，open 才挂，避免每次渲染都注册。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   if (!open) {
     return null;
   }

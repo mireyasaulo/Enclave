@@ -94,9 +94,16 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
     setDraft(groupQuery.data?.announcement ?? "");
   }, [groupQuery.data?.announcement, groupQuery.isLoading]);
 
+  // 走查 Round 2：tanstack-router 在 /group/A/announcement → /group/B/announcement
+  // 这种只换 param 的跳转下不重挂载组件，draftInitializedRef.current 仍为
+  // true，下方 seed-effect 会 early-return，textarea 一直显示上一群 A 的公
+  // 告。和 group-chat-background-page 已经做过的处理对齐，把 ref/draft 都
+  // 重置一遍，等下一次 group/B 数据到达再 seed。
   useEffect(() => {
     setNotice(null);
-  }, [groupId]);
+    draftInitializedRef.current = false;
+    setDraft("");
+  }, [baseUrl, groupId]);
 
   useEffect(() => {
     if (
