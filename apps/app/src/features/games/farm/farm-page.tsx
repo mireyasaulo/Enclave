@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { FARM_CROP_CATALOG, type FarmCropId } from "@yinjie/contracts";
@@ -37,6 +37,26 @@ interface HarvestToast {
 function FarmPageInner() {
   const stateQuery = useFarmState();
   const setServerNowMs = useSetFarmServerNow();
+  // farm 是独立路由，被 /discover/games 或 /tabs/games 拉起。
+  // 若调用方传了 returnPath（如 /discover/games），点 返回 就回到那里；
+  // 否则默认回 /tabs/games（游戏中心）——这样 /discover/games → farm → 返回
+  // 不会再走 /tabs/games 中转，避免 history.back 死循环回到 farm。
+  const navigate = useNavigate();
+  const locationSearch = useRouterState({
+    select: (state) => state.location.searchStr,
+  });
+  const customReturnTarget = useMemo(() => {
+    const search = locationSearch ?? "";
+    const params = new URLSearchParams(
+      search.startsWith("?") ? search.slice(1) : search,
+    );
+    const ret = params.get("returnPath")?.trim();
+    if (!ret || !ret.startsWith("/")) {
+      return null;
+    }
+    const retHash = params.get("returnHash")?.trim();
+    return { path: ret, hash: retHash || undefined };
+  }, [locationSearch]);
   const [selectedPlotIndex, setSelectedPlotIndex] = useState<number | null>(null);
   const [seedShopOpen, setSeedShopOpen] = useState(false);
   const [warehouseOpen, setWarehouseOpen] = useState(false);
@@ -123,13 +143,28 @@ function FarmPageInner() {
         style={{ paddingTop: "max(1rem, calc(env(safe-area-inset-top, 0px) + 0.5rem))" }}
       >
         <header className="flex items-center justify-between">
-          <Link
-            to="/tabs/games"
-            search={{ game: "yinjie-farm" }}
-            className="rounded-full px-2 py-1 text-xs text-stone-500 hover:bg-white/60"
-          >
-            ← {t(msg`返回`)}
-          </Link>
+          {customReturnTarget ? (
+            <button
+              type="button"
+              onClick={() =>
+                navigate({
+                  to: customReturnTarget.path,
+                  hash: customReturnTarget.hash,
+                })
+              }
+              className="rounded-full px-2 py-1 text-xs text-stone-500 hover:bg-white/60"
+            >
+              ← {t(msg`返回`)}
+            </button>
+          ) : (
+            <Link
+              to="/tabs/games"
+              search={{ game: "yinjie-farm" }}
+              className="rounded-full px-2 py-1 text-xs text-stone-500 hover:bg-white/60"
+            >
+              ← {t(msg`返回`)}
+            </Link>
+          )}
           <h1 className="flex-1 text-center text-lg font-semibold text-emerald-900">
             {t(msg`隐界农场`)}
           </h1>
