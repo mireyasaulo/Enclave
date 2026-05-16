@@ -27,10 +27,9 @@ import { clearCloudRuntimeSession } from "../lib/cloud-session";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 import { buildPublicShareUrl } from "../lib/share-url";
-import {
-  isNativeMobileBridgeAvailable,
-  shareWithNativeShell,
-} from "../runtime/mobile-bridge";
+import { isNativeMobileBridgeAvailable } from "../runtime/mobile-bridge";
+import { writeClipboardText } from "../runtime/native-clipboard";
+import { shareTextOrUrl } from "../runtime/native-share";
 import { useCloudSessionStore } from "../store/cloud-session-store";
 
 // 主流货币给个符号前缀（CNY 套餐展示 "CNY 49.9" 比 "¥49.9" 累赘）。
@@ -78,6 +77,9 @@ function formatDateTime(value?: string | null) {
 
 async function copyTextToClipboard(text: string): Promise<boolean> {
   if (!text) return false;
+  if (await writeClipboardText(text)) {
+    return true;
+  }
   if (
     typeof navigator !== "undefined" &&
     navigator.clipboard?.writeText
@@ -191,31 +193,25 @@ function InviteShareCard({ invite }: InviteShareCardProps) {
 
   const handleShare = useCallback(async () => {
     if (!shareUrl) return;
-    const payload = {
+    const result = await shareTextOrUrl({
       title: invite.shareTitle,
       text: invite.shareBody,
       url: shareUrl,
-    };
-    if (isNativeMobileBridgeAvailable()) {
-      const ok = await shareWithNativeShell(payload);
-      if (ok) {
+    });
+
+    if (result.ok) {
+      if (result.via === "clipboard") {
+        setFeedback({ tone: "success", message: t(msg`已复制邀请链接。`) });
+      } else {
         setFeedback({ tone: "success", message: t(msg`已唤起分享面板。`) });
-        return;
       }
+      return;
     }
-    if (
-      typeof navigator !== "undefined" &&
-      typeof navigator.share === "function"
-    ) {
-      try {
-        await navigator.share(payload);
-        return;
-      } catch (error) {
-        if ((error as DOMException)?.name === "AbortError") {
-          return;
-        }
-      }
+
+    if (result.reason === "cancelled") {
+      return;
     }
+
     void handleCopy(shareUrl, t(msg`已复制邀请链接。`));
   }, [shareUrl, invite.shareTitle, invite.shareBody, handleCopy, t]);
 

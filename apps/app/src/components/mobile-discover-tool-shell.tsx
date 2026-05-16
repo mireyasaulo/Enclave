@@ -8,6 +8,7 @@ const t = translateRuntimeMessage;
 import {
   shareWithNativeShell,
 } from "../runtime/mobile-bridge";
+import { writeClipboardText } from "../runtime/native-clipboard";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { buildPublicShareUrl } from "../lib/share-url";
 import { TabPageTopBar } from "./tab-page-top-bar";
@@ -101,7 +102,9 @@ export function MobileDiscoverToolShell({
     }
 
     try {
-      await navigator.clipboard.writeText(shareText);
+      if (!(await writeClipboardText(shareText))) {
+        throw new Error("clipboard copy failed");
+      }
       setShareNotice({
         tone: "success",
         message: nativeMobileShareSupported

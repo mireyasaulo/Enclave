@@ -27,6 +27,7 @@ import {
   TextField,
   cn,
 } from "@yinjie/ui";
+import { writeClipboardText } from "../runtime/native-clipboard";
 
 type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
@@ -226,7 +227,9 @@ export function LiveCompanionPage() {
     }
 
     try {
-      await navigator.clipboard.writeText(link);
+      if (!(await writeClipboardText(link))) {
+        throw new Error("clipboard copy failed");
+      }
       pushMobileHandoffRecord({
         category: "channel",
         description: input.description,

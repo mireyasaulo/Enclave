@@ -89,6 +89,12 @@ type MobileBridgePlugin = {
     target: MobileBridgeLaunchTarget | null;
   }>;
   clearPendingLaunchTarget(): Promise<void>;
+  writeClipboardText(options: { text: string }): Promise<void>;
+  readClipboardText(): Promise<{ text: string | null }>;
+  writeClipboardImage(options: {
+    base64Data: string;
+    mimeType?: string;
+  }): Promise<void>;
 };
 
 const mobileBridge = registerPlugin<MobileBridgePlugin>("YinjieMobileBridge");
@@ -445,6 +451,48 @@ export async function clearPendingNativeLaunchTarget() {
 
   try {
     await mobileBridge.clearPendingLaunchTarget();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function writeNativeClipboardText(text: string) {
+  if (!isNativeMobileBridgeAvailable()) {
+    return false;
+  }
+
+  try {
+    await mobileBridge.writeClipboardText({ text });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function readNativeClipboardText(): Promise<string | null> {
+  if (!isNativeMobileBridgeAvailable()) {
+    return null;
+  }
+
+  try {
+    const result = await mobileBridge.readClipboardText();
+    return result.text ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function writeNativeClipboardImage(
+  base64Data: string,
+  mimeType?: string,
+) {
+  if (!isNativeMobileBridgeAvailable()) {
+    return false;
+  }
+
+  try {
+    await mobileBridge.writeClipboardImage({ base64Data, mimeType });
     return true;
   } catch {
     return false;

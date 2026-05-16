@@ -23,7 +23,10 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         CAPPluginMethod(name: "requestNotificationPermission", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showLocalNotification", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getPendingLaunchTarget", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "clearPendingLaunchTarget", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "clearPendingLaunchTarget", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "writeClipboardText", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "readClipboardText", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "writeClipboardImage", returnType: CAPPluginReturnPromise)
     ]
 
     private var pendingImagePickerCall: CAPPluginCall?
@@ -356,6 +359,41 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
     @objc func clearPendingLaunchTarget(_ call: CAPPluginCall) {
         UserDefaults.standard.removeObject(forKey: "YinjiePendingLaunchTarget")
         call.resolve()
+    }
+
+    @objc func writeClipboardText(_ call: CAPPluginCall) {
+        guard let text = call.getString("text") else {
+            call.reject("text is required")
+            return
+        }
+
+        DispatchQueue.main.async {
+            UIPasteboard.general.string = text
+            call.resolve()
+        }
+    }
+
+    @objc func readClipboardText(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            let value = UIPasteboard.general.string
+            call.resolve([
+                "text": value ?? NSNull()
+            ])
+        }
+    }
+
+    @objc func writeClipboardImage(_ call: CAPPluginCall) {
+        guard let base64Data = normalize(call.getString("base64Data")),
+              let imageData = Data(base64Encoded: base64Data, options: [.ignoreUnknownCharacters]),
+              let image = UIImage(data: imageData) else {
+            call.reject("base64Data is required and must decode to a valid image")
+            return
+        }
+
+        DispatchQueue.main.async {
+            UIPasteboard.general.image = image
+            call.resolve()
+        }
     }
 
     private func mapAuthorizationStatus(_ status: UNAuthorizationStatus) -> String {

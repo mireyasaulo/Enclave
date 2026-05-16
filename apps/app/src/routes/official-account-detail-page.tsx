@@ -42,6 +42,7 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { buildPublicShareUrl } from "../lib/share-url";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
+import { writeClipboardText } from "../runtime/native-clipboard";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -244,7 +245,9 @@ function MobileOfficialAccountDetailPage({ accountId }: { accountId: string }) {
     }
 
     try {
-      await navigator.clipboard.writeText(accountSummary);
+      if (!(await writeClipboardText(accountSummary))) {
+        throw new Error("clipboard copy failed");
+      }
       setActionNotice({
         tone: "success",
         message: nativeMobileShareSupported

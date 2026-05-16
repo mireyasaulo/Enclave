@@ -37,6 +37,7 @@ import { formatConversationTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { buildPublicShareUrl } from "../lib/share-url";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
+import { writeClipboardText } from "../runtime/native-clipboard";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -241,7 +242,9 @@ function MobileOfficialAccountArticlePage({
     }
 
     try {
-      await navigator.clipboard.writeText(articleUrl);
+      if (!(await writeClipboardText(articleUrl))) {
+        throw new Error("clipboard copy failed");
+      }
       setShareNotice({
         message: nativeMobileShareSupported
           ? t(msg`系统分享暂时不可用，已复制文章链接。`)

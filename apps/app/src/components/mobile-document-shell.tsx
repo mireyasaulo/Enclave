@@ -11,6 +11,7 @@ import { buildPublicShareUrl } from "../lib/share-url";
 import {
   shareWithNativeShell,
 } from "../runtime/mobile-bridge";
+import { writeClipboardText } from "../runtime/native-clipboard";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { TabPageTopBar } from "./tab-page-top-bar";
@@ -84,7 +85,9 @@ export function MobileDocumentShell({
     }
 
     try {
-      await navigator.clipboard.writeText(documentSummary);
+      if (!(await writeClipboardText(documentSummary))) {
+        throw new Error("clipboard copy failed");
+      }
       setNotice({
         tone: "success",
         message: nativeMobileShareSupported

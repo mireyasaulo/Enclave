@@ -59,6 +59,7 @@ import { isDesktopOnlyPath } from "../lib/history-back";
 import { revealSavedFile } from "../runtime/reveal-saved-file";
 import { saveGeneratedFile } from "../runtime/save-generated-file";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
+import { writeClipboardText } from "../runtime/native-clipboard";
 import {
   isMobileWebShareSurface,
   isNativeMobileShareSurface,
@@ -802,7 +803,9 @@ export function GroupQrPage() {
     }
 
     try {
-      await navigator.clipboard.writeText(value);
+      if (!(await writeClipboardText(value))) {
+        throw new Error("clipboard copy failed");
+      }
       showNotice(successMessage);
     } catch {
       if (retryOptions) {
@@ -882,7 +885,9 @@ export function GroupQrPage() {
     }
 
     try {
-      await navigator.clipboard.writeText(mobileLink);
+      if (!(await writeClipboardText(mobileLink))) {
+        throw new Error("clipboard copy failed");
+      }
       pushMobileHandoffRecord({
         category: "group_invite",
         label: t(msg`${groupQuery.data?.name ?? fallbackGroupLabel} 邀请`),

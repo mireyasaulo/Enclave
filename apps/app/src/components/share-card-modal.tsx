@@ -8,6 +8,10 @@ import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { PUBLIC_SHARE_ORIGIN } from "../lib/share-url";
+import {
+  isNativeMobileBridgeAvailable,
+  shareFileWithNativeShell,
+} from "../runtime/mobile-bridge";
 
 // qrcode (~70KB) + html-to-image (~30KB) 是分享卡片专用的重依赖。
 // 静态 import 会让它们被 vendor-misc chunk 吃掉，模块预加载链路一并拉，公网
@@ -240,6 +244,21 @@ export function ShareCardModal({
     const fileName = `${filenamePrefix}-${cardKey}.png`;
 
     try {
+      // iOS / Android 原生壳：走 UIActivityViewController / Android 系统分享，
+      // 拿到的 PNG 可以直达微信、相册、邮件等任意目标。
+      if (isNativeMobileBridgeAvailable()) {
+        const blob = await fetch(pngDataUrl).then((r) => r.blob());
+        const result = await shareFileWithNativeShell({
+          blob,
+          fileName,
+          mimeType: "image/png",
+          title: modalTitle,
+        });
+        if (result.shared) {
+          return;
+        }
+      }
+
       if (
         typeof navigator !== "undefined" &&
         "canShare" in navigator &&
