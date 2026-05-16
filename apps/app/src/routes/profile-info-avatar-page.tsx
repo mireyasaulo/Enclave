@@ -42,6 +42,31 @@ type UrlInputError = "format" | "too_large" | "unsafe_scheme" | null;
 // avatar 当 href / 作为 <a> / 第三方 webview 渲染的下游路径都可能命中
 // 脚本执行 / 本地文件读取。即使 <img src> 不会执行 javascript:，写到
 // session storage 再被第三方组件复用就晚了。
+// preview 里 <AvatarChip src={trimmed}> 会跟着每次 keystroke 重新发起图片请求：
+// 用户键入 "https://example.com/foo.png" 期间，从 "https://" 起就开始命中
+// isLikelyImageSource → 每打一个字就一次 <img onError> 网络往返（"https://e"、
+// "https://ex"…到 "https://example.com/foo.png" 才真正能加载）。
+// gate：URL 得「看起来够完整」才进 preview——data:image/ 直接放行；
+// http(s) 必须既能 parse、又得有 pathname 段（不是裸 host 起步）或 query。
+// 这条件不挑剔到「必须含 .png」，因为很多 CDN 图片 URL 无扩展名。
+function looksLikePreviewableImageUrl(value: string): boolean {
+  if (!value) return false;
+  if (/^data:image\//i.test(value)) {
+    return value.length > "data:image/x;,".length;
+  }
+  let parsed: URL | null = null;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    return false;
+  }
+  // pathname 至少有一段（"/" 算空），或者带 query 参数
+  return parsed.pathname.length > 1 || parsed.search.length > 0;
+}
+
 function checkAvatarUrlInput(value: string): UrlInputError {
   if (!value) return null; // 空 = 不打算改，由 canSave 单独 gate
   // 提早判 image data URL：合法 data:image/png;... 走 length gate
@@ -155,9 +180,14 @@ export function ProfileInfoAvatarPage() {
     ? null
     : checkAvatarUrlInput(trimmed);
   const canSave = valueToSave.length > 0 && dirty && urlInputError === null;
+  // 只在 trimmed 看起来是完整图片 URL 时才走 preview，避免每次 keystroke
+  // 都触发一次半截 URL 的 <img> 网络请求。半截 URL 一律退回当前头像 / 默认。
+  const previewableTrimmed = looksLikePreviewableImageUrl(trimmed)
+    ? trimmed
+    : null;
   const previewSrc =
     pickedLocal?.dataUrl ||
-    trimmed ||
+    previewableTrimmed ||
     (hasCustomAvatar ? avatar : defaultOwnerAvatar);
 
   const saveMutation = useMutation({
