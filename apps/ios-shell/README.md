@@ -159,3 +159,50 @@ Push token 约定：
 - 签名证书：手动签名走 keychain import；自动签名要求 Apple ID 已登录 Xcode
 - `ios-release.env.local` 不要 commit；在 CI 上用 secret 写出 `ios-release.env.local` 或导出环境变量后跑 `pnpm ios:ipa:release`
 - 单次 build 输出已 gitignore，不会污染工作区
+
+## GitHub Actions（`.github/workflows/ios-release.yml`）
+
+仓库带了一个 macOS 14 runner 的 workflow，触发方式：
+
+- **手动**：Actions tab → "iOS Release" → Run workflow，可指定 marketingVersion / buildNumber / exportMethod / 是否上传 TestFlight；不填走 `ios-shell.config.json` 的默认值
+- **打 tag**：`git tag app-v1.0.1 && git push origin app-v1.0.1`
+
+成功后产物在 Actions run 的 **Artifacts** 区：`yinjie-ios-ipa-<run_number>.zip`，里面是 `.ipa`，下载后用 Apple Configurator 2 / Xcode Devices / TestFlight 装到真机即可。
+
+### 必需 GitHub Secrets
+
+| Secret 名 | 说明 | 怎么得到 |
+| --- | --- | --- |
+| `IOS_DISTRIBUTION_CERT_BASE64` | iOS Distribution 证书的 .p12 文件 base64 | Keychain Access 选中证书 → Export → 导出 .p12 → `base64 -i cert.p12 \| pbcopy` |
+| `IOS_DISTRIBUTION_CERT_PASSWORD` | 上面 .p12 的密码 | 导出时设的 |
+| `IOS_PROVISIONING_PROFILE_BASE64` | .mobileprovision 文件 base64 | Apple Developer → Profiles → 下载 → `base64 -i profile.mobileprovision \| pbcopy` |
+| `IOS_PROVISIONING_PROFILE_NAME` | profile 的 "Name"（不是 UUID 不是文件名） | 下载页能看到，或 `security cms -D -i profile.mobileprovision \| grep -A1 "<key>Name</key>"` |
+| `IOS_DEVELOPMENT_TEAM` | 10 位 Apple Developer Team ID | Apple Developer → Membership 页 |
+| `IOS_CODE_SIGN_IDENTITY` | 完整签名身份字符串 | 通常是 `Apple Distribution: Your Org Name (TEAMID)` —— 在本机 Keychain 里证书的 Common Name |
+| `IOS_KEYCHAIN_PASSWORD` | CI 临时 keychain 密码（任意字符串即可） | 自定 |
+| `IOS_BUNDLE_IDENTIFIER` | bundle id | `com.yinjie.ios`（或你自己注册的） |
+| `IOS_APS_ENVIRONMENT` | APNs 环境 | `production`（TestFlight / App Store） / `development`（Xcode 直跑真机） |
+
+### 可选 secrets（启用 TestFlight 自动上传）
+
+只在 workflow_dispatch 时把 `uploadTestFlight=true` 才用。
+
+| Secret | 说明 |
+| --- | --- |
+| `IOS_APPSTORE_API_KEY_ID` | App Store Connect API Key ID（10 位） |
+| `IOS_APPSTORE_API_ISSUER_ID` | Issuer ID（UUID） |
+| `IOS_APPSTORE_API_KEY_BASE64` | .p8 文件 base64：`base64 -i AuthKey_XXX.p8 \| pbcopy` |
+
+> 三个一起配齐才有意义；缺一个 step 会 fail。
+
+### Apple 后台必做的事
+
+1. App ID `com.yinjie.ios` 启用 **Push Notifications** capability
+2. 创 **APNs Auth Key (.p8)**（Keys → Apple Push Notifications service），下载备好（只能下载一次）
+3. 创/下载对应 bundle id 的 **iOS Distribution Certificate** + **Provisioning Profile**（profile 类型选 `App Store` 用于 TestFlight，或 `Ad Hoc` 用于内部分发）
+4. 装 IPA 到真机后 → 在 App 内授权通知 → 后端 `push_tokens` 表会自动出现新行（`platform=ios, environment=production`）
+
+### 排查
+
+- workflow 第一步 `Validate required signing secrets` 会列出所有缺的 secret 名，按提示加上即可
+- `Build IPA via ipa:release` 失败时，xcarchive 会被上传成 artifact `yinjie-ios-xcarchive-*`，下载后用 macOS Xcode 打开 → Show in Organizer 可以看完整签名 / 编译日志
