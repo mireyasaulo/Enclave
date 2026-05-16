@@ -119,7 +119,11 @@ function MobileDiscoverEncounterPage() {
       return;
     }
     if (permissionState === "needs-permission") {
+      // heroDescription 明说"首次使用请点下方按钮授权动作传感器，之后晃动手机即可
+      // 触发相遇"——iOS 首次点击应只走 requestPermission()，授权完成后让用户自己
+      // 决定下一步（摇手机 / 再次点击），不要顺手扣掉一次每日额度。
       await requestPermission();
+      return;
     }
     shakeMutation.mutate();
   };
