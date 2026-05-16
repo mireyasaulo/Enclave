@@ -159,6 +159,40 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
     };
   }, [cancelPinToBottom]);
 
+  // 键盘弹起 / 折叠、附件 preview 出现等都会让 scroll container 的 clientHeight
+  // 突然变化（不会触发 scroll 事件，但贴底位置实质性丢失）。如果用户原本在底
+  // 部，clientHeight 缩小后 scrollTop 不变 → 视觉上「滑离了底部」，最新消息掉
+  // 到 composer / 键盘后面看不到了。ResizeObserver 监听容器尺寸变化，仅当
+  // 上一次记录处于贴底状态时再次贴底，不打断用户已经向上翻看历史的滚动位置。
+  useEffect(() => {
+    if (typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const element = ref.current;
+    if (!element) {
+      return;
+    }
+    let previousClientHeight = element.clientHeight;
+    const observer = new ResizeObserver(() => {
+      const current = ref.current;
+      if (!current) {
+        return;
+      }
+      const nextClientHeight = current.clientHeight;
+      const shrank = nextClientHeight < previousClientHeight;
+      previousClientHeight = nextClientHeight;
+      if (!shrank) {
+        return;
+      }
+      if (!isAtBottomRef.current) {
+        return;
+      }
+      current.scrollTop = current.scrollHeight;
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   useLayoutEffect(() => {
     const previousItemCount = previousItemCountRef.current;
     previousItemCountRef.current = itemCount;
