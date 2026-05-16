@@ -945,11 +945,19 @@ export function ContactsPage() {
       characterId: string;
       pinned: boolean;
     }) => {
+      // 原实现只看 selectedConversation（来自 friend pane 选中的好友），
+      // 在 starred-friends / tags / groups sub-pane 里 selectedFriendItem=null →
+      // selectedConversation=null，所有 pin/mute 切换都白白多打一次 getOrCreate
+      // 即便 conversationsQuery.data 里就有那条直通会话。先在 cache 里找；找不到
+      // 才回退到 getOrCreate（新好友、刚加好友但还没生成 direct conversation）。
+      const cachedConversation = (conversationsQuery.data ?? []).find(
+        (conversation) =>
+          !isPersistedGroupConversation(conversation) &&
+          conversation.participants.includes(characterId),
+      );
       const conversationId =
-        selectedConversation?.participants.includes(characterId) &&
-        !isPersistedGroupConversation(selectedConversation)
-          ? selectedConversation.id
-          : (await getOrCreateConversation({ characterId }, baseUrl)).id;
+        cachedConversation?.id ??
+        (await getOrCreateConversation({ characterId }, baseUrl)).id;
 
       return setConversationPinned(conversationId, { pinned }, baseUrl);
     },
@@ -970,11 +978,14 @@ export function ContactsPage() {
       characterId: string;
       muted: boolean;
     }) => {
+      const cachedConversation = (conversationsQuery.data ?? []).find(
+        (conversation) =>
+          !isPersistedGroupConversation(conversation) &&
+          conversation.participants.includes(characterId),
+      );
       const conversationId =
-        selectedConversation?.participants.includes(characterId) &&
-        !isPersistedGroupConversation(selectedConversation)
-          ? selectedConversation.id
-          : (await getOrCreateConversation({ characterId }, baseUrl)).id;
+        cachedConversation?.id ??
+        (await getOrCreateConversation({ characterId }, baseUrl)).id;
 
       return setConversationMuted(conversationId, { muted }, baseUrl);
     },

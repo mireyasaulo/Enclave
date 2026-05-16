@@ -224,21 +224,28 @@ export function DesktopContactsStarredFriendsPane({
           // 关键词搜不到（friends.length>0 但 filteredFriends.length==0）单独走
           // 第三个分支，否则会落到「选一位星标朋友 / 从中间星标列表里选一位」，
           // 但此时中间列表就是空的，提示和实际状态对不上。
+          // loading=true && friends.length===0 时不要写「还没有星标朋友」，那是
+          // 已经确认 0 条的措辞——首次进入时 friendsQuery 还在 pending，落这条
+          // 文案会让用户误以为自己一个星标都没有，等数据回来才发现并不是。
           emptyState={
             <DesktopContactPaneEmptyState
               title={
-                friends.length === 0
-                  ? t(msg`还没有星标朋友`)
-                  : normalizedSearchText && filteredFriends.length === 0
-                    ? t(msg`没有匹配的星标朋友`)
-                    : t(msg`选一位星标朋友`)
+                loading && friends.length === 0
+                  ? t(msg`正在读取星标朋友...`)
+                  : friends.length === 0
+                    ? t(msg`还没有星标朋友`)
+                    : normalizedSearchText && filteredFriends.length === 0
+                      ? t(msg`没有匹配的星标朋友`)
+                      : t(msg`选一位星标朋友`)
               }
               description={
-                friends.length === 0
-                  ? t(msg`去联系人资料页把常联系的好友设为星标朋友，TA 们会出现在这里。`)
-                  : normalizedSearchText && filteredFriends.length === 0
-                    ? t(msg`换个关键词再试试，或清空搜索查看所有星标朋友。`)
-                    : t(msg`从中间星标列表里选一位，这里会显示资料和管理操作。`)
+                loading && friends.length === 0
+                  ? t(msg`稍等片刻，列表加载完成后会出现在这里。`)
+                  : friends.length === 0
+                    ? t(msg`去联系人资料页把常联系的好友设为星标朋友，TA 们会出现在这里。`)
+                    : normalizedSearchText && filteredFriends.length === 0
+                      ? t(msg`换个关键词再试试，或清空搜索查看所有星标朋友。`)
+                      : t(msg`从中间星标列表里选一位，这里会显示资料和管理操作。`)
               }
             />
           }
