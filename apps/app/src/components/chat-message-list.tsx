@@ -1979,7 +1979,19 @@ export function ChatMessageList({
                 }),
               });
             })
-            .catch(() => undefined);
+            // 桌面单聊里点联系人名片 → getOrCreateConversation 失败时原来
+            // 直接 .catch(() => undefined) 静默吞掉，用户点了卡片却毫无反
+            // 应，会反复点。和下面 add-friend 分支的 catch 行为对齐，弹
+            // ActionNotice 让用户知道这次失败了。
+            .catch((error) => {
+              setActionNotice({
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : t(msg`打开聊天失败，请稍后重试。`),
+                tone: "danger",
+              });
+            });
           return;
         }
 
