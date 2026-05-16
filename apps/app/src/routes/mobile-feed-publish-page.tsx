@@ -21,6 +21,7 @@ import {
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { pickImageFiles } from "../runtime/native-image-picker";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -131,6 +132,19 @@ export function MobileFeedPublishPage() {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
+  }, [discardConfirmOpen]);
+
+  // 原生壳 Back 键在 confirm modal 打开时只关 modal，不让 history.back
+  // 把用户从 publish 直接弹回（甚至 minimize 到桌面）。
+  useEffect(() => {
+    if (!discardConfirmOpen) {
+      return;
+    }
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      setDiscardConfirmOpen(false);
+      return true;
+    });
   }, [discardConfirmOpen]);
 
   function performBack() {

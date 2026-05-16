@@ -23,6 +23,7 @@ import {
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { pickImageFiles } from "../runtime/native-image-picker";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -96,10 +97,19 @@ export function MobileMomentsPublishPage() {
       queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
         current ? [newMoment, ...current] : current,
       );
+      // "我的朋友圈"用 mine cache（profile-moments-page），这里也得 prepend +
+      // invalidate，不然从发布页返回我的朋友圈第一次还看不见刚发的。
+      queryClient.setQueryData<Moment[]>(
+        ["app-moments-mine", baseUrl],
+        (current) => (current ? [newMoment, ...current] : current),
+      );
       // fire-and-forget：原来 await refetch 让"发表中"按钮多卡 600ms+。
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", baseUrl],
       });
       // 只在用户还停在 publish 页时才 navigate。isPending 期间 我把 取消按钮
       // 禁了 + handleBack guard 了，但浏览器层的 swipe-back / Android 物理返回键
@@ -160,6 +170,28 @@ export function MobileMomentsPublishPage() {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [discardConfirmOpen, mediaPickerOpen]);
+
+  // 原生壳硬件 Back 键统一走 publish 页自己的 handleBack：
+  // - modal 打开 → 关 modal
+  // - 有内容 → 弹 discard confirm
+  // - 空内容 → performBack（navigate 回 Moments）
+  // 不让默认 BACK chain 走 history.back，避免 publish 直接进 + history 不够
+  // 时把 app minimize 到桌面。
+  useEffect(() => {
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      if (discardConfirmOpen) {
+        dismissDiscardConfirm();
+        return true;
+      }
+      if (mediaPickerOpen) {
+        setMediaPickerOpen(false);
+        return true;
+      }
+      handleBack();
+      return true;
+    });
+  });
 
   function performBack() {
     navigateBackOrFallback(
