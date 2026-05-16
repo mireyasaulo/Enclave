@@ -713,7 +713,10 @@ export function GamesPage() {
                     invited={Boolean(
                       friendInviteStatusByActivityId[activity.id],
                     )}
-                    onSelect={() => setSelectedGameId(game.id)}
+                    // 之前点 row 主体只 setSelectedGameId（移动端没 preview pane，
+                    // 视觉上 = 死按钮）；移动端这里改成"加入 ta 的局"——直接拉起
+                    // 朋友正在玩的游戏，跟 GameListRow body tap 一致。
+                    onSelect={() => handleSelectAndLaunch(game.id)}
                     onInvite={() => handleInviteFriend(activity.id)}
                   />
                 );
@@ -731,7 +734,6 @@ export function GamesPage() {
                   key={`featured-${game.id}`}
                   game={game}
                   onLaunch={() => handleSelectAndLaunch(game.id)}
-                  onSelect={() => setSelectedGameId(game.id)}
                 />
               ))}
             </ul>
@@ -749,7 +751,6 @@ export function GamesPage() {
                   key={`hot-${entry.gameId}`}
                   game={game}
                   onLaunch={() => handleSelectAndLaunch(game.id)}
-                  onSelect={() => setSelectedGameId(game.id)}
                 />
               );
             })}
@@ -767,7 +768,6 @@ export function GamesPage() {
                   key={`new-${entry.gameId}`}
                   game={game}
                   onLaunch={() => handleSelectAndLaunch(game.id)}
-                  onSelect={() => setSelectedGameId(game.id)}
                 />
               );
             })}

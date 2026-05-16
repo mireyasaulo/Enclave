@@ -219,33 +219,34 @@ function MobileNoteEditor({
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      // 把 mutate() 飞出去那一刻的 contentHtml 一起带给 onSuccess —— 让 onSuccess
-      // 能判断用户在 server 来回的 200ms~2s 里有没有继续往 editor 里继续敲字。
-      // 不然慢网下 user 边等保存边补一句，回到 onSuccess 这里 setEditorState(nextState)
-      // + innerHTML 覆盖会把这一句静默吃掉（contentEditable 没 disabled，是故意
-      // 不让保存阻塞编辑节奏的）。
-      const sentContentHtml = editorState.contentHtml;
+      // 走查 R5：把 mutate() 飞出去那一刻的 *整段* editorState snapshot 一起带给
+      // onSuccess —— R2 只比对 contentHtml 不够：用户完全可能在 save round-trip 的
+      // 200ms~2s 内打开 tag 输入框新加一个 tag，或者点附件按钮再传一张图，body
+      // 一字未改 sentContentHtml === editorState.contentHtml = userKeptTyping=false
+      // = onSuccess 用 nextState（server 视角，不含新 tag / 新图）setEditorState
+      // 反向覆盖，用户刚加的 tag / asset 就被静默吃掉。改成比对 buildNoteSnapshot
+      // 整体（contentHtml / contentText / tags / assets 都管）。
+      const sentSnapshot = buildNoteSnapshot(editorState);
       const payload = buildNoteMutationPayload(editorState);
       const savedNote = await (noteId
         ? updateFavoriteNote(noteId, payload, baseUrl)
         : createFavoriteNote(payload, baseUrl));
-      return { savedNote, sentContentHtml };
+      return { savedNote, sentSnapshot };
     },
-    onSuccess: async ({ savedNote, sentContentHtml }) => {
+    onSuccess: async ({ savedNote, sentSnapshot }) => {
       const nextDraftId = activeDraftId || draftIdParam?.trim() || savedNote.id;
       const nextState = buildEditorStateFromDocument(savedNote);
       const nextSnapshot = buildNoteSnapshot(nextState);
-      // 走查 R2：保存中用户继续敲字时不能拿 server 归一化后的 HTML 把 editor 反向
-      // 覆盖；保存中按钮是 disabled，但 contentEditable 区域不是，用户完全可能在
-      // 200ms~2s 的 round-trip 内补几个字 / 改个标点 / 删一段。检测方法：mutate
-      // 飞出去那一刻的 sentContentHtml 跟 onSuccess 跑到这里时 editorState.contentHtml
-      // 还一致 → 没继续敲，可以安全用 server 版本归一化；不一致 → 用户接着写了，
-      // 保留 editor 现状，下一次 auto-save 会把新内容再发一次，dirty 指示器会亮起
-      // 告诉用户「存在未保存修改」。
-      const userKeptTyping = editorState.contentHtml !== sentContentHtml;
+      // 保存中用户继续动 editor（敲字 / 加 tag / 传图）时不能拿 server 归一化版
+      // 反向覆盖；保存按钮虽然 disabled，contentEditable / tag editor / 附件入口
+      // 都没 disabled，是故意不让保存阻塞编辑节奏。判断逻辑：mutate 飞出去那一
+      // 刻的 sentSnapshot 跟 onSuccess 跑到这里时 buildNoteSnapshot(editorState)
+      // 还一致 → 用户期间没动 editor，可以用 server 归一化版回填；不一致 → 保留
+      // editor 现状，dirty 指示器自动亮起告诉用户下一次 auto-save 会同步过去。
+      const userKeptEditing = buildNoteSnapshot(editorState) !== sentSnapshot;
 
       setNoteId(savedNote.id);
-      if (!userKeptTyping) {
+      if (!userKeptEditing) {
         setEditorState(nextState);
         if (editorRef.current) {
           editorRef.current.innerHTML = nextState.contentHtml;
@@ -260,9 +261,10 @@ function MobileNoteEditor({
       saveDesktopNoteDraft({
         draftId: nextDraftId,
         noteId: savedNote.id,
-        // 用户已经继续打字了，localStorage 里也得记最新内容；不然窗口关掉再
-        // 重进会回到 server 归一化版（之前的 keystroke 就真没了）。
-        ...(userKeptTyping ? editorState : nextState),
+        // 用户已经继续动 editor 了（不只是敲字，也可能加了 tag / asset），
+        // localStorage 里也得记最新内容；不然窗口关掉再重进会回到 server 归一化
+        // 版（用户刚加的 tag / 图就真没了）。
+        ...(userKeptEditing ? editorState : nextState),
         updatedAt: new Date().toISOString(),
       });
 
