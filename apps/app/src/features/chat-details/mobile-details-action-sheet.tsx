@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { registerAndroidBackInterceptor } from "../../runtime/android-back-button";
 
 type MobileDetailsActionSheetAction = {
   key: string;
@@ -29,6 +30,21 @@ export function MobileDetailsActionSheet({
   onClose,
 }: MobileDetailsActionSheetProps) {
   const t = translateRuntimeMessage;
+
+  // 原生壳硬件 Back 键：sheet 打开时先关 sheet，不让 BACK 同时 history.back
+  // 把用户从 chat-details / group-chat-details / group-member-picker 带回上
+  // 一级。和 mobile-message-action-sheet.tsx 对齐。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [open, onClose]);
 
   if (!open) {
     return null;

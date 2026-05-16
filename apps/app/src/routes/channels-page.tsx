@@ -709,6 +709,15 @@ export function ChannelsPage() {
     },
     [baseUrl],
   );
+  // 同上：mobile MobileChannelsViewport 里的 useEffect 把 onVisiblePost 当依赖，
+  // 切 section / 父级任意 re-render 都会让 view POST 重发一次（实测切「朋友」tab
+  // 一次激活同一 postId 17ms 内发了两次 /feed/:id/view）。
+  const handleMobileViewPost = useCallback(
+    (postId: string) => {
+      void viewFeedPost(postId, { progressSeconds: 1 }, baseUrl);
+    },
+    [baseUrl],
+  );
 
   function navigateToRouteStateReturn() {
     if (!safeReturnPath) {
@@ -1377,9 +1386,7 @@ export function ChannelsPage() {
             onShare={(post) => void handleSharePost(post)}
             onToggleFollowAuthor={toggleFollowAuthor}
             onToggleFavorite={toggleFavorite}
-            onVisiblePost={(postId) => {
-              void viewFeedPost(postId, { progressSeconds: 1 }, baseUrl);
-            }}
+            onVisiblePost={handleMobileViewPost}
           />
         ) : null}
       </div>
@@ -1807,6 +1814,10 @@ function ChannelAudioPictorial({
           src={resolveAppMediaUrl(currentImage)}
           alt={title}
           draggable={false}
+          // active 卡可见，其余卡都堆在下方 snap-y 列表里不可见；
+          // 没有 lazy 时 ~20 张专辑封面同时拉，公网隧道下首屏明显堆积。
+          loading={active ? "eager" : "lazy"}
+          decoding="async"
           className="pointer-events-none absolute inset-0 h-full w-full object-cover"
         />
       ) : (
