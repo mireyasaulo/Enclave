@@ -352,6 +352,16 @@ export function ProfileInfoAvatarPage() {
             {t(msg`图片地址`)}
           </div>
           <TextField
+            // type="url"：iOS Safari / 系统键盘会切到 URL 模式（自带 .com /
+            // / 键、关掉首字母大写和拼写校正），跟「粘贴图片 URL」的语义对齐。
+            // 没有外层 <form>，所以 type=url 不会触发浏览器默认表单校验拦住
+            // 提交；只是键盘改 layout。auto-capitalize/correct 都关，URL 不
+            // 该被改写。
+            type="url"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            inputMode="url"
             value={draft}
             disabled={isSaving}
             onChange={(event) => {
