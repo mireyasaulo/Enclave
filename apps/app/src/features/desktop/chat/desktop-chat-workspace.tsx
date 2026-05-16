@@ -896,6 +896,16 @@ export function DesktopChatWorkspace({
       return;
     }
 
+    // 「发起群聊」/「确认隐藏/清空/退群」对话框打开时不能再被 Cmd+F 抢
+    // 走聚焦——用户按 Cmd+F 是希望在 dialog 内（如群聊搜索成员）触发
+    // 浏览器原生 Find，或者就让按键穿透；不应该弹出右栏「聊天记录」遮住
+    // 当前 dialog。
+    const dialogActive =
+      Boolean(createGroupDialogState) ||
+      Boolean(conversationDangerAction) ||
+      Boolean(conversationContextMenu) ||
+      Boolean(officialMessageContextMenu);
+
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (
         !(event.ctrlKey || event.metaKey) ||
@@ -905,6 +915,10 @@ export function DesktopChatWorkspace({
       }
 
       if (event.altKey) {
+        return;
+      }
+
+      if (dialogActive) {
         return;
       }
 
@@ -920,7 +934,11 @@ export function DesktopChatWorkspace({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [
     activeConversation,
+    conversationContextMenu,
+    conversationDangerAction,
+    createGroupDialogState,
     officialAccountsActive,
+    officialMessageContextMenu,
     serviceConversationActive,
     subscriptionInboxActive,
   ]);
