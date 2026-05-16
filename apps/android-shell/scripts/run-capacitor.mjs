@@ -27,7 +27,7 @@ const shellConfigLocalPath = resolve(
   "android-shell.config.local.json",
 );
 const capacitorConfigPath = resolve(shellDir, "capacitor.config.json");
-const appBundledRuntimeConfigPath = resolve(appDir, "dist/runtime-config.json");
+const appBundledRuntimeConfigPath = resolve(appDir, "dist-mobile/runtime-config.json");
 const localToolsDir = resolve(workspaceDir, ".cache/tools");
 const localJdkDir = resolve(localToolsDir, "jdk-21");
 const localJdkDownloadDir = resolve(localToolsDir, "downloads");
@@ -889,9 +889,9 @@ if (command === "doctor") {
       "capacitor.config.json",
       existsSync(resolve(shellDir, "capacitor.config.json")),
     ],
-    ["apps/app/dist", existsSync(resolve(appDir, "dist"))],
+    ["apps/app/dist-mobile", existsSync(resolve(appDir, "dist-mobile"))],
     [
-      "apps/app/dist/runtime-config.json",
+      "apps/app/dist-mobile/runtime-config.json",
       existsSync(appBundledRuntimeConfigPath),
     ],
     ["android project", existsSync(androidProjectDir)],
