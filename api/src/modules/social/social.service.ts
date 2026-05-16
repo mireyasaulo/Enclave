@@ -18,6 +18,7 @@ import {
 import { listBuiltInCharacterPresets } from '../characters/built-in-character-presets';
 import { listCelebrityCharacterPresets } from '../characters/celebrity-character-presets';
 import {
+  SCENE_IDS,
   SCENE_LABEL_ZH,
   matchCandidatesByScene,
   normalizeScene,
@@ -484,25 +485,34 @@ export class SocialService {
     const allPresets = listBuiltInCharacterPresets();
 
     // 走查 R1：用户主动调时按天 cap + 最小间隔卡住直连接口的滥用。scheduler 旁路。
+    // 走查 R2：daily cap / cooldown 只看"用户主动场景相遇"产出的 friend_requests。
+    // 以前用 triggerScene: Not(IsNull())，会把 shake_keep / shake / manual_add /
+    // need_discovery_short_interval 这些其它入口的行一起算进 30/天预算 ——
+    // 摇一摇一下午就能把场景相遇额度直接吃光，跟 yuanzui 现网 DB 实测一致
+    // (29 shake_keep + 5 manual_add 都会被错误纳入)。改成 In([...SCENE_IDS])
+    // 只认 16 个合法场景 ID，scheduler 也走同一组 ID 共享配额（量极小，不会挤压用户）。
     if (caller === 'user') {
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
-      const todayRequests = await this.friendRequestRepo.find({
-        where: {
-          ownerId: owner.id,
-          triggerScene: Not(IsNull()),
-          createdAt: MoreThanOrEqual(startOfDay),
-        },
-        select: ['id', 'createdAt'],
-        order: { createdAt: 'DESC' },
-      });
-      if (todayRequests.length >= SCENE_USER_DAILY_LIMIT) {
+      const dailyWhere = {
+        ownerId: owner.id,
+        triggerScene: In([...SCENE_IDS]),
+        createdAt: MoreThanOrEqual(startOfDay),
+      } as const;
+      const [count, lastRequest] = await Promise.all([
+        this.friendRequestRepo.count({ where: dailyWhere }),
+        this.friendRequestRepo.findOne({
+          where: dailyWhere,
+          select: ['id', 'createdAt'],
+          order: { createdAt: 'DESC' },
+        }),
+      ]);
+      if (count >= SCENE_USER_DAILY_LIMIT) {
         throw new AppError('SOCIAL_SCENE_DAILY_LIMIT', {
           status: HttpStatus.TOO_MANY_REQUESTS,
           legacyMessage: '今天的场景相遇次数已经用完，明天再试试。',
         });
       }
-      const lastRequest = todayRequests[0];
       if (lastRequest) {
         const last = new Date(lastRequest.createdAt).getTime();
         const elapsed = Date.now() - last;

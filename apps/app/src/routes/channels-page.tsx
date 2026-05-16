@@ -2195,6 +2195,14 @@ function ChannelAudioPictorial({
     } else {
       audio.pause();
       audio.currentTime = 0;
+      // 走查 R1（本轮）：仅 pause + reset 不释放浏览器为这条 audio 已下载的
+      // 缓冲。React 把 src 属性移除后，Chromium / Firefox 仍持有上一份 mp3 数据，
+      // 直到 audio.load() 或 GC。视频号 20 张卡按顺序滑过去，每张「曾 active」过
+      // 的 audio 都会留 ~100-500KB 的残留 buffer（30s 128kbps mp3 ≈ 480KB），
+      // 全部滑完累计可达 5-10MB 挂在视频号页直到用户离开。这里 load() 强制把
+      // media element 重置成 "无源" 初始态，立即释放缓冲。无 src 时 load() 只
+      // 触发 emptied 事件、不发请求，安全。
+      audio.load();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, audioUrl]);
@@ -2493,6 +2501,10 @@ function ChannelVideoSurface({
     } else {
       video.pause();
       video.currentTime = 0;
+      // 走查 R1（本轮）：同 ChannelAudioPictorial——单纯 pause 不释放浏览器
+      // 已下载的视频 buffer。视频体积更大（5s minimax 720p 视频 ≈ 1-2MB），
+      // 滑过去若干视频卡后内存增长更显著。load() 触发 emptied 释放资源。
+      video.load();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, videoUrl]);

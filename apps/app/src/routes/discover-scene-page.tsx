@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
@@ -164,7 +164,6 @@ function MobileDiscoverScenePage() {
   const [encounterCount, setEncounterCount] = useState(
     () => loadEncounters(baseUrl).length,
   );
-  const cooldownTimerRef = useRef<number | null>(null);
 
   const routeState = useMemo(
     () => parseMobileDiscoverToolRouteState(hash),
@@ -181,17 +180,10 @@ function MobileDiscoverScenePage() {
       setNow(next);
       if (next >= cooldownUntil) {
         window.clearInterval(id);
-        if (cooldownTimerRef.current === id) {
-          cooldownTimerRef.current = null;
-        }
       }
     }, 200);
-    cooldownTimerRef.current = id;
     return () => {
       window.clearInterval(id);
-      if (cooldownTimerRef.current === id) {
-        cooldownTimerRef.current = null;
-      }
     };
   }, [cooldownUntil]);
 
@@ -409,12 +401,17 @@ function MobileDiscoverScenePage() {
               {/*
                 走查 R6：DAILY_LIMIT 是"今天用完"的硬墙，立即重试只会再吃一次
                 429 闪一下错误条目，明天再来才有意义；这一种情况不应出"重试"
-                按钮，避免用户疯点。其它错误（网络/cooldown/服务异常）保留重试。
+                按钮，避免用户疯点。
+                走查 R7：SOCIAL_SCENE_INVALID 是入参根本没被服务端识别（前端
+                按钮 scene.id 跟服务端 SCENE_SYNONYMS 表不一致，或被中间件改写
+                成奇怪字符串），立即重试只会再吃一次 400，没意义；同样隐藏重试。
+                其它错误（网络 / cooldown / 服务异常 / AI 不可用）保留重试。
               */}
               {sceneMutation.variables &&
               !(
                 isApiRequestError(sceneMutation.error) &&
-                sceneMutation.error.errorCode === "SOCIAL_SCENE_DAILY_LIMIT"
+                (sceneMutation.error.errorCode === "SOCIAL_SCENE_DAILY_LIMIT" ||
+                  sceneMutation.error.errorCode === "SOCIAL_SCENE_INVALID")
               ) ? (
                 <button
                   type="button"
