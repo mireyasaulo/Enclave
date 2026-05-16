@@ -39,9 +39,14 @@ export class WikiReportService {
       details?: string;
     },
   ): Promise<ModerationReportEntity> {
-    const targetType = input.targetType?.trim();
-    const targetId = input.targetId?.trim();
-    const reason = input.reason?.trim();
+    // typeof 守：optional chaining 挡 null/undefined 但拦不住对象，
+     // 客户端传 {"reason":{"a":1}} → .trim() 抛 TypeError → 500。
+    const targetType =
+      typeof input.targetType === 'string' ? input.targetType.trim() : '';
+    const targetId =
+      typeof input.targetId === 'string' ? input.targetId.trim() : '';
+    const reason =
+      typeof input.reason === 'string' ? input.reason.trim() : '';
     if (!targetType || !WIKI_TARGET_TYPES.has(targetType)) {
       throw new AppError('WIKI_REPORT_INVALID_STATE', {
         params: {
@@ -68,7 +73,10 @@ export class WikiReportService {
         targetType,
         targetId,
         reason,
-        details: input.details?.trim() || null,
+        details:
+          typeof input.details === 'string'
+            ? input.details.trim() || null
+            : null,
         status: 'open',
       }),
     );
