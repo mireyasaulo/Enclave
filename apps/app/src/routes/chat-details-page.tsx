@@ -431,6 +431,19 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
         queryKey: ["app-conversations", baseUrl],
       });
     },
+    // 失败时 toggle 不会被 invalidate 回拉，UI 看着没动 + 没提示。
+    // 公网隧道偶发 5xx / 重连过期都会触发，必须给个提示。
+    onError: (error, pinned) => {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : pinned
+              ? t(msg`置顶失败，请稍后再试。`)
+              : t(msg`取消置顶失败，请稍后再试。`),
+      });
+    },
   });
   const muteMutation = useMutation({
     mutationFn: (muted: boolean) =>
@@ -444,6 +457,17 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
       });
       await queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
+      });
+    },
+    onError: (error, muted) => {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : muted
+              ? t(msg`开启免打扰失败，请稍后再试。`)
+              : t(msg`关闭免打扰失败，请稍后再试。`),
       });
     },
   });
@@ -506,6 +530,17 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
         queryKey: ["app-conversations", baseUrl],
       });
     },
+    onError: (error, enabled) => {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : enabled
+              ? t(msg`开启强提醒失败，请稍后再试。`)
+              : t(msg`关闭强提醒失败，请稍后再试。`),
+      });
+    },
   });
 
   const saveToContactsMutation = useMutation({
@@ -549,6 +584,15 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
         }),
       ]);
     },
+    onError: (error) => {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : t(msg`添加通讯录失败，请稍后再试。`),
+      });
+    },
   });
 
   const clearMutation = useMutation({
@@ -567,6 +611,15 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
         }),
       ]);
     },
+    onError: (error) => {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : t(msg`清空聊天记录失败，请稍后再试。`),
+      });
+    },
   });
   const hideMutation = useMutation({
     mutationFn: () => hideConversation(conversationId, baseUrl),
@@ -583,6 +636,15 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
       }
 
       void navigate({ to: "/tabs/chat", replace: true });
+    },
+    onError: (error) => {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : t(msg`隐藏聊天失败，请稍后再试。`),
+      });
     },
   });
 
@@ -606,6 +668,15 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
       setNotice({
         tone: "success",
         message: t(msg`已提交投诉。`),
+      });
+    },
+    onError: (error) => {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : t(msg`投诉提交失败，请稍后再试。`),
       });
     },
   });
@@ -640,6 +711,15 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
           queryKey: ["app-conversations", baseUrl],
         }),
       ]);
+    },
+    onError: (error) => {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : t(msg`加入黑名单失败，请稍后再试。`),
+      });
     },
   });
 
