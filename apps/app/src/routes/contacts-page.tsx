@@ -42,7 +42,7 @@ import {
   setFriendStarred,
   unblockCharacter,
 } from "@yinjie/contracts";
-import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
+import { AppPage, Button, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../components/avatar-chip";
 import { SparkBadge } from "../components/spark-badge";
@@ -1918,39 +1918,51 @@ export function ContactsPage() {
           }}
           detailContent={
             desktopSelection?.kind === "new-friends" ? (
-              <DesktopContactsFriendRequestsPane
-                requests={friendRequestsQuery.data ?? []}
-                loading={friendRequestsQuery.isLoading}
-                error={
-                  friendRequestsQuery.error instanceof Error
-                    ? friendRequestsQuery.error.message
-                    : null
+              // 内层 Suspense：lazy pane chunk 第一次加载时只让右栏 detail
+              // 区显示 loader，避免外层 RouteRedirectState 把已经渲染好的 sidebar
+              // 也一起替换掉，用户瞬间失去通讯录上下文。fallback 用 LoadingBlock
+              // 居中，跟 pane 自带的 loading 状态视觉一致。
+              <Suspense
+                fallback={
+                  <div className="flex h-full items-center justify-center bg-[rgba(245,247,247,0.96)]">
+                    <LoadingBlock label={t(msg`正在打开新的朋友...`)} />
+                  </div>
                 }
-                actionError={
-                  acceptFriendRequestMutation.error instanceof Error
-                    ? acceptFriendRequestMutation.error.message
-                    : declineFriendRequestMutation.error instanceof Error
-                      ? declineFriendRequestMutation.error.message
+              >
+                <DesktopContactsFriendRequestsPane
+                  requests={friendRequestsQuery.data ?? []}
+                  loading={friendRequestsQuery.isLoading}
+                  error={
+                    friendRequestsQuery.error instanceof Error
+                      ? friendRequestsQuery.error.message
                       : null
-                }
-                actionSuccess={friendRequestSuccess?.message ?? null}
-                acceptPendingId={
-                  acceptFriendRequestMutation.isPending
-                    ? (acceptFriendRequestMutation.variables ?? null)
-                    : null
-                }
-                declinePendingId={
-                  declineFriendRequestMutation.isPending
-                    ? (declineFriendRequestMutation.variables ?? null)
-                    : null
-                }
-                onAccept={(requestId) =>
-                  acceptFriendRequestMutation.mutate(requestId)
-                }
-                onDecline={(requestId) =>
-                  declineFriendRequestMutation.mutate(requestId)
-                }
-              />
+                  }
+                  actionError={
+                    acceptFriendRequestMutation.error instanceof Error
+                      ? acceptFriendRequestMutation.error.message
+                      : declineFriendRequestMutation.error instanceof Error
+                        ? declineFriendRequestMutation.error.message
+                        : null
+                  }
+                  actionSuccess={friendRequestSuccess?.message ?? null}
+                  acceptPendingId={
+                    acceptFriendRequestMutation.isPending
+                      ? (acceptFriendRequestMutation.variables ?? null)
+                      : null
+                  }
+                  declinePendingId={
+                    declineFriendRequestMutation.isPending
+                      ? (declineFriendRequestMutation.variables ?? null)
+                      : null
+                  }
+                  onAccept={(requestId) =>
+                    acceptFriendRequestMutation.mutate(requestId)
+                  }
+                  onDecline={(requestId) =>
+                    declineFriendRequestMutation.mutate(requestId)
+                  }
+                />
+              </Suspense>
             ) : desktopSelection?.kind === "starred-friends" ? (
               <DesktopContactsStarredFriendsPane
                 friends={starredFriends}
