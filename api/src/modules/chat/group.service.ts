@@ -467,6 +467,11 @@ export class GroupService {
       pinnedAt: pinned ? new Date() : null,
     });
 
+    // 和本服务里其它写操作（updateGroup / updatePreferences / clearGroupMessages
+    // 等）对齐：isMuted / savedToContacts / showMemberNicknames 都走 updatePreferences
+    // → emit；唯独 setGroupPinned 不 emit → 多端在线时另一端的 chat-list 不会立刻
+    // 把这条群挪到置顶组，要等下次 invalidate refetch 才动，体感像没生效。
+    await this.emitGroupConversationUpdated(groupId);
     return this.toGroup(updated);
   }
 
