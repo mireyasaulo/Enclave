@@ -121,7 +121,13 @@ export function ShareCardModal({
   // 截图等 qrReady 后再开始，避免先无 QR 截一次、QR 到了再重截一次。
   const [qrReady, setQrReady] = useState(false);
   const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // 区分两类失败：
+  //   - generationError：截图阶段失败，没有图可看，需要用大块红字占据预览区
+  //   - saveError：导出已成功、保存/分享时挂了，必须保留图片可见，用户才能
+  //     按文案「长按图片手动保存」走兜底路径。之前共用一个 error state →
+  //     保存失败时把图片替换成红字，文案让用户去长按图片但图片已经没了。
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // QR 是模块级缓存的 promise，第一次生成、之后所有 modal 共享。失败时取 null。
   useEffect(() => {
@@ -140,7 +146,8 @@ export function ShareCardModal({
   useEffect(() => {
     if (!cardKey || !qrReady) return;
     setPngDataUrl(null);
-    setError(null);
+    setGenerationError(null);
+    setSaveError(null);
     let cancelled = false;
 
     const run = async () => {
@@ -205,7 +212,7 @@ export function ShareCardModal({
       } catch (err) {
         console.error("[share-card] export failed", err);
         if (!cancelled) {
-          setError(t(msg`图片生成失败，请稍后重试`));
+          setGenerationError(t(msg`图片生成失败，请稍后重试`));
         }
       }
     };
@@ -241,6 +248,7 @@ export function ShareCardModal({
 
   const handleSaveOrShare = async () => {
     if (!pngDataUrl) return;
+    setSaveError(null);
     const fileName = `${filenamePrefix}-${cardKey}.png`;
 
     try {
@@ -293,7 +301,7 @@ export function ShareCardModal({
       a.remove();
     } catch (err) {
       console.error("[share-card] save failed", err);
-      setError(t(msg`保存失败，请长按图片手动保存`));
+      setSaveError(t(msg`保存失败，请长按图片手动保存`));
     }
   };
 
@@ -392,14 +400,25 @@ export function ShareCardModal({
         </div>
 
         <div className="max-h-[60vh] overflow-auto bg-[#F2F2F2] p-3">
-          {error ? (
-            <div className="py-12 text-center text-sm text-red-500">{error}</div>
-          ) : pngDataUrl ? (
-            <img
-              src={pngDataUrl}
-              alt={t(msg`分享图卡预览`)}
-              className="w-full rounded-md shadow-sm"
-            />
+          {pngDataUrl ? (
+            <>
+              {saveError ? (
+                // 保存/分享失败时，让红条挂在图片**上方**而不是替换掉图片——
+                // 文案是「请长按图片手动保存」，前提是图片还在视口里可被长按。
+                <div className="mb-2 rounded-md bg-red-50 px-3 py-2 text-center text-[12px] text-red-600">
+                  {saveError}
+                </div>
+              ) : null}
+              <img
+                src={pngDataUrl}
+                alt={t(msg`分享图卡预览`)}
+                className="w-full rounded-md shadow-sm"
+              />
+            </>
+          ) : generationError ? (
+            <div className="py-12 text-center text-sm text-red-500">
+              {generationError}
+            </div>
           ) : (
             <div className="py-12 text-center text-sm text-gray-500">
               {t(msg`生成图片中…`)}
