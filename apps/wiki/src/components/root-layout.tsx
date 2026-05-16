@@ -7,8 +7,25 @@ import {
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/macro";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { LanguageSwitcher, translateRuntimeMessage } from "@yinjie/i18n";
+
+const TUTORIAL_LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"] as const;
+type TutorialLocale = (typeof TUTORIAL_LOCALES)[number];
+
+function pickTutorialLocale(locale: string | undefined): TutorialLocale {
+  if (!locale) return "zh-CN";
+  const exact = TUTORIAL_LOCALES.find((l) => l === locale);
+  if (exact) return exact;
+  const prefix = locale.split("-")[0]?.toLowerCase();
+  const fallback: Record<string, TutorialLocale> = {
+    zh: "zh-CN",
+    en: "en-US",
+    ja: "ja-JP",
+    ko: "ko-KR",
+  };
+  return fallback[prefix ?? ""] ?? "zh-CN";
+}
 import { Button, LoadingBlock } from "@yinjie/ui";
 import { clearSession, hasRole, useRoleLabel, type WikiUser } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
@@ -141,6 +158,7 @@ const NAV_GROUPS: NavGroup[] = [
 
 export function RootLayout() {
   const t = translateRuntimeMessage;
+  const { i18n } = useLingui();
   const { user } = useAuth();
   const roleLabel = useRoleLabel();
   const navigate = useNavigate();
@@ -226,6 +244,24 @@ export function RootLayout() {
             </div>
           </form>
           <div className="ml-auto flex items-center gap-2 md:ml-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const target = pickTutorialLocale(i18n.locale);
+                window.open(
+                  `/tutorial-${target}.html`,
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+              }}
+              title={t(msg`新手教程 / Tutorial`)}
+            >
+              <span aria-hidden>📖</span>
+              <span className="ml-1 hidden sm:inline">
+                <Trans>教程</Trans>
+              </span>
+            </Button>
             <LanguageSwitcher variant="compact" description={null} />
             {user ? (
               <UserMenu user={user} roleLabel={roleLabel} />
