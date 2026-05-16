@@ -200,7 +200,23 @@ export function useConversationThread(conversationId: string) {
     }
 
     setConversationTitle(conversation.title);
-    setParticipants(conversation.participants.slice(0, 1));
+    // conversationsQuery cache 每次刷新（60s 定时 / 窗口聚焦 / socket 消息
+    // invalidate）都拿到新的 activeConversation 对象引用，effect 重跑。
+    // 标题 string 用 setState 同值会被 React 跳过 re-render，但
+    // participants.slice(0, 1) 每次都是新数组——直接 setParticipants 进去
+    // 会触发整个 ConversationThreadPanel + ChatMessageList + ChatComposer
+    // 都跟着重渲染一遍，单聊里 participants[0] 角色 ID 永远不变。
+    // 内容相等时复用旧引用，跳过这条无意义的 re-render 链。
+    setParticipants((current) => {
+      const next = conversation.participants.slice(0, 1);
+      if (
+        current.length === next.length &&
+        current.every((id, index) => id === next[index])
+      ) {
+        return current;
+      }
+      return next;
+    });
   }, [activeConversation]);
 
   useEffect(() => {
