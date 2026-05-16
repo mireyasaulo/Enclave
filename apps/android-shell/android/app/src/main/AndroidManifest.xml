@@ -57,7 +57,22 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"><!--
+            Round 36：必须显式声明 adjustResize。capacitor.config.json 里
+            Keyboard plugin 配的 "resize": "native" 依赖 manifest 上写明
+            adjustResize 才能在键盘弹起时让窗口（连带 WebView 可视区）
+            自动缩小，留出键盘高度给输入框。没声明时默认是
+            adjustUnspecified，OEM 之间分歧：
+              - Samsung One UI 多个版本默认 adjustPan
+              - Huawei EMUI / 华为 HarmonyOS App 模式 默认 adjustPan
+              - Xiaomi MIUI 部分版本 / 红米早期机型 默认 adjustPan
+              - Vivo OriginOS / OPPO ColorOS 部分版本 默认 adjustNothing
+            adjustPan / adjustNothing 都是「键盘盖住下半截」，焦点输入框
+            如果不在屏幕上半区就被键盘整个遮住，用户**看不到自己在打字**。
+            adjustResize 让 Android 把 root container 高度压缩到键盘上边沿，
+            WebView 内的 sticky 输入框跟着停在键盘正上方。
+        -->
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

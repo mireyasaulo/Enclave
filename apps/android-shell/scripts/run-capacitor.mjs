@@ -1148,6 +1148,20 @@ if (command === "doctor") {
       ),
     ]);
 
+    // Round 36：MainActivity 必须 windowSoftInputMode=adjustResize，
+    // Capacitor Keyboard plugin 的 resize:"native" 依赖 manifest 上写明这条，
+    // 否则部分 OEM (Samsung/Huawei/Xiaomi 早期 MIUI) 默认 adjustPan，
+    // 键盘弹起盖住输入框用户看不到打字。
+    checks.push([
+      "manifest MainActivity windowSoftInputMode adjustResize",
+      /<activity[^>]*android:name=".MainActivity"[^>]*android:windowSoftInputMode="adjustResize"/.test(
+        androidManifest,
+      ) ||
+        /<activity[^>]*android:windowSoftInputMode="adjustResize"[^>]*android:name=".MainActivity"/.test(
+          androidManifest,
+        ),
+    ]);
+
     // Hardening: manifest cleartext must be a build-variant placeholder, not
     // a hardcoded literal that can drift in tracked git history.
     checks.push([
