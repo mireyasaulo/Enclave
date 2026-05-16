@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
-import { Compass, Sparkles } from "lucide-react";
+import { Compass, LoaderCircle, Sparkles } from "lucide-react";
 import { isApiRequestError, keepShakeSession, shake } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
@@ -230,7 +230,15 @@ function MobileDiscoverEncounterPage() {
           variant="primary"
           className="h-12 w-full rounded-full bg-[#07c160] text-white hover:bg-[#06ad56]"
         >
-          <Sparkles size={16} />
+          {/* 走查 Round 1：AI 端到端 ~60s（planning + 角色生成两次推理），按钮原来全程
+              只有「正在寻找...」一行文字、没有 spinner——公网隧道 + 移动端用户经常以为
+              页面卡死多次点按钮。disabled 防住了重复 mutate，但视觉缺少"它正在干活"的
+              反馈。对齐 chat 模块用的 LoaderCircle + animate-spin。 */}
+          {shakeMutation.isPending ? (
+            <LoaderCircle size={16} className="animate-spin" />
+          ) : (
+            <Sparkles size={16} />
+          )}
           {heroButtonLabel}
         </Button>
       }
