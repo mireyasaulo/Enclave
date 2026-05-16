@@ -494,6 +494,13 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
     }
   }
 
+  // 把"添加"/"移除"这两条本地化标签提到 useMemo 外面算：本文件用的是
+  // translateRuntimeMessage 直引用而不是 useRuntimeTranslator 钩子，所以
+  // useMemo 的 deps 里加 t 也是 stable ref——locale 切换后 deps 不会变，
+  // 缓存的 "添加" / "移除" 仍是上个语言。提到外面后每次 render 直接读 t()
+  // 拿到当前 locale 文案，再走 string deps 触发 useMemo 重算。
+  const addMemberLabel = t(msg`添加`);
+  const removeMemberLabel = t(msg`移除`);
   const memberItems = useMemo(() => {
     const members = (membersQuery.data ?? []).slice(0, visibleMemberCount);
 
@@ -505,7 +512,7 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
       })),
       {
         key: "add",
-        label: t(msg`添加`),
+        label: addMemberLabel,
         kind: "add" as const,
         onClick: () => {
           void navigate({
@@ -517,7 +524,7 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
       },
       {
         key: "remove",
-        label: t(msg`移除`),
+        label: removeMemberLabel,
         kind: "remove" as const,
         onClick: () => {
           void navigate({
@@ -528,7 +535,15 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
         },
       },
     ];
-  }, [groupId, groupRouteHash, membersQuery.data, navigate, visibleMemberCount]);
+  }, [
+    addMemberLabel,
+    groupId,
+    groupRouteHash,
+    membersQuery.data,
+    navigate,
+    removeMemberLabel,
+    visibleMemberCount,
+  ]);
 
   const hasCollapsedMembers = totalMemberCount > COLLAPSED_MEMBER_PREVIEW_COUNT;
   const dangerSheetConfig =
