@@ -1021,6 +1021,19 @@ export function ContactsPage() {
     return () => window.clearTimeout(timer);
   }, [friendRequestSuccess]);
 
+  // 有待处理好友申请且在桌面布局下时，提前 warm 这个 lazy chunk。用户多半
+  // 会点 sidebar 那个 shortcut，预加载后命中点击瞬间不再走 Suspense fallback。
+  // chunk 很小（pane 自身 + AvatarChip），eager 一次没有成本顾虑。
+  const hasPendingRequests = pendingRequestCount > 0;
+  useEffect(() => {
+    if (!isDesktopLayout || !hasPendingRequests) {
+      return;
+    }
+    void import(
+      "../features/desktop/contacts/desktop-contacts-friend-requests-pane"
+    );
+  }, [isDesktopLayout, hasPendingRequests]);
+
   // 离开 new-friends 面板时清掉 success 提示。否则用户接受好友 → 切到其它
   // 面板 → 2.4s 内切回来，pane 重新挂载读到上次的 friendRequestSuccess，
   // 闪一遍旧确认条，看起来像新动作刚发生。
