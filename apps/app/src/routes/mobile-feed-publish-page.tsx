@@ -19,6 +19,8 @@ import { parseMobileFeedPublishRouteState } from "../features/feed/mobile-feed-p
 import {
   publishFeedComposeDraft,
   useMomentComposeDraft,
+  type MomentImageDraft,
+  type MomentVideoDraft,
 } from "../features/moments/moment-compose-media";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
@@ -52,16 +54,34 @@ export function MobileFeedPublishPage() {
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    // 再走查 R1：mutationFn 之前直接闭包读 composeDraft.* 字段，onSuccess 无脑
+    // 调 composeDraft.reset() + navigate(/discover/feed)。慢网下用户路径：
+    //   1. 输入 "A"，点发表。mutation 飞 5s 慢请求。
+    //   2. 用户在 isPending 期间点返回 — handleBack 看 isPending 直接 performBack，
+    //      整个 publish 页 unmount，用户回到 /discover/feed。
+    //   3. 用户重开 publish 页（PenSquare）。mount effect (L114) 把 composeDraft
+    //      reset 一遍 → text="". 用户输入新内容 "B" 准备重发。
+    //   4. 第 5s "A" 的 mutation onSuccess 跑回来：
+    //      a. composeDraft.reset() → "B" 草稿被抹掉
+    //      b. navigate(/discover/feed) → 把用户从 publish 页上弹走
+    //      用户 "B" 凭空消失 + 莫名其妙被踢回广场。
+    // 与 discover-feed-page createMutation R1 同模式：把 mutate-time 的 draft
+    // 当 variables 传进 onSuccess；只有 draft 仍然是那份 snapshot 才 reset +
+    // navigate（说明这次成功对应的是用户当前正在 publish 的内容），动了就
+    // 静默写 flash + 写 cache，不碰用户新草稿、不抢路由。
+    mutationFn: (input: {
+      text: string;
+      imageDrafts: MomentImageDraft[];
+      videoDraft: MomentVideoDraft | null;
+    }) =>
       publishFeedComposeDraft({
-        text: composeDraft.text,
-        imageDrafts: composeDraft.imageDrafts,
-        videoDraft: composeDraft.videoDraft,
+        text: input.text,
+        imageDrafts: input.imageDrafts,
+        videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newPost) => {
+    onSuccess: (newPost, input) => {
       storeFeedPublishFlash(t(msg`广场动态已发布，世界居民公开可见。`));
-      composeDraft.reset();
       // 把新 post prepend 到 paged 头部 + 平铺 flat cache，跳到 /discover/feed 时立刻可见，
       // 不必等后台 refetch；同时砍回 page 1，避免发布后分页边界重复。
       const newListItem = { ...newPost, commentsPreview: [] };
@@ -96,7 +116,19 @@ export function MobileFeedPublishPage() {
       void queryClient.invalidateQueries({
         queryKey: ["app-feed-paged", baseUrl],
       });
-      void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
+      // discover-feed-page createMutation R4 已经把 ["app-feed-post"] 这条
+      // 没意义的 invalidate 删了——"新发了一条 post"对任何 *已存在* post 的
+      // detail cache 都没影响，只会逼桌面 workspace / channels-page 当前选中
+      // 的 detail useQuery 做一次毫无意义的 refetch（200-500ms 一发）。
+      // 本路径同模式，跟着拿掉。
+      const draftStillMatchesPublish =
+        composeDraft.text === input.text &&
+        composeDraft.imageDrafts === input.imageDrafts &&
+        composeDraft.videoDraft === input.videoDraft;
+      if (!draftStillMatchesPublish) {
+        return;
+      }
+      composeDraft.reset();
       void navigate({
         to: safeReturnPath ?? "/discover/feed",
         ...(safeReturnHash ? { hash: safeReturnHash } : {}),
@@ -233,7 +265,15 @@ export function MobileFeedPublishPage() {
         rightActions={
           <button
             type="button"
-            onClick={() => createMutation.mutate()}
+            onClick={() =>
+              createMutation.mutate({
+                // 把 mutate-time 的 draft snapshot 当 variables 传进去 ——
+                // 见上方 createMutation 注释。
+                text: composeDraft.text,
+                imageDrafts: composeDraft.imageDrafts,
+                videoDraft: composeDraft.videoDraft,
+              })
+            }
             disabled={!composeDraft.hasContent || createMutation.isPending}
             className={cn(
               "h-9 rounded-full px-3 text-[15px] font-medium transition",
