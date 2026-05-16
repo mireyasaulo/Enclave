@@ -62,7 +62,7 @@ export function DesktopContactsFriendRequestsPane({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto px-8 py-6">
+      <div className="flex min-h-0 flex-1 flex-col overflow-auto px-8 py-6">
         {actionError ? (
           <div className="mb-4">
             <InlineNotice tone="danger">{actionError}</InlineNotice>
@@ -74,7 +74,9 @@ export function DesktopContactsFriendRequestsPane({
         ) : null}
 
         {loading ? (
-          <div className="flex h-full items-center justify-center">
+          // 用 flex-1 而不是 h-full，避免和上方 banner 叠加后撑爆容器引出冗余滚动条
+          // （banner + h-full=parentHeight = 总高 > parent → 多出来的部分要滚才看到）
+          <div className="flex flex-1 items-center justify-center">
             <LoadingBlock label={t(msg`正在读取好友请求...`)} />
           </div>
         ) : error && !requests.length ? (
@@ -83,7 +85,9 @@ export function DesktopContactsFriendRequestsPane({
           // 的 actionError 提示。
           <ErrorBlock message={error} />
         ) : requests.length ? (
-          <div className="space-y-3">
+          // shrink-0：父容器是 flex-col，列表过长时 flex 默认会等比缩，反而把单行
+          // 压扁。要走 parent.overflow-auto 的滚动条，列表自身得放弃 shrink。
+          <div className="space-y-3 shrink-0">
             {requests.map((request) => {
               const expired = isFriendRequestExpired(request.expiresAt);
               const disabled =
@@ -180,7 +184,7 @@ export function DesktopContactsFriendRequestsPane({
             })}
           </div>
         ) : (
-          <div className="flex h-full items-center justify-center">
+          <div className="flex flex-1 items-center justify-center">
             <EmptyState
               title={t(msg`暂时没有新的好友请求`)}
               description={t(msg`等待世界里的相遇事件触发新的申请。`)}
