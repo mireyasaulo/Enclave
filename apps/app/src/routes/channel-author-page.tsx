@@ -103,13 +103,52 @@ export function ChannelAuthorPage() {
       profileQuery.data?.isFollowing
         ? unfollowChannelAuthor(authorId, baseUrl)
         : followChannelAuthor(authorId, baseUrl),
+    // optimistic：channels-page 主 feed 的 followMutation 已经做了 per-author 乐观，
+    // 但作者主页这条独立路径之前没接，关注按钮要等 mutation 落地 + invalidate +
+    // refetch 整条链路才翻状态（实测公网 ~400ms），用户连点会以为按钮没响应。
+    // 同步翻 profile cache 的 isFollowing + followerCount。
+    onMutate: async () => {
+      await queryClient.cancelQueries({
+        queryKey: ["app-channel-author", baseUrl, authorId],
+      });
+      const previous = queryClient.getQueryData<typeof profileQuery.data>([
+        "app-channel-author",
+        baseUrl,
+        authorId,
+      ]);
+      if (previous) {
+        const wasFollowing = previous.isFollowing;
+        queryClient.setQueryData(
+          ["app-channel-author", baseUrl, authorId],
+          {
+            ...previous,
+            isFollowing: !wasFollowing,
+            followerCount: wasFollowing
+              ? Math.max(0, previous.followerCount - 1)
+              : previous.followerCount + 1,
+          },
+        );
+      }
+      return { previous };
+    },
+    onError: (_error, _input, context) => {
+      // 回滚 profile cache。home 那边的 mutation 是另一条独立链路，不需要这里回滚。
+      if (context?.previous) {
+        queryClient.setQueryData(
+          ["app-channel-author", baseUrl, authorId],
+          context.previous,
+        );
+      }
+    },
     onSuccess: async () => {
       setNotice({
         message: profileQuery.data?.isFollowing
-          ? t(msg`已取消关注。`)
-          : t(msg`已关注该视频号作者。`),
+          ? t(msg`已关注该视频号作者。`)
+          : t(msg`已取消关注。`),
         tone: "success",
       });
+      // onMutate 已经翻了 isFollowing；这里 profileQuery.data.isFollowing 是
+      // optimistic 后的最新值，所以文案分支需要对调（true 表示刚刚关注成功）。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-channel-author", baseUrl, authorId],
