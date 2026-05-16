@@ -354,6 +354,16 @@ export function MomentsPage() {
   useEffect(() => {
     mutationBaseUrlRef.current = baseUrl;
   }, [baseUrl]);
+  // 同步防双击锁——下方 mobile onDeleteMoment 的 `if (deleteMutation.isPending)
+  // return;` guard 是上一次 render 的闭包值，window.confirm 是阻塞 native dialog
+  // 期间 click 事件会被浏览器排队，用户在 dialog 出现的极短窗口内连点两次：
+  // click 1 弹 confirm 阻塞、click 2 进队列；用户在 confirm 上点 OK，click 1
+  // 走完 mutate.mutate(X) 后 React 还没 commit isPending=true，队列里的 click 2
+  // 用同一个闭包跑出来时仍判 false → 第二个 confirm 又弹出来；用户再点 OK 又
+  // 触发一次 DELETE。CDP 实测（confirm 重定义成同步返 true 后）：5 click →
+  // 5 DELETE 在 1ms 内全飞出去。ref 同步赋值，第一次 click 翻 true 之后所有
+  // 后续 click 立刻早返。
+  const mobileDeleteInflightRef = useRef(false);
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
     onMutate: (momentId: string) => {
@@ -1548,14 +1558,29 @@ export function MomentsPage() {
       }}
       onLikeMoment={(momentId) => likeMutation.mutate(momentId)}
       onDeleteMoment={(momentId) => {
+        // ref guard 必须在 window.confirm 之前 set，否则 confirm 阻塞期间
+        // 队列里的第二个 click 拿同一份闭包跑出来时 isPending 仍是旧 false，
+        // 会弹第二个 confirm；详见 mobileDeleteInflightRef 注释。
+        if (mobileDeleteInflightRef.current) return;
         if (deleteMutation.isPending) return;
+        mobileDeleteInflightRef.current = true;
         if (
           typeof window !== "undefined" &&
           !window.confirm(t(msg`确定删除这条朋友圈吗？`))
         ) {
+          // 用户取消：清掉 ref 让下次 tap 能再来一次。这里有个边界——
+          // 如果 confirm 阻塞期间用户连点了一次（被浏览器排队），cancel 后
+          // 队列里的那次会再弹一个 confirm。第二次 confirm 弹出来不会触发
+          // 重复 DELETE（用户可以选择 Cancel），算可接受退化；要彻底压掉得
+          // 加 setTimeout 排队，会让 confirm 出现有可感的延迟，得不偿失。
+          mobileDeleteInflightRef.current = false;
           return;
         }
-        deleteMutation.mutate(momentId);
+        deleteMutation.mutate(momentId, {
+          onSettled: () => {
+            mobileDeleteInflightRef.current = false;
+          },
+        });
       }}
       onOpenActionMenu={(momentId, anchorRect) =>
         setActionBubble({ momentId, anchorRect })
