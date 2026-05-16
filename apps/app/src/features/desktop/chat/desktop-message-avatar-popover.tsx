@@ -311,9 +311,15 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
       onClose();
     };
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
+      if (event.key !== "Escape") {
+        return;
       }
+      // popover 是浮在最上层的；Esc 应该只关掉 popover，不要继续冒泡到
+      // workspace 的 dismissSidePanel(window keydown)，避免一下 Esc 同时把
+      // 聊天信息/查找记录侧栏也关掉。
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
     };
     const handleViewportChange = () => {
       if (!document.body.contains(anchorElement)) {
