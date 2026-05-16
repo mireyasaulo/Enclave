@@ -20,7 +20,7 @@ export function getIosRuntimeCapabilities(): AppRuntimeCapabilities {
     canResolveLocalRuntimeData: false,
     canConfigureProviderLocally: false,
     canUseSecureStorage: true,
-    canReceivePush: false,
+    canReceivePush: true,
     canPickImages: true,
     canConfigureRemoteService: true,
     canExportDiagnostics: false,
@@ -61,5 +61,20 @@ export async function bootstrapIos() {
     ]);
   } catch {
     // 插件缺失或调用失败时静默 —— 不应阻塞 App 启动。
+  }
+
+  // APNs 推送 token 同步：监听 native 重发的新 token、监听 owner 变化（登录/换号），
+  // 并在已授权 + 已登录时兜底 sync 一次。未授权 / 未登录会安全短路，不会主动弹权限。
+  try {
+    const {
+      startIosPushTokenSyncListener,
+      startIosOwnerChangeListener,
+      syncIosPushToken,
+    } = await import("../push-token-sync");
+    startIosPushTokenSyncListener();
+    startIosOwnerChangeListener();
+    void syncIosPushToken();
+  } catch {
+    // 同上：动态 import 失败也不阻塞启动
   }
 }

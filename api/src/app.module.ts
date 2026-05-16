@@ -33,6 +33,8 @@ import { MinimaxModule } from './modules/minimax/minimax.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { SubscriptionExpiredFilter } from './modules/subscription/subscription-expired.filter';
 import { WikiModule } from './modules/wiki/wiki.module';
+import { PushModule } from './modules/push/push.module';
+import { PushTokenEntity } from './modules/push/push-token.entity';
 
 // Entities
 import { CharacterEntity } from './modules/characters/character.entity';
@@ -238,6 +240,7 @@ import {
           WikiFieldProtectionEntity,
           AbuseFilterEntity,
           AbuseFilterHitEntity,
+          PushTokenEntity,
         ],
         synchronize: true,
       }),
@@ -270,6 +273,7 @@ import {
     CloudRuntimeModule,
     SystemModule,
     WikiModule,
+    PushModule,
   ],
   providers: [
     {

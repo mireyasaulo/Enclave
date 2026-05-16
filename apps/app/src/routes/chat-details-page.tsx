@@ -460,6 +460,13 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
       const permission = enabled
         ? await requestNotificationPermission()
         : undefined;
+      if (permission === "granted") {
+        // 用户刚授权通知 → 立刻把 APNs device token 同步给后端，避免要等下次启动
+        const { syncIosPushToken } = await import(
+          "../runtime/push-token-sync"
+        );
+        void syncIosPushToken();
+      }
       return { conversation, enabled, permission };
     },
     onSuccess: async ({ enabled, permission }) => {

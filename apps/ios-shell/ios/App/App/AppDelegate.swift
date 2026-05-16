@@ -15,11 +15,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
         UserDefaults.standard.set(token, forKey: "YinjiePushToken")
+        NotificationCenter.default.post(
+            name: Notification.Name("YinjiePushTokenChanged"),
+            object: nil,
+            userInfo: ["token": token]
+        )
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         UserDefaults.standard.removeObject(forKey: "YinjiePushToken")
         print("Yinjie push registration failed: \(error.localizedDescription)")
+        NotificationCenter.default.post(
+            name: Notification.Name("YinjiePushTokenChanged"),
+            object: nil,
+            userInfo: ["error": error.localizedDescription]
+        )
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

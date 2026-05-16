@@ -1,4 +1,4 @@
-import { Capacitor, registerPlugin } from "@capacitor/core";
+import { Capacitor, registerPlugin, type PluginListenerHandle } from "@capacitor/core";
 import {
   normalizeMobilePushLaunchTarget,
   type MobilePushLaunchTarget,
@@ -95,6 +95,15 @@ type MobileBridgePlugin = {
     base64Data: string;
     mimeType?: string;
   }): Promise<void>;
+  addListener(
+    eventName: "pushTokenChanged",
+    listener: (event: { token: string | null; error?: string }) => void,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
+};
+
+export type PushTokenChangedEvent = {
+  token: string | null;
+  error?: string;
 };
 
 const mobileBridge = registerPlugin<MobileBridgePlugin>("YinjieMobileBridge");
@@ -496,6 +505,24 @@ export async function writeNativeClipboardImage(
     return true;
   } catch {
     return false;
+  }
+}
+
+export async function onNativePushTokenChanged(
+  callback: (event: PushTokenChangedEvent) => void,
+): Promise<PluginListenerHandle | null> {
+  if (!isNativeMobileBridgeAvailable()) {
+    return null;
+  }
+  try {
+    return await mobileBridge.addListener("pushTokenChanged", (event) => {
+      callback({
+        token: event?.token ?? null,
+        error: event?.error,
+      });
+    });
+  } catch {
+    return null;
   }
 }
 

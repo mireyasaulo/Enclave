@@ -34,6 +34,33 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
     private var pendingCameraCaptureCall: CAPPluginCall?
     private var activeDocumentInteractionController: UIDocumentInteractionController?
 
+    override public func load() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePushTokenChanged(_:)),
+            name: Notification.Name("YinjiePushTokenChanged"),
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func handlePushTokenChanged(_ notification: Notification) {
+        let userInfo = notification.userInfo ?? [:]
+        var payload: [String: Any] = [:]
+        if let token = userInfo["token"] as? String {
+            payload["token"] = token
+        } else {
+            payload["token"] = NSNull()
+        }
+        if let error = userInfo["error"] as? String {
+            payload["error"] = error
+        }
+        notifyListeners("pushTokenChanged", data: payload)
+    }
+
     @objc func openExternalUrl(_ call: CAPPluginCall) {
         guard let rawUrl = call.getString("url"),
               let url = URL(string: rawUrl.trimmingCharacters(in: .whitespacesAndNewlines)) else {
