@@ -123,11 +123,16 @@ function MobileStarredFriendsPage() {
     );
   }, [normalizedSearchText, starredFriends]);
 
+  // 新一轮走查：同 tags-page，effect deps 不能含 searchText —— 否则
+  // setSearchText('h') 重渲染时本 effect 比较 'h' !== '' 又把 searchText 撤回
+  // 空，第二条 effect 同时把 URL navigate 到 'q=h'；下一帧 routeState.keyword
+  // 变 'h'、searchText 变 ''，两个 effect 互相再纠正一次，瞬间死循环 +
+  // 输入框可见闪烁。world-characters-page 已经踩过这个坑并修过，这里同步。
   useEffect(() => {
-    if (searchText !== routeState.keyword) {
-      setSearchText(routeState.keyword);
-    }
-  }, [routeState.keyword, searchText]);
+    setSearchText((current) =>
+      current === routeState.keyword ? current : routeState.keyword,
+    );
+  }, [routeState.keyword]);
 
   useEffect(() => {
     if (normalizedHash === (currentRouteHash ?? "")) {
