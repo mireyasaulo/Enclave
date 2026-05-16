@@ -301,21 +301,40 @@ export async function captureImageWithNativeShell(): Promise<MobileBridgeImageCa
   }
 }
 
-async function encodeBlobAsBase64(blob: Blob) {
-  const bytes = new Uint8Array(await blob.arrayBuffer());
-  const chunkSize = 0x8000;
-  let binary = "";
-
-  for (let index = 0; index < bytes.length; index += chunkSize) {
-    const chunk = bytes.subarray(index, index + chunkSize);
-    binary += String.fromCharCode(...chunk);
-  }
-
-  if (typeof btoa !== "function") {
-    throw new Error("base64 encoder is unavailable"); // i18n-ignore-line
-  }
-
-  return btoa(binary);
+// 真机走查 R2：老实现把 blob 一次性 ArrayBuffer 化成 Uint8Array，再用
+// `binary += String.fromCharCode(...chunk)` 同步循环拼一个 binary 串，
+// 最后 btoa。整条编码链全在 JS 主线程：
+//   - 10MB 图（saveRemoteFile 常见）：~150-400ms 主线程阻塞
+//   - 30MB+ PDF（saveGeneratedFile）：~500ms+
+// shareFile 入口在 R1 已经把 native 端的 base64 decode + atomic write 挪去
+// 后台跑了，但 JS 这条编码同步路径仍把 WKWebView 卡住 → 用户点「保存到
+// 文件」 / 「分享」之后看到按钮高亮但好几百 ms 后才出 sheet。
+//
+// FileReader.readAsDataURL 走的是 WebKit 原生 base64 编码，async + 不占
+// JS 主线程；onload 回调时把 "data:<mime>;base64,<payload>" 前缀剥掉就拿到
+// 我们要的 base64 串。一次 await、零同步阻塞，分享按钮高亮到 sheet 弹出
+// 之间的延迟从「肉眼可见的卡」降到「自然延迟」。WKWebView / Chrome WebView
+// 都从 iOS 9 / Android 4.4 开始支持 FileReader，覆盖我们所有移动壳目标。
+async function encodeBlobAsBase64(blob: Blob): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result !== "string") {
+        reject(new Error("base64 encoder produced non-string result")); // i18n-ignore-line
+        return;
+      }
+      // readAsDataURL 输出 "data:<mime>;base64,<base64>"。空 blob 时是 "data:,"
+      // 没逗号后内容；indexOf 兜底拿 -1 时退到原串（实际不会发生，留一条
+      // 防御路径）。
+      const comma = result.indexOf(",");
+      resolve(comma >= 0 ? result.slice(comma + 1) : result);
+    };
+    reader.onerror = () => {
+      reject(reader.error ?? new Error("failed to encode blob as base64")); // i18n-ignore-line
+    };
+    reader.readAsDataURL(blob);
+  });
 }
 
 export async function readNativePushToken() {
