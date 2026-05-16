@@ -51,6 +51,14 @@ export function MobileMomentsPublishPage() {
   const resetComposeDraft = composeDraft.reset;
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  // 同步防双击锁——下面 onClick 注释里那句「JS 层兜底防双击」原版用的是闭包
+  // 抓的 canSubmit 当 guard，但 canSubmit 是上一次 render 时定下的常量，
+  // React 没来得及 commit 「isPending=true」之前，连点 5 次会拿到同一个
+  // canSubmit=true 同步通过 5 次，5 条 POST 全飞出去（实测连点 5 次发出 5 个
+  // POST，2 个被服务端 429 砍掉，剩下 3 个真的入库 → 朋友圈出 3 条一模一样
+  // 的帖子）。ref 同步赋值不走 React render，第一次 click 把它翻 true 之后
+  // 同帧内的所有后续 click 都被卡住，等 onSettled 才解锁。
+  const submittingRef = useRef(false);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   // toast 用 {message, key} 而不是 raw string —— 三行 SettingRow（所在位置/
@@ -350,12 +358,20 @@ export function MobileMomentsPublishPage() {
           <button
             type="button"
             onClick={() => {
-              // JS 层兜底防双击：disabled 属性靠 React 下次 commit 才生效，
-              // 用户在第一次 mutate 触发到 isPending 翻 true 中间那一帧再点一下
-              // 也会再发一份 mutation —— TanStack Query 不去重，两条 POST 都会
-              // 跑完，朋友圈直接出两条一模一样的帖子。
+              // JS 层兜底防双击：disabled 属性靠 React 下次 commit 才生效；同
+              // 一帧里 closure 抓的 canSubmit 也是上一次 render 的常量，连点
+              // 5 次会同步通过 5 次（实测 5 个 POST 全飞，2 个被服务端 429 砍
+              // 掉，剩下 3 个真入库 → 朋友圈出 3 条重复帖）。submittingRef 是
+              // 同步赋值的 ref，第一次 click 把它翻 true 之后同帧的所有后续
+              // click 都被卡住。
+              if (submittingRef.current) return;
               if (!canSubmit) return;
-              createMutation.mutate();
+              submittingRef.current = true;
+              createMutation.mutate(undefined, {
+                onSettled: () => {
+                  submittingRef.current = false;
+                },
+              });
             }}
             disabled={!canSubmit}
             className={cn(
