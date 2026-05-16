@@ -138,6 +138,12 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   // sendGroupMessage("ended") + 两个 navigate 同时出去。第二份消息会被服务端
   // 接受，群里出现 2 条"通话已结束"系统提示。ref 同步赋值不走 React render。
   const leavingScreenRef = useRef(false);
+  // 同步防双击锁——「同步最新状态」按钮 `disabled={syncStatusMutation.isPending}`
+  // 兜底；isPending 是 React state，同帧连点 2 次 → 两份 sendGroupMessage("ongoing")
+  // 同时投到群里，群通话状态卡片连刷 2 条一模一样的"成员席位已变动"系统消息。
+  // auto-fire effect (line ~365) 也调 syncCurrentStatus，但走 panelOpenedReportedRef
+  // / hasSyncedStatus 自己的 dedup，不会跟这个 ref 冲突。
+  const syncStatusBusyRef = useRef(false);
 
   const groupQuery = useQuery({
     queryKey: ["app-group", baseUrl, resolvedGroupId],
@@ -336,11 +342,18 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     if (!resolvedGroupId || !groupQuery.data || !totalCount) {
       return;
     }
-
-    await syncStatusMutation.mutateAsync({
-      activeCount,
-      totalCount,
-    });
+    if (syncStatusBusyRef.current) {
+      return;
+    }
+    syncStatusBusyRef.current = true;
+    try {
+      await syncStatusMutation.mutateAsync({
+        activeCount,
+        totalCount,
+      });
+    } finally {
+      syncStatusBusyRef.current = false;
+    }
   }, [
     activeCount,
     groupQuery.data,

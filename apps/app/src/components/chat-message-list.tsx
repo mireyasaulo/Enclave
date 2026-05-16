@@ -436,6 +436,14 @@ export function ChatMessageList({
   const [selectionActionPending, setSelectionActionPending] = useState<
     "favorite" | "delete" | "recall" | null
   >(null);
+  // 同步防双击锁——下面多选 action bar 上「收藏 / 撤回 / 删除」3 个按钮都
+  // 用 `disabled={selectionActionPending !== null}` 兜底，但 selectionActionPending
+  // 是 React state，要等 commit 才进 DOM。多选 8 条群消息后双击「删除」 →
+  // 两份 handleDeleteSelectedMessages 同时跑 → 同一批 8 个 messageId 各被
+  // POST /groups/$id/messages/$mid DELETE 2 遍。第二轮全部 404 server log
+  // 飘红，UI 上则跑到 setActionNotice("批量删除失败...") 让用户以为操作没
+  // 成功——其实第一轮已经全删了。ref 同步赋值挡掉同帧第二次 click。
+  const selectionActionBusyRef = useRef(false);
   const [forwardMessages, setForwardMessages] = useState<
     ChatRenderableMessage[] | null
   >(null);
@@ -2569,7 +2577,11 @@ export function ChatMessageList({
     if (!messagesToFavorite.length) {
       return;
     }
+    if (selectionActionBusyRef.current) {
+      return;
+    }
 
+    selectionActionBusyRef.current = true;
     setSelectionActionPending("favorite");
     try {
       if (threadContext) {
@@ -2624,6 +2636,7 @@ export function ChatMessageList({
         onSecondaryAction: onErrorAction ?? undefined,
       });
     } finally {
+      selectionActionBusyRef.current = false;
       setSelectionActionPending(null);
     }
   };
@@ -2633,8 +2646,12 @@ export function ChatMessageList({
     if (!messagesToDelete.length) {
       return;
     }
+    if (selectionActionBusyRef.current) {
+      return;
+    }
 
     const deletedMessageIdSet = new Set<string>();
+    selectionActionBusyRef.current = true;
     setSelectionActionPending("delete");
 
     try {
@@ -2730,6 +2747,7 @@ export function ChatMessageList({
         onSecondaryAction: onErrorAction ?? undefined,
       });
     } finally {
+      selectionActionBusyRef.current = false;
       setSelectionActionPending(null);
     }
   };
@@ -2739,8 +2757,12 @@ export function ChatMessageList({
     if (!messagesToRecall.length || !threadContext) {
       return;
     }
+    if (selectionActionBusyRef.current) {
+      return;
+    }
 
     const skippedCount = selectedMessages.length - messagesToRecall.length;
+    selectionActionBusyRef.current = true;
     setSelectionActionPending("recall");
 
     try {
@@ -2811,6 +2833,7 @@ export function ChatMessageList({
         onSecondaryAction: onErrorAction ?? undefined,
       });
     } finally {
+      selectionActionBusyRef.current = false;
       setSelectionActionPending(null);
     }
   };
