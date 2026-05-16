@@ -27,15 +27,28 @@ export class MomentsController {
   constructor(private readonly momentsService: MomentsService) {}
 
   @Get()
-  getFeed(@Query('page') page?: string, @Query('limit') limit?: string) {
+  getFeed(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('mine') mine?: string,
+    @Query('character') character?: string,
+  ) {
     // 兼容旧调用：不传 page 时返回完整 Moment[]（搜索索引、分享卡等使用）；
     // 传了 page/limit 时走分页路径，返回 { items, total, hasMore }。
+    // 传 mine=true：只返回当前世界主人发的 Moment[]，省掉前端把全表 N 条
+    // 都拉回来再 filter 一遍 ownerId 的浪费（"我的朋友圈"页用）。
+    // 传 character=ID：只返回该角色发的 Moment[]，移动端 friend-moments 页用，
+    // 替代之前拉全表 ~724KB 再客户端 filter 的浪费路径。
+    const ownerOnly = mine === 'true' || mine === '1';
+    const characterAuthorId = character?.trim() || undefined;
     if (page === undefined && limit === undefined) {
-      return this.momentsService.getFeed();
+      return this.momentsService.getFeed({ ownerOnly, characterAuthorId });
     }
     return this.momentsService.getFeed({
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
+      ownerOnly,
+      characterAuthorId,
     });
   }
 

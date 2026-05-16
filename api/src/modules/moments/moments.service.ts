@@ -242,9 +242,16 @@ export class MomentsService implements OnModuleInit {
   async getFeed(input: {
     page?: number;
     limit?: number;
-  }): Promise<{ items: Moment[]; total: number; hasMore: boolean }>;
+    ownerOnly?: boolean;
+    characterAuthorId?: string;
+  }): Promise<{ items: Moment[]; total: number; hasMore: boolean } | Moment[]>;
   async getFeed(
-    input?: { page?: number; limit?: number },
+    input?: {
+      page?: number;
+      limit?: number;
+      ownerOnly?: boolean;
+      characterAuthorId?: string;
+    },
   ): Promise<Moment[] | { items: Moment[]; total: number; hasMore: boolean }> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const avatarContext = await this.buildMomentAvatarContext({
@@ -252,7 +259,27 @@ export class MomentsService implements OnModuleInit {
       ownerAvatar: owner.avatar,
       ownerUsername: owner.username,
     });
-    const posts = await this.postRepo.find({ order: { postedAt: 'DESC' } });
+    // ownerOnly：移动端"我的朋友圈"页用。直接在 DB 层 where 掉非主人 post，
+    // 不再把 248+ 条全部拉回 Node 端 filter 一遍——典型 world owner 自己只发
+    // 个位数条，省掉 ~95% 网络 + JSON 序列化开销。
+    //
+    // characterAuthorId：移动端 friend-moments 页用（/friend-moments/$id）。
+    // 之前进单个角色朋友圈页要拉全表 110 条 ~724KB 再客户端 filter 出该角色的
+    // 几条；改成 DB 层 where authorType='character' AND authorId=id 一次性收敛。
+    // 还要走一遍 canOwnerViewPost（如果该 char 不是好友/被屏蔽，仍然 0 条返回）。
+    const trimmedCharId = input?.characterAuthorId?.trim();
+    const baseFindOptions = input?.ownerOnly
+      ? {
+          where: { authorType: 'user', authorId: owner.id },
+          order: { postedAt: 'DESC' as const },
+        }
+      : trimmedCharId
+        ? {
+            where: { authorType: 'character', authorId: trimmedCharId },
+            order: { postedAt: 'DESC' as const },
+          }
+        : { order: { postedAt: 'DESC' as const } };
+    const posts = await this.postRepo.find(baseFindOptions);
     const visiblePosts = posts.filter((post) =>
       this.canOwnerViewPost(
         post,
@@ -261,13 +288,22 @@ export class MomentsService implements OnModuleInit {
       ),
     );
 
-    if (!input) {
+    const hasPagination =
+      input && (input.page !== undefined || input.limit !== undefined);
+    if (!hasPagination) {
       return this._batchEnrichPosts(visiblePosts, avatarContext);
     }
 
-    const page = Math.max(1, Math.floor(input.page ?? 1));
-    const rawLimit = Math.floor(input.limit ?? 20);
-    const limit = Math.min(50, Math.max(1, rawLimit));
+    // 走 Number.isFinite 守 NaN：?page=abc / ?limit=abc 这种乱传不应该悄悄返回
+    // 空列表，应当兜回默认页（page=1, limit=20）让 UI 还能正常加载。
+    const rawPage = Number(input!.page);
+    const page = Number.isFinite(rawPage)
+      ? Math.max(1, Math.floor(rawPage))
+      : 1;
+    const rawLimit = Number(input!.limit);
+    const limit = Number.isFinite(rawLimit)
+      ? Math.min(50, Math.max(1, Math.floor(rawLimit)))
+      : 20;
     const start = (page - 1) * limit;
     const pageSlice = visiblePosts.slice(start, start + limit);
     const items = await this._batchEnrichPosts(pageSlice, avatarContext);
