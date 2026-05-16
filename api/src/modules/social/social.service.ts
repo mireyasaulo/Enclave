@@ -386,16 +386,37 @@ export class SocialService {
     const resolvedOwnerId =
       ownerId ?? (await this.worldOwnerService.getOwnerOrThrow()).id;
 
+    if (!DEFAULT_FRIENDSHIP_CHARACTER_IDS.length) {
+      return;
+    }
+
+    // 原实现对 13 个默认角色逐条 findOneBy character + findOneBy friendship，
+    // 每次 getFriends() 都额外 26 条 SQL（稳态没新写入也照打）。改成一次 IN()
+    // 取齐两份数据后只对真正缺失/欠补的角色写 DB，常态下查询数从 26 退回到 2。
+    const characters = await this.characterRepo.find({
+      where: { id: In([...DEFAULT_FRIENDSHIP_CHARACTER_IDS]) },
+    });
+    if (!characters.length) {
+      return;
+    }
+    const characterById = new Map(characters.map((c) => [c.id, c]));
+    const existingFriendships = await this.friendshipRepo.find({
+      where: {
+        ownerId: resolvedOwnerId,
+        characterId: In(characters.map((c) => c.id)),
+      },
+    });
+    const existingByCharacterId = new Map(
+      existingFriendships.map((f) => [f.characterId, f]),
+    );
+
     for (const characterId of DEFAULT_FRIENDSHIP_CHARACTER_IDS) {
-      const character = await this.characterRepo.findOneBy({ id: characterId });
+      const character = characterById.get(characterId);
       if (!character) {
         continue;
       }
 
-      const existing = await this.friendshipRepo.findOneBy({
-        ownerId: resolvedOwnerId,
-        characterId,
-      });
+      const existing = existingByCharacterId.get(characterId);
       if (!existing) {
         await this.friendshipRepo.save(
           this.friendshipRepo.create({
