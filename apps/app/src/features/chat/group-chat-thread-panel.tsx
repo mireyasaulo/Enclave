@@ -597,7 +597,10 @@ export function GroupChatThreadPanel({
       );
       return optimisticMessage.id;
     },
-    [groupId, ownerAvatar, ownerId, ownerName],
+    // t 必须进 deps：locale 切换后 t 引用会变；漏掉这条 callback 会用旧
+    // locale 的 fallback "我" 给乐观消息——多语言用户能在群里看到一条"我"
+    // 还是英文 "Me"，和当前 UI locale 不一致一帧才会被服务端 echo 覆盖。
+    [groupId, ownerAvatar, ownerId, ownerName, t],
   );
   const submitOutgoingGroupMessage = useCallback(
     async (payload: SendGroupMessageRequest) => {

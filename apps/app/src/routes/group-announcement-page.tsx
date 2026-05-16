@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
@@ -77,10 +77,22 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
     queryFn: () => getGroup(groupId, baseUrl),
   });
   const [draft, setDraft] = useState("");
+  // 公告 textarea 字数往往比群名长，慢网下用户更可能在 groupQuery 落地前
+  // 就已经开始打字 + socket conversationUpdated 还会触发 group refetch
+  // → 上一版每次 announcement 改变都 setDraft 覆盖，正在编辑的内容被吞。
+  // 只在首次拿到 group 数据时同步一次，之后用户控制 draft。
+  const draftInitializedRef = useRef(false);
 
   useEffect(() => {
+    if (draftInitializedRef.current) {
+      return;
+    }
+    if (groupQuery.isLoading) {
+      return;
+    }
+    draftInitializedRef.current = true;
     setDraft(groupQuery.data?.announcement ?? "");
-  }, [groupQuery.data?.announcement]);
+  }, [groupQuery.data?.announcement, groupQuery.isLoading]);
 
   useEffect(() => {
     setNotice(null);

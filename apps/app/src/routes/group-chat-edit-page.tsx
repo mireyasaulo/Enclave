@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -119,10 +119,22 @@ function MobileGroupChatEditPage({
       ? (groupQuery.data?.name ?? "")
       : (ownerMember?.memberName?.trim() ?? "");
   const [draft, setDraft] = useState("");
+  // 用户在输入框打字时，groupQuery / membersQuery 的异步到达不能把 draft 直接
+  // 覆盖回服务端值——慢网下用户可能已经输入半截，被这条 useEffect 吞掉只
+  // 剩服务端的旧名字 / 旧昵称。改成"只在第一次拿到加载完成的源数据时同步
+  // 一次"，之后用户控制 draft。
+  const draftInitializedRef = useRef(false);
 
   useEffect(() => {
+    if (draftInitializedRef.current) {
+      return;
+    }
+    if (mode === "name" ? groupQuery.isLoading : membersQuery.isLoading) {
+      return;
+    }
+    draftInitializedRef.current = true;
     setDraft(initialValue);
-  }, [initialValue]);
+  }, [groupQuery.isLoading, initialValue, membersQuery.isLoading, mode]);
 
   useEffect(() => {
     if (
