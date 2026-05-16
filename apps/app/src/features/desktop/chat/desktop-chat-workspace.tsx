@@ -505,6 +505,11 @@ export function DesktopChatWorkspace({
     subscriptionInboxActive,
   ]);
 
+  // 多处 useEffect 用 activeConversation 整对象当 deps，conversationsQuery
+  // 每 60s 轮询都给一个新引用，effect 跟着 cleanup → re-run，纯白用功。把 id
+  // 提出来用，下游 effect 的 deps 改成稳定字符串。
+  const activeConversationId = activeConversation?.id ?? null;
+
   const buildCurrentChatRouteHash = useCallback(
     (
       overrides: Partial<
@@ -530,11 +535,11 @@ export function DesktopChatWorkspace({
                   accountId: selectedServiceAccountId,
                   articleId: selectedOfficialArticleId,
                 }
-              : activeConversation
+              : activeConversationId
                 ? {
-                    conversationId: activeConversation.id,
+                    conversationId: activeConversationId,
                     messageId:
-                      activeConversation.id === selectedConversationId
+                      activeConversationId === selectedConversationId
                         ? highlightedMessageId
                         : undefined,
                   }
@@ -555,7 +560,7 @@ export function DesktopChatWorkspace({
       });
     },
     [
-      activeConversation,
+      activeConversationId,
       highlightedMessageId,
       selectedConversationId,
       selectedOfficialAccountId,
@@ -656,7 +661,7 @@ export function DesktopChatWorkspace({
 
   useEffect(() => {
     if (
-      !activeConversation ||
+      !activeConversationId ||
       subscriptionInboxActive ||
       officialAccountsActive ||
       serviceConversationActive
@@ -670,7 +675,7 @@ export function DesktopChatWorkspace({
       return;
     }
   }, [
-    activeConversation,
+    activeConversationId,
     closeRightPanel,
     officialAccountsActive,
     serviceConversationActive,
@@ -688,7 +693,6 @@ export function DesktopChatWorkspace({
   //     [focusRequestKey] effect 把搜索框 focus + select 再来一遍，用户在
   //     查找记录里搜到一半时，下一次轮询会把已经输入的关键词全选高亮，
   //     下一个按键直接覆盖掉
-  const activeConversationId = activeConversation?.id ?? null;
   useEffect(() => {
     if (
       !activeConversationId ||
@@ -732,8 +736,8 @@ export function DesktopChatWorkspace({
     if (
       !selectedCallAction ||
       !selectedConversationId ||
-      !activeConversation ||
-      activeConversation.id !== selectedConversationId ||
+      !activeConversationId ||
+      activeConversationId !== selectedConversationId ||
       subscriptionInboxActive ||
       officialAccountsActive ||
       serviceConversationActive
@@ -761,7 +765,7 @@ export function DesktopChatWorkspace({
       replace: true,
     });
   }, [
-    activeConversation,
+    activeConversationId,
     buildCurrentChatRouteHash,
     navigateToChatWorkspace,
     officialAccountsActive,
@@ -776,13 +780,13 @@ export function DesktopChatWorkspace({
   useEffect(() => {
     if (
       !desktopCallRequest ||
-      activeConversation?.id === desktopCallRequest.conversationId
+      activeConversationId === desktopCallRequest.conversationId
     ) {
       return;
     }
 
     setDesktopCallRequest(null);
-  }, [activeConversation, desktopCallRequest]);
+  }, [activeConversationId, desktopCallRequest]);
 
   useEffect(() => {
     if (!notice) {
@@ -930,7 +934,9 @@ export function DesktopChatWorkspace({
   }, [dismissSidePanel, rightPanelMode]);
 
   useEffect(() => {
-    const hasActiveThread = Boolean(activeConversation);
+    // 只依赖 id：activeConversation 整对象每次 conversationsQuery 轮询都换
+    // 引用，把 effect 拖去 cleanup → re-attach window keydown，纯白用功。
+    const hasActiveThread = Boolean(activeConversationId);
     if (
       !hasActiveThread ||
       subscriptionInboxActive ||
@@ -977,7 +983,7 @@ export function DesktopChatWorkspace({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [
-    activeConversation,
+    activeConversationId,
     conversationContextMenu,
     conversationDangerAction,
     createGroupDialogState,
