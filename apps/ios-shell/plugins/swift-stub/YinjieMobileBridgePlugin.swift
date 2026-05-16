@@ -489,7 +489,14 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             return
         }
 
-        provider.loadFileRepresentation(forTypeIdentifier: "public.image") { url, _ in
+        // 优先请求 public.jpeg：原片是 HEIC 时 PhotoKit 会自动转 JPEG，避免
+        // 给安卓 / Web / 旧端发出去后无法解码。
+        let preferredTypeIdentifier =
+            provider.hasItemConformingToTypeIdentifier("public.jpeg")
+                ? "public.jpeg"
+                : "public.image"
+
+        provider.loadFileRepresentation(forTypeIdentifier: preferredTypeIdentifier) { url, _ in
             guard let url else {
                 completion(nil)
                 return
@@ -500,8 +507,13 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
 
             do {
                 try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
-                let ext = url.pathExtension.isEmpty ? "jpg" : url.pathExtension
-                let fileName = "\(UUID().uuidString).\(ext)"
+                let resolvedExt: String = {
+                    if preferredTypeIdentifier == "public.jpeg" {
+                        return "jpg"
+                    }
+                    return url.pathExtension.isEmpty ? "jpg" : url.pathExtension
+                }()
+                let fileName = "\(UUID().uuidString).\(resolvedExt)"
                 let destination = tempDir.appendingPathComponent(fileName)
 
                 if fileManager.fileExists(atPath: destination.path) {
@@ -519,7 +531,7 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                     asset["webPath"] = webPath
                 }
 
-                if let mimeType = mimeType(forExtension: ext) {
+                if let mimeType = mimeType(forExtension: resolvedExt) {
                     asset["mimeType"] = mimeType
                 }
 

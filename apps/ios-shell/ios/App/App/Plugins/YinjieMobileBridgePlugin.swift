@@ -562,7 +562,16 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             return
         }
 
-        provider.loadFileRepresentation(forTypeIdentifier: "public.image") { url, _ in
+        // iPhone 拍的照片默认存 HEIC。直接 loadFileRepresentation(public.image)
+        // 拿到的就是 HEIC 二进制，Android / 安卓 Web / 旧 iOS / 多数浏览器都
+        // 解不出来。优先请求 public.jpeg —— 如果原片是 HEIC，PhotoKit 会
+        // 自动转 JPEG；原片是 JPEG/PNG/GIF 时则 fallback 到 public.image。
+        let preferredTypeIdentifier =
+            provider.hasItemConformingToTypeIdentifier("public.jpeg")
+                ? "public.jpeg"
+                : "public.image"
+
+        provider.loadFileRepresentation(forTypeIdentifier: preferredTypeIdentifier) { url, _ in
             guard let url else {
                 completion(nil)
                 return
@@ -573,8 +582,13 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
 
             do {
                 try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
-                let ext = url.pathExtension.isEmpty ? "jpg" : url.pathExtension
-                let fileName = "\(UUID().uuidString).\(ext)"
+                let resolvedExt: String = {
+                    if preferredTypeIdentifier == "public.jpeg" {
+                        return "jpg"
+                    }
+                    return url.pathExtension.isEmpty ? "jpg" : url.pathExtension
+                }()
+                let fileName = "\(UUID().uuidString).\(resolvedExt)"
                 let destination = tempDir.appendingPathComponent(fileName)
 
                 if fileManager.fileExists(atPath: destination.path) {
@@ -592,7 +606,7 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                     asset["webPath"] = webPath
                 }
 
-                if let mimeType = mimeType(forExtension: ext) {
+                if let mimeType = mimeType(forExtension: resolvedExt) {
                     asset["mimeType"] = mimeType
                 }
 
