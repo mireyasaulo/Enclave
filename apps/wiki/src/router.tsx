@@ -10,6 +10,9 @@ import { Trans } from "@lingui/react/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button, Card } from "@yinjie/ui";
 import { RootLayout } from "./components/root-layout";
+// 首屏路由：home-page 走静态 import 跟主 chunk 一起到，省一个 RTT。
+// 其它路由保留 lazy，按需加载。
+import { HomePage } from "./routes/home-page";
 
 // 默认 404 组件：tanstack-router 内置 fallback 是裸的英文 "Not Found"，
 // 公网访问者打错路径或点了过期链接看到一坨英文体验差。包成一张本地化卡片
@@ -34,11 +37,6 @@ function WikiNotFound() {
     </Card>
   );
 }
-
-const HomePage = lazy(async () => {
-  const mod = await import("./routes/home-page");
-  return { default: mod.HomePage };
-});
 
 const LoginPage = lazy(async () => {
   const mod = await import("./routes/login-page");
