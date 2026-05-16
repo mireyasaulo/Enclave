@@ -800,10 +800,7 @@ export function ChannelsPage() {
               // 通常已经在草稿里缩短改写过，旧 text 会把刚改完的本意顶回去。
               onClick: () => {
                 const variables = commentMutation.variables;
-                if (!variables) {
-                  commentMutation.reset();
-                  return;
-                }
+                if (!variables) return;
                 const currentDraft =
                   commentDrafts[variables.postId] ?? variables.text;
                 commentMutation.mutate({
@@ -2283,14 +2280,44 @@ function MobileChannelsViewport({
   const cardRefs = useRef(new Map<string, HTMLElement>());
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // 首次有数据时 pick 第一条作为 active；之后 activePostId 由 IntersectionObserver
+  // 维护。注意：如果 activePostId 指向的 post 被删（"减少推荐"乐观 filter 掉），
+  // 不要回退到 posts[0]——用户可能滚到了第 5 张，posts[0] 跟他看的不是一回事，
+  // 强切回去会让最顶上那条音频替换掉他正在看的卡片的音频。留 stale 一帧让
+  // observer 重算 → setActivePostId(实际可见的卡)。极端情况 (observer 不 fire) 下
+  // 才退化到 posts[0]，用 setTimeout 兜底。
+  const fallbackTimerRef = useRef<number | null>(null);
   useEffect(() => {
     if (!posts.length) {
       setActivePostId(null);
       return;
     }
 
-    if (!activePostId || !posts.some((post) => post.id === activePostId)) {
+    if (!activePostId) {
       setActivePostId(posts[0]?.id ?? null);
+      return;
+    }
+
+    if (!posts.some((post) => post.id === activePostId)) {
+      // 留 350ms 让 IntersectionObserver 在新布局里 fire 一次；超时还没拿到
+      // 真正的可见卡，再退化到 posts[0]。
+      if (fallbackTimerRef.current != null) {
+        window.clearTimeout(fallbackTimerRef.current);
+      }
+      fallbackTimerRef.current = window.setTimeout(() => {
+        fallbackTimerRef.current = null;
+        setActivePostId((current) => {
+          // 这期间 observer 已经 fire 把 activePostId 换成存在的 post → 别覆盖
+          if (current && posts.some((p) => p.id === current)) return current;
+          return posts[0]?.id ?? null;
+        });
+      }, 350);
+      return () => {
+        if (fallbackTimerRef.current != null) {
+          window.clearTimeout(fallbackTimerRef.current);
+          fallbackTimerRef.current = null;
+        }
+      };
     }
   }, [activePostId, posts]);
 
