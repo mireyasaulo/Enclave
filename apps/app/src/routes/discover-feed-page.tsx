@@ -746,7 +746,20 @@ export function DiscoverFeedPage() {
       if (mutationBaseUrl !== baseUrl) {
         return;
       }
-      setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
+      // 走查新一轮 Round 5：原本无脑 setCommentDrafts((current) => ({ ...current,
+      // [postId]: "" }))。但桌面 row 的 submit 按钮在 RTT 期间是 disabled，
+      // textarea 仍然能继续敲——用户场景：发完 "abc" 等服务器返回的同时打字
+      // "I see your point, abc def" 准备开下一条；onSuccess 回来直接把整个
+      // commentDrafts[postId] 抹成空，用户刚打到一半的下一条评论凭空消失。
+      // 跟 createMutation 已经在做的 `draftStillMatchesPublish` snapshot
+      // 一致：只在 draft 仍等于这次成功的 text 时才清；用户在 RTT 内改过就
+      // 留着他们的 WIP。
+      setCommentDrafts((current) => {
+        if ((current[input.postId] ?? "") !== input.text) {
+          return current;
+        }
+        return { ...current, [input.postId]: "" };
+      });
       setDesktopReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
