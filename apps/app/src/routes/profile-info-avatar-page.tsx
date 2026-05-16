@@ -572,7 +572,12 @@ export function ProfileInfoAvatarPage() {
       ) : null}
 
       {errorMessage ? (
-        <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(220,38,38,0.18)] bg-[rgba(254,242,242,0.96)] px-3 py-2 text-[12px] leading-5 text-[color:var(--state-danger-text)]">
+        // role="alert"：保存失败 / picker 报错时通知屏幕阅读器立即朗读；
+        // 视觉上的红字 banner 跟它一起出现，sighted 用户也不漏。
+        <div
+          role="alert"
+          className="mx-4 mt-3 rounded-[10px] border border-[rgba(220,38,38,0.18)] bg-[rgba(254,242,242,0.96)] px-3 py-2 text-[12px] leading-5 text-[color:var(--state-danger-text)]"
+        >
           {errorMessage}
         </div>
       ) : null}

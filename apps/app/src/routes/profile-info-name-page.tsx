@@ -214,7 +214,11 @@ export function ProfileInfoNamePage() {
       ) : null}
 
       {errorMessage ? (
-        <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(220,38,38,0.18)] bg-[rgba(254,242,242,0.96)] px-3 py-2 text-[12px] leading-5 text-[color:var(--state-danger-text)]">
+        // role="alert"：屏幕阅读器立即朗读保存失败原因，跟红字 banner 视觉同步。
+        <div
+          role="alert"
+          className="mx-4 mt-3 rounded-[10px] border border-[rgba(220,38,38,0.18)] bg-[rgba(254,242,242,0.96)] px-3 py-2 text-[12px] leading-5 text-[color:var(--state-danger-text)]"
+        >
           {errorMessage}
         </div>
       ) : null}

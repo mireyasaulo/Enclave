@@ -189,7 +189,14 @@ export function ProfileInfoPage() {
       </div>
 
       {toast ? (
-        <div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+96px)] z-[1100] flex justify-center">
+        // role="status" + aria-live=polite：之前 toast 完全没 a11y 属性，VoiceOver /
+        // TalkBack 用户点完「复制隐界号」按钮听不到任何反馈，以为没成功又点一次。
+        // 加 polite 让屏幕阅读器在当前朗读结束后宣读这条消息（不中断按钮点击反馈）。
+        <div
+          className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+96px)] z-[1100] flex justify-center"
+          role="status"
+          aria-live="polite"
+        >
           <div className="rounded-[6px] bg-black/72 px-3 py-1.5 text-[13px] text-white">
             {toast.message}
           </div>
