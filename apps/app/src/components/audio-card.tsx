@@ -57,6 +57,15 @@ export function AudioCard({
     audioRegistry.add(el);
     return () => {
       audioRegistry.delete(el);
+      // 走查新一轮：朋友圈 audio_card 类型动态在以下场景下 AudioCard unmount —
+      //   1) 屏蔽该角色 / 删除该 moment → 卡片被 filter 出 visibleMoments
+      //   2) 切账户 / 离开页 → 整页 unmount
+      // React 把 <audio> 从 DOM 摘掉后 Chromium / Firefox 不会自动 pause（webkit
+      // 实测会），音轨会一直 loop 到刷新整页。和 51b8980a (ChannelAudioPictorial)
+      // 同模式：unmount cleanup 主动 pause。
+      if (!el.paused) {
+        el.pause();
+      }
     };
   }, []);
 

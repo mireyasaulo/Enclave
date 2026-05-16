@@ -634,6 +634,14 @@ function MomentVideoViewerOverlay({
         setNeedsManualPlay(true);
       });
     }
+    // 走查新一轮：viewer 关闭 / 朋友圈页 unmount 时 React 把 <video> 从 DOM
+    // 摘掉后 Chromium / Firefox 不会自动 pause —— 视频的音轨会在后台继续跑直
+    // 到刷新整页（实测桌面 Chrome 起音 → 关 viewer，音乐还在响）。和
+    // 51b8980a (视频号 ChannelVideoSurface) 同模式：unmount 走 cleanup 主动
+    // pause，避免「关掉看了还能听到」。
+    return () => {
+      el.pause();
+    };
   }, []);
 
   const handleManualPlay = (event: MouseEvent<HTMLButtonElement>) => {

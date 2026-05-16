@@ -132,7 +132,14 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
       if (now - lastTapRef.current < 280) {
         lastTapRef.current = 0;
         if (onDoubleTapLike && moment.canInteract) {
-          onDoubleTapLike();
+          // Instagram-style「双击点赞」语义：只加赞不取消。之前 onDoubleTapLike
+          // 直接走 toggleMomentLike（toggle 语义），用户在自己已经点过赞的帖子
+          // 上随手双击想看一下心跳动画 → 静默把赞取消了，列表里 likes 行少了
+          // 自己的名字，体感是"我啥都没做它怎么就把我赞没了"。已经点过的就只
+          // 放一下浮心反馈，不再 toggle；要取消用户得走 ⋯ 菜单的「取消」入口。
+          if (!liked) {
+            onDoubleTapLike();
+          }
           setFloatingHeartTick((tick) => tick + 1);
         }
         return;
