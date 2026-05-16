@@ -6709,6 +6709,21 @@ function LocationViewerOverlay({
     return unregister;
   }, [isDesktop, onClose]);
 
+  // 桌面键盘 Esc：位置查看器是 fixed inset-0 全屏模态，desktop 用户
+  // 不该只能点 ✕ 或 backdrop 关。和 image viewer 父级的 Esc 处理对齐。
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) {
+        return;
+      }
+      event.preventDefault();
+      onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     <div className="fixed inset-0 z-50 bg-[rgba(5,10,20,0.88)] backdrop-blur-md">
       <button
@@ -6829,6 +6844,25 @@ function NoteViewerOverlay({
       return true;
     });
     return unregister;
+  }, [actionMenuOpen, onClose]);
+
+  // 桌面键盘 Esc：笔记查看器同样是 fixed inset-0 全屏模态，Esc 先关
+  // action 子菜单，再关查看器。和原生壳 Back 拦截器的 fallback 顺序对齐。
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) {
+        return;
+      }
+      event.preventDefault();
+      if (actionMenuOpen) {
+        setActionMenuOpen(false);
+        return;
+      }
+      onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [actionMenuOpen, onClose]);
   const noteQuery = useQuery({
     queryKey: ["favorite-note", baseUrl, attachment.noteId],
