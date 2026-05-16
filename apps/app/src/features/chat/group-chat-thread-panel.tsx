@@ -313,42 +313,26 @@ export function GroupChatThreadPanel({
     failedHighlightRef.current.clear();
   }, [baseUrl, groupId]);
 
-  const groupLastClearedAt = groupQuery.data?.lastClearedAt;
   useEffect(() => {
     if (!messagesQuery.data) {
       return;
     }
     // 同 use-conversation-thread 对单聊的修法：mergeGroupMessageWindow 只追
     // 加不删除，群里"清空 / 撤回 / 删除"后 cache 缩水时，本地 messages 还
-    // 留着已经被清掉的消息——用户在已清空的群聊里继续看到旧消息。
+    // 留着已经被清掉的消息——用户在已清空的群聊里继续看到旧消息。改成保留
+    // 还没 echo 的 local_* 乐观消息，server 消息整体跟 cache 走。
     //
-    // 改成：保留 local_* 乐观消息 + 比 cache 最新 / lastClearedAt 更新的
-    // server 消息（应对 mount refetch 在飞期间 socket 投递的新消息被 GET
-    // 响应覆盖掉的 race），其余 server 消息整体跟 cache 走。
-    const incoming = messagesQuery.data;
-    const incomingIds = new Set(incoming.map((m) => m.id));
-    const incomingNewestTs = incoming.reduce((max, m) => {
-      const ts = parseTimestamp(m.createdAt) ?? 0;
-      return ts > max ? ts : max;
-    }, 0);
-    const lastClearedTs = groupLastClearedAt
-      ? (parseTimestamp(groupLastClearedAt) ?? 0)
-      : 0;
-    const cutoffTs = Math.max(incomingNewestTs, lastClearedTs);
+    // 取舍同直聊：mount refetch 在飞期间 socket 投递的新消息可能被 GET
+    // 响应覆盖；之前用 "createdAt > cutoff" 兜底反而会让"删除当前最新
+    // 一条消息"也命中，删的不被丢回来。race-arrival 自然在下一条 socket
+    // 推送里被带回，这里就选简单更可靠的整体替换。
     setMessages((current) => {
-      const survivors = current.filter((message) => {
-        if (message.id.startsWith("local_")) {
-          return true;
-        }
-        if (incomingIds.has(message.id)) {
-          return false;
-        }
-        const ts = parseTimestamp(message.createdAt) ?? 0;
-        return ts > cutoffTs;
-      });
-      return mergeGroupMessageWindow(survivors, incoming);
+      const pendingLocal = current.filter((message) =>
+        message.id.startsWith("local_"),
+      );
+      return mergeGroupMessageWindow(pendingLocal, messagesQuery.data!);
     });
-  }, [groupLastClearedAt, messagesQuery.data]);
+  }, [messagesQuery.data]);
 
   // 群不存在时，本来 thread 页就是个死页：retry 也是同款 404，用户除了
   // 手动 back / 重新输 URL 没出路。和姊妹子页 details / edit / announcement /
