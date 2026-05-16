@@ -3274,6 +3274,23 @@ function MobileChannelCommentsSheet({
     });
     return map;
   }, [comments]);
+  // 走查 新一轮 R2：onReply / onLikeComment 是 ChannelsPage 内联箭头，每次
+  // parent 渲染 identity 都翻新。用户在 textarea 里敲字 → setCommentDrafts →
+  // ChannelsPage re-render → sheet re-render，下面 comments.map 重跑一遍
+  // （142 条评论时 142 次 stripToolCallSyntax regex + 142 次 JSX 创建）。
+  // 把回调透过 ref 包成「永远稳定」的版本，再用 useMemo 缓存整段评论 list 的
+  // JSX 树——deps 里没 draft，敲字时直接返回上次的 element 树，React 在
+  // 子树上 bailout 跳过 reconciliation。
+  const latestSheetHandlersRef = useRef({ onReply, onLikeComment });
+  latestSheetHandlersRef.current = { onReply, onLikeComment };
+  const stableOnReply = useCallback(
+    (c: FeedComment) => latestSheetHandlersRef.current.onReply(c),
+    [],
+  );
+  const stableOnLikeComment = useCallback(
+    (c: FeedComment) => latestSheetHandlersRef.current.onLikeComment(c),
+    [],
+  );
 
   useEffect(() => {
     if (!open || typeof document === "undefined") {
@@ -3341,6 +3358,99 @@ function MobileChannelCommentsSheet({
       previousCommentCountRef.current = comments.length;
     }
   }, [open, comments, isLoading]);
+
+  // 走查 新一轮 R2：把评论 list JSX 整段 useMemo，deps 不含 draft/submitPending/
+  // replyTarget——这些只影响底部 textarea，敲字时直接返回上轮缓存的 element 树，
+  // React 在子树上 bailout 跳过整个 142 条评论的重渲。stripToolCallSyntax 也跟着
+  // 缓存住，不每次 keypress 都跑 142 次 regex。
+  const commentsListNode = useMemo<ReactNode>(() => {
+    if (!comments.length) return null;
+    return (
+      <div className="space-y-3">
+        {comments.map((comment) => {
+          // 优先用后端 serializeComment 给的 replyToAuthorName——本地
+          // commentAuthorNameMap 只能反查到当前已显示的 comments；如果被
+          // 回复的根评论在分页之外 / 已删 / 已隐，本地 map 是空，"回复 X"
+          // 整段就漏掉了。后端的 lookup map 是整个 post 全量评论 + 单条
+          // reply 新建时临时灌入，覆盖面更广，优先取后端值。
+          const replyTargetName = comment.replyToCommentId
+            ? (comment.replyToAuthorName ??
+                commentAuthorNameMap.get(comment.replyToCommentId) ??
+                null)
+            : null;
+          const cleanText = stripToolCallSyntax(comment.text);
+          const liking = likePendingCommentId === comment.id;
+          return (
+            <div
+              key={comment.id}
+              className="rounded-[16px] border border-[color:var(--border-subtle)] bg-white px-3.5 py-3"
+            >
+              <div className="flex items-start gap-3">
+                <AvatarChip
+                  name={comment.authorName}
+                  src={comment.authorAvatar}
+                  size="wechat"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 text-[11px]">
+                    <span className="truncate font-medium text-[#111827]">
+                      {comment.authorName}
+                    </span>
+                    <span className="text-[#9ca3af]">
+                      {formatTimestamp(comment.createdAt)}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-[12px] leading-6 text-[#111827]">
+                    {replyTargetName ? (
+                      <span className="text-[#6b7280]">
+                        {t(msg`回复 ${replyTargetName}`)}
+                        {"："}
+                      </span>
+                    ) : null}
+                    {cleanText}
+                  </div>
+                  <div className="mt-2 flex items-center gap-4 text-[11px] text-[#6b7280]">
+                    <button
+                      type="button"
+                      onClick={() => stableOnReply(comment)}
+                      className="transition active:text-[#111827]"
+                    >
+                      {t(msg`回复`)}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={comment.likedByOwner || liking}
+                      onClick={() => stableOnLikeComment(comment)}
+                      className={cn(
+                        "inline-flex items-center gap-1 transition",
+                        comment.likedByOwner
+                          ? "text-[#07c160]"
+                          : "active:text-[#111827]",
+                      )}
+                    >
+                      <ThumbsUp size={12} />
+                      {liking
+                        ? t(msg`处理中`)
+                        : comment.likedByOwner
+                          ? t(msg`已赞 ${comment.likeCount}`)
+                          : t(msg`赞 ${comment.likeCount}`)}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }, [
+    comments,
+    commentAuthorNameMap,
+    likePendingCommentId,
+    stableOnReply,
+    stableOnLikeComment,
+    t,
+  ]);
 
   if (!open || !post) {
     return null;
@@ -3431,86 +3541,7 @@ function MobileChannelCommentsSheet({
               {t(msg`还没有评论，先发第一句。`)}
             </div>
           ) : null}
-          {comments.length ? (
-            <div className="space-y-3">
-              {comments.map((comment) => {
-                // 优先用后端 serializeComment 给的 replyToAuthorName——本地
-                // commentAuthorNameMap 只能反查到当前已显示的 comments；如果被
-                // 回复的根评论在分页之外 / 已删 / 已隐，本地 map 是空，"回复 X"
-                // 整段就漏掉了。后端的 lookup map 是整个 post 全量评论 + 单条
-                // reply 新建时临时灌入，覆盖面更广，优先取后端值。
-                const replyTargetName = comment.replyToCommentId
-                  ? (comment.replyToAuthorName ??
-                      commentAuthorNameMap.get(comment.replyToCommentId) ??
-                      null)
-                  : null;
-
-                return (
-                  <div
-                    key={comment.id}
-                    className="rounded-[16px] border border-[color:var(--border-subtle)] bg-white px-3.5 py-3"
-                  >
-                    <div className="flex items-start gap-3">
-                      <AvatarChip
-                        name={comment.authorName}
-                        src={comment.authorAvatar}
-                        size="wechat"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 text-[11px]">
-                          <span className="truncate font-medium text-[#111827]">
-                            {comment.authorName}
-                          </span>
-                          <span className="text-[#9ca3af]">
-                            {formatTimestamp(comment.createdAt)}
-                          </span>
-                        </div>
-                        <div className="mt-1 text-[12px] leading-6 text-[#111827]">
-                          {replyTargetName ? (
-                            <span className="text-[#6b7280]">
-                              {t(msg`回复 ${replyTargetName}`)}
-                              {"："}
-                            </span>
-                          ) : null}
-                          {stripToolCallSyntax(comment.text)}
-                        </div>
-                        <div className="mt-2 flex items-center gap-4 text-[11px] text-[#6b7280]">
-                          <button
-                            type="button"
-                            onClick={() => onReply(comment)}
-                            className="transition active:text-[#111827]"
-                          >
-                            {t(msg`回复`)}
-                          </button>
-                          <button
-                            type="button"
-                            disabled={
-                              comment.likedByOwner ||
-                              likePendingCommentId === comment.id
-                            }
-                            onClick={() => onLikeComment(comment)}
-                            className={cn(
-                              "inline-flex items-center gap-1 transition",
-                              comment.likedByOwner
-                                ? "text-[#07c160]"
-                                : "active:text-[#111827]",
-                            )}
-                          >
-                            <ThumbsUp size={12} />
-                            {likePendingCommentId === comment.id
-                              ? t(msg`处理中`)
-                              : comment.likedByOwner
-                                ? t(msg`已赞 ${comment.likeCount}`)
-                                : t(msg`赞 ${comment.likeCount}`)}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : null}
+          {commentsListNode}
         </div>
 
         <div className="border-t border-[color:var(--border-subtle)] bg-white px-4 pb-2 pt-3">
