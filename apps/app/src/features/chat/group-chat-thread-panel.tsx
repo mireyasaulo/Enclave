@@ -867,10 +867,15 @@ export function GroupChatThreadPanel({
     const loadedCount = messagesQuery.data?.length ?? 0;
     const pendingLoad = loadMoreRequestRef.current;
 
-    if (loadedCount < messageLimit) {
-      setHasOlderMessages(false);
-    } else if (!pendingLoad) {
-      setHasOlderMessages(true);
+    // 走查 Round 1：原版没区分"loadMore 飞行中"vs"已完成"，setMessageLimit
+    // 一翻倍 queryKey 立刻换 → messagesQuery.data 短暂回 undefined（没配
+    // placeholderData / keepPreviousData），effect 跑 loadedCount=0 <
+    // messageLimit=100 → setHasOlderMessages(false)，"查看更多消息"按钮
+    // 在飞行期间消失；fetch 回来后第一个 branch 不再触发 hasOlderMessages
+    // 也没机会回 true，用户被卡在"看不到再翻"状态。飞行中（pendingLoad
+    // 或 isFetching）跳过定调，等 fetch 完成后下方分支正式判定。
+    if (!pendingLoad && !messagesQuery.isFetching) {
+      setHasOlderMessages(loadedCount >= messageLimit);
     }
 
     if (!pendingLoad || messagesQuery.isFetching) {
@@ -882,6 +887,10 @@ export function GroupChatThreadPanel({
       setHasOlderMessages(false);
       return;
     }
+
+    // load-more 收完一页后定调：满 messageLimit 视为还有更老的；少于
+    // messageLimit 说明已翻到群消息开头。
+    setHasOlderMessages(loadedCount >= messageLimit);
 
     window.requestAnimationFrame(() => {
       const element = scrollAnchorRef.current;
