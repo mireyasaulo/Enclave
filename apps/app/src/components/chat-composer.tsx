@@ -915,6 +915,12 @@ export function ChatComposer({
     };
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
+        // 不 preventDefault：desktop-chat-workspace 那条 window keydown
+        // microtask 兜底（line 919）会接着跑 dismissSidePanel —— 桌面单聊
+        // 开着「聊天信息」侧栏然后点表情按钮打开 sticker panel，按 Esc 会
+        // 同时把 panel 和背后的侧栏一起关掉。和 image viewer / contextMenu
+        // 同款修法。
+        event.preventDefault();
         setStickerPanelOpen(false);
       }
     };
@@ -1000,6 +1006,9 @@ export function ChatComposer({
     };
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
+        // 同 sticker panel：不 preventDefault 的话 dismissSidePanel
+        // microtask 会接着跑把背后的「聊天信息」侧栏一起关掉。
+        event.preventDefault();
         setDesktopPlusMenuOpen(false);
       }
     };
