@@ -106,13 +106,20 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
   ) {
     const moreButtonRef = useRef<HTMLButtonElement>(null);
     const lastTapRef = useRef<number>(0);
-    const [floatingHeart, setFloatingHeart] = useState(false);
+    // 走查 R6：用计数器代替 boolean，每次双击 +1 — 这样：
+    //   1) useEffect dep 真的变了，重置 700ms 定时器（之前 setFloatingHeart(true)
+    //      在 floatingHeart 已经是 true 时是 no-op，原定时器照着第一次双击的时间
+    //      点走完，第二次双击的心跑了不到 700ms 就消失，体感"被吃掉"）；
+    //   2) 渲染时把计数器透到 <FloatingHeart key=> ——key 一变 React 卸载老节点
+    //      重挂，CSS keyframe animation 才真的能从头放一次（同 DOM 节点上同一
+    //      个 animation 名字不会自动重启）。
+    const [floatingHeartTick, setFloatingHeartTick] = useState(0);
 
     useEffect(() => {
-      if (!floatingHeart) return;
-      const timer = window.setTimeout(() => setFloatingHeart(false), 700);
+      if (!floatingHeartTick) return;
+      const timer = window.setTimeout(() => setFloatingHeartTick(0), 700);
       return () => window.clearTimeout(timer);
-    }, [floatingHeart]);
+    }, [floatingHeartTick]);
 
     const handleAreaPointerDown = (event: PointerEvent<HTMLDivElement>) => {
       const target = event.target as HTMLElement;
@@ -126,7 +133,7 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
         lastTapRef.current = 0;
         if (onDoubleTapLike && moment.canInteract) {
           onDoubleTapLike();
-          setFloatingHeart(true);
+          setFloatingHeartTick((tick) => tick + 1);
         }
         return;
       }
@@ -394,7 +401,11 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
             </div>
           ) : null}
 
-          {floatingHeart ? <FloatingHeart liked={liked} /> : null}
+          {floatingHeartTick > 0 ? (
+            // key=tick 把节点重挂，让 keyframe 重头跑一遍；定时器 useEffect
+            // 同时被新 tick 重置。
+            <FloatingHeart key={floatingHeartTick} liked={liked} />
+          ) : null}
         </div>
       </article>
     );
