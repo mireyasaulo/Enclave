@@ -811,10 +811,15 @@ export function ContactsPage() {
     mutationFn: (requestId: string) => acceptFriendRequest(requestId, baseUrl),
     // mutate 开新一轮前先把对面 mutation 的错误清掉，否则用户点接受失败 → 改点
     // 拒绝成功，actionError 里那条旧的"接受失败"红字还会卡在面板顶端。
+    // 同时把"点击时是否在 new-friends 面板"快照成 context，避免 onSuccess
+    // 里再读 desktopSelection 时用户已经手动切到别处，被 auto-navigate 拽回来。
     onMutate: () => {
       declineFriendRequestMutation.reset();
+      return {
+        wasOnNewFriendsPane: desktopSelection?.kind === "new-friends",
+      };
     },
-    onSuccess: async (_, requestId) => {
+    onSuccess: async (_data, requestId, context) => {
       const acceptedRequest =
         (friendRequestsQuery.data ?? []).find(
           (request) => request.id === requestId,
@@ -822,7 +827,7 @@ export function ContactsPage() {
       // 用户在「新的朋友」面板里多半是在批量处理；接受一条就强制跳到该好友详情
       // 等于把人甩出列表，下一条还得手动回来。这里只在用户原本就不在 new-friends
       // 面板（例如通知/路由直跳进来 accept）时才跳，避免打断批量流。
-      const wasOnNewFriendsPane = desktopSelection?.kind === "new-friends";
+      const wasOnNewFriendsPane = context?.wasOnNewFriendsPane ?? false;
 
       setNotice(t(msg`已通过好友申请。`));
       setFriendRequestSuccess(t(msg`已通过好友申请。`));

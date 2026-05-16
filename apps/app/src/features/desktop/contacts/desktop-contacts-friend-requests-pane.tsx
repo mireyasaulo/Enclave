@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { msg } from "@lingui/macro";
 import type { MessageDescriptor } from "@lingui/core";
 import type { FriendRequest } from "@yinjie/contracts";
@@ -35,9 +36,21 @@ export function DesktopContactsFriendRequestsPane({
   // 请求不会从列表里自动消失。这里把过期/非过期分开计数：侧栏 shortcut 拿到
   // 的 pendingRequestCount 是 requests.length（含过期），面板顶端用同一份口径
   // 显示总数 + 单独点出过期条数，避免侧栏说"5 条待处理"而面板里只数 3 条。
-  const expiredCount = requests.filter((item) =>
-    isFriendRequestExpired(item.expiresAt),
-  ).length;
+  //
+  // 顺手把 expired 标记 memo 进每行，避免顶层 filter 跑一次 + map 里又
+  // 调一次 new Date()，20+ 条请求时这俩链路加起来 40+ 次构造，按引用变才重算。
+  const decoratedRequests = useMemo(
+    () =>
+      requests.map((request) => ({
+        request,
+        expired: isFriendRequestExpired(request.expiresAt),
+      })),
+    [requests],
+  );
+  const expiredCount = useMemo(
+    () => decoratedRequests.filter((item) => item.expired).length,
+    [decoratedRequests],
+  );
   const pendingCount = requests.length;
 
   return (
@@ -88,8 +101,7 @@ export function DesktopContactsFriendRequestsPane({
           // shrink-0：父容器是 flex-col，列表过长时 flex 默认会等比缩，反而把单行
           // 压扁。要走 parent.overflow-auto 的滚动条，列表自身得放弃 shrink。
           <div className="space-y-3 shrink-0">
-            {requests.map((request) => {
-              const expired = isFriendRequestExpired(request.expiresAt);
+            {decoratedRequests.map(({ request, expired }) => {
               const disabled =
                 request.status !== "pending" ||
                 Boolean(acceptPendingId || declinePendingId);
