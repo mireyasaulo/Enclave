@@ -539,6 +539,24 @@ function DangerConfirmDialog({
   onConfirm: () => void;
 }) {
   const t = useRuntimeTranslator();
+  // Esc 关弹层：DesktopContactTextEditDialog 已经加过同款；这里漏了，用户在「加入
+  // 黑名单 / 删除联系人」二次确认对话框前误点出来 Esc 关不掉，得鼠标去找最右下角
+  // 「取消」或背景点白 backdrop，不符合标准 modal 交互。stopPropagation 防止 Esc
+  // 一路冒泡到 desktop chat workspace 把背后的侧栏也带关掉。pending 中不响应，
+  // 跟 cancel 按钮的 disabled 语义对齐——避免请求飞行中按 Esc 让对话框走，但
+  // mutation 仍在跑导致用户以为取消了。
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || pending) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      onCancel();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onCancel, pending]);
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
       <button
