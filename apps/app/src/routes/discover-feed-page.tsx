@@ -1229,7 +1229,11 @@ const pendingLikePostId = likeMutation.isPending
                         {t(msg`居民公开可见`)}
                       </div>
                     ) : null}
-                    {displayText ? <div>{displayText}</div> : null}
+                    {displayText ? (
+                      <div className="whitespace-pre-wrap break-words">
+                        {displayText}
+                      </div>
+                    ) : null}
                     {post.media.length > 0 ? (
                       <MomentMediaGallery
                         contentType={resolveFeedMomentContentType(post.media)}
