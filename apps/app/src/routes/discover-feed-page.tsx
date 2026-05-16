@@ -1752,12 +1752,22 @@ const pendingLikePostId = likeMutation.isPending
                 <span className="min-w-0 flex-1">
                   {likeMutation.error.message}
                 </span>
+                {/* 旧按钮是 handleStatusBack（refetch 整张 feed），跟"点赞失败"
+                    完全不挨着，用户点完莫名其妙列表重刷一遍但赞没补上。改成
+                    真的对失败那条 post 重试一次。 */}
                 <button
                   type="button"
-                  onClick={handleStatusBack}
+                  onClick={() => {
+                    const targetPostId = likeMutation.variables;
+                    if (targetPostId) {
+                      likeMutation.mutate(targetPostId);
+                    } else {
+                      likeMutation.reset();
+                    }
+                  }}
                   className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                 >
-                  {interactionActionLabel}
+                  {t(msg`重试点赞`)}
                 </button>
               </div>
             </InlineNotice>
@@ -1771,12 +1781,21 @@ const pendingLikePostId = likeMutation.isPending
                 <span className="min-w-0 flex-1">
                   {commentMutation.error.message}
                 </span>
+                {/* 同上：refetch 整张 feed 解决不了"评论没发出去"。回放上一次
+                    的 mutate 变量（postId + replyTarget + text）真去重试。 */}
                 <button
                   type="button"
-                  onClick={handleStatusBack}
+                  onClick={() => {
+                    const variables = commentMutation.variables;
+                    if (variables) {
+                      commentMutation.mutate(variables);
+                    } else {
+                      commentMutation.reset();
+                    }
+                  }}
                   className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                 >
-                  {interactionActionLabel}
+                  {t(msg`重试发送`)}
                 </button>
               </div>
             </InlineNotice>
@@ -1800,23 +1819,46 @@ const pendingLikePostId = likeMutation.isPending
           {!feedQuery.isLoading &&
           !feedQuery.isError &&
           !visiblePosts.length ? (
-            <MobileFeedStatusCard
-              badge={t(msg`广场`)}
-              title={t(msg`还没有新动态`)}
-              description={t(
-                msg`你先发一条居民公开可见的动态，或者等世界里的居民先开口。`,
-              )}
-              action={
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
-                  onClick={handleEmptyStateAction}
-                >
-                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`发一条广场动态`)}
-                </Button>
-              }
-            />
+            feedPosts.length > 0 ? (
+              // 后端给了 N 条 post 但全是被屏蔽的角色：旧逻辑统一显示「还没有
+              // 新动态 → 你先发一条」，把"被你自己屏蔽掉了"包装成"广场空"，
+              // 用户去 contacts 解除屏蔽前根本不知道为什么列表是空的。
+              <MobileFeedStatusCard
+                badge={t(msg`广场`)}
+                title={t(msg`广场动态都被你屏蔽了`)}
+                description={t(
+                  msg`当前页的 ${feedPosts.length} 条动态作者都在你的屏蔽名单里。去通讯录里解除屏蔽，或者翻翻其他居民的动态。`,
+                )}
+                action={
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
+                    onClick={() => void navigate({ to: "/tabs/contacts" })}
+                  >
+                    {t(msg`打开通讯录`)}
+                  </Button>
+                }
+              />
+            ) : (
+              <MobileFeedStatusCard
+                badge={t(msg`广场`)}
+                title={t(msg`还没有新动态`)}
+                description={t(
+                  msg`你先发一条居民公开可见的动态，或者等世界里的居民先开口。`,
+                )}
+                action={
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
+                    onClick={handleEmptyStateAction}
+                  >
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`发一条广场动态`)}
+                  </Button>
+                }
+              />
+            )
           ) : null}
         </section>
       </div>
