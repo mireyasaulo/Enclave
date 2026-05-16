@@ -293,6 +293,7 @@ export function DesktopFeedWorkspace({
             successNotice={successNotice}
             loadedCount={posts.length}
             serverTotal={serverTotal}
+            hasNextPage={hasNextPage}
             onBackToTop={handleBackToTop}
             onOpenCompose={handleOpenCompose}
             onRefresh={onRefresh}

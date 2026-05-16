@@ -11,6 +11,10 @@ type DesktopFeedToolbarProps = {
   loadedCount: number;
   /** 服务端汇报的总数；不传或 < loadedCount 时按 loadedCount 显示。 */
   serverTotal?: number;
+  /** 是否还有下一页未拉；用来在「已经到底」时把 toolbar 的数量文案从
+   *  「已加载 X / 共 Y」收敛到「共 X」，避免被屏蔽过滤吃掉的差额一直挂在
+   *  顶部看着像「还有 N 条没拉」。 */
+  hasNextPage?: boolean;
   onBackToTop: () => void;
   onOpenCompose: () => void;
   onRefresh: () => void;
@@ -23,6 +27,7 @@ export function DesktopFeedToolbar({
   successNotice,
   loadedCount,
   serverTotal,
+  hasNextPage = false,
   onBackToTop,
   onOpenCompose,
   onRefresh,
@@ -62,7 +67,13 @@ export function DesktopFeedToolbar({
 
         <div className="mt-4 flex items-center justify-end">
           <div className="text-[12px] text-[color:var(--text-muted)]">
-            {typeof serverTotal === "number" && serverTotal > loadedCount
+            {/* 还有下一页时如实展示「已加载 X / 共 Y」，告诉用户还能滚出更多；
+                所有分页都拉完后 (hasNextPage=false) 把它收敛到「共 X 条」——
+                屏蔽过滤吃掉的差额永远补不回来，挂在 toolbar 上反而像在催用户
+                继续等数据，跟 list 底部「已经到底了」也对不上。 */}
+            {typeof serverTotal === "number" &&
+            serverTotal > loadedCount &&
+            hasNextPage
               ? t(msg`已加载 ${loadedCount} / 共 ${serverTotal} 条动态`)
               : t(msg`共 ${loadedCount} 条动态`)}
           </div>
