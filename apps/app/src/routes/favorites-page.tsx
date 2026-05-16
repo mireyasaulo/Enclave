@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
@@ -97,6 +97,15 @@ export function FavoritesPage() {
 }
 
 function DesktopFavoritesPage() {
+  // 之前用模块级 `t = translateRuntimeMessage` 渲染整页 i18n 字符串，但
+  // translateRuntimeMessage 本身不订阅 locale 变化——用户在收藏页打开时
+  // 切换语言（设置 / 偏好菜单），整个 DesktopFavoritesPage 不会重渲染：
+  // 分类标签 / subtitle / 详情按钮 / 空态文案全停在切换前的语言，要切
+  // 走 tab 再切回才更新。useRuntimeTranslator 内部 useAppLocale 订阅
+  // activationVersion + locale，触发 re-render，render 时模块级 t 再被
+  // 调一遍自然读到新 locale。mobile-favorites-page / desktop-notes-workspace
+  // 一直用的就是 useRuntimeTranslator()，这里跟齐——返回值不用，纯订阅。
+  useRuntimeTranslator();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
