@@ -303,12 +303,30 @@ export function ContactsPage() {
   const baseUrl = runtimeConfig.apiBaseUrl;
   const routeState = parseDesktopContactsRouteState(hash);
   const [searchText, setSearchText] = useState("");
-  const [notice, setNotice] = useState<string | null>(null);
+  // 通讯录顶端的全局 notice：默认 info（成功类反馈），批量操作失败时走 danger。
+  // 以前用 string + 渲染时硬编码 tone="info" 一刀切，批量删除/打标签/星标的整条
+  // 调用挂掉（502 / 网络抖断）时弹出的"删除：操作失败：xxx" 也被画成蓝色 info，
+  // 看上去跟"已置顶"这种成功反馈长得一模一样，用户察觉不到出错。
+  const [notice, _setNotice] = useState<{
+    message: string;
+    tone: "info" | "danger";
+  } | null>(null);
+  const setNotice = useCallback((next: string | null) => {
+    _setNotice(next ? { message: next, tone: "info" } : null);
+  }, []);
+  const setNoticeError = useCallback((next: string | null) => {
+    _setNotice(next ? { message: next, tone: "danger" } : null);
+  }, []);
   // 新的朋友面板专用的内联成功提示——全局 notice 会泄漏到这里（如改星标后切回，
   // 旧 isSuccess 还挂着会把"已设为星标朋友。"显示在好友申请面板里）。
-  const [friendRequestSuccess, setFriendRequestSuccess] = useState<
-    string | null
+  // 带 ts 防止连续两次同 message（如连点两条「接受」）setState 拿到一样的字符串
+  // 引用被 React.Object.is 跳过，自清 timer 不重启，第二次只能蹭第一次剩余的时间。
+  const [friendRequestSuccess, setFriendRequestSuccessState] = useState<
+    { message: string; ts: number } | null
   >(null);
+  const setFriendRequestSuccess = useCallback((message: string) => {
+    setFriendRequestSuccessState({ message, ts: Date.now() });
+  }, []);
   const [showWorldCharacters, setShowWorldCharacters] = useState(
     routeState.showWorldCharacters,
   );
@@ -961,15 +979,15 @@ export function ContactsPage() {
     startChatResetRef.current();
   }, [baseUrl]);
 
-  // 通讯录所有 setNotice 都是 confirmation 文案（"已设为星标朋友"、"聊天已
-  // 置顶" 等），动作完成后应该自然淡出而不是永久 stick 在顶部。原写法没接
-  // 自清 timer，notice 会一直挂着，直到下一次 action 把它覆盖。对齐
-  // mobile-add-friend / friend-requests 的 2.4s 自清模板。
+  // 通讯录全局 notice 完成动作后应该自然淡出，对齐 mobile-add-friend / friend-
+  // requests 的自清模板。原本一律 2.4s，但 danger（批量失败）信息在 2.4s 里
+  // 用户基本来不及读完红字 + 错误原因，延长到 4.5s。
   useEffect(() => {
     if (!notice) {
       return;
     }
-    const timer = window.setTimeout(() => setNotice(null), 2400);
+    const delay = notice.tone === "danger" ? 4500 : 2400;
+    const timer = window.setTimeout(() => _setNotice(null), delay);
     return () => window.clearTimeout(timer);
   }, [notice]);
 
@@ -978,7 +996,7 @@ export function ContactsPage() {
       return;
     }
     const timer = window.setTimeout(
-      () => setFriendRequestSuccess(null),
+      () => setFriendRequestSuccessState(null),
       2400,
     );
     return () => window.clearTimeout(timer);
@@ -1885,7 +1903,7 @@ export function ContactsPage() {
                       ? declineFriendRequestMutation.error.message
                       : null
                 }
-                actionSuccess={friendRequestSuccess}
+                actionSuccess={friendRequestSuccess?.message ?? null}
                 acceptPendingId={
                   acceptFriendRequestMutation.isPending
                     ? (acceptFriendRequestMutation.variables ?? null)
@@ -2388,10 +2406,15 @@ export function ContactsPage() {
             <div className="space-y-1.5 px-3 pt-2">
               {notice ? (
                 <InlineNotice
-                  tone="info"
-                  className="rounded-[11px] border-[rgba(96,165,250,0.16)] px-2.5 py-1.5 text-[10px] leading-4 shadow-none"
+                  tone={notice.tone}
+                  className={cn(
+                    "rounded-[11px] px-2.5 py-1.5 text-[10px] leading-4 shadow-none",
+                    notice.tone === "danger"
+                      ? "border-[rgba(220,38,38,0.18)]"
+                      : "border-[rgba(96,165,250,0.16)]",
+                  )}
                 >
-                  {notice}
+                  {notice.message}
                 </InlineNotice>
               ) : null}
               {mobileErrorItems.map((item) => (
