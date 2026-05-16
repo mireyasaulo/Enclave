@@ -2697,14 +2697,29 @@ export class FeedService implements OnModuleInit {
       return new Set<string>();
     }
 
-    const interactions = await this.interactionRepo.find({
-      where: { ownerId, type: 'comment_like' },
-    });
+    // 走查 R3 perf：原实现 `find({ where: { ownerId, type: 'comment_like' } })`
+    // 拉用户**全部**评论点赞历史，再用 `commentIds.includes()` 在内存里挑——
+    // 老用户广场刷一遍下来每行 commentLike 都拉、O(interactions × commentIds)
+    // 内存扫一次。常逛广场 + 群活跃的账号实测 5000+ commentLike 行，每翻一页
+    // 读 5000 行 JSON parse + 60 次 includes = 上百 ms 直接挂在 getFeed 关键路径。
+    // 改成 SQL 层 json_extract(payload, '$.commentId') IN (:commentIds)，只拉
+    // 本页评论真被点过的几行，命中量从"用户全量"降到"本页"。
+    // simple-json 列底层是 TEXT 存 JSON 字符串，SQLite/MySQL 都有 json_extract。
+    const interactions = await this.interactionRepo
+      .createQueryBuilder('interaction')
+      .where('interaction.userId = :ownerId', { ownerId })
+      .andWhere("interaction.type = 'comment_like'")
+      .andWhere(
+        "json_extract(interaction.payload, '$.commentId') IN (:...commentIds)",
+        { commentIds },
+      )
+      .getMany();
 
+    const commentIdSet = new Set(commentIds);
     return new Set(
       interactions
         .map((item) => String(item.payload?.commentId ?? '').trim())
-        .filter((item) => item && commentIds.includes(item)),
+        .filter((item) => item && commentIdSet.has(item)),
     );
   }
 
