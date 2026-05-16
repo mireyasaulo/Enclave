@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Search, X } from "lucide-react";
 import { getFriends } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
+import { InlineNotice } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 import {
@@ -83,6 +84,29 @@ export function ManagementPermissionsScreen({ onPickFriend }: Props) {
       {isLoading ? (
         <div className="px-4 py-8 text-center text-[12px] text-[color:var(--text-muted)]">
           {t(msg`正在读取联系人...`)}
+        </div>
+      ) : friendsQuery.isError && friendsQuery.error instanceof Error ? (
+        // friendsQuery 失败时 data=[] 会直接走"通讯录还是空的"误导分支，对齐
+        // 黑名单屏的处理：单独识别 error 状态 + 重试按钮，别让用户以为自己
+        // 没好友。
+        <div className="px-3 py-4">
+          <InlineNotice
+            tone="danger"
+            className="rounded-[11px] px-2.5 py-2 text-[12px] leading-5 shadow-none"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="min-w-0 flex-1">
+                {friendsQuery.error.message || t(msg`联系人列表暂时读取失败。`)}
+              </span>
+              <button
+                type="button"
+                onClick={() => void friendsQuery.refetch()}
+                className="shrink-0 rounded-full border border-[rgba(220,38,38,0.18)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
+              >
+                {t(msg`重试读取`)}
+              </button>
+            </div>
+          </InlineNotice>
         </div>
       ) : !sections.length ? (
         <div className="px-6 py-10 text-center text-[12px] text-[color:var(--text-muted)]">

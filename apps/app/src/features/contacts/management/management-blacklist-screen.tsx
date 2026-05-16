@@ -61,6 +61,33 @@ export function ManagementBlacklistScreen() {
     );
   }
 
+  // 之前没处理 isError：blockedQuery 网络失败时 data=[] 直接走"黑名单为空"
+  // 分支，用户会误以为自己没有拉黑过任何人，错过实际存在的黑名单。补一个
+  // 区分 error / 空态的分支，给重试按钮。
+  if (blockedQuery.isError && blockedQuery.error instanceof Error) {
+    return (
+      <div className="px-3 py-4">
+        <InlineNotice
+          tone="danger"
+          className="rounded-[11px] px-2.5 py-2 text-[12px] leading-5 shadow-none"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="min-w-0 flex-1">
+              {blockedQuery.error.message || t(msg`黑名单暂时读取失败。`)}
+            </span>
+            <button
+              type="button"
+              onClick={() => void blockedQuery.refetch()}
+              className="shrink-0 rounded-full border border-[rgba(220,38,38,0.18)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
+            >
+              {t(msg`重试读取`)}
+            </button>
+          </div>
+        </InlineNotice>
+      </div>
+    );
+  }
+
   if (!blocked.length) {
     return (
       <div className="px-6 py-12 text-center">

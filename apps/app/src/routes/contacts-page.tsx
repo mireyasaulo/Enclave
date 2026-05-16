@@ -304,6 +304,11 @@ export function ContactsPage() {
   const routeState = parseDesktopContactsRouteState(hash);
   const [searchText, setSearchText] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
+  // 新的朋友面板专用的内联成功提示——全局 notice 会泄漏到这里（如改星标后切回，
+  // 旧 isSuccess 还挂着会把"已设为星标朋友。"显示在好友申请面板里）。
+  const [friendRequestSuccess, setFriendRequestSuccess] = useState<
+    string | null
+  >(null);
   const [showWorldCharacters, setShowWorldCharacters] = useState(
     routeState.showWorldCharacters,
   );
@@ -815,6 +820,7 @@ export function ContactsPage() {
       const wasOnNewFriendsPane = desktopSelection?.kind === "new-friends";
 
       setNotice(t(msg`已通过好友申请。`));
+      setFriendRequestSuccess(t(msg`已通过好友申请。`));
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-friend-requests", baseUrl],
@@ -844,7 +850,8 @@ export function ContactsPage() {
   const declineFriendRequestMutation = useMutation({
     mutationFn: (requestId: string) => declineFriendRequest(requestId, baseUrl),
     onSuccess: async () => {
-      setNotice(t(msg`好友请求已处理。`));
+      setNotice(t(msg`已忽略好友申请。`));
+      setFriendRequestSuccess(t(msg`已忽略好友申请。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-friend-requests", baseUrl],
       });
@@ -952,6 +959,17 @@ export function ContactsPage() {
     const timer = window.setTimeout(() => setNotice(null), 2400);
     return () => window.clearTimeout(timer);
   }, [notice]);
+
+  useEffect(() => {
+    if (!friendRequestSuccess) {
+      return;
+    }
+    const timer = window.setTimeout(
+      () => setFriendRequestSuccess(null),
+      2400,
+    );
+    return () => window.clearTimeout(timer);
+  }, [friendRequestSuccess]);
 
   // 原生壳硬件 Back（仅移动布局生效）：
   // 1) + 快捷菜单打开时先收菜单
@@ -1854,6 +1872,7 @@ export function ContactsPage() {
                       ? declineFriendRequestMutation.error.message
                       : null
                 }
+                actionSuccess={friendRequestSuccess}
                 acceptPendingId={
                   acceptFriendRequestMutation.isPending
                     ? (acceptFriendRequestMutation.variables ?? null)
@@ -2454,7 +2473,16 @@ export function ContactsPage() {
             ) : null}
 
             {friendSections.map((section) => (
-              <div key={section.key} id={section.anchorId}>
+              // scroll-margin-top 跟 syncActiveMobileIndexKey 的 stickyOffset 保
+              // 持 104px 一致：右侧 A-Z 索引点 "M" 后 scrollIntoView 把这块锚点
+              // 对齐到 MobileViewportPane 滚动容器的 top，而 TabPageTopBar 是
+              // sticky top-0 占着同一个位置，section header（字母 "M"）直接被
+              // 盖住；加 104px scroll-margin 让锚点落在 top bar 下沿。
+              <div
+                key={section.key}
+                id={section.anchorId}
+                style={{ scrollMarginTop: 104 }}
+              >
                 <SectionHeader title={section.title} />
                 {section.items.map((item, index) => (
                   <FriendListRow
