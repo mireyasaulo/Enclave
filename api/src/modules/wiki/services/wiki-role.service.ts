@@ -13,6 +13,7 @@ import { WikiBlockEntity } from '../entities/wiki-block.entity';
 import { WikiProtectionService } from './wiki-protection.service';
 
 const ROLES = ['newcomer', 'autoconfirmed', 'patroller', 'admin'] as const;
+const MAX_REASON_LENGTH = 200;
 type WikiRole = (typeof ROLES)[number];
 
 @Injectable()
@@ -84,11 +85,28 @@ export class WikiRoleService {
     targetUserId: string,
     actor: AuthenticatedUser,
     input: { role: WikiRole; reason?: string },
-  ): Promise<UserEntity> {
+  ): Promise<{
+    id: string;
+    username: string;
+    role: string;
+    userType: string;
+    roleGrantedAt: Date | null;
+    roleGrantedBy: string | null;
+  }> {
     if (!ROLES.includes(input.role)) {
       throw new AppError('WIKI_VALIDATION_FAILED', {
         params: { detail: 'role 必须是 newcomer / autoconfirmed / patroller / admin' },
         legacyMessage: 'role 必须是 newcomer / autoconfirmed / patroller / admin',
+      });
+    }
+    // reason 会拼到 user.roleGrantedBy 落库展示，必须有长度上限 —— 否则
+    // 任何 admin 都能用 5KB+ 字符串撑爆这一列，admin-users 列表里渲染会卡。
+    const trimmedReason = (input.reason ?? '').trim();
+    if (trimmedReason.length > MAX_REASON_LENGTH) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { detail: `reason 不能超过 ${MAX_REASON_LENGTH} 个字符` },
+        legacyMessage: `reason 不能超过 ${MAX_REASON_LENGTH} 个字符`,
       });
     }
     const user = await this.userRepo.findOne({ where: { id: targetUserId } });
@@ -122,13 +140,22 @@ export class WikiRoleService {
     user.role = input.role;
     user.roleGrantedAt = new Date();
     user.roleGrantedBy = `admin:${actor.username}${
-      input.reason ? `:${input.reason}` : ''
+      trimmedReason ? `:${trimmedReason}` : ''
     }`;
     await this.userRepo.save(user);
     this.logger.log(
       `manual role change: ${user.username} → ${input.role} by ${actor.username}`,
     );
-    return user;
+    // 不要 return user 原始 entity —— TypeORM 会把 passwordHash / email 一起序列化
+    // 走 HTTP 出去，admin 哪怕只是改个角色也会拿到所有用户的 bcrypt hash 和邮箱。
+    return {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      userType: user.userType,
+      roleGrantedAt: user.roleGrantedAt,
+      roleGrantedBy: user.roleGrantedBy ?? null,
+    };
   }
 
   // 解析 userId → 公开展示信息（username / role）。recent-changes、pending-reviews、
