@@ -16,6 +16,7 @@
     "environment": "production",
     "apiBaseUrl": "https://1gw06751dd053.vicp.fun",
     "socketBaseUrl": "https://1gw06751dd053.vicp.fun",
+    "cloudApiBaseUrl": "https://1gw06751dd053.vicp.fun",
     "publicAppName": "Yinjie"
   },
   "localization": {
