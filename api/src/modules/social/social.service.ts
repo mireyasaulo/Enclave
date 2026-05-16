@@ -201,15 +201,30 @@ export class SocialService {
     const friendships = await this.friendshipRepo.find({
       where: { ownerId: owner.id, status: Not(In(['blocked', 'removed'])) },
     });
-    const result = await Promise.all(
-      friendships.map(async (friendship) => ({
-        friendship,
-        character: await this.characterRepo.findOneBy({
-          id: friendship.characterId,
-        }),
-      })),
+    if (!friendships.length) {
+      return [];
+    }
+    // 原实现对每个 friendship 都跑一次 characterRepo.findOneBy，N 个好友 = N+1 次 SQL。
+    // yuanzui0728 默认好友 + 自建角色加起来 30+，每次进通讯录主页都要打 30+ 条
+    // SELECT character WHERE id = ?。改成一条 IN([...]) 查询后回到常数次 SQL。
+    const characterIds = Array.from(
+      new Set(friendships.map((f) => f.characterId)),
     );
-    return result.filter((entry) => entry.character !== null);
+    const characters = await this.characterRepo.find({
+      where: { id: In(characterIds) },
+    });
+    const characterById = new Map(characters.map((c) => [c.id, c]));
+    const result: {
+      friendship: FriendshipEntity;
+      character: CharacterEntity | null;
+    }[] = [];
+    for (const friendship of friendships) {
+      const character = characterById.get(friendship.characterId);
+      if (character) {
+        result.push({ friendship, character });
+      }
+    }
+    return result;
   }
 
   async setFriendStarred(

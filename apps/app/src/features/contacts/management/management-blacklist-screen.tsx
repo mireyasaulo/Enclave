@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -25,8 +26,9 @@ export function ManagementBlacklistScreen() {
     queryFn: () => listCharacters(baseUrl),
   });
 
-  const characterMap = new Map(
-    (charactersQuery.data ?? []).map((c) => [c.id, c]),
+  const characterMap = useMemo(
+    () => new Map((charactersQuery.data ?? []).map((c) => [c.id, c])),
+    [charactersQuery.data],
   );
 
   const unblockMutation = useMutation({

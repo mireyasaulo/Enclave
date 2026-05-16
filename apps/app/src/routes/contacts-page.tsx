@@ -337,7 +337,11 @@ export function ContactsPage() {
   >(null);
   const previousBaseUrlRef = useRef(baseUrl);
   const startChatResetRef = useRef<() => void>(() => {});
-  const deferredSearchText = useDeferredValue("");
+  // 之前写成 useDeferredValue("") —— deferredSearchText 永远是空串，导致桌面
+  // 通讯录的内联搜索一直跑不到 matchesFriendSearch 分支：输入框打了字看上去没
+  // 反应，「没有找到匹配的联系人」「清空搜索」这两个空态分支也永远不会亮起。
+  // 必须把 searchText 真正喂进 useDeferredValue 才能让搜索生效。
+  const deferredSearchText = useDeferredValue(searchText);
   const desktopContactsPath = "/tabs/contacts";
   const normalizedPathname = normalizePathname(pathname);
   const desktopPathMismatch = normalizedPathname !== desktopContactsPath;

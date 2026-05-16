@@ -62,12 +62,15 @@ export function createFriendDirectoryItems(
   items: FriendListItem[],
 ): FriendDirectoryItem[] {
   return sortDirectoryItems(
-    items.map((item) => ({
-      ...item,
-      displayName: getFriendDisplayName(item),
-      sortLabel: getFriendDisplayName(item),
-      indexLabel: getContactIndexLabel(getFriendDisplayName(item)),
-    })),
+    items.map((item) => {
+      const displayName = getFriendDisplayName(item);
+      return {
+        ...item,
+        displayName,
+        sortLabel: displayName,
+        indexLabel: getContactIndexLabel(displayName),
+      };
+    }),
   );
 }
 
