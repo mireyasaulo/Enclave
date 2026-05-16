@@ -12,13 +12,11 @@ import { Inject, Logger, forwardRef } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { AiProviderAuthError } from '../ai/ai.types';
-import { ReplyLogicRulesService } from '../ai/reply-logic-rules.service';
 import { SubscriptionExpiredException } from '../subscription/subscription-expired.exception';
 import {
   WorldLanguageService,
   type WorldLanguageCode,
 } from '../config/world-language.service';
-import { describeAttachmentForDisplay } from './attachment-semantic-text';
 import type {
   ContactCardAttachment,
   FileAttachment,
@@ -118,7 +116,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     @Inject(forwardRef(() => ChatService))
     private readonly chatService: ChatService,
-    private readonly replyLogicRules: ReplyLogicRulesService,
     private readonly worldLanguage: WorldLanguageService,
   ) {}
 
@@ -196,12 +193,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     const { conversationId, characterId } = payload;
-    const replyText =
-      payload.type === 'sticker'
-        ? (payload.text ?? '[表情包]')
-        : 'attachment' in payload
-          ? (payload.text ?? describeAttachmentForDisplay(payload.attachment))
-          : payload.text;
 
     try {
       let convId = conversationId;
@@ -214,46 +205,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         convId = conv.id;
       }
 
-      const activity = await this.chatService.getCharacterActivity(characterId);
-      const runtimeRules = await this.replyLogicRules.getRules();
-      if (activity === 'sleeping') {
-        const delay =
-          runtimeRules.sleepDelayMs.min +
-          Math.random() *
-            (runtimeRules.sleepDelayMs.max - runtimeRules.sleepDelayMs.min);
-        setTimeout(() => {
-          void this.deliverConversationReply(
-            convId,
-            characterId,
-            payload,
-            replyText,
-          );
-        }, delay);
-        return { event: 'message_sent', data: { conversationId: convId } };
-      }
-
-      if (activity && ['working', 'commuting'].includes(activity)) {
-        const delay =
-          runtimeRules.busyDelayMs.min +
-          Math.random() *
-            (runtimeRules.busyDelayMs.max - runtimeRules.busyDelayMs.min);
-        setTimeout(() => {
-          void this.deliverConversationReply(
-            convId,
-            characterId,
-            payload,
-            replyText,
-          );
-        }, delay);
-        return { event: 'message_sent', data: { conversationId: convId } };
-      }
-
-      await this.deliverConversationReply(
-        convId,
-        characterId,
-        payload,
-        replyText,
-      );
+      await this.deliverConversationReply(convId, characterId, payload);
       return { event: 'message_sent', data: { conversationId: convId } };
     } catch (err) {
       this.logger.error('Error handling message', err);
@@ -332,22 +284,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     convId: string,
     characterId: string,
     payload: SendMessagePayload,
-    replyText: string,
   ) {
     this.emitTypingStart(convId, characterId, 'reply');
 
     try {
       const { messages, scheduledReplyArtifactJobIds } =
         await this.chatService.sendMessageDetailed(convId, payload);
-      const aiReply = messages.find(
-        (message) => message.senderType === 'character',
-      );
-      if (aiReply) {
-        const lengthBasis =
-          aiReply.type === 'sticker' ? replyText.length : aiReply.text.length;
-        const delay = Math.min(Math.max(lengthBasis * 16, 400), 3_000);
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
 
       this.emitTypingStop(convId, characterId, 'reply');
 
