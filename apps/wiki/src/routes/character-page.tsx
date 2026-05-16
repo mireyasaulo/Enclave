@@ -26,6 +26,7 @@ import {
 import { SnapshotDiff } from "../components/snapshot-diff";
 import { TalkPanel } from "../components/talk-panel";
 import { WatchToggle } from "../components/watch-toggle";
+import { ReportButton } from "../components/report-button";
 import { FormRow } from "../components/form-row";
 import { formatDateTime } from "../lib/format";
 import { useUsernameMap } from "../lib/use-username-map";
@@ -94,6 +95,9 @@ export function CharacterPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
           <WatchToggle characterId={characterId} />
+          {user && (
+            <ReportButton targetType="wiki_page" targetId={characterId} />
+          )}
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2">

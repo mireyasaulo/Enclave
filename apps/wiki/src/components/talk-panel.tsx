@@ -21,6 +21,7 @@ import {
 } from "../lib/wiki-api";
 import { formatDateTime } from "../lib/format";
 import { useUsernameMap } from "../lib/use-username-map";
+import { ReportButton } from "./report-button";
 
 export function TalkPanel({ characterId }: { characterId: string }) {
   const t = translateRuntimeMessage;
@@ -352,6 +353,7 @@ function PostTree({
                 >
                   <Trans>回复</Trans>
                 </button>
+                <ReportButton targetType="wiki_talk_post" targetId={post.id} />
                 {canDelete(post) && (
                   <button
                     type="button"
