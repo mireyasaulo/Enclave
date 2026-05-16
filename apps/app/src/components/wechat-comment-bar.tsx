@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 
 const t = translateRuntimeMessage;
 
@@ -104,13 +105,32 @@ export function WeChatCommentBar({
   }, [open]);
 
   // Close on Escape.
+  // 走查 R1：之前 ESC handler 不看 IME composing —— 中文 / 日文用户在 textarea
+  // 打字开候选窗时按 ESC 想关候选窗（系统行为），keydown 一样冒出来命中这条
+  // handler 把整个评论 bar 关掉，已经敲的草稿留在 commentDrafts 不丢但 bar 自
+  // 己消失用户必须再点一次评论入口才能继续。跟桌面广场动态 R1 (902d9f0a) 同
+  // 修法：event.isComposing / event.keyCode===229 时跳过。
   useEffect(() => {
     if (!open) return;
     const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key !== "Escape") return;
+      if (event.isComposing || event.keyCode === 229) return;
+      onClose();
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
+  }, [open, onClose]);
+
+  // Android 硬件 Back：bar 打开时按 Back 应该收 bar 而不是退掉整页。
+  // 跟 chat 系列 (38a65fa5) / mobile-feed-publish discardConfirm / MomentMediaGallery
+  // viewer 一致的模式。preventDefault + 返回 true 消费按键。
+  useEffect(() => {
+    if (!open) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
   }, [open, onClose]);
 
   // Auto-grow textarea up to 5 lines.
