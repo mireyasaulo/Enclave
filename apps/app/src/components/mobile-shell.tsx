@@ -20,6 +20,7 @@ import { useMessageReminders } from "../features/chat/use-message-reminders";
 import { useChatReminderEntries } from "../features/chat/use-chat-reminder-entries";
 import { MobileReminderToastHost } from "../features/chat/mobile-reminder-toast-host";
 import { persistMobileWebRoute } from "../features/shell/mobile-web-route-persistence";
+import { useKeyboardInset } from "../hooks/use-keyboard-inset";
 import { recordAppNavigation } from "../lib/history-back";
 import { isMobileWebRuntime } from "../runtime/platform";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -98,6 +99,15 @@ export function MobileShell({ children }: PropsWithChildren) {
       document.body.classList.remove("yj-mobile");
     };
   }, []);
+
+  const { keyboardInset } = useKeyboardInset();
+  useEffect(() => {
+    const value = keyboardInset > 0 ? `${keyboardInset}px` : "0px";
+    document.documentElement.style.setProperty("--keyboard-inset", value);
+    return () => {
+      document.documentElement.style.removeProperty("--keyboard-inset");
+    };
+  }, [keyboardInset]);
 
   return (
     <div className="yj-mobile-shell relative h-dvh min-h-dvh overflow-hidden bg-[color:var(--bg-canvas)] text-[color:var(--text-primary)]">

@@ -5,6 +5,25 @@
   --safe-area-inset-right: env(safe-area-inset-right, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  /* 由 MobileShell 发布；用于 fixed/sticky 元素与软键盘共享同一基线 */
+  --keyboard-inset: 0px;
+}
+
+.yj-safe-top {
+  padding-top: var(--safe-area-inset-top);
+}
+.yj-safe-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+/* 同时避开底部安全区和软键盘——把 sticky 输入条、底部 FAB、Sheet 抬到合适位置 */
+.yj-safe-bottom-with-keyboard {
+  padding-bottom: max(var(--safe-area-inset-bottom), var(--keyboard-inset));
+}
+.yj-safe-left {
+  padding-left: var(--safe-area-inset-left);
+}
+.yj-safe-right {
+  padding-right: var(--safe-area-inset-right);
 }
 
 html,
