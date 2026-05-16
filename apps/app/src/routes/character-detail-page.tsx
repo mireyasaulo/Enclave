@@ -464,6 +464,14 @@ export function CharacterDetailPage() {
     });
   }, [characterId, friendship?.remarkName, friendshipTagsKey, isEditingProfile]);
 
+  // 走查 R4：getOrCreateConversation 后端有两个会改 conversation 行的副作用：
+  // (a) 第一次跟某角色聊天会 INSERT 一条新 direct conversation；(b) 用户之前
+  // 从 /chat 列表 hide 过的会话，再次 getOr* 会把 isHidden 翻回 false 并清
+  // hiddenAt（chat.service.ts L246-L250）。这两种情况下 app-conversations 缓存
+  // 都已经脏。原 onSuccess 直接 navigate 不 invalidate，用户从 character-detail
+  // 点"发消息"进入聊天 → 看完按 back → /tabs/chat 列表里要么少这条新会话，要么
+  // 还把它显示在隐藏列表（导致冗余 hide 提示反复弹）。openCallMutation 同样会
+  // 触发 getOrCreateConversation，需要一并补上。
   const startChatMutation = useMutation({
     mutationFn: async () => {
       if (!character) {
@@ -483,6 +491,9 @@ export function CharacterDetailPage() {
           baseUrl,
         ).catch(() => undefined);
       }
+      await queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
       void navigate({
         to: isDesktopLayout
           ? buildDesktopChatThreadPath({
@@ -517,11 +528,14 @@ export function CharacterDetailPage() {
         kind,
       };
     },
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       if (!result?.conversation) {
         return;
       }
 
+      await queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
       void navigate({
         to: isDesktopLayout
           ? "/tabs/chat"
