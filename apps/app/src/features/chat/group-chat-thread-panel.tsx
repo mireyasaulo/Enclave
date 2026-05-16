@@ -34,7 +34,6 @@ import { FeatureUnavailableDialog } from "../../components/feature-unavailable-d
 import { ChatMessageList } from "../../components/chat-message-list";
 import {
   encodeChatReplyText,
-  sanitizeDisplayedChatText,
   type ChatReplyMetadata,
 } from "../../lib/chat-text";
 import { resolveMessageSemanticPreview } from "../../lib/message-attachment-semantic";
@@ -1068,9 +1067,15 @@ export function GroupChatThreadPanel({
 
   const [callUnavailableKind, setCallUnavailableKind] =
     useState<DesktopChatCallKind | null>(null);
-  const handleDesktopCallAction = (kind: DesktopChatCallKind) => {
-    setCallUnavailableKind(kind);
-  };
+  // 同 conversation-thread-panel Round 1 修复：useEffect 把 handleDesktopCallAction
+  // 列进 deps，inline fn 每 render 换引用 → effect 每 render 都跑（token guard
+  // 是兜底，不是节流）。useCallback 固化引用。
+  const handleDesktopCallAction = useCallback(
+    (kind: DesktopChatCallKind) => {
+      setCallUnavailableKind(kind);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!isDesktop || !desktopCallRequest) {
