@@ -90,6 +90,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         } else {
             application.applicationIconBadgeNumber = 0
         }
+
+        // 真机走查 R4：用户「在 Settings.app 里手动开关通知权限」是 iOS 上一条
+        // 完全不会通知 app 的死链：
+        //   - 用户首次打开 app → 系统弹「是否允许通知」→ 选「不允许」→ JS 那条
+        //     requestNotificationPermission 拿到 .denied 静默回写 UI；
+        //   - 之后用户改主意，去 Settings → 隐界 → 通知 → 把开关拨到「允许」→
+        //     回到 app；
+        //   - iOS **不会** 触发 didFinishLaunchingWithOptions（app 一直没被 kill），
+        //     也 **不会** 重发授权 callback 或主动 register APNs 拿新 token。
+        // 这条 applicationDidBecomeActive 在「从 Settings 切回 app」时会触发
+        // （Settings 是独立 process，切走 → 切回 → resign → become active），
+        // 是 iOS 上唯一稳定能捕获到这条路径的 hook。
+        //
+        // 老实现这里只清 badge，没 re-register；结果用户「在 Settings 刚开通知
+        // → 回到 app → 给某个朋友发消息」之后，他朋友的回复永远不会以推送
+        // 形式到达：APNs 没拿到 device token，cloud-api 那张 push_tokens 表里
+        // 这个用户根本没行；JS 那条 isNativeMobileBridgeAvailable + permission
+        // === "granted" 判完直接走 syncIosPushToken → readNativePushToken
+        // 返回 null → reason: "no-token" 默默跳过。要等到下次用户 force-quit
+        // app 重启走 didFinishLaunchingWithOptions 才能恢复。期间用户只看到
+        // 「app 内推送状态显示已开通」但实际没收到，根因极难 trace。
+        //
+        // 复用跟 didFinishLaunchingWithOptions 同款的 register pattern：已授权
+        // 时调一次 registerForRemoteNotifications。registerForRemoteNotifications
+        // 是 idempotent 的（APNs 已有 token 时返回老 token，没变化时 didRegister
+        // 仍触发把当前 token 通过 NotificationCenter 广播一次让 JS 兜底同步），
+        // 调用本身极轻量。.notDetermined（用户从没回应过）走 JS 主动
+        // requestNotificationPermission 的路径，不在这里弹系统对话框。
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            guard settings.authorizationStatus == .authorized ||
+                    settings.authorizationStatus == .provisional else {
+                return
+            }
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
