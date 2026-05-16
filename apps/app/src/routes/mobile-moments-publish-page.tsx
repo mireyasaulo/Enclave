@@ -53,7 +53,19 @@ export function MobileMomentsPublishPage() {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
-  const [toast, setToast] = useState<string>("");
+  // toast 用 {message, key} 而不是 raw string —— 三行 SettingRow（所在位置/
+  // 提醒谁看/谁可以看）点击都派发同一句「敬请期待」，如果只比较 message
+  // 字符串，useEffect 的 toast dep 不变 → setTimeout 不重启 → 用户在 1.6s
+  // 内连点不同行，第二次的 toast 提前消失。给每次 setToast 配一个递增 key，
+  // useEffect 跟着 key 走就能稳定地每次重置 1.6s 倒计时。
+  const [toast, setToast] = useState<{ message: string; key: number } | null>(
+    null,
+  );
+  const toastKeyRef = useRef(0);
+  function showToast(message: string) {
+    toastKeyRef.current += 1;
+    setToast({ message, key: toastKeyRef.current });
+  }
 
   // textarea 高度跟内容长——原来 rows={4} 是死高，写长一点的朋友圈就只能在 4 行
   // 的小框里内部滚动（手指在 textarea 里另起一个滚动事件，体感跟微信完全不一样）。
@@ -148,9 +160,9 @@ export function MobileMomentsPublishPage() {
 
   useEffect(() => {
     if (!toast) return;
-    const timer = window.setTimeout(() => setToast(""), 1600); // i18n-ignore-line: clearing state
+    const timer = window.setTimeout(() => setToast(null), 1600);
     return () => window.clearTimeout(timer);
-  }, [toast]);
+  }, [toast?.key]);
 
   // ESC 关闭「放弃发表」确认弹窗 / 媒体选择器（和 farm 的 sheet/modal 处理对齐）。
   useEffect(() => {
@@ -488,17 +500,17 @@ export function MobileMomentsPublishPage() {
           <SettingRow
             label={t(msg`所在位置`)}
             value={t(msg`不显示位置`)}
-            onTap={() => setToast(t(msg`敬请期待`))}
+            onTap={() => showToast(t(msg`敬请期待`))}
           />
           <SettingRow
             label={t(msg`提醒谁看`)}
             value=""
-            onTap={() => setToast(t(msg`敬请期待`))}
+            onTap={() => showToast(t(msg`敬请期待`))}
           />
           <SettingRow
             label={t(msg`谁可以看`)}
             value={t(msg`公开`)}
-            onTap={() => setToast(t(msg`敬请期待`))}
+            onTap={() => showToast(t(msg`敬请期待`))}
             isLast
           />
         </section>
@@ -528,7 +540,7 @@ export function MobileMomentsPublishPage() {
       {toast ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+96px)] z-[1100] flex justify-center">
           <div className="rounded-[6px] bg-black/72 px-3 py-1.5 text-[13px] text-white">
-            {toast}
+            {toast.message}
           </div>
         </div>
       ) : null}
