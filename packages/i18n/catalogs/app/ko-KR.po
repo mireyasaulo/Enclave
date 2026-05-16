@@ -26180,7 +26180,7 @@ msgstr "숨겨진 세계 그룹 채팅"
 #: apps/app/src/routes/group-qr-page.tsx:228
 #: apps/app/src/routes/group-qr-page.tsx:291
 msgid "邀请你加入「{groupDisplayName}」"
-msgstr "'{groupDisplayName}'에 가입하도록 초대합니다."
+msgstr "「{groupDisplayName}」에 가입하도록 초대합니다."
 
 #: apps/app/src/routes/group-qr-page.tsx:229
 #: apps/app/src/routes/group-qr-page.tsx:292
