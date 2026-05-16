@@ -457,8 +457,13 @@ public class YinjieMobileBridgePlugin extends Plugin {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            ContextCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        // 跟 getNotificationPermissionState (Round 12) 对齐：
+        //   - pre-Tiramisu 没 runtime permission，但 areNotificationsEnabled()
+        //     在用户关掉通知时返 false；当前实现只判 T+ permission 等于跳过这层
+        //     检查直接 notify()，系统静默丢消息，JS 收到 resolve() 以为弹了。
+        //   - T+ 也可能 permission=GRANTED + areNotificationsEnabled=false（用户
+        //     在 Settings 关掉了整个 channel / app 通知），同样静默掉消息。
+        if (!"granted".equals(readNotificationPermissionState())) {
             call.reject("notification permission is not granted");
             return;
         }
