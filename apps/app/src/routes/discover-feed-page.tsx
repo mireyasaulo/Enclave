@@ -2032,23 +2032,41 @@ const pendingLikePostId = likeMutation.isPending
               // 后端给了 N 条 post 但全是被屏蔽的角色：旧逻辑统一显示「还没有
               // 新动态 → 你先发一条」，把"被你自己屏蔽掉了"包装成"广场空"，
               // 用户去 contacts 解除屏蔽前根本不知道为什么列表是空的。
-              <MobileFeedStatusCard
-                badge={t(msg`广场`)}
-                title={t(msg`广场动态都被你屏蔽了`)}
-                description={t(
-                  msg`当前页的 ${feedPosts.length} 条动态作者都在你的屏蔽名单里。去通讯录里解除屏蔽，或者翻翻其他居民的动态。`,
-                )}
-                action={
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
-                    onClick={() => void navigate({ to: "/tabs/contacts" })}
-                  >
-                    {t(msg`打开通讯录`)}
-                  </Button>
-                }
-              />
+              // 进一步：R21 加了「全被屏蔽 → 自动翻下一页」的兜底 effect，
+              // 但本空态不挑剔状态直接渲，用户看到的是"广场动态都被你屏蔽了"
+              // 静态文案 + 「打开通讯录」按钮——其实后台还在自动翻下一页找
+              // 非屏蔽内容。用户来不及反应就点了按钮跳走，后台的努力被抹掉。
+              // 翻页还没结束（还在 fetch / 还有下一页 / 没命中错误）时换成
+              // loading 文案，让用户知道在等什么；翻完了再降级到原始 CTA。
+              isFetchingNextFeedPage ||
+              (hasNextFeedPage && !isFetchNextFeedPageError) ? (
+                <MobileFeedStatusCard
+                  badge={t(msg`广场`)}
+                  title={t(msg`正在寻找未屏蔽的动态`)}
+                  description={t(
+                    msg`当前页的 ${feedPosts.length} 条动态作者都在你的屏蔽名单里，正在自动翻下一页找未屏蔽的居民动态。`,
+                  )}
+                  tone="loading"
+                />
+              ) : (
+                <MobileFeedStatusCard
+                  badge={t(msg`广场`)}
+                  title={t(msg`广场动态都被你屏蔽了`)}
+                  description={t(
+                    msg`当前共 ${feedPosts.length} 条动态作者全部在你的屏蔽名单里。去通讯录里解除屏蔽，或者等其他居民发布新动态。`,
+                  )}
+                  action={
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
+                      onClick={() => void navigate({ to: "/tabs/contacts" })}
+                    >
+                      {t(msg`打开通讯录`)}
+                    </Button>
+                  }
+                />
+              )
             ) : (
               <MobileFeedStatusCard
                 badge={t(msg`广场`)}
