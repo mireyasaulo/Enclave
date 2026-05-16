@@ -22,6 +22,18 @@
             android:name="yinjie.environment"
             android:value="${yinjieEnvironment}" />
 
+        <!--
+            FCM 在 app 处于 background + 收到 notification 字段时，由系统直接弹通知，
+            不进 YinjieFirebaseMessagingService.onMessageReceived（详见 Round 14）。
+            没有这条 meta-data，SDK 会回落到「fcm_fallback_notification_channel」
+            （IMPORTANCE_DEFAULT、英文 "Miscellaneous" 标签）而不是我们已经创建的
+            "yinjie_messages"（IMPORTANCE_HIGH、本地化「隐界消息」）；聊天推送被
+            当做营销级提示，重要性、声音、状态栏小图标 tint 全部跟前台/本地推送脱节。
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="yinjie_messages" />
+
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
             android:name=".MainActivity"
