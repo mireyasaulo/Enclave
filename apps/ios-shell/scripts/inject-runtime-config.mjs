@@ -42,12 +42,16 @@ const template = readJsonIfExists(templatePath) ?? {};
 const baseRuntime = shellConfig.runtime ?? {};
 const localRuntime = localConfig.runtime ?? {};
 
-// 优先级：env > local > shell config > template
+// 优先级：env > local > shell config（不再 fallback 到 template）。
+// runtime-config.example.json 里 apiBaseUrl 是 "https://api.example.yinjie.app"
+// 占位，跟 Round 21 的 cloudApiBaseUrl 同款陷阱：一旦 env / local / base 都没
+// 写，template 会把这条假 URL 静默塞进打包产物。`if (!apiBaseUrl)` 那条 guard
+// 是按「空字符串」判，template 给的是非空假值，永远 trip 不到。改成不接
+// template，未配显式 process.exit(1) 报错。
 const apiBaseUrl =
   pickEnv("YINJIE_IOS_CORE_API_BASE_URL") ||
   normalizeOptionalString(localRuntime.apiBaseUrl) ||
-  normalizeOptionalString(baseRuntime.apiBaseUrl) ||
-  normalizeOptionalString(template.apiBaseUrl);
+  normalizeOptionalString(baseRuntime.apiBaseUrl);
 
 if (!apiBaseUrl) {
   console.error(
@@ -56,11 +60,12 @@ if (!apiBaseUrl) {
   process.exit(1);
 }
 
+// socketBaseUrl 不接 template：同样会 silent 注入 example 域名。回落到
+// apiBaseUrl 是预期行为（多数部署 ws 跟 http 同源），不需要 template 这条。
 const socketBaseUrl =
   pickEnv("YINJIE_IOS_SOCKET_BASE_URL") ||
   normalizeOptionalString(localRuntime.socketBaseUrl) ||
   normalizeOptionalString(baseRuntime.socketBaseUrl) ||
-  normalizeOptionalString(template.socketBaseUrl) ||
   apiBaseUrl;
 
 // cloud-api（多租户反代入口）。原生壳的 origin 是 capacitor://localhost，
@@ -114,8 +119,10 @@ const buildNumberRaw =
   (shellConfig.buildNumber !== undefined ? String(shellConfig.buildNumber) : null);
 const appVersionCode = buildNumberRaw ? Number(buildNumberRaw) : null;
 
+// 不要 spread template：上面 5 个 URL/字符串字段已经显式覆盖，spread 是冗
+// 余的；同时 template 以后多塞字段（比如 experimentFlagsUrl）会被静默带进
+// 打包产物，跟「不要 fallback example」是一回事。显式列字段。
 const runtimeConfig = {
-  ...template,
   apiBaseUrl,
   socketBaseUrl,
   cloudApiBaseUrl: cloudApiBaseUrl || null,
