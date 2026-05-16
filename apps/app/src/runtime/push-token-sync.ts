@@ -246,7 +246,24 @@ let ownerSubscriptionStarted = false;
 
 /**
  * 注册 native 端 pushTokenChanged 事件监听 —— 当 APNs 重发新 device token
- * 时（比如 reinstall、iOS 大版本升级），自动 force-resync 到后端。
+ * 时（比如 reinstall、iOS 大版本升级），自动 resync 到后端。
+ *
+ * 走查 R7：listener 不能写 `force: true`。Apple 保证
+ * didRegisterForRemoteNotificationsWithDeviceToken 一定 fire（即使 token 没
+ * 变），AppDelegate.applicationDidBecomeActive 的「Settings 改通知权限 →
+ * not-granted → granted transition → re-register」路径每次触发都会让 listener
+ * 收到一次事件；in-app 第一次授权时 Plugin 自己 register 一次，紧接着第一次
+ * 切回前台 didBecomeActive 又 register 一次（lastNotificationAuthStatus 那条
+ * transition 判定看到 previous=.notDetermined → current=.authorized 视作新
+ * 授权）。force: true 让这每一次都打 cloud-api POST /api/push/tokens，对同一
+ * 个 token 重复打没意义。
+ *
+ * 改 force: false：让 syncIosPushToken 走 (ownerId, tokenHash) cache 短路 ——
+ *   - token 真换了（reinstall / 大版本升级 / iCloud restore）→ tokenHash 不
+ *     一样 → cache miss → 正常 POST 上去；
+ *   - token 没换（每次 register 通常都是同 token）→ cache hit → skipped-cache
+ *     不发请求。
+ * 业务上对 token rotation 的捕获能力不变，仅去掉重复 POST 的浪费。
  */
 export function startIosPushTokenSyncListener() {
   if (!isIosPlatform() || !isNativeMobileBridgeAvailable()) {
@@ -262,7 +279,7 @@ export function startIosPushTokenSyncListener() {
       return;
     }
     if (event.token) {
-      void syncIosPushToken({ force: true });
+      void syncIosPushToken();
     }
   });
 }
