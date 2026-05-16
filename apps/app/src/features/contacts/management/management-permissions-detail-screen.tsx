@@ -68,8 +68,13 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
   // 还是 false，sync 会把 B 的乐观状态（true）盖回 false。等 B 完成再 invalidate
   // 一次才回 true，肉眼上看到 B 开关闪了一下。在任何 mutation 在飞时跳过
   // server→local 同步，等用户最后一次操作真正落库后再同步。
+  // 新一轮走查 R3：再加 friendsQuery.isFetching 守护。原写法只看 isPending，但
+  // mutation onSuccess 同步把 isPending 翻 false 时 invalidate 触发的 refetch 还
+  // 没回来，friendship 还是旧值；effect 立刻跑一次 → 把乐观的 true sync 回旧的
+  // false → 用户看到 switch 先 ON 一瞬，flicker 到 OFF，refetch 回来再 ON。
+  // 把 isFetching 一并 gate 住，等数据真到位再 sync 才不抖。
   useEffect(() => {
-    if (mutation.isPending) {
+    if (mutation.isPending || friendsQuery.isFetching) {
       return;
     }
     setHideTheir(Boolean(friendship?.momentsHiddenFromMe));
@@ -80,6 +85,7 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
     friendship?.momentsHiddenFromThem,
     friendship?.chatOnly,
     mutation.isPending,
+    friendsQuery.isFetching,
   ]);
 
   const apply = (
