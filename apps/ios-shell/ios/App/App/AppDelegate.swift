@@ -6,6 +6,13 @@ import UserNotifications
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var window: UIWindow?
 
+    // 真机走查 R5：用来识别「用户在 Settings 里切换了通知权限」这条 transition。
+    // didFinishLaunchingWithOptions 在冷启时种第一份值；applicationDidBecomeActive
+    // 每次切回前台拿到最新值跟它比，只在 not-granted → granted 这个边沿才 re-register
+    // 一次。避免 R4 修法每次切回前台都无脑 register → didRegister fire → JS listener
+    // syncIosPushToken({force:true}) → 每次切回都打一次 cloud-api POST 的浪费。
+    private var lastNotificationAuthStatus: UNAuthorizationStatus?
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         cacheLaunchTarget(from: launchOptions?[.remoteNotification] as? [AnyHashable: Any], defaultSource: "push")
@@ -22,6 +29,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // .notDetermined 时我们留给业务侧 requestNotificationPermission 那条
         // 路径自然触发系统授权弹窗 + register，避免冷启就弹权限把用户吓走。
         UNUserNotificationCenter.current().getNotificationSettings { settings in
+            // 走查 R5：抓住冷启时观察到的 status 作为 transition 的基线，下次
+            // applicationDidBecomeActive 拿当前 status 跟它比，只在边沿才 register
+            // 一次而不是每次都 register。
+            self.lastNotificationAuthStatus = settings.authorizationStatus
+
             guard settings.authorizationStatus == .authorized ||
                     settings.authorizationStatus == .provisional else {
                 return
@@ -103,24 +115,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // （Settings 是独立 process，切走 → 切回 → resign → become active），
         // 是 iOS 上唯一稳定能捕获到这条路径的 hook。
         //
-        // 老实现这里只清 badge，没 re-register；结果用户「在 Settings 刚开通知
-        // → 回到 app → 给某个朋友发消息」之后，他朋友的回复永远不会以推送
-        // 形式到达：APNs 没拿到 device token，cloud-api 那张 push_tokens 表里
-        // 这个用户根本没行；JS 那条 isNativeMobileBridgeAvailable + permission
-        // === "granted" 判完直接走 syncIosPushToken → readNativePushToken
-        // 返回 null → reason: "no-token" 默默跳过。要等到下次用户 force-quit
-        // app 重启走 didFinishLaunchingWithOptions 才能恢复。期间用户只看到
-        // 「app 内推送状态显示已开通」但实际没收到，根因极难 trace。
+        // 走查 R5：但不能每次切回前台都 register —— Apple 保证 didRegister 一定
+        // fire（即使 token 没变），NotificationCenter.post 也跟着 fire，JS listener
+        // 一收到 push token changed 事件就走 syncIosPushToken({force: true})，每次
+        // 切回前台都触发一次 cloud-api POST /api/push/tokens 完全是浪费。重度用户
+        // 一天切 app 几十次就是几十次冗余网络请求。
         //
-        // 复用跟 didFinishLaunchingWithOptions 同款的 register pattern：已授权
-        // 时调一次 registerForRemoteNotifications。registerForRemoteNotifications
-        // 是 idempotent 的（APNs 已有 token 时返回老 token，没变化时 didRegister
-        // 仍触发把当前 token 通过 NotificationCenter 广播一次让 JS 兜底同步），
-        // 调用本身极轻量。.notDetermined（用户从没回应过）走 JS 主动
-        // requestNotificationPermission 的路径，不在这里弹系统对话框。
+        // 引入 lastNotificationAuthStatus 状态机：didFinishLaunchingWithOptions
+        // 种基线，这里拿到当前 status 跟基线比，只在「not-granted → granted」
+        // edge 触发 re-register（覆盖 R4 修的核心场景：用户在 Settings 改后回到
+        // app）。其它情况（已授权 → 已授权 / 始终未授权 / 用户在 Settings 关掉
+        // 权限）都不 register，避免冗余 APNs 轮询 + cloud-api POST。
+        //
+        // .notDetermined（用户从没回应过）→ JS 主动 requestNotificationPermission
+        // 走系统授权弹窗的路径，不在这里弹系统对话框吓走用户。
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            guard settings.authorizationStatus == .authorized ||
-                    settings.authorizationStatus == .provisional else {
+            let previous = self.lastNotificationAuthStatus
+            let current = settings.authorizationStatus
+            self.lastNotificationAuthStatus = current
+
+            let wasGranted =
+                previous == .authorized || previous == .provisional
+            let isGranted =
+                current == .authorized || current == .provisional
+
+            // 只在「之前不是 granted，现在变成 granted」的 transition 触发；
+            // 冷启 didFinishLaunchingWithOptions 已经处理了「冷启时就 granted」
+            // 那条路径并把 lastNotificationAuthStatus 种成 granted，这里看到
+            // 「previous=granted, current=granted」就直接跳过，不重复 register。
+            guard isGranted, !wasGranted else {
                 return
             }
             DispatchQueue.main.async {
