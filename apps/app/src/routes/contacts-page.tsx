@@ -941,6 +941,18 @@ export function ContactsPage() {
     startChatResetRef.current();
   }, [baseUrl]);
 
+  // 通讯录所有 setNotice 都是 confirmation 文案（"已设为星标朋友"、"聊天已
+  // 置顶" 等），动作完成后应该自然淡出而不是永久 stick 在顶部。原写法没接
+  // 自清 timer，notice 会一直挂着，直到下一次 action 把它覆盖。对齐
+  // mobile-add-friend / friend-requests 的 2.4s 自清模板。
+  useEffect(() => {
+    if (!notice) {
+      return;
+    }
+    const timer = window.setTimeout(() => setNotice(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
   // 原生壳硬件 Back（仅移动布局生效）：
   // 1) + 快捷菜单打开时先收菜单
   // 2) 批量管理模式时先退多选

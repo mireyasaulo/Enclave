@@ -513,7 +513,25 @@ function MobileAddFriend() {
           </div>
         ) : loadingError ? (
           <div className="px-3 pt-3">
-            <ErrorBlock message={loadingError.message} />
+            <ErrorBlock message={loadingError.message}>
+              {/* 对齐 friend-requests-page / contacts-page 的错误重试模板：4 条
+                  query 任一挂掉时用户原本只能退页再进；这里把 refetch 一次性
+                  重跑 4 条，让用户原地恢复。 */}
+              <div className="mt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    void charactersQuery.refetch();
+                    void friendsQuery.refetch();
+                    void friendRequestsQuery.refetch();
+                    void blockedQuery.refetch();
+                  }}
+                  className="rounded-full border border-[rgba(220,38,38,0.18)] bg-white px-3 py-1 text-[11px] font-medium text-[color:var(--state-danger-text)]"
+                >
+                  {t(msg`重试读取`)}
+                </button>
+              </div>
+            </ErrorBlock>
           </div>
         ) : !trimmedKeyword ? (
           <MobileAddFriendWelcomeState

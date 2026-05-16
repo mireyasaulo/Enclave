@@ -223,7 +223,11 @@ function ModalHeader({
           </button>
         ) : null}
       </div>
-      <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
+      {/* flex-1 min-w-0 truncate：permissions-detail 时标题来自 detailFriendName
+          （可能是较长的外语好友名），原来 text-[15px] 单元素没有 max-width 也
+          没 overflow:hidden，名字稍长就把 h-12 行高撑出 / 换行；改成中间区域
+          占满剩余空间并按需省略。 */}
+      <div className="min-w-0 flex-1 truncate text-center text-[15px] font-medium text-[color:var(--text-primary)]">
         {title}
       </div>
       <div className="flex w-9 justify-end">
