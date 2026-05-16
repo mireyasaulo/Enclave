@@ -181,14 +181,33 @@ export function ProfileInfoAvatarPage() {
     ? null
     : checkAvatarUrlInput(trimmed);
   const canSave = valueToSave.length > 0 && dirty && urlInputError === null;
-  // 只在 trimmed 看起来是完整图片 URL 时才走 preview，避免每次 keystroke
-  // 都触发一次半截 URL 的 <img> 网络请求。半截 URL 一律退回当前头像 / 默认。
-  const previewableTrimmed = looksLikePreviewableImageUrl(trimmed)
-    ? trimmed
-    : null;
+
+  // ❗第二轮走查 Round 1 实测：键入 "https://placehold.co/200/png" 触发了
+  // 7 次 <img> 网络请求（"https://placehold.co/2" 起每个前缀 pathname.length>1
+  // 都满足 looksLikePreviewableImageUrl，每个 keystroke 一次 onError 往返）。
+  // 加 300ms debounce：只有用户停下打字 300ms 后才把 trimmed 灌进 previewSrc，
+  // 中途敲的半截 URL 不会触发任何加载。pickedLocal（本地选图）走立即路径，因为
+  // 它不是从 keystroke 来的，已经是 data URL，加载零成本。
+  const [debouncedPreviewSrc, setDebouncedPreviewSrc] = useState<string>("");
+  useEffect(() => {
+    // pickedLocal 在场时不用 debounce，由下面 previewSrc 优先级直接拿
+    if (pickedLocal) {
+      return;
+    }
+    const previewable = looksLikePreviewableImageUrl(trimmed) ? trimmed : "";
+    // 已经一致就别白触发 setState
+    if (previewable === debouncedPreviewSrc) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setDebouncedPreviewSrc(previewable);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [trimmed, pickedLocal, debouncedPreviewSrc]);
+
   const previewSrc =
     pickedLocal?.dataUrl ||
-    previewableTrimmed ||
+    debouncedPreviewSrc ||
     (hasCustomAvatar ? avatar : defaultOwnerAvatar);
 
   const saveMutation = useMutation({
