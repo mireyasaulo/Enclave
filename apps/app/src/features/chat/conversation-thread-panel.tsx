@@ -22,7 +22,6 @@ import {
 } from "../../components/chat-message-list";
 import {
   encodeChatReplyText,
-  sanitizeDisplayedChatText,
   type ChatReplyMetadata,
 } from "../../lib/chat-text";
 import { resolveMessageSemanticPreview } from "../../lib/message-attachment-semantic";
@@ -186,11 +185,12 @@ export function ConversationThreadPanel({
     ) : null;
   const highlightedWindowRequestRef = useRef<string | null>(null);
   const handledDesktopCallRequestTokenRef = useRef<number | null>(null);
-  const { entryNotice, clearEntryNotice, guardVideoEntry, resetEntryGuard } =
-    useDigitalHumanEntryGuard({
-      baseUrl,
-      enabled: conversationType === "direct",
-    });
+  // clearEntryNotice / guardVideoEntry 在本文件没用到——上层 panel 只展示
+   // entryNotice、并在切会话时 reset。dead destructure 让 eslint 抱怨。
+  const { entryNotice, resetEntryGuard } = useDigitalHumanEntryGuard({
+    baseUrl,
+    enabled: conversationType === "direct",
+  });
   const {
     ref: scrollAnchorRef,
     isAtBottom,

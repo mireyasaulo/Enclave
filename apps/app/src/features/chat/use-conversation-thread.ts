@@ -508,7 +508,7 @@ export function useConversationThread(conversationId: string) {
   // 的 useCallback 真正能稳定下来。
   const sendMutationAsync = sendMutation.mutateAsync;
   const runSendMutation = useCallback(
-    async (input: Parameters<typeof sendMutation.mutateAsync>[0]) => {
+    async (input: Parameters<typeof sendMutationAsync>[0]) => {
       try {
         await sendMutationAsync(input);
       } catch {
