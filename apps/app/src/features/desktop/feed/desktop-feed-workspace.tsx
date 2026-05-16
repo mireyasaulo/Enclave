@@ -28,7 +28,10 @@ type DesktopFeedWorkspaceProps = {
   baseUrl?: string;
   commentDrafts: Record<string, string>;
   commentErrorMessage?: string | null;
-  commentPendingPostId: string | null;
+  /** 走查 Round 4：单个 string|null 只能追最后一次 mutate 的 postId，桌面端
+   *  并发提交时旧 row 的 loading 状态会被新 row 顶掉、按钮被解锁出现重复发
+   *  送。改成 Set 让每条 row 各自检查自己的 postId 是否在飞。 */
+  commentPendingPostIds: ReadonlySet<string>;
   composeErrorMessage?: string | null;
   createPending: boolean;
   errors?: string[];
@@ -94,7 +97,7 @@ export function DesktopFeedWorkspace({
   baseUrl,
   commentDrafts,
   commentErrorMessage,
-  commentPendingPostId,
+  commentPendingPostIds,
   composeErrorMessage,
   createPending,
   errors = [],
@@ -310,7 +313,7 @@ export function DesktopFeedWorkspace({
             <div className="mx-auto w-full max-w-[760px]">
               <DesktopFeedList
                 commentDrafts={commentDrafts}
-                commentPendingPostId={commentPendingPostId}
+                commentPendingPostIds={commentPendingPostIds}
                 commentReplyTarget={commentReplyTarget}
                 detailErrorMessage={
                   detailQuery.isError && detailQuery.error instanceof Error

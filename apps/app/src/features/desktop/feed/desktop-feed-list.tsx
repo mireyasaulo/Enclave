@@ -13,7 +13,8 @@ import { type FeedCommentReplyTarget } from "./feed-types";
 
 type DesktopFeedListProps = {
   commentDrafts: Record<string, string>;
-  commentPendingPostId: string | null;
+  /** Round 4：并发评论时单个 string|null 不够 — 改 Set 让每条 row 各查自己。 */
+  commentPendingPostIds: ReadonlySet<string>;
   commentReplyTarget?: FeedCommentReplyTarget | null;
   detailErrorMessage?: string | null;
   detailLoading: boolean;
@@ -54,7 +55,7 @@ type DesktopFeedListProps = {
 
 export function DesktopFeedList({
   commentDrafts,
-  commentPendingPostId,
+  commentPendingPostIds,
   commentReplyTarget = null,
   detailErrorMessage = null,
   detailLoading,
@@ -97,7 +98,7 @@ export function DesktopFeedList({
               <DesktopFeedRow
                 key={post.id}
                 commentDraft={commentDrafts[post.id] ?? ""}
-                commentLoading={commentPendingPostId === post.id}
+                commentLoading={commentPendingPostIds.has(post.id)}
                 commentReplyTarget={
                   commentReplyTarget?.postId === post.id
                     ? commentReplyTarget

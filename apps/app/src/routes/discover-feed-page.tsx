@@ -130,6 +130,14 @@ export function DiscoverFeedPage() {
     postId: string;
     replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
+  // 走查 Round 4：commentMutation.variables 只追最后一次 mutate 的 postId —
+  // 桌面端 Row A 还在飞的时候用户在 Row B 也按发送，variables 翻到 B，Row A
+  // 的 `commentLoading=pendingCommentPostId===A` 立刻变 false，"发送"按钮被
+  // 解锁，用户能在 A 上再敲一次回车，产出一条重复评论。维护一个并发集合，
+  // onMutate 入栈、onSettled 出栈，桌面 Row 直接 `.has(postId)`。
+  const [commentInflightPostIds, setCommentInflightPostIds] = useState<
+    ReadonlySet<string>
+  >(() => new Set());
   const [showCompose, setShowCompose] = useState(false);
   // 「查看全部 N 条评论」点开后，按 postId 把 listFeedComments 的全量结果放进来；
   // 命中即在 secondary 区用全量替换 commentsPreview。loadingPostId 用来在点击
@@ -541,6 +549,22 @@ export function DiscoverFeedPage() {
 
       return addFeedComment(input.postId, { text }, baseUrl);
     },
+    onMutate: (input) => {
+      setCommentInflightPostIds((current) => {
+        if (current.has(input.postId)) return current;
+        const next = new Set(current);
+        next.add(input.postId);
+        return next;
+      });
+    },
+    onSettled: (_data, _error, input) => {
+      setCommentInflightPostIds((current) => {
+        if (!current.has(input.postId)) return current;
+        const next = new Set(current);
+        next.delete(input.postId);
+        return next;
+      });
+    },
     onSuccess: (newComment, input) => {
       setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
       setDesktopReplyTarget((current) =>
@@ -644,9 +668,11 @@ export function DiscoverFeedPage() {
 const pendingLikePostId = likeMutation.isPending
     ? likeMutation.variables
     : null;
-  const pendingCommentPostId = commentMutation.isPending
-    ? (commentMutation.variables?.postId ?? null)
-    : null;
+  // Round 4：桌面端要并发跟踪多条 row 的 inflight 状态，单值 `pendingCommentPostId`
+  // 已不够用。这里保留旧名给移动端 commentBar 兜 `.has()`（移动端只能有一条
+  // 评论 bar 打开），桌面端走 commentInflightPostIds 直传。
+  const isCommentPendingForPost = (postId: string) =>
+    commentInflightPostIds.has(postId);
   // blockedCharacterIds + visiblePosts 之前每 render 都 new Set / new Array：
   // 桌面 workspace 拿 posts={visiblePosts} 作 prop，引用每次都换 → workspace
   // 内部 useEffect 依赖 posts 的（比如 selectedPostId 校验、scrollIntoView lock）
@@ -1380,7 +1406,7 @@ const pendingLikePostId = likeMutation.isPending
               ? commentMutation.error.message
               : null
           }
-          commentPendingPostId={pendingCommentPostId}
+          commentPendingPostIds={commentInflightPostIds}
           composeErrorMessage={
             composeDraft.mediaError ??
             (createMutation.isError && createMutation.error instanceof Error
@@ -2190,7 +2216,7 @@ const pendingLikePostId = likeMutation.isPending
         }}
         pending={
           commentBarTarget
-            ? pendingCommentPostId === commentBarTarget.postId
+            ? isCommentPendingForPost(commentBarTarget.postId)
             : false
         }
         onSubmit={() => {
