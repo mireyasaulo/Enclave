@@ -401,18 +401,23 @@ export function ConversationThreadPanel({
     [],
   );
 
-  const handleDismissRouteContextNotice = () => {
-    // 容器挂载后 useScrollAnchor 的 useLayoutEffect 会同步把 scrollTop 顶
-    // 到 scrollHeight（首次加载消息时一定会跑），scroll 事件就跟着触发
-    // onScrollCapture。如果不区分是不是用户手势，notice 在 callReturn /
-    // game-invite / group-invite 场景刚显示就被 mount 自身的 auto-scroll
-    // 干掉，用户根本没机会看到。
-    // isAtBottomRef.current 在 mount auto-scroll 内被 scrollToBottom 同步
-    // 写 true，stays true 直到用户真手势把列表拖出贴底窗口 → 此时再 dismiss
-    // 才是用户意图。typing-触发的 onChange 那条 path 不走这条 guard。
+  // 容器挂载后 useScrollAnchor 的 useLayoutEffect 会同步把 scrollTop 顶
+  // 到 scrollHeight（首次加载消息时一定会跑），scroll 事件就跟着触发
+  // onScrollCapture。如果不区分是不是用户手势，notice 在 callReturn /
+  // game-invite / group-invite 场景刚显示就被 mount 自身的 auto-scroll
+  // 干掉，用户根本没机会看到。isAtBottomRef.current 在 mount auto-scroll
+  // 内被 scrollToBottom 同步写 true，stays true 直到用户真手势把列表拖出
+  // 贴底窗口 → 此时再 dismiss 才是用户意图。
+  const handleScrollDismissRouteContextNotice = () => {
     if (scrollAnchor.isAtBottomRef.current) {
       return;
     }
+    routeContextNotice?.onDismiss?.();
+  };
+  // 上一版本把 scroll-guard 一起套到 composer onChange 上 —— 用户在贴底状态
+  // 下打字时 isAtBottomRef === true，typing 也走不到 onDismiss。打字属于
+  // 明确的用户意图（"我要继续聊"），照常 dismiss，不走 guard。
+  const handleTypingDismissRouteContextNotice = () => {
     routeContextNotice?.onDismiss?.();
   };
 
@@ -656,7 +661,7 @@ export function ConversationThreadPanel({
                   // 避免误触发"页面整体下拽 / 顶部导航条收放"的浏览器手势。
                   "relative flex h-full flex-col overflow-auto overscroll-contain px-3 py-3.5"
             }
-            onScrollCapture={handleDismissRouteContextNotice}
+            onScrollCapture={handleScrollDismissRouteContextNotice}
           >
             {messagesQuery.isLoading ? (
               isDesktop ? (
@@ -796,7 +801,7 @@ export function ConversationThreadPanel({
               enabled: runtimeConfig.appPlatform !== "desktop",
             }}
             onChange={(value) => {
-              handleDismissRouteContextNotice();
+              handleTypingDismissRouteContextNotice();
               if (socketError) {
                 setSocketError(null);
               }
