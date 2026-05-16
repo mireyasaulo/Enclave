@@ -2387,8 +2387,17 @@ export function DiscoverFeedPage() {
                     if (!variables) {
                       return;
                     }
+                    // 走查 Round 1：跟桌面 Round 3 (7c3c566c) 同坑——用户失败后把
+                    // 评论 bar 内草稿清空（或只剩空白）再点 InlineNotice 的「重试发送」时，
+                    // `commentDrafts[postId]` 落到 ""，`?? variables.text` 不会兜底（??
+                    // 只看 nullish），currentDraft="" 直接灌进 mutationFn 触发 "请先输入
+                    // 评论内容。" 校验，错误条被替换成毫不相干的新错。trim 后为空时
+                    // 兜回 variables.text—用户主动点重试就是要把上次那条再发一遍。
+                    const draftCandidate = commentDrafts[variables.postId];
                     const currentDraft =
-                      commentDrafts[variables.postId] ?? variables.text;
+                      draftCandidate && draftCandidate.trim()
+                        ? draftCandidate
+                        : variables.text;
                     commentMutation.mutate({
                       ...variables,
                       text: currentDraft,
