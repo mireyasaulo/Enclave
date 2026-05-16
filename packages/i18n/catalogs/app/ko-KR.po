@@ -28609,3 +28609,7 @@ msgstr "저장을 취소했습니다."
 #: apps/app/src/runtime/file-runtime-i18n.ts:62
 msgid "已打开文件。"
 msgstr "파일을 열었습니다."
+
+#: apps/app/src/lib/error-translate.ts:202
+msgid "摇一摇生成失败，请稍后重试。"
+msgstr "흔들기 생성에 실패했습니다. 잠시 후 다시 시도해 주세요."

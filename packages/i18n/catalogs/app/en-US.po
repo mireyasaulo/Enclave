@@ -28609,3 +28609,7 @@ msgstr "Save cancelled."
 #: apps/app/src/runtime/file-runtime-i18n.ts:62
 msgid "已打开文件。"
 msgstr "File opened."
+
+#: apps/app/src/lib/error-translate.ts:202
+msgid "摇一摇生成失败，请稍后重试。"
+msgstr "Shake generation failed. Please try again later."
