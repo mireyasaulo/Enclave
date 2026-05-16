@@ -188,11 +188,12 @@ export function CharacterDetailPage() {
   // 都是这条路径），底部按钮直接渲染「发消息 / 音视频通话」，friendRequestsQuery
   // 的结果只在 "添加到通讯录" / "等待对方通过" / "查看好友申请" 三种非好友状态下
   // 使用。原来无条件 enabled 让每个名片打开都触发一次 /social/friend-requests
-  // 全量查询，毫无价值地多一次后台往返。等 friendsQuery 解析后再判断是否需要拉。
+  // 全量查询，毫无价值地多一次后台往返。已确认是好友就 skip；friendsQuery 还在
+  // loading / 报错时仍允许拉，保证非好友态下 UI 能拿到 inbound/outbound 状态。
   const friendRequestsQuery = useQuery({
     queryKey: ["app-friend-requests", baseUrl, "all"],
     queryFn: () => getFriendRequests(baseUrl, { direction: "all" }),
-    enabled: friendsQuery.isSuccess && !isAlreadyFriend,
+    enabled: !isAlreadyFriend,
   });
   const blockedQuery = useQuery({
     queryKey: ["app-chat-details-blocked", baseUrl],
@@ -744,13 +745,30 @@ export function CharacterDetailPage() {
     );
   };
 
+  // 走查 R2：手机端备注/标签编辑表单的「保存」按钮只看 isPending 决定 disabled，
+  // 即便用户没动过任何字符也会发一次 updateFriendProfile。后端会照样写 friendship
+  // + 触发 cyber_avatar.captureSignal 这一整路审计/数字人 signal。点了「设置备注和
+  // 标签」只是想关一下面板的人会无意识地刷一次后台 IO。对比一下"normalize 后"的
+  // remarkName 和 tags，跟服务器值完全等价就 setIsEditingProfile(false) 直接关
+  // 面板，跟桌面 DesktopContactTextEditDialog 的 confirmDisabled 行为对齐。
   const handleSaveProfile = async () => {
+    const nextRemarkName = profileForm.remarkName.trim() || null;
+    const nextTags = profileForm.tags
+      .split(/[，,]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const currentRemarkName = friendship?.remarkName?.trim() || null;
+    const currentTags = friendship?.tags ?? [];
+    const tagsUnchanged =
+      nextTags.length === currentTags.length &&
+      nextTags.every((tag, index) => tag === currentTags[index]);
+    if (nextRemarkName === currentRemarkName && tagsUnchanged) {
+      setIsEditingProfile(false);
+      return;
+    }
     await updateProfileMutation.mutateAsync({
-      remarkName: profileForm.remarkName.trim() || null,
-      tags: profileForm.tags
-        .split(/[，,]/)
-        .map((item) => item.trim())
-        .filter(Boolean),
+      remarkName: nextRemarkName,
+      tags: nextTags,
     });
   };
 

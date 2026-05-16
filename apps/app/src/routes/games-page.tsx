@@ -298,6 +298,7 @@ export function GamesPage() {
     const game = getGameCenterGame(gameId);
     launchGame(gameId);
     setSelectedGameId(gameId);
+    setHasLaunchedThisSession(true);
     if (gameId === "yinjie-farm") {
       // farm 是独立路由 /tabs/games/yinjie-farm。
       // 用 safeReturnPath（用户真正的来源）；若没有，从 /discover/games 进
@@ -539,12 +540,20 @@ export function GamesPage() {
 
   const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : null;
   // 移动端不像 desktop 有 preview pane——embedded slot 是 inline 的"正在玩"
-  // 区块，跟 selectedGameId（被点选 / 被预览的那个游戏）无关。原来要求
-  // activeGameId === selectedGame.id 会让用户点另一行列表行的"卡片本体"
-  // （onSelect）触发 setSelectedGameId 后，正在玩的 embedded 游戏被悄悄
-  // unmount——本轮进度（也会触发 R2 修过的 unmount 持久化）但视觉上游戏
-  // 突然消失，体验是 bug。改成只要 activeGameId 是 embedded 游戏就显示。
-  const isEmbeddedActive = hasEmbeddedGame(activeGameId);
+  // 区块，跟 selectedGameId（被点选 / 被预览的那个游戏）无关。
+  // 原来要求 activeGameId === selectedGame.id：用户点另一行卡片本体
+  // （onSelect 而不是绿色"开始"）会让 selectedGameId 改掉，正在玩的
+  // embedded 游戏被悄悄 unmount——这是 bug。
+  // 但单纯改成 hasEmbeddedGame(activeGameId) 又有副作用：disk 上 activeGameId
+  // 可能是上次会话的尾巴 / fixture default ("signal-squad")，新用户一进来
+  // 就被自动塞个 embedded slot 进来，跟 invite 链路 (`?invite=...`) 也对不上
+  // （URL 里说要去 night-market 邀约页，slot 却预热 signal-squad）。
+  // 折中：本次 mount 内用户没有显式 launch 过，就尊重 OLD 等式逻辑；
+  // 一旦 launchGame 过一次，slot 就完全跟 activeGameId 走，跟 selectedGameId
+  // 解耦——这样 tap 另一行卡片本体不会再把游戏视觉上踢飞。
+  const [hasLaunchedThisSession, setHasLaunchedThisSession] = useState(false);
+  const isEmbeddedActive = hasEmbeddedGame(activeGameId)
+    && (hasLaunchedThisSession || activeGameId === selectedGame.id);
   // gameCenterFriendActivities 是模块常量，过滤结果也是常量。
   const friendActivities = useMemo(
     () =>
