@@ -38,6 +38,10 @@ import {
 } from "../features/favorites/favorites-route-state";
 import { createDesktopNoteDraft } from "../features/favorites/note-drafts-storage";
 import {
+  removeFavoriteNoteRecord,
+  removeFavoriteNoteSummary,
+} from "../features/favorites/note-editor-helpers";
+import {
   computeDesktopFavoritesFingerprint,
   hydrateDesktopFavoritesFromNative,
   mergeDesktopFavoriteRecords,
@@ -333,18 +337,52 @@ function DesktopFavoritesPage() {
       const nextLocalFavorites = removeDesktopFavorite(item.sourceId);
       return { item, nextLocalFavorites };
     },
-    onSuccess: async ({ item, nextLocalFavorites }) => {
-      const nextRemoteFavorites =
-        item.category === "messages" || item.category === "notes"
-          ? await queryClient.fetchQuery({
-              queryKey: ["app-favorites", baseUrl],
-              queryFn: () => getFavorites(baseUrl),
-              staleTime: 0,
-            })
-          : (favoritesQuery.data ?? []);
+    onSuccess: ({ item, nextLocalFavorites }) => {
+      // 之前是 fetchQuery({ staleTime: 0 }) 把整个收藏列表（最多 500 条）再
+      // 拉一遍，只为确认这一条被删了——一次删除 → 一次全量网络。
+      // 同文件的 DesktopNotesWorkspace.deleteMutation 早就用 setQueryData
+      // 局部改 cache，这里照搬。
+      // 另一个动机：fetchQuery 回来前那 200ms 里，focus / visibilitychange
+      // 触发的 syncFavorites 会用 favoritesRemoteDataRef.current（仍含被删
+      // 项的旧 cache）去 merge → 被删项在列表里"复活"一下再消失。改成
+      // setQueryData 同步 cache 后，effect 187 立刻刷新 ref，race 消失。
+      queryClient.setQueryData<DesktopFavoriteRecord[]>(
+        ["app-favorites", baseUrl],
+        (current) =>
+          (current ?? []).filter(
+            (favorite) => favorite.sourceId !== item.sourceId,
+          ),
+      );
+      // notes 分类的收藏对应 chat_favorite_notes 表的一行，后端 removeFavorite
+      // 已经按 sourceId 路由到 removeFavoriteNote；FE 这边把 favorite-notes
+      // 这份 cache 也同步清掉，否则 favoriteNoteSummaryMap 还吊着被删的 note，
+      // 详情区 / 搜索 haystack 都会拿到陈数据，直到下一次 refetch。
+      if (item.category === "notes") {
+        const noteId = parseFavoriteNoteIdFromSourceId(item.sourceId);
+        if (noteId) {
+          queryClient.setQueryData(
+            ["favorite-notes", baseUrl],
+            (current?: FavoriteNoteSummary[]) =>
+              removeFavoriteNoteSummary(current, noteId),
+          );
+          // app-favorites cache 上面已经按 sourceId 过滤了一次，这里再走
+          // removeFavoriteNoteRecord 是个 idempotent no-op，但留着以防将来
+          // 改 sourceId 命名规则。
+          queryClient.setQueryData<DesktopFavoriteRecord[]>(
+            ["app-favorites", baseUrl],
+            (current) => removeFavoriteNoteRecord(current, noteId),
+          );
+          void queryClient.removeQueries({
+            queryKey: ["favorite-note", baseUrl, noteId],
+          });
+        }
+      }
 
-      setFavorites(
-        mergeDesktopFavoriteRecords(nextRemoteFavorites, nextLocalFavorites),
+      setFavorites((current) =>
+        mergeDesktopFavoriteRecords(
+          current.filter((favorite) => favorite.sourceId !== item.sourceId),
+          nextLocalFavorites,
+        ),
       );
       setNotice(t(msg`${item.title} 已从收藏中移除。`));
     },
