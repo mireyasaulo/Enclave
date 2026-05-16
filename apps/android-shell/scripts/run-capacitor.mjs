@@ -611,6 +611,16 @@ function validateReleaseShellConfig(config) {
     );
   }
 
+  // Round 9 之后 YinjieRuntimePlugin.getConfig 会读 cloudApiBaseUrl 透给 JS。
+  // 原生壳 origin 是 https://localhost，没有同源 cloud-api 后端；setCloudApiBaseUrlProvider
+  // 在 Capacitor 壳里只认这一条，缺了就 worlds 列表 / cloud session refresh / 公共账号
+  // 刷新整条链路返 null 不发请求，安装包看着能跑实际跑不通。release 必须强制带上。
+  if (!config.runtime.cloudApiBaseUrl) {
+    throw new Error(
+      "release android bundle requires runtime.cloudApiBaseUrl from tracked config or YINJIE_ANDROID_CLOUD_API_BASE_URL (native shell origin is https://localhost, no same-origin cloud-api)",
+    );
+  }
+
   if (config.allowCleartextTraffic) {
     throw new Error(
       "release android bundle requires allowCleartextTraffic=false in tracked config or YINJIE_ANDROID_ALLOW_CLEARTEXT_TRAFFIC=false",
@@ -946,6 +956,11 @@ if (command === "doctor") {
       "active production apiBaseUrl",
       Boolean(activeShellConfig.runtime.apiBaseUrl),
     ]);
+    // Round 17：跟 validateReleaseShellConfig 对齐，提早曝光 cloudApiBaseUrl 缺失。
+    checks.push([
+      "active production cloudApiBaseUrl",
+      Boolean(activeShellConfig.runtime.cloudApiBaseUrl),
+    ]);
     checks.push([
       "active production cleartext traffic disabled",
       !activeShellConfig.allowCleartextTraffic,
@@ -961,6 +976,10 @@ if (command === "doctor") {
       Boolean(trackedShellConfig.runtime.apiBaseUrl),
     ]);
     checks.push([
+      "tracked production cloudApiBaseUrl",
+      Boolean(trackedShellConfig.runtime.cloudApiBaseUrl),
+    ]);
+    checks.push([
       "tracked production cleartext traffic disabled",
       !trackedShellConfig.allowCleartextTraffic,
     ]);
@@ -973,6 +992,10 @@ if (command === "doctor") {
     checks.push([
       "release env production apiBaseUrl",
       Boolean(releaseEnvShellConfig.runtime.apiBaseUrl),
+    ]);
+    checks.push([
+      "release env production cloudApiBaseUrl",
+      Boolean(releaseEnvShellConfig.runtime.cloudApiBaseUrl),
     ]);
     checks.push([
       "release env production cleartext traffic disabled",
