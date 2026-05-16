@@ -219,22 +219,39 @@ function MobileNoteEditor({
 
   const saveMutation = useMutation({
     mutationFn: async () => {
+      // 把 mutate() 飞出去那一刻的 contentHtml 一起带给 onSuccess —— 让 onSuccess
+      // 能判断用户在 server 来回的 200ms~2s 里有没有继续往 editor 里继续敲字。
+      // 不然慢网下 user 边等保存边补一句，回到 onSuccess 这里 setEditorState(nextState)
+      // + innerHTML 覆盖会把这一句静默吃掉（contentEditable 没 disabled，是故意
+      // 不让保存阻塞编辑节奏的）。
+      const sentContentHtml = editorState.contentHtml;
       const payload = buildNoteMutationPayload(editorState);
-      return noteId
+      const savedNote = await (noteId
         ? updateFavoriteNote(noteId, payload, baseUrl)
-        : createFavoriteNote(payload, baseUrl);
+        : createFavoriteNote(payload, baseUrl));
+      return { savedNote, sentContentHtml };
     },
-    onSuccess: async (savedNote) => {
+    onSuccess: async ({ savedNote, sentContentHtml }) => {
       const nextDraftId = activeDraftId || draftIdParam?.trim() || savedNote.id;
       const nextState = buildEditorStateFromDocument(savedNote);
       const nextSnapshot = buildNoteSnapshot(nextState);
+      // 走查 R2：保存中用户继续敲字时不能拿 server 归一化后的 HTML 把 editor 反向
+      // 覆盖；保存中按钮是 disabled，但 contentEditable 区域不是，用户完全可能在
+      // 200ms~2s 的 round-trip 内补几个字 / 改个标点 / 删一段。检测方法：mutate
+      // 飞出去那一刻的 sentContentHtml 跟 onSuccess 跑到这里时 editorState.contentHtml
+      // 还一致 → 没继续敲，可以安全用 server 版本归一化；不一致 → 用户接着写了，
+      // 保留 editor 现状，下一次 auto-save 会把新内容再发一次，dirty 指示器会亮起
+      // 告诉用户「存在未保存修改」。
+      const userKeptTyping = editorState.contentHtml !== sentContentHtml;
 
       setNoteId(savedNote.id);
-      setEditorState(nextState);
-      setSavedSnapshot(nextSnapshot);
-      if (editorRef.current) {
-        editorRef.current.innerHTML = nextState.contentHtml;
+      if (!userKeptTyping) {
+        setEditorState(nextState);
+        if (editorRef.current) {
+          editorRef.current.innerHTML = nextState.contentHtml;
+        }
       }
+      setSavedSnapshot(nextSnapshot);
       setNotice({
         tone: "success",
         message: t(msg`笔记已保存到收藏。`),
@@ -243,7 +260,9 @@ function MobileNoteEditor({
       saveDesktopNoteDraft({
         draftId: nextDraftId,
         noteId: savedNote.id,
-        ...nextState,
+        // 用户已经继续打字了，localStorage 里也得记最新内容；不然窗口关掉再
+        // 重进会回到 server 归一化版（之前的 keystroke 就真没了）。
+        ...(userKeptTyping ? editorState : nextState),
         updatedAt: new Date().toISOString(),
       });
 
@@ -802,7 +821,10 @@ function MobileNoteEditor({
 
   const handleSave = useCallback(async () => {
     try {
-      const savedNote = await saveMutation.mutateAsync();
+      // mutationFn 现在返回 { savedNote, sentContentHtml }（为了让 onSuccess
+      // 判断「用户在保存途中是否继续打字」），handleSave 这一层把 savedNote
+      // 直接拨出来，保持对外契约不变。
+      const { savedNote } = await saveMutation.mutateAsync();
       return savedNote;
     } catch {
       return null;
