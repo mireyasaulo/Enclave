@@ -1365,58 +1365,6 @@ export function DesktopChatWorkspace({
     });
   }
 
-  useEffect(() => {
-    if (
-      !activeConversation ||
-      selectedServiceAccountId ||
-      subscriptionInboxActive ||
-      officialAccountsActive
-    ) {
-      return;
-    }
-
-    function handleKeyDown(event: globalThis.KeyboardEvent) {
-      if (event.defaultPrevented) {
-        return;
-      }
-
-      if (event.altKey || event.shiftKey) {
-        return;
-      }
-
-      if (!event.ctrlKey && !event.metaKey) {
-        return;
-      }
-
-      if (event.key.toLowerCase() !== "f") {
-        return;
-      }
-
-      event.preventDefault();
-      setRightPanelMode("history");
-      setHistoryPanelCanReturnToDetails(false);
-      setHistoryPanelFocusKey(Date.now());
-      setDetailsActionRequest(null);
-      navigateToChatWorkspace({
-        hash: buildCurrentChatRouteHash({
-          panel: "history",
-          detailsAction: undefined,
-        }),
-        replace: true,
-      });
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [
-    activeConversation,
-    buildCurrentChatRouteHash,
-    navigateToChatWorkspace,
-    officialAccountsActive,
-    selectedServiceAccountId,
-    subscriptionInboxActive,
-  ]);
-
   const handleConversationContextMenu = useCallback(
     (
       event: MouseEvent<HTMLElement>,
