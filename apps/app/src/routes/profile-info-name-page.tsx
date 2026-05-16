@@ -126,6 +126,9 @@ export function ProfileInfoNamePage() {
           onChange={(event) => {
             userTouchedRef.current = true;
             setDraft(event.target.value);
+            // 用户已经动手敲新的名字，意味着上一次保存失败这件事翻篇了，把
+            // 红字 banner 清掉，免得新尝试还挂着旧 attempt 的失败说明。
+            saveMutation.reset();
           }}
           maxLength={NAME_MAX_LENGTH}
           placeholder={t(msg`输入名字`)}

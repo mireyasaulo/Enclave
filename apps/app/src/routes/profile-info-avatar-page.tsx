@@ -199,6 +199,12 @@ export function ProfileInfoAvatarPage() {
       return;
     }
     setLocalError(null);
+    // 上次保存失败 → 错误 banner 钉死在底部，用户重新选了张图也还挂着——
+    // 既看着新选了图、又同时挂着上次保存失败的红字，容易让用户以为新选的
+    // 图也已经被尝试保存了。新一次的用户动作意味着「上一次失败的 attempt 翻篇」，
+    // reset 两个 mutation 把红字清掉。
+    saveMutation.reset();
+    resetMutation.reset();
     setIsReadingFile(true);
     const reader = new FileReader();
     const finish = () => {
@@ -334,6 +340,10 @@ export function ProfileInfoAvatarPage() {
               userTouchedRef.current = true;
               setDraft(event.target.value);
               setLocalError(null);
+              // 用户已经动手改新的 URL，意味着上一次保存失败这件事翻篇了，把
+              // 红字 banner 清掉，免得新尝试还挂着旧 attempt 的失败说明。
+              saveMutation.reset();
+              resetMutation.reset();
             }}
             placeholder={t(msg`粘贴图片 URL 或留空`)}
             // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。

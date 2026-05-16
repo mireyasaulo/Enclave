@@ -121,6 +121,9 @@ export function ProfileInfoSignaturePage() {
           onChange={(event) => {
             userTouchedRef.current = true;
             setDraft(event.target.value);
+            // 用户已经动手敲新的签名，意味着上一次保存失败翻篇了，把红字
+            // banner 清掉，免得新尝试还挂着旧 attempt 的失败说明。
+            saveMutation.reset();
           }}
           maxLength={SIGNATURE_MAX_LENGTH}
           placeholder={t(msg`写一句此刻想说的话`)}
