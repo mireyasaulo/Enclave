@@ -55,7 +55,12 @@ export function DesktopFeedComposePanel({
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const trimmedTextLength = text.trim().length;
-
+  // 仅当 pointerdown 起点就在 backdrop 上时才允许后续 click 关闭面板。
+  // 旧逻辑只判断 click 的 event.target===currentTarget，但 click 是 (down → up)
+  // 的合成事件，鼠标按在 textarea 上选中文字 → 拖出面板边界 → 释放 → click
+  // 事件冒到 backdrop 上 → target===backdrop → 误关闭，用户输入大半的草稿被这层
+  // 弱判定吃掉（草稿本身留着，但要重开还得多一步）。
+  const downedOnBackdropRef = useRef(false);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -72,10 +77,17 @@ export function DesktopFeedComposePanel({
   return (
     <div
       className="absolute inset-0 z-20 flex justify-end bg-[rgba(15,23,42,0.12)] backdrop-blur-[2px]"
+      onPointerDown={(event) => {
+        downedOnBackdropRef.current = event.target === event.currentTarget;
+      }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) {
+        if (
+          downedOnBackdropRef.current &&
+          event.target === event.currentTarget
+        ) {
           onClose();
         }
+        downedOnBackdropRef.current = false;
       }}
     >
       <div className="flex h-full w-full max-w-[380px] flex-col border-l border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.96)] shadow-[-24px_0_48px_rgba(15,23,42,0.08)]">
