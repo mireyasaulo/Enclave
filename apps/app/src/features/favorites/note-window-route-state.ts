@@ -6,6 +6,19 @@ export type DesktopNoteWindowRouteState = {
   returnTo?: string;
 };
 
+// returnTo 直接喂给 navigate({ to }) / history.back()。攻击 URL
+// /tabs/favorites#draftId=x&returnTo=javascript:alert(1) 用户点"返回"时
+// 走 fallback 分支会触发 JS。严格只放过应用内的绝对路径——必须以"/"打头，
+// 且不能是协议无关 URL "//evil.com"。
+function sanitizeReturnTo(value: string | null | undefined) {
+  const normalized = value?.trim();
+  if (!normalized) return undefined;
+  if (!normalized.startsWith("/") || normalized.startsWith("//")) {
+    return undefined;
+  }
+  return normalized;
+}
+
 export function buildDesktopNoteWindowRouteHash(
   input: DesktopNoteWindowRouteState,
 ) {
@@ -16,8 +29,9 @@ export function buildDesktopNoteWindowRouteHash(
     params.set("noteId", input.noteId.trim());
   }
 
-  if (input.returnTo?.trim()) {
-    params.set("returnTo", input.returnTo.trim());
+  const returnTo = sanitizeReturnTo(input.returnTo);
+  if (returnTo) {
+    params.set("returnTo", returnTo);
   }
 
   return params.toString();
@@ -36,7 +50,7 @@ export function parseDesktopNoteWindowRouteHash(hash: string) {
   }
 
   const noteId = params.get("noteId")?.trim() || undefined;
-  const returnTo = params.get("returnTo")?.trim() || undefined;
+  const returnTo = sanitizeReturnTo(params.get("returnTo"));
 
   return {
     draftId,

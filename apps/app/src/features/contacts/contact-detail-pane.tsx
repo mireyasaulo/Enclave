@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { msg } from "@lingui/macro";
 import { MessageCircleMore } from "lucide-react";
@@ -57,6 +57,10 @@ type ContactDetailPaneProps = {
   onToggleBlock?: () => void;
   deletePending?: boolean;
   onDeleteFriend?: () => void;
+  /** 右侧空态（character=null）的自定义渲染。星标朋友 / 标签 这类 sub-pane
+   *  传入上下文化的空态，避免默认那条「从左侧通讯录选择好友后...」在 0 starred
+   *  / 0 tags 时把用户引向另一个列表。 */
+  emptyState?: ReactNode;
 };
 
 type FriendProfileFormState = {
@@ -95,6 +99,7 @@ export function ContactDetailPane({
   onToggleBlock,
   deletePending = false,
   onDeleteFriend,
+  emptyState,
 }: ContactDetailPaneProps) {
   const t = useRuntimeTranslator();
   const queryClient = useQueryClient();
@@ -138,7 +143,7 @@ export function ContactDetailPane({
   });
 
   if (!character) {
-    return <DesktopContactPaneEmptyState />;
+    return <>{emptyState ?? <DesktopContactPaneEmptyState />}</>;
   }
 
   const isFriend = Boolean(friendship);

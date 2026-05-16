@@ -7,7 +7,16 @@ import { AvatarChip } from "../../components/avatar-chip";
 
 const t = translateRuntimeMessage;
 
-export function DesktopContactPaneEmptyState() {
+export function DesktopContactPaneEmptyState({
+  title,
+  description,
+}: {
+  /** 默认是"选择联系人"。星标/标签 sub-pane 应该传上下文化的标题，
+   *  否则在 0 starred / 0 tags 时右侧仍然指向"左侧通讯录"，跟用户实际所在的
+   *  子 pane 不对应。 */
+  title?: string;
+  description?: string;
+} = {}) {
   return (
     <div className="flex h-full items-center justify-center bg-[#f5f5f5] px-10">
       <div className="flex max-w-sm flex-col items-center text-center">
@@ -15,10 +24,11 @@ export function DesktopContactPaneEmptyState() {
           ···
         </div>
         <div className="mt-4 text-[16px] font-medium text-[color:var(--text-primary)]">
-          {t(msg`选择联系人`)}
+          {title ?? t(msg`选择联系人`)}
         </div>
         <p className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-          {t(msg`从左侧通讯录选择好友后，这里会显示联系人资料、内容入口和管理操作。`)}
+          {description ??
+            t(msg`从左侧通讯录选择好友后，这里会显示联系人资料、内容入口和管理操作。`)}
         </p>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { ErrorBlock, LoadingBlock, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { ContactDetailPane } from "../../contacts/contact-detail-pane";
+import { DesktopContactPaneEmptyState } from "../../contacts/desktop-contact-profile-blocks";
 import {
   getFriendDisplayName,
   matchesFriendSearch,
@@ -215,6 +216,23 @@ export function DesktopContactsStarredFriendsPane({
         <ContactDetailPane
           character={selectedFriend?.character ?? null}
           friendship={selectedFriend?.friendship ?? null}
+          // 0 位星标朋友 / 关键词搜不到时，默认空态会显示"从左侧通讯录选择好友"，
+          // 但用户此刻就在星标 sub-pane 里，左侧 sub-list 里就是空的——指错地方了。
+          // 给一个跟当前 pane 对齐的提示。
+          emptyState={
+            <DesktopContactPaneEmptyState
+              title={
+                friends.length === 0
+                  ? t(msg`还没有星标朋友`)
+                  : t(msg`选一位星标朋友`)
+              }
+              description={
+                friends.length === 0
+                  ? t(msg`去联系人资料页把常联系的好友设为星标朋友，TA 们会出现在这里。`)
+                  : t(msg`从中间星标列表里选一位，这里会显示资料和管理操作。`)
+              }
+            />
+          }
           commonGroups={
             selectedFriend
               ? (commonGroupsByCharacterId?.[selectedFriend.character.id] ?? [])

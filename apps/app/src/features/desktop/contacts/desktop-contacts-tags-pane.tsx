@@ -28,6 +28,7 @@ import {
 import { buildDesktopChatThreadPath } from "../chat/desktop-chat-route-state";
 import { buildContactTagGroups } from "../../contacts/contact-tag-groups";
 import { ContactDetailPane } from "../../contacts/contact-detail-pane";
+import { DesktopContactPaneEmptyState } from "../../contacts/desktop-contact-profile-blocks";
 import { getFriendDisplayName } from "../../contacts/contact-utils";
 import { buildDesktopFriendMomentsRouteHash } from "../../moments/friend-moments-route-state";
 import { isPersistedGroupConversation } from "../../../lib/conversation-route";
@@ -567,6 +568,23 @@ export function DesktopContactsTagsPane() {
         <ContactDetailPane
           character={selectedFriend?.character ?? null}
           friendship={selectedFriend?.friendship ?? null}
+          // 0 个标签 / 关键词搜不到时，默认空态会指"从左侧通讯录选择好友"，
+          // 但用户此时在标签 sub-pane，左侧 sub-list 里就是空的——指错地方了。
+          // 给一个跟当前 pane 对齐的提示。
+          emptyState={
+            <DesktopContactPaneEmptyState
+              title={
+                tagGroups.length === 0
+                  ? t(msg`还没有联系人标签`)
+                  : t(msg`选一个标签里的联系人`)
+              }
+              description={
+                tagGroups.length === 0
+                  ? t(msg`先在联系人资料里给好友补上标签，标签页会自动聚合。`)
+                  : t(msg`从中间标签和联系人列表里选一个，这里会显示资料和管理操作。`)
+              }
+            />
+          }
           commonGroups={commonGroups}
           onOpenGroup={(groupId) => {
             void navigate({
