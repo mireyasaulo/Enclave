@@ -3,10 +3,16 @@ import {
   lazy,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { msg } from "@lingui/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import {
   addMomentComment,
@@ -16,6 +22,8 @@ import {
   getFriends,
   toggleMomentLike,
   type Moment,
+  type MomentComment,
+  type MomentsPageResponse,
 } from "@yinjie/contracts";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AppPage, Button, ErrorBlock, LoadingBlock } from "@yinjie/ui";
@@ -233,32 +241,175 @@ export function FriendMomentsPage() {
       // 避免拉回 GET /api/moments 全量 + 30+ media 条件请求 RTT。
     },
   });
+  // 走查 Round 1：mutationFn 不能再次读 commentDrafts —— onMutate 立刻 clear drafts，
+  // 等 TanStack Query 调 mutationFn 时闭包里 drafts[momentId] 已经是 ""。
+  // 在 onMutate 里把 text/target 写进 ref，mutationFn 直接读 ref。
+  const commentSubmitArgsRef = useRef<
+    Record<
+      string,
+      { text: string; target: { commentId: string; authorId: string } | null }
+    >
+  >({});
   const commentMutation = useMutation({
-    mutationFn: (momentId: string) => {
+    // 走查 Round 1：之前没有 onMutate，公网隧道 ~600ms RTT 下用户提交评论后
+    // 输入框 600ms 不消失 + 列表里也看不到自己刚发的评论，体感"评论卡住"。
+    // 跟 moments-page.tsx Round 1 optimistic comment 模板对齐：4 把 cache 全
+    // sync + ref 捕获 args + onError 回滚 drafts。
+    onMutate: async (momentId: string) => {
       const text = commentDrafts[momentId]?.trim();
-      if (!text) {
-        throw new Error(t(msg`请先输入评论内容。`));
+      if (!text || !ownerId) {
+        return { skipped: true as const };
       }
 
       const replyTo =
         desktopReplyTarget && desktopReplyTarget.postId === momentId
           ? desktopReplyTarget
           : null;
+      const target = replyTo
+        ? { commentId: replyTo.commentId, authorId: replyTo.authorId }
+        : null;
+
+      commentSubmitArgsRef.current[momentId] = { text, target };
+
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-paged", baseUrl],
+        }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-mine", baseUrl],
+        }),
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-character", baseUrl],
+        }),
+      ]);
+
+      const flatSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      const pagedSnapshots = queryClient.getQueriesData<
+        InfiniteData<MomentsPageResponse>
+      >({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
+      const mineSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-mine", baseUrl],
+      });
+      const characterSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments-character", baseUrl],
+      });
+
+      const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
+      const tempComment: MomentComment = {
+        id: tempId,
+        postId: momentId,
+        authorId: ownerId,
+        authorName: ownerUsername ?? t(msg`我`),
+        authorAvatar: ownerAvatar ?? "",
+        authorType: "user",
+        text,
+        replyToCommentId: target?.commentId ?? null,
+        replyToAuthorId: target?.authorId ?? null,
+        createdAt: new Date().toISOString(),
+      };
+
+      const appendComment = (moment: Moment): Moment =>
+        moment.id !== momentId
+          ? moment
+          : {
+              ...moment,
+              comments: [...moment.comments, tempComment],
+              commentCount: moment.commentCount + 1,
+            };
+
+      flatSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+      pagedSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(key, {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            items: page.items.map(appendComment),
+          })),
+        });
+      });
+      mineSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+      characterSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+
+      const savedDraft = commentDrafts[momentId] ?? "";
+      const savedReply =
+        desktopReplyTarget && desktopReplyTarget.postId === momentId
+          ? desktopReplyTarget
+          : null;
+
+      setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
+      setDesktopReplyTarget((current) =>
+        current?.postId === momentId ? null : current,
+      );
+
+      return {
+        skipped: false as const,
+        flatSnapshots,
+        pagedSnapshots,
+        mineSnapshots,
+        characterSnapshots,
+        momentId,
+        tempId,
+        savedDraft,
+        savedReply,
+      };
+    },
+    mutationFn: (momentId: string) => {
+      const args = commentSubmitArgsRef.current[momentId];
+      if (!args?.text) {
+        throw new Error(t(msg`请先输入评论内容。`));
+      }
 
       return addMomentComment(
         momentId,
         {
-          text,
-          replyToCommentId: replyTo?.commentId,
-          replyToAuthorId: replyTo?.authorId,
+          text: args.text,
+          replyToCommentId: args.target?.commentId,
+          replyToAuthorId: args.target?.authorId,
         },
         baseUrl,
       );
     },
-    onError: (error) => {
+    onError: (error, momentId, context) => {
+      delete commentSubmitArgsRef.current[momentId];
+      if (!context || context.skipped) {
+        return;
+      }
+      context.flatSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.pagedSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.mineSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.characterSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      // 恢复 drafts / reply target 让用户改后重发
+      setCommentDrafts((current) => ({
+        ...current,
+        [context.momentId]: context.savedDraft,
+      }));
+      if (context.savedReply) {
+        setDesktopReplyTarget(context.savedReply);
+      }
       // 评论失败：danger notice，跟 like 失败同色调，避免红 ErrorBlock + 绿 notice 同屏。
-      // 不挂「重试评论」按钮——composer 框还在显示（onError 没清 commentDrafts），
-      // 用户直接在框里点「发送」就能再试。
       setNotice({
         tone: "danger",
         message:
@@ -267,22 +418,49 @@ export function FriendMomentsPage() {
             : t(msg`评论失败，请稍后重试。`),
       });
     },
-    onSuccess: (_, momentId) => {
-      setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
-      setDesktopReplyTarget((current) =>
-        current?.postId === momentId ? null : current,
-      );
+    onSuccess: (realComment, momentId, context) => {
+      delete commentSubmitArgsRef.current[momentId];
       setNotice({ tone: "success", message: t(msg`朋友圈互动已更新。`) });
-      // fire-and-forget：await 会让"发表"按钮一直 disabled，公网隧道下感觉评论卡几秒。
-      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
-      });
-      // 本页 source-of-truth 是 app-moments-character[characterId]，必须刷新它
-      // 否则评论数 / 评论列表在本页要等下次 refetch 才更新。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-character", baseUrl, characterId],
-      });
+      // 把 optimistic temp 原地换成 server 真实评论 —— 跟 moments-page 一样
+      // **完全省掉**一次 invalidate 触发的 GET /api/moments/character/X refetch
+      // （公网隧道下还会带回 30+ media 条件请求 RTT），是评论后"页面又卡一下"的主因。
+      if (context && !context.skipped) {
+        const { tempId } = context;
+        const replaceComment = (moment: Moment): Moment =>
+          moment.id !== momentId
+            ? moment
+            : {
+                ...moment,
+                comments: moment.comments.map((c) =>
+                  c.id === tempId ? realComment : c,
+                ),
+              };
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+        queryClient.setQueriesData<InfiniteData<MomentsPageResponse>>(
+          { queryKey: ["app-moments-paged", baseUrl] },
+          (data) =>
+            data
+              ? {
+                  ...data,
+                  pages: data.pages.map((page) => ({
+                    ...page,
+                    items: page.items.map(replaceComment),
+                  })),
+                }
+              : data,
+        );
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments-mine", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments-character", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+      }
     },
   });
 
