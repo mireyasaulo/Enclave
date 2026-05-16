@@ -1683,8 +1683,12 @@ export function ChatComposer({
       return;
     }
 
-    const droppedFiles = extractClipboardFiles(event.dataTransfer);
-    if (!droppedFiles.length) {
+    // 浏览器安全：dragenter/dragover 期间 DataTransfer.files 是空、
+    // items[i].getAsFile() 返回 null，只有 drop 才能读真文件。原写法用
+    // extractClipboardFiles 检测会永远拿到 []，于是 drop overlay
+    // 「松开鼠标发送图片或文件」从来没出现过——只看 kind/types 即可探到
+    // 这是 file drag。
+    if (!hasDraggableFiles(event.dataTransfer)) {
       return;
     }
 
@@ -1698,8 +1702,7 @@ export function ChatComposer({
       return;
     }
 
-    const droppedFiles = extractClipboardFiles(event.dataTransfer);
-    if (!droppedFiles.length) {
+    if (!hasDraggableFiles(event.dataTransfer)) {
       return;
     }
 
@@ -6763,6 +6766,28 @@ function extractClipboardFiles(clipboardData: DataTransfer | null) {
   }
 
   return [...clipboardData.files];
+}
+
+// 用于 dragenter/dragover：drop 之前拿不到真文件，只能通过 kind/types
+// 探测是不是文件 drag。注意 types 在 Chromium 上是大写 "Files"，标准
+// DataTransfer.types 用大写 "Files"，DataTransferItemList.kind 用小写
+// "file"——两条都查一下兼容性更稳。
+function hasDraggableFiles(dataTransfer: DataTransfer | null) {
+  if (!dataTransfer) {
+    return false;
+  }
+
+  if (dataTransfer.types && dataTransfer.types.includes("Files")) {
+    return true;
+  }
+
+  for (const item of dataTransfer.items) {
+    if (item.kind === "file") {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function findActiveMentionToken(value: string, cursor: number) {
