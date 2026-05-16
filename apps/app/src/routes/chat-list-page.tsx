@@ -613,10 +613,23 @@ function MobileChatListPage() {
         queryKey: ["app-conversations", baseUrl],
       });
     });
-    const offMessage = onChatMessage(() => {
+    const offMessage = onChatMessage((payload) => {
       void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
+      // 同时 invalidate 对应会话的 messages cache：移动端全局 staleTime=60s，
+      // 用户在 chat-list 收到 AI 回复时 chat-room 已 unmount，下次点进去 useQuery
+      // 把 60s 内的旧 cache 当 fresh 直接返回 → 列表显示 AI 回复 preview，但
+      // 点进去要等到 staleTime 过期才看得到。invalidate 让下次挂载触发 refetch。
+      if ("conversationId" in payload) {
+        void queryClient.invalidateQueries({
+          queryKey: ["app-conversation-messages", baseUrl, payload.conversationId],
+        });
+      } else if ("groupId" in payload) {
+        void queryClient.invalidateQueries({
+          queryKey: ["app-group-messages", baseUrl, payload.groupId],
+        });
+      }
     });
     return () => {
       offUpdated();

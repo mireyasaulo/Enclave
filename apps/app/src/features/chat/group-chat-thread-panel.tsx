@@ -388,6 +388,12 @@ export function GroupChatThreadPanel({
         });
       }
       setMessages((current) => upsertIncomingGroupMessage(current, payload));
+      // messages cache 标 stale：本地 state 已经有新消息，但 cache 没动；
+      // 用户离开再回来时 useQuery 在移动端 staleTime=60s 内不会 refetch，
+      // 看不到这条群消息。invalidate 让下次挂载强制 refetch。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-group-messages", baseUrl, groupId],
+      });
       // 标已读：用户正活跃在群聊页面，收到新消息时主动同步
       // 后端读位。要是不调，会话列表的未读会一直涨——本地 messages 在 socket
       // 推送时长，但 messagesQuery.data 不变，下方"messages 长度变化时标已读"

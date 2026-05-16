@@ -198,6 +198,16 @@ export function RootLayout() {
     };
   }, [mobileNavOpen]);
 
+  // ESC 关闭抽屉（无障碍 + 桌面键盘用户）
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileNavOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [mobileNavOpen]);
+
   const visibleGroups = useMemo(
     () =>
       NAV_GROUPS.map((g) => ({

@@ -247,6 +247,12 @@ export function useConversationThread(conversationId: string) {
       setSocketError(null);
       setMessages((current) => upsertIncomingDirectMessage(current, payload));
       syncActiveConversationMessage(payload);
+      // 把 messages cache 也标 stale：本地 state 已经有新消息了，但 cache 没动；
+      // 用户离开再回来时 useQuery 会读 cache（移动端 staleTime=60s 内不 refetch），
+      // 看不到 AI 回复。invalidate 让下次挂载强制 refetch。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversation-messages", baseUrl, conversationId],
+      });
       if (isReminderConversation) {
         void invalidateReminderQueries();
       }
