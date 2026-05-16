@@ -1631,44 +1631,60 @@ export function ChatMessageList({
     return nextIds;
   }, [visibleMessages]);
 
-  const imageMessages = visibleMessages
-    .filter(
-      (
-        message,
-      ): message is ChatRenderableMessage & {
-        type: "image";
-        attachment: Extract<MessageAttachment, { kind: "image" }>;
-      } =>
-        !recalledMessageIdSet.has(message.id) &&
-        message.type === "image" &&
-        message.attachment?.kind === "image",
-    )
-    .map((message) => {
-      const label =
-        message.attachment.fileName ||
-        sanitizeDisplayedChatText(message.text) ||
-        t(msg`[图片]`);
-      const returnTo =
-        buildMessageReturnTo?.(message.id) ??
-        (threadContext
-          ? threadContext.type === "group"
-            ? `/group/${threadContext.id}#chat-message-${message.id}`
-            : `/chat/${threadContext.id}#chat-message-${message.id}`
-          : undefined);
-      const meta = threadContext?.title?.trim()
-        ? `${threadContext.title} · ${formatMessageTimestamp(message.createdAt)}`
-        : formatMessageTimestamp(message.createdAt);
+  // useMemo：每次父组件渲染（typing 指示器 tick / 任何 state 变化）都会
+  // 走到这里，filter + map 历史里所有图片消息 → 让下游 standaloneViewerItems
+  // 的 useMemo 也跟着重算。长聊天滚动到顶后历史里图片 ≥10 张时这层 O(n) 是
+  // 可见开销。挂 useMemo 后只在 visibleMessages / recalledMessageIdSet /
+  // buildMessageReturnTo / threadContext / resolveAttachmentUrl 真变了时重算。
+  const imageMessages = useMemo(
+    () =>
+      visibleMessages
+        .filter(
+          (
+            message,
+          ): message is ChatRenderableMessage & {
+            type: "image";
+            attachment: Extract<MessageAttachment, { kind: "image" }>;
+          } =>
+            !recalledMessageIdSet.has(message.id) &&
+            message.type === "image" &&
+            message.attachment?.kind === "image",
+        )
+        .map((message) => {
+          const label =
+            message.attachment.fileName ||
+            sanitizeDisplayedChatText(message.text) ||
+            t(msg`[图片]`);
+          const returnTo =
+            buildMessageReturnTo?.(message.id) ??
+            (threadContext
+              ? threadContext.type === "group"
+                ? `/group/${threadContext.id}#chat-message-${message.id}`
+                : `/chat/${threadContext.id}#chat-message-${message.id}`
+              : undefined);
+          const meta = threadContext?.title?.trim()
+            ? `${threadContext.title} · ${formatMessageTimestamp(message.createdAt)}`
+            : formatMessageTimestamp(message.createdAt);
 
-      return {
-        id: message.id,
-        url: resolveAttachmentUrl(message.attachment.url),
-        label,
-        fileName: message.attachment.fileName,
-        createdAt: message.createdAt,
-        meta,
-        returnTo,
-      };
-    });
+          return {
+            id: message.id,
+            url: resolveAttachmentUrl(message.attachment.url),
+            label,
+            fileName: message.attachment.fileName,
+            createdAt: message.createdAt,
+            meta,
+            returnTo,
+          };
+        }),
+    [
+      buildMessageReturnTo,
+      recalledMessageIdSet,
+      resolveAttachmentUrl,
+      t,
+      threadContext,
+      visibleMessages,
+    ],
+  );
   const standaloneViewerItems = useMemo(
     () =>
       imageMessages.map(
