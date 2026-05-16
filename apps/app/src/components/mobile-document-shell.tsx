@@ -7,6 +7,7 @@ import { AppPage, Button, InlineNotice } from "@yinjie/ui";
 
 const t = translateRuntimeMessage;
 import { navigateBackOrFallback } from "../lib/history-back";
+import { buildPublicShareUrl } from "../lib/share-url";
 import {
   shareWithNativeShell,
 } from "../runtime/mobile-bridge";
@@ -45,10 +46,7 @@ export function MobileDocumentShell({
       typeof window === "undefined"
         ? ""
         : `${window.location.pathname}${window.location.search}${window.location.hash}`;
-    const documentUrl =
-      typeof window === "undefined" || !documentPath
-        ? title
-        : `${window.location.origin}${documentPath}`;
+    const documentUrl = documentPath ? buildPublicShareUrl(documentPath) : title;
     const documentSummary = [title, summary, documentUrl].join("\n\n");
 
     if (nativeMobileShareSupported) {

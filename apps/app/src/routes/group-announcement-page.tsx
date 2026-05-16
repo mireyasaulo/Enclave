@@ -16,6 +16,7 @@ import {
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isMissingGroupError } from "../lib/group-route-fallback";
 import { isDesktopOnlyPath } from "../lib/history-back";
+import { buildPublicShareUrl } from "../lib/share-url";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -165,10 +166,7 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
     }
 
     const groupPath = `/group/${groupId}/announcement`;
-    const groupUrl =
-      typeof window === "undefined"
-        ? groupPath
-        : `${window.location.origin}${groupPath}`;
+    const groupUrl = buildPublicShareUrl(groupPath);
     const announcementTitle = t(msg`${group.name} 群公告`);
     const summary = [announcementTitle, announcement, groupUrl].join("\n\n");
 

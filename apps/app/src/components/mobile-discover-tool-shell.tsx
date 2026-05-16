@@ -9,6 +9,7 @@ import {
   shareWithNativeShell,
 } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
+import { buildPublicShareUrl } from "../lib/share-url";
 import { TabPageTopBar } from "./tab-page-top-bar";
 
 type MobileDiscoverToolShellProps = {
@@ -60,10 +61,7 @@ export function MobileDiscoverToolShell({
       typeof window === "undefined"
         ? ""
         : `${window.location.pathname}${window.location.search}${window.location.hash}`;
-    const toolUrl =
-      typeof window === "undefined" || !toolPath
-        ? undefined
-        : `${window.location.origin}${toolPath}`;
+    const toolUrl = toolPath ? buildPublicShareUrl(toolPath) : undefined;
     const shareText = toolUrl
       ? [shareTitle, shareSummary, toolUrl].join("\n\n")
       : [shareTitle, shareSummary].join("\n\n");

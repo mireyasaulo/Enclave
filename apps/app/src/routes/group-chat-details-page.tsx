@@ -31,6 +31,7 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { buildGroupInviteReturnSearch } from "../lib/group-invite-delivery";
 import { isMissingGroupError } from "../lib/group-route-fallback";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { buildPublicShareUrl } from "../lib/share-url";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -374,10 +375,7 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
     }
 
     const groupPath = `/group/${groupId}`;
-    const groupUrl =
-      typeof window === "undefined"
-        ? groupPath
-        : `${window.location.origin}${groupPath}`;
+    const groupUrl = buildPublicShareUrl(groupPath);
 
     return {
       title: t(msg`${group.name} 群聊`),

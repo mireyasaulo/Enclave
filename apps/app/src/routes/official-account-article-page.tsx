@@ -35,6 +35,7 @@ import {
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatConversationTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { buildPublicShareUrl } from "../lib/share-url";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -136,10 +137,7 @@ function MobileOfficialAccountArticlePage({
     ? `official-article-${article.id}`
     : null;
   const articlePath = `/official-accounts/articles/${articleId}`;
-  const articleUrl =
-    typeof window === "undefined"
-      ? articlePath
-      : `${window.location.origin}${articlePath}`;
+  const articleUrl = buildPublicShareUrl(articlePath);
   const safeReturnPath =
     routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
       ? routeState.returnPath

@@ -36,6 +36,7 @@ import {
   isPersistedGroupConversation,
 } from "../lib/conversation-route";
 import { isMissingGroupError } from "../lib/group-route-fallback";
+import { buildPublicShareUrl } from "../lib/share-url";
 import {
   createGroupInviteDeliveryBatchId,
   hydrateGroupInviteDeliveryFromNative,
@@ -218,11 +219,7 @@ export function GroupQrPage() {
   ]);
 
   const inviteLink = useMemo(() => {
-    if (typeof window === "undefined") {
-      return `/group/${groupId}`;
-    }
-
-    return new URL(`/group/${groupId}`, window.location.origin).toString();
+    return buildPublicShareUrl(`/group/${groupId}`);
   }, [groupId]);
   const inviteCode = `YJ-GROUP-${groupId.replace(/-/g, "").slice(0, 10).toUpperCase()}`;
   const inviteText = useMemo(() => {

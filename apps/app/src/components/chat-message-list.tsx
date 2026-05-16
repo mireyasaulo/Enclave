@@ -113,6 +113,7 @@ import {
 } from "../lib/format";
 import { resolveMessageSemanticPreview } from "../lib/message-attachment-semantic";
 import { resolveConfiguredCoreApiBaseUrl } from "../lib/runtime-config";
+import { buildPublicShareUrl } from "../lib/share-url";
 import { buildYinjieId } from "../lib/yinjie-id";
 import { emitChatMessage, joinConversationRoom } from "../lib/socket";
 import {
@@ -1287,10 +1288,7 @@ export function ChatMessageList({
     attachment: Extract<MessageAttachment, { kind: "contact_card" }>,
   ) => {
     const profilePath = `/character/${attachment.characterId}`;
-    const profileUrl =
-      typeof window === "undefined"
-        ? profilePath
-        : `${window.location.origin}${profilePath}`;
+    const profileUrl = buildPublicShareUrl(profilePath);
     const summary = buildContactAttachmentSummary(attachment, profileUrl);
 
     if (!isNativeMobileShareSurface()) {

@@ -20,6 +20,7 @@ import {
   LoadingBlock,
 } from "@yinjie/ui";
 import { describeRequestError } from "../../lib/request-error";
+import { buildPublicShareUrl } from "../../lib/share-url";
 import {
   isNativeMobileBridgeAvailable,
   shareWithNativeShell,
@@ -97,10 +98,7 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
 
 function buildFallbackShareUrl(code: string | null) {
   if (!code) return null;
-  if (typeof window === "undefined") return null;
-  const origin = window.location.origin;
-  if (!origin) return null;
-  return `${origin.replace(/\/+$/, "")}/?invite=${encodeURIComponent(code)}`;
+  return buildPublicShareUrl(`/?invite=${encodeURIComponent(code)}`);
 }
 
 interface InviteShareCardProps {

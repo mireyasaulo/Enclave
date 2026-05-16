@@ -46,6 +46,7 @@ import { buildCharacterDetailRouteHash } from "../features/contacts/character-de
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { buildCreateGroupRouteHash } from "../lib/create-group-route-state";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { buildPublicShareUrl } from "../lib/share-url";
 import { buildYinjieId } from "../lib/yinjie-id";
 import {
   openAppSettings,
@@ -307,10 +308,7 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
     const contactPath = targetCharacterId
       ? `/character/${targetCharacterId}`
       : `/chat/${conversationId}/details`;
-    const contactUrl =
-      typeof window === "undefined"
-        ? contactPath
-        : `${window.location.origin}${contactPath}`;
+    const contactUrl = buildPublicShareUrl(contactPath);
     const contactName =
       friendship?.remarkName?.trim() ||
       targetCharacter?.name ||

@@ -73,6 +73,7 @@ import {
 import { stripToolCallSyntax } from "../features/moments/moment-content";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { buildPublicShareUrl } from "../lib/share-url";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -894,9 +895,7 @@ const pendingLikePostId = likeMutation.isPending
       postId: post.id,
     });
     const sharePath = `${pathname}${shareHash ? `#${shareHash}` : ""}`;
-    // 用户在 vicp.fun 隧道 / localhost / 内网 IP 上点分享时，window.location.origin
-    // 会泄露这些非公网域名，分享给朋友打不开。统一用对外的官网域名 enclaveai.top。
-    const shareUrl = `https://enclaveai.top${sharePath}`;
+    const shareUrl = buildPublicShareUrl(sharePath);
     const postSummary = getFeedSummaryText(post);
     const summaryText = `${post.authorName}：${postSummary}\n${shareUrl}`;
 

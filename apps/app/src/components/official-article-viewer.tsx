@@ -13,6 +13,7 @@ import {
   shareWithNativeShell,
 } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
+import { buildPublicShareUrl } from "../lib/share-url";
 
 export function OfficialArticleViewer({
   article,
@@ -64,10 +65,7 @@ export function OfficialArticleViewer({
   );
 
   const articlePath = `/official-accounts/articles/${article.id}`;
-  const articleUrl =
-    typeof window === "undefined"
-      ? articlePath
-      : `${window.location.origin}${articlePath}`;
+  const articleUrl = buildPublicShareUrl(articlePath);
 
   function retryCopyLink() {
     void handleCopyLink({

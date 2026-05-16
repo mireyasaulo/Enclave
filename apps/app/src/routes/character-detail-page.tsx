@@ -57,6 +57,7 @@ import { useCappedPending } from "../hooks/use-capped-pending";
 import { isPersistedGroupConversation } from "../lib/conversation-route";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { buildPublicShareUrl } from "../lib/share-url";
 import { buildYinjieId } from "../lib/yinjie-id";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
@@ -749,10 +750,7 @@ export function CharacterDetailPage() {
     }
 
     const profilePath = `/character/${character.id}`;
-    const profileUrl =
-      typeof window === "undefined"
-        ? profilePath
-        : `${window.location.origin}${profilePath}`;
+    const profileUrl = buildPublicShareUrl(profilePath);
     const profileSummary = [
       t(msg`${displayName} 的隐界名片`),
       character.relationship?.trim() || worldContactLabel,

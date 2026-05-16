@@ -7,6 +7,7 @@ import {
 import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { PUBLIC_SHARE_ORIGIN } from "../lib/share-url";
 
 // qrcode (~70KB) + html-to-image (~30KB) 是分享卡片专用的重依赖。
 // 静态 import 会让它们被 vendor-misc chunk 吃掉，模块预加载链路一并拉，公网
@@ -16,8 +17,7 @@ import { translateRuntimeMessage } from "@yinjie/i18n";
 const t = translateRuntimeMessage;
 
 // 水印里的 QR 与文案都指向 site 主域名。
-// 不读 env，因为 app 客户端的 SITE_URL 没有现成常量，且这个值固定。
-const SITE_URL = "https://enclaveai.top";
+const SITE_URL = PUBLIC_SHARE_ORIGIN;
 
 // QR 是 site URL 编码出来的 data URL，整个 app 生命周期都不变。
 // 第一次生成后挂在模块作用域，后续 modal 打开直接读 — 不再每次重新生成。
