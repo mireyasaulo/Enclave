@@ -2755,36 +2755,50 @@ export function ContactsPage() {
               </div>
             ) : null}
 
-            {friendSections.map((section) => (
-              // scroll-margin-top 跟 syncActiveMobileIndexKey 的 stickyOffset 保
-              // 持 104px 一致：右侧 A-Z 索引点 "M" 后 scrollIntoView 把这块锚点
-              // 对齐到 MobileViewportPane 滚动容器的 top，而 TabPageTopBar 是
-              // sticky top-0 占着同一个位置，section header（字母 "M"）直接被
-              // 盖住；加 104px scroll-margin 让锚点落在 top bar 下沿。
-              <div
-                key={section.key}
-                id={section.anchorId}
-                style={{ scrollMarginTop: 104 }}
-              >
-                <SectionHeader title={section.title} />
-                {section.items.map((item, index) => (
-                  <FriendListRow
-                    key={item.character.id}
-                    item={item}
-                    index={index}
-                    bulkMode={bulkMode}
-                    selected={bulkSelectedIds.has(item.character.id)}
-                    onClick={() => {
-                      if (bulkMode) {
-                        toggleBulkSelection(item.character.id);
-                        return;
-                      }
-                      handleOpenProfile(item.character.id);
-                    }}
-                  />
-                ))}
-              </div>
-            ))}
+            {friendSections.map((section) => {
+              // 新一轮走查：bulk 模式下把"我自己"过滤掉。原写法 friendSections 含
+              // SELF，bulk 模式渲染 FriendListRow 时会显示空 checkbox 圆圈，但
+              // toggleBulkSelection 的 SELF 守卫又会拒绝写入 → 用户点 SELF 行 checkbox
+              // 没反应，看着像 App 卡了。totalIds / onSelectAll 已经把 SELF 排除，
+              // 把渲染侧也对齐。section 全空时仍保留 header 占位，避免右侧 A-Z
+              // 索引点 W 后 scrollIntoView 找不到锚点。
+              const items =
+                bulkMode
+                  ? section.items.filter(
+                      (item) => item.character.id !== SELF_CHARACTER_ID,
+                    )
+                  : section.items;
+              return (
+                // scroll-margin-top 跟 syncActiveMobileIndexKey 的 stickyOffset 保
+                // 持 104px 一致：右侧 A-Z 索引点 "M" 后 scrollIntoView 把这块锚点
+                // 对齐到 MobileViewportPane 滚动容器的 top，而 TabPageTopBar 是
+                // sticky top-0 占着同一个位置，section header（字母 "M"）直接被
+                // 盖住；加 104px scroll-margin 让锚点落在 top bar 下沿。
+                <div
+                  key={section.key}
+                  id={section.anchorId}
+                  style={{ scrollMarginTop: 104 }}
+                >
+                  <SectionHeader title={section.title} />
+                  {items.map((item, index) => (
+                    <FriendListRow
+                      key={item.character.id}
+                      item={item}
+                      index={index}
+                      bulkMode={bulkMode}
+                      selected={bulkSelectedIds.has(item.character.id)}
+                      onClick={() => {
+                        if (bulkMode) {
+                          toggleBulkSelection(item.character.id);
+                          return;
+                        }
+                        handleOpenProfile(item.character.id);
+                      }}
+                    />
+                  ))}
+                </div>
+              );
+            })}
           </section>
         </div>
 

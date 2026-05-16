@@ -8,6 +8,7 @@ import {
   Square,
   type LucideIcon,
 } from "lucide-react";
+import { SELF_CHARACTER_ID } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
@@ -217,36 +218,45 @@ export function DesktopContactsWorkspace({
                 {!loading && friendSections.length ? (
                   <div className="overflow-hidden">
                     <DesktopDirectoryTitle title={t(msg`联系人`)} />
-                    {friendSections.map((section, sectionIndex) => (
-                      <div
-                        key={section.key}
-                        id={section.anchorId}
-                        className={cn(
-                          sectionIndex > 0
-                            ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
-                            : undefined,
-                        )}
-                      >
-                        <DesktopSectionHeader title={section.title} />
-                        {section.items.map((item, index) => (
-                          <DesktopFriendListRow
-                            key={item.character.id}
-                            item={item}
-                            index={index}
-                            pendingCharacterId={pendingCharacterId}
-                            active={activeFriendId === item.character.id}
-                            bulkMode={bulkMode}
-                            selected={
-                              bulkSelectedIds?.has(item.character.id) ?? false
-                            }
-                            onClick={() => onSelectFriend(item.character.id)}
-                            onDoubleClick={() =>
-                              onOpenFriendChat(item.character.id)
-                            }
-                          />
-                        ))}
-                      </div>
-                    ))}
+                    {friendSections.map((section, sectionIndex) => {
+                      // 新一轮走查：bulk 模式渲染时把 SELF 滤掉，对齐 toggleBulkSelection /
+                      // desktopBulkAllIds 的 SELF 守卫；不然点 "我自己" 的 checkbox 无反应。
+                      const items = bulkMode
+                        ? section.items.filter(
+                            (item) => item.character.id !== SELF_CHARACTER_ID,
+                          )
+                        : section.items;
+                      return (
+                        <div
+                          key={section.key}
+                          id={section.anchorId}
+                          className={cn(
+                            sectionIndex > 0
+                              ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
+                              : undefined,
+                          )}
+                        >
+                          <DesktopSectionHeader title={section.title} />
+                          {items.map((item, index) => (
+                            <DesktopFriendListRow
+                              key={item.character.id}
+                              item={item}
+                              index={index}
+                              pendingCharacterId={pendingCharacterId}
+                              active={activeFriendId === item.character.id}
+                              bulkMode={bulkMode}
+                              selected={
+                                bulkSelectedIds?.has(item.character.id) ?? false
+                              }
+                              onClick={() => onSelectFriend(item.character.id)}
+                              onDoubleClick={() =>
+                                onOpenFriendChat(item.character.id)
+                              }
+                            />
+                          ))}
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : null}
 
