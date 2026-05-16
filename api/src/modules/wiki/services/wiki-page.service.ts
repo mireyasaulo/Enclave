@@ -44,6 +44,18 @@ export type WikiPageView = {
   exists: boolean;
 };
 
+type ListPagesRow = {
+  id: string;
+  name: string;
+  avatar: string;
+  bio: string;
+  relationship: string;
+  relationshipType: string;
+  sourceType: string;
+  lifecycleStatus: string;
+  protectionLevel: string;
+};
+
 @Injectable()
 export class WikiPageService {
   constructor(
@@ -55,6 +67,16 @@ export class WikiPageService {
     private readonly revisionRepo: Repository<CharacterRevisionEntity>,
     private readonly blueprints: CharacterBlueprintService,
   ) {}
+
+  // listPages 是 wiki 首页唯一阻塞 API，三次全表扫 + 内存 sort。
+  // 加 60s TTL 进程内缓存：冷启动一次后，二次访问 RTT 从几百 ms 降到 <10 ms。
+  // 写路径都要主动 invalidate；TTL 是兜底，最坏陈旧 60s 可接受。
+  private static readonly LIST_PAGES_TTL_MS = 60_000;
+  private listPagesCache: { value: ListPagesRow[]; expiresAt: number } | null = null;
+
+  invalidateListPagesCache(): void {
+    this.listPagesCache = null;
+  }
 
   async getOrInitPage(characterId: string): Promise<CharacterPageEntity> {
     let page = await this.pageRepo.findOne({ where: { characterId } });
@@ -81,7 +103,9 @@ export class WikiPageService {
       editCount: 0,
       isDeleted: false,
     });
-    return this.pageRepo.save(page);
+    const saved = await this.pageRepo.save(page);
+    this.invalidateListPagesCache();
+    return saved;
   }
 
   async getPageView(
@@ -205,19 +229,17 @@ export class WikiPageService {
     };
   }
 
-  async listPages(): Promise<
-    Array<{
-      id: string;
-      name: string;
-      avatar: string;
-      bio: string;
-      relationship: string;
-      relationshipType: string;
-      sourceType: string;
-      lifecycleStatus: string;
-      protectionLevel: string;
-    }>
-  > {
+  async listPages(): Promise<ListPagesRow[]> {
+    const now = Date.now();
+    if (this.listPagesCache && this.listPagesCache.expiresAt > now) {
+      return this.listPagesCache.value;
+    }
+    const value = await this.computeListPages();
+    this.listPagesCache = { value, expiresAt: now + WikiPageService.LIST_PAGES_TTL_MS };
+    return value;
+  }
+
+  private async computeListPages(): Promise<ListPagesRow[]> {
     const characters = await this.characterRepo.find({ order: { name: 'ASC' } });
     const pages = await this.pageRepo.find();
     const pendingRevisions = await this.revisionRepo.find({
@@ -457,6 +479,7 @@ export class WikiPageService {
         deletedBy: isDeleted ? actorId : null,
       },
     );
+    this.invalidateListPagesCache();
     return (await this.pageRepo.findOne({ where: { characterId } }))!;
   }
 }

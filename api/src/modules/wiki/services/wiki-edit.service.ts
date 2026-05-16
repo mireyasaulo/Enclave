@@ -85,6 +85,10 @@ export class WikiEditService {
     user: AuthenticatedUser,
     input: SubmitEditInput,
   ): Promise<SubmitEditResult> {
+    // submit / createPage / requestLifecycle / syncFromCharacter 都会改 listPages
+    // 输出（新增 pending revision、改 page status、改 character 基本信息）。统一入口
+    // invalidate，避免编辑者刷首页看到 60s 内的陈旧自有改动。
+    this.pages.invalidateListPagesCache();
     if (input.recipeSnapshot) {
       return this.submitRecipeEdit(characterId, user, input);
     }
@@ -319,6 +323,7 @@ export class WikiEditService {
       editSummary?: string | null;
     },
   ): Promise<SubmitEditResult & { characterId: string }> {
+    this.pages.invalidateListPagesCache();
     const characterId = this.resolveNewCharacterId(input.characterId);
     await this.blocks.assertCanEdit(user, characterId);
 
@@ -512,6 +517,7 @@ export class WikiEditService {
         ...(publishedRecipe ? { recipeSnapshot: publishedRecipe } : {}),
       },
     );
+    this.pages.invalidateListPagesCache();
   }
 
   async requestLifecycle(
@@ -520,6 +526,7 @@ export class WikiEditService {
     operation: 'soft_delete' | 'restore',
     reason?: string | null,
   ): Promise<SubmitEditResult> {
+    this.pages.invalidateListPagesCache();
     await this.blocks.assertCanEdit(user, characterId);
     const page = await this.pages.getOrInitPage(characterId);
     this.assertProtection(page.protectionLevel, user.role);
@@ -666,6 +673,7 @@ export class WikiEditService {
     characterId: string,
     actor: AuthenticatedUser,
   ): Promise<SubmitEditResult> {
+    this.pages.invalidateListPagesCache();
     if (rankOf(actor.role) < rankOf('patroller')) {
       throw new AppError('WIKI_FORBIDDEN', {
         status: HttpStatus.FORBIDDEN,
@@ -743,6 +751,10 @@ export class WikiEditService {
     revision: CharacterRevisionEntity,
     actorId: string,
   ): Promise<void> {
+    // 这个方法所有成功分支都会改 page/character/blueprint。统一在入口失效一次
+    // listPages 缓存，比在 4 个 pageRepo.update 后各加一行更省事；提前失效只代价
+    // 一次 cache miss，无功能副作用。
+    this.pages.invalidateListPagesCache();
     const latestRevisionId = await this.resolveLatestRevisionId(revision);
     if (revision.operation === 'create') {
       if (!revision.recipeSnapshot) {
