@@ -1414,6 +1414,10 @@ export function GroupChatThreadPanel({
               endNoticePending={sendCallInviteMutation.isPending}
               onClose={() => setDesktopCallPanelState(null)}
               onPanelOpened={(counts) => {
+                // 走查 Round 5：mutateAsync().then() 没接 .catch()，群通话邀请
+                // 网络失败时 rejection 直接落到 window.unhandledrejection 污染
+                // telemetry。sendCallInviteMutation.onError 已经维护错误状态，
+                // 这里 .catch(()=>{}) 仅止血 orphaned rejection。
                 void sendCallInviteMutation
                   .mutateAsync({
                     kind: desktopCallPanelState.kind,
@@ -1429,7 +1433,8 @@ export function GroupChatThreadPanel({
                       activeCount: counts.activeCount,
                       totalCount: counts.totalCount,
                     });
-                  });
+                  })
+                  .catch(() => {});
               }}
               onOpenMobileHandoff={() => {
                 void navigate({
@@ -1443,6 +1448,7 @@ export function GroupChatThreadPanel({
                 });
               }}
               onSendInviteNotice={(counts) => {
+                // 同 onPanelOpened：止血 orphaned rejection。
                 void sendCallInviteMutation
                   .mutateAsync({
                     kind: desktopCallPanelState.kind,
@@ -1458,9 +1464,13 @@ export function GroupChatThreadPanel({
                       activeCount: counts.activeCount,
                       totalCount: counts.totalCount,
                     });
-                  });
+                  })
+                  .catch(() => {});
               }}
               onEndCall={(counts) => {
+                // 同 onPanelOpened：止血 orphaned rejection。失败时
+                // sendCallInviteMutation.error 会被 panel 的 endNoticePending /
+                // 顶部错误条接住，用户可以重新点结束。
                 void sendCallInviteMutation
                   .mutateAsync({
                     kind: desktopCallPanelState.kind,
@@ -1474,7 +1484,8 @@ export function GroupChatThreadPanel({
                   .then(() => {
                     setLastPublishedCallCounts(null);
                     setDesktopCallPanelState(null);
-                  });
+                  })
+                  .catch(() => {});
               }}
             />
           </div>

@@ -1,8 +1,9 @@
-import { Suspense, lazy, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { onChatMessage, onConversationUpdated } from "../lib/socket";
 import { ArrowLeft, MessageSquarePlus, Search } from "lucide-react";
 import { getGroups, type Group } from "@yinjie/contracts";
 import { AppPage, Button, cn } from "@yinjie/ui";
@@ -86,10 +87,33 @@ function MobileGroupContactsPage() {
     [safeReturnHash, safeReturnPath],
   );
 
+  const queryClient = useQueryClient();
   const groupsQuery = useQuery({
     queryKey: ["app-contact-groups", baseUrl],
     queryFn: () => getGroups(baseUrl),
   });
+
+  // 走查 Round 5：群被 AI 回复触发 touchGroupActivity → isHidden=false 翻回
+  // 可见时，chat-list 通过 socket onChatMessage/onConversationUpdated 立即拉
+  // 刷新；但通讯录页只裸 useQuery 没订阅 socket，要等用户离开再回来才看到
+  // 这条群。这里订阅同样的两个事件 invalidate 自己的 cache key，对齐
+  // chat-list-page 的口径。
+  useEffect(() => {
+    const offUpdated = onConversationUpdated(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-contact-groups", baseUrl],
+      });
+    });
+    const offMessage = onChatMessage(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-contact-groups", baseUrl],
+      });
+    });
+    return () => {
+      offUpdated();
+      offMessage();
+    };
+  }, [baseUrl, queryClient]);
 
   // 走查 Round 3：getGroups 后端 listGroups 不过滤 isHidden，被 hideGroup 隐藏
   // 的群当前会和正常群混在通讯录里——和 hide 的语义不符（hide=暂时从入口摘掉，
