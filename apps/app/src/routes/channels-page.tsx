@@ -1733,6 +1733,14 @@ export function ChannelsPage() {
             queryKey: ["app-channels-home", baseUrl],
           });
         }}
+        onForwardFailed={(input) => {
+          // 走查 R9：picker 在 mutation pending 时不挡关闭，用户点完好友
+          // 立刻关 picker，失败时 picker 内的红条已经不渲染，page 级 notice 兜底。
+          setNoticeTone("info");
+          setNoticeActionLabel(null);
+          setNoticeAction(null);
+          setNotice(t(msg`转发给 ${input.targetName} 失败：${input.message}`));
+        }}
       />
     </AppPage>
   );

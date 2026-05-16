@@ -21,6 +21,16 @@ type ChannelsForwardPickerProps = {
   onClose: () => void;
   /** 通知 channels-page 刷 toast + bump shareCount。 */
   onForwarded?: (target: { characterId: string; name: string }) => void;
+  /**
+   * 转发失败兜底回调：用户点完好友马上点 取消/backdrop 关 picker，picker 内
+   * 的 errorMessage 已经不渲染了；让 channels-page 知道这次失败，在 page 级
+   * 显示一行 notice，避免静默吞错。
+   */
+  onForwardFailed?: (input: {
+    targetCharacterId: string;
+    targetName: string;
+    message: string;
+  }) => void;
 };
 
 /**
@@ -38,6 +48,7 @@ export function ChannelsForwardPicker({
   baseUrl,
   onClose,
   onForwarded,
+  onForwardFailed,
 }: ChannelsForwardPickerProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -119,15 +130,24 @@ export function ChannelsForwardPicker({
         (error as { code?: string; message?: string })?.code ??
         (error as { message?: string })?.message ??
         "";
+      let translatedMessage: string;
       if (code === "FEED_FORWARD_MEDIA_BROKEN") {
-        setErrorMessage(t(msg`这条视频号还没有可播放的视频/音频，无法转发。`));
+        translatedMessage = t(msg`这条视频号还没有可播放的视频/音频，无法转发。`);
       } else if (code === "FEED_FORWARD_NOT_CHANNELS") {
-        setErrorMessage(t(msg`只支持转发视频号帖子。`));
+        translatedMessage = t(msg`只支持转发视频号帖子。`);
       } else if (code === "FEED_POST_NOT_PUBLISHED") {
-        setErrorMessage(t(msg`帖子尚未发布，稍后再试。`));
+        translatedMessage = t(msg`帖子尚未发布，稍后再试。`);
       } else {
-        setErrorMessage(t(msg`转发失败，请稍后重试。`));
+        translatedMessage = t(msg`转发失败，请稍后重试。`);
       }
+      setErrorMessage(translatedMessage);
+      // 走查 R9：picker 可能已经被用户手动关了（onClose 不挡 mutation pending），
+      // 这种情况下 errorMessage 不会被渲染。让 channels-page 兜底 page 级 notice。
+      onForwardFailed?.({
+        targetCharacterId: target.character.id,
+        targetName: target.character.name,
+        message: translatedMessage,
+      });
     }
   }
 
