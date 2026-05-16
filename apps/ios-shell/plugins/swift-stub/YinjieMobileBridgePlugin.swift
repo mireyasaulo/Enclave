@@ -568,14 +568,9 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                     return
                 }
 
-                if let imageUrl = info[.imageURL] as? URL,
-                   let asset = self.copyImageAsset(from: imageUrl) {
-                    call.resolve([
-                        "asset": asset
-                    ])
-                    return
-                }
-
+                // 跳过 info[.imageURL]：iPhone 相机默认 HEIC，直接 copy 会把
+                // HEIC 原片送给后端，下游 Android / Web 解不开。统一走
+                // originalImage → jpegData 强制转 JPEG，顺带剥掉 EXIF GPS。
                 guard let image = info[.originalImage] as? UIImage,
                       let imageData = image.jpegData(compressionQuality: 0.92),
                       let asset = self.writeCapturedCameraImage(data: imageData) else {

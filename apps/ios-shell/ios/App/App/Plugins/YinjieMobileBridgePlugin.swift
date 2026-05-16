@@ -643,14 +643,11 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                     return
                 }
 
-                if let imageUrl = info[.imageURL] as? URL,
-                   let asset = self.copyImageAsset(from: imageUrl) {
-                    call.resolve([
-                        "asset": asset
-                    ])
-                    return
-                }
-
+                // 不要走 info[.imageURL] 直接 copy 原文件：iPhone 7+ 相机默认
+                // HEIF/HEIC 编码，那条路径会把 HEIC 原片直接交给后端，下游
+                // Android / Web / 旧 iOS 解不开（详见 Round 7 picker 同款问题）。
+                // 统一走 originalImage → jpegData(0.92)，强制输出 JPEG。
+                // 顺带去掉了 EXIF 里的 GPS / 设备信息，发出去之前先脱敏一遍。
                 guard let image = info[.originalImage] as? UIImage,
                       let imageData = image.jpegData(compressionQuality: 0.92),
                       let asset = self.writeCapturedCameraImage(data: imageData) else {
