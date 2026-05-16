@@ -78,6 +78,21 @@ export function MobileMomentsPublishPage() {
     ta.style.height = `${next}px`;
   }, [composeDraft.text]);
 
+  // 钉住 createMutation 触发时刻的 baseUrl —— mid-flight 切账户后 onSuccess
+  // 闭包里的 baseUrl 已经是新账户，但本次发表落到的是旧账户的 cloud-api。
+  // 不加这把 guard 会出三件错事：
+  //   1) storeMomentPublishFlash 走 sessionStorage（跨账户共享），用户切到 B
+  //      会在 B 的朋友圈页看到「朋友圈已发布」绿条，但 B 里啥也没多
+  //   2) queryClient.setQueryData / invalidate 全部走当前 baseUrl=B 的 key —
+  //      把 A 账户的新 moment prepend 到 B 的 cache 头部，UI 瞬间出现一条
+  //      不属于 B 的帖子；invalidate 立刻把 B refetch 回正常，但前 ~600ms 闪
+  //      一下脏数据
+  //   3) navigate replace 到 /discover/moments，把用户从 publish 页拽到 B 的
+  //      朋友圈页 —— 但他切到 B 的本意可能就是去做别的事
+  const createMutationBaseUrlRef = useRef(baseUrl);
+  useEffect(() => {
+    createMutationBaseUrlRef.current = baseUrl;
+  }, [baseUrl]);
   const createMutation = useMutation({
     mutationFn: () =>
       publishMomentComposeDraft({
@@ -86,13 +101,18 @@ export function MobileMomentsPublishPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newMoment) => {
-      storeMomentPublishFlash(t(msg`朋友圈已发布。`));
-      composeDraft.reset();
-      // 把新发布的 moment prepend 到 paged 头部 + 收回到 page 1。跳转后 moments-page mount
-      // 能立刻看到自己刚发的内容；后台 invalidate 再去合并服务端最新状态（评论/点赞等）。
+    onMutate: () => {
+      // onMutate 在 mutationFn 之前同步跑；这里钉住的 baseUrl 就是 publish 真正发
+      // 到的目标账户。
+      return { mutationBaseUrl: baseUrl };
+    },
+    onSuccess: (newMoment, _vars, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
+      // mid-flight 切账户：把 moment prepend 进**旧账户**的 cache（A 切到 B 后
+      // 再切回 A 时第一帧就能看到刚发的），但不要触当前账户（B）的 UI 反馈。
+      // invalidate 也针对旧账户：B 完全不该被这次 A 的发表牵动。
       queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
-        ["app-moments-paged", baseUrl],
+        ["app-moments-paged", mutationBaseUrl],
         (current) =>
           current && current.pages.length > 0
             ? {
@@ -106,23 +126,34 @@ export function MobileMomentsPublishPage() {
               }
             : current,
       );
-      queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
-        current ? [newMoment, ...current] : current,
+      queryClient.setQueryData<Moment[]>(
+        ["app-moments", mutationBaseUrl],
+        (current) => (current ? [newMoment, ...current] : current),
       );
       // "我的朋友圈"用 mine cache（profile-moments-page），这里也得 prepend +
       // invalidate，不然从发布页返回我的朋友圈第一次还看不见刚发的。
       queryClient.setQueryData<Moment[]>(
-        ["app-moments-mine", baseUrl],
+        ["app-moments-mine", mutationBaseUrl],
         (current) => (current ? [newMoment, ...current] : current),
       );
       // fire-and-forget：原来 await refetch 让"发表中"按钮多卡 600ms+。
-      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
+        queryKey: ["app-moments", mutationBaseUrl],
       });
       void queryClient.invalidateQueries({
-        queryKey: ["app-moments-mine", baseUrl],
+        queryKey: ["app-moments-paged", mutationBaseUrl],
       });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-mine", mutationBaseUrl],
+      });
+      // 切走后剩下的 flash/draft-reset/navigate 都跟当前用户体验有关——
+      // 切账户后用户已经不在 publish 上下文里，全部静默。和 R7/R8/R9
+      // mid-flight 关 sheet 失败时静默吞错同思路。
+      if (mutationBaseUrl !== createMutationBaseUrlRef.current) {
+        return;
+      }
+      storeMomentPublishFlash(t(msg`朋友圈已发布。`));
+      composeDraft.reset();
       // 只在用户还停在 publish 页时才 navigate。isPending 期间 我把 取消按钮
       // 禁了 + handleBack guard 了，但浏览器层的 swipe-back / Android 物理返回键
       // 这种系统手势绕过 React 拦不住——用户已经离开后 onSuccess 再 navigate 会
