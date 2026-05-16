@@ -2692,22 +2692,6 @@ const ConversationCardLink = memo(function ConversationCardLink({
     </>
   );
 
-  if (isPersistedGroupConversation(conversation)) {
-    return (
-      <Link
-        to={
-          buildDesktopChatThreadPath({
-            conversationId: conversation.id,
-          }) as never
-        }
-        className={className}
-        onContextMenu={(event) => onContextMenu(event, conversation)}
-      >
-        {content}
-      </Link>
-    );
-  }
-
   return (
     <Link
       to={

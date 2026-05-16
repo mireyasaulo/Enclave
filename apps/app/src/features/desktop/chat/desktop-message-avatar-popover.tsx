@@ -122,7 +122,9 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
     enabled: !isOwner && Boolean(characterId),
   });
   const blockedQuery = useQuery({
-    queryKey: ["app-chat-avatar-card-blocked", baseUrl],
+    // 与 desktop-chat-workspace 的拉黑列表共用同一份 cache，否则桌面端
+    // 每次点开头像 popover 都会再发一次相同的 getBlockedCharacters 请求。
+    queryKey: ["app-chat-blocked-characters", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: !isOwner && Boolean(characterId),
   });
