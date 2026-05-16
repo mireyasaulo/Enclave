@@ -279,6 +279,23 @@ const checks = [
         : "PrivacyInfo.xcprivacy not seeded yet; run `pnpm ios:configure` to prepare App Store privacy defaults",
   },
   {
+    // YinjieSecureStoragePlugin 之前直接拿 OSStatus 当 Result.Failure，也直接
+    // 塞给 call.reject(_:_:_:Error?)。OSStatus 是 Int32 的 typealias，Swift
+    // 标准库不 conform Error，Result.Failure 必须 : Error —— 这条会让整个 iOS
+    // 壳过不了 swiftc。必须包一层 KeychainError 走 Error 通道。
+    label: "secure-storage-error-bridge",
+    ok:
+      !fs.existsSync(secureStoragePluginPath) ||
+      (fileMatches(
+        secureStoragePluginPath,
+        /Result<[^>]+,\s*KeychainError>/,
+      ) &&
+        fileIncludes(secureStoragePluginPath, "struct KeychainError")),
+    detail: fs.existsSync(secureStoragePluginPath)
+      ? "YinjieSecureStoragePlugin wraps OSStatus in KeychainError (Result.Failure must conform to Error)"
+      : "secure storage plugin not found yet; run `pnpm ios:sync` first",
+  },
+  {
     label: "runtime-plugin-sync",
     ok:
       !fs.existsSync(runtimePluginPath) ||

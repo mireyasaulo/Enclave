@@ -2,6 +2,20 @@ import Foundation
 import Capacitor
 import Security
 
+// OSStatus 是 Int32 的 typealias，Swift 标准库里不 conform Error；
+// 直接写 Result<X, OSStatus> 或 call.reject(_:_:_:error:OSStatus) 都过不了
+// 编译（Result.Failure 必须 : Error，call.reject 第 3 参也是 Error?）。
+// 包一层 KeychainError 让它带着 status 走 Error 通道。
+private struct KeychainError: Error, CustomNSError {
+    let status: OSStatus
+
+    static var errorDomain: String { "YinjieSecureStorage" }
+    var errorCode: Int { Int(status) }
+    var errorUserInfo: [String: Any] {
+        ["NSDebugDescription": "Keychain operation failed with OSStatus \(status)"]
+    }
+}
+
 @objc(YinjieSecureStoragePlugin)
 public class YinjieSecureStoragePlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "YinjieSecureStoragePlugin"
@@ -74,7 +88,7 @@ public class YinjieSecureStoragePlugin: CAPPlugin, CAPBridgedPlugin {
         ]
     }
 
-    private func readValue(for key: String) -> Result<String?, OSStatus> {
+    private func readValue(for key: String) -> Result<String?, KeychainError> {
         var item: CFTypeRef?
         var lookup = query(for: key)
         lookup[kSecReturnData as String] = kCFBooleanTrue
@@ -86,7 +100,7 @@ public class YinjieSecureStoragePlugin: CAPPlugin, CAPBridgedPlugin {
         }
 
         guard status == errSecSuccess else {
-            return .failure(status)
+            return .failure(KeychainError(status: status))
         }
 
         guard let data = item as? Data else {
@@ -96,7 +110,7 @@ public class YinjieSecureStoragePlugin: CAPPlugin, CAPBridgedPlugin {
         return .success(String(data: data, encoding: .utf8))
     }
 
-    private func writeValue(_ value: String, for key: String) -> Result<Void, OSStatus> {
+    private func writeValue(_ value: String, for key: String) -> Result<Void, KeychainError> {
         let encodedValue = Data(value.utf8)
         let lookup = query(for: key)
         let attributes = [kSecValueData as String: encodedValue]
@@ -107,17 +121,22 @@ public class YinjieSecureStoragePlugin: CAPPlugin, CAPBridgedPlugin {
         }
 
         if updateStatus != errSecItemNotFound {
-            return .failure(updateStatus)
+            return .failure(KeychainError(status: updateStatus))
         }
 
         var insert = lookup
         insert[kSecValueData as String] = encodedValue
         let insertStatus = SecItemAdd(insert as CFDictionary, nil)
-        return insertStatus == errSecSuccess ? .success(()) : .failure(insertStatus)
+        return insertStatus == errSecSuccess
+            ? .success(())
+            : .failure(KeychainError(status: insertStatus))
     }
 
-    private func deleteValue(for key: String) -> Result<Void, OSStatus> {
+    private func deleteValue(for key: String) -> Result<Void, KeychainError> {
         let status = SecItemDelete(query(for: key) as CFDictionary)
-        return (status == errSecSuccess || status == errSecItemNotFound) ? .success(()) : .failure(status)
+        if status == errSecSuccess || status == errSecItemNotFound {
+            return .success(())
+        }
+        return .failure(KeychainError(status: status))
     }
 }
