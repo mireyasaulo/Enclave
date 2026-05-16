@@ -513,10 +513,21 @@ export function DesktopNotesWorkspace({
   }, [notice]);
 
   useEffect(() => {
+    // 之前只 set document.title，没 cleanup：用户在 inline 模式（FavoritesPage
+    // 内嵌编辑器）打开笔记 → 浏览器 tab 标题变成 "无标题笔记 · 未保存" 之
+    // 类，关掉编辑器走人后，整个 app 没有其它地方再 set document.title
+    // （全局 grep 只此一处），tab title 永远停在这条笔记名上，用户在
+    // /tabs/chat / /tabs/moments 等其它 tab 看到的浏览器标题都是个笔记名。
+    // standalone 窗口模式下也无副作用：窗口关闭时整个进程结束，title
+    // 恢复无所谓。
+    const previousTitle = document.title;
     const title = isDirty
       ? t(msg`${noteTitle} · 未保存`)
       : noteTitle;
     document.title = title;
+    return () => {
+      document.title = previousTitle;
+    };
   }, [isDirty, noteTitle, t]);
 
   useEffect(() => {
