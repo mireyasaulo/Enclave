@@ -680,6 +680,26 @@ function ensureAppDelegatePushHooks() {
     );
   }
 
+  if (!source.includes("willPresent notification: UNNotification")) {
+    source = insertBeforeClassEnd(
+      source,
+      [
+        "",
+        "    func userNotificationCenter(",
+        "        _ center: UNUserNotificationCenter,",
+        "        willPresent notification: UNNotification,",
+        "        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void",
+        "    ) {",
+        "        if #available(iOS 14.0, *) {",
+        "            completionHandler([.banner, .list, .sound, .badge])",
+        "        } else {",
+        "            completionHandler([.alert, .sound, .badge])",
+        "        }",
+        "    }",
+      ].join("\n"),
+    );
+  }
+
   if (!source.includes("private func cacheLaunchTarget(")) {
     source = insertBeforeClassEnd(
       source,

@@ -76,6 +76,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         cacheLaunchTarget(from: response.notification.request.content.userInfo, defaultSource: "local_reminder")
     }
 
+    // App 处于前台时，iOS 默认会把通知静默丢掉。我们走 showLocalNotification
+    // 的入口（强提醒 / 会话提醒）前已经在 JS 侧排除了「用户正在看这条会话」
+    // 的情况，所以走到这里的都应当弹 banner + 出声。远端推送同理：后端会
+    // 在「用户在该会话且 visible」时跳过推送，所以前台拿到推送也都是要让
+    // 用户看见的。
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        if #available(iOS 14.0, *) {
+            completionHandler([.banner, .list, .sound, .badge])
+        } else {
+            completionHandler([.alert, .sound, .badge])
+        }
+    }
+
     private func cacheLaunchTarget(from userInfo: [AnyHashable: Any]?, defaultSource: String) {
         guard let userInfo else {
             return
