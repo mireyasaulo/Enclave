@@ -722,8 +722,14 @@ function MobileAddFriendResultRow({
               <div className="truncate text-[14px] font-medium text-[color:var(--text-primary)]">
                 {displayName}
               </div>
+              {/* badge 跟按钮文案对齐：Bug W 之后 outbound pending 按钮显示
+                  "已发送"、inbound pending 显示"待处理"，但顶部 badge 一律
+                  formatRelationshipStatus("pending")="待处理"——同一行 badge 跟
+                  button 描述对不上。pending 状态时按 acceptAt 区分。 */}
               <span className="shrink-0 text-[10px] text-[color:var(--text-dim)]">
-                {t(formatRelationshipStatus(item.status))}
+                {item.status === "pending" && item.pendingRequest?.acceptAt
+                  ? t(msg`已发送`)
+                  : t(formatRelationshipStatus(item.status))}
               </span>
             </div>
             <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
