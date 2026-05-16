@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -49,6 +49,8 @@ export type Character = CharacterEntity;
 
 @Injectable()
 export class CharactersService implements OnModuleInit {
+  private readonly logger = new Logger(CharactersService.name);
+
   constructor(
     @InjectRepository(CharacterEntity)
     private repo: Repository<CharacterEntity>,
@@ -547,11 +549,17 @@ export class CharactersService implements OnModuleInit {
     // profile 优先级最高（用户已经在 wiki 端 finalize 过的 PersonalityProfile）。
     // 没传 profile 但传了 recipe → 实时用 blueprint service 把 recipe → profile，
     // 否则用户花几十字段填的 prompt 配方会被静默丢，世界里 AI 完全没人设。
+    // bundle 既无 profile 也无 recipe（早期 wiki 写入路径只填 name/bio）→ 用
+    // 标量字段合成一个最小可用 baseline，避免 DB 里落 profile={} 这种导致
+    // chat 路径 system_prompt 全空、AI 直接拒答的角色行。
     if (input.profile !== undefined && input.profile !== null) {
       patch.profile = input.profile;
     } else if (input.recipe) {
       const derived = this.tryDeriveProfileFromRecipe(input.recipe, trimmedName);
       if (derived) patch.profile = derived;
+    }
+    if (!patch.profile) {
+      patch.profile = this.buildBaselineProfileFromInput(trimmedName, input);
     }
 
     // —— 2026-05-15 起：wiki 私有角色已和 admin 一一对应到这 11 个字段，
@@ -663,6 +671,62 @@ export class CharactersService implements OnModuleInit {
    * recipe 是用户手填的、可能字段缺失/类型错乱，这里用 try/catch 兜底，
    * 出错就吞掉（按"recipe 没填"处理），避免一份坏 bundle 直接 500。
    */
+  /**
+   * 既没 profile 也没可用 recipe 时，从 import body 的标量字段
+   * (name/relationship/expertDomains/bio/personality) 合成一个最小可用 profile。
+   * 至少保证 name/relationship/traits 必填字段存在，让 prompt-builder 不再
+   * 渲染出 "你是 undefined" 的 system_prompt。
+   * 字段缺省值故意保守（emotionalTone: 自然真实 / responseLength: medium /
+   * emojiUsage: occasional），与 RealWorldRuntimeProfileService 的运行时回填
+   * 一致；下次用户在 wiki 补全 recipe 再导入，会被 input.profile/recipe 覆盖。
+   */
+  private buildBaselineProfileFromInput(
+    trimmedName: string,
+    input: {
+      relationship?: string;
+      relationshipType?: string;
+      expertDomains?: string[];
+      bio?: string;
+      personality?: string | null;
+    },
+  ): PersonalityProfile {
+    const personalityNote =
+      typeof input.personality === 'string' ? input.personality.trim() : '';
+    const bioNote = typeof input.bio === 'string' ? input.bio.trim() : '';
+    const relationship =
+      (typeof input.relationship === 'string' && input.relationship.trim()) ||
+      trimmedName;
+    const basePrompt =
+      [
+        trimmedName ? `你是${trimmedName}` : '',
+        relationship ? `用户的${relationship}` : '',
+        personalityNote ? `性格：${personalityNote}` : '',
+        bioNote ? `简介：${bioNote}` : '',
+      ]
+        .filter(Boolean)
+        .join('，') || '';
+    return {
+      characterId: '',
+      name: trimmedName,
+      relationship,
+      expertDomains: Array.isArray(input.expertDomains)
+        ? input.expertDomains.filter(
+            (item): item is string => typeof item === 'string',
+          )
+        : [],
+      basePrompt,
+      memorySummary: '',
+      traits: {
+        speechPatterns: [],
+        catchphrases: [],
+        topicsOfInterest: [],
+        emotionalTone: '自然真实',
+        responseLength: 'medium',
+        emojiUsage: 'occasional',
+      },
+    } as PersonalityProfile;
+  }
+
   private tryDeriveProfileFromRecipe(
     recipe: CharacterBlueprintRecipeValue,
     characterIdHint: string,
@@ -673,9 +737,12 @@ export class CharactersService implements OnModuleInit {
         characterIdHint,
       ) as PersonalityProfile;
     } catch (err) {
-      // 不打 ERROR，避免日志噪音；recipe 出错本身就是用户输入问题
-      // i18n-ignore-line: backend log line, not user-facing
-      console.warn(
+      // recipe 字段缺失（wiki strip 过 / 第三方脚本上传半残数据）是常见的，
+      // 但旧实现走 console.warn 不会进 Nest formatter，stderr 里被淹掉、
+      // 用户报"导入私有角色 chat 空回复"时排查只能靠人肉 grep。
+      // 走 logger.warn 至少能在 dev-services/api-*.err.log 里搜到 stack。
+      this.logger.warn(
+        // i18n-ignore-line: backend log line, not user-facing
         `[importPersonalCharacter] recipe → profile failed for "${characterIdHint}": ${(err as Error).message}`,
       );
       return null;

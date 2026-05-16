@@ -141,4 +141,53 @@ describe('CharactersService.importPersonalCharacter', () => {
       }),
     ).rejects.toThrow(/超长/);
   });
+
+  // 2026-05-16 修复：wiki 早期版本写入路径只填 name/bio，recipe/profile 都是
+  // 空；之前导入这种 bundle 时新角色落库 profile={}，chat 路径 system_prompt
+  // 渲染出 "你是 undefined" 直接黑掉。现在 import 路径要兜底合成最小可用 profile。
+  it('synthesizes baseline profile when bundle has neither profile nor recipe', async () => {
+    const buildProfileSpy = jest.fn(() => ({ shouldNotBeCalled: true } as never));
+    const { svc, buildProfileSpy: spy } = makeService({
+      existing: null,
+      buildProfileSpy,
+    });
+    const out = await svc.importPersonalCharacter({
+      name: '小白',
+      relationship: '同事',
+      bio: '北京的产品经理',
+      personality: '理性',
+      expertDomains: ['产品', '心理学'],
+    });
+    expect(spy).not.toHaveBeenCalled();
+    const profile = (out.character as Char).profile as Record<string, unknown>;
+    expect(profile).toBeTruthy();
+    expect(profile.name).toBe('小白');
+    expect(profile.relationship).toBe('同事');
+    expect(profile.expertDomains).toEqual(['产品', '心理学']);
+    expect(profile.basePrompt).toContain('小白');
+    expect(profile.basePrompt).toContain('同事');
+    expect(profile.basePrompt).toContain('理性');
+    expect(profile.basePrompt).toContain('北京的产品经理');
+    expect((profile.traits as Record<string, unknown>).emotionalTone).toBe('自然真实');
+  });
+
+  // 2026-05-16 修复：tryDeriveProfileFromRecipe 抛出（典型场景：wiki strip 过
+  // recipe.tone）时不应让 import 整体 500，而是回落到合成 baseline。
+  it('falls back to baseline when recipe derivation throws', async () => {
+    const buildProfileSpy = jest.fn(() => {
+      throw new Error('Cannot read properties of undefined (reading "coreDirective")');
+    });
+    const { svc } = makeService({ existing: null, buildProfileSpy });
+    const out = await svc.importPersonalCharacter({
+      name: '小蓝',
+      relationship: '邻居',
+      recipe: { identity: { name: '小蓝' } } as never,
+    });
+    const profile = (out.character as Char).profile as Record<string, unknown>;
+    // 合成 baseline 至少要补 name/relationship/traits 三件套，下游 prompt-builder
+    // 拿到不会再渲染 "你是 undefined"。
+    expect(profile.name).toBe('小蓝');
+    expect(profile.relationship).toBe('邻居');
+    expect(profile.traits).toBeTruthy();
+  });
 });

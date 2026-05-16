@@ -301,6 +301,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         scheduledReplyArtifactJobIds,
       );
     } catch (error) {
+      // 这里曾经吞掉所有 generateReply / planAssistantReplyModalities / actionRuntime
+      // 异常，只给前端发本地化的"对方暂时无法回复"，stderr/stdout 都没有任何
+      // 痕迹——用户报"导入私有角色无法对话"时排查只能盲查 DB / 复现。
+      // 这条 logger.error 至少保留 stack，让 dev-services/api-*.err.log 能搜到。
+      this.logger.error(
+        `conversation reply failed conv=${convId} char=${characterId}`,
+        error instanceof Error ? error.stack : String(error),
+      );
       this.emitTypingStop(convId, characterId, 'reply');
       await this.emitConversationFailure(convId);
       const failureMessage = await this.describeReplyFailure(error);
