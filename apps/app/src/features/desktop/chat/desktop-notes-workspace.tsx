@@ -155,7 +155,13 @@ export function DesktopNotesWorkspace({
     enabled: Boolean(selectedNoteId),
   });
   const recentConversationsQuery = useQuery({
-    queryKey: ["desktop-note-send-conversations", baseUrl],
+    // 跟 chat-list / desktop-chat-window-page / discover-page 等十几处共享同一份
+    // 会话列表 cache，避免开"发送笔记"弹层重新打一次 getConversations
+    // 网络（用户聊会话列表早就拉过了）。之前用 "desktop-note-send-conversations"
+    // 单独一份 key，每次开弹层都要等冷启动 fetch；而且 sendMutation.onSuccess
+    // 后只 invalidate ["app-conversations", baseUrl]，这份独立 cache 不
+    // 失效，再开弹层看到的"最近活跃"还是发送前的时间戳。
+    queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: Boolean(sendDialogNote),
   });
