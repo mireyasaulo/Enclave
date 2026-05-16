@@ -107,6 +107,10 @@ const FAVORITE_NOTE_SOURCE_ID_PREFIX = 'favorite-note-';
 const MAX_FAVORITES = 500;
 const MAX_FAVORITE_NOTES = 200;
 const MAX_FAVORITE_NOTE_TAGS = 8;
+// 走查 R1 抓到没人卡 contentHtml 大小，写 1MB 也照样存。SQLite 单 TEXT 默认上限
+// 1GB，不挡的话堆 200 条 1MB 笔记 = 200MB DB，肉眼难发现。512KB 给富文本 +
+// 内嵌 base64 小图留足空间，超出就 400。
+const MAX_FAVORITE_NOTE_HTML_BYTES = 512 * 1024;
 const chatReplyPrefixPattern = /^\[\[chat_reply:([^\]]+)\]\]\n?/;
 
 @Injectable()
@@ -395,6 +399,11 @@ export class FavoritesService implements OnModuleInit {
         legacyMessage: '笔记内容不能为空。',
       });
     }
+    if (Buffer.byteLength(input.contentHtml, 'utf8') > MAX_FAVORITE_NOTE_HTML_BYTES) {
+      throw new AppError('CHAT_NOTE_CONTENT_TOO_LARGE', {
+        legacyMessage: '笔记内容过大，请拆分后再保存。',
+      });
+    }
     const timestamp = new Date().toISOString();
     const note = buildFavoriteNoteDocument({
       id: randomUUID(),
@@ -446,6 +455,11 @@ export class FavoritesService implements OnModuleInit {
     if (typeof input?.contentHtml !== 'string') {
       throw new AppError('CHAT_NOTE_CONTENT_REQUIRED', {
         legacyMessage: '笔记内容不能为空。',
+      });
+    }
+    if (Buffer.byteLength(input.contentHtml, 'utf8') > MAX_FAVORITE_NOTE_HTML_BYTES) {
+      throw new AppError('CHAT_NOTE_CONTENT_TOO_LARGE', {
+        legacyMessage: '笔记内容过大，请拆分后再保存。',
       });
     }
 
@@ -1085,18 +1099,11 @@ function normalizeFavoriteNoteAssets(value: FavoriteNoteAsset[] | undefined) {
       // 截断兜底），合法 http(s)/相对路径不受影响。
       url: sanitizeFavoriteAssetUrl(asset.url.trim()),
       mimeType: asset.mimeType?.trim() || undefined,
-      sizeBytes:
-        typeof asset.sizeBytes === 'number' && Number.isFinite(asset.sizeBytes)
-          ? asset.sizeBytes
-          : undefined,
-      width:
-        typeof asset.width === 'number' && Number.isFinite(asset.width)
-          ? asset.width
-          : undefined,
-      height:
-        typeof asset.height === 'number' && Number.isFinite(asset.height)
-          ? asset.height
-          : undefined,
+      // 之前只挡 NaN/Infinity，不挡负数和 1e308。负数当尺寸 + 巨大数都没意义，
+      // 一律收敛成 undefined，避免 UI 端再 max-h-{height}px 渲染出问题。
+      sizeBytes: clampNonNegativeNumber(asset.sizeBytes),
+      width: clampNonNegativeNumber(asset.width),
+      height: clampNonNegativeNumber(asset.height),
     }))
     .filter((asset) => asset.fileName && asset.url);
 }
@@ -1105,6 +1112,16 @@ function sanitizeFavoriteAssetUrl(value: string) {
   if (DANGEROUS_URL_PROTOCOL.test(value)) {
     return '';
   }
+  return value;
+}
+
+// asset 的 sizeBytes/width/height 在 normalizeFavoriteNoteAssets 里之前只挡
+// NaN/Infinity。负数 + 1e308 这种合法 Number.isFinite() 但语义没意义，全部
+// 收敛成 undefined。安全上限按 Number.MAX_SAFE_INTEGER 兜底防止溢出。
+function clampNonNegativeNumber(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  if (value < 0) return undefined;
+  if (value > Number.MAX_SAFE_INTEGER) return undefined;
   return value;
 }
 
