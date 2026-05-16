@@ -898,7 +898,26 @@ export function DesktopChatWorkspace({
         return;
       }
 
-      dismissSidePanel();
+      // 这条 window keydown 是 details 侧栏开着时的「按 Esc 关侧栏」兜底。
+      // 问题是 confirm/text-edit/forward/create-group 这些 dialog 的 Esc
+      // handler 也都挂在 window 上 —— stopPropagation 在「同元素同事件」上
+      // 不会阻断后续 sibling listener（MDN：use stopImmediatePropagation
+      // for that）。worskpace effect 在 rightPanelMode 变 details 时挂上，
+      // 早于 dialog 挂载；所以 Esc 时 workspace 先 fire，dismissSidePanel
+      // 直接把侧栏关了，然后 dialog 再 fire 把弹窗也关了 —— 用户看到的是
+      // "Esc 同时把弹窗和背后的侧栏都关掉"。Round 5/6/7 给 dialog Esc 补
+      // stopPropagation 在 popover（document/bubble，在 window 之前）那条
+      // 路径上有效，但 window/bubble 同元素 sibling 上根本拦不住。
+      //
+      // 把真正的 dismissSidePanel 推到 microtask：所有同步 keydown
+      // listener 跑完后，如果还没人 preventDefault 这次 Esc（说明确实没有
+      // modal/dialog 接走它），才真的关侧栏。
+      queueMicrotask(() => {
+        if (event.defaultPrevented) {
+          return;
+        }
+        dismissSidePanel();
+      });
     };
 
     document.addEventListener("pointerdown", handlePointerDown, true);
