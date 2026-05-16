@@ -373,7 +373,7 @@
 <ul>
   <li>ブラウザ側: リアルタイム（閉じて戻ってきても残る）</li>
   <li>サーバー側: AI 生成または手動保存時にスナップショット</li>
-  <li>復旧手順: <a href="#"><code>/my-drafts</code></a> → 該当下書きをクリック → <code>?draftId=...</code> 付き編集ページへ復帰</li>
+  <li>復旧手順: <a href="/my-drafts"><code>/my-drafts</code></a> → 該当下書きをクリック → <code>?draftId=...</code> 付き編集ページへ復帰</li>
 </ul>
 
 <h3>5.4 編集を送信する</h3>
@@ -452,7 +452,7 @@
 </ul>
 
 <h3>差分（diff）の比較</h3>
-<p>任意の 2 リビジョンを選択 → 「比較」 → <code>/character/:id/diff?from=A&to=B</code> に遷移し並列表示:</p>
+<p>任意の 2 リビジョンを選択 → 「比較」 → <code>/character/:id/diff?from=A&amp;to=B</code> に遷移し並列表示:</p>
 <ul>
   <li>変更されたフィールド（diffFromParent）</li>
   <li>各変更フィールドの旧 vs 新</li>
@@ -547,7 +547,7 @@
   <li>送信</li>
 </ol>
 
-<p>通報は管理者の <a href="#"><code>/admin/reports</code></a> キューに自動で入り、人間が処理します。結果は 3 種類:</p>
+<p>通報は管理者の <a href="/admin/reports"><code>/admin/reports</code></a> キューに自動で入り、人間が処理します。結果は 3 種類:</p>
 <ul>
   <li><strong>解決済み（resolved）</strong>: 管理者が対処（削除 / 差し戻し / 封禁など）</li>
   <li><strong>却下（dismissed）</strong>: 通報が成立しないと判断</li>

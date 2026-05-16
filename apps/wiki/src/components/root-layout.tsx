@@ -9,6 +9,9 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { LanguageSwitcher, translateRuntimeMessage } from "@yinjie/i18n";
+import { Button, LoadingBlock } from "@yinjie/ui";
+import { clearSession, hasRole, useRoleLabel, type WikiUser } from "../lib/auth-store";
+import { useAuth } from "../lib/use-auth";
 
 const TUTORIAL_LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"] as const;
 type TutorialLocale = (typeof TUTORIAL_LOCALES)[number];
@@ -26,9 +29,6 @@ function pickTutorialLocale(locale: string | undefined): TutorialLocale {
   };
   return fallback[prefix ?? ""] ?? "zh-CN";
 }
-import { Button, LoadingBlock } from "@yinjie/ui";
-import { clearSession, hasRole, useRoleLabel, type WikiUser } from "../lib/auth-store";
-import { useAuth } from "../lib/use-auth";
 
 type NavItem = {
   to: string;
