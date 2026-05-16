@@ -535,6 +535,12 @@ export function SearchPage() {
       groupedResults={groupedResults}
       hasKeyword={hasKeyword}
       history={history}
+      // searchText 是用户实时输入（受控 input 必须用它），effectiveSearchText 是
+      // useDeferredValue 过的副本，filter / 卡片实际渲染都跟它走。把 effective
+      // 单独传一份用于高亮 keyword：之前卡片用 searchText.trim() 当 keyword，
+      // 快速连打 "ab" 时 searchText 已是 "ab" 但 visibleResults 还是按 "a" 过出来的，
+      // 卡片文本只含 "a" 不含 "ab"，<mark> 高亮直接全部消失再回填，观感像"高亮丢了"。
+      highlightKeyword={effectiveSearchText}
       loading={loading}
       matchedCounts={matchedCounts}
       onApplyHistory={handleApplyHistory}

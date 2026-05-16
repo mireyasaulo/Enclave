@@ -39,6 +39,10 @@ type MobileSearchWorkspaceProps = {
   error: string | null;
   groupedResults: SearchResultSection[];
   hasKeyword: boolean;
+  // 单独传一份"卡片高亮"用的 keyword：用 search-page 那边 useDeferredValue 过的
+  // effective 值，跟实际过滤 / 渲染走的 keyword 对得上；不要再把 searchText.trim()
+  // 当 keyword，那样快速连打时卡片文本和 keyword 不同步，<mark> 高亮会瞬时消失。
+  highlightKeyword: string;
   history: SearchHistoryItem[];
   loading: boolean;
   matchedCounts: SearchMatchCounts;
@@ -117,6 +121,7 @@ export function MobileSearchWorkspace({
   error,
   groupedResults,
   hasKeyword,
+  highlightKeyword,
   history,
   loading,
   matchedCounts,
@@ -141,8 +146,17 @@ export function MobileSearchWorkspace({
   const chipsRef = useRef<HTMLDivElement | null>(null);
   const chipRefs = useRef<Partial<Record<SearchCategory, HTMLButtonElement | null>>>({});
 
+  // Mount autofocus 只在"用户主动进搜一搜准备开始打字"的初次入口生效——
+  // 把输入框拨成激活态、立刻能输入。但用户点结果跳走再 back 回来时，URL hash
+  // 里仍带 #q=...，组件 mount 时 searchText 已经有值；这种情况下用户的意图是
+  // 继续浏览之前已经搜出来的卡片，不是接着打字。这时再 autofocus 反而把 iOS
+  // 软键盘顶起来盖掉半屏结果，需要用户先 dismiss 才能滚动。
   useEffect(() => {
+    if (searchText) {
+      return;
+    }
     inputRef.current?.focus();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- 只在 mount 决策一次
   }, []);
 
   // 切到非「全部」 chip——常见路径是点下面的 quickScopeCard / 「查看更多」——
@@ -499,7 +513,14 @@ export function MobileSearchWorkspace({
             <MobileSearchStatusCard
               badge={t(msg`无结果`)}
               title={t(msg`没有找到相关内容`)}
-              description={t(msg`换个关键词，或者切到别的分类试试。`)}
+              // 之前一律说"换个关键词，或者切到别的分类试试。"——「全部」分类下其实
+              // 已经把所有索引都搜过了，根本没有"别的分类"可切，文案误导。只在缩范围
+              // 的非「全部」分类里才提"切到别的分类"。
+              description={
+                activeCategory === "all"
+                  ? t(msg`换个关键词试试。`)
+                  : t(msg`换个关键词，或者切到别的分类试试。`)
+              }
             />
           </div>
         ) : null}
@@ -521,7 +542,7 @@ export function MobileSearchWorkspace({
                         <SearchResultCard
                           key={item.id}
                           item={item}
-                          keyword={searchText.trim().toLowerCase()}
+                          keyword={highlightKeyword.trim().toLowerCase()}
                           layout="mobile"
                           onOpen={onOpenResult}
                         />
@@ -573,7 +594,7 @@ export function MobileSearchWorkspace({
                   <SearchResultCard
                     key={item.id}
                     item={item}
-                    keyword={searchText.trim().toLowerCase()}
+                    keyword={highlightKeyword.trim().toLowerCase()}
                     layout="mobile"
                     onOpen={onOpenResult}
                   />
