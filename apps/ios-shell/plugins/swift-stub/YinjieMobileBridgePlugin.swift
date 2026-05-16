@@ -23,13 +23,43 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         CAPPluginMethod(name: "requestNotificationPermission", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showLocalNotification", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getPendingLaunchTarget", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "clearPendingLaunchTarget", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "clearPendingLaunchTarget", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "writeClipboardText", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "readClipboardText", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "writeClipboardImage", returnType: CAPPluginReturnPromise)
     ]
 
     private var pendingImagePickerCall: CAPPluginCall?
     private var pendingFilePickerCall: CAPPluginCall?
     private var pendingCameraCaptureCall: CAPPluginCall?
     private var activeDocumentInteractionController: UIDocumentInteractionController?
+
+    override public func load() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePushTokenChanged(_:)),
+            name: Notification.Name("YinjiePushTokenChanged"),
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func handlePushTokenChanged(_ notification: Notification) {
+        let userInfo = notification.userInfo ?? [:]
+        var payload: [String: Any] = [:]
+        if let token = userInfo["token"] as? String {
+            payload["token"] = token
+        } else {
+            payload["token"] = NSNull()
+        }
+        if let error = userInfo["error"] as? String {
+            payload["error"] = error
+        }
+        notifyListeners("pushTokenChanged", data: payload)
+    }
 
     @objc func openExternalUrl(_ call: CAPPluginCall) {
         guard let rawUrl = call.getString("url"),
@@ -367,6 +397,49 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
         call.resolve()
     }
 
+    @objc func writeClipboardText(_ call: CAPPluginCall) {
+        guard let text = call.getString("text") else {
+            call.reject("text is required")
+            return
+        }
+
+        DispatchQueue.main.async {
+            UIPasteboard.general.string = text
+            call.resolve()
+        }
+    }
+
+    @objc func readClipboardText(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            let value = UIPasteboard.general.string
+            call.resolve([
+                "text": value ?? NSNull()
+            ])
+        }
+    }
+
+    @objc func writeClipboardImage(_ call: CAPPluginCall) {
+        guard let base64Data = normalize(call.getString("base64Data")),
+              let imageData = Data(base64Encoded: base64Data, options: [.ignoreUnknownCharacters]),
+              let image = UIImage(data: imageData) else {
+            call.reject("base64Data is required and must decode to a valid image")
+            return
+        }
+
+        DispatchQueue.main.async {
+            UIPasteboard.general.image = image
+            call.resolve()
+        }
+    }
+
+    private func normalize(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
+            return nil
+        }
+
+        return value
+    }
+
     private func mapAuthorizationStatus(_ status: UNAuthorizationStatus) -> String {
         switch status {
         case .authorized, .provisional, .ephemeral:
@@ -489,8 +562,10 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
             return
         }
 
-        // 优先请求 public.jpeg：原片是 HEIC 时 PhotoKit 会自动转 JPEG，避免
-        // 给安卓 / Web / 旧端发出去后无法解码。
+        // iPhone 拍的照片默认存 HEIC。直接 loadFileRepresentation(public.image)
+        // 拿到的就是 HEIC 二进制，Android / 安卓 Web / 旧 iOS / 多数浏览器都
+        // 解不出来。优先请求 public.jpeg —— 如果原片是 HEIC，PhotoKit 会
+        // 自动转 JPEG；原片是 JPEG/PNG/GIF 时则 fallback 到 public.image。
         let preferredTypeIdentifier =
             provider.hasItemConformingToTypeIdentifier("public.jpeg")
                 ? "public.jpeg"
@@ -568,9 +643,11 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                     return
                 }
 
-                // 跳过 info[.imageURL]：iPhone 相机默认 HEIC，直接 copy 会把
-                // HEIC 原片送给后端，下游 Android / Web 解不开。统一走
-                // originalImage → jpegData 强制转 JPEG，顺带剥掉 EXIF GPS。
+                // 不要走 info[.imageURL] 直接 copy 原文件：iPhone 7+ 相机默认
+                // HEIF/HEIC 编码，那条路径会把 HEIC 原片直接交给后端，下游
+                // Android / Web / 旧 iOS 解不开（详见 Round 7 picker 同款问题）。
+                // 统一走 originalImage → jpegData(0.92)，强制输出 JPEG。
+                // 顺带去掉了 EXIF 里的 GPS / 设备信息，发出去之前先脱敏一遍。
                 guard let image = info[.originalImage] as? UIImage,
                       let imageData = image.jpegData(compressionQuality: 0.92),
                       let asset = self.writeCapturedCameraImage(data: imageData) else {
@@ -765,13 +842,5 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
 
         popover.sourceView = presenter.view
         popover.sourceRect = presenter.view.bounds
-    }
-
-    private func normalize(_ value: String?) -> String? {
-        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
-            return nil
-        }
-
-        return value
     }
 }

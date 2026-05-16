@@ -120,6 +120,51 @@ const checks = [
       fs.existsSync(path.join(shellRoot, "plugins", "swift-stub", "YinjieMobileBridgePlugin.swift")),
     detail: "native plugin stubs are present",
   },
+  (() => {
+    // configure-ios-project.mjs 用 overwrite:false 把 swift-stub/ 下的文件复制到
+    // ios/App/App/Plugins/。fresh checkout 上线时 stub 就是真正装上设备的代码。
+    // 如果 stub 跟 installed 漂移（比如 installed 加了剪贴板、推送 token listener
+    // 后忘了同步 stub），任何全新打的包都会缺这些方法 → JS 调用直接抛 unimplemented。
+    const stubMobileBridge = path.join(
+      shellRoot,
+      "plugins",
+      "swift-stub",
+      "YinjieMobileBridgePlugin.swift",
+    );
+    const stubRuntime = path.join(
+      shellRoot,
+      "plugins",
+      "swift-stub",
+      "YinjieRuntimePlugin.swift",
+    );
+    const stubSecure = path.join(
+      shellRoot,
+      "plugins",
+      "swift-stub",
+      "YinjieSecureStoragePlugin.swift",
+    );
+    const stubMobileBridgeOk = fileIncludesAll(stubMobileBridge, [
+      "CAPPluginMethod(name: \"writeClipboardText\"",
+      "CAPPluginMethod(name: \"readClipboardText\"",
+      "CAPPluginMethod(name: \"writeClipboardImage\"",
+      "CAPPluginMethod(name: \"showLocalNotification\"",
+      "handlePushTokenChanged",
+      "override public func load()",
+    ]);
+    const stubRuntimeOk = fileIncludesAll(stubRuntime, [
+      "bundledConfig[\"cloudApiBaseUrl\"]",
+      "CAPPluginMethod(name: \"setLocale\"",
+    ]);
+    const stubSecureOk = fileIncludes(stubSecure, "struct KeychainError");
+    return {
+      label: "plugin-stubs-in-sync",
+      ok: stubMobileBridgeOk && stubRuntimeOk && stubSecureOk,
+      detail:
+        stubMobileBridgeOk && stubRuntimeOk && stubSecureOk
+          ? "swift-stub plugins carry clipboard/push/locale/cloudApiBaseUrl/KeychainError parity with installed copies"
+          : "swift-stub plugins are stale vs ios/App/App/Plugins/ — fresh checkouts will be missing native bridge methods (re-copy from installed)",
+    };
+  })(),
   {
     label: "ios-project",
     ok: fs.existsSync(path.join(shellRoot, "ios")),
