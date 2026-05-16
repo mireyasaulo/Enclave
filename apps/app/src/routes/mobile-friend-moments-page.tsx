@@ -96,6 +96,9 @@ export function MobileFriendMomentsPage() {
     tone: "success" | "info";
     message: string;
   } | null>(null);
+  // 「分享图卡」目标 — 点 ⋯ → 分享时把 momentId 存下来。
+  // 用 id 而不是整个对象，friendMoments 后续刷新时预览也会跟着新。
+  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
 
   const characterQuery = useQuery({
     queryKey: ["app-character", baseUrl, resolvedCharacterId],
@@ -359,9 +362,6 @@ export function MobileFriendMomentsPage() {
     activeMoment?.likes.some((like) => like.authorType === "user"),
   );
 
-  // 「分享图卡」目标 — 点 ⋯ → 分享时把 momentId 存下来。
-  // 用 id 而不是整个对象，friendMoments 后续刷新时预览也会跟着新。
-  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
   const shareMoment = shareMomentId
     ? friendMoments.find((moment) => moment.id === shareMomentId) ?? null
     : null;

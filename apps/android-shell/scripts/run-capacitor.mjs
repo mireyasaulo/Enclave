@@ -17,6 +17,10 @@ const shellDir = resolve(currentDir, "..");
 const workspaceDir = resolve(shellDir, "../..");
 const appDir = resolve(shellDir, "../app");
 const androidProjectDir = resolve(shellDir, "android");
+const androidAssetsPublicDir = resolve(
+  androidProjectDir,
+  "app/src/main/assets/public",
+);
 const shellConfigPath = resolve(shellDir, "android-shell.config.json");
 const shellConfigLocalPath = resolve(
   shellDir,
@@ -765,6 +769,33 @@ function runGradle(taskName, env = process.env) {
   });
 }
 
+// vite-plugin-compression 给 dist/ 生成了 *.gz / *.br 兄弟文件用于 nginx 静态服务，
+// 但 Android Gradle 资源合并器把同名 foo.js 与 foo.js.gz 当成 duplicate resource 拒绝。
+// cap sync 完成后顺手把这些预压缩产物从 android assets 里剔掉，让 APK 构建通过。
+function stripPrecompressedAssets() {
+  if (!existsSync(androidAssetsPublicDir)) {
+    return;
+  }
+  let removed = 0;
+  const walk = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = resolve(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+        continue;
+      }
+      if (entry.name.endsWith(".gz") || entry.name.endsWith(".br")) {
+        rmSync(fullPath, { force: true });
+        removed += 1;
+      }
+    }
+  };
+  walk(androidAssetsPublicDir);
+  if (removed > 0) {
+    console.log(`stripped ${removed} precompressed assets (.gz/.br)`);
+  }
+}
+
 function reportBuildArtifact(label, artifactPath) {
   if (!existsSync(artifactPath)) {
     console.log(`note  expected ${label} output not found at ${artifactPath}`);
@@ -1191,6 +1222,7 @@ if (command === "apk") {
     cwd: shellDir,
     env: executionEnvironment.env,
   });
+  stripPrecompressedAssets();
   if (
     executionEnvironment.usingLocalJdk &&
     executionEnvironment.resolvedLocalJdkDir
@@ -1218,6 +1250,7 @@ if (command === "bundle") {
     cwd: shellDir,
     env: executionEnvironment.env,
   });
+  stripPrecompressedAssets();
   if (
     executionEnvironment.usingLocalJdk &&
     executionEnvironment.resolvedLocalJdkDir
@@ -1235,6 +1268,10 @@ run("pnpm", ["exec", "cap", command, ...restArgs], {
   cwd: shellDir,
   env: executionEnvironment.env,
 });
+
+if (command === "sync") {
+  stripPrecompressedAssets();
+}
 
 if (command === "add" && restArgs[0] === "android") {
   const { changedPaths } = configureAndroidShell();
