@@ -462,6 +462,21 @@ export function GroupChatThreadPanel({
     };
   }, [baseUrl, groupId, queryClient]);
 
+  // typing watchdog：群聊也一样会卡 typing — socket 断重连那几百 ms 里
+  // typing_stop + 真消息一起丢，多个 character 的「xx 正在输入...」就永
+  // 远不会消。120s 兜底；如果中间任意一个 character 的 typing 状态有更
+  // 新（再次 typing_start / 收到该 character 真消息 → delete[id]），
+  // typingStates 引用变化会重置 watchdog，活跃会话不会被误清。
+  useEffect(() => {
+    if (!Object.keys(typingStates).length) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setTypingStates({});
+    }, 120_000);
+    return () => window.clearTimeout(timer);
+  }, [typingStates]);
+
   useEffect(() => {
     if (!groupId || !unreadSnapshotReady) {
       return;

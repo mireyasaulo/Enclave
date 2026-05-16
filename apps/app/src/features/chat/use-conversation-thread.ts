@@ -332,6 +332,22 @@ export function useConversationThread(conversationId: string) {
     unreadSnapshotReady,
   ]);
 
+  // typing watchdog：服务端在 reply / image_generation 完成时一定会 emit
+  // typing_stop + 真消息，但移动端公网隧道偶发"socket 断开-重连"那几百 ms
+  // 里这两条事件都会 drop（server 当时认为还连着，往死 socket emit 后丢
+  // 包）。结果 UI 卡在「对方正在回复...」/「对方正在生成图片...」直到用户
+  // 切换会话再回来。120s 兜底——典型 reply <10s、image_generation 慢到
+  // 30-60s 也覆盖得住，真到 2 分钟还没消息就基本可以判定丢了。
+  useEffect(() => {
+    if (!typingState) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setTypingState(null);
+    }, 120_000);
+    return () => window.clearTimeout(timer);
+  }, [typingState]);
+
   // 挂载 + 每次 messagesQuery cache 长度变化时统一标已读一次。和
   // group-chat-thread-panel 的处理一致；socket 收到 character 消息后
   // setQueriesData 会撑高 cache 长度，自动触发这里。
