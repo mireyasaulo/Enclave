@@ -629,18 +629,44 @@ const pendingLikePostId = likeMutation.isPending
     setDesktopAvatarPopover(null);
   }, [hash, pathname]);
 
+  // StrictMode dev 下 useEffect 会跑两次（mount → cleanup → mount），原本拆成
+  // 两个 effect（这里只 reset+清 notice / 下面 consume publish flash）会因为
+  // consumeFeedPublishFlash 不幂等（第二次返回 null）+ 本 effect 再跑一遍
+  // setNotice("") 把刚显的发布提示清掉 → 用户从发表页跳回广场看不到任何成功提示。
+  // 合并成一个 effect + 用 ref 缓存第一次 consume 的结果，dev/prod 行为一致；
+  // 同时把 setNotice 的写入留到 flash 取完之后，再考虑要不要清。
+  const publishFlashRef = useRef<{ taken: boolean; value: string | null }>({
+    taken: false,
+    value: null,
+  });
   useEffect(() => {
     resetComposeDraft();
     setCommentDrafts({});
     setActionBubble(null);
     setCommentBarTarget(null);
     setShowCompose(false);
+    setFullCommentsByPostId({});
+    setLoadingFullCommentsPostId(null);
+
+    if (!publishFlashRef.current.taken) {
+      publishFlashRef.current.taken = true;
+      publishFlashRef.current.value = isDesktopLayout
+        ? null
+        : consumeFeedPublishFlash();
+    }
+    const flash = publishFlashRef.current.value;
+    if (flash) {
+      setNoticeTone("success");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(flash);
+      return;
+    }
+
     setNoticeActionLabel(null);
     setNoticeAction(null);
     setNotice(""); // i18n-ignore-line
-    setFullCommentsByPostId({});
-    setLoadingFullCommentsPostId(null);
-  }, [baseUrl, resetComposeDraft]);
+  }, [baseUrl, isDesktopLayout, resetComposeDraft]);
 
   async function expandFullComments(postId: string) {
     if (loadingFullCommentsPostId === postId) return;
@@ -669,19 +695,6 @@ const pendingLikePostId = likeMutation.isPending
       );
     }
   }
-
-  useEffect(() => {
-    if (isDesktopLayout) {
-      return;
-    }
-    const flash = consumeFeedPublishFlash();
-    if (flash) {
-      setNoticeTone("success");
-      setNoticeActionLabel(null);
-      setNoticeAction(null);
-      setNotice(flash);
-    }
-  }, [isDesktopLayout]);
 
   useEffect(() => {
     setFavoriteSourceIds(readDesktopFavorites().map((item) => item.sourceId));
