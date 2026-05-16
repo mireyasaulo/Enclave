@@ -2022,6 +2022,17 @@ export function ContactsPage() {
                 />
               </Suspense>
             ) : desktopSelection?.kind === "starred-friends" ? (
+              // 内层 Suspense：pane chunk 首次加载时只让右栏 detail 区显示 loader，
+              // 否则外层 RouteRedirectState 会把整个 workspace（包括 sidebar 的
+              // shortcut list + 联系人目录）都替换成"正在打开桌面通讯录"的占位，
+              // 用户瞬间失去通讯录上下文。跟 new-friends pane 对齐。
+              <Suspense
+                fallback={
+                  <div className="flex h-full items-center justify-center bg-[rgba(245,247,247,0.96)]">
+                    <LoadingBlock label={t(msg`正在打开星标朋友...`)} />
+                  </div>
+                }
+              >
               <DesktopContactsStarredFriendsPane
                 friends={starredFriends}
                 selectedCharacterId={desktopSelection.id ?? null}
@@ -2127,6 +2138,7 @@ export function ContactsPage() {
                   void friendsQuery.refetch();
                 }}
               />
+              </Suspense>
             ) : desktopSelection?.kind === "tags" ? (
               <DesktopContactsTagsPane />
             ) : desktopSelection?.kind === "groups" ? (
