@@ -882,15 +882,28 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
 
     private func writeSharedFile(data: Data, fileName: String) -> URL? {
         let fileManager = FileManager.default
-        let tempDir = fileManager.temporaryDirectory.appendingPathComponent("yinjie-shared", isDirectory: true)
+        // 走 UUID 子目录而不是 yinjie-shared/<fileName> 直接挤同一个目标路径。
+        // 旧实现：两次连续 share/openFile 用同名文件（"report.pdf" / "image.png"
+        // / saveLocalFile 的 download 默认名等）会撞同一个 destination —— 第二次
+        // 调用先 removeItem 把第一次正在被 UIActivityViewController / UIDocumentInteraction
+        // Controller 持有的 URL 内容删掉，然后 atomic write 新数据。AirDrop / Save
+        // to Files 这种异步 receiver 在第一次 sheet 还没收完前去读 URL，要么读到
+        // 不存在、要么读到第二次的数据 —— 用户看到的传输完成但内容跟自己分享的不
+        // 一致，复现路径罕见但实在。
+        //
+        // 改成每次调用进自己的 UUID 子目录：destination 形如
+        //   yinjie-shared/<UUID>/report.pdf
+        // 各次调用互不相干，receiver 端 URL.lastPathComponent 仍是用户的原 fileName，
+        // 邮件主题 / Save to Files 默认文件名都不变。UUID 子目录在 plugin load() 的
+        // purgeOwnedTemporarySubdirectories 路径里跟着 yinjie-shared 整个被回收。
+        let containerDir =
+            fileManager.temporaryDirectory.appendingPathComponent("yinjie-shared", isDirectory: true)
+        let sessionDir =
+            containerDir.appendingPathComponent(UUID().uuidString, isDirectory: true)
 
         do {
-            try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
-            let destination = tempDir.appendingPathComponent(sanitizeFileName(fileName))
-
-            if fileManager.fileExists(atPath: destination.path) {
-                try fileManager.removeItem(at: destination)
-            }
+            try fileManager.createDirectory(at: sessionDir, withIntermediateDirectories: true)
+            let destination = sessionDir.appendingPathComponent(sanitizeFileName(fileName))
 
             try data.write(to: destination, options: .atomic)
             return destination
