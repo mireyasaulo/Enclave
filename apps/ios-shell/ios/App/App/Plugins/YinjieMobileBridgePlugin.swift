@@ -811,7 +811,19 @@ public class YinjieMobileBridgePlugin: CAPPlugin, CAPBridgedPlugin, PHPickerView
                 try fileManager.removeItem(at: destination)
             }
 
-            try fileManager.copyItem(at: sourceUrl, to: destination)
+            // Round 47: pickFile 用 UIDocumentPickerViewController(asCopy: true)，iOS
+            // 早就把用户选中的文件 copy 进我们 app 的 sandbox tempDir 了（sourceUrl
+            // 指向的就是这个 sandbox 内副本，我们拥有它）。再 copyItem 到
+            // yinjie-documents/ 等于做第二次完整 disk write —— 对 100MB+ PDF / zip
+            // 这种大文件，在真机 NAND 上是 ~500ms-1s 的实打实数据复制 +
+            // 200MB+ 的瞬时存储占用（iOS 那条 sandbox 副本要等 iOS 自己 GC 才回
+            // 收）。Round 23 把这条 disk I/O 挪到后台线程不再卡主线程，但 disk
+            // throughput / wear / 临时存储这三笔账没动。
+            //
+            // 改 moveItem：同 sandbox 同 volume 下 iOS 走 inode rename，O(1)，不
+            // 复制数据。yinjie-documents/ 拿到自己想要的 UUID 命名 + 生命周期管
+            // 理，iOS 那条临时 dir 在 file 被搬走后自然变空 / 可被 iOS 后续清理。
+            try fileManager.moveItem(at: sourceUrl, to: destination)
 
             let displayName = sourceUrl.lastPathComponent.isEmpty
                 ? destinationFileName
