@@ -12,8 +12,8 @@ import {
   addMomentComment,
   getBlockedCharacters,
   getCharacter,
+  getCharacterMoments,
   getFriends,
-  getMoments,
   toggleMomentLike,
   type Moment,
 } from "@yinjie/contracts";
@@ -126,10 +126,16 @@ export function FriendMomentsPage() {
     queryFn: () => getFriends(baseUrl),
     enabled: isDesktopLayout,
   });
+  // ?character=ID 服务端过滤，只回该角色发的 ≤几 KB ——之前 getMoments 全表
+  // ~960KB 客户端 filter 出该角色 5-10 条，每次首进单个角色朋友圈页都付这
+  // 流量（cache 命中要等 search 索引或别处先 getMoments 过）。
+  // mobile-friend-moments-page 早就走 getCharacterMoments 这套了，桌面这条
+  // 漏了一直在用全表。app-moments-character cache 跟 useOptimisticMomentLikeHandlers
+  // 已经同步好的 4 把 key 之一，optimistic toggle 跨页面一致。
   const momentsQuery = useQuery({
-    queryKey: ["app-moments", baseUrl],
-    queryFn: () => getMoments(baseUrl),
-    enabled: isDesktopLayout,
+    queryKey: ["app-moments-character", baseUrl, characterId],
+    queryFn: () => getCharacterMoments(characterId, baseUrl),
+    enabled: isDesktopLayout && Boolean(characterId),
   });
   const blockedQuery = useQuery({
     queryKey: ["app-moments-blocked-characters", baseUrl],
@@ -209,6 +215,11 @@ export function FriendMomentsPage() {
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
       });
+      // 本页 source-of-truth 是 app-moments-character[characterId]，必须刷新它
+      // 否则评论数 / 评论列表在本页要等下次 refetch 才更新。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-character", baseUrl, characterId],
+      });
     },
   });
 
@@ -242,14 +253,14 @@ export function FriendMomentsPage() {
     () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
     [blockedQuery.data],
   );
+  // 服务端按 character=ID 过滤已经只回这个角色的 moments，前端只剩 blocked
+  // 兜底。blocked 后整页该角色 moments 隐藏，EmptyState 里另有专门文案
+  // （「这位角色的朋友圈当前不可见」）。
   const friendMoments = useMemo(
     () =>
-      (momentsQuery.data ?? []).filter(
-        (moment) =>
-          moment.authorId === characterId &&
-          (moment.authorType !== "character" ||
-            !blockedCharacterIds.has(moment.authorId)),
-      ),
+      blockedCharacterIds.has(characterId)
+        ? []
+        : (momentsQuery.data ?? []),
     [momentsQuery.data, characterId, blockedCharacterIds],
   );
 
