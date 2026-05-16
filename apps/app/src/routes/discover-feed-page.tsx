@@ -390,28 +390,26 @@ export function DiscoverFeedPage() {
         videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newPost, input) => {
-      const draftStillMatchesPublish =
-        composeDraft.text === input.text &&
-        composeDraft.imageDrafts === input.imageDrafts &&
-        composeDraft.videoDraft === input.videoDraft;
-      if (draftStillMatchesPublish) {
-        composeDraft.reset();
-        setShowCompose(false);
-      }
-      setNoticeTone("success");
-      setNoticeActionLabel(null);
-      setNoticeAction(null);
-      setNotice(t(msg`广场动态已发布，世界居民公开可见。`));
+    // 走查新 Round 10：钉住 mutate-time 的 baseUrl。慢网下用户点发布 → 切账户 B →
+    // 5s 后服务端 (A) 返回 newPost：旧 onSuccess 闭包里所有 baseUrl 都是当前的 B，
+    // 1) queryClient.setQueryData(["app-feed-paged", B]) 把 A 账户的新 post prepend
+    //    到 B 的 paged cache 头部 + invalidate B 的 ["app-feed-paged"] → B 首屏
+    //    闪一条不属于 B 的脏 post + 立刻 refetch 矫正；
+    // 2) setNotice("广场动态已发布。") 落到 B 的 toolbar，B 看着像自己发的；
+    // 3) composeDraft.reset() / setShowCompose(false) 落到 B 的 compose 状态（虽然
+    //    B 没打开 compose 影响不大，但仍然概念错位）。
+    // 与 mobile-moments-publish-page R3 (c02adc58)、commentMutation/likeMutation
+    // 下面两段同模式：onMutate 钉 mutationBaseUrl，cache 写入按它走（保证用户切
+    // 回 A 时第一帧能看到刚发的 post），UI 反馈只在 mutationBaseUrl === 当前
+    // baseUrl 时才做，切走后静默。
+    onMutate: () => ({ mutationBaseUrl: baseUrl }),
+    onSuccess: (newPost, input, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
       // 立刻把新 post prepend 到 paged 头部 + 平铺 flat cache，本页就能马上看到刚发的内容；
       // 顺便把已加载的多页砍回 1 页（发布后分页边界后移，避免 page 1 末尾和 page 2 开头重复）。
-      // 砍页等价于 resetFeedToFirstPage，但走的不是那个 helper，所以 prefetch
-      // 计数器要同步重置，否则发布前已经打满 cap 时新账户 / 当前账户都拉不出
-      // 后续页，sentinel 救不到底端外。
-      resetDesktopAutoPrefetchCounter();
       const newListItem = { ...newPost, commentsPreview: [] };
       queryClient.setQueryData<InfiniteData<FeedListResponse>>(
-        ["app-feed-paged", baseUrl],
+        ["app-feed-paged", mutationBaseUrl],
         (current) =>
           current && current.pages.length > 0
             ? {
@@ -427,7 +425,7 @@ export function DiscoverFeedPage() {
             : current,
       );
       queryClient.setQueryData<FeedListResponse>(
-        ["app-feed", baseUrl],
+        ["app-feed", mutationBaseUrl],
         (current) =>
           current
             ? {
@@ -438,15 +436,43 @@ export function DiscoverFeedPage() {
       );
       // 后台 invalidate 让 discover-page、search-index 等共用 cache 的页面也合并最新状态
       void queryClient.invalidateQueries({
-        queryKey: ["app-feed-paged", baseUrl],
+        queryKey: ["app-feed-paged", mutationBaseUrl],
       });
-      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-feed", mutationBaseUrl],
+      });
       // 走查新 Round 4：旧版还顺手 invalidate(["app-feed-post", baseUrl])，但
       // 「新发了一条 post」这件事对任何 *已存在* post 的 detail 都没影响——
       // 新 post 自己根本没 detail cache entry。这条 invalidate 只会逼桌面端
       // 当前选中的「查看全部 N 条评论」detailQuery 做一次毫无意义的 refetch
       // （慢链路上 200-500ms 一发），用户视感是发完帖子后正在阅读的另一条
       // 评论列表突然 loading 一下。
+
+      // mid-flight 切账户的话剩下的 UI 反馈跟当前账户体验有关，都静默：
+      //   - notice 不弹到新账户的 toolbar（B 没发，看着像自己发了）
+      //   - composeDraft.reset() / setShowCompose 不影响新账户的 compose 状态
+      //   - resetDesktopAutoPrefetchCounter() 影响的是当前账户的 paged cache 计
+      //     数器，跟旧账户的发表行为无关——但 cache 砍页是按 mutationBaseUrl 做
+      //     的，新账户的 prefetch 状态不该被牵动
+      if (mutationBaseUrl !== baseUrl) {
+        return;
+      }
+      // 砍页等价于 resetFeedToFirstPage，但走的不是那个 helper，所以 prefetch
+      // 计数器要同步重置，否则发布前已经打满 cap 时新账户 / 当前账户都拉不出
+      // 后续页，sentinel 救不到底端外。
+      resetDesktopAutoPrefetchCounter();
+      const draftStillMatchesPublish =
+        composeDraft.text === input.text &&
+        composeDraft.imageDrafts === input.imageDrafts &&
+        composeDraft.videoDraft === input.videoDraft;
+      if (draftStillMatchesPublish) {
+        composeDraft.reset();
+        setShowCompose(false);
+      }
+      setNoticeTone("success");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(t(msg`广场动态已发布，世界居民公开可见。`));
     },
   });
 
@@ -466,11 +492,18 @@ export function DiscoverFeedPage() {
         : likeFeedPost(postId, baseUrl);
     },
     onMutate: async (postId) => {
+      // 走查新 Round 10：钉 mutationBaseUrl 防 mid-flight 切账户写错家。
+      // 慢网下用户点赞 A → 切账户 B → 服务端返回：旧 onError/onSettled/onSuccess
+      // 闭包里 baseUrl 已经是 B，按 ["app-feed-paged", B] 回滚/写回会去翻动 B 账户
+      // 的 cache（B 跟这条点赞没关系）；onSuccess 的 notice 也会落到 B 的 toolbar。
+      // 改成所有 cache 操作按 mutationBaseUrl=A 走；UI 反馈仅在 mutationBaseUrl===
+      // 当前 baseUrl 时才做。
+      const mutationBaseUrl = baseUrl;
       // 钉 BEFORE 状态先于一切 cache 改动 —— cancelQueries 之后立刻读，
       // 这样 await 期间 React 即使被打断重渲，本次 mutationFn 也按这条记录走。
       const beforeData = queryClient.getQueryData<InfiniteData<FeedListResponse>>([
         "app-feed-paged",
-        baseUrl,
+        mutationBaseUrl,
       ]);
       const beforePost = beforeData?.pages
         .flatMap((page) => page.posts)
@@ -479,7 +512,9 @@ export function DiscoverFeedPage() {
         postId,
         beforePost?.ownerState?.hasLiked ?? false,
       );
-      await queryClient.cancelQueries({ queryKey: ["app-feed-paged", baseUrl] });
+      await queryClient.cancelQueries({
+        queryKey: ["app-feed-paged", mutationBaseUrl],
+      });
       setLikeInflightPostIds((current) => {
         if (current.has(postId)) return current;
         const next = new Set(current);
@@ -489,7 +524,7 @@ export function DiscoverFeedPage() {
       // 直接 setQueriesData 翻 hasLiked/likeCount，不再 capture full snapshot
       // —— onError 用反向 toggle 回滚（见下方 onError 注释）。
       queryClient.setQueriesData<InfiniteData<FeedListResponse>>(
-        { queryKey: ["app-feed-paged", baseUrl] },
+        { queryKey: ["app-feed-paged", mutationBaseUrl] },
         (current) => {
           if (!current) return current;
           return {
@@ -525,8 +560,10 @@ export function DiscoverFeedPage() {
           };
         },
       );
+      return { mutationBaseUrl };
     },
-    onError: (_error, postId) => {
+    onError: (_error, postId, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
       // 之前用 full-snapshot rollback：snapshot 在本 mutation 的 onMutate 时拍，
       // 不含其他 post 在期间产生的乐观更新。串发场景下（点 A 还在飞就点 B）
       // B 成功 + A 失败时，A 的 onError 拿 snapshotA 一把全覆盖回去，B 的乐观
@@ -534,7 +571,7 @@ export function DiscoverFeedPage() {
       // 改成"只对出错那条 post 反向 toggle"：onMutate 把 hasLiked 翻了一下，
       // 这里再翻回去就行，不碰其他 post。
       queryClient.setQueriesData<InfiniteData<FeedListResponse>>(
-        { queryKey: ["app-feed-paged", baseUrl] },
+        { queryKey: ["app-feed-paged", mutationBaseUrl] },
         (current) => {
           if (!current) return current;
           return {
@@ -582,7 +619,13 @@ export function DiscoverFeedPage() {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, _postId, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
+      // mid-flight 切账户后 notice 不该弹到新账户（B 上看到"广场互动已更新"
+      // 但 B 没做任何互动，看着像别人借自己账号点了赞）。
+      if (mutationBaseUrl !== baseUrl) {
+        return;
+      }
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -619,12 +662,20 @@ export function DiscoverFeedPage() {
       return addFeedComment(input.postId, { text }, baseUrl);
     },
     onMutate: (input) => {
+      // 走查新 Round 10：钉 mutationBaseUrl。慢网下用户发评论 → 切账户 B →
+      // 服务端返回 newComment：旧 onSuccess 闭包按当前 baseUrl=B 写 cache，把 A
+      // 的 newComment append 到 B 的 ["app-feed-paged", B] / ["app-feed", B] /
+      // ["app-feed-post", B, postId] 三套 cache → B 首屏会闪一条不属于 B 的评论；
+      // setCommentDrafts / setDesktopReplyTarget / setCommentBarTarget /
+      // setNotice 这些 UI 反馈也都落到 B 的 state 上。
+      // cache 写按 mutationBaseUrl=A，UI 反馈仅在仍在 A 上时做；切走静默。
       setCommentInflightPostIds((current) => {
         if (current.has(input.postId)) return current;
         const next = new Set(current);
         next.add(input.postId);
         return next;
       });
+      return { mutationBaseUrl: baseUrl };
     },
     onSettled: (_data, _error, input) => {
       setCommentInflightPostIds((current) => {
@@ -634,22 +685,8 @@ export function DiscoverFeedPage() {
         return next;
       });
     },
-    onSuccess: (newComment, input) => {
-      setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
-      setDesktopReplyTarget((current) =>
-        current?.postId === input.postId ? null : current,
-      );
-      setCommentBarTarget((current) =>
-        current?.postId === input.postId ? null : current,
-      );
-      setNoticeTone("success");
-      setNoticeActionLabel(null);
-      setNoticeAction(null);
-      setNotice(
-        input.replyTarget
-          ? t(msg`广场回复已发送。`)
-          : t(msg`广场互动已更新。`),
-      );
+    onSuccess: (newComment, input, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
       // 旧版每次评论都 invalidate paged-feed + legacy + post 三套 cache，
       // 桌面端自动 prefetch 4 页时 paged 失效 → 80+ 条 post 含 media JSON
       // 整把重拉，连续评论的体感是"输入框卡，列表轻微抖动 1-2s"。
@@ -672,7 +709,7 @@ export function DiscoverFeedPage() {
               commentCount: post.commentCount + 1,
             };
       queryClient.setQueriesData<InfiniteData<FeedListResponse>>(
-        { queryKey: ["app-feed-paged", baseUrl] },
+        { queryKey: ["app-feed-paged", mutationBaseUrl] },
         (current) =>
           current
             ? {
@@ -685,14 +722,14 @@ export function DiscoverFeedPage() {
             : current,
       );
       queryClient.setQueryData<FeedListResponse>(
-        ["app-feed", baseUrl],
+        ["app-feed", mutationBaseUrl],
         (current) =>
           current
             ? { ...current, posts: current.posts.map(appendToPost) }
             : current,
       );
       queryClient.setQueryData<FeedPostWithComments>(
-        ["app-feed-post", baseUrl, input.postId],
+        ["app-feed-post", mutationBaseUrl, input.postId],
         (current) =>
           current
             ? {
@@ -701,6 +738,28 @@ export function DiscoverFeedPage() {
                 commentCount: current.commentCount + 1,
               }
             : current,
+      );
+      // mid-flight 切账户：剩下的 UI / state 反馈（清草稿、清 replyTarget /
+      // commentBarTarget、弹 notice、展开"查看全部"列表追评）都跟当前账户的
+      // UX 有关，切走后这些 state 已经属于新账户，强行碰会把新账户的草稿
+      // / reply target 全抹掉。静默就行。
+      if (mutationBaseUrl !== baseUrl) {
+        return;
+      }
+      setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
+      setDesktopReplyTarget((current) =>
+        current?.postId === input.postId ? null : current,
+      );
+      setCommentBarTarget((current) =>
+        current?.postId === input.postId ? null : current,
+      );
+      setNoticeTone("success");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(
+        input.replyTarget
+          ? t(msg`广场回复已发送。`)
+          : t(msg`广场互动已更新。`),
       );
       // 「查看全部」展开后（移动端 fullCommentsByPostId）：直接 append 避免再拉一遍。
       if (fullCommentsByPostId[input.postId]) {
