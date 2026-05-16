@@ -220,9 +220,19 @@ export function DiscoverFeedPage() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const hasNextFeedPage = feedQuery.hasNextPage;
   const isFetchingNextFeedPage = feedQuery.isFetchingNextPage;
+  // fetchNextPage 失败时（中途网络抖动 / 服务端 5xx），feedQuery.isError 仍
+  // 是 false（首屏数据没坏），错误是隐式 isFetchNextPageError 标记。旧逻辑
+  // 没看这个 flag：observer 见 sentinel 一直在视口 → 不停重试 → 不停失败，
+  // 用户既看不到失败提示也看不到 "正在加载更多" 之外的反馈。检到这个状态
+  // 后：(1) 关掉 observer 别再自动重试；(2) 在底部 sentinel 旁边显式渲一条
+  // 「加载更多失败 · 重试」让用户手动触发。
+  const isFetchNextFeedPageError = feedQuery.isFetchNextPageError;
   const fetchNextFeedPage = feedQuery.fetchNextPage;
   useEffect(() => {
     if (!hasNextFeedPage || isFetchingNextFeedPage) {
+      return;
+    }
+    if (isFetchNextFeedPageError) {
       return;
     }
     const sentinel = loadMoreRef.current;
@@ -239,7 +249,12 @@ export function DiscoverFeedPage() {
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [fetchNextFeedPage, hasNextFeedPage, isFetchingNextFeedPage]);
+  }, [
+    fetchNextFeedPage,
+    hasNextFeedPage,
+    isFetchingNextFeedPage,
+    isFetchNextFeedPageError,
+  ]);
 
   // 桌面端没有触底 sentinel，但旧版无脑递归 prefetch 把所有页一路串行拉到底——
   // 广场总量 200+ 时光首屏就要排 10+ RTT，把后端拉爆且白白下载用户没滚到的页。
@@ -1850,6 +1865,18 @@ const pendingLikePostId = likeMutation.isPending
                 <div className="py-3 text-center text-[11px] text-[color:var(--text-muted)]">
                   {t(msg`正在加载更多…`)}
                 </div>
+              ) : isFetchNextFeedPageError ? (
+                /* fetchNextPage 失败后旧逻辑啥也不显示 + observer 还在死循环
+                   重试。现在显式渲一条「加载更多失败 · 点击重试」让用户手动
+                   触发，且 observer 自动 fetch 已经被 isFetchNextFeedPageError
+                   gate 关掉避免后台炸 RTT。 */
+                <button
+                  type="button"
+                  onClick={() => void fetchNextFeedPage()}
+                  className="block w-full py-3 text-center text-[11px] text-[#576B95] active:opacity-60"
+                >
+                  {t(msg`加载更多失败 · 点击重试`)}
+                </button>
               ) : !hasNextFeedPage ? (
                 <div className="py-3 text-center text-[11px] text-[color:var(--text-muted)]">
                   {t(msg`已经到底了`)}
