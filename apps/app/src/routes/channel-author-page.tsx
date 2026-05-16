@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
@@ -90,8 +90,20 @@ export function ChannelAuthorPage() {
     message: string;
     tone: "success" | "info";
   } | null>(null);
-  const [activeCollection, setActiveCollection] =
-    useState<ChannelAuthorCollectionTab>("all");
+  // 走查 R5（新一轮）：原来 useState("all") + 一对 read/write useEffect 串联：
+  // mount commit 里两个 effect 按声明顺序执行——读 effect 把 LS 里 "audio" 灌
+  // setActiveCollection 是 *scheduled* 的状态更新，下一个 effect 立刻 fire 时
+  // activeCollection 还是 useState 初值 "all"，写 effect 把 LS 直接覆盖回 "all"。
+  // 接着 StrictMode 双跑 effect 时再读到的就是 "all"（自己刚写进去的），灌一次
+  // 等价状态变更，再写一次 "all"。用户上次留下的 "audio" 永远被 mount 重置成 "all"。
+  // 用户重现：作者页切去音乐 → 返回视频号 → 再次进同一作者页 → 退回到全部 tab。
+  // 改成 useState 用 lazy initializer 一次性把 LS 里的值灌成初值，写改成
+  // changeCollection helper 在 click 时同时调 setState + LS write，effect 不再
+  // 兜任何写。authorId 变化（路由切换到新作者）时再走一个独立 read effect。
+  const [activeCollection, setActiveCollection] = useState<ChannelAuthorCollectionTab>(
+    () => readStoredChannelAuthorCollection(authorId),
+  );
+  const lastReadAuthorIdRef = useRef(authorId);
 
   const profileQuery = useQuery({
     queryKey: ["app-channel-author", baseUrl, authorId],
@@ -162,7 +174,13 @@ export function ChannelAuthorPage() {
 
   useEffect(() => {
     setNotice(null);
-    setActiveCollection(readStoredChannelAuthorCollection(authorId));
+    // 切到新 authorId（路由 in-place 切作者）时再读一次 LS；初次 mount 已经
+    // 由 useState lazy initializer 处理过，不要在这里再 set 同样的初值——会
+    // 触发 unnecessary re-render，也避开 mount + StrictMode 把覆盖 bug 重新引回。
+    if (lastReadAuthorIdRef.current !== authorId) {
+      lastReadAuthorIdRef.current = authorId;
+      setActiveCollection(readStoredChannelAuthorCollection(authorId));
+    }
   }, [authorId, baseUrl]);
 
   // 走查 R2：success notice 之前一直挂着不消，跟主视频号页 2.4s 自动消失的
@@ -179,9 +197,14 @@ export function ChannelAuthorPage() {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
-  useEffect(() => {
-    writeStoredChannelAuthorCollection(authorId, activeCollection);
-  }, [activeCollection, authorId]);
+  // 写改成 click 时同时调 setState + LS write —— 见 changeCollection helper。
+  // 不要再用 useEffect 兜写：mount commit 里 effect 顺序会让初始 "all" 覆盖
+  // 用户上次留下的真实选择，下方读 effect 的 setState 又来不及在 StrictMode
+  // 双跑前生效，最终 LS 被刷回 "all"，体感 collection tab 永远没记住。
+  const changeCollection = (tab: ChannelAuthorCollectionTab) => {
+    setActiveCollection(tab);
+    writeStoredChannelAuthorCollection(authorId, tab);
+  };
 
   useEffect(() => {
     if (!isDesktopLayout) {
@@ -563,7 +586,7 @@ export function ChannelAuthorPage() {
                     <button
                       key={tab.key}
                       type="button"
-                      onClick={() => setActiveCollection(tab.key)}
+                      onClick={() => changeCollection(tab.key)}
                       className={cn(
                         "relative shrink-0 px-4 py-3 text-[14px] transition",
                         activeCollection === tab.key
