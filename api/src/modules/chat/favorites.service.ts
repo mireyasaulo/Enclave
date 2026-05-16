@@ -305,7 +305,16 @@ export class FavoritesService implements OnModuleInit {
   async createMessageFavorite(
     input: CreateMessageFavoriteInput,
   ): Promise<FavoriteRecord> {
-    if (!input.threadId.trim() || !input.messageId.trim()) {
+    // 之前空 body 直接走 input.threadId.trim() → "Cannot read properties of
+    // undefined (reading 'trim')" 弹 500。改用可选链 + 字符串守卫，把所有缺字段
+    // 的请求都收敛成 CHAT_FAVORITE_PARAMS_REQUIRED 4xx。
+    if (
+      typeof input?.threadId !== 'string' ||
+      !input.threadId.trim() ||
+      typeof input?.messageId !== 'string' ||
+      !input.messageId.trim() ||
+      (input.threadType !== 'direct' && input.threadType !== 'group')
+    ) {
       throw new AppError('CHAT_FAVORITE_PARAMS_REQUIRED', {
         legacyMessage: '收藏消息缺少必要参数。',
       });
@@ -379,6 +388,13 @@ export class FavoritesService implements OnModuleInit {
   async createFavoriteNote(
     input: UpsertFavoriteNoteInput,
   ): Promise<FavoriteNoteDocument> {
+    // sanitizeFavoriteNoteHtml 内部 value.trim() 在 contentHtml=undefined/null
+    // 时直接抛 → 500。POST {} / {"contentHtml":null} 这种都该 4xx，先在这里收一遍。
+    if (typeof input?.contentHtml !== 'string') {
+      throw new AppError('CHAT_NOTE_CONTENT_REQUIRED', {
+        legacyMessage: '笔记内容不能为空。',
+      });
+    }
     const timestamp = new Date().toISOString();
     const note = buildFavoriteNoteDocument({
       id: randomUUID(),
@@ -424,6 +440,12 @@ export class FavoritesService implements OnModuleInit {
     if (!normalizedId) {
       throw new AppError('CHAT_NOTE_ID_REQUIRED', {
         legacyMessage: '笔记标识不能为空。',
+      });
+    }
+    // 跟 createFavoriteNote 对齐：contentHtml 缺字段 → 4xx 而不是 500。
+    if (typeof input?.contentHtml !== 'string') {
+      throw new AppError('CHAT_NOTE_CONTENT_REQUIRED', {
+        legacyMessage: '笔记内容不能为空。',
       });
     }
 
