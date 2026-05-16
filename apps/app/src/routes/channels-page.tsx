@@ -314,12 +314,34 @@ export function ChannelsPage() {
         }
         return { ...current, [input.postId]: "" };
       });
-      setMobileReplyTarget((current) =>
-        current?.postId === input.postId ? null : current,
-      );
-      setDesktopReplyTarget((current) =>
-        current?.postId === input.postId ? null : current,
-      );
+      // 走查 R3：原来只按 postId 抹 replyTarget——但用户提交回复 A 后还没
+      // 收到 RTT 就先按了评论 B 的「回复」按钮，replyTarget 已经被替换成 B；
+      // mutation 落地把 current.postId === input.postId 当真，把刚换上的 B 也
+      // 一起清掉，用户的「我下一步要回 B」意图丢失。改成「sent target 跟当前
+      // target 完全相同」才清；用户已经切到别的评论 / 退回到顶层评论时不动。
+      // input.replyTarget 为 null（顶层评论）时，原 replyTarget 必为 null
+      // （顶层评论提交不会经过 setMobileReplyTarget），不需要再做事。
+      const sentTarget = input.replyTarget ?? null;
+      setMobileReplyTarget((current) => {
+        if (!current || !sentTarget) return current;
+        if (
+          current.postId === sentTarget.postId &&
+          current.commentId === sentTarget.commentId
+        ) {
+          return null;
+        }
+        return current;
+      });
+      setDesktopReplyTarget((current) => {
+        if (!current || !sentTarget) return current;
+        if (
+          current.postId === sentTarget.postId &&
+          current.commentId === sentTarget.commentId
+        ) {
+          return null;
+        }
+        return current;
+      });
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
