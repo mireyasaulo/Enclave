@@ -172,6 +172,13 @@ export function DesktopContactsFriendRequestsPane({
                           size="lg"
                           disabled={disabled}
                           onClick={() => onDecline(request.id)}
+                          // 按钮原本只是「拒绝」/「清除」三个字，screen reader 读出
+                          // 来时完全不知道是给谁拒绝；接受同理。带上 characterName。
+                          aria-label={
+                            expired
+                              ? t(msg`清除 ${request.characterName} 的过期好友申请`)
+                              : t(msg`拒绝 ${request.characterName} 的好友申请`)
+                          }
                           className="rounded-[12px] border-[color:var(--border-faint)] bg-white px-5 shadow-none hover:bg-[color:var(--surface-console)]"
                         >
                           {declinePendingId === request.id
@@ -188,6 +195,9 @@ export function DesktopContactsFriendRequestsPane({
                             size="lg"
                             disabled={disabled}
                             onClick={() => onAccept(request.id)}
+                            aria-label={t(
+                              msg`接受 ${request.characterName} 的好友申请`,
+                            )}
                             className="rounded-[12px] bg-[#07c160] px-5 text-white shadow-none hover:bg-[#06ad56]"
                           >
                             {acceptPendingId === request.id
