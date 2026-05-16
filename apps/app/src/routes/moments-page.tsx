@@ -984,6 +984,19 @@ export function MomentsPage() {
     if (momentsQuery.isError && momentsQuery.error instanceof Error) {
       errors.push(momentsQuery.error.message);
     }
+    // 桌面 auto-prefetch 中途某页失败：之前 isFetchNextPageError 完全没暴露到 UI ——
+    // 用户看到列表停在 100/240 条，刷新按钮就在那，但没线索告诉他「下一页加载失败」。
+    // 移动端有专门的错误条和重试按钮（fetchNextPageError prop），桌面也得透传。
+    // 点「刷新」会 resetMomentsToFirstPage + refetch，react-query v5 refetch 成功后
+    // isFetchNextPageError 自然归零，auto-prefetch 链路恢复。
+    if (
+      momentsQuery.isFetchNextPageError &&
+      momentsQuery.error instanceof Error
+    ) {
+      errors.push(
+        t(msg`部分朋友圈加载失败，请点击刷新重试：${momentsQuery.error.message}`),
+      );
+    }
 
     if (blockedQuery.isError && blockedQuery.error instanceof Error) {
       errors.push(blockedQuery.error.message);
