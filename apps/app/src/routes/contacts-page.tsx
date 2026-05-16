@@ -571,7 +571,17 @@ export function ContactsPage() {
       ).length,
     [friendRequestsQuery.data],
   );
-  const groupCount = contactGroupsQuery.data?.length ?? 0;
+  // 走查 Round 7：原版用 contactGroupsQuery.data.length 当 "X 个群聊" 副标，
+  // 但 /contacts/groups 子页早在 Round 3 加了客户端过滤 isHidden=true，
+  // visibleGroups 只统计未隐藏的——两边数对不上：父页"5 个群聊"，进去
+  // 实际只能看到 2 条，差出来的 3 条是 hide 状态的。统一按 visible 口径
+  // 算 count。
+  const groupCount = useMemo(
+    () =>
+      (contactGroupsQuery.data ?? []).filter((group) => !group.isHidden)
+        .length,
+    [contactGroupsQuery.data],
+  );
 
   const selectedFriendItem = useMemo(() => {
     if (desktopSelection?.kind !== "friend") {
