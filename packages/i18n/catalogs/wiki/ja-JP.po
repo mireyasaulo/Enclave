@@ -890,78 +890,78 @@ msgstr "不正対策フィルター"
 msgid "治理仪表盘"
 msgstr "ガバナンスダッシュボード"
 
-#: apps/wiki/src/components/root-layout.tsx:186
+#: apps/wiki/src/components/root-layout.tsx:188
 msgid "隐界角色百科"
 msgstr "隠界キャラクター事典"
 
-#: apps/wiki/src/components/root-layout.tsx:241
+#: apps/wiki/src/components/root-layout.tsx:246
 msgid "打开导航"
 msgstr "ナビを開く"
 
-#: apps/wiki/src/components/root-layout.tsx:251
+#: apps/wiki/src/components/root-layout.tsx:256
 msgid "隐"
 msgstr "隠"
 
-#: apps/wiki/src/components/root-layout.tsx:254
+#: apps/wiki/src/components/root-layout.tsx:259
 msgid "隐界世界角色管理平台"
 msgstr "隠界ワールドキャラクター管理プラットフォーム"
 
-#: apps/wiki/src/components/root-layout.tsx:257
+#: apps/wiki/src/components/root-layout.tsx:262
 msgid "隐界角色管理"
 msgstr "隠界キャラクター管理"
 
-#: apps/wiki/src/components/root-layout.tsx:272
+#: apps/wiki/src/components/root-layout.tsx:277
 msgid "搜索角色词条…（回车）"
 msgstr "エントリを検索…（Enter）"
 
-#: apps/wiki/src/components/root-layout.tsx:288
-#: apps/wiki/src/components/root-layout.tsx:306
+#: apps/wiki/src/components/root-layout.tsx:293
+#: apps/wiki/src/components/root-layout.tsx:311
 msgid "新手教程 / Tutorial"
 msgstr "ビギナーガイド / Tutorial"
 
-#: apps/wiki/src/components/root-layout.tsx:289
+#: apps/wiki/src/components/root-layout.tsx:294
 msgid "新手教程"
 msgstr "チュートリアル"
 
-#: apps/wiki/src/components/root-layout.tsx:310
+#: apps/wiki/src/components/root-layout.tsx:315
 msgid "教程"
 msgstr "チュートリアル"
 
-#: apps/wiki/src/components/root-layout.tsx:328
-#: apps/wiki/src/components/root-layout.tsx:346
+#: apps/wiki/src/components/root-layout.tsx:333
+#: apps/wiki/src/components/root-layout.tsx:351
 #: apps/wiki/src/routes/login-page.tsx:41
 #: apps/wiki/src/routes/login-page.tsx:138
 #: apps/wiki/src/routes/register-page.tsx:112
 msgid "登录"
 msgstr "サインイン"
 
-#: apps/wiki/src/components/root-layout.tsx:343
+#: apps/wiki/src/components/root-layout.tsx:348
 #: apps/wiki/src/routes/admin-users-page.tsx:77
 #: apps/wiki/src/routes/register-page.tsx:52
 #: apps/wiki/src/routes/register-page.tsx:103
 msgid "注册"
 msgstr "登録"
 
-#: apps/wiki/src/components/root-layout.tsx:364
+#: apps/wiki/src/components/root-layout.tsx:369
 msgid "搜索词条…"
 msgstr "エントリを検索…"
 
-#: apps/wiki/src/components/root-layout.tsx:376
-#: apps/wiki/src/components/root-layout.tsx:390
+#: apps/wiki/src/components/root-layout.tsx:381
+#: apps/wiki/src/components/root-layout.tsx:395
 msgid "关闭导航"
 msgstr "ナビを閉じる"
 
-#: apps/wiki/src/components/root-layout.tsx:412
+#: apps/wiki/src/components/root-layout.tsx:417
 msgid "隐界世界角色管理平台 · 任何登录用户都可以提交角色创建、编辑和生命周期变更，由巡查员审核生效"
 msgstr "隠界ワールドキャラクター管理プラットフォーム · サインインユーザーはキャラクターの作成・編集・ライフサイクル変更を送信でき、巡回員の審査を経て反映されます"
 
-#: apps/wiki/src/components/root-layout.tsx:507
+#: apps/wiki/src/components/root-layout.tsx:512
 #: apps/wiki/src/routes/account-page.tsx:54
 #: apps/wiki/src/routes/account-page.tsx:69
 msgid "账户设置"
 msgstr "アカウント設定"
 
-#: apps/wiki/src/components/root-layout.tsx:519
+#: apps/wiki/src/components/root-layout.tsx:524
 msgid "退出"
 msgstr "サインアウト"
 
@@ -1199,6 +1199,18 @@ msgstr "再試行"
 #: apps/wiki/src/main.tsx:102
 msgid "刷新页面"
 msgstr "ページを再読み込み"
+
+#: apps/wiki/src/router.tsx:22
+msgid "页面不存在"
+msgstr "ページが見つかりません"
+
+#: apps/wiki/src/router.tsx:25
+msgid "请检查链接是否正确，或回到首页继续浏览。"
+msgstr "リンクが正しいかご確認いただくか、ホームに戻ってからお進みください。"
+
+#: apps/wiki/src/router.tsx:30
+msgid "返回首页"
+msgstr "ホームに戻る"
 
 #: apps/wiki/src/routes/account-page.tsx:56
 msgid "请先 <0>登录</0> 后再访问账户设置。"
