@@ -748,8 +748,14 @@ function ChannelAuthorHeaderStat({
 function ChannelPostCover({ post }: { post: FeedPostListItem }) {
   const t = useRuntimeTranslator();
   const coverPresentation = resolveChannelPostCoverPresentation(t, post);
+  // 走查 R1 新一轮：post.coverUrl 偶发 404 / cloud-api 反代 401（token expire
+  // 边界）/ minimax 资源被回收。原本直接渲染破图占位，作者主页列表里每条 row
+  // 都是一张破图缩略图，体感整页都坏了。失败回退到下方 panelClassName 渐变面板
+  // （resolveChannelPostCoverPresentation 已经按 mediaType / live_clip 给好色卡
+  // 与图标），跟"无 coverUrl"分支视觉一致。
+  const [coverFailed, setCoverFailed] = useState(false);
 
-  if (post.coverUrl?.trim()) {
+  if (post.coverUrl?.trim() && !coverFailed) {
     // 经 normalizeFeedPost 后 coverUrl 已是绝对 URL，但走 cloud-api 多租户反代时
     // <img src> 这类标签拿不到 Authorization header，必须用 resolveAppMediaUrl
     // 把 token 拼到 query string，否则 CloudClientAuthGuard 401，封面变破图。
@@ -758,6 +764,9 @@ function ChannelPostCover({ post }: { post: FeedPostListItem }) {
         <img
           src={resolveAppMediaUrl(post.coverUrl)}
           alt={post.title || post.authorName}
+          loading="lazy"
+          decoding="async"
+          onError={() => setCoverFailed(true)}
           className="h-full w-full object-cover"
         />
         <div

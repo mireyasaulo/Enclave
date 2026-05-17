@@ -2164,6 +2164,12 @@ function ChannelAudioPictorial({
         : [];
   const [imageIndex, setImageIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  // 走查 R1 新一轮：cover/poster img 失败时之前没兜底，浏览器原生 broken-image
+  // 占位会盖在沉浸式播放区——音频还在播但视觉是一张破图，体感"卡片坏了"。
+  // 维护被标记失败的图片 url 集合；渲染时把这些 url 替换成渐变 Music2 占位。
+  const [failedImageUrls, setFailedImageUrls] = useState<Set<string>>(
+    () => new Set(),
+  );
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
@@ -2371,6 +2377,9 @@ function ChannelAudioPictorial({
   };
 
   const currentImage = displayImages[imageIndex];
+  const currentImageFailed = currentImage
+    ? failedImageUrls.has(currentImage)
+    : false;
 
   return (
     <div
@@ -2383,7 +2392,7 @@ function ChannelAudioPictorial({
       tabIndex={0}
       aria-label={isPlaying ? t(msg`暂停`) : t(msg`播放`)}
     >
-      {currentImage ? (
+      {currentImage && !currentImageFailed ? (
         <img
           key={currentImage}
           src={resolveAppMediaUrl(currentImage)}
@@ -2393,6 +2402,20 @@ function ChannelAudioPictorial({
           // 没有 lazy 时 ~20 张专辑封面同时拉，公网隧道下首屏明显堆积。
           loading={active ? "eager" : "lazy"}
           decoding="async"
+          onError={() => {
+            // 走查 R1 新一轮：minimax 出的 cover 图偶发 404 / cloud-api 反代
+            // 401（token expire 边界）/ 网络掉包。原本浏览器直接显示破图占位，
+            // 盖在 audio 播放区上头，体感像「整张卡片坏了」实际音频还在响。
+            // 标记失败 → 切到 Music2 渐变兜底；切到别的图 / 离开 active 卡 +
+            // 再回来 重新尝试加载（setState 触发重渲染时若该 url 仍在 set 里，
+            // 不会重试；用户主动刷新页面才彻底重试，避免 hot-loop）。
+            setFailedImageUrls((prev) => {
+              if (prev.has(currentImage)) return prev;
+              const next = new Set(prev);
+              next.add(currentImage);
+              return next;
+            });
+          }}
           className="pointer-events-none absolute inset-0 h-full w-full object-cover"
         />
       ) : (
