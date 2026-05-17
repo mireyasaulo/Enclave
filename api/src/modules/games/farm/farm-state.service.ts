@@ -1135,6 +1135,16 @@ export class FarmStateService {
         legacyMessage: `角色不存在：${characterId}`,
       });
     }
+    // 好感已经满 100 还允许送礼的话，玩家金币照扣、ledger 写一条 intimacyDelta=正数
+    // 的 intimacy_change，但 character.intimacyLevel 被 Math.min(100, ...) 截掉没动 —
+    // 接口对外撒谎、玩家白送一笔。直接拒掉，留给玩家自己判断要不要继续刷。
+    if ((character.intimacyLevel ?? 0) >= 100) {
+      throw new AppError('FARM_INTIMACY_MAXED', {
+        status: HttpStatus.CONFLICT,
+        params: { characterName: character.name },
+        legacyMessage: `${character.name} 的好感度已满，再送也不会涨了`,
+      });
+    }
     const state = await this.getOrCreatePlayerState(ownerId);
     if (state.coins < amount) {
       throw new AppError('FARM_INSUFFICIENT_COINS', {
@@ -1148,12 +1158,13 @@ export class FarmStateService {
       npc.coins += amount;
       await this.npcRepo.save(npc);
     }
-    const intimacyDelta = Math.max(
+    const requestedDelta = Math.max(
       1,
       Math.floor((amount / 100) * FARM_GIFT_INTIMACY_PER_100_COINS),
     );
     const oldIntimacy = character.intimacyLevel ?? 0;
-    const newIntimacy = Math.max(0, Math.min(100, oldIntimacy + intimacyDelta));
+    const newIntimacy = Math.max(0, Math.min(100, oldIntimacy + requestedDelta));
+    const intimacyDelta = newIntimacy - oldIntimacy;
     if (newIntimacy !== oldIntimacy) {
       character.intimacyLevel = newIntimacy;
       await this.charactersService.upsert(character);
@@ -1206,6 +1217,13 @@ export class FarmStateService {
         legacyMessage: `角色不存在：${characterId}`,
       });
     }
+    if ((character.intimacyLevel ?? 0) >= 100) {
+      throw new AppError('FARM_INTIMACY_MAXED', {
+        status: HttpStatus.CONFLICT,
+        params: { characterName: character.name },
+        legacyMessage: `${character.name} 的好感度已满，再送也不会涨了`,
+      });
+    }
     const state = await this.getOrCreatePlayerState(ownerId);
     let displayName = itemId;
     if (itemKind === 'crop' || itemKind === 'seed') {
@@ -1256,9 +1274,10 @@ export class FarmStateService {
       state.consumablesPayload = bag;
     }
 
-    const intimacyDelta = Math.max(1, quantity * FARM_GIFT_INTIMACY_PER_ITEM);
+    const requestedDelta = Math.max(1, quantity * FARM_GIFT_INTIMACY_PER_ITEM);
     const oldIntimacy = character.intimacyLevel ?? 0;
-    const newIntimacy = Math.max(0, Math.min(100, oldIntimacy + intimacyDelta));
+    const newIntimacy = Math.max(0, Math.min(100, oldIntimacy + requestedDelta));
+    const intimacyDelta = newIntimacy - oldIntimacy;
     if (newIntimacy !== oldIntimacy) {
       character.intimacyLevel = newIntimacy;
       await this.charactersService.upsert(character);
