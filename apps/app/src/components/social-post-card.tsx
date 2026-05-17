@@ -70,7 +70,15 @@ export function SocialPostCard({
               {authorName}
             </button>
           ) : (
-            <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
+            // 走查 R4：character 分支 (onAuthorClick 路径) 已经 truncate，user
+            // 分支（世界主人 / 不可点头像）缺这条，碰上长 username（"用户_aabbccddeeff..."
+            // 之类的 wiki 走查账号 / Android 输入法插入的特殊字符）会顶破 flex
+            // 行把 headerActions 推到下一行，meta 也跟着错位。补 truncate 与
+            // 上面 button 分支对齐，长名一律单行省略号。
+            <div
+              className="truncate text-[13px] font-medium text-[color:var(--text-primary)]"
+              title={authorName}
+            >
               {authorName}
             </div>
           )}
