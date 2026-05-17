@@ -446,9 +446,57 @@ export class FeedService implements OnModuleInit {
       ownerId: owner.id,
       ownerAvatar: owner.avatar,
     });
-    const authorPosts = (
-      await this.getVisibleChannelPosts(owner.id, 'recommended')
-    ).filter((post) => post.authorId === authorId);
+    // 走查 2026-05-17 新会话 R3：原实现先 `getVisibleChannelPosts('recommended')`
+    // 把全站所有视频号 post（最大 1000+ 行）拉到内存再 .filter(post.authorId===
+    // authorId)——单作者主页要 SELECT * + 5 个并行 owner/social 查询，浪费明显。
+    // 改成只拉这位作者的 post，按需做 blocked / not_interested / visible / media
+    // 可播放 这四道过滤，逻辑等价但 IO 量与作者贴数成线性，不再被全站规模放大。
+    const authorPostsRaw = await this.postRepo.find({
+      where: {
+        authorId,
+        surface: 'channels',
+        publishStatus: 'published',
+      },
+      order: { recommendationScore: 'DESC', createdAt: 'DESC' },
+    });
+    const [
+      visibleCharacterIds,
+      blockedCharacterIdSet,
+      notInterestedPostIdSet,
+    ] = await Promise.all([
+      this.getVisibleCharacterIdSet(owner.id),
+      this.socialService
+        .getBlockedCharacterIds(owner.id)
+        .then((ids) => new Set(ids)),
+      // notInterested 只查这一批 post——比全表扫小。
+      authorPostsRaw.length === 0
+        ? Promise.resolve(new Set<string>())
+        : this.interactionRepo
+            .find({
+              where: {
+                ownerId: owner.id,
+                type: 'not_interested',
+                postId: In(authorPostsRaw.map((p) => p.id)),
+              },
+            })
+            .then((items) => new Set(items.map((item) => item.postId))),
+    ]);
+    const authorPosts = authorPostsRaw.filter((post) => {
+      if (post.authorType === 'character') {
+        if (!visibleCharacterIds.has(post.authorId)) return false;
+        if (blockedCharacterIdSet.has(post.authorId)) return false;
+        if (post.visibility === 'private') return false;
+        if (
+          post.visibility === 'friends' &&
+          !avatarContext.ownerFriendCharacterIds.has(post.authorId)
+        ) {
+          return false;
+        }
+      }
+      if (notInterestedPostIdSet.has(post.id)) return false;
+      if (!this.isPostMediaPlayable(post)) return false;
+      return true;
+    });
     const latestPost =
       authorPosts[0] ??
       (await this.postRepo.findOne({
