@@ -3762,7 +3762,14 @@ function MobileChannelCommentsSheet({
         aria-label={t(msg`关闭评论面板`)}
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 flex max-h-[80dvh] flex-col overflow-hidden rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] pb-[calc(env(safe-area-inset-bottom,0px)+0.25rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
+      {/*
+        走查 2026-05-17 R3：pb 原来只用 safe-area-inset-bottom——iOS WKWebView /
+        Android Capacitor 软键盘弹起时，sheet 底部 textarea + 发送按钮被键盘整段
+        盖住，用户没法看到自己正在敲的内容也按不到发送按钮（mobile-note-send-sheet
+        早就改成了 max(safe-area, --keyboard-inset) 同款修复）。--keyboard-inset
+        由 mobile-shell 的 useKeyboardInset 写入根 :root，键盘开合时实时更新。
+      */}
+      <div className="absolute inset-x-0 bottom-0 flex max-h-[80dvh] flex-col overflow-hidden rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] pb-[calc(max(env(safe-area-inset-bottom,0px),var(--keyboard-inset,0px))+0.25rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
         <div className="flex justify-center pb-1.5">
           <div className="h-1 w-10 rounded-full bg-[rgba(148,163,184,0.45)]" />
         </div>
