@@ -741,7 +741,13 @@ function MobileAddFriendNoResultsState({ keyword }: { keyword: string }) {
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[rgba(15,23,42,0.05)] text-[color:var(--text-secondary)]">
         <Search size={22} />
       </div>
-      <div className="mt-4 text-[16px] font-medium text-[color:var(--text-primary)]">
+      {/* 走查 R3：原版标题没 max-w / break-words，submittedKeyword 来自 URL
+          hash 的 q= 参数，攻击者诱导用户打开 /add-friend#q=<60 个无空格字符>
+          时标题文本会撑破窄屏（iOS 320px 容器只剩 ~270px），整页落到水平
+          滚动。Chinese 在字间会自然换行不踩；纯 ASCII 长串才会爆。加 mx-auto
+          max-w-[280px] + break-words 跟下方描述统一收紧；description 已经有
+          max-w-[280px] 就是这套防线，title 漏了一个。 */}
+      <div className="mx-auto mt-4 max-w-[280px] break-words text-[16px] font-medium text-[color:var(--text-primary)]">
         {t(msg`没有找到“${keyword}”`)}
       </div>
       <div className="mt-1.5 max-w-[280px] text-[12px] leading-5 text-[color:var(--text-muted)]">
