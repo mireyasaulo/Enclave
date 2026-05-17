@@ -1315,16 +1315,6 @@ export function CharacterDetailPage() {
                 />
               </div>
             ) : null}
-            {pinMutation.isError && pinMutation.error instanceof Error ? (
-              <div className="mx-auto w-full max-w-[640px] px-3">
-                <ErrorBlock message={pinMutation.error.message} />
-              </div>
-            ) : null}
-            {muteMutation.isError && muteMutation.error instanceof Error ? (
-              <div className="mx-auto w-full max-w-[640px] px-3">
-                <ErrorBlock message={muteMutation.error.message} />
-              </div>
-            ) : null}
             {blockMutation.isError && blockMutation.error instanceof Error ? (
               <div className="mx-auto w-full max-w-[640px] px-3">
                 <ErrorBlock message={blockMutation.error.message} />
@@ -1702,6 +1692,33 @@ export function CharacterDetailPage() {
                   action={renderMobileErrorBackAction()}
                 >
                   {updateProfileMutation.error.message}
+                </MobileCharacterErrorNotice>
+              )
+            ) : null}
+            {/* 走查新 R1：之前 pinMutation/muteMutation 的 ErrorBlock 只挂在
+                desktop 分支（旧 1318-1326）；mobile 静默失败，开关回弹但屏幕
+                没任何反馈，用户怀疑自己点漏。统一到 isDesktopLayout ?
+                <ErrorBlock> : <MobileCharacterErrorNotice> 的范式，跟上下
+                10 个 mutation 写法对齐，避免一处双写。 */}
+            {pinMutation.isError && pinMutation.error instanceof Error ? (
+              isDesktopLayout ? (
+                <ErrorBlock message={pinMutation.error.message} />
+              ) : (
+                <MobileCharacterErrorNotice
+                  action={renderMobileErrorBackAction()}
+                >
+                  {pinMutation.error.message}
+                </MobileCharacterErrorNotice>
+              )
+            ) : null}
+            {muteMutation.isError && muteMutation.error instanceof Error ? (
+              isDesktopLayout ? (
+                <ErrorBlock message={muteMutation.error.message} />
+              ) : (
+                <MobileCharacterErrorNotice
+                  action={renderMobileErrorBackAction()}
+                >
+                  {muteMutation.error.message}
                 </MobileCharacterErrorNotice>
               )
             ) : null}

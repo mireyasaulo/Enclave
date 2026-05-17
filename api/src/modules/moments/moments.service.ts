@@ -2145,8 +2145,11 @@ export class MomentsService implements OnModuleInit {
     }
 
     const owner = await this.worldOwnerService.getOwnerOrThrow();
-    const ownerFriendCharacterIds =
-      await this.characters.getActiveFriendCharacterIdSet(owner.id);
+    const [ownerFriendCharacterIds, momentsHiddenFromThemCharacterIds] =
+      await Promise.all([
+        this.characters.getActiveFriendCharacterIdSet(owner.id),
+        this.remarkResolver.getMomentsHiddenFromThemCharacterIds(owner.id),
+      ]);
 
     for (const char of activeCandidates) {
       // 朋友圈是「好友圈」语义：非好友角色不会主动到任何朋友圈里露脸。
@@ -2160,8 +2163,22 @@ export class MomentsService implements OnModuleInit {
 
       participantCount += 1;
 
+      // 走查 R2 复检：朋友权限页"TA 看不到我的朋友圈"开关一直是 dead flag——
+      // 此时 npc tick 仍把用户最新 moment 推给这位 char 当候选，char 会
+      // 点赞 / 评论，用户看到通知就知道开关白勾了。把 hiddenFromThem 的 char
+      // 在看到 user authorType 的 post 时直接过滤掉，他俩之间的 user→char
+      // 朋友圈链路就切干净了（char→user 方向由 momentsHiddenFromMe 兜底）。
+      const hideUserPostsFromThisChar =
+        momentsHiddenFromThemCharacterIds.has(char.id);
+
       const candidatePosts = recentPosts.filter(
-        (post) => post.authorId !== char.id,
+        (post) =>
+          post.authorId !== char.id &&
+          !(
+            hideUserPostsFromThisChar &&
+            post.authorType === 'user' &&
+            post.authorId === owner.id
+          ),
       );
       if (candidatePosts.length === 0) continue;
 
