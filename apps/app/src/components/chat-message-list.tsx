@@ -4204,7 +4204,14 @@ function resolveCharacterAvatarAction(
     return null;
   }
 
-  return threadType === "direct" ? ("mobile-profile" as const) : null;
+  // 走查 R1：原版仅 threadType==="direct" 时才挂 mobile-profile，群聊里点
+  // 角色头像 → button 路径走不进 → fallback 到不可交互的 <AvatarChip>，移
+  // 动端群聊里完全没法点头像查资料。group-chat-details-page 的成员九宫格 R1
+  // 已经把死链补成跳 /character/$id，桌面群聊也走 desktop-popover 弹层有
+  // 反馈；唯独移动端群聊消息列表里头像还是哑的。补成 group / direct 同源
+  // mobile-profile，handleMobileCharacterAvatarClick 已经 buildCharacterProfileHash
+  // 带 returnPath 回得来。
+  return threadType ? ("mobile-profile" as const) : null;
 }
 
 function UnreadMarkerDivider({
