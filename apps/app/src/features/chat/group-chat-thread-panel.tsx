@@ -62,7 +62,7 @@ import { MobileChatThreadHeader } from "./mobile-chat-thread-header";
 import { useGroupBackground } from "./backgrounds/use-conversation-background";
 import { useScrollAnchor } from "../../hooks/use-scroll-anchor";
 import { getFriendDisplayName } from "../contacts/contact-utils";
-import { formatTimestamp, parseTimestamp } from "../../lib/format";
+import { formatTimestamp } from "../../lib/format";
 import { isPersistedGroupConversation } from "../../lib/conversation-route";
 import { isMissingGroupError } from "../../lib/group-route-fallback";
 import { isDesktopOnlyPath } from "../../lib/history-back";
@@ -754,15 +754,13 @@ export function GroupChatThreadPanel({
     },
   });
 
-  const orderedMessages = useMemo(
-    () =>
-      [...messages].sort(
-        (left, right) =>
-          (parseTimestamp(left.createdAt) ?? 0) -
-          (parseTimestamp(right.createdAt) ?? 0),
-      ),
-    [messages],
-  );
+  // 走查本会话 R1：`messages` 已经由 mergeGroupMessageWindow / upsertIncomingGroupMessage /
+  // replaceGroupLocalMessage / sortThreadMessages 全链路保证按 createdAt 升序——
+  // 这里再 [...messages].sort 一次纯属重复劳动：O(N log N) 比较 × 每次 2 个
+  // parseTimestamp 调用，200 条消息 × typing tick / socket echo / state mutation
+  // 触发的高频 re-render 是热点 CPU 浪费。直接复用 messages 引用，避免每次 render
+  // 还要新建一个 array 让下游 useMemo (renderableMessages / unreadMarkerMessageId)
+  // 全部跟着重算。
   const enqueueOutgoingGroupMessage = useCallback(
     (payload: SendGroupMessageRequest) => {
       const optimisticMessage = buildOptimisticGroupMessage({
@@ -825,7 +823,7 @@ export function GroupChatThreadPanel({
   );
   const renderableMessages = useMemo(
     () =>
-      orderedMessages.map((message) =>
+      messages.map((message) =>
         message.senderType === "character"
           ? {
               ...message,
@@ -836,19 +834,19 @@ export function GroupChatThreadPanel({
             }
           : message,
       ),
-    [orderedMessages, resolveCharacterDisplayName],
+    [messages, resolveCharacterDisplayName],
   );
-  const hasHighlightedMessage = orderedMessages.some(
+  const hasHighlightedMessage = messages.some(
     (message) => message.id === highlightedMessageId,
   );
   const unreadMarkerMessageId = useMemo(
     () =>
       findFirstUnreadMessageId(
-        orderedMessages,
+        messages,
         initialUnreadCutoff,
         initialUnreadCount > 0,
       ),
-    [initialUnreadCount, initialUnreadCutoff, orderedMessages],
+    [initialUnreadCount, initialUnreadCutoff, messages],
   );
   const sendError =
     sendMutation.error instanceof Error ? sendMutation.error.message : null;

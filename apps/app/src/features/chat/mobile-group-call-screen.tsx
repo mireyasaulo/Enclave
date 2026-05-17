@@ -185,10 +185,24 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
       routeState?.totalCount,
     ],
   );
-  const activeMembers = useMemo(
-    () => members.filter((member) => joinedMemberIds.includes(member.memberId)),
-    [joinedMemberIds, members],
-  );
+  // 走查本会话 R1：原版 activeMembers 算的是整张 filtered 数组，但下方只读
+  // .length 当 activeCount 用，从不消费数组。members.filter + includes 在每个
+  // joinedMemberIds 变化（用户点切换席位）或 members 变化（成员加入/移除）的
+  // re-render 上跑 O(N·M)；改成 Set 化 joinedMemberIds 后 reduce 计数，O(N+M)
+  // 一次，避免每次 re-render 都新建一个 throwaway array 喂 useMemo cache。
+  const activeCount = useMemo(() => {
+    if (!members.length || !joinedMemberIds.length) {
+      return 0;
+    }
+    const joinedSet = new Set(joinedMemberIds);
+    let count = 0;
+    for (const member of members) {
+      if (joinedSet.has(member.memberId)) {
+        count += 1;
+      }
+    }
+    return count;
+  }, [joinedMemberIds, members]);
   const visibleMembers = useMemo(() => members.slice(0, 10), [members]);
   // 走查 新 R1：原版直接在 JSX 里 `members.map(m=>m.memberId)` 喂 GroupAvatarChip，
   // 每次 render（成员加入/离开、syncCurrentStatus 1200ms timer 触发、activeCount
@@ -199,7 +213,6 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     () => members.map((member) => member.memberId),
     [members],
   );
-  const activeCount = activeMembers.length;
   const totalCount = members.length;
   const waitingCount = Math.max(totalCount - activeCount, 0);
   const groupName = groupQuery.data?.name ?? t(msg`群聊`);
