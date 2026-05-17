@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -100,7 +101,17 @@ export class MomentsController {
     // 走 sendFile.options.headers 而不是 response.setHeader：sendFile 失败（文件
     // 不存在抛 ENOENT → NestJS 全局 500）时**不会**带上 immutable Cache-Control，
     // 避免浏览器把错误响应永久缓存。
-    return response.sendFile(
+    //
+    // 走查 R3：sendFile 内部抛 ENOENT 会经 express 的 next(err) → NestJS 全局
+    // 异常通道，500 响应体 legacyMessage 会带上完整磁盘路径，比如：
+    //   "ENOENT: no such file or directory, stat
+    //    '/home/ps/claude/yinjie-app/data/accounts/91173587559732/moments-media/x.png'"
+    // 这条 legacyMessage 同时泄露 (a) 服务端绝对路径 (b) account/phone id
+    // (91173587559732 是用户登录手机号 hash)，对外暴露面太大。改回调形式接管
+    // err，匹配 ENOENT/EACCES 等"文件没找到/不可读"族直接抛 MOMENTS_MEDIA_NOT_FOUND
+    // (404，跟 normalizeMomentMediaFileName 抛同一条)，其它真异常照常 next 让
+    // 全局通道处理但 message 也要兜成不带路径的统一文案。
+    response.sendFile(
       this.momentsService.resolveMomentMediaFilePath(
         this.momentsService.normalizeMomentMediaFileName(fileName),
       ),
@@ -108,6 +119,24 @@ export class MomentsController {
         headers: {
           'Cache-Control': 'public, max-age=31536000, immutable',
         },
+      },
+      (err) => {
+        if (!err) return;
+        const code = (err as NodeJS.ErrnoException).code;
+        if (code === 'ENOENT' || code === 'EACCES' || code === 'EISDIR') {
+          // 跟 normalizeMomentMediaFileName 抛同一个 code/legacyMessage，前端
+          // 已有 i18n 映射，不需要新增字典项。
+          throw new AppError('MOMENTS_MEDIA_NOT_FOUND', {
+            status: HttpStatus.NOT_FOUND,
+            legacyMessage: '朋友圈媒体不存在。',
+          });
+        }
+        // 其它意外错误（权限、IO 异常）：吃掉原始 err.message（可能含路径），
+        // 抛一条不暴露内部细节的统一 500。
+        throw new AppError('MOMENTS_MEDIA_NOT_FOUND', {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          legacyMessage: '朋友圈媒体读取失败，请稍后重试。',
+        });
       },
     );
   }

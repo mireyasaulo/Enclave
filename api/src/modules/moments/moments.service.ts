@@ -147,6 +147,11 @@ type MomentAvatarContext = {
   ownerId: string;
   visibleCharacterIds: Set<string>;
   ownerFriendCharacterIds: Set<string>;
+  // 走查新 R1：朋友资料 → 朋友权限管理 → 「我不看 TA 的朋友圈」开关勾掉的
+  // characterId 集合。canOwnerViewPost 把 author 在这个集合里的 post 一并
+  // 隐掉。之前这个开关存到 friendship.momentsHiddenFromMe，但 moments 服务
+  // 完全没读它，UI toggle 等于 dead flag。
+  momentsHiddenFromMeCharacterIds: Set<string>;
   characterAvatarById: Map<string, string>;
   remarkMap: FriendRemarkMap;
 };
@@ -369,6 +374,7 @@ export class MomentsService implements OnModuleInit {
         post,
         avatarContext.visibleCharacterIds,
         avatarContext.ownerFriendCharacterIds,
+        avatarContext.momentsHiddenFromMeCharacterIds,
       ),
     );
 
@@ -412,6 +418,7 @@ export class MomentsService implements OnModuleInit {
         post,
         avatarContext.visibleCharacterIds,
         avatarContext.ownerFriendCharacterIds,
+        avatarContext.momentsHiddenFromMeCharacterIds,
       )
     )
       return null;
@@ -776,6 +783,19 @@ export class MomentsService implements OnModuleInit {
       });
     }
 
+    // 走查 R3：空文件直接通过。CDP 实测之前 size=0 的 .png 也能 200 落盘，
+    // 列表里再渲染时浏览器 decode 失败 → "破图"图标。前端 publish 路径不会
+    // 主动发 0 字节（pickImageFiles 拿到 File 也是 > 0 字节），但第三方
+    // curl / 移动端 picker 偶尔 cancel-after-select / SD 卡掉链能拿到空 File。
+    // 多一行兜底，让 422 在上传那一刻就拒掉，避免列表里展示挂掉的图。
+    // file.size 和 buffer.length 都校验：multer 在某些边界下两者不一致。
+    if (file.size <= 0 || !file.buffer || file.buffer.length === 0) {
+      throw new AppError('MOMENTS_MEDIA_REQUIRED', {
+        legacyMessage: '上传的朋友圈媒体为空，请重新选择。',
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+
     const displayName = normalizeMomentMediaDisplayName(
       file.originalname,
       isImage ? 'moment-image' : 'moment-video',
@@ -832,9 +852,12 @@ export class MomentsService implements OnModuleInit {
   normalizeMomentMediaFileName(fileName: string): string {
     const normalized = path.basename(fileName).trim();
     if (!normalized) {
+      // legacyMessage 是非 i18n 客户端 / 直接 curl 调用的兜底显示文案；本仓库其它
+      // 所有 MOMENTS_* 错误都用中文，单独这条用英文走的是「Moment media not found」
+      // 会跨 locale 漏出，跟项目"中文兜底 + 前端再翻译"的约定不一致。
       throw new AppError('MOMENTS_MEDIA_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Moment media not found',
+        legacyMessage: '朋友圈媒体不存在。',
       });
     }
 
@@ -1154,13 +1177,19 @@ export class MomentsService implements OnModuleInit {
     post: MomentPostEntity,
     visibleCharacterIds: Set<string>,
     ownerFriendCharacterIds?: Set<string>,
+    momentsHiddenFromMeCharacterIds?: Set<string>,
   ): boolean {
     if (post.authorType !== 'character') return true;
     if (!visibleCharacterIds.has(post.authorId)) return false;
     if (post.visibility === 'private') return false;
     // 朋友圈是「好友圈」语义：未加好友的角色无论是 public 还是 friends 都不在这里露出。
     // （想看所有角色的动态请去广场页面，那里走 feed.service 的查询，不受这个门控约束。）
-    return !!ownerFriendCharacterIds?.has(post.authorId);
+    if (!ownerFriendCharacterIds?.has(post.authorId)) return false;
+    // 走查新 R1：用户在朋友权限里关掉了"看 TA 的朋友圈"
+    // (friendship.momentsHiddenFromMe=true) 就完整把 TA 的 moment 过滤掉。
+    // 此前这个开关只存了 DB，没有任何路径会读，是个 dead UI。
+    if (momentsHiddenFromMeCharacterIds?.has(post.authorId)) return false;
+    return true;
   }
 
   private canOwnerInteractWithPost(
@@ -1181,24 +1210,40 @@ export class MomentsService implements OnModuleInit {
     postId: string,
   ): Promise<MomentPostEntity> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
-    const [visibleCharacterIds, ownerFriendCharacterIds] = await Promise.all([
+    const [
+      visibleCharacterIds,
+      ownerFriendCharacterIds,
+      momentsHiddenFromMeCharacterIds,
+    ] = await Promise.all([
       this.getVisibleCharacterIdSet(),
       this.characters.getActiveFriendCharacterIdSet(owner.id),
+      this.remarkResolver.getMomentsHiddenFromMeCharacterIds(owner.id),
     ]);
     const post = await this.postRepo.findOneBy({ id: postId });
     if (
       !post ||
-      !this.canOwnerViewPost(post, visibleCharacterIds, ownerFriendCharacterIds)
+      !this.canOwnerViewPost(
+        post,
+        visibleCharacterIds,
+        ownerFriendCharacterIds,
+        momentsHiddenFromMeCharacterIds,
+      )
     ) {
+      // 之前用 'Moment not found' 英文兜底，对齐 deleteOwnerPost 的中文兜底；
+      // 老/非 i18n 客户端拿到 curl message 不会再出英文文案，跟其它 MOMENTS_*
+      // 错误的中文风格一致。
       throw new AppError('MOMENTS_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Moment not found',
+        legacyMessage: '该朋友圈不存在或已被删除。',
       });
     }
     if (!this.canOwnerInteractWithPost(post, ownerFriendCharacterIds, owner.id)) {
+      // 补句末句号，跟同模块其它 legacyMessage（如「评论内容不能为空。」）的
+      // 标点风格对齐——前端 toast 拼接时不会出现「需先加为好友才能互动 朋友圈
+      // 互动已更新。」这种半句缺标点。
       throw new AppError('MOMENTS_NOT_FRIEND', {
         status: HttpStatus.FORBIDDEN,
-        legacyMessage: '需先加为好友才能互动',
+        legacyMessage: '需先加为好友才能互动。',
       });
     }
     return post;
@@ -1434,12 +1479,17 @@ export class MomentsService implements OnModuleInit {
             id: input.ownerId,
             avatar: input.ownerAvatar ?? '',
           };
-    const [visibleCharacters, ownerFriendCharacterIds, remarkMap] =
-      await Promise.all([
-        this.characters.findAllVisibleToOwner(owner.id),
-        this.characters.getActiveFriendCharacterIdSet(owner.id),
-        this.remarkResolver.getOwnerRemarkMap(owner.id),
-      ]);
+    const [
+      visibleCharacters,
+      ownerFriendCharacterIds,
+      remarkMap,
+      momentsHiddenFromMeCharacterIds,
+    ] = await Promise.all([
+      this.characters.findAllVisibleToOwner(owner.id),
+      this.characters.getActiveFriendCharacterIdSet(owner.id),
+      this.remarkResolver.getOwnerRemarkMap(owner.id),
+      this.remarkResolver.getMomentsHiddenFromMeCharacterIds(owner.id),
+    ]);
 
     let ownerUsername =
       input?.ownerUsername === undefined
@@ -1460,6 +1510,7 @@ export class MomentsService implements OnModuleInit {
         visibleCharacters.map((character) => character.id),
       ),
       ownerFriendCharacterIds,
+      momentsHiddenFromMeCharacterIds,
       characterAvatarById: new Map(
         visibleCharacters.map((character) => [character.id, character.avatar]),
       ),
@@ -1651,9 +1702,31 @@ export class MomentsService implements OnModuleInit {
     const location = input.location?.trim() || undefined;
     const media = this.normalizeMomentMediaInput(input.media);
     const inferredContentType = this.inferMomentContentType(media);
-    const contentType = this.normalizeMomentContentType(
-      input.contentType ?? inferredContentType,
-    );
+    // normalizeMomentContentType 把任何不识别的值（如 'image'、空串、拼错的
+    // 'video_clip' 等）静默压成 'text'。和 `?? inferredContentType` 顺序结合
+    // 后果是：客户端发 contentType='image' + 10 张图 → 压成 'text' →
+    // assertMomentMediaMatchesContentType 抛 MOMENTS_TEXT_NO_MEDIA「纯文本
+    // 朋友圈不能附带图片或视频」，错误指向完全反了，第三方/curl 调用者根本
+    // 调不出来。
+    // 走查 R2：input.contentType 给了但不在白名单里 → 当成"客户端没给"，
+    // 走 inferredContentType。前端官方 client 永远发的是 contract 里的合法值，
+    // 这个 fallback 只影响第三方 / 老 client / 拼写错误用例，行为更宽容。
+    // input.contentType 明确给 'text'（仍在白名单内）+ media>0 的检测路径
+    // 不受影响——normalize 那里就直接返回 'text'，下面 assertMatch 照样抛
+    // MOMENTS_TEXT_NO_MEDIA（合理：明确要求 text 却带媒体 = 客户端语义冲突）。
+    const KNOWN_TYPES: ReadonlySet<MomentContentType> = new Set([
+      'text',
+      'image_album',
+      'video',
+      'live_photo',
+      'audio_card',
+    ]);
+    const explicitContentType =
+      typeof input.contentType === 'string' &&
+      KNOWN_TYPES.has(input.contentType as MomentContentType)
+        ? (input.contentType as MomentContentType)
+        : undefined;
+    const contentType = explicitContentType ?? inferredContentType;
     const visibility = this.normalizeUserMomentVisibility(input.visibility);
 
     // 视觉为空（纯空白 / 纯 ZWS）且没附媒体 → 拒收。trim 后纯零宽字符在
