@@ -1371,9 +1371,13 @@ export class FeedService implements OnModuleInit {
     const comment = await this.commentRepo.findOneBy({ id: commentId });
 
     if (!comment) {
+      // 走查新一轮 R3：legacyMessage 之前是英文 "Comment not found"，移动端
+      // 点赞「查看全部」展开的评论时刚好被别端 / AI 删掉就会蹦出来，跟
+      // replyToComment 已经统一过的中文「评论不存在或已被删除。」不齐整，
+      // 用户视感是"突然冒一条不会说中文的错误"。对齐 replyToComment 文案。
       throw new AppError('FEED_COMMENT_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Comment not found',
+        legacyMessage: '评论不存在或已被删除。',
       });
     }
 

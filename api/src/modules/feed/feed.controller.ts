@@ -91,8 +91,15 @@ export class FeedController {
 
   @Post()
   createPost(
+    // 走查新一轮 R3：旧版 `body` 不带 `?`，curl / 第三方端发不带 body 的 POST
+    // 时（Content-Type 漏掉 / proxy 把 body strip 掉 / fetch 漏传 body），
+    // NestJS 把 body 透成 undefined → `body.text` 直接 TypeError 抛 500，
+    // legacyMessage "Cannot read properties of undefined (reading 'text')"
+    // 这条裸 JS 错飘到前端 InlineNotice，跟其他 AppError 风格不齐整且暴露栈。
+    // body 全链改成 `body?.X` 安全读，下游 normalizeCreatePostInput 已经按
+    // typeof 兜底（R2 fix），无效字段自然退化成空，让 FEED_EMPTY 400 走稳。
     @Body()
-    body: {
+    body?: {
       text?: string;
       title?: string;
       media?: MomentMediaAsset[];
@@ -105,16 +112,16 @@ export class FeedController {
       surface?: 'feed' | 'channels';
     },
   ) {
-    return this.feedService.createOwnerPost(body.text, {
-      title: body.title,
-      media: body.media,
-      mediaType: body.mediaType,
-      mediaUrl: body.mediaUrl,
-      coverUrl: body.coverUrl,
-      durationMs: body.durationMs,
-      aspectRatio: body.aspectRatio,
-      topicTags: body.topicTags,
-      surface: body.surface,
+    return this.feedService.createOwnerPost(body?.text, {
+      title: body?.title,
+      media: body?.media,
+      mediaType: body?.mediaType,
+      mediaUrl: body?.mediaUrl,
+      coverUrl: body?.coverUrl,
+      durationMs: body?.durationMs,
+      aspectRatio: body?.aspectRatio,
+      topicTags: body?.topicTags,
+      surface: body?.surface,
     });
   }
 
@@ -134,8 +141,13 @@ export class FeedController {
   }
 
   @Post(':id/comment')
-  addComment(@Param('id') postId: string, @Body() body: { text: string }) {
-    return this.feedService.addOwnerComment(postId, body.text);
+  addComment(
+    @Param('id') postId: string,
+    // R3：body 可能缺失（无 body / 异常 content-type），旧 body.text 抛 500。
+    // 缺失统一退化成 ""，下游 assertCommentText 走 FEED_COMMENT_EMPTY 400。
+    @Body() body?: { text?: string },
+  ) {
+    return this.feedService.addOwnerComment(postId, body?.text ?? '');
   }
 
   @Post(':id/like')
@@ -161,9 +173,11 @@ export class FeedController {
   @Post(':id/share')
   sharePost(
     @Param('id') postId: string,
-    @Body() body: { channel?: 'native' | 'copy' | 'system' | 'unknown' },
+    // R3：sharePost 无 body 时 `body.channel` 抛 500。channel 缺失时让 service
+    // 的白名单兜底走 'unknown'。
+    @Body() body?: { channel?: 'native' | 'copy' | 'system' | 'unknown' },
   ) {
-    return this.feedService.shareOwnerPost(postId, body.channel);
+    return this.feedService.shareOwnerPost(postId, body?.channel);
   }
 
   @Post(':id/forward-to-chat')
@@ -193,7 +207,12 @@ export class FeedController {
   }
 
   @Post('comments/:id/reply')
-  replyComment(@Param('id') commentId: string, @Body() body: { text: string }) {
-    return this.feedService.replyToComment(commentId, body.text);
+  replyComment(
+    @Param('id') commentId: string,
+    // R3：无 body → body.text 抛 500。缺失退化成 ""，service.assertCommentText
+    // 走 FEED_COMMENT_EMPTY 400 给用户友好提示。
+    @Body() body?: { text?: string },
+  ) {
+    return this.feedService.replyToComment(commentId, body?.text ?? '');
   }
 }
