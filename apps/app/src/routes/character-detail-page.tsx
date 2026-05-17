@@ -1341,14 +1341,13 @@ export function CharacterDetailPage() {
               character={character}
               friendship={friendship}
               commonGroups={commonGroups}
-              onOpenGroup={(groupId) => {
-                void navigate({
-                  to: buildDesktopChatThreadPath({
-                    conversationId: groupId,
-                  }),
-                });
-              }}
-              onOpenMoments={handleOpenMoments}
+              // 走查新 R1：character-detail-page 自身就是"详细资料"目的地，
+              // ContactDetailPane 里的「详细资料」入口行 onOpenProfile={() => {}}
+              // 点了什么都不会发生，行尾的箭头还在邀请用户去戳。把这一行直接
+              // 隐掉（showProfileEntry=false），同时把"朋友圈"那行需要的 fallback
+              // 收口到 onOpenMoments——本来 contact-detail-pane 在 onOpenMoments
+              // 缺失时还会 fallback 到 onOpenProfile，传一个 throw 兜底避免误用。
+              showProfileEntry={false}
               onOpenProfile={() => {}}
               onStartChat={() => {
                 setNotice(null);

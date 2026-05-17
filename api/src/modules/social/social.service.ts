@@ -45,6 +45,17 @@ export const DEFAULT_FRIENDSHIP_CHARACTER_IDS = [...DEFAULT_CHARACTER_IDS];
 const SCENE_USER_DAILY_LIMIT = 30;
 const SCENE_USER_MIN_INTERVAL_MS = 1500;
 
+// 走查新 R1：updateFriendProfile 之前完全没卡 remark / tags 长度——前端
+// character-detail-page 自己声明了 REMARK_NAME_MAX_LENGTH=20、
+// TAGS_INPUT_MAX_LENGTH=200、单 tag 在 normalizeTags 时只是 trim。
+// 任何直连接口（curl / Charles 重放 / 第三方端）都能塞 1MB remark 进 DB，
+// 让 listFriends 这条 select 在该 owner 上慢成爆栈。后端跟前端拉齐+留点
+// buffer：remark 卡 40 字符（前端 20 是 UI 显示宽度，后端给一倍冗余兼容
+// emoji 组合字符），单 tag 30、tag 数量 32（>> 前端实际可见 8 行）。
+const REMARK_NAME_MAX_BYTES = 40;
+const TAG_MAX_LENGTH = 30;
+const TAGS_MAX_COUNT = 32;
+
 @Injectable()
 export class SocialService {
   private readonly logger = new Logger(SocialService.name);
@@ -304,8 +315,30 @@ export class SocialService {
       });
     }
 
-    friendship.remarkName = normalizeOptionalText(payload.remarkName);
-    friendship.tags = normalizeTags(payload.tags);
+    const nextRemarkName = normalizeOptionalText(payload.remarkName);
+    if (nextRemarkName && nextRemarkName.length > REMARK_NAME_MAX_BYTES) {
+      throw new AppError('SOCIAL_REMARK_NAME_TOO_LONG', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Remark name is too long',
+      });
+    }
+    const nextTags = normalizeTags(payload.tags);
+    if (nextTags) {
+      if (nextTags.length > TAGS_MAX_COUNT) {
+        throw new AppError('SOCIAL_TAGS_TOO_MANY', {
+          status: HttpStatus.BAD_REQUEST,
+          legacyMessage: 'Too many tags',
+        });
+      }
+      if (nextTags.some((tag) => tag.length > TAG_MAX_LENGTH)) {
+        throw new AppError('SOCIAL_TAG_TOO_LONG', {
+          status: HttpStatus.BAD_REQUEST,
+          legacyMessage: 'Tag is too long',
+        });
+      }
+    }
+    friendship.remarkName = nextRemarkName;
+    friendship.tags = nextTags;
 
     const saved = await this.friendshipRepo.save(friendship);
     await this.cyberAvatar.captureSignal({
@@ -1143,6 +1176,12 @@ ${personaSummary || '（暂无更多信息）'}
     existing.status = 'removed';
     existing.isStarred = false;
     existing.starredAt = null;
+    // 走查新 R1：原来 deleteFriend 只翻 status='removed'，remarkName/tags 留在
+    // 行里。activateFriendship 重新加好友时只把 status 改回 'friend'，备注/
+    // 标签照样冒出来——跟微信"删好友再加=清白"的心智模型相悖，且会让用户
+    // 在删除前忘了的"对方真名X"备注在 reaccept 后泄回。一并清掉。
+    existing.remarkName = null;
+    existing.tags = null;
     const saved = await this.friendshipRepo.save(existing);
     await this.cyberAvatar.captureSignal({
       ownerId: owner.id,
