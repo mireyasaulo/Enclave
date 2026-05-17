@@ -1226,6 +1226,19 @@ ${personaSummary || '（暂无更多信息）'}
       chatOnly?: boolean;
     },
   ): Promise<FriendshipEntity> {
+    // 走查 R1：char-default-self（"我自己" 自我镜像）允许设置可见性 / 仅聊天
+    // 等权限毫无业务意义且会破坏自我对谈/自朋友圈链路（chatOnly 触发 feed 过滤、
+    // momentsHiddenFromMe 让自己看不到自己的朋友圈）。UI 已经在 add-friend search
+    // 和 management 朋友权限列表过滤掉 self，但端口本身没拦——客户端攻击 /
+    // 手工 curl 仍可以打。后端兜底拒绝，跟 blockCharacter / deleteFriend 自防
+    // 一致。
+    if (characterId === SELF_CHARACTER_ID) {
+      throw new AppError('SOCIAL_CANNOT_UPDATE_SELF_PERMISSIONS', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage:
+          'Cannot update permissions on self mirror character',
+      });
+    }
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const friendship = await this.friendshipRepo.findOneBy({
       ownerId: owner.id,
