@@ -1214,7 +1214,8 @@ function replaceBuildSetting(source, key, value) {
 }
 
 function ensureBuildSettingPresent(source, key, value) {
-  const pattern = new RegExp(`${key}\\s*=`);
+  // Round 2 同款：key 进 regex 必须 escape，否则点号 / 括号会被当通配符 → 误匹配。
+  const pattern = new RegExp(`${escapeForRegex(key)}\\s*=`);
   if (pattern.test(source)) {
     return replaceBuildSetting(source, key, value);
   }
