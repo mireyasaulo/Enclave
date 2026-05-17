@@ -131,7 +131,16 @@ export function ShareCardModal({
   const [saveError, setSaveError] = useState<string | null>(null);
 
   // QR 是模块级缓存的 promise，第一次生成、之后所有 modal 共享。失败时取 null。
+  // 新一轮走查 R2 (perf)：原本 deps=[] —— 父组件（FeedPostShareCardModal /
+  // MomentShareCardModal）无脑 mount ShareCardModal、传 cardKey={post?.id ??
+  // null}，cardKey 为 null 时整个 modal 走 L260 早返 null 不渲，但本 effect
+  // mount 时就 fire 一遍 → 触发 getQrDataUrl() → 第一次拉 lazy import 把
+  // qrcode (~70KB) 整个 chunk 拽下来。即使用户从来不点「生成分享图卡」按钮，
+  // 进 /discover/feed / /moments / /friend-moments / /profile 这些挂分享 modal
+  // 的页面首屏就吃掉这次网络。改成 gate 在 cardKey 上：用户真打开 modal 才
+  // 触发 QR 生成，qrPromise 模块级缓存仍保证同 session 内只拉一次。
   useEffect(() => {
+    if (!cardKey) return;
     let cancelled = false;
     getQrDataUrl().then((url) => {
       if (cancelled) return;
@@ -141,7 +150,7 @@ export function ShareCardModal({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [cardKey]);
 
   // 截图触发：每次换 cardKey 重做。等 QR 准备好（避免水印缺图）后再画。
   useEffect(() => {
