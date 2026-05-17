@@ -1626,6 +1626,21 @@ export function MomentsPage() {
       onAuthorTap={(moment) => {
         if (moment.authorType === "character") {
           openMobileFriendMoments(moment.authorId);
+          return;
+        }
+        // 走查 R1：自己发的 moment 在主朋友圈里 avatar+昵称仍按 link 色
+        // (WECHAT_LINK_COLOR) 渲染成可点击按钮，但 onAuthorTap 对
+        // authorType==="user" 静默 no-op —— 用户点自己的头像/名字一片死，
+        // 跟 onLikeAuthorTap 里"自己点自己 → /profile/moments"语义对齐：
+        // 点谁的名字看谁的朋友圈。authorId === ownerId 自检兜底，老
+        // multi-owner cache 残留时不至于把自己跳到别人的"我的朋友圈"
+        // （/profile/moments 对应 owner 视角，跨 owner 没有意义）。
+        if (
+          moment.authorType === "user" &&
+          ownerId &&
+          moment.authorId === ownerId
+        ) {
+          void navigate({ to: "/profile/moments" });
         }
       }}
       onLikeAuthorTap={(like) => {
