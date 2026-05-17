@@ -915,6 +915,25 @@ function MobileNoteEditor({
     void leaveEditor();
   }, [activeDraftId, editorState, isDirty, leaveEditor, noteId]);
 
+  // 走查 R3：requestClose 只在用户点应用左上 back / 硬件 Back 时被调用。
+  // 浏览器 back 按钮 / iOS WebView 边缘滑动返回 / 桌面浏览器 popstate 走的是
+  // 直接 history.back()，组件 unmount 前根本没调用 requestClose —— 空 draft
+  // 仍残留 LS，跟 R1 真因不同（那个是 reconnect 多创建），这个是 unmount 漏清。
+  // 用 ref 兜最新 (activeDraftId / editorState / noteId)，在真正 unmount 时
+  // 兜底清一次没保存的空 draft。已 saveMutation 成功的情况 noteId 已 set，
+  // 不会进 if；用户主动写了内容（非 empty）也不会进 if，安全。
+  const unmountCleanupStateRef = useRef({ activeDraftId, editorState, noteId });
+  unmountCleanupStateRef.current = { activeDraftId, editorState, noteId };
+  useEffect(() => {
+    return () => {
+      const { activeDraftId: id, editorState: state, noteId: nid } =
+        unmountCleanupStateRef.current;
+      if (!nid && id && isNoteContentEmpty(state)) {
+        clearDesktopNoteDraft(id);
+      }
+    };
+  }, []);
+
   // 走查 R1：Android 原生壳硬件 Back 之前完全不被这页拦截 —— 用户从 + 菜单进
   // 编辑器随便打了字按物理返回，history.back 直接走掉，dirty 内容静默丢失没
   // 任何提示；即使没编辑也漏掉 requestClose 里的空草稿清理（chat-list-page
