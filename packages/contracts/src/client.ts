@@ -84,7 +84,11 @@ import type {
   FarmDecorationPurchaseResult,
   FarmDogPurchaseResult,
   FarmEventView,
+  FarmGiftCoinsResult,
+  FarmGiftItemResult,
   FarmHarvestResult,
+  FarmLeaderboardType,
+  FarmLeaderboardView,
   FarmNeighborDetail,
   FarmNeighborSummary,
   FarmPlayerStateView,
@@ -3537,6 +3541,56 @@ export function removeFarmDecoration(
   );
 }
 
+export function getFarmLeaderboard(
+  options?: { type?: FarmLeaderboardType; limit?: number },
+  baseUrl?: string,
+) {
+  const params = new URLSearchParams();
+  if (options?.type) params.set("type", options.type);
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  return requestLegacyApi<FarmLeaderboardView>(
+    qs ? `/games/farm/leaderboard?${qs}` : "/games/farm/leaderboard",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function giftFarmCoins(
+  input: { characterId: string; amount: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmGiftCoinsResult>(
+    "/games/farm/gift-coins",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function giftFarmItem(
+  input: {
+    characterId: string;
+    itemKind: "crop" | "seed" | "consumable";
+    itemId: string;
+    quantity: number;
+  },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmGiftItemResult>(
+    "/games/farm/gift-item",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
 export function getFarmEvents(
   options?: { since?: string; limit?: number },
   baseUrl?: string,
@@ -4449,4 +4503,240 @@ export function rejectInviteRedemption(
   baseUrl?: string,
 ) {
   return rejectInviteRedemptionAdmin(id, payload, init, baseUrl);
+}
+
+// ============================================================
+// 抢车位 (parking-war) — see api/src/modules/games/parking-war/
+// ============================================================
+import type {
+  ParkingWarCarTier,
+  ParkingWarCollectResult,
+  ParkingWarDailyBonusResult,
+  ParkingWarEventView,
+  ParkingWarLeaderboardRow,
+  ParkingWarLotSurface,
+  ParkingWarNeighborDetail,
+  ParkingWarNeighborSummary,
+  ParkingWarPlayerStateView,
+  ParkingWarRarity,
+  ParkingWarRecallResult,
+  ParkingWarTicketResult,
+  ParkingWarTowResult,
+} from "./parking-war";
+
+const PW = "/games/parking-war";
+
+function postJsonParkingWar<T>(path: string, body: unknown, baseUrl?: string) {
+  return requestLegacyApi<T>(
+    path,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body ?? {}),
+    },
+    baseUrl,
+  );
+}
+
+export function getParkingWarState(baseUrl?: string) {
+  return requestLegacyApi<ParkingWarPlayerStateView>(
+    `${PW}/state`,
+    undefined,
+    baseUrl,
+  );
+}
+
+export function getParkingWarNeighbors(
+  options?: { limit?: number },
+  baseUrl?: string,
+) {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  return requestLegacyApi<ParkingWarNeighborSummary[]>(
+    qs ? `${PW}/neighbors?${qs}` : `${PW}/neighbors`,
+    undefined,
+    baseUrl,
+  );
+}
+
+export function getParkingWarNeighborDetail(
+  characterId: string,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<ParkingWarNeighborDetail>(
+    `${PW}/neighbors/${encodeURIComponent(characterId)}`,
+    undefined,
+    baseUrl,
+  );
+}
+
+export function getParkingWarEvents(
+  options?: { since?: string; limit?: number },
+  baseUrl?: string,
+) {
+  const params = new URLSearchParams();
+  if (options?.since) params.set("since", options.since);
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  return requestLegacyApi<ParkingWarEventView[]>(
+    qs ? `${PW}/events?${qs}` : `${PW}/events`,
+    undefined,
+    baseUrl,
+  );
+}
+
+export function getParkingWarLeaderboard(
+  options?: { scope?: "global" | "friends"; limit?: number },
+  baseUrl?: string,
+) {
+  const params = new URLSearchParams();
+  if (options?.scope) params.set("scope", options.scope);
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  return requestLegacyApi<ParkingWarLeaderboardRow[]>(
+    qs ? `${PW}/leaderboard?${qs}` : `${PW}/leaderboard`,
+    undefined,
+    baseUrl,
+  );
+}
+
+export function parkParkingWarCar(
+  input: { carId: string; slotIndex: number; characterId?: string },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarPlayerStateView>(
+    `${PW}/park`,
+    input,
+    baseUrl,
+  );
+}
+
+export function recallParkingWarCar(
+  input: { occupancyId: string },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarRecallResult>(
+    `${PW}/recall`,
+    input,
+    baseUrl,
+  );
+}
+
+export function collectParkingWarSlot(
+  input: { slotIndex?: number },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarCollectResult>(
+    `${PW}/collect`,
+    input,
+    baseUrl,
+  );
+}
+
+export function ticketParkingWarOccupancy(
+  input: { occupancyId: string },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarTicketResult>(
+    `${PW}/ticket`,
+    input,
+    baseUrl,
+  );
+}
+
+export function towParkingWarOccupancy(
+  input: { occupancyId: string },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarTowResult>(
+    `${PW}/tow`,
+    input,
+    baseUrl,
+  );
+}
+
+export function buyParkingWarCar(
+  input: { tier: ParkingWarCarTier; rarity: ParkingWarRarity },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarPlayerStateView>(
+    `${PW}/buy-car`,
+    input,
+    baseUrl,
+  );
+}
+
+export function upgradeParkingWarCar(
+  input: { carId: string },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarPlayerStateView>(
+    `${PW}/upgrade-car`,
+    input,
+    baseUrl,
+  );
+}
+
+export function paintParkingWarCar(
+  input: { carId: string; paintIndex: number },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarPlayerStateView>(
+    `${PW}/paint-car`,
+    input,
+    baseUrl,
+  );
+}
+
+export function repairParkingWarCar(
+  input: { carId: string },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarPlayerStateView>(
+    `${PW}/repair-car`,
+    input,
+    baseUrl,
+  );
+}
+
+export function upgradeParkingWarLot(
+  input: {
+    target: "size" | "surface";
+    value: number | ParkingWarLotSurface;
+  },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarPlayerStateView>(
+    `${PW}/upgrade-lot`,
+    input,
+    baseUrl,
+  );
+}
+
+export function upgradeParkingWarGarage(baseUrl?: string) {
+  return postJsonParkingWar<ParkingWarPlayerStateView>(
+    `${PW}/upgrade-garage`,
+    {},
+    baseUrl,
+  );
+}
+
+export function claimParkingWarDailyBonus(baseUrl?: string) {
+  return postJsonParkingWar<ParkingWarDailyBonusResult>(
+    `${PW}/daily-bonus`,
+    {},
+    baseUrl,
+  );
+}
+
+export function claimParkingWarDailyTask(
+  input: { taskId: string },
+  baseUrl?: string,
+) {
+  return postJsonParkingWar<ParkingWarPlayerStateView>(
+    `${PW}/daily-task/claim`,
+    input,
+    baseUrl,
+  );
 }

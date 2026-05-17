@@ -180,6 +180,45 @@ export interface FarmDecorationPlaceResult {
   placement: FarmDecorationPlacement;
 }
 
+export type FarmLeaderboardType = "level" | "harvest" | "coins";
+
+export interface FarmLeaderboardEntry {
+  rank: number;
+  isOwner: boolean;
+  characterId: string | null;
+  name: string;
+  avatar: string | null;
+  level: number;
+  totalHarvested: number;
+  coins: number;
+  intimacyLevel?: number | null;
+}
+
+export interface FarmLeaderboardView {
+  type: FarmLeaderboardType;
+  generatedAt: string;
+  entries: FarmLeaderboardEntry[];
+  ownerRank: number;
+}
+
+export interface FarmGiftCoinsResult {
+  player: FarmPlayerStateView;
+  target: FarmNeighborSummary;
+  coinsGifted: number;
+  intimacyDelta: number;
+}
+
+export interface FarmGiftItemResult {
+  player: FarmPlayerStateView;
+  target: FarmNeighborSummary;
+  itemKind: "crop" | "seed" | "consumable";
+  itemId: string;
+  quantity: number;
+  intimacyDelta: number;
+}
+
+export const FARM_GIFT_DAILY_LIMIT_COINS = 2000;
+
 export interface FarmDogPurchaseResult {
   player: FarmPlayerStateView;
   dog: FarmDogState;
