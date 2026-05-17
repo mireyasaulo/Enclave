@@ -36,7 +36,7 @@ import {
 } from "../features/chat/mobile-group-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isMissingGroupError } from "../lib/group-route-fallback";
-import { isDesktopOnlyPath } from "../lib/history-back";
+import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 type GroupMemberPickerMode = "add" | "remove";
@@ -506,7 +506,17 @@ function MobileGroupMemberPickerPage({
             variant="ghost"
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-primary)]"
-            onClick={openGroupDetails}
+            onClick={() => {
+              // R1 走查：原本直接 navigate({to: details}) push 一条新 history
+              // 项，用户 [details → members/add → 点返回] 后浏览器后退会落回
+              // members/add 死循环。和姊妹页 announcement/edit/background/search
+              // 同口径用 navigateBackOrFallback：能 history.back() 就 back，安全
+              // 兜不住时再走 fresh navigate 到 details。
+              navigateBackOrFallback(
+                openGroupDetails,
+                `/group/${groupId}/details`,
+              );
+            }}
             aria-label={t(msg`返回`)}
           >
             <ArrowLeft size={18} />
