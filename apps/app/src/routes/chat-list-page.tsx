@@ -773,15 +773,24 @@ function MobileChatListPage() {
         return;
       }
 
+      // 走查 R4：unmount 兜底落库 pending hide。.finally 不接 rejection——
+       // 公网隧道超时 / cloud token 过期 / 服务端 5xx 时 hideGroup/hideConversation
+       // 抛错 → 落 unhandledrejection 污染 telemetry。这条路径在用户离开 tab
+       // 时跑，没地方挂 UI 提示，加 .catch 静默吞掉就好；下次进消息列表
+       // invalidate 一定会重拉 conversations，列表上看不到这条聊天意味着实际
+       // 没被 hide，对用户来说就是"没生效，可以再划一次"，比让 console / 远
+       // 程 telemetry 多一条 unhandled error 更合适。
       void (
         pending.isGroup
           ? hideGroup(pending.conversationId, baseUrl)
           : hideConversation(pending.conversationId, baseUrl)
-      ).finally(() => {
-        void queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
+      )
+        .catch(() => {})
+        .finally(() => {
+          void queryClient.invalidateQueries({
+            queryKey: ["app-conversations", baseUrl],
+          });
         });
-      });
     };
   }, [baseUrl, queryClient]);
 
