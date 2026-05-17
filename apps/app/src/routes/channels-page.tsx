@@ -929,9 +929,12 @@ export function ChannelsPage() {
     queryKey: ["app-feed-comments", baseUrl, mobileCommentSheetPostId],
     queryFn: () => listFeedComments(mobileCommentSheetPostId!, baseUrl),
     enabled: Boolean(mobileCommentSheetPostId),
+    // 走查 R3（本轮）：兜底用稳定 EMPTY_COMMENT_PREVIEW，避免每帧新 [] 让
+    // mobileCommentsQuery.data 在真数据到位前每次 render 都换 identity，
+    // 进而把 MobileChannelCommentsSheet 里 commentsListNode 的 useMemo 也带飞。
     placeholderData: mobileCommentSheetPostId
       ? getCommentsPreview(mobileCommentSheetPostId)
-      : [],
+      : EMPTY_COMMENT_PREVIEW,
   });
   const desktopCommentsQuery = useQuery({
     queryKey: ["app-feed-comments", baseUrl, desktopSelectedPostId],
@@ -939,7 +942,7 @@ export function ChannelsPage() {
     enabled: Boolean(isDesktopLayout && desktopSelectedPostId),
     placeholderData: desktopSelectedPostId
       ? getCommentsPreview(desktopSelectedPostId)
-      : [],
+      : EMPTY_COMMENT_PREVIEW,
   });
   const desktopAuthorProfileQuery = useQuery({
     queryKey: ["app-channel-author", baseUrl, syncedRouteSelectedAuthorId],
@@ -1563,7 +1566,7 @@ export function ChannelsPage() {
           }}
           onRefresh={() => generateMutation.mutate()}
           refreshPending={generateMutation.isPending}
-          comments={desktopCommentsQuery.data ?? []}
+          comments={desktopCommentsQuery.data ?? EMPTY_COMMENT_PREVIEW}
           commentsErrorMessage={desktopCommentPanelErrorMessage}
           commentsLoading={desktopCommentsQuery.isLoading}
           commentReplyTarget={desktopReplyTarget}
@@ -1831,7 +1834,7 @@ export function ChannelsPage() {
         ) : null}
       </div>
       <MobileChannelCommentsSheet
-        comments={mobileCommentsQuery.data ?? []}
+        comments={mobileCommentsQuery.data ?? EMPTY_COMMENT_PREVIEW}
         commentsArePlaceholder={mobileCommentsQuery.isPlaceholderData}
         draft={
           mobileCommentSheetPost
