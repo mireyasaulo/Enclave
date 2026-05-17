@@ -22,6 +22,7 @@ import { ChatDetailsSection } from "../features/chat-details/chat-details-sectio
 import { ChatMemberGrid } from "../features/chat-details/chat-member-grid";
 import { ChatSettingRow } from "../features/chat-details/chat-setting-row";
 import { MobileDetailsActionSheet } from "../features/chat-details/mobile-details-action-sheet";
+import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { DesktopChatRouteRedirectShell } from "../features/chat/chat-route-redirect-shell";
 import {
   buildMobileGroupRouteHash,
@@ -518,6 +519,24 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
         key: member.id,
         label: member.memberName ?? member.memberId,
         src: member.memberAvatar,
+        // 点群成员头像：character → 打开角色资料页；自己（user 类型 owner）
+        // 不挂 onClick 走 ChatMemberGrid 的 button 默认 no-op，避免 deadlink
+        // 跳到 /character/owner-uuid（不是角色）报 404。桌面端
+        // desktop-chat-details-panel.tsx 已经按 memberType 分支处理过，
+        // 移动端原本完全没挂 onClick 整个 grid 哑掉。
+        onClick:
+          member.memberType === "character"
+            ? () => {
+                void navigate({
+                  to: "/character/$characterId",
+                  params: { characterId: member.memberId },
+                  hash: buildCharacterDetailRouteHash({
+                    returnPath: `/group/${groupId}/details`,
+                    returnHash: groupRouteHash,
+                  }),
+                });
+              }
+            : undefined,
       })),
       {
         key: "add",
