@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   BookText,
   Camera,
@@ -24,7 +24,6 @@ import {
   clearCloudRuntimeSession,
   shouldShowCloudAccountControls,
 } from "../lib/cloud-session";
-import { normalizePathname } from "../lib/normalize-pathname";
 import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../store/cloud-session-store";
@@ -34,15 +33,6 @@ export function ProfilePage() {
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const isDesktopLayout = useDesktopLayout();
-  const pathname = useRouterState({
-    select: (state) => state.location.pathname,
-  });
-  const search = useRouterState({
-    select: (state) => state.location.searchStr,
-  });
-  const hash = useRouterState({
-    select: (state) => state.location.hash,
-  });
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   // 退出登录 confirm dialog 打开时 Back 键只关 dialog，不让默认 chain
@@ -64,10 +54,6 @@ export function ProfilePage() {
   const cloudAccessToken = useCloudSessionStore((state) => state.accessToken);
   const cloudPhone = useCloudSessionStore((state) => state.phone);
   const runtimeConfig = useAppRuntimeConfig();
-  const desktopProfilePath = "/tabs/profile";
-  const normalizedPathname = normalizePathname(pathname);
-  const desktopPathMismatch =
-    isDesktopLayout && normalizedPathname !== desktopProfilePath;
   const settingsPath = isDesktopLayout
     ? "/desktop/settings"
     : "/profile/settings";
@@ -82,30 +68,17 @@ export function ProfilePage() {
       worldOwnerId: ownerId,
     });
 
+  // 走查 R1：本组件挂在 path="/tabs/profile" 上，desktopProfilePath 跟当前路由
+  // 是同一条。原本 useRouterState 订阅 pathname/search/hash 配合 desktopPathMismatch
+  // 判 "isDesktopLayout && 路径不是 /tabs/profile" 然后跳回同样的 /tabs/profile —
+  // 但 isDesktopLayout=true 时上面分支已经 navigate(/desktop/settings) + 早 return
+  // null 了，第二支永远跑不到。三个 useRouterState 等于让组件订阅整个 router
+  // location，路由每变都白 re-render 一次，删掉省一份订阅成本。
   useEffect(() => {
     if (isDesktopLayout) {
       void navigate({ to: "/desktop/settings", replace: true });
-      return;
     }
-
-    if (!desktopPathMismatch) {
-      return;
-    }
-
-    void navigate({
-      to: desktopProfilePath,
-      search: search || undefined,
-      hash: hash || undefined,
-      replace: true,
-    });
-  }, [
-    desktopPathMismatch,
-    desktopProfilePath,
-    hash,
-    isDesktopLayout,
-    navigate,
-    search,
-  ]);
+  }, [isDesktopLayout, navigate]);
 
   if (isDesktopLayout) {
     return null;
