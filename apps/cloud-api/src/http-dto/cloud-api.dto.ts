@@ -521,13 +521,15 @@ export class UpsertCloudConfigDto {
 }
 
 export class ListInviteRedemptionsDto {
-  @Transform(trimString)
+  @Transform(trimStringOptional)
   @IsOptional()
   @IsString({ message: "query 必须是字符串。" })
   @MaxLength(255, { message: "query 不能超过 255 个字符。" })
   query?: string;
 
-  @Transform(trimString)
+  // admin UI 清空状态下拉时常发 ?status=，trimStringOptional 把空串归一成
+  // undefined，@IsOptional 才能放行；否则 @IsIn 会卡空串 400。
+  @Transform(trimStringOptional)
   @IsOptional()
   @IsIn(INVITE_REDEMPTION_STATUSES, { message: "status 不合法。" })
   status?: (typeof INVITE_REDEMPTION_STATUSES)[number];

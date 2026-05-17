@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate } from "@tanstack/react-router";
@@ -41,6 +41,18 @@ export function MobileDocumentShell({
     actionLabel?: string;
     onAction?: () => void;
   } | null>(null);
+
+  // 走查 R2：success notice 之前没有自动消失，「已打开系统分享面板。」/
+  // 「文档摘要已复制。」一旦出现就钉在页面上直到下次 setNotice 才换。其它
+  // profile/me 子页（profile-info-page 的复制 toast / mobile-favorites-page
+  // 的 setNotice）都做 1.6~2.4s 自动消失，这里跟齐。
+  // info（失败 + 重试按钮）一支挂着不动是有意的，用户需要点击 actionLabel 重试 /
+  // 「返回上一页」自行收掉；不参与自动消失。
+  useEffect(() => {
+    if (!notice || notice.tone !== "success") return;
+    const timer = window.setTimeout(() => setNotice(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
 
   async function handleShareDocument() {
     const documentPath =
