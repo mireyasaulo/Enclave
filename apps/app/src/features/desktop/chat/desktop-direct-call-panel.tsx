@@ -118,6 +118,9 @@ export function DesktopDirectCallPanel({
       cameraEnabled,
   });
   const isVideoMode = kind === "video";
+  // 走查 R2：systemStatus 在视频通话面板开启时拉一次判断 digital human gateway
+  // 是否可用，5-10s 内开关同一面板不必再拉。retry=false 故意保留——网关挂掉
+  // 时这条请求自身会立刻 fail，没必要再重试。
   const systemStatusQuery = useQuery({
     queryKey: ["desktop-direct-call-system-status", runtimeConfig.apiBaseUrl],
     queryFn: () => getSystemStatus(runtimeConfig.apiBaseUrl),
@@ -126,15 +129,21 @@ export function DesktopDirectCallPanel({
       kind === "video" &&
       Boolean(conversationId),
     retry: false,
+    staleTime: 30_000,
   });
+  // 走查 R2：原先用独立 cache key ["desktop-direct-call-character", ...]，
+  // 跟 desktop-chat-details-panel / desktop-message-avatar-popover / chat-list 等
+  // 十几处共用的 ["app-character", baseUrl, characterId] 两份独立 cache。
+  // 单聊里用户点视频/语音通话之前，必然刚在聊天/详情侧栏看过对方资料，
+  // app-character cache 是热的，但通话面板这条用独立 key 还要再发一次相同
+  // 的 getCharacter 请求（公网隧道 ~600ms 卡顿）。统一到 app-character +
+  // 15s staleTime 复用主缓存。同 chat-message-list 走查关于 forward-dialog
+  // 共享 app-conversations / contact-card R10 同款修法。
   const characterQuery = useQuery({
-    queryKey: [
-      "desktop-direct-call-character",
-      runtimeConfig.apiBaseUrl,
-      characterId,
-    ],
+    queryKey: ["app-character", runtimeConfig.apiBaseUrl, characterId],
     queryFn: () => getCharacter(characterId ?? "", runtimeConfig.apiBaseUrl),
     enabled: Boolean(characterId),
+    staleTime: 15_000,
   });
   const activeCall = isVideoMode ? digitalHumanCall : voiceCall;
   const speech = activeCall.speech;
