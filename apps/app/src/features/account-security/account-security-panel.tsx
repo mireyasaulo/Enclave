@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -70,6 +70,11 @@ export function AccountSecurityPanel() {
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // useMutation.isPending 翻 true 是异步的，连续两/三连击之间还没 propagate，
+  // sendCodeMutation.mutate() 同步会再触发请求——手快的用户点 3 下就真打到
+  // cloud-api 3 条 /password/send-change-code，再被服务端 429 退回，体验差且
+  // 浪费配额。用 ref 做同步守卫，settled 时复位。
+  const sendInFlightRef = useRef(false);
   const [feedback, setFeedback] = useState<{
     tone: "success" | "danger";
     message: string;
@@ -288,7 +293,12 @@ export function AccountSecurityPanel() {
                   // onChange 再 strip 字母变成 "123"——用户复制了 7 位有效数字结果
                   // 只剩 3 位，根本不知道发生了什么。改成 onChange 内一次性 strip
                   // 非数字 + slice 6，由 React 控制最终 value，maxLength 不需要。
+                  // 新一轮走查 R1：先走 NFKC 把全角数字（U+FF10-FF19）、全角空格、
+                  // 罗马数字等折算成半角，否则 `/\D+/g` 会把全角 "１２３４５６" 当
+                  // 非数字全 strip 成空。日韩用户邮件客户端在 IME 自动转换下复制
+                  // OTP 进来就是全角，原本 6 位有效输入直接被吞光。
                   const next = event.target.value
+                    .normalize("NFKC")
                     .replace(/\D+/g, "")
                     .slice(0, 6);
                   setCode(next);
@@ -300,7 +310,15 @@ export function AccountSecurityPanel() {
               />
             </div>
             <Button
-              onClick={() => sendCodeMutation.mutate()}
+              onClick={() => {
+                if (sendInFlightRef.current) return;
+                sendInFlightRef.current = true;
+                sendCodeMutation.mutate(undefined, {
+                  onSettled: () => {
+                    sendInFlightRef.current = false;
+                  },
+                });
+              }}
               disabled={
                 sendCodeMutation.isPending ||
                 resendCountdown > 0 ||
