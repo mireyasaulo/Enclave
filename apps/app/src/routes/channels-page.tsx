@@ -1637,7 +1637,23 @@ export function ChannelsPage() {
         }
         rightActions={
           <Button
-            onClick={() => generateMutation.mutate()}
+            onClick={() => {
+              // 走查 R2 新一轮：generateChannelPost 走 characters.findAllVisibleToOwner
+              // 随机角色出一条 audio，永远落到「推荐」流——不会自动产生关注 / 朋友的
+              // 视频号 / 直播。原顶部「换一批」按钮在 朋友 / 关注 / 直播 tab 上一样能
+              // 点，notice 提示「新视频号正在生成中，几分钟后刷新看看」，但用户回这些
+              // tab 永远看不到那条新 audio（不在筛选集合里），refresh 后仍是空态或者
+              // 老的几条，体感「换一批没用」。empty state 的「去推荐看看」按钮已经按
+              // 同款逻辑切到 recommended 再 generate，顶部按钮跟它对齐。
+              if (
+                activeSection === "following" ||
+                activeSection === "friends" ||
+                activeSection === "live"
+              ) {
+                handleSectionChange("recommended");
+              }
+              generateMutation.mutate();
+            }}
             variant="ghost"
             size="sm"
             className="h-8 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3.5 text-[12px] font-medium text-[color:var(--text-primary)] hover:bg-white"
