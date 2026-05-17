@@ -119,9 +119,13 @@ export function StickerPanel({
   const deleteTransitionTimerRefs = useRef(new Map<string, number>());
   const collapsingStickerKeysRef = useRef(new Set<string>());
   const queryClient = useQueryClient();
+  // 走查 R5：表情面板每次打开都重 mount → 重发 getStickerCatalog。但内置表情
+  // 包和自定义表情都是低频变更（用户管理表情时主动 invalidate 同 key）。
+  // 60s staleTime 让连点表情按钮重开面板的场景不再额外发 RTT。
   const stickerCatalogQuery = useQuery({
     queryKey: [PANEL_QUERY_KEY, baseUrl],
     queryFn: () => getStickerCatalog(baseUrl),
+    staleTime: 60_000,
   });
   const catalog = stickerCatalogQuery.data ?? {
     builtinPacks: STICKER_PACKS,
