@@ -3827,9 +3827,18 @@ function MobileChannelCommentsSheet({
               })()}
             </div>
           </div>
+          {/*
+            走查 2026-05-17 R1（新一轮）：原来 sheet 右上角这颗 X 关闭按钮 *只*
+            渲染一个 X 图标，没 aria-label / 没文字 label。VoiceOver / TalkBack
+            读到这颗按钮只会念 "button"，盲用用户没法判断它做什么。背景 backdrop
+            button 已经带 aria-label="关闭评论面板"，但盲用用户多半 swipe 在 sheet
+            内部，先扫到的就是这颗带 X 的按钮——没语义就只能跳过 / 退出整页。
+            visually 用户看图标即可识别，加 aria-label 无副作用。
+          */}
           <button
             type="button"
             onClick={onClose}
+            aria-label={t(msg`关闭评论面板`)}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#6b7280] transition active:bg-[color:var(--surface-card-hover)]"
           >
             <X size={15} />
