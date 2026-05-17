@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
@@ -17,6 +17,7 @@ import {
   UserRound,
   Volume2,
 } from "lucide-react";
+import { registerAndroidBackInterceptor } from "../../runtime/android-back-button";
 
 const t = translateRuntimeMessage;
 
@@ -112,6 +113,22 @@ export function GroupMessageContextMenu({
     Math.max(VIEWPORT_PADDING, y),
     Math.max(VIEWPORT_PADDING, viewportHeight - menuHeight - VIEWPORT_PADDING),
   );
+
+  // 走查新一轮 R1：长按消息冒出的这个上下文菜单是用 `contextMenuState ? <Menu .../>
+  // : null` 条件挂载的（chat-message-list 内）——挂上后没注册 Android 硬件 Back
+  // 拦截。Android 用户长按消息 → 菜单弹出 → 按 BACK 不是关菜单而是触发 webview
+  // history.back 把人从群聊页弹回 chat-list；菜单 backdrop 同时被销毁，看着就
+  // 是"按一次返回直接被弹出聊天页"。和 mobile-mention-picker-sheet /
+  // mobile-message-action-sheet / message-quote-selection-sheet 同口径，挂载
+  // 期间拦 BACK 改派给 onClose。
+  useEffect(() => {
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
+    return unregister;
+  }, [onClose]);
 
   return (
     <div

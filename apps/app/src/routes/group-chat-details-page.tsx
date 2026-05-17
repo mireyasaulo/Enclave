@@ -36,7 +36,7 @@ import { buildPublicShareUrl } from "../lib/share-url";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { translateRuntimeMessage, useAppLocale } from "@yinjie/i18n";
 
 export function GroupChatDetailsPage() {
   const { groupId } = useParams({ from: "/group/$groupId/details" });
@@ -60,6 +60,13 @@ export function GroupChatDetailsPage() {
 
 function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
   const t = translateRuntimeMessage;
+  // 走查新一轮 R1：本文件 t = translateRuntimeMessage 是模块级 stable ref，
+  // 下方 groupSummary useMemo 把 t 列进 deps 但 locale 切换时 t 引用不变 →
+  // 用户切语言后，分享出去的标题/正文仍是切换前的旧 locale（实测 zh→en 切换
+  // 后点"分享群聊"，复制出来的还是中文"XX 群聊 / N 人群聊"）。和本文件 R3
+  // 修过的 addMemberLabel/removeMemberLabel 提到外面同口径——把 locale 拉进
+  // useMemo deps，让 share summary 跟随当前语言重算。
+  const { locale } = useAppLocale();
   const navigate = useNavigate();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const queryClient = useQueryClient();
@@ -435,7 +442,9 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
       ].join("\n"),
       url: groupUrl,
     };
-  }, [groupId, groupQuery.data, t, totalMemberCount]);
+    // locale 进 deps — t 是 stable ref，单独依赖 t 无法在切语言时触发重算。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, groupQuery.data, locale, totalMemberCount]);
 
   async function handleShareGroup() {
     if (!groupSummary) {
