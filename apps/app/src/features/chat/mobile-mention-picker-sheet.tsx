@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AvatarChip } from "../../components/avatar-chip";
@@ -28,6 +28,7 @@ export function MobileMentionPickerSheet({
   onClose,
   onSelect,
 }: MobileMentionPickerSheetProps) {
+  const headingId = useId();
   // 原生壳硬件 Back 键：sheet 打开时优先关 sheet，不让 BACK 同时 history.back
   // 把用户从群聊页带回 chat list。和 mobile-message-action-sheet.tsx 对齐。
   useEffect(() => {
@@ -51,10 +52,21 @@ export function MobileMentionPickerSheet({
       <button
         type="button"
         className="absolute inset-0"
-        aria-label={t(msg`关闭选择提醒成员面板`)}
+        // 走查新一轮 R3：原文案"关闭选择提醒成员面板"和下方标题"选择要提醒的人"
+        // 不一致——盲人用户先听到 backdrop 的"选择提醒成员"，进 sheet 又听"要
+        // 提醒的人"，两个用词指向同一动作但语感冲突。统一成"提醒群成员"。
+        aria-label={t(msg`关闭提醒群成员面板`)}
         onClick={onClose}
       />
+      {/* 走查新一轮 R3：和 mobile-details-action-sheet R(re)1 / mobile-message-
+          action-sheet 新一轮 R2 同款 a11y 问题——没挂 role="dialog" + aria-modal
+          + aria-labelledby，VoiceOver/TalkBack 把这条 bottom sheet 当普通滚动
+          列表念，盲人群聊里打 @ 后听不到"提醒群成员 / 选择要提醒的人"提示，
+          直接念到第一个候选。补 dialog 语义 + headingId 关联。*/}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
         className="absolute inset-x-0 overflow-hidden rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]"
         style={{ bottom: keyboardInset > 0 ? `${keyboardInset}px` : 0 }}
       >
@@ -65,7 +77,10 @@ export function MobileMentionPickerSheet({
           <div className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--text-dim)]">
             {t(msg`群成员`)}
           </div>
-          <div className="mt-1 text-[13px] font-medium text-[#111827]">
+          <div
+            id={headingId}
+            className="mt-1 text-[13px] font-medium text-[#111827]"
+          >
             {t(msg`选择要提醒的人`)}
           </div>
         </div>
