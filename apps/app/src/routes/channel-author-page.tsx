@@ -162,12 +162,24 @@ export function ChannelAuthorPage() {
       });
       // onMutate 已经翻了 isFollowing；这里 profileQuery.data.isFollowing 是
       // optimistic 后的最新值，所以文案分支需要对调（true 表示刚刚关注成功）。
+      //
+      // 新一轮走查 R3：原来只 invalidate home 主接口，没动 decorations。home
+      // 的 4 个 tab 计数（推荐/朋友/关注/直播）来源是 decorations.sections.count，
+      // 而 关注 tab 数 = sectionCounts.following = followedAuthorIds 命中数。
+      // 在作者页点 +关注 / 已关注 → server 端 follow 表加/减一行 → 用户回到
+      // home 时关注 tab 数应该 +1 / -1，但因为这条链路没碰 decorations，那个
+      // 数字一直保持作者页点之前的旧值，直到用户切个 tab 触发重新进 home。
+      // channels-page 自己的 followMutation 早就把这两个都 invalidate 了（line 652-654），
+      // 这里跟它对齐。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-channel-author", baseUrl, authorId],
         }),
         queryClient.invalidateQueries({
           queryKey: ["app-channels-home", baseUrl],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-channels-home-decorations", baseUrl],
         }),
       ]);
     },
