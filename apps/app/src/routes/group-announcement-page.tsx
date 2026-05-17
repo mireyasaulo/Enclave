@@ -15,7 +15,7 @@ import {
 } from "../features/chat/mobile-group-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isMissingGroupError } from "../lib/group-route-fallback";
-import { isDesktopOnlyPath } from "../lib/history-back";
+import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { buildPublicShareUrl } from "../lib/share-url";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
@@ -299,11 +299,22 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
       title={t(msg`群公告`)}
       subtitle={groupQuery.data?.name ?? t(msg`群聊信息`)}
       onBack={() => {
-        void navigate({
-          to: "/group/$groupId/details",
-          params: { groupId },
-          ...(currentRouteHash ? { hash: currentRouteHash } : {}),
-        });
+        // 走查 R1：原版直接 navigate({to: details}) 会 push 一条新 history 项，
+        // 用户 [details → announcement → 点返回] 后 history 变成
+        // [details, announcement, details]，再按浏览器后退又落回 announcement
+        // 死循环。和 group-chat-background-page 已实施的方案对齐，用
+        // navigateBackOrFallback：能 history.back() 就 back，安全兜不住时
+        // (deep link / 跨域跳入) 才 fresh navigate。
+        navigateBackOrFallback(
+          () => {
+            void navigate({
+              to: "/group/$groupId/details",
+              params: { groupId },
+              ...(currentRouteHash ? { hash: currentRouteHash } : {}),
+            });
+          },
+          `/group/${groupId}/details`,
+        );
       }}
       rightActions={
         groupQuery.data ? (

@@ -12,7 +12,7 @@ import {
 import { DesktopChatRouteRedirectShell } from "../features/chat/chat-route-redirect-shell";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isMissingGroupError } from "../lib/group-route-fallback";
-import { isDesktopOnlyPath } from "../lib/history-back";
+import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 export function GroupMessageSearchPage() {
@@ -111,11 +111,19 @@ function MobileGroupMessageSearchPage({ groupId }: { groupId: string }) {
         void messagesQuery.refetch();
       }}
       onBack={() => {
-        void navigate({
-          to: "/group/$groupId/details",
-          params: { groupId },
-          ...(searchRouteHash ? { hash: searchRouteHash } : {}),
-        });
+        // 走查 R1：原版直接 navigate push 新 history 项，用户 [details →
+        // search → 点返回] 后浏览器后退会落回 search 死循环。和 background
+        // 页同口径用 navigateBackOrFallback。
+        navigateBackOrFallback(
+          () => {
+            void navigate({
+              to: "/group/$groupId/details",
+              params: { groupId },
+              ...(searchRouteHash ? { hash: searchRouteHash } : {}),
+            });
+          },
+          `/group/${groupId}/details`,
+        );
       }}
       onOpenMessage={(messageId) => {
         void navigate({

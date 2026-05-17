@@ -19,7 +19,7 @@ import {
 } from "../features/chat/mobile-group-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isMissingGroupError } from "../lib/group-route-fallback";
-import { isDesktopOnlyPath } from "../lib/history-back";
+import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const t = translateRuntimeMessage;
@@ -275,7 +275,13 @@ function MobileGroupChatEditPage({
     <ChatDetailsShell
       title={mode === "name" ? t(msg`群聊名称`) : t(msg`我在本群的昵称`)}
       subtitle={groupQuery.data?.name ?? t(msg`群聊信息`)}
-      onBack={openGroupDetails}
+      onBack={() => {
+        // 走查 R1：openGroupDetails 直接 navigate({to: details}) push 一条新
+        // history 项，用户 [details → edit → 点返回] 后浏览器后退会落回 edit
+        // 死循环。和 group-chat-background-page 同口径用 navigateBackOrFallback：
+        // 能 history.back() 就 back，deep link / 跨域跳入兜不住时才 fresh navigate。
+        navigateBackOrFallback(openGroupDetails, `/group/${groupId}/details`);
+      }}
     >
       {groupQuery.isLoading ||
       (mode === "nickname" && membersQuery.isLoading) ? (

@@ -56,7 +56,7 @@ import {
 } from "../features/shell/mobile-handoff-storage";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatConversationTimestamp, parseTimestamp } from "../lib/format";
-import { isDesktopOnlyPath } from "../lib/history-back";
+import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { revealSavedFile } from "../runtime/reveal-saved-file";
 import { saveGeneratedFile } from "../runtime/save-generated-file";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
@@ -2474,11 +2474,19 @@ export function GroupQrPage() {
       title={t(msg`群二维码`)}
       subtitle={groupQuery.data?.name ?? t(msg`群聊邀请`)}
       onBack={() => {
-        void navigate({
-          to: "/group/$groupId/details",
-          params: { groupId },
-          ...(detailsRouteHash ? { hash: detailsRouteHash } : {}),
-        });
+        // 走查 R1：原版直接 navigate push 新 history 项，用户 [details → qr →
+        // 点返回] 后浏览器后退会落回 qr 死循环。和 background 页同口径用
+        // navigateBackOrFallback。
+        navigateBackOrFallback(
+          () => {
+            void navigate({
+              to: "/group/$groupId/details",
+              params: { groupId },
+              ...(detailsRouteHash ? { hash: detailsRouteHash } : {}),
+            });
+          },
+          `/group/${groupId}/details`,
+        );
       }}
     >
       <div className="space-y-3 px-3">{content}</div>
