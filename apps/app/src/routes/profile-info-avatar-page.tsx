@@ -453,7 +453,15 @@ export function ProfileInfoAvatarPage() {
           <button
             type="button"
             disabled={!canSave || isSaving}
-            onClick={() => saveMutation.mutate()}
+            onClick={() => {
+              // R3 走查：用户先点「恢复默认头像」失败 → resetMutation.isError；
+              // 接着选张图点「完成」，errorMessage 优先级里 saveMutation 排第一，
+              // 但 reset 那条错误还挂着 → 用户看 banner 仍是旧 reset 错误（甚至
+              // 中间夹一帧 save 成功的瞬间），新 attempt 不出新结果。点开新 attempt
+              // 先把对面 mutation 的错误清掉，banner 始终反映「当前这次操作」。
+              resetMutation.reset();
+              saveMutation.mutate();
+            }}
             className={cn(
               "rounded-full px-3 py-1 text-[13px] font-medium transition-colors",
               !canSave || isSaving
@@ -552,6 +560,8 @@ export function ProfileInfoAvatarPage() {
               }
               if (event.key === "Enter" && canSave && !isSaving) {
                 event.preventDefault();
+                // 跟「完成」按钮同步：清掉 reset 的旧错误，确保 banner 反映这次保存。
+                resetMutation.reset();
                 saveMutation.mutate();
               }
             }}
@@ -622,7 +632,13 @@ export function ProfileInfoAvatarPage() {
           <button
             type="button"
             disabled={isSaving}
-            onClick={() => resetMutation.mutate()}
+            onClick={() => {
+              // R3 走查同款：清 saveMutation 的旧错误，避免点完「恢复默认」
+              // banner 还挂着上次「完成」失败的红字让用户搞不清当前 attempt
+              // 的状态。
+              saveMutation.reset();
+              resetMutation.mutate();
+            }}
             className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60 disabled:active:bg-transparent"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(148,163,184,0.16)] text-[color:var(--text-secondary)]">
