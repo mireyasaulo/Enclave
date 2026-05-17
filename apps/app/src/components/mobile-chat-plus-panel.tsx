@@ -676,45 +676,56 @@ export function MobileChatPlusPanel({
           {favoriteRecords.length ? (
             // 走查 R3：title 是 flex row 第一子项，要带 min-w-0/flex-1 才能让
             // truncate 真起作用；badge 加 shrink-0 防被长标题挤变形。
+            // 走查新一轮 R2：description 跟 title 一样时（笔记 favorite 几乎都是
+            // 这种），picker 第三行只是把 title 又写一遍——share text 那边已经
+            // 在 buildFavoriteShareText 去重了，这里 UI 上同步把那行藏掉。
             <div className="mx-2.5 max-h-[40dvh] overflow-auto rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
-              {favoriteRecords.map((item, index) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() =>
-                    void onSelectFavoriteText(buildFavoriteShareText(item))
-                  }
-                  disabled={busy}
-                  className={cn(
-                    "flex w-full items-start gap-3 px-3 py-2.5 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60",
-                    index > 0
-                      ? "border-t border-[color:var(--border-subtle)]"
-                      : undefined,
-                  )}
-                >
-                  <AvatarChip
-                    name={item.avatarName ?? item.title}
-                    src={item.avatarSrc}
-                    size="wechat"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <div className="min-w-0 flex-1 truncate text-[13px] text-[color:var(--text-primary)]">
-                        {item.title}
+              {favoriteRecords.map((item, index) => {
+                const trimmedTitle = item.title.trim();
+                const trimmedDescription = item.description.trim();
+                const hasDistinctDescription =
+                  trimmedDescription && trimmedDescription !== trimmedTitle;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() =>
+                      void onSelectFavoriteText(buildFavoriteShareText(item))
+                    }
+                    disabled={busy}
+                    className={cn(
+                      "flex w-full items-start gap-3 px-3 py-2.5 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60",
+                      index > 0
+                        ? "border-t border-[color:var(--border-subtle)]"
+                        : undefined,
+                    )}
+                  >
+                    <AvatarChip
+                      name={item.avatarName ?? item.title}
+                      src={item.avatarSrc}
+                      size="wechat"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="min-w-0 flex-1 truncate text-[13px] text-[color:var(--text-primary)]">
+                          {item.title}
+                        </div>
+                        <span className="shrink-0 rounded-full bg-[rgba(7,193,96,0.10)] px-2 py-0.5 text-[10px] text-[#07c160]">
+                          {item.badge}
+                        </span>
                       </div>
-                      <span className="shrink-0 rounded-full bg-[rgba(7,193,96,0.10)] px-2 py-0.5 text-[10px] text-[#07c160]">
-                        {item.badge}
-                      </span>
+                      <div className="mt-0.5 text-[10px] text-[color:var(--text-muted)]">
+                        {item.meta}
+                      </div>
+                      {hasDistinctDescription ? (
+                        <div className="mt-1.5 line-clamp-2 text-[11px] leading-[18px] text-[color:var(--text-secondary)]">
+                          {item.description}
+                        </div>
+                      ) : null}
                     </div>
-                    <div className="mt-0.5 text-[10px] text-[color:var(--text-muted)]">
-                      {item.meta}
-                    </div>
-                    <div className="mt-1.5 line-clamp-2 text-[11px] leading-[18px] text-[color:var(--text-secondary)]">
-                      {item.description}
-                    </div>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           ) : !favoritesQuery.isLoading && !showFavoritesError ? (
             <div className="px-4 py-8 text-center text-sm text-[color:var(--text-muted)]">
