@@ -9,6 +9,19 @@
 //   Round 20: handlePushTokenChanged listener 走 NotificationCenter，AppDelegate
 //     的 didRegister / didFail 要 post 出来，YinjieMobileBridgePlugin.load()
 //     才能收到再 notifyListeners("pushTokenChanged") 给 JS
+//   走查 R3: applicationDidBecomeActive 必须主动把 app icon badge 清零 ——
+//     iOS 不会自动消，APNs 后端设的 "5 条未读" 角标会一直挂在桌面上，连续
+//     两轮真机才发现（模拟器看不出来，badge 一般为 0）
+//   走查 R4: cacheLaunchTarget 写完 UserDefaults 后必须 post 一条
+//     NotificationCenter "YinjiePendingLaunchTargetChanged"。前台横幅点击下
+//     window.focus / pageshow / visibilitychange 三条 JS 监听都不触发，
+//     YinjieMobileBridgePlugin 转 notifyListeners 是唯一能叫醒 JS 的通道；
+//     applicationDidBecomeActive 同时要 re-register APNs，覆盖「用户在
+//     Settings 里手动开通知权限 → 回到 app」这条 iOS 死链
+//   走查 R5: 但不能每次切回前台都 register —— didRegister 一定 fire →
+//     NotificationCenter.post → JS listener syncIosPushToken({force:true})
+//     每次都打 cloud-api POST。引入 lastNotificationAuthStatus instance var
+//     做状态机，只在「not-granted → granted」transition 触发一次
 
 import UIKit
 import Capacitor
@@ -17,6 +30,10 @@ import UserNotifications
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var window: UIWindow?
+
+    // 走查 R5/R6：didFinishLaunchingWithOptions 种基线，applicationDidBecomeActive
+    // 每次切回前台拿当前 status 跟它比，只在 not-granted → granted edge re-register。
+    private var lastNotificationAuthStatus: UNAuthorizationStatus?
 
     func application(
         _ application: UIApplication,
@@ -28,7 +45,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // 的新 device token 推下来（iCloud restore / iOS 大版本升级 / SIM
         // 换卡 / 删 reinstall 等场景）。.notDetermined 不动，保留首次弹权限
         // 走业务侧 requestNotificationPermission 的路径。
+        //
+        // 走查 R5：冷启时也种 lastNotificationAuthStatus 基线，避免下次
+        // applicationDidBecomeActive previous=nil → wasGranted=false → 重复
+        // register 一次。
         UNUserNotificationCenter.current().getNotificationSettings { settings in
+            self.lastNotificationAuthStatus = settings.authorizationStatus
             guard settings.authorizationStatus == .authorized ||
                     settings.authorizationStatus == .provisional else {
                 return
@@ -58,6 +80,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             object: nil,
             userInfo: ["error": error.localizedDescription]
         )
+    }
+
+    // 走查 R3 / R4 / R5：每次切回前台
+    //   1. 主动把 app icon badge 清零（iOS 不会自动消）
+    //   2. 拿当前 notification authorizationStatus 跟 lastNotificationAuthStatus
+    //      比，只在「not-granted → granted」transition 触发 re-register，
+    //      覆盖「用户在 Settings 里改通知权限 → 回到 app」这条死链；其它
+    //      情况都跳过，避免每次切回前台都 register → didRegister → JS
+    //      syncIosPushToken({force:true}) → cloud-api POST 的浪费
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        if #available(iOS 16.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(0) { _ in }
+        } else {
+            application.applicationIconBadgeNumber = 0
+        }
+
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let previous = self.lastNotificationAuthStatus
+            let current = settings.authorizationStatus
+            self.lastNotificationAuthStatus = current
+
+            let wasGranted =
+                previous == .authorized || previous == .provisional
+            let isGranted =
+                current == .authorized || current == .provisional
+
+            guard isGranted, !wasGranted else {
+                return
+            }
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
     }
 
     // App 处于前台时，iOS 默认会把通知静默丢掉。我们走 showLocalNotification
@@ -140,6 +195,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         UserDefaults.standard.set(payload, forKey: "YinjiePendingLaunchTarget")
+
+        // 走查 R4：前台横幅点击 → didReceive 写 UserDefaults，但 app 一直
+        // focused & visible，JS 那条 window.focus / pageshow / visibilitychange
+        // 三个监听一个都不触发。借 NotificationCenter 把「pending target 变了」
+        // 这条信号推到 YinjieMobileBridgePlugin，转 notifyListeners 通知 JS
+        // 重读 UserDefaults。冷启场景 plugin 还没观察 notification，这条 post
+        // 自然丢，但冷启 JS mount 后会主动 getPendingLaunchTarget 兜底。
+        NotificationCenter.default.post(
+            name: Notification.Name("YinjiePendingLaunchTargetChanged"),
+            object: nil
+        )
     }
 
     private func normalize(_ value: Any?) -> String? {

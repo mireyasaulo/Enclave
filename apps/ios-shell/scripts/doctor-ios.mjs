@@ -299,6 +299,46 @@ const checks = [
       ? "applicationDidBecomeActive re-registers APNs only on not-granted → granted transition (handles user toggling permission in Settings without burning cloud-api POST on every foreground)"
       : "AppDelegate not found yet; run `pnpm ios:sync` first",
   },
+  (() => {
+    // 真机走查 Round 1（2026-05-17）：xcode-template/AppDelegatePush.example.swift
+    // 是「configure-ios-project.mjs.ensureAppDelegatePushHooks() 加完之后 AppDelegate
+    // 长啥样」的参考实现 —— 给 code review / 手动复现 / fork 用户做依据用。前几轮
+    // 真机走查（R3 badge 清零、R4 前台横幅 broadcast、R4/R5 Settings-change
+    // re-register + 状态机基线）一路给 configure patcher 加补丁，但模板这边没同步
+    // 过 —— 现状是 patcher 跟 installed AppDelegate.swift 都已经带这 4 条修复，
+    // 模板仍停留在「只有 didRegister / willPresent / cacheLaunchTarget」的 R20 时代。
+    //
+    // 后果：
+    //   - 任何对着模板 review AppDelegate 行为的人会以为这 4 条死链「修过 = 不存在」，
+    //     实际 patcher 还在防它们复发；
+    //   - fork 用户拿模板做基础手写自己的 AppDelegate，4 个真机 bug 会一并复发；
+    //   - configure patcher 一旦谁手抖回滚，installed 跟模板 drift 没人 catch。
+    //
+    // 跟 plugin-stubs-in-sync 同款逻辑：盯死模板里必须出现这 4 条修复对应的关键字。
+    const templateAppDelegate = path.join(
+      shellRoot,
+      "xcode-template",
+      "AppDelegatePush.example.swift",
+    );
+    const templateOk = fileIncludesAll(templateAppDelegate, [
+      "lastNotificationAuthStatus",
+      "setBadgeCount(0)",
+      "applicationIconBadgeNumber = 0",
+      "wasGranted",
+      "isGranted",
+      "YinjiePendingLaunchTargetChanged",
+      "self.lastNotificationAuthStatus = settings.authorizationStatus",
+    ]);
+    return {
+      label: "appdelegate-template-in-sync",
+      ok: !fs.existsSync(templateAppDelegate) || templateOk,
+      detail: !fs.existsSync(templateAppDelegate)
+        ? "xcode-template/AppDelegatePush.example.swift not found"
+        : templateOk
+          ? "xcode-template/AppDelegatePush.example.swift reflects R3/R4/R5/R6 patcher output (badge clear, transition-only re-register, pending-target broadcast)"
+          : "xcode-template/AppDelegatePush.example.swift is stale vs configure patcher — missing R3 (badge clear) / R4 (pending-target post) / R4-R5 (lastNotificationAuthStatus transition register); reviewers / forks will think those bugs never existed",
+    };
+  })(),
   {
     label: "plugin-bridge-metadata",
     ok:
