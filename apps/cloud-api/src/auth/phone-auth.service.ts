@@ -23,6 +23,7 @@ import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { PhoneVerificationSessionEntity } from "../entities/phone-verification-session.entity";
 import { CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE } from "./cloud-jwt.constants";
 import { MockSmsProviderService } from "./mock-sms-provider.service";
+import { assertPasswordStrength } from "./password-policy";
 
 const DEV_BYPASS_CODE = "123456";
 
@@ -134,6 +135,14 @@ export class PhoneAuthService {
           ? "This cloud account has been banned."
           : "This cloud account has been archived.",
       );
+    }
+
+    // setPasswordOnRegister 在这里做"硬校验"，让超 72 字节的 emoji 密码、
+    // 跟 phone 相同的弱密等直接 400 给客户端。否则 hook 里那段 try/catch
+    // 会吞掉 BadRequestException，客户端看到 200 + accessToken 以为密码已设
+    // 上，下一次走 login-with-password 就 401，体验灾难。
+    if (extras?.setPasswordOnRegister) {
+      assertPasswordStrength(extras.setPasswordOnRegister, [normalizedPhone]);
     }
 
     if (this.userPostVerifyHook) {

@@ -22,6 +22,7 @@ import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { EmailVerificationSessionEntity } from "../entities/email-verification-session.entity";
 import { issueCloudClientAccessToken } from "./cloud-client-token";
 import { CloudMailService } from "./cloud-mail.service";
+import { assertPasswordStrength } from "./password-policy";
 
 const DEV_BYPASS_CODE = "123456";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -152,6 +153,12 @@ export class EmailAuthService {
     }
 
     const synthPhone = synthesizePhoneFromEmail(normalized);
+
+    // setPasswordOnRegister 在这里硬校验（72 字节 / 跟身份相同 / 含空格），不让
+    // hook 里那段 try/catch 把 BadRequest 吞掉、客户端误以为密码已设。
+    if (extras?.setPasswordOnRegister) {
+      assertPasswordStrength(extras.setPasswordOnRegister, [normalized, synthPhone]);
+    }
 
     if (this.userPostVerifyHook) {
       try {
