@@ -3640,7 +3640,7 @@ msgstr "新しいパスワード"
 #: apps/app/src/features/account-security/account-security-panel.tsx:246
 #: apps/app/src/routes/welcome-page.tsx:1200
 msgid "8-32 位，任意字符（不含空格）"
-msgstr "8〜32 文字、任意の文字（スペースは不可）"
+msgstr "8〜32 文字、空白不可"
 
 #: apps/app/src/features/account-security/account-security-panel.tsx:254
 msgid "确认新密码"
