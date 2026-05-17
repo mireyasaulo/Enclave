@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { DEFAULT_LOCALE, type SupportedLocale } from "../locales";
+import type { SupportedLocale } from "../locales";
 
 const SKIP_ELEMENT_SELECTOR = [
   "script",
@@ -46,10 +46,11 @@ export function DomTextLocalizer({
     }
 
     const translateValue = (sourceValue: string) => {
-      if (locale === DEFAULT_LOCALE && dictionary.size === 0) {
-        return sourceValue;
-      }
-
+      // 不再用 "locale === DEFAULT_LOCALE && dictionary.size === 0" 短路：
+      // 这种情况下服务端落库的 en-US / ja-JP / ko-KR 老系统消息（比如世界
+      // 之前是 en-US 时生成的 "You added X." friend-added notice）切回中文
+      // UI 后会原样泄漏，根本走不到 translateKnownPattern。pattern matching
+      // 只是几条 regex tests，开销可忽略。
       const trimmedSource = sourceValue.trim();
       if (!trimmedSource) {
         return sourceValue;
@@ -816,18 +817,31 @@ function translateKnownPattern(
     return `${opener}: ${authorName} just sent an AI-generated short, worth pausing for 10 seconds.`;
   }
 
-  const characterAddedMatch = sourceValue.match(
-    /^你已添加了(.+)，现在可以开始聊天了。$/,
-  );
-  if (characterAddedMatch) {
-    const target = translatePatternTarget(characterAddedMatch[1] ?? "");
+  // social.service.ts:buildFriendAddedSystemMessage 按"加好友当时"world 的
+  // 语言把 system 消息直接落库（zh-CN / en-US / ja-JP / ko-KR 四套硬编码
+  // 文案）。用户后续切语言时，老消息仍是当时 locale 的原文。这里识别四种
+  // 源串都映射到当前 locale，避免 zh→en 单向命中、en→zh 反向继续显示英文。
+  const characterAddedPatterns: Array<{ pattern: RegExp; sourceLocale: SupportedLocale }> = [
+    { pattern: /^你已添加了(.+)，现在可以开始聊天了。$/, sourceLocale: "zh-CN" },
+    { pattern: /^You added (.+)\. You can start chatting now\.$/, sourceLocale: "en-US" },
+    { pattern: /^(.+)を追加しました。これでチャットを始められます。$/, sourceLocale: "ja-JP" },
+    { pattern: /^(.+)을\(를\) 추가했어요\. 이제 채팅을 시작할 수 있어요\.$/, sourceLocale: "ko-KR" },
+  ];
+  for (const { pattern, sourceLocale } of characterAddedPatterns) {
+    const match = sourceValue.match(pattern);
+    if (!match) continue;
+    if (locale === sourceLocale) return null;
+    const target = translatePatternTarget(match[1] ?? "");
+    if (locale === "zh-CN") {
+      return `你已添加了${target}，现在可以开始聊天了。`;
+    }
     if (locale === "ja-JP") {
-      return `${target} を追加しました。チャットを開始できます。`;
+      return `${target}を追加しました。これでチャットを始められます。`;
     }
     if (locale === "ko-KR") {
-      return `${target}을(를) 추가했습니다. 이제 채팅을 시작할 수 있습니다.`;
+      return `${target}을(를) 추가했어요. 이제 채팅을 시작할 수 있어요.`;
     }
-    return `${target} has been added. You can start chatting now.`;
+    return `You added ${target}. You can start chatting now.`;
   }
 
   const nicknameMatch = sourceValue.match(/^昵称：(.+?)(?: · (.+))?$/);
