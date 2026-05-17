@@ -312,7 +312,19 @@ export function MobileMomentsPublishPage() {
 
   async function handlePickImages() {
     try {
-      const files = await pickImageFiles({ multiple: true });
+      // 第二次走查 R4：原生壳 (PHPicker / PickVisualMedia) 拿到 limit 后会在系统
+      // 选图 UI 上限制最多可勾数量。不传时 native-image-picker 默认 9 张，但跟
+      // 当前已塞进 draft 的 imageDrafts 不联动 —— 已有 5 张时原生界面仍允许勾
+      // 9 张，回到 composeDraft.addImageFiles 才被 "还可以继续添加 4 张" 拒掉，
+      // 用户的选择白做。把剩余可用槽位算进去传给原生层，UI 层直接 cap。
+      const remainingSlots = Math.max(
+        0,
+        9 - composeDraft.imageDrafts.length,
+      );
+      const files = await pickImageFiles({
+        multiple: true,
+        limit: remainingSlots > 0 ? remainingSlots : undefined,
+      });
       if (files.length === 0) {
         return;
       }
