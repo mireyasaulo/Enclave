@@ -180,8 +180,10 @@ export class ParkingWarStateService implements OnModuleInit {
   ): Promise<ParkingWarPlayerStateView> {
     const state = await this.getOrCreatePlayerState(ownerId);
     await this.refreshDailyShield(state);
-    await this.tickPlayerHomeOccupancies(state);
-    return this.toPlayerView(state);
+    // tick 已经把最新 home/away occupancies 加载并 save 了，直接传给 view 用，
+    // 不要再 SELECT 一遍 —— 之前每次 /state 都跑 4 次 occupancy 查询
+    const tickResult = await this.tickPlayerHomeOccupancies(state);
+    return this.toPlayerView(state, tickResult);
   }
 
   /**
@@ -266,14 +268,17 @@ export class ParkingWarStateService implements OnModuleInit {
   async tickPlayerHomeOccupancies(
     state: ParkingWarPlayerStateEntity,
     nowMs: number = Date.now(),
-  ): Promise<void> {
+  ): Promise<{
+    home: ParkingWarOccupancyEntity[];
+    away: ParkingWarOccupancyEntity[];
+  } | null> {
     const lastTickMs = state.lastTickAt?.getTime() ?? nowMs;
     const rawDelta = Math.max(0, nowMs - lastTickMs);
     const cappedDelta = Math.min(rawDelta, PARKING_WAR_OFFLINE_CATCHUP_CAP_MS);
     if (cappedDelta <= 0) {
       state.lastTickAt = new Date(nowMs);
       await this.playerRepo.save(state);
-      return;
+      return null;
     }
 
     // away 必须排除 lotOwnerKind=player —— 玩家把自己车停在自家时，occupancy
@@ -373,6 +378,7 @@ export class ParkingWarStateService implements OnModuleInit {
     }
     state.lastTickAt = new Date(nowMs);
     await this.playerRepo.save(state);
+    return { home: homeOccupancies, away: awayOccupancies };
   }
 
   async collectFromSlot(
@@ -1333,20 +1339,31 @@ export class ParkingWarStateService implements OnModuleInit {
 
   private async toPlayerView(
     state: ParkingWarPlayerStateEntity,
+    preloaded?: {
+      home: ParkingWarOccupancyEntity[];
+      away: ParkingWarOccupancyEntity[];
+    } | null,
   ): Promise<ParkingWarPlayerStateView> {
     // 同 tickPlayerHomeOccupancies：away 仅指停在 NPC 邻居家的车，避免与 home 重叠
-    const [homeOccupancies, awayOccupancies] = await Promise.all([
-      this.occupancyRepo.find({
-        where: { lotOwnerKind: 'player', lotOwnerId: state.ownerId },
-      }),
-      this.occupancyRepo.find({
-        where: {
-          visitorKind: 'player',
-          visitorId: state.ownerId,
-          lotOwnerKind: 'npc',
-        },
-      }),
-    ]);
+    let homeOccupancies: ParkingWarOccupancyEntity[];
+    let awayOccupancies: ParkingWarOccupancyEntity[];
+    if (preloaded) {
+      homeOccupancies = preloaded.home;
+      awayOccupancies = preloaded.away;
+    } else {
+      [homeOccupancies, awayOccupancies] = await Promise.all([
+        this.occupancyRepo.find({
+          where: { lotOwnerKind: 'player', lotOwnerId: state.ownerId },
+        }),
+        this.occupancyRepo.find({
+          where: {
+            visitorKind: 'player',
+            visitorId: state.ownerId,
+            lotOwnerKind: 'npc',
+          },
+        }),
+      ]);
+    }
 
     const todayKey = formatDateKey(new Date());
     const dailyBonusAvailable = state.lastDailyBonusKey !== todayKey;

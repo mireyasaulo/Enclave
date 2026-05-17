@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
@@ -89,11 +89,30 @@ export function ParkingWarGame({
   const { data: state, isLoading, isError } = useParkingWarState();
   const [tab, setTab] = useState<TabId>("home");
   const [toast, setToast] = useState<string | null>(null);
+  // 上一条 toast 的定时器 id，新 toast 进来时先 clear，
+  // 避免 A→B 连发时 A 的 timeout 把 B 提前清掉，
+  // 也避免组件卸载后 setState on unmounted
+  const toastTimerRef = useRef<number | null>(null);
 
-  const showToast = (msgText: string) => {
+  const showToast = useCallback((msgText: string, durationMs = 2400) => {
+    if (toastTimerRef.current != null) {
+      window.clearTimeout(toastTimerRef.current);
+    }
     setToast(msgText);
-    window.setTimeout(() => setToast(null), 2400);
-  };
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimerRef.current = null;
+    }, durationMs);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current != null) {
+        window.clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = null;
+      }
+    };
+  }, []);
 
   // 老 localStorage 一次性清理。旧版本（≤ Stage 6）数据完全是本机的，
   // 现在迁服务端后这些 key 没用了；保留下去只会让用户的浏览器存里多一坨
@@ -105,13 +124,12 @@ export function ParkingWarGame({
       const hadLegacy = keys.some((k) => window.localStorage.getItem(k));
       for (const k of keys) window.localStorage.removeItem(k);
       if (hadLegacy) {
-        setToast(t(msg`原存档已废弃，已为你开通云端车场`));
-        window.setTimeout(() => setToast(null), 3200);
+        showToast(t(msg`原存档已废弃，已为你开通云端车场`), 3200);
       }
     } catch {
       /* private mode / quota — 静默忽略 */
     }
-  }, []);
+  }, [showToast]);
 
   if (isLoading) {
     return (
@@ -660,10 +678,12 @@ function CarPickerSheet({
   onToast: (m: string) => void;
 }) {
   const park = useParkParkingWarCar();
+  // 用 state.serverNowMs 而不是 Date.now()：客户端时钟漂移时
+  // 本应可用的车会被错判成"还在冷却"，picker 直接显示空
   const idleCars = state.ownedCars.filter(
     (c) =>
       !c.parkedRef &&
-      (c.unavailableUntilMs == null || c.unavailableUntilMs < Date.now()),
+      (c.unavailableUntilMs == null || c.unavailableUntilMs < state.serverNowMs),
   );
   const handlePick = async (car: ParkingWarOwnedCar) => {
     try {
@@ -1296,7 +1316,7 @@ function RankTab({
               className="flex items-center gap-2 px-2 py-1 text-xs text-zinc-600"
             >
               <span className="w-14 text-[10px] text-zinc-400">
-                {formatRelative(Date.parse(e.createdAt), Date.now())}
+                {formatRelative(Date.parse(e.createdAt), state.serverNowMs)}
               </span>
               <span className="flex-1 truncate">{renderEventLabel(e)}</span>
               {typeof e.amountCents === "number" && e.amountCents !== 0 && (
