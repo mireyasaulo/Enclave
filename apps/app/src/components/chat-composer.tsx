@@ -2617,7 +2617,17 @@ export function ChatComposer({
       return;
     }
 
-    const mentionText = `@${candidate.name} `;
+    // 走查 R6：「mention-all」候选 name 走 t(msg`所有人`) → 用户语言不同会
+    // 插出 `@Everyone` / `@전체` / `@全員`，但 api/src/modules/chat/chat-text.utils.ts
+    // summarizeChatMentions 写死 `mentions.includes('@所有人')` 检测 @all——
+    // 非中文用户点了「@所有人」候选，AI 那条群通话/通知里 hasMentionAll 永远
+    // false，notifyOnAtAll 用户收不到 @all 提示。展示文案保留本地化，但实际
+    // 插入到 message text 的协议 token 强制走 `@所有人`，与服务端契约对齐。
+    const insertedName =
+      candidate.id === "mention-all"
+        ? "所有人" // i18n-ignore-line: protocol marker, server matches literal Chinese text
+        : candidate.name;
+    const mentionText = `@${insertedName} `;
     const nextValue = `${value.slice(0, activeMention.start)}${mentionText}${value.slice(activeMention.end)}`;
     onChange(nextValue);
     setMentionActiveIndex(0);
