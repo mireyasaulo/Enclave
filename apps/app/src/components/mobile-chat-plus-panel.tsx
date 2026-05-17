@@ -34,6 +34,7 @@ import {
 import { getFriendDisplayName } from "../features/contacts/contact-utils";
 import {
   buildFavoriteShareText,
+  computeDesktopFavoritesFingerprint,
   mergeDesktopFavoriteRecords,
   readDesktopFavorites,
   type DesktopFavoriteRecord,
@@ -280,11 +281,20 @@ export function MobileChatPlusPanel({
       return;
     }
 
-    setFavoriteRecords(
-      mergeDesktopFavoriteRecords(
-        favoritesQuery.data ?? [],
-        readDesktopFavorites(),
-      ),
+    // 走查新一轮 R3：favoritesQuery 后台 refetch（30s staleTime 之外）每次回来都
+    // 会重新合并 + setState 一份新数组，favoriteRecords 引用一换就把所有 favorite
+    // <button> 重 render。30s 内同一份云端数据 + 同一份 localStorage 多半内容
+    // 不变，先用 fingerprint（sourceId@collectedAt 轻量串）对比，相等就跳过
+    // setState 避免无意义重渲。
+    const nextRecords = mergeDesktopFavoriteRecords(
+      favoritesQuery.data ?? [],
+      readDesktopFavorites(),
+    );
+    setFavoriteRecords((current) =>
+      computeDesktopFavoritesFingerprint(current) ===
+      computeDesktopFavoritesFingerprint(nextRecords)
+        ? current
+        : nextRecords,
     );
   }, [activeView, favoritesQuery.data, open]);
 
