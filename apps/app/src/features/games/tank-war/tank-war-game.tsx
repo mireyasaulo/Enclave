@@ -46,6 +46,10 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
 
   useTankWarInput(inputRef, hud.status, hud.mode === "two-player");
 
+  // 触屏环境只挂了 P1 按键（见 tank-war-touch-controls），MenuOverlay 里仍允许
+  // 切「双人」会让 P2 在手机上无操作 — 静默把模式锁回单人，避免用户起一局
+  // 才发现 P2 不能动。桌面键盘双人本地对战不受影响。
+
   useEffect(() => {
     spritesRef.current = bakeSprites();
     const canvas = canvasRef.current;
@@ -142,7 +146,7 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
       </div>
 
       {hud.status === "boot" || hud.status === "game-over" || hud.status === "stage-clear" ? (
-        <MenuOverlay hud={hud} controls={controls} />
+        <MenuOverlay hud={hud} controls={controls} isTouch={isTouch} />
       ) : null}
 
       {hud.status === "paused" ? (
@@ -207,6 +211,7 @@ function PausedOverlay({ onResume }: { onResume: () => void }) {
 function MenuOverlay({
   hud,
   controls,
+  isTouch,
 }: {
   hud: HudSnapshot;
   controls: {
@@ -215,10 +220,14 @@ function MenuOverlay({
     restart: () => void;
     toggleMute: () => void;
   };
+  isTouch: boolean;
 }) {
   // 默认值跟随当前 world 状态：mode 跟上一局，stage 在 boot/game-over 时取已解锁
   // 最高关；stage-clear 时定位到刚通关的关卡，方便点 "再来一局" 复刷同一关。
-  const [mode, setMode] = useState<PlayerMode>(() => hud.mode);
+  // 触屏环境强制单人 — 触控只挂 P1 按键。
+  const [mode, setMode] = useState<PlayerMode>(() =>
+    isTouch ? "one-player" : hud.mode,
+  );
   const [stage, setStage] = useState<number>(() => {
     if (hud.status === "boot") return 1;
     if (hud.status === "stage-clear") return hud.stage;
@@ -235,40 +244,49 @@ function MenuOverlay({
           {t(msg`恭喜过关，进入下一关`)}
         </p>
       )}
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setMode("one-player")}
-          className={cn(
-            "rounded-full px-3 py-1 text-[12px]",
-            mode === "one-player" ? "bg-amber-400 text-black" : "bg-white/10",
-          )}
-        >
-          {t(msg`单人`)}
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode("two-player")}
-          className={cn(
-            "rounded-full px-3 py-1 text-[12px]",
-            mode === "two-player" ? "bg-amber-400 text-black" : "bg-white/10",
-          )}
-        >
-          {t(msg`双人`)}
-        </button>
-      </div>
+      {isTouch ? (
+        <p className="text-[11px] text-white/60">{t(msg`移动端仅支持单人，双人本地对战请用桌面键盘。`)}</p>
+      ) : (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMode("one-player")}
+            className={cn(
+              "rounded-full px-3 py-1 text-[12px]",
+              mode === "one-player" ? "bg-amber-400 text-black" : "bg-white/10",
+            )}
+          >
+            {t(msg`单人`)}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("two-player")}
+            className={cn(
+              "rounded-full px-3 py-1 text-[12px]",
+              mode === "two-player" ? "bg-amber-400 text-black" : "bg-white/10",
+            )}
+          >
+            {t(msg`双人`)}
+          </button>
+        </div>
+      )}
       <div className="flex items-center gap-2">
         <span className="text-[11px] text-white/70">{t(msg`选关:`)}</span>
         <input
           type="number"
           min={1}
           max={hud.maxUnlockedStage}
+          step={1}
           value={stage}
-          onChange={(e) =>
-            setStage(
-              Math.max(1, Math.min(hud.maxUnlockedStage, Number(e.target.value) || 1)),
-            )
-          }
+          onChange={(e) => {
+            // Math.floor 必须卡死：用户能输入 "3.5"（或粘贴 / spinner 步长改变），
+            // 直接传给 decodeStage 会做 STAGES[2.5] 拿到 undefined，再 throw
+            // "expected 13 rows, got undefined" — 整局游戏崩。type=number step=1
+            // 仅是 UI 提示，不阻止小数。
+            const raw = Number(e.target.value);
+            const n = Number.isFinite(raw) ? Math.floor(raw) : 1;
+            setStage(Math.max(1, Math.min(hud.maxUnlockedStage, n || 1)));
+          }}
           // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
           // zoom-in。在 HUD 上选关时整个游戏画面瞬间被拉大，玩家被迫先双指
           // 捏回来才能看 maxUnlockedStage / 已解锁数。

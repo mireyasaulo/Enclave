@@ -202,10 +202,19 @@ export function removeDesktopFavorite(sourceId: string) {
 }
 
 export function buildFavoriteShareText(item: DesktopFavoriteRecord) {
-  const lines = [t(msg`[收藏] ${item.title}`)];
+  const title = item.title.trim();
+  const description = item.description.trim();
+  const lines = [t(msg`[收藏] ${title || item.title}`)];
 
-  if (item.description.trim()) {
-    lines.push(item.description.trim());
+  // 走查 R2：现网 yuanzui0728 的 10 条收藏里 8 条都是 description === title
+  // （笔记类纯文本 favorite 默认把 title 复用进 description），share text 第二行
+  //  把 title 又写一遍肉眼像 bug：
+  //    [收藏] R5 重要内容：明天 14:00 团队评审
+  //    R5 重要内容：明天 14:00 团队评审   ← 重复
+  //    来自 笔记
+  //    5月17日 10:55
+  if (description && description !== title) {
+    lines.push(description);
   }
 
   lines.push(t(msg`来自 ${item.badge}`));

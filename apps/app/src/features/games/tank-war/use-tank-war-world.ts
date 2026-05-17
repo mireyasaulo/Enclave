@@ -136,10 +136,13 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
     void lastTs;
   }, []);
 
-  // HUD 投影 — 每 120ms 拍一次快照
+  // HUD 投影 — 每 120ms 拍一次快照，只在内容真的变了才 setState；
+  // 否则 React 每秒做 8 次空 reconcile（boot/paused/stage-clear 静止
+  // 场景尤其浪费）。setHud 接 prev => 比较，避免外面再缓存一份 lastRef。
   useEffect(() => {
     const id = window.setInterval(() => {
-      setHud(snapshot(worldRef.current, persistRef.current));
+      const next = snapshot(worldRef.current, persistRef.current);
+      setHud((prev) => (hudEqual(prev, next) ? prev : next));
     }, 120);
     return () => window.clearInterval(id);
   }, []);
@@ -160,11 +163,14 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
   // pauseToggle 是 keydown 置 true 的一次性请求信号；这里轮询消费并立刻清零，
   // 让下一次按 P/Esc 又能触发一次 togglePause。不要用边沿检测——前一版用 cur && !last
   // 配合 keydown 翻转 pauseToggle，第二次按下相当于把信号写成下降沿，被 poller 吞掉。
+  // 触发后立刻 setHud：HUD 投影的 setInterval 是 120ms 一拍，按 P 后"暂停 / 继续"
+  // 文字翻转有最高 120ms 延迟 — 玩家以为按键没生效又按一下，被吞掉一次。
   useEffect(() => {
     const id = window.setInterval(() => {
       if (inputRef.current.pauseToggle) {
         inputRef.current.pauseToggle = false;
         togglePause(worldRef.current, sfxRef.current);
+        setHud(snapshot(worldRef.current, persistRef.current));
       }
     }, 50);
     return () => window.clearInterval(id);
@@ -219,6 +225,9 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
 
   const togglePauseCb = useCallback(() => {
     togglePause(worldRef.current, sfxRef.current);
+    // 同步刷新 HUD：按钮 onClick 不能等 120ms 投影才换文字（按下后用户看
+    // 「继续 / 暂停」label 没变 → 再按一次 → 实际触发了第二次 togglePause）。
+    setHud(snapshot(worldRef.current, persistRef.current));
   }, []);
 
   const controls = useMemo<WorldControls>(
@@ -233,6 +242,21 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
   );
 
   return { hud, controls, inputRef };
+}
+
+function hudEqual(a: HudSnapshot, b: HudSnapshot): boolean {
+  return (
+    a.status === b.status &&
+    a.mode === b.mode &&
+    a.stage === b.stage &&
+    a.lives === b.lives &&
+    a.livesP2 === b.livesP2 &&
+    a.enemyRemaining === b.enemyRemaining &&
+    a.score === b.score &&
+    a.scoreP2 === b.scoreP2 &&
+    a.muted === b.muted &&
+    a.maxUnlockedStage === b.maxUnlockedStage
+  );
 }
 
 function snapshot(world: GameWorld, persist: TankWarPersist): HudSnapshot {

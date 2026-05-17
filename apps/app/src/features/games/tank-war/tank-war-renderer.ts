@@ -3,6 +3,7 @@ import {
   HUD_X,
   HUD_WIDTH,
   HALF,
+  LOGIC_HEIGHT,
   TILE_SIZE,
   MAX_ENEMIES_ONFIELD,
   POWER_UP_BLINK_MS,
@@ -236,9 +237,10 @@ function drawHud(
   world: GameWorld,
   sheet: SpriteSheet,
 ): void {
-  // HUD 背景
+  // HUD 背景：用 LOGIC_HEIGHT(224) 而非 BATTLEFIELD(208)，否则右侧 HUD 下沿
+  // 会缺 16px 灰条 — 玩家眼里看到一截黑边贴着 HUD 柱子。
   ctx.fillStyle = "#7c7c7c";
-  ctx.fillRect(HUD_X, 0, HUD_WIDTH, BATTLEFIELD);
+  ctx.fillRect(HUD_X, 0, HUD_WIDTH, LOGIC_HEIGHT);
   ctx.fillStyle = "#000";
   ctx.font = "8px monospace";
 

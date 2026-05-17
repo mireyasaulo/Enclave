@@ -32,7 +32,7 @@ import {
   TIMER_MS,
   maxBulletsFor,
 } from "./tank-war-data";
-import { createRng, rngInt, rngPick } from "./tank-war-rng";
+import { rngInt, rngPick } from "./tank-war-rng";
 import { decodeStage, rosterFor } from "./tank-war-stages";
 import {
   DIR_DOWN,
@@ -277,16 +277,25 @@ function countEnemiesOnField(world: GameWorld): number {
   return n;
 }
 
+// 模块级单例 RNG 包装：以前每次 getRng() 都 new 一个闭包对象，AI 每个敌坦克
+// 每帧都要拿 rng → 4 enemies × 60fps = 240 个临时闭包/秒。tick 是单线程串行，
+// 用 _rngWorld 共享指针把 wrapper 复用掉，行为与旧版完全一致（mulberry32
+// 内部 s 的增量 = world.rngState 的增量 = 0x6d2b79f5，序列等价）。
+let _rngWorld: GameWorld | null = null;
+const _sharedRng: { next: () => number } = {
+  next(): number {
+    const w = _rngWorld!;
+    w.rngState = (w.rngState + 0x6d2b79f5) >>> 0;
+    let t = w.rngState;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  },
+};
+
 function getRng(world: GameWorld) {
-  // 用 world.rngState 持续推进
-  const rng = createRng(world.rngState);
-  return {
-    next: () => {
-      const v = rng.next();
-      world.rngState = (world.rngState + 0x6d2b79f5) >>> 0;
-      return v;
-    },
-  };
+  _rngWorld = world;
+  return _sharedRng;
 }
 
 function aabbOverlap(
@@ -391,7 +400,12 @@ function moveTank(
 
 function fireBullet(world: GameWorld, t: Tank, audio: AudioHook | null): void {
   const max = t.owner === "enemy" ? 1 : maxBulletsFor(t.level);
-  const ownerBullets = world.bullets.filter((b) => b.ownerId === t.id).length;
+  // 玩家按住开火时 fireBullet 每 tick 都被调；用计数器代替 .filter 避免每帧
+  // 分配一个临时数组 — 60fps × 玩家+AI ≈ 数百次/秒的小对象都能省。
+  let ownerBullets = 0;
+  for (const b of world.bullets) {
+    if (b.ownerId === t.id) ownerBullets++;
+  }
   if (ownerBullets >= max) return;
   const now = performance.now();
   if (now < t.reloadAtMs) return;
