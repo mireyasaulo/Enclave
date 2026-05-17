@@ -34,6 +34,7 @@ type UrlInputError =
   | "too_large"
   | "unsafe_scheme"
   | "data_url_empty"
+  | "missing_path"
   | null;
 
 // data: 头部最短壳是 "data:image/x;," (14 字符) 或 "data:image/png;base64," (22 字符)。
@@ -114,7 +115,12 @@ function checkAvatarUrlInput(value: string): UrlInputError {
   // 也可能是这种形态。落库后端不挡、AvatarChip 也能渲染，唯独这里挡掉 →
   // 一打开页面错误条钉死，没有任何修复路径（用户想改成正常 URL 也得先看错）。
   if (isRelativeAvatarPath(value)) {
-    return value.length > MAX_AVATAR_INPUT_LENGTH ? "too_large" : null;
+    if (value.length > MAX_AVATAR_INPUT_LENGTH) return "too_large";
+    // "/" 单独不能当头像 URL（裸根没文件），跟 looksLikePreviewableImageUrl
+    // 的 value.length > 1 对齐——之前接受 "/"、保存后 AvatarChip 走 /api/.../?token
+    // 命中根目录 → 不是图片 → fallback。
+    if (value.length <= 1) return "missing_path";
+    return null;
   }
   // scheme sniff：在 try-parse 前先看冒号前缀。new URL("javascript:alert(1)")
   // 会成功（protocol=javascript:），protocol 检查也会 catch 到，但单独抛
@@ -136,7 +142,16 @@ function checkAvatarUrlInput(value: string): UrlInputError {
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     return "format";
   }
-  return value.length > MAX_AVATAR_INPUT_LENGTH ? "too_large" : null;
+  if (value.length > MAX_AVATAR_INPUT_LENGTH) return "too_large";
+  // 跟 looksLikePreviewableImageUrl 对齐：裸 host（"https://x.com"）pathname
+  // 是 "/" 长度 1，search 空 → 不是图片 URL。之前 check 只看 protocol 不看 path，
+  // 用户能保存这种 URL：preview 不显示（preview gate 一致挡掉），但 canSave=true
+  // 让「完成」绿着；落库后 AvatarChip 走 <img src="https://x.com"> → 拉到 HTML
+  // 页 / 重定向 → onError → fallback，用户没线索可查。
+  if (parsed.pathname.length <= 1 && parsed.search.length === 0) {
+    return "missing_path";
+  }
+  return null;
 }
 
 export function ProfileInfoAvatarPage() {
@@ -601,6 +616,11 @@ export function ProfileInfoAvatarPage() {
           {trimmed && urlInputError === "data_url_empty" ? (
             <div className="mt-2 text-[11px] leading-4 text-[#92400e]">
               {t(msg`图片数据不完整或为空，请检查后再粘贴。`)}
+            </div>
+          ) : null}
+          {trimmed && urlInputError === "missing_path" ? (
+            <div className="mt-2 text-[11px] leading-4 text-[#92400e]">
+              {t(msg`图片链接需要带路径（如 /avatar.png），裸域名不是图片地址。`)}
             </div>
           ) : null}
         </div>
