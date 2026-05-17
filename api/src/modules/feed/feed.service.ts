@@ -1140,23 +1140,27 @@ export class FeedService implements OnModuleInit {
     targetCharacterId: string;
     note?: string;
   }): Promise<{ messageId: string; conversationId: string }> {
+    // 走查 R2（本轮）：之前所有 forward 路径 throw 的 AppError 都用英文 legacyMessage。
+    // channels-forward-picker 当前按 code switch 翻译，所以正常 UI 路径不会暴露
+    // 英文。但任何非 picker 路径（debug 面板、内部调用、未来新 caller）拿到的
+    // error.message 仍是英文。同款 R1 修法保持一致：所有 legacyMessage 出中文。
     const post = await this.postRepo.findOneBy({ id: input.postId });
     if (!post) {
       throw new AppError('FEED_POST_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Feed post not found',
+        legacyMessage: '该动态不存在或已被删除。',
       });
     }
     if (post.surface !== 'channels') {
       throw new AppError('FEED_FORWARD_NOT_CHANNELS', {
         status: HttpStatus.BAD_REQUEST,
-        legacyMessage: 'Only channels posts can be forwarded',
+        legacyMessage: '只支持转发视频号帖子。',
       });
     }
     if (post.publishStatus !== 'published') {
       throw new AppError('FEED_POST_NOT_PUBLISHED', {
         status: HttpStatus.BAD_REQUEST,
-        legacyMessage: 'Cannot forward an unpublished post',
+        legacyMessage: '帖子尚未发布，稍后再试。',
       });
     }
     if (
@@ -1165,7 +1169,7 @@ export class FeedService implements OnModuleInit {
     ) {
       throw new AppError('FEED_FORWARD_MEDIA_BROKEN', {
         status: HttpStatus.BAD_REQUEST,
-        legacyMessage: 'Post media is not playable',
+        legacyMessage: '这条视频号还没有可播放的视频/音频，无法转发。',
       });
     }
 
@@ -1186,7 +1190,7 @@ export class FeedService implements OnModuleInit {
     if (!targetCharacter) {
       throw new AppError('FEED_FORWARD_TARGET_REQUIRED', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Target character not found',
+        legacyMessage: '这位好友已不在通讯录，请换一位再试。',
       });
     }
 

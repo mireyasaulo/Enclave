@@ -3287,11 +3287,19 @@ const MobileChannelsCard = memo(function MobileChannelsCard({
                   </div>
                 </div>
               </button>
-              {post.authorId !== SELF_CHARACTER_ID ? (
+              {post.authorId !== SELF_CHARACTER_ID &&
+              post.authorType !== "user" ? (
                 // 「我自己」是用户的代理角色，关注 / 取消关注自己没语义；前后端
                 // 都没禁——但后端 followChannelAuthor 对 owner===authorId 才
                 // no-op，char-default-self 不是 owner.id，会真插一行 follow 记录，
                 // 视觉上落到 "已关注" 来回切看着很怪。直接在 UI 隐掉。
+                //
+                // 走查 R2（本轮）：用户自己发的 surface='channels' post 也会在
+                // 自己的视频号 home 出现，authorId=owner.id 但 authorType==='user'。
+                // 老的 SELF_CHARACTER_ID 检查只过 char-default-self；用户在自己
+                // 卡上点 +关注 → server 端 followChannelAuthor 撞到 owner.id 分支
+                // 真 no-op + 返回 isFollowing=false → 按钮永远停在 "+关注"，点一万次
+                // 不变，体感"按钮坏了"。authorType==='user' 时统一把按钮也隐掉。
                 <button
                   type="button"
                   onClick={onToggleFollowAuthor}

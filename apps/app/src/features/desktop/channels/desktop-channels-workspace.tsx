@@ -1031,11 +1031,16 @@ function ChannelFeedSlide({
                   </div>
                 </div>
               </button>
-              {post.authorId !== SELF_CHARACTER_ID ? (
+              {post.authorId !== SELF_CHARACTER_ID &&
+              post.authorType !== "user" ? (
                 // 「我自己」是用户自己的代理角色，不让用户关注 / 取消关注自己——
                 // 后端 followChannelAuthor 也对 owner.id===authorId 做了 no-op，
                 // 但 char-default-self 是角色而非 owner，会真插一行 follow 记录，
                 // 视觉上落到 "已关注" / 点了又能 "+ 关注"，徒增困惑。
+                //
+                // 走查 R2（本轮）：authorType==='user' 是 owner 自己发的视频号 post
+                // （自己也可发 surface='channels'）。这条 follow 按钮真点了 server
+                // 端 owner.id 分支 no-op，按钮永远停在 "+ 关注"，看着像点不动。
                 <button
                   type="button"
                   onClick={onToggleAuthorFollow}
@@ -1416,7 +1421,11 @@ function DesktopChannelAuthorPanel({
           </div>
 
           <div className="mt-4 flex gap-2">
-            {profile.authorId !== SELF_CHARACTER_ID ? (
+            {/* 走查 R2（本轮）：authorType==='user' 时也是 owner 自己（server 端
+                followChannelAuthor 对 owner.id no-op，按钮永远停在 +关注 不动）。
+                跟移动端作者主页 + home 卡片 R2 改法对齐。 */}
+            {profile.authorId !== SELF_CHARACTER_ID &&
+            profile.authorType !== "user" ? (
               <Button
                 variant={profile.isFollowing ? "secondary" : "primary"}
                 size="sm"

@@ -530,8 +530,15 @@ export function ChannelAuthorPage() {
                 {/* 「我自己」是用户的代理角色（char-default-self ≠ owner.id）；
                     后端 followChannelAuthor 对 owner===authorId 才 no-op，
                     char-default-self 会被真插一行 follow → 按钮在 +关注/已关注
-                    之间反复横跳，没语义。和移动端卡片里的逻辑保持一致：隐掉。 */}
-                {profile.authorId !== SELF_CHARACTER_ID ? (
+                    之间反复横跳，没语义。和移动端卡片里的逻辑保持一致：隐掉。
+
+                    走查 R2（本轮）：用户自己也可以发 surface='channels' post，
+                    点自己头像进作者主页 → 老逻辑 authorId !== SELF_CHARACTER_ID
+                    通过，按钮露出 → 点 +关注 / server 端 owner.id 分支 no-op
+                    + isFollowing 永远 false → 按钮停在 "+关注" 不动，看着像
+                    "我点了但没生效"。authorType==='user' 时一并隐掉。 */}
+                {profile.authorId !== SELF_CHARACTER_ID &&
+                profile.authorType !== "user" ? (
                   <Button
                     variant={profile.isFollowing ? "secondary" : "primary"}
                     size="lg"
