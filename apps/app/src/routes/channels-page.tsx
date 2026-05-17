@@ -3769,6 +3769,22 @@ function MobileChannelCommentsSheet({
         </div>
 
         <div className="border-t border-[color:var(--border-subtle)] bg-white px-4 pb-2 pt-3">
+          {/*
+            新一轮走查 R4：非好友帖（post.canInteract===false）的评论 sheet 之前
+            textarea 默认 enabled、send 按钮也只在 !draft.trim() 时 disable。用户
+            读完评论想跟着发一句，敲完按「发送」→ ChannelsPage.submitComment 走
+            ensureCommentPostCanInteract → setNotice("需先加为好友才能互动")。
+            但通知 InlineNotice 渲染在 ChannelsPage 顶部，被 z-50 评论 sheet 整张
+            backdrop 完全盖住，用户看不到任何反馈，体感「按了发送什么都没发生」。
+            sheet 自带 post，本地直接判 canInteract 把输入框 + 发送钮 disable，
+            并在 sheet 内贴一行黄色提示替代不可见的页级 notice，让限制在用户视
+            线内。
+          */}
+          {post && post.canInteract === false ? (
+            <div className="mb-2 rounded-[12px] bg-[rgba(234,179,8,0.10)] px-3 py-2 text-[11px] leading-[1.35rem] text-[#854d0e]">
+              {t(msg`需先加为好友才能互动。`)}
+            </div>
+          ) : null}
           {replyTarget ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-[12px] bg-[rgba(7,193,96,0.08)] px-3 py-2 text-[11px] text-[#166534]">
               {/*
@@ -3797,10 +3813,13 @@ function MobileChannelCommentsSheet({
               rows={2}
               value={draft}
               onChange={(event) => onDraftChange(event.target.value)}
+              disabled={post?.canInteract === false}
               placeholder={
-                replyTarget
-                  ? t(msg`回复 ${replyTarget.authorName}...`)
-                  : t(msg`说点什么...`)
+                post?.canInteract === false
+                  ? t(msg`需先加为好友才能评论`)
+                  : replyTarget
+                    ? t(msg`回复 ${replyTarget.authorName}...`)
+                    : t(msg`说点什么...`)
               }
               // 走查 R11：服务端 assertCommentText 上限 500 字（UTF-16 length），
               // 之前 textarea 没卡，用户写 600 字提交才看到「评论最多 500 字。」
@@ -3810,12 +3829,16 @@ function MobileChannelCommentsSheet({
               // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
               // zoom-in。视频号评论 sheet 是常用功能，原本 text-[13px] 每次写
               // 评论都让整页放大、回弹时还要双指捏才能回正。
-              className="min-h-[72px] flex-1 rounded-[16px] border-[color:var(--border-subtle)] bg-[#f7f7f7] px-3 py-2 text-[16px] shadow-none focus:border-[rgba(7,193,96,0.2)] focus:bg-white"
+              className="min-h-[72px] flex-1 rounded-[16px] border-[color:var(--border-subtle)] bg-[#f7f7f7] px-3 py-2 text-[16px] shadow-none focus:border-[rgba(7,193,96,0.2)] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
             />
             <Button
               variant="primary"
               size="sm"
-              disabled={!draft.trim() || submitPending}
+              disabled={
+                !draft.trim() ||
+                submitPending ||
+                post?.canInteract === false
+              }
               onClick={onSubmit}
               className="mb-1 h-10 rounded-full bg-[#07c160] px-4 text-[12px] text-white shadow-none hover:bg-[#06ad56]"
             >
