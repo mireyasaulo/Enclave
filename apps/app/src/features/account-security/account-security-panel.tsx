@@ -10,7 +10,10 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, TextField } from "@yinjie/ui";
 import { describeRequestError } from "../../lib/request-error";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
-import { useCloudSessionStore } from "../../store/cloud-session-store";
+import {
+  isCloudSessionExpired,
+  useCloudSessionStore,
+} from "../../store/cloud-session-store";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 // bcrypt 只 hash 密码前 72 字节，cloud-api 的 password-policy.ts 已经按 byte 长度卡。
@@ -66,6 +69,12 @@ export function AccountSecurityPanel() {
   const runtimeConfig = useAppRuntimeConfig();
   const cloudApiBaseUrl = normalizeBaseUrl(runtimeConfig.cloudApiBaseUrl);
   const accessToken = useCloudSessionStore((state) => state.accessToken);
+  const expiresAt = useCloudSessionStore((state) => state.expiresAt);
+  // 走查 R2：原本 panel 只看 !accessToken 决定 disabled，但 expiresAt < now 时
+  // accessToken 字符串还在 store 里，按钮全亮，用户点了「发送验证码」再被 401
+  // 退回——浪费一次填表 + 等响应。socket.ts / media-url.ts / runtime-config.ts
+  // 早就按 isCloudSessionExpired 拦了，账号安全 panel 不该是唯一例外。
+  const sessionExpired = !accessToken || isCloudSessionExpired(expiresAt);
 
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -259,18 +268,26 @@ export function AccountSecurityPanel() {
   // 把核心提交条件统一到一个 flag 上，避免 disabled / 视觉态各走各的。
   const submitDisabled =
     changePasswordMutation.isPending ||
-    !accessToken ||
+    sessionExpired ||
     !code.trim() ||
     !newPassword ||
     !confirmPassword;
 
   return (
     <div className="space-y-4">
-      <InlineNotice tone="muted">
-        {t(
-          msg`修改密码需要邮箱验证码确认；验证码会发送至当前账号绑定的邮箱。`,
-        )}
-      </InlineNotice>
+      {sessionExpired ? (
+        // session 失效时把通用提示换成 danger banner，提前告知用户「先回去登录
+        // 再来改密码」，而不是让用户填完整页表单点提交才被 401 退回。
+        <InlineNotice tone="danger" role="alert">
+          {t(msg`云账号会话已失效，请重新登录后再尝试修改密码。`)}
+        </InlineNotice>
+      ) : (
+        <InlineNotice tone="muted">
+          {t(
+            msg`修改密码需要邮箱验证码确认；验证码会发送至当前账号绑定的邮箱。`,
+          )}
+        </InlineNotice>
+      )}
 
       <form
         className="space-y-3 rounded-2xl border border-[color:var(--border-faint)] bg-white p-4"
@@ -333,7 +350,7 @@ export function AccountSecurityPanel() {
               disabled={
                 sendCodeMutation.isPending ||
                 resendCountdown > 0 ||
-                !accessToken
+                sessionExpired
               }
               variant="secondary"
               size="lg"
