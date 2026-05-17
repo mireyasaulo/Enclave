@@ -155,9 +155,18 @@ export function DiscoverFeedPage() {
   const [fullCommentsByPostId, setFullCommentsByPostId] = useState<
     Record<string, FeedComment[]>
   >({});
-  const [loadingFullCommentsPostId, setLoadingFullCommentsPostId] = useState<
-    string | null
-  >(null);
+  // 走查 R1：之前是单值 `string | null`，"哪一条 post 正在读全量评论" 只能记录
+  // 最近点开的那一条。用户在 A 的 loading 还没回来时手抖再戳 B → state 翻到 B
+  // → A 卡片底部的 "查看全部 N 条" 按钮 label 立刻退回到普通文案、disabled 翻回
+  // false，看着像 A 没在加载，用户以为没点中再戳一次。expandFullComments(A) 入
+  // 口处 ref.has(A) 判定走早返兜底（不会真发第二个 RTT），但 UI 上完全没反馈，
+  // 用户视感是 "我点了它怎么不动"，体感跟 commentInflightPostIds /
+  // likeInflightPostIds R4/R5 处理过的并发 row 同款。一并升级成 Set，渲染层
+  // 用 .has() 各自判定，多条 post 并行 expand 时按钮各自 disabled / 显示
+  // "正在读取..." 自包含，再戳同一个不会让 UX 跳。
+  const [loadingFullCommentsPostIds, setLoadingFullCommentsPostIds] = useState<
+    ReadonlySet<string>
+  >(() => new Set());
   const [notice, setNotice] = useState("");
   const [noticeTone, setNoticeTone] = useState<"success" | "info">("success");
   const [noticeActionLabel, setNoticeActionLabel] = useState<string | null>(
@@ -1136,7 +1145,7 @@ export function DiscoverFeedPage() {
     setCommentBarTarget(null);
     setShowCompose(false);
     setFullCommentsByPostId({});
-    setLoadingFullCommentsPostId(null);
+    setLoadingFullCommentsPostIds((current) => (current.size > 0 ? new Set() : current));
     // 走查新 Round 5：账户切换时把残留的桌面端互动状态一并清掉。
     // 历史 baseUrl 切换只 reset 了 composeDraft / commentDrafts / actionBubble
     // / commentBarTarget / showCompose / fullComments，剩下 5 处 state 跨
@@ -1272,7 +1281,12 @@ export function DiscoverFeedPage() {
     if (fullCommentsByPostId[postId]) return;
     expandingPostIdsRef.current.add(postId);
     const expandBaseUrl = baseUrl;
-    setLoadingFullCommentsPostId(postId);
+    setLoadingFullCommentsPostIds((current) => {
+      if (current.has(postId)) return current;
+      const next = new Set(current);
+      next.add(postId);
+      return next;
+    });
     try {
       const all = await listFeedComments(postId, expandBaseUrl);
       // mid-flight 切账户：丢弃这次结果，让 B 账户的 state 保持干净。
@@ -1303,9 +1317,12 @@ export function DiscoverFeedPage() {
       );
     } finally {
       expandingPostIdsRef.current.delete(postId);
-      setLoadingFullCommentsPostId((current) =>
-        current === postId ? null : current,
-      );
+      setLoadingFullCommentsPostIds((current) => {
+        if (!current.has(postId)) return current;
+        const next = new Set(current);
+        next.delete(postId);
+        return next;
+      });
     }
   }
 
@@ -2498,10 +2515,10 @@ export function DiscoverFeedPage() {
                             onClick={() => {
                               void expandFullComments(post.id);
                             }}
-                            disabled={loadingFullCommentsPostId === post.id}
+                            disabled={loadingFullCommentsPostIds.has(post.id)}
                             className="mt-1 block text-left text-[12px] text-[#576B95] active:opacity-60 disabled:opacity-50"
                           >
-                            {loadingFullCommentsPostId === post.id
+                            {loadingFullCommentsPostIds.has(post.id)
                               ? t(msg`正在读取全部评论…`)
                               : t(msg`查看全部 ${post.commentCount} 条评论`)}
                           </button>
