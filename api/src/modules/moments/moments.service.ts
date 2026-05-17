@@ -3,8 +3,8 @@ import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { AppError } from '../../common/app-error.exception';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, MoreThanOrEqual, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, In, MoreThanOrEqual, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import type { AiMessagePart, PersonalityProfile } from '../ai/ai.types';
 import { pickThemeAndStyle } from './music-theme-catalog';
@@ -179,13 +179,69 @@ export class MomentsService implements OnModuleInit {
     private commentRepo: Repository<MomentCommentEntity>,
     @InjectRepository(MomentLikeEntity)
     private likeRepo: Repository<MomentLikeEntity>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   async onModuleInit() {
+    // 索引先建好再做后续清理：参考 feed.service 同模式。toggleLike 在
+    // findOneBy → save 两步之间存在并发窗口，慢网+客户端连续点击或后台
+    // schedule 任务并发到达，能让同一对 (postId, authorId) 落两行 like，
+    // likeCount 漂移、UI 把"自己"算成点了两次。给 moment_likes 建
+    // UNIQUE(postId, authorId) 在 DB 层兜底；entity 装饰器 unique 是
+    // 陷阱（synchronize 早于 onModuleInit，老库重复行卡死整个 child），
+    // 走 runtime DELETE+CREATE INDEX 幂等路径。
+    // moment_posts 的 (authorId, postedAt) 复合索引让"我的朋友圈"、
+    // friend-moments/$id 等 ownerOnly / characterAuthorId 路径不再
+    // 退化成全表扫描。
+    await this.ensureMomentUniqueIndexes();
     await this.backfillMomentAuthorAvatars();
     await this.backfillUserMomentVisibilityToFriends();
     await this.backfillCharacterMomentsToFeed();
     await this.cleanupLegacyDemoMomentPosts();
+  }
+
+  private async ensureMomentUniqueIndexes(): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      // 1. 去重 moment_likes：每对 (postId, authorId) 只保留 createdAt 最早一行
+      await queryRunner.query(`
+        DELETE FROM moment_likes
+        WHERE id NOT IN (
+          SELECT MIN(id) FROM moment_likes GROUP BY postId, authorId
+        )
+      `);
+      await queryRunner.query(`
+        CREATE UNIQUE INDEX IF NOT EXISTS uniq_moment_likes_post_author
+        ON moment_likes(postId, authorId)
+      `);
+      // 2. 用 like 表实际行数把 likeCount 拉回真值，修复历史漂移
+      await queryRunner.query(`
+        UPDATE moment_posts
+        SET likeCount = COALESCE((
+          SELECT COUNT(*) FROM moment_likes WHERE moment_likes.postId = moment_posts.id
+        ), 0)
+      `);
+      // 3. commentCount 同理重算（rare race，但既然在跑就一起对齐）
+      await queryRunner.query(`
+        UPDATE moment_posts
+        SET commentCount = COALESCE((
+          SELECT COUNT(*) FROM moment_comments WHERE moment_comments.postId = moment_posts.id
+        ), 0)
+      `);
+      // 4. authorId+postedAt 复合索引：ownerOnly / characterAuthorId 路径走索引
+      await queryRunner.query(`
+        CREATE INDEX IF NOT EXISTS idx_moment_posts_author_postedAt
+        ON moment_posts(authorId, postedAt)
+      `);
+    } catch (error) {
+      this.logger.error(
+        `ensureMomentUniqueIndexes failed: ${(error as Error).message}`,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   // 跟 feed.service 的 cleanupLegacyDemoChannelPosts 对称：May 9 切真生成之前
@@ -490,8 +546,13 @@ export class MomentsService implements OnModuleInit {
   ): Promise<{ liked: boolean }> {
     const existing = await this.likeRepo.findOneBy({ postId, authorId });
     if (existing) {
-      await this.likeRepo.delete(existing.id);
-      await this.postRepo.decrement({ id: postId }, 'likeCount', 1);
+      // 并发窗口里 findOneBy 双方都看到 existing → 双方都跑 delete + decrement，
+      // likeCount 会减成 -1 再被 onModuleInit recount 拉回。delete().affected 拿到
+      // 真实删了多少行，只有真正赢得这次删除的那一次才扣 count。
+      const result = await this.likeRepo.delete(existing.id);
+      if ((result.affected ?? 0) > 0) {
+        await this.postRepo.decrement({ id: postId }, 'likeCount', 1);
+      }
       return { liked: false };
     }
     const like = this.likeRepo.create({
@@ -501,7 +562,23 @@ export class MomentsService implements OnModuleInit {
       authorAvatar,
       authorType,
     });
-    await this.likeRepo.save(like);
+    try {
+      await this.likeRepo.save(like);
+    } catch (error) {
+      // uniq_moment_likes_post_author 撞了：并发两路 toggleLike 都看到没有
+      // existing 然后同时 save，DB 层兜底唯一索引把第二路 abort。语义上
+      // 这次 toggle 实际"已经"被另一路完成（liked=true），UI 也已 optimistic
+      // 切到 liked 状态，再退一步反而把 UI 和 DB 弄反。直接当成成功返回。
+      const message = (error as Error).message?.toLowerCase() ?? '';
+      if (
+        message.includes('uniq_moment_likes_post_author') ||
+        message.includes('unique constraint') ||
+        message.includes('sqlite_constraint')
+      ) {
+        return { liked: true };
+      }
+      throw error;
+    }
     await this.postRepo.increment({ id: postId }, 'likeCount', 1);
     return { liked: true };
   }
