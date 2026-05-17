@@ -23,18 +23,18 @@ msgid "音乐"
 msgstr "音乐"
 
 #: apps/app/src/components/audio-card.tsx:172
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:103
-#: apps/app/src/routes/channels-page.tsx:2431
-#: apps/app/src/routes/channels-page.tsx:2659
-msgid "暂停"
-msgstr "暂停"
-
-#: apps/app/src/components/audio-card.tsx:172
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:2431
 #: apps/app/src/routes/channels-page.tsx:2659
 msgid "播放"
 msgstr "播放"
+
+#: apps/app/src/components/audio-card.tsx:172
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:103
+#: apps/app/src/routes/channels-page.tsx:2431
+#: apps/app/src/routes/channels-page.tsx:2659
+msgid "暂停"
+msgstr "暂停"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:216
@@ -2557,7 +2557,7 @@ msgstr "关闭弹窗"
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:118
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:168
-#: apps/app/src/components/share-card-modal.tsx:429
+#: apps/app/src/components/share-card-modal.tsx:430
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:589
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:120
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:277
@@ -3520,31 +3520,31 @@ msgstr "服务号文章"
 msgid "阅读全文"
 msgstr "阅读全文"
 
-#: apps/app/src/components/share-card-modal.tsx:225
+#: apps/app/src/components/share-card-modal.tsx:226
 msgid "图片生成失败，请稍后重试"
 msgstr "图片生成失败，请稍后重试"
 
-#: apps/app/src/components/share-card-modal.tsx:338
+#: apps/app/src/components/share-card-modal.tsx:339
 msgid "保存失败，请长按图片手动保存"
 msgstr "保存失败，请长按图片手动保存"
 
-#: apps/app/src/components/share-card-modal.tsx:407
+#: apps/app/src/components/share-card-modal.tsx:408
 msgid "隐界 Enclave"
 msgstr "隐界 Enclave"
 
-#: apps/app/src/components/share-card-modal.tsx:413
-msgid "enclaveai.top · 浏览器即开即用"
-msgstr "enclaveai.top · 浏览器即开即用"
+#: apps/app/src/components/share-card-modal.tsx:414
+msgid "浏览器即开即用"
+msgstr "浏览器即开即用"
 
-#: apps/app/src/components/share-card-modal.tsx:448
+#: apps/app/src/components/share-card-modal.tsx:449
 msgid "分享图卡预览"
 msgstr "分享图卡预览"
 
-#: apps/app/src/components/share-card-modal.tsx:458
+#: apps/app/src/components/share-card-modal.tsx:459
 msgid "生成图片中…"
 msgstr "生成图片中…"
 
-#: apps/app/src/components/share-card-modal.tsx:473
+#: apps/app/src/components/share-card-modal.tsx:474
 msgid "保存 / 分享图片"
 msgstr "保存 / 分享图片"
 
@@ -8211,17 +8211,17 @@ msgid "批量管理"
 msgstr "批量管理"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
-#: apps/app/src/routes/channels-page.tsx:1680
-#: apps/app/src/routes/channels-page.tsx:1832
-msgid "生成中..."
-msgstr "生成中..."
-
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
 #: apps/app/src/i18n/static-dom-seed.ts:49
 #: apps/app/src/routes/channels-page.tsx:1680
 #: apps/app/src/routes/channels-page.tsx:1833
 msgid "换一批"
 msgstr "换一批"
+
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
+#: apps/app/src/routes/channels-page.tsx:1680
+#: apps/app/src/routes/channels-page.tsx:1832
+msgid "生成中..."
+msgstr "生成中..."
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:405
 #: apps/app/src/features/shell/desktop-nav-config.ts:89

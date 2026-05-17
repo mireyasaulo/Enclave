@@ -23,18 +23,18 @@ msgid "音乐"
 msgstr "음악"
 
 #: apps/app/src/components/audio-card.tsx:172
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:103
-#: apps/app/src/routes/channels-page.tsx:2431
-#: apps/app/src/routes/channels-page.tsx:2659
-msgid "暂停"
-msgstr "일시정지"
-
-#: apps/app/src/components/audio-card.tsx:172
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:2431
 #: apps/app/src/routes/channels-page.tsx:2659
 msgid "播放"
 msgstr "재생"
+
+#: apps/app/src/components/audio-card.tsx:172
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:103
+#: apps/app/src/routes/channels-page.tsx:2431
+#: apps/app/src/routes/channels-page.tsx:2659
+msgid "暂停"
+msgstr "일시정지"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:216
@@ -2557,7 +2557,7 @@ msgstr "팝업 닫기"
 
 #: apps/app/src/components/feature-coming-soon-dialog.tsx:118
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:168
-#: apps/app/src/components/share-card-modal.tsx:429
+#: apps/app/src/components/share-card-modal.tsx:430
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:589
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:120
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:277
@@ -3520,31 +3520,31 @@ msgstr "서비스 계정 글"
 msgid "阅读全文"
 msgstr "전체 읽기"
 
-#: apps/app/src/components/share-card-modal.tsx:225
+#: apps/app/src/components/share-card-modal.tsx:226
 msgid "图片生成失败，请稍后重试"
 msgstr "이미지 생성에 실패했어요. 잠시 후 다시 시도해 주세요."
 
-#: apps/app/src/components/share-card-modal.tsx:338
+#: apps/app/src/components/share-card-modal.tsx:339
 msgid "保存失败，请长按图片手动保存"
 msgstr "저장에 실패했어요. 미리보기를 길게 눌러 수동으로 저장해 주세요."
 
-#: apps/app/src/components/share-card-modal.tsx:407
+#: apps/app/src/components/share-card-modal.tsx:408
 msgid "隐界 Enclave"
 msgstr "Enclave"
 
-#: apps/app/src/components/share-card-modal.tsx:413
-msgid "enclaveai.top · 浏览器即开即用"
-msgstr "enclaveai.top · 브라우저에서 바로 사용 가능"
+#: apps/app/src/components/share-card-modal.tsx:414
+msgid "浏览器即开即用"
+msgstr "브라우저에서 바로 사용"
 
-#: apps/app/src/components/share-card-modal.tsx:448
+#: apps/app/src/components/share-card-modal.tsx:449
 msgid "分享图卡预览"
 msgstr "공유 이미지 미리보기"
 
-#: apps/app/src/components/share-card-modal.tsx:458
+#: apps/app/src/components/share-card-modal.tsx:459
 msgid "生成图片中…"
 msgstr "이미지 생성 중…"
 
-#: apps/app/src/components/share-card-modal.tsx:473
+#: apps/app/src/components/share-card-modal.tsx:474
 msgid "保存 / 分享图片"
 msgstr "저장 / 공유"
 
@@ -8211,17 +8211,17 @@ msgid "批量管理"
 msgstr "일괄 관리"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
-#: apps/app/src/routes/channels-page.tsx:1680
-#: apps/app/src/routes/channels-page.tsx:1832
-msgid "生成中..."
-msgstr "생성 중..."
-
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
 #: apps/app/src/i18n/static-dom-seed.ts:49
 #: apps/app/src/routes/channels-page.tsx:1680
 #: apps/app/src/routes/channels-page.tsx:1833
 msgid "换一批"
 msgstr "새로 보기"
+
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
+#: apps/app/src/routes/channels-page.tsx:1680
+#: apps/app/src/routes/channels-page.tsx:1832
+msgid "生成中..."
+msgstr "생성 중..."
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:405
 #: apps/app/src/features/shell/desktop-nav-config.ts:89
