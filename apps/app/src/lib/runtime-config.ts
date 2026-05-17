@@ -4,9 +4,11 @@ import {
   resolveCoreApiBaseUrl,
   setApiRequestErrorHandler,
   setCloudApiBaseUrlProvider,
+  setCloudApiLocaleProvider,
   setCloudWorldApiTokenProvider,
   setCoreApiBaseUrlProvider,
 } from "@yinjie/contracts";
+import { getActiveLocale } from "@yinjie/i18n";
 import { handleApiSubscriptionExpiredError } from "./subscription-expired";
 import { resolveAppRuntimeContext } from "../runtime/platform";
 import { getAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -143,6 +145,12 @@ export function configureContractsRuntime() {
   setApiRequestErrorHandler((error) => {
     handleApiSubscriptionExpiredError(error);
   });
+  // R3 走查（2026-05-17 我-设置）：cloud-api error filter 优先按 X-Yinjie-Locale
+  // 头确定响应语言，没有才回落到 Accept-Language（即浏览器 / 系统语言）。
+  // 用户在「我-设置-多语言」改成 en-US 但系统是 zh-CN 时，过去 cloud-api 仍按
+  // zh-CN 返回报错。这里挂上 getActiveLocale（i18n 实例当前激活的 locale），
+  // 让每次 cloud-api 请求带上用户当前实际选择。
+  setCloudApiLocaleProvider(() => getActiveLocale());
 }
 
 export function resolveConfiguredCoreApiBaseUrl() {

@@ -249,6 +249,15 @@ let coreApiAdminSecretProvider:
 let cloudWorldApiTokenProvider:
   | ((baseUrl: string | undefined) => string | null | undefined)
   | null = null;
+// 客户端当前的 UI locale。cloud-api 的 error filter 优先按 X-Yinjie-Locale
+// 头确定响应语言，没有才回落到 Accept-Language（即浏览器 / 系统语言）。
+// 用户在 app 内显式选了 locale（多语言设置）后，必须把这个值透传过去，否则
+// 系统是 zh-CN 而 app 选了 en-US 的用户会拿到中文 cloud-api 报错。
+// provider 由 app 在 main.tsx hydrate 后调 setCloudApiLocaleProvider 注册。
+// 返回 null/undefined 表示不附带，cloud-api 会按 Accept-Language 回落。
+let cloudApiLocaleProvider:
+  | (() => string | null | undefined)
+  | null = null;
 let apiRequestErrorHandler:
   | ((error: ApiRequestError) => void)
   | null = null;
@@ -367,6 +376,14 @@ export function setCloudWorldApiTokenProvider(
     | null,
 ) {
   cloudWorldApiTokenProvider = provider;
+}
+
+// 注册当前 UI locale provider；cloud-api 请求会以此设 X-Yinjie-Locale 头，
+// 让服务端按用户在 app 内选择的语言返回 error message（而非浏览器系统语言）。
+export function setCloudApiLocaleProvider(
+  provider: (() => string | null | undefined) | null,
+) {
+  cloudApiLocaleProvider = provider;
 }
 
 export function setApiRequestErrorHandler(
@@ -587,6 +604,18 @@ function requestCloudApi<T>(
   init?: RequestInit,
   baseUrl?: string,
 ) {
+  // 把用户在 app 内显式选的 UI locale 透传给 cloud-api，让 error filter
+  // 优先按 X-Yinjie-Locale 而不是 Accept-Language（系统语言）渲染错误文案。
+  // 避免「系统 zh-CN 但 app 改成 en-US」的用户在改密 / 发码失败时拿到中文。
+  // 调用方已在 headers 里显式设了同名头时不覆盖（保留它的意图）。
+  const locale = cloudApiLocaleProvider?.()?.trim();
+  if (locale) {
+    const headers = new Headers(init?.headers);
+    if (!headers.has("X-Yinjie-Locale")) {
+      headers.set("X-Yinjie-Locale", locale);
+      init = { ...(init ?? {}), headers };
+    }
+  }
   return request<T>(path, init, resolveCloudApiBaseUrl(baseUrl));
 }
 

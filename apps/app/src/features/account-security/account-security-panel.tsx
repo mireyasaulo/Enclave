@@ -57,8 +57,19 @@ function writeResendEnd(token: string | null | undefined, endsAt: number) {
 //      触发同一条 429 → 用户陷在 60s 循环里浪费配额。给一个保守的 5 分钟
 //      冷却，等真实窗口慢慢滑过去；用户实在急可以刷新页面或换设备。
 // R1 走查（2026-05-17）：之前正则 /(\d+)\s*秒/ 只命中 zh/ja，en/ko 都 fallback 60s。
+// R3 走查（2026-05-17）：cloud-api 把动态秒数透传在 error body 的 params.seconds
+// 字段里（cloud-api-i18n.ts translateKnownDynamicMessage），结构化优先比 regex
+// 匹配局部化后的文案更稳。preferStructuredParams 优先；message 解析仍保留作回退
+// (旧版本服务端没 params 字段；本地直连未走 cloud-api 时也走 message 兜底)。
 const RATE_LIMIT_FALLBACK_COOLDOWN_SECONDS = 5 * 60;
-function resolveRateLimitCooldown(message: string | undefined): number {
+function resolveRateLimitCooldown(
+  message: string | undefined,
+  params?: Record<string, string | number | boolean | null> | null,
+): number {
+  const structuredSeconds = params?.seconds;
+  if (typeof structuredSeconds === "number" && Number.isFinite(structuredSeconds) && structuredSeconds > 0) {
+    return Math.min(structuredSeconds, 600);
+  }
   if (!message) return RATE_LIMIT_FALLBACK_COOLDOWN_SECONDS;
   // i18n-ignore-next-line: 跨 locale 解析 cloud-api 已 i18n 化的 retry-after 文本。
   const patterns = [/(\d+)\s*秒/, /(\d+)\s*초/, /\bin\s+(\d+)\s*seconds?\b/i];
@@ -202,7 +213,7 @@ export function AccountSecurityPanel() {
       setFeedback({ tone: "danger", message: description });
       // 429 时把按钮 lock 住，否则用户读完报错连点 → 又一条 429，反复打到后端节流。
       if (isApiRequestError(error) && error.statusCode === 429) {
-        startResendCooldown(resolveRateLimitCooldown(error.message));
+        startResendCooldown(resolveRateLimitCooldown(error.message, error.params));
       }
     },
   });
