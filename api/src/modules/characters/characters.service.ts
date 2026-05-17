@@ -550,19 +550,49 @@ export class CharactersService implements OnModuleInit {
 
     // Patch：只放 input 里"实际提供"的字段；undefined 表示缺失，跳过。
     const patch: Partial<CharacterEntity> = {};
-    if (typeof input.avatar === 'string') patch.avatar = input.avatar;
+    // 走查第 3 次 R1：avatar 全空白字符串原样存浪费字节，且前端 PreviewAvatar
+    // / AvatarChip 都 trim 后落 fallback；统一在入口 trim。
+    if (typeof input.avatar === 'string') patch.avatar = input.avatar.trim();
     if (typeof input.bio === 'string') patch.bio = input.bio;
     if (input.personality !== undefined) {
       patch.personality = input.personality ?? undefined;
     }
+    // 走查第 3 次 R1：relationship / relationshipType 是单行 UI 文本（chip / title），
+    // 塞 "\n" 会撑高通讯录单行渲染，并把多行指令注入 AI prompt。和 name 同档拒。
     if (typeof input.relationship === 'string') {
+      if (containsControlChar(input.relationship)) {
+        throw new AppError('PRIVATE_IMPORT_INVALID', {
+          status: HttpStatus.BAD_REQUEST,
+          legacyMessage: 'relationship 不能包含换行符或控制字符。',
+        });
+      }
       patch.relationship = input.relationship;
     }
     if (typeof input.relationshipType === 'string') {
+      if (containsControlChar(input.relationshipType)) {
+        throw new AppError('PRIVATE_IMPORT_INVALID', {
+          status: HttpStatus.BAD_REQUEST,
+          legacyMessage: 'relationshipType 不能包含换行符或控制字符。',
+        });
+      }
       patch.relationshipType = input.relationshipType;
     }
+    // expertDomains：每个元素是 tag chip。空字符串 / 控制字符都会破坏 chip
+    // 渲染（零宽 pill / 撑高单行）。filter 空串 + reject 控制字符。
     if (Array.isArray(input.expertDomains)) {
-      patch.expertDomains = input.expertDomains;
+      const cleaned: string[] = [];
+      for (const item of input.expertDomains) {
+        if (typeof item !== 'string') continue;
+        if (containsControlChar(item)) {
+          throw new AppError('PRIVATE_IMPORT_INVALID', {
+            status: HttpStatus.BAD_REQUEST,
+            legacyMessage: 'expertDomains 元素不能包含换行符或控制字符。',
+          });
+        }
+        const trimmed = item.trim();
+        if (trimmed.length > 0) cleaned.push(trimmed);
+      }
+      patch.expertDomains = cleaned;
     }
     if (input.triggerScenes !== undefined) {
       patch.triggerScenes = input.triggerScenes ?? undefined;
@@ -631,7 +661,39 @@ export class CharactersService implements OnModuleInit {
       patch.intimacyLevel = input.intimacyLevel;
     }
     if (input.aiRelationships !== undefined) {
-      patch.aiRelationships = input.aiRelationships ?? undefined;
+      // 走查第 3 次 R1：
+      //   (1) bundle 里 relationshipType 没卡控制字符，"bff\nclose" 这种值会
+      //       塞进 AI prompt 拼接形成多行指令；
+      //   (2) 没 dedup，同一 characterId 写 3 条不同 strength 全部落库，下游
+      //       按 Map / array[0] 读时取哪条全看迭代顺序，行为不确定。
+      // 这里先把 relationshipType 卡掉、再走 Map 按 characterId 去重（last-wins
+      // 保留语义：用户重复填同 id 时通常意图是覆盖前面那条）。
+      const rels = input.aiRelationships ?? undefined;
+      if (rels) {
+        for (const rel of rels) {
+          if (
+            typeof rel?.relationshipType === 'string' &&
+            containsControlChar(rel.relationshipType)
+          ) {
+            throw new AppError('PRIVATE_IMPORT_INVALID', {
+              status: HttpStatus.BAD_REQUEST,
+              legacyMessage:
+                'aiRelationships.relationshipType 不能包含换行符或控制字符。',
+            });
+          }
+        }
+        const dedup = new Map<
+          string,
+          { characterId: string; relationshipType: string; strength: number }
+        >();
+        for (const rel of rels) {
+          if (!rel?.characterId) continue;
+          dedup.set(rel.characterId, rel);
+        }
+        patch.aiRelationships = Array.from(dedup.values());
+      } else {
+        patch.aiRelationships = undefined;
+      }
     }
     // sourceType / sourceKey 不让 import 路径改写：它们是 import-personal
     // 自身的身份标识（'private_import' + name），用户在 wiki 编辑页改这俩
@@ -686,11 +748,33 @@ export class CharactersService implements OnModuleInit {
     // 这一刻还没 newId，会落 characterId=''；后续 chat orchestrator 走
     // `runtimeProvider = resolveRuntimeProvider({ characterId: profile.characterId })`
     // 拿到空串会跳过 character_override 路由——通过 usageContext.characterId
-    // 还能兜住但语义上是错的。这里 saved 之后补一道 upsert，DB 行的 profile
-    // 自始终带正确的 characterId。只在 characterId 为空 / 缺失时补，避免误改
-    // 用户在 wiki 端 finalize 过的 profile.characterId（极少见但允许）。
-    if (saved.profile && !saved.profile.characterId) {
-      saved.profile = { ...saved.profile, characterId: saved.id };
+    // 还能兜住但语义上是错的。
+    //
+    // 走查第 3 次 R1：原本只在 characterId 为空时回填，注释里写"允许用户在
+    // wiki 端 finalize 过的 profile.characterId"；但 wiki UI 实际不暴露这字段，
+    // 唯一能写它的路径就是手工 bundle，且写一个不匹配 entity.id 的值会让
+    // character_override 路由静默失配。改成"profile.characterId 永远 ≡ saved.id"。
+    // 同时把 aiRelationships 里指向自身的条目剥掉——任何 social-graph tick 走
+    // self-edge 都是死循环或归一化失真的开端。
+    const desiredProfileId = saved.id;
+    let needsResave = false;
+    if (
+      saved.profile &&
+      saved.profile.characterId !== desiredProfileId
+    ) {
+      saved.profile = { ...saved.profile, characterId: desiredProfileId };
+      needsResave = true;
+    }
+    if (Array.isArray(saved.aiRelationships)) {
+      const withoutSelf = saved.aiRelationships.filter(
+        (rel) => rel.characterId !== desiredProfileId,
+      );
+      if (withoutSelf.length !== saved.aiRelationships.length) {
+        saved.aiRelationships = withoutSelf;
+        needsResave = true;
+      }
+    }
+    if (needsResave) {
       await this.repo.save(saved);
     }
 

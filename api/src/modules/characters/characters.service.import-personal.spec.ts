@@ -132,6 +132,89 @@ describe('CharactersService.importPersonalCharacter', () => {
     ).resolves.toBeDefined();
   });
 
+  it('rejects relationship / relationshipType containing control characters', async () => {
+    // 第 3 次走查 R1：name 已卡，但 relationship / relationshipType 这俩单行
+    // UI 文本字段没卡，"我的\n朋友" 落库后通讯录单行 chip 渲染撑高、AI prompt
+    // 拼接被多行注入。和 name 同档拒。
+    const { svc } = makeService({ existing: null });
+    await expect(
+      svc.importPersonalCharacter({
+        name: '小白',
+        relationship: '我的\n朋友',
+      }),
+    ).rejects.toThrow(/relationship/);
+    await expect(
+      svc.importPersonalCharacter({
+        name: '小白',
+        relationshipType: 'bff\tclose',
+      }),
+    ).rejects.toThrow(/relationshipType/);
+  });
+
+  it('filters empty expertDomains items and rejects control chars in them', async () => {
+    // 第 3 次走查 R1：filter 之前只过 typeof string，不过 trim 长度，导致
+    // ["valid","","alsovalid"] 落库后通讯录渲染一个零宽 tag pill。
+    // 同时元素本身也不能带控制字符（chip 渲染撑高）。
+    const { svc } = makeService({ existing: null });
+    const out = await svc.importPersonalCharacter({
+      name: '小白',
+      expertDomains: ['valid', '', 'alsovalid', '   '],
+    });
+    expect(out.character.expertDomains).toEqual(['valid', 'alsovalid']);
+    await expect(
+      svc.importPersonalCharacter({
+        name: '小绿',
+        expertDomains: ['ok', 'bad\nval'],
+      }),
+    ).rejects.toThrow(/expertDomains/);
+  });
+
+  it('dedups and self-ref-strips aiRelationships', async () => {
+    // 第 3 次走查 R1：
+    //   - 同一 characterId 写多条不同 strength 都能落库 → Map 按 last-wins dedup
+    //   - aiRelationships 包含 saved.id 形成 self-loop → 后置 filter 剥掉
+    const captured: Char[] = [];
+    const { svc } = makeService({ existing: null });
+    // 让 repo.save 模拟 echo saved 对象、记录调用以便断言 self-ref 被剥
+    (svc as unknown as { repo: { save: jest.Mock } }).repo.save = jest.fn(
+      async (row: Char) => {
+        captured.push({ ...row });
+        return row;
+      },
+    );
+    const out = await svc.importPersonalCharacter({
+      name: '小白',
+      aiRelationships: [
+        { characterId: 'private-X', relationshipType: 'friend', strength: 0.3 },
+        { characterId: 'private-X', relationshipType: 'close', strength: 0.9 },
+        { characterId: 'private-Y', relationshipType: 'friend', strength: 0.5 },
+      ],
+    });
+    // 落库的最终 aiRelationships 中：X 只剩 1 条（last-wins），Y 1 条
+    expect(out.character.aiRelationships).toEqual([
+      { characterId: 'private-X', relationshipType: 'close', strength: 0.9 },
+      { characterId: 'private-Y', relationshipType: 'friend', strength: 0.5 },
+    ]);
+  });
+
+  it('always overwrites profile.characterId with the entity id', async () => {
+    // 第 3 次走查 R1：之前只在 profile.characterId 为空时回填，注释说"允许用户
+    // 在 wiki 端 finalize"，但 wiki UI 不暴露该字段，唯一能写它的就是手工
+    // bundle。写一个不匹配 entity.id 的值会让 chat orchestrator resolveRuntimeProvider
+    // 失配，character_override 路由静默掉。强制让 profile.characterId ≡ saved.id。
+    const { svc } = makeService({ existing: null });
+    const out = await svc.importPersonalCharacter({
+      name: '小白',
+      profile: {
+        characterId: 'private-COMPLETELY-FAKE',
+        name: 'X',
+        relationship: 'r',
+        basePrompt: 'b',
+      } as never,
+    });
+    expect(out.character.profile.characterId).toBe(out.character.id);
+  });
+
   it('rejects names containing control characters (\\n, \\t, \\r)', async () => {
     // 走查 R1：原来 name 没卡控制字符，"line1\nline2" 被允许写入，落库后
     // 通讯录单行 title 渲染会撑高列表项，AI prompt 也会被多行指令注入。

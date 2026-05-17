@@ -37,6 +37,7 @@ import {
 } from './message-reminders.service';
 import type {
   ContactCardAttachment,
+  Conversation,
   FileAttachment,
   ImageAttachment,
   LocationCardAttachment,
@@ -136,58 +137,94 @@ export class ChatController {
     // invalidate ["app-conversations"] 重拉新 lastMessage。client onChatMessage
     // 路径没有「message_deleted」事件，删一条非最后消息的话另一端 thread 内
     // 仍要等下次进会话 refetch 才会同步（和 group 同名行为一致）。
-    const conversation = await this.chatService.getConversation(conversationId);
-    if (conversation && conversation.type === 'direct') {
-      this.chatGateway.emitConversationUpdated({
-        id: conversation.id,
-        type: 'direct',
-        title: conversation.title,
-        participants: conversation.participants,
-      });
-    }
+    await this.emitDirectConversationUpdatedIfNeeded(conversationId);
     return result;
   }
 
   @Post(':id/read')
-  markRead(@Param('id') id: string) {
-    return this.chatService.markConversationRead(id);
+  async markRead(@Param('id') id: string) {
+    await this.chatService.markConversationRead(id);
+    // 走查 R5：和 group 写操作 emit conversation_updated 同步。原版单聊点
+    // 「标为已读」/在 chat 页面进入触发的 markRead 走 REST 不 emit，多端在线
+    // 时另一端 chat-list 的未读小红点要等 60s 兜底轮询才消掉。其它写操作
+    // (markUnread/pin/mute/strongReminder/hide/clear) 同款修法，单独抽
+    // emitDirectConversationUpdatedIfNeeded helper 集中处理。
+    await this.emitDirectConversationUpdatedIfNeeded(id);
   }
 
   @Post(':id/unread')
-  markUnread(@Param('id') id: string) {
-    return this.chatService.markConversationUnread(id);
+  async markUnread(@Param('id') id: string) {
+    const conversation = await this.chatService.markConversationUnread(id);
+    this.emitConversationUpdateIfDirect(conversation);
+    return conversation;
   }
 
   @Post(':id/pin')
-  setPinned(@Param('id') id: string, @Body() body: { pinned: boolean }) {
-    return this.chatService.setConversationPinned(id, body.pinned);
+  async setPinned(@Param('id') id: string, @Body() body: { pinned: boolean }) {
+    const conversation = await this.chatService.setConversationPinned(
+      id,
+      body.pinned,
+    );
+    this.emitConversationUpdateIfDirect(conversation);
+    return conversation;
   }
 
   @Post(':id/mute')
-  setMuted(@Param('id') id: string, @Body() body: { muted: boolean }) {
-    return this.chatService.setConversationMuted(id, body.muted);
+  async setMuted(@Param('id') id: string, @Body() body: { muted: boolean }) {
+    const conversation = await this.chatService.setConversationMuted(
+      id,
+      body.muted,
+    );
+    this.emitConversationUpdateIfDirect(conversation);
+    return conversation;
   }
 
   @Post(':id/strong-reminder')
-  setStrongReminder(
+  async setStrongReminder(
     @Param('id') id: string,
     @Body() body: { enabled: boolean; durationHours?: number },
   ) {
-    return this.chatService.setConversationStrongReminder(
+    const conversation = await this.chatService.setConversationStrongReminder(
       id,
       body.enabled,
       body.durationHours,
     );
+    this.emitConversationUpdateIfDirect(conversation);
+    return conversation;
   }
 
   @Post(':id/hide')
-  hideConversation(@Param('id') id: string) {
-    return this.chatService.hideConversation(id);
+  async hideConversation(@Param('id') id: string) {
+    const conversation = await this.chatService.hideConversation(id);
+    this.emitConversationUpdateIfDirect(conversation);
+    return conversation;
   }
 
   @Post(':id/clear')
-  clearConversation(@Param('id') id: string) {
-    return this.chatService.clearConversationHistory(id);
+  async clearConversation(@Param('id') id: string) {
+    const conversation = await this.chatService.clearConversationHistory(id);
+    this.emitConversationUpdateIfDirect(conversation);
+    return conversation;
+  }
+
+  private emitConversationUpdateIfDirect(conversation: Conversation) {
+    if (conversation.type !== 'direct') {
+      return;
+    }
+    this.chatGateway.emitConversationUpdated({
+      id: conversation.id,
+      type: 'direct',
+      title: conversation.title,
+      participants: conversation.participants,
+    });
+  }
+
+  private async emitDirectConversationUpdatedIfNeeded(conversationId: string) {
+    const conversation = await this.chatService.getConversation(conversationId);
+    if (!conversation) {
+      return;
+    }
+    this.emitConversationUpdateIfDirect(conversation);
   }
 }
 
