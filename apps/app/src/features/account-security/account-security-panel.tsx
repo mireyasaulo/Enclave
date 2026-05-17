@@ -198,6 +198,13 @@ export function AccountSecurityPanel() {
 
       <form
         className="space-y-3 rounded-2xl border border-[color:var(--border-faint)] bg-white p-4"
+        // noValidate：禁掉 HTML5 native 校验。<input pattern="\d{6}"> 留着是
+        // 给 a11y 报字段格式期望，但 native popup（"Please match the requested
+        // format."）的文案是浏览器系统语言决定的，zh-CN 用户在 headless chrome
+        // / 海外原生浏览器下会看到英文，跟 app 当前 locale 不一致。我们自己的
+        // handleSubmit 已经全量校验：code 非空 → newPassword 长度 / 空格 /
+        // 一致性，错误文案走 t()，不需要 native 兜底。
+        noValidate
         onSubmit={(event) => {
           event.preventDefault();
           if (submitDisabled) return;
@@ -215,6 +222,12 @@ export function AccountSecurityPanel() {
                 onChange={(event) => {
                   // 后端验证码硬是 6 位数字（email-auth.service.ts generateCode），
                   // 移动端给一个 numeric 键盘 + 长度截断，少一次"输错位数才报错"的来回。
+                  // 注意 maxLength 不能上：HTML 层 maxLength 在 input 事件之前先把
+                  // 用户粘贴的内容截掉，"abc1234567" 这种带前缀字符 + 7 位数字的
+                  // OTP（邮件复制带前后空格/标签是典型场景）会先被截成 "abc123"，
+                  // onChange 再 strip 字母变成 "123"——用户复制了 7 位有效数字结果
+                  // 只剩 3 位，根本不知道发生了什么。改成 onChange 内一次性 strip
+                  // 非数字 + slice 6，由 React 控制最终 value，maxLength 不需要。
                   const next = event.target.value
                     .replace(/\D+/g, "")
                     .slice(0, 6);
@@ -224,8 +237,6 @@ export function AccountSecurityPanel() {
                 placeholder={t(msg`6 位数字`)}
                 inputMode="numeric"
                 autoComplete="one-time-code"
-                maxLength={6}
-                pattern="\d{6}"
               />
             </div>
             <Button
