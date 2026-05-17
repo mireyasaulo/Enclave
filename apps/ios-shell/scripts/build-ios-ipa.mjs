@@ -49,6 +49,59 @@ function optionalEnv(name, fallback = "") {
   return value || fallback;
 }
 
+// 真机走查 Round 4 (2026-05-17)：iOS-shell.config.json / .local.json 都
+// 声明 ios.exportMethod，local example 的 _comment 还明确写「所有字段可选，
+// 缺失则继承 ios-shell.config.json；env 仍可在最后覆盖」—— 但 build-ios-ipa.mjs
+// 老实现只读 YINJIE_IOS_EXPORT_METHOD env，缺失就直接 fallback 到字面量 "ad-hoc"，
+// shell config 里的 exportMethod 是 dead code。用户编辑 config 把 exportMethod
+// 改成 release-testing / app-store-connect 之后还得记得再 export env，
+// 否则 IPA 静默走 ad-hoc，TestFlight / App Store Connect 路径全错。
+//
+// configure-ios-project.mjs 那边 pickConfigured 已经实现了「env > config」
+// 的双层 fallback；build 这边没用上同款 helper。这里把 shellConfig +
+// localShellConfig deep-merge 后的 ios.exportMethod 当作 env 之后的兜底。
+function readJsonIfExists(filePath) {
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function deepMerge(target, source) {
+  if (!isPlainObject(target)) {
+    return isPlainObject(source) ? deepMerge({}, source) : source;
+  }
+  if (!isPlainObject(source)) {
+    return target;
+  }
+  const result = { ...target };
+  for (const key of Object.keys(source)) {
+    const srcVal = source[key];
+    const tgtVal = result[key];
+    if (isPlainObject(tgtVal) && isPlainObject(srcVal)) {
+      result[key] = deepMerge(tgtVal, srcVal);
+    } else {
+      result[key] = srcVal;
+    }
+  }
+  return result;
+}
+
+function loadMergedShellConfig() {
+  const baseConfig = readJsonIfExists(resolve(shellDir, "ios-shell.config.json")) ?? {};
+  const localConfig =
+    readJsonIfExists(resolve(shellDir, "ios-shell.config.local.json")) ?? {};
+  return deepMerge(baseConfig, localConfig);
+}
+
+const mergedShellConfig = loadMergedShellConfig();
+
 function run(command, commandArgs, options = {}) {
   console.log(`$ ${command} ${commandArgs.join(" ")}`);
   const result = spawnSync(command, commandArgs, {
@@ -298,8 +351,16 @@ const provisioningProfile = optionalEnv(
   "YINJIE_IOS_PROVISIONING_PROFILE_SPECIFIER",
 );
 const codeSignIdentity = optionalEnv("YINJIE_IOS_CODE_SIGN_IDENTITY");
+// 真机走查 R4：env > shellConfig.ios.exportMethod > "ad-hoc"。configure 那边
+// 同款 pickConfigured 用法。ios-shell.config.json 默认 "app-store-connect"
+// 一直没生效，曾用户编辑 config 想换 release-testing / app-store-connect
+// 都得记得再 export env，否则静默走 ad-hoc，TestFlight / App Store 路径全错。
+const configuredExportMethod =
+  typeof mergedShellConfig?.ios?.exportMethod === "string"
+    ? mergedShellConfig.ios.exportMethod.trim()
+    : "";
 const exportMethod = resolveExportMethod(
-  optionalEnv("YINJIE_IOS_EXPORT_METHOD", "ad-hoc"),
+  optionalEnv("YINJIE_IOS_EXPORT_METHOD", configuredExportMethod || "ad-hoc"),
 );
 
 if (codeSignStyle === "Manual" && !provisioningProfile) {
