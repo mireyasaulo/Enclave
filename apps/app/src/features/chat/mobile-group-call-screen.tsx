@@ -190,6 +190,15 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     [joinedMemberIds, members],
   );
   const visibleMembers = useMemo(() => members.slice(0, 10), [members]);
+  // 走查 新 R1：原版直接在 JSX 里 `members.map(m=>m.memberId)` 喂 GroupAvatarChip，
+  // 每次 render（成员加入/离开、syncCurrentStatus 1200ms timer 触发、activeCount
+  // 变化等）都 new 一个 array → GroupAvatarChip 拿到新 prop 引用、重新算 hashSeed
+  // × 4 + 重新挂 4 个 <img>。memberIds 改 useMemo 锁住引用，群成员稳定时
+  // GroupAvatarChip 完全跳过重渲染。
+  const memberIdsForAvatar = useMemo(
+    () => members.map((member) => member.memberId),
+    [members],
+  );
   const activeCount = activeMembers.length;
   const totalCount = members.length;
   const waitingCount = Math.max(totalCount - activeCount, 0);
@@ -903,7 +912,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
           <div className="flex items-center gap-4">
             <GroupAvatarChip
               name={groupName}
-              members={members.map((member) => member.memberId)}
+              members={memberIdsForAvatar}
               size="wechat"
             />
             <div className="min-w-0 flex-1">

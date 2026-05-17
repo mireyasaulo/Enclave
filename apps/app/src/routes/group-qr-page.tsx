@@ -40,6 +40,7 @@ import { buildPublicShareUrl } from "../lib/share-url";
 import {
   createGroupInviteDeliveryBatchId,
   hydrateGroupInviteDeliveryFromNative,
+  isGroupInviteStorageKey,
   readGroupInviteDeliveryRecord,
   readGroupInviteDeliveryTargets,
   readGroupInviteReopenRecords,
@@ -645,13 +646,24 @@ export function GroupQrPage() {
     const handleFocus = () => {
       void syncGroupInviteState();
     };
+    // 走查 新 R1：原版 storage handler 直接复用 handleFocus，OTHER tab 任何
+    // localStorage 写入都会触发 hydrate→读 3 个 storage key→setState×4，包括
+    // 主题切换、last viewed page、草稿等完全无关的写入。用 isGroupInviteStorageKey
+    // gate 一下，只在群邀请投递/记录/复登的 3 个 key 上才真同步；老 Safari 的
+    // localStorage.clear() 场景 key=null helper 也按全量同步对待。
+    const handleStorage = (event: StorageEvent) => {
+      if (!isGroupInviteStorageKey(event.key)) {
+        return;
+      }
+      void syncGroupInviteState();
+    };
 
     window.addEventListener("focus", handleFocus);
-    window.addEventListener("storage", handleFocus);
+    window.addEventListener("storage", handleStorage);
     return () => {
       cancelled = true;
       window.removeEventListener("focus", handleFocus);
-      window.removeEventListener("storage", handleFocus);
+      window.removeEventListener("storage", handleStorage);
     };
   }, [groupId, nativeDesktopGroupInvite]);
 

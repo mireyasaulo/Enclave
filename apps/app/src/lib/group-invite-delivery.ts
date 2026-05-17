@@ -46,6 +46,25 @@ const GROUP_INVITE_DELIVERY_STORAGE_KEY = "yinjie-group-invite-delivery";
 const GROUP_INVITE_DELIVERY_TARGETS_STORAGE_KEY =
   "yinjie-group-invite-delivery-targets";
 const GROUP_INVITE_REOPEN_STORAGE_KEY = "yinjie-group-invite-reopen";
+
+// 走查 新 R1：group-qr-page 在 window "storage" 事件上挂了同步 handler——但
+// 浏览器对 OTHER tab 任何 localStorage 写入都会 broadcast 一遍 storage event，
+// 不管 key 是不是我们关心的。tab 之间换主题、记录 last viewed page、上次输入
+// 草稿等等都会触发我们的 hydrate→读 3 个 storage key→setState×4。导出一个
+// key 判别器让调用方过滤 event.key，避免无关 tab 写入触发同步开销。
+export function isGroupInviteStorageKey(key: string | null | undefined) {
+  if (!key) {
+    // 老版本 Safari 在 localStorage.clear() 时 storage event 的 key=null，
+    // 这种"清空所有 key"语义下还是应该全量同步一遍。
+    return true;
+  }
+  return (
+    key === GROUP_INVITE_DELIVERY_STORAGE_KEY ||
+    key === GROUP_INVITE_DELIVERY_TARGETS_STORAGE_KEY ||
+    key === GROUP_INVITE_REOPEN_STORAGE_KEY
+  );
+}
+
 let groupInviteNativeWriteQueue: Promise<void> = Promise.resolve();
 
 function getStorage() {
