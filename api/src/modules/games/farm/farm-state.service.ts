@@ -423,6 +423,15 @@ export class FarmStateService {
         legacyMessage: `等级不足：需 ${def.unlockLevel} 级才能购买 ${def.nameZh} 种子`,
       });
     }
+    // UI 的 seed-shop-sheet 已经按 isFarmCropInSeason 过滤掉了过季作物，
+    // 但 API 之前是裸的：客户端绕过 / API 直调可以买到 7 个月后才能种的种子，
+    // 等于 coins 沉淀，plant 时再报 OUT_OF_SEASON。补齐服务端的同步校验。
+    if (!isCropAvailableNow(cropId)) {
+      throw new AppError('FARM_CROP_OUT_OF_SEASON', {
+        params: { cropName: def.nameZh },
+        legacyMessage: `${def.nameZh} 不在当季，过几个月再来`,
+      });
+    }
     const totalCost = def.seedCost * quantity;
     if (state.coins < totalCost) {
       throw new AppError('FARM_INSUFFICIENT_COINS', {
