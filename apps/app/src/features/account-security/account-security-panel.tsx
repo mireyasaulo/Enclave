@@ -14,6 +14,27 @@ import { useCloudSessionStore } from "../../store/cloud-session-store";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
+// 走查 R4：cooldown 之前只活在组件 useState 里，用户点完「发送验证码」 → 触发
+// cooldown → 切去任意子页（连切去 /profile/settings 都算）回来时组件 unmount /
+// remount，state 清零，按钮恢复成「发送验证码」可点 → 又一发请求，server
+// 60s 滑窗马上再返 429。
+// 模块级 Map 按 accessToken 维度缓存 endsAt（绝对时间戳），mount 时复读 →
+// 跨 nav 真实保留剩余时间。reload 整页时也会丢，但 reload 本身是用户显式
+// 行为；接下来一次点击会被 server 429 兜住，再次落盘。
+const RESEND_END_BY_TOKEN = new Map<string, number>();
+function readResendEnd(token: string | null | undefined) {
+  if (!token) return 0;
+  return RESEND_END_BY_TOKEN.get(token) ?? 0;
+}
+function writeResendEnd(token: string | null | undefined, endsAt: number) {
+  if (!token) return;
+  if (endsAt <= Date.now()) {
+    RESEND_END_BY_TOKEN.delete(token);
+    return;
+  }
+  RESEND_END_BY_TOKEN.set(token, endsAt);
+}
+
 // 后端 429 走两条文案：
 //   1) "验证码发送过于频繁，请在 {n} 秒后重试。"（60 秒滑窗）
 //   2) "该邮箱验证码请求次数过多，请稍后再试。"（小时窗口超 5 条上限）
@@ -50,7 +71,9 @@ export function AccountSecurityPanel() {
   // 之前用 setInterval 每秒 -1 一个 state；后台 tab 节流会把 1Hz 拉到 1/min，
   // 倒计时显示和后端实际 retry-after 拉开十几倍。改成存 endsAt 绝对时间戳，
   // 每秒从 Date.now() 重算剩余秒，回前台立刻对齐真实剩余。
-  const [resendEndsAt, setResendEndsAt] = useState(0);
+  // R4：mount 时从模块级 RESEND_END_BY_TOKEN 读上次留下来的 endsAt，让 cooldown
+  // 跨页面切换真实保留剩余时间。
+  const [resendEndsAt, setResendEndsAt] = useState(() => readResendEnd(accessToken));
   const [resendCountdown, setResendCountdown] = useState(0);
 
   useEffect(() => {
@@ -66,19 +89,29 @@ export function AccountSecurityPanel() {
       setResendCountdown(remaining);
       if (remaining <= 0) {
         setResendEndsAt(0);
+        writeResendEnd(accessToken, 0);
       }
     };
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [resendEndsAt]);
+  }, [accessToken, resendEndsAt]);
+
+  // accessToken 切换（换号/登出）时拉一次最新 endsAt，避免上一个用户的冷却
+  // 误伤新身份。
+  useEffect(() => {
+    setResendEndsAt(readResendEnd(accessToken));
+  }, [accessToken]);
 
   const startResendCooldown = (seconds: number) => {
     if (seconds <= 0) {
       setResendEndsAt(0);
+      writeResendEnd(accessToken, 0);
       return;
     }
-    setResendEndsAt(Date.now() + seconds * 1000);
+    const endsAt = Date.now() + seconds * 1000;
+    setResendEndsAt(endsAt);
+    writeResendEnd(accessToken, endsAt);
   };
 
   const sendCodeMutation = useMutation({
