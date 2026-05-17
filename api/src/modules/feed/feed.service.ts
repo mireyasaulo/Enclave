@@ -91,6 +91,25 @@ const CHANNEL_HOME_SECTION_LABELS: Record<FeedChannelHomeSection, string> = {
   live: '直播',
 };
 
+// 走查 R1（本轮）：客户端只发 4 个白名单 section，但 curl/反代/旧缓存链路里
+// 任意脏字符串都会落进 input.section——TS enum 是编译期，运行时 service 把它
+// 透回 `activeSection: 'galaxy'`，而前端拿到的 sectionLabels 只认识 4 个 key，
+// 未来如果哪个 UI 真的把 activeSection 喂回 sections.find 之类的逻辑会拿到
+// undefined。统一在 service 入口 normalize，未知值兜底回 recommended。
+function normalizeChannelHomeSection(
+  raw: unknown,
+): FeedChannelHomeSection {
+  if (
+    raw === 'recommended' ||
+    raw === 'friends' ||
+    raw === 'following' ||
+    raw === 'live'
+  ) {
+    return raw;
+  }
+  return 'recommended';
+}
+
 const CHANNEL_VIDEO_TOPIC_TAGS = ['AI世界', '隐界'];
 const CHANNEL_VIDEO_ASPECT_RATIO = 9 / 16;
 
@@ -352,7 +371,7 @@ export class FeedService implements OnModuleInit {
       ownerId: owner.id,
       ownerAvatar: owner.avatar,
     });
-    const section = input?.section ?? 'recommended';
+    const section = normalizeChannelHomeSection(input?.section);
     const page = clampFeedPaginationPage(input?.page ?? 1);
     const limit = clampFeedPaginationLimit(input?.limit ?? 20);
 
@@ -394,7 +413,7 @@ export class FeedService implements OnModuleInit {
       ownerId: owner.id,
       ownerAvatar: owner.avatar,
     });
-    const section = input?.section ?? 'recommended';
+    const section = normalizeChannelHomeSection(input?.section);
     const page = clampFeedPaginationPage(input?.page ?? 1);
     const limit = clampFeedPaginationLimit(input?.limit ?? 20);
 
@@ -403,35 +422,52 @@ export class FeedService implements OnModuleInit {
     // + notInterested + followed + friends），仅最后一道 section filter 不同。
     // 拿 allVisiblePosts 后按需在内存里 re-filter 出 sectionFiltered，避免重复
     // SELECT * + 重复 owner social 4 项查询。
+    //
+    // 走查 R1（本轮）：上一轮 R5 把"重拉全表"省下来了，但 filterChannelPostsBySection
+    // 在 friends/following section 上仍各自现查一次 followRepo.find / getFriendCharacterIds，
+    // 而紧跟在后面的 buildChannelSectionCounts 又把两份都拉一遍——其中一份是
+    // 重复 IO。把 follow/friend 这两份小数据在外层 Promise.all 一次性拉到，
+    // filter 与 count 两边都吃同一份，friends/following section 的 decorations
+    // 接口少 1 个 DB 查询（公网下省一次 RTT 等价 5-15ms）。
     const allVisiblePosts = await this.getVisibleChannelPosts(
       owner.id,
       'recommended',
     );
-    const postsForSection =
-      section === 'recommended'
-        ? allVisiblePosts
-        : await this.filterChannelPostsBySection(
-            allVisiblePosts,
-            owner.id,
-            section,
-          );
+    const [followedAuthorIds, friendCharacterIds] = await Promise.all([
+      this.followRepo
+        .find({ where: { ownerId: owner.id } })
+        .then((rows) => new Set(rows.map((row) => row.authorId))),
+      this.socialService
+        .getFriendCharacterIds(owner.id)
+        .then((ids) => new Set(ids)),
+    ]);
+    const postsForSection = this.filterChannelPostsBySectionWithSets(
+      allVisiblePosts,
+      section,
+      followedAuthorIds,
+      friendCharacterIds,
+    );
     const pagedPosts = paginate(postsForSection, page, limit);
 
-    const [commentsPreviewMap, authors, liveEntries, sectionCounts] =
-      await Promise.all([
-        this.buildCommentsPreviewMap(
-          pagedPosts.map((post) => post.id),
-          owner.id,
-          avatarContext,
-        ),
-        this.buildChannelAuthorSummaries(
-          allVisiblePosts,
-          owner.id,
-          avatarContext,
-        ),
-        this.buildLiveEntries(allVisiblePosts, avatarContext),
-        this.buildChannelSectionCounts(allVisiblePosts, owner.id),
-      ]);
+    const sectionCounts = this.computeChannelSectionCounts(
+      allVisiblePosts,
+      followedAuthorIds,
+      friendCharacterIds,
+    );
+
+    const [commentsPreviewMap, authors, liveEntries] = await Promise.all([
+      this.buildCommentsPreviewMap(
+        pagedPosts.map((post) => post.id),
+        owner.id,
+        avatarContext,
+      ),
+      this.buildChannelAuthorSummaries(
+        allVisiblePosts,
+        owner.id,
+        avatarContext,
+      ),
+      this.buildLiveEntries(allVisiblePosts, avatarContext),
+    ]);
 
     return {
       sections: (
@@ -514,9 +550,14 @@ export class FeedService implements OnModuleInit {
       }));
 
     if (!latestPost) {
+      // 走查 R1 同款修法：channel-author-page 错误条直接吃 error.message，i18n
+      // 字典 hit 不到的语言会原样飘英文。`error-translate.ts` 已经按 code 译过
+      // 「视频号作者不存在。」，但 channel-author-page 现在显示的是 legacyMessage。
+      // 这里直接出中文跟 FEED_POST_NOT_FOUND（line 4097）/ FEED_FORWARD_TARGET_REQUIRED
+      // 对齐。
       throw new AppError('FEED_CHANNEL_AUTHOR_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
-        legacyMessage: 'Channel author not found',
+        legacyMessage: '视频号作者不存在或已被删除。',
       });
     }
 
@@ -3008,7 +3049,21 @@ export class FeedService implements OnModuleInit {
         .getFriendCharacterIds(ownerId)
         .then((ids) => new Set(ids)),
     ]);
+    return this.computeChannelSectionCounts(
+      posts,
+      followedAuthorIds,
+      friendCharacterIds,
+    );
+  }
 
+  // 走查 R1（本轮）：纯内存计算版本，让 getChannelHomeDecorations 把
+  // followedAuthorIds + friendCharacterIds 在外层取一次后同时喂给
+  // filterChannelPostsBySectionWithSets 和 sectionCounts，避免一次 RTT 重复 IO。
+  private computeChannelSectionCounts(
+    posts: FeedPostEntity[],
+    followedAuthorIds: Set<string>,
+    friendCharacterIds: Set<string>,
+  ): Record<FeedChannelHomeSection, number> {
     return {
       recommended: posts.length,
       friends: posts.filter((post) => friendCharacterIds.has(post.authorId))
@@ -3021,6 +3076,33 @@ export class FeedService implements OnModuleInit {
           (post.topicTags ?? []).some((tag) => tag.includes('直播')),
       ).length,
     };
+  }
+
+  // 走查 R1（本轮）：filterChannelPostsBySection 的纯内存版本——基于已经在外层
+  // 取好的 follow/friend 两份集合直接过滤，避免 decorations 接口在 friends/following
+  // section 上再额外拉一次 followRepo.find / getFriendCharacterIds。
+  private filterChannelPostsBySectionWithSets(
+    basePosts: FeedPostEntity[],
+    section: FeedChannelHomeSection,
+    followedAuthorIds: Set<string>,
+    friendCharacterIds: Set<string>,
+  ): FeedPostEntity[] {
+    if (section === 'recommended') return basePosts;
+    if (section === 'live') {
+      return basePosts.filter(
+        (post) =>
+          post.sourceKind === 'live_clip' ||
+          (post.topicTags ?? []).some((tag) => tag.includes('直播')),
+      );
+    }
+    if (section === 'friends') {
+      return basePosts.filter((post) => friendCharacterIds.has(post.authorId));
+    }
+    if (section === 'following') {
+      return basePosts.filter((post) => followedAuthorIds.has(post.authorId));
+    }
+    // 走查 R1（本轮）：未知 section 输入（curl ?section=galaxy 等）兜底当 recommended。
+    return basePosts;
   }
 
   // 视频号死链/无 URL 的视频/音频帖直接不展示。
@@ -3354,7 +3436,7 @@ export class FeedService implements OnModuleInit {
 
     throw new AppError('FEED_CHANNEL_AUTHOR_NOT_FOUND', {
       status: HttpStatus.NOT_FOUND,
-      legacyMessage: 'Channel author not found',
+      legacyMessage: '视频号作者不存在或已被删除。',
     });
   }
 
