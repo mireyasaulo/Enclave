@@ -233,15 +233,27 @@ export function ShareCardModal({
     };
   }, [cardKey, qrReady]);
 
+  // 第二次走查 R3 (perf)：caller (MomentShareCardModal / FeedPostShareCardModal)
+  // 都把 onClose={() => setX(null)} inline 箭头透下来。父组件 (MobileMomentsView
+  // 等) 在 share modal 打开期间凡 notice 2.4s 定时器收尾 / commentMutation
+  // pending 翻动 / pullState 抖 → 整页 re-render → onClose 身份换 → 下面两条
+  // useEffect 把 keydown listener + Android back interceptor unregister + register
+  // 一遍。和 WeChatCommentBar / WeChatActionBubble / MobileMomentsView 的
+  // cleanup-storm 同模式：ref 钉最新 onClose，effect 只在 cardKey 翻转时跑。
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
   // ESC 关闭 — 必须放在任何条件 return 之前以遵守 hooks 规则
   useEffect(() => {
     if (!cardKey) return;
     const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [cardKey, onClose]);
+  }, [cardKey]);
 
   // Android 硬件 Back：分享卡 modal 打开时按 Back 应该收 modal 而不是退掉
   // 整个广场/朋友圈页 —— modal 已经 body.overflow=hidden 屏蔽了底层交互，
@@ -250,10 +262,10 @@ export function ShareCardModal({
     if (!cardKey) return;
     return registerAndroidBackInterceptor((event) => {
       event.preventDefault();
-      onClose();
+      onCloseRef.current();
       return true;
     });
-  }, [cardKey, onClose]);
+  }, [cardKey]);
 
   // body 滚动锁 — modal 打开时背景不能滚动（手机上特别重要，否则手指滑动
   // 会同时滚动底层页面）。
