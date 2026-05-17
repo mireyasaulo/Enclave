@@ -264,10 +264,25 @@ export class FeedService implements OnModuleInit {
       `);
 
       // 3. 用 like 表实际行数重算 likeCount；同理用 type='favorite' 重算 favoriteCount
+      // 走查 R2（本轮）：原 SQL 只数 feed_post_likes —— 但 likeOwnerPost（用户点赞）
+      // 走的是 createPostInteraction → user_feed_interactions(type='like') + likeCount++，
+      // feed_post_likes 那张表只被 toggleLike（AI 角色点赞）写。于是每次 cloud-api
+      // 重启跑 ensureFeedUniqueIndexes，所有用户自己的赞被这条 UPDATE 静默抹掉
+      // 一次：likeCount 重置成 feed_post_likes 单表 COUNT（纯 AI 数量），UI 里仍
+      // hasLiked=true 但卡上"X 赞"少了用户自己的 +1，体感像「我点过的赞被吞」。
+      // 验证：yuanzui 库里 post 4f836b6c-... ufi_count=1（用户已 like）/ pl_count=14
+      //  / likeCount=14——用户的 +1 应该让 likeCount=15，但它跟 pl_count 一致，
+      //  说明上次启动把用户的赞抹掉了。
+      // 两张表语义不重叠（user → ufi、character → pl），直接求和即可，没有重复
+      // 计数风险。
       await queryRunner.query(`
         UPDATE feed_posts
         SET likeCount = COALESCE((
           SELECT COUNT(*) FROM feed_post_likes WHERE feed_post_likes.postId = feed_posts.id
+        ), 0) + COALESCE((
+          SELECT COUNT(*) FROM user_feed_interactions
+          WHERE user_feed_interactions.postId = feed_posts.id
+            AND user_feed_interactions.type = 'like'
         ), 0)
       `);
       await queryRunner.query(`
