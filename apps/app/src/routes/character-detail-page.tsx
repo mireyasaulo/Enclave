@@ -1394,11 +1394,18 @@ export function CharacterDetailPage() {
                     }
               }
               deletePending={deleteFriendMutation.isPending}
+              // 走查第三遍 R1：原来 onDeleteFriend 走 handleDeleteFriendAction →
+              // 里面 isDesktopLayout 分支又 window.confirm 一次，跟 ContactDetailPane
+              // 自己的 DangerConfirmDialog 叠成 double-confirm（用户在 pane 里点
+              // 「删除」→ 又弹原生 confirm "确认删除这个联系人吗？"）。隔壁的
+              // onToggleBlock 写法已经直接 blockMutation.mutate(isBlocked)，因为
+              // pane 已经确认过；delete 这里漏对齐。改成同款直 mutate。
               onDeleteFriend={
                 isSelfMirror
                   ? undefined
                   : () => {
-                      handleDeleteFriendAction();
+                      setNotice(null);
+                      deleteFriendMutation.mutate();
                     }
               }
             />
@@ -2108,9 +2115,15 @@ export function CharacterDetailPage() {
                 <ProfileSwitchRow
                   label={starredFriendLabel}
                   checked={friendship?.isStarred ?? false}
-                  onToggle={() =>
-                    setStarredMutation.mutate(!(friendship?.isStarred ?? false))
-                  }
+                  onToggle={() => {
+                    // 走查第三遍 R2：桌面 onToggleStarred wrapper (line 1351) 一直
+                    // setNotice(null) 起手，移动 ProfileSwitchRow 这里漏了，前一条
+                    // success notice 会跟新 toggle 重叠几百 ms 才被替换。对齐。
+                    setNotice(null);
+                    setStarredMutation.mutate(
+                      !(friendship?.isStarred ?? false),
+                    );
+                  }}
                   disabled={setStarredMutation.isPending}
                   compact={!isDesktopLayout}
                 />
@@ -2125,11 +2138,14 @@ export function CharacterDetailPage() {
                 <ProfileSwitchRow
                   label={t(msg`默认用语音回复`)}
                   checked={character.defaultVoiceReply ?? false}
-                  onToggle={() =>
+                  onToggle={() => {
+                    // 走查第三遍 R2：同上 —— 桌面 onToggleDefaultVoiceReply 已经
+                    // setNotice(null) 起手，对齐移动这里。
+                    setNotice(null);
                     setDefaultVoiceReplyMutation.mutate(
                       !(character.defaultVoiceReply ?? false),
-                    )
-                  }
+                    );
+                  }}
                   disabled={setDefaultVoiceReplyMutation.isPending}
                   compact={!isDesktopLayout}
                 />
