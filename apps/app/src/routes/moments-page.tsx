@@ -1906,31 +1906,51 @@ function MobileMomentsView({
   // 不能直接 history.back() 把朋友圈页退掉。与 publish 页 (fa97a32c)、chat
   // 系列 (38a65fa5 等) 最近的 Back 行为对齐——用户语义是「关弹窗」，
   // 不是「离开页面」。优先级匹配 ESC 习惯：最新打开的先关。
+  //
+  // 走查第三轮 R1：CDP 实测——commentBar 打开期间在 textarea 连按 30 字，
+  // back interceptor add/del 计数同样 30/30。父组件 MomentsPage 把
+  // onCloseActionMenu={() => setActionBubble(null)} 等 inline 箭头每次 render
+  // 都新引用透下来，effect deps 里挂了俩 handler → commentDrafts 每键 setState
+  // 就 unregister + register 一次。和 publish 页 (423e2749) 同模式：用 ref
+  // 把最新 handler/状态钉稳，effect 只在 hasOverlay 翻转时跑。
+  const backInterceptorRef = useRef({
+    commentBarTarget,
+    actionBubble,
+    shareMomentId,
+    onCloseCommentBar,
+    onCloseActionMenu,
+    setShareMomentId,
+  });
   useEffect(() => {
-    const hasOverlay = Boolean(
-      commentBarTarget || actionBubble || shareMomentId,
-    );
+    backInterceptorRef.current = {
+      commentBarTarget,
+      actionBubble,
+      shareMomentId,
+      onCloseCommentBar,
+      onCloseActionMenu,
+      setShareMomentId,
+    };
+  });
+  const hasOverlay = Boolean(
+    commentBarTarget || actionBubble || shareMomentId,
+  );
+  useEffect(() => {
     if (!hasOverlay) return;
     return registerAndroidBackInterceptor((event) => {
       event.preventDefault();
-      if (commentBarTarget) {
-        onCloseCommentBar();
+      const ctx = backInterceptorRef.current;
+      if (ctx.commentBarTarget) {
+        ctx.onCloseCommentBar();
         return true;
       }
-      if (actionBubble) {
-        onCloseActionMenu();
+      if (ctx.actionBubble) {
+        ctx.onCloseActionMenu();
         return true;
       }
-      setShareMomentId(null);
+      ctx.setShareMomentId(null);
       return true;
     });
-  }, [
-    actionBubble,
-    commentBarTarget,
-    shareMomentId,
-    onCloseActionMenu,
-    onCloseCommentBar,
-  ]);
+  }, [hasOverlay]);
 
   return (
     <AppPage className="relative space-y-0 bg-white px-0 pb-0 pt-0">
