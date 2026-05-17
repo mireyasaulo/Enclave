@@ -67,7 +67,10 @@ import {
   type MomentVideoDraft,
 } from "../features/moments/moment-compose-media";
 import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
-import { getMomentSummaryText } from "../features/moments/moment-content";
+import {
+  getMomentSummaryText,
+  stripToolCallSyntax,
+} from "../features/moments/moment-content";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
@@ -835,11 +838,33 @@ export function MomentsPage() {
   );
   const visibleMoments = useMemo(
     () =>
-      momentsData.filter(
-        (moment) =>
-          moment.authorType !== "character" ||
-          !blockedCharacterIds.has(moment.authorId),
-      ),
+      momentsData.filter((moment) => {
+        if (
+          moment.authorType === "character" &&
+          blockedCharacterIds.has(moment.authorId)
+        ) {
+          return false;
+        }
+        // 第二次走查 R1：偶尔有 AI 角色把 [TOOL_CALL] / <tool_call> 语法当正文
+        // 发出来（实测线上 116 条里有 1 条全是 web_search 调用语法），
+        // wechat-moment-card 把这种内容 strip 成空字符串后 hasText=false +
+        // 多数是 text contentType (无 media) → 卡片只剩头像 + 时间戳 + ⋯ +
+        // 一堆评论挂着，用户看到「界闻 / 刚刚 ⋯ / 评论：追政策信号倒挺敏锐」
+        // 完全不知道在评什么。和 wechat-moment-card 内 visibleComments
+        // 的 strip-then-skip 同模式：父层先过滤掉整张「空胶水」卡片，
+        // 让附带的评论 / 点赞也一起退场（孤儿评论无意义）。location
+        // 兜底是防御性的——理论上没有 location-only moment，但若 contentType=text
+        // + media=[] + text strip 为空，仅 location 仍能撑住卡片，留个口。
+        const stripped = stripToolCallSyntax(moment.text);
+        if (
+          !stripped &&
+          moment.media.length === 0 &&
+          !moment.location
+        ) {
+          return false;
+        }
+        return true;
+      }),
     [momentsData, blockedCharacterIds],
   );
   // 「后端给了 N 条 moment 但全是被屏蔽角色」识别——空态 CTA 选「打开通讯录」

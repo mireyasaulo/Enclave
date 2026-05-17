@@ -37,6 +37,7 @@ import {
   buildMobileFriendMomentsRouteHash,
   parseMobileFriendMomentsRouteState,
 } from "../features/moments/mobile-friend-moments-route-state";
+import { stripToolCallSyntax } from "../features/moments/moment-content";
 import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
@@ -478,9 +479,18 @@ export function MobileFriendMomentsPage() {
   // re-render，叠加 N 个 useMemo 重算会把高频 setState 路径多吃几 ms。
   const friendMoments = useMemo(
     () =>
-      (momentsQuery.data ?? []).filter(
-        (moment) => !blockedCharacterIds.has(moment.authorId),
-      ),
+      (momentsQuery.data ?? []).filter((moment) => {
+        if (blockedCharacterIds.has(moment.authorId)) return false;
+        // 第二次走查 R1：跟主朋友圈页同款——AI 角色偶尔把 [TOOL_CALL] /
+        // <tool_call> 当正文发，wechat-moment-card 把 text strip 成空 +
+        // 无 media → 卡片只剩头像/时间戳/⋯ + 评论挂着孤儿。父层先过滤掉
+        // 整张「空胶水」卡片。
+        const stripped = stripToolCallSyntax(moment.text);
+        if (!stripped && moment.media.length === 0 && !moment.location) {
+          return false;
+        }
+        return true;
+      }),
     [blockedCharacterIds, momentsQuery.data],
   );
   // 时间线左边那列「日 / 月」的预格式化。之前在 friendMoments.map 内联里每条
