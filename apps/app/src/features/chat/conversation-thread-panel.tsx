@@ -219,6 +219,13 @@ export function ConversationThreadPanel({
       ),
     [initialUnreadCount, initialUnreadCutoff, renderedMessages],
   );
+  // 走查 R2：原版直接在 JSX 里 `[participants[0]]`，每次 render 都 new 一个数组 →
+  // MobileChatPlusPanel 里 useMemo(excludeIdSet) 的 dep 跟着每帧失效 → 每帧
+  // new Set + filter 66 个好友。这条 useMemo 把数组引用稳定下来。
+  const contactPickerExcludeIds = useMemo<readonly string[] | undefined>(
+    () => (participants[0] ? [participants[0]] : undefined),
+    [participants],
+  );
   const replyPreview = replyDraft
     ? {
         senderName: replyDraft.senderName,
@@ -870,9 +877,7 @@ export function ConversationThreadPanel({
                   : {}),
               });
             }}
-            contactPickerExcludeIds={
-              participants[0] ? [participants[0]] : undefined
-            }
+            contactPickerExcludeIds={contactPickerExcludeIds}
             replyPreview={replyPreview}
             onCancelReply={() => setReplyDraft(null)}
             onSubmit={() => void handleSubmit()}
