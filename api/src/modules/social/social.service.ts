@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, In, IsNull, MoreThanOrEqual, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, In, IsNull, MoreThan, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { AppError } from '../../common/app-error.exception';
 import { FriendshipEntity } from './friendship.entity';
 import { FriendRequestEntity } from './friend-request.entity';
@@ -560,10 +560,27 @@ export class SocialService {
 
     // 既要排除已经是好友的，也要排除已经有 pending 申请的（避免重复轰炸）。
     // 两条 find 互不依赖，并行省一个 RT。
+    // 走查 R3-Round1：以前 pending 全捞，包括 expiresAt < now 的"僵尸 pending"。
+    // friend_requests 没有 cron 帮它从 pending → expired，所以 24h 没动的 scene
+    // 申请会永远卡住对应角色，不能再被场景相遇匹中（实测 yuanzui 91173587559732
+    // 这个 world：53 pending 里 2 个 expiresAt 已过期，对应 2 个角色"永远被占用"）。
+    // 显式加 expiresAt > now (null 兼容历史数据) 把 dead pending 当作"空位"释放。
+    const now = new Date();
     const [existingFriendships, pendingRequests] = await Promise.all([
       this.friendshipRepo.find({ where: { ownerId: owner.id } }),
       this.friendRequestRepo.find({
-        where: { ownerId: owner.id, status: 'pending' },
+        where: [
+          {
+            ownerId: owner.id,
+            status: 'pending',
+            expiresAt: MoreThan(now),
+          },
+          {
+            ownerId: owner.id,
+            status: 'pending',
+            expiresAt: IsNull(),
+          },
+        ],
       }),
     ]);
     const friendIds = new Set(
