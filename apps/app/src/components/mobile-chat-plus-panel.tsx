@@ -31,6 +31,7 @@ import {
   CHAT_LOCATION_SCENES,
   buildLocationCardAttachment,
 } from "../features/chat/chat-location-scenes";
+import { getFriendDisplayName } from "../features/contacts/contact-utils";
 import {
   buildFavoriteShareText,
   mergeDesktopFavoriteRecords,
@@ -307,6 +308,28 @@ export function MobileChatPlusPanel({
     [hasVoiceCall, hasVideoCall],
   );
 
+  // 父级 ChatComposer 每次 keystroke 都把 plus 面板带着重渲，excludeCharacterIds
+  // 数组也是单聊侧每次 render new 一个 [participants[0]]——不 memo 就每帧 new Set
+  // 再 filter 66 个好友一遍。memo 之后引用稳定，下面 friends.map 的 button 也能
+  // 配合 useMemo 后的 friends 数组拿到 stable identity。
+  // ※必须放在 `if (!open) return null` 之前，否则 rules-of-hooks 违例。
+  const excludeIdSet = useMemo(
+    () =>
+      excludeCharacterIds && excludeCharacterIds.length
+        ? new Set(excludeCharacterIds)
+        : null,
+    [excludeCharacterIds],
+  );
+  const friends = useMemo(
+    () =>
+      excludeIdSet
+        ? (friendsQuery.data ?? []).filter(
+            ({ character }) => !excludeIdSet.has(character.id),
+          )
+        : (friendsQuery.data ?? []),
+    [excludeIdSet, friendsQuery.data],
+  );
+
   if (!open) {
     return null;
   }
@@ -314,15 +337,6 @@ export function MobileChatPlusPanel({
   const UnavailableIcon = unavailableAction?.icon;
   const unavailableFallbackAction = unavailableAction?.fallbackAction;
   const unavailableFallbackLabel = unavailableAction?.fallbackLabel;
-  const excludeIdSet =
-    excludeCharacterIds && excludeCharacterIds.length
-      ? new Set(excludeCharacterIds)
-      : null;
-  const friends = excludeIdSet
-    ? (friendsQuery.data ?? []).filter(
-        ({ character }) => !excludeIdSet.has(character.id),
-      )
-    : (friendsQuery.data ?? []);
   const showFriendsError = friendsQuery.isError && friends.length === 0;
   const showFavoritesError =
     favoritesQuery.isError && favoriteRecords.length === 0;
@@ -379,60 +393,56 @@ export function MobileChatPlusPanel({
                           ? undefined
                           : item.disabledLabel;
                     const Icon = item.icon;
-                    const handleClick = itemDisabled
-                      ? () => {
-                          setUnavailableAction(item);
-                          onUnavailableAction?.(
-                            item.unavailableDescription
-                              ? t(item.unavailableDescription)
-                              : t(msg`${t(item.label)} 暂未接入。`),
+                    // 走查 R1：原版是 9 层嵌套三元，每个 tile 每帧 new 6+ 个
+                    // 闭包候选 + 跟踪起来眼睛要瞎。归并成单条 dispatcher，可读
+                    // 性 + 闭包数减少；语义保持不变。
+                    const handleClick = () => {
+                      if (itemDisabled) {
+                        setUnavailableAction(item);
+                        onUnavailableAction?.(
+                          item.unavailableDescription
+                            ? t(item.unavailableDescription)
+                            : t(msg`${t(item.label)} 暂未接入。`),
+                        );
+                        return;
+                      }
+
+                      setUnavailableAction(null);
+                      switch (item.key) {
+                        case "album":
+                          onPickAlbum();
+                          return;
+                        case "camera":
+                          onPickCamera();
+                          return;
+                        case "file":
+                          onPickFile();
+                          return;
+                        case "favorite":
+                          setFavoriteRecords(
+                            mergeDesktopFavoriteRecords(
+                              favoritesQuery.data ?? [],
+                              readDesktopFavorites(),
+                            ),
                           );
-                        }
-                      : item.key === "album"
-                        ? () => {
-                            setUnavailableAction(null);
-                            onPickAlbum();
-                          }
-                        : item.key === "camera"
-                          ? () => {
-                              setUnavailableAction(null);
-                              onPickCamera();
-                            }
-                          : item.key === "favorite"
-                            ? () => {
-                                setUnavailableAction(null);
-                                setFavoriteRecords(
-                                  mergeDesktopFavoriteRecords(
-                                    favoritesQuery.data ?? [],
-                                    readDesktopFavorites(),
-                                  ),
-                                );
-                                setActiveView("favorites");
-                              }
-                            : item.key === "contact"
-                              ? () => {
-                                  setUnavailableAction(null);
-                                  setActiveView("contacts");
-                                }
-                              : item.key === "file"
-                                ? () => {
-                                    setUnavailableAction(null);
-                                    onPickFile();
-                                  }
-                                : item.key === "voice-call"
-                                  ? () => {
-                                      setUnavailableAction(null);
-                                      onStartVoiceCall?.();
-                                    }
-                                  : item.key === "video-call"
-                                    ? () => {
-                                        setUnavailableAction(null);
-                                        onStartVideoCall?.();
-                                      }
-                                  : () => {
-                                      setUnavailableAction(null);
-                                      setActiveView("locations");
-                                    };
+                          setActiveView("favorites");
+                          return;
+                        case "contact":
+                          setActiveView("contacts");
+                          return;
+                        case "location":
+                          setActiveView("locations");
+                          return;
+                        case "voice-call":
+                          onStartVoiceCall?.();
+                          return;
+                        case "video-call":
+                          onStartVideoCall?.();
+                          return;
+                        default:
+                          return;
+                      }
+                    };
 
                     return (
                       <button
@@ -580,43 +590,53 @@ export function MobileChatPlusPanel({
           ) : null}
           {friends.length ? (
             <div className="mx-2.5 max-h-[40dvh] overflow-auto rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
-              {friends.map(({ character }, index) => (
-                <button
-                  key={character.id}
-                  type="button"
-                  onClick={() =>
-                    void onSelectContactCard({
-                      kind: "contact_card",
-                      characterId: character.id,
-                      name: character.name,
-                      avatar: character.avatar,
-                      relationship: character.relationship,
-                      bio: character.bio ?? undefined,
-                    })
-                  }
-                  disabled={busy}
-                  className={cn(
-                    "flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60",
-                    index > 0
-                      ? "border-t border-[color:var(--border-subtle)]"
-                      : undefined,
-                  )}
-                >
-                  <AvatarChip
-                    name={character.name}
-                    src={character.avatar}
-                    size="wechat"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13px] text-[color:var(--text-primary)]">
-                      {character.name}
+              {friends.map((item, index) => {
+                const { character, friendship } = item;
+                // 走查 R1：联系人列表跟通讯录 / 群成员选择 / 桌面拓展面板里都
+                // 是 remarkName > character.name 的显示规则，但 + 面板这里漏了
+                // friendship.remarkName，给了备注的好友（如 "林医生 → 健康顾问"）
+                // 在挑名片时只看到原名，跟其它入口对不上。
+                const displayName = getFriendDisplayName(item);
+                return (
+                  <button
+                    key={character.id}
+                    type="button"
+                    onClick={() =>
+                      void onSelectContactCard({
+                        kind: "contact_card",
+                        characterId: character.id,
+                        name: character.name,
+                        avatar: character.avatar,
+                        relationship: character.relationship,
+                        bio: character.bio ?? undefined,
+                      })
+                    }
+                    disabled={busy}
+                    className={cn(
+                      "flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60",
+                      index > 0
+                        ? "border-t border-[color:var(--border-subtle)]"
+                        : undefined,
+                    )}
+                  >
+                    <AvatarChip
+                      name={displayName}
+                      src={character.avatar}
+                      size="wechat"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[13px] text-[color:var(--text-primary)]">
+                        {displayName}
+                      </div>
+                      <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
+                        {friendship.remarkName?.trim()
+                          ? character.name
+                          : character.relationship || t(msg`世界联系人`)}
+                      </div>
                     </div>
-                    <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
-                      {character.relationship || t(msg`世界联系人`)}
-                    </div>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           ) : null}
           {!friendsQuery.isLoading && !showFriendsError && !friends.length ? (
