@@ -284,6 +284,19 @@ function queueNativeGroupInviteDeliveryStoreWrite(
     .catch(() => undefined);
 }
 
+// 走查新一轮 R2：localStorage.setItem 在两个常见场景会抛：
+//   1. QuotaExceededError —— 5MB 配额满（用户聊天附件/邀请历史攒多了）
+//   2. SecurityError —— Safari iOS 隐私模式下 localStorage 存在但 setItem
+//      固定抛错（quota=0）
+// 原版三处 setItem 全裸跑：
+//   · writeGroupInviteDeliveryRecord(line 428) 被 group-qr-page sendToConversation
+//     调用：抛错会被外层 catch 翻成 danger notice"未能把群邀请发到 X"——但
+//     sendGroupMessage 已经成功，群邀请其实已经发到了，提示完全 misleading；
+//     更糟糕的是用户重试一次还是抛同样的错，邀请被服务端收两遍。
+//   · writeGroupInviteReopenRecord(line 489) 被 group-qr-page useEffect 调用：
+//     useEffect 同步抛错会冒到 React error boundary —— 整个 QR 页直接白屏。
+// 修：三段 setItem/removeItem 各裹一层 try/catch，单段失败不影响其它两段，
+// 业务上"持久化降级"——内存里 React state 仍正确，下次会话再写就 OK。
 function writeGroupInviteDeliveryStoreToLocal(
   store: GroupInviteDeliveryStore,
   options?: {
@@ -295,31 +308,43 @@ function writeGroupInviteDeliveryStoreToLocal(
     return store;
   }
 
-  if (Object.keys(store.deliveryRecords).length) {
-    storage.setItem(
-      GROUP_INVITE_DELIVERY_STORAGE_KEY,
-      JSON.stringify(store.deliveryRecords),
-    );
-  } else {
-    storage.removeItem(GROUP_INVITE_DELIVERY_STORAGE_KEY);
+  try {
+    if (Object.keys(store.deliveryRecords).length) {
+      storage.setItem(
+        GROUP_INVITE_DELIVERY_STORAGE_KEY,
+        JSON.stringify(store.deliveryRecords),
+      );
+    } else {
+      storage.removeItem(GROUP_INVITE_DELIVERY_STORAGE_KEY);
+    }
+  } catch {
+    // 配额满 / Safari 隐私模式 —— 静默降级，下次再写
   }
 
-  if (Object.keys(store.deliveryTargets).length) {
-    storage.setItem(
-      GROUP_INVITE_DELIVERY_TARGETS_STORAGE_KEY,
-      JSON.stringify(store.deliveryTargets),
-    );
-  } else {
-    storage.removeItem(GROUP_INVITE_DELIVERY_TARGETS_STORAGE_KEY);
+  try {
+    if (Object.keys(store.deliveryTargets).length) {
+      storage.setItem(
+        GROUP_INVITE_DELIVERY_TARGETS_STORAGE_KEY,
+        JSON.stringify(store.deliveryTargets),
+      );
+    } else {
+      storage.removeItem(GROUP_INVITE_DELIVERY_TARGETS_STORAGE_KEY);
+    }
+  } catch {
+    // 同上
   }
 
-  if (Object.keys(store.reopenRecords).length) {
-    storage.setItem(
-      GROUP_INVITE_REOPEN_STORAGE_KEY,
-      JSON.stringify(store.reopenRecords),
-    );
-  } else {
-    storage.removeItem(GROUP_INVITE_REOPEN_STORAGE_KEY);
+  try {
+    if (Object.keys(store.reopenRecords).length) {
+      storage.setItem(
+        GROUP_INVITE_REOPEN_STORAGE_KEY,
+        JSON.stringify(store.reopenRecords),
+      );
+    } else {
+      storage.removeItem(GROUP_INVITE_REOPEN_STORAGE_KEY);
+    }
+  } catch {
+    // 同上
   }
 
   if (options?.syncNative !== false) {
