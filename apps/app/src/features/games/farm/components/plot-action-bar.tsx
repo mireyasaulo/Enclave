@@ -13,6 +13,7 @@ import {
   useDebugFarmPlot,
   useHarvestFarmPlot,
   usePlantFarmCrop,
+  useUprootFarmPlot,
   useWaterFarmPlot,
   useWeedFarmPlot,
 } from "../use-farm-state";
@@ -24,6 +25,7 @@ export type PlotPulseKind =
   | "debug"
   | "fertilize"
   | "pesticide"
+  | "uproot"
   | "harvest";
 
 interface PlotActionBarProps {
@@ -47,6 +49,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
   const harvestMutation = useHarvestFarmPlot();
   const fertilizerMutation = useApplyFarmFertilizer();
   const pesticideMutation = useApplyFarmPesticide();
+  const uprootMutation = useUprootFarmPlot();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const plot: FarmPlot | null = useMemo(() => {
@@ -71,6 +74,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
     debugMutation.isPending ||
     fertilizerMutation.isPending ||
     pesticideMutation.isPending ||
+    uprootMutation.isPending ||
     harvestMutation.isPending;
 
   const fertilizerCount = state.consumables?.fertilizer ?? 0;
@@ -169,6 +173,8 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
   }
 
   const def = FARM_CROP_CATALOG[plot.cropId];
+  const isPerennial = def.isPerennial === true;
+  const harvestCount = plot.harvestCount ?? 0;
   const remainingMs =
     plot.maturedAt != null ? plot.maturedAt - nowMs : 0;
 
@@ -178,6 +184,11 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
         <span className="flex items-center gap-1">
           <span>{def.emoji}</span>
           {t(msg`第`)} {plotIndex + 1} {t(msg`块田 ·`)} {def.nameZh}
+          {isPerennial && harvestCount > 0 && (
+            <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] text-emerald-700">
+              {t(msg`已收`)} {harvestCount} {t(msg`茬`)}
+            </span>
+          )}
         </span>
         <span className="text-stone-500">
           {isRipe ? t(msg`已成熟`) : `${t(msg`还差`)} ${formatRemainingMs(remainingMs)}`}
@@ -188,7 +199,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
           {errorMsg}
         </div>
       )}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {isRipe ? (
           <button
             type="button"
@@ -312,6 +323,28 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
             </button>
           </>
         )}
+        <button
+          type="button"
+          onClick={() => {
+            const confirmMsg = isPerennial
+              ? t(msg`确定砍掉这棵${def.nameZh}？已收 ${harvestCount} 茬，砍了就清空。`)
+              : t(msg`确定铲掉这株${def.nameZh}？`);
+            if (!window.confirm(confirmMsg)) return;
+            clearError();
+            const targetPlot = plotIndex!;
+            uprootMutation.mutate(
+              { plotIndex: targetPlot },
+              {
+                onSuccess: () => onPulse?.(targetPlot, "uproot"),
+                onError: handleError,
+              },
+            );
+          }}
+          disabled={isPending}
+          className="ml-auto inline-flex min-h-[36px] items-center gap-1 rounded-full bg-stone-200 px-3 py-1.5 text-xs text-stone-600 hover:bg-stone-300 disabled:opacity-60"
+        >
+          🪓 {isPerennial ? t(msg`砍树`) : t(msg`铲除`)}
+        </button>
       </div>
     </div>
   );

@@ -7,6 +7,8 @@ import {
 } from 'typeorm';
 import {
   FarmConsumableId,
+  FarmDecorationId,
+  FarmDecorationPlacement,
   FarmDogState,
   FarmPlot,
   FarmStolenLogEntry,
@@ -53,6 +55,14 @@ export class FarmPlayerStateEntity {
   // 看家狗：level=0 表示未购买；energy 0-100；lastFedAt ms。
   @Column('simple-json', { nullable: true })
   dogPayload?: FarmDogState | null;
+
+  // 已购但还未摆出的装饰物库存（按 type 计数）。
+  @Column('simple-json', { nullable: true })
+  decorationInventoryPayload?: Partial<Record<FarmDecorationId, number>> | null;
+
+  // 实际摆在农场背景层的装饰物实例。
+  @Column('simple-json', { nullable: true })
+  placedDecorationsPayload?: FarmDecorationPlacement[] | null;
 
   @Column({ type: 'datetime', nullable: true })
   lastTickAt?: Date | null;

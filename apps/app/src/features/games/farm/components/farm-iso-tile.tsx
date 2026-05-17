@@ -22,6 +22,7 @@ const PULSE_EMOJI: Record<PlotPulseKind, string> = {
   debug: "🐛",
   fertilize: "💩",
   pesticide: "🧴",
+  uproot: "🪓",
   harvest: "🪙",
 };
 

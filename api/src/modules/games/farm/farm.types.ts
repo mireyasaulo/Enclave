@@ -1,18 +1,42 @@
 export type FarmCropId =
+  // 一阶（lv 1-2，平民蔬菜）
   | 'cabbage'
   | 'potato'
   | 'carrot'
+  | 'radish'
+  | 'lettuce'
+  | 'spinach'
+  | 'onion'
+  // 二阶（lv 2-4，主粮 + 普通收益）
   | 'wheat'
   | 'corn'
+  | 'peanut'
+  | 'soybean'
   | 'tomato'
   | 'strawberry'
   | 'sunflower'
   | 'rice'
+  | 'eggplant'
+  | 'cucumber'
+  // 三阶（lv 4-6，高价 + 罕见）
   | 'pumpkin'
+  | 'watermelon'
+  | 'sugarcane'
   | 'lavender'
-  | 'ginseng'
+  | 'mint'
   | 'goji'
-  | 'snow_lotus';
+  | 'dragon_fruit'
+  // 多年生果树（lv 7-9，一次种、多季收）
+  | 'apple_tree'
+  | 'peach_tree'
+  | 'grape_vine'
+  | 'orange_tree'
+  | 'cherry_tree'
+  // 顶级药材 / 节日特供
+  | 'ginseng'
+  | 'snow_lotus'
+  | 'plum_blossom'
+  | 'osmanthus';
 
 export type FarmPlotStage =
   | 'empty'
@@ -29,6 +53,7 @@ export type FarmActorType = 'owner' | 'character';
 export type FarmEventKind =
   | 'plant'
   | 'harvest'
+  | 'uproot'
   | 'water'
   | 'weed'
   | 'debug'
@@ -42,6 +67,7 @@ export type FarmEventKind =
   | 'dog_buy'
   | 'dog_feed'
   | 'dog_upgrade'
+  | 'decorate'
   | 'visit'
   | 'intimacy_change'
   | 'incident_broadcast';
@@ -74,6 +100,8 @@ export interface FarmPlot {
   fertilized?: boolean;
   // 农药 cooling-off 截止时间。在此 ms 之前，bugs 不再随机生成。
   pesticideUntilMs?: number | null;
+  // 多年生果树已收获过的次数；不是空地就 ≥0，第 0 茬未收就 0。
+  harvestCount?: number;
 }
 
 export interface FarmDogState {
@@ -126,6 +154,41 @@ export interface FarmCropDefinition {
   unlockLevel: number;
   rarity: FarmCropRarity;
   experience: number;
+  // 多年生作物：一次播种、多季收获。perennialCycleHours 是收获后的下一茬周期。
+  isPerennial?: boolean;
+  perennialCycleHours?: number;
+  // 节日限定：仅在 festivalWindow 启用日期内可购买与播种（默认 disabled）。
+  festival?: 'spring' | 'mid_autumn' | 'halloween';
+}
+
+export type FarmDecorationId =
+  | 'scarecrow'
+  | 'windmill'
+  | 'wood_fence'
+  | 'pond'
+  | 'flower_bed'
+  | 'lantern'
+  | 'statue'
+  | 'hammock'
+  | 'beehive'
+  | 'mailbox';
+
+export interface FarmDecorationDefinition {
+  id: FarmDecorationId;
+  nameZh: string;
+  emoji: string;
+  price: number;
+  unlockLevel: number;
+  descriptionZh: string;
+  // 偶发功能：scarecrow 减少害虫生成几率；其他都是纯装饰。
+  effect?: 'reduce_bugs';
+}
+
+export interface FarmDecorationPlacement {
+  id: string; // 唯一实例 id，UUID
+  type: FarmDecorationId;
+  x: number; // 0-100 百分比坐标（农场背景层）
+  y: number;
 }
 
 export interface FarmPlayerStateView {
@@ -139,6 +202,10 @@ export interface FarmPlayerStateView {
   seedBag: Record<string, number>;
   consumables: Record<FarmConsumableId, number>;
   dog: FarmDogState;
+  // 已购但未必摆出的装饰库存：按 type 计数；
+  // placedDecorations 是当前摆在农场背景里的具体实例。
+  decorationInventory: Record<FarmDecorationId, number>;
+  placedDecorations: FarmDecorationPlacement[];
   weeklyStolenLog: FarmStolenLogEntry[];
   serverNowMs: number;
   updatedAt: string;
@@ -214,6 +281,18 @@ export interface FarmConsumablePurchaseResult {
   coinsSpent: number;
 }
 
+export interface FarmDecorationPurchaseResult {
+  player: FarmPlayerStateView;
+  decorationId: FarmDecorationId;
+  quantity: number;
+  coinsSpent: number;
+}
+
+export interface FarmDecorationPlaceResult {
+  player: FarmPlayerStateView;
+  placement: FarmDecorationPlacement;
+}
+
 export interface FarmTickSummary {
   scannedCharacterCount: number;
   actedCount: number;
@@ -248,17 +327,36 @@ export const FARM_DEFAULT_PLAYER_SEED_BAG: Record<FarmCropId, number> = {
   cabbage: 5,
   potato: 3,
   carrot: 0,
+  radish: 0,
+  lettuce: 0,
+  spinach: 0,
+  onion: 0,
   wheat: 0,
   corn: 0,
-  strawberry: 0,
+  peanut: 0,
+  soybean: 0,
   tomato: 0,
+  strawberry: 0,
   sunflower: 0,
   rice: 0,
+  eggplant: 0,
+  cucumber: 0,
   pumpkin: 0,
+  watermelon: 0,
+  sugarcane: 0,
   lavender: 0,
+  mint: 0,
   goji: 0,
+  dragon_fruit: 0,
+  apple_tree: 0,
+  peach_tree: 0,
+  grape_vine: 0,
+  orange_tree: 0,
+  cherry_tree: 0,
   ginseng: 0,
   snow_lotus: 0,
+  plum_blossom: 0,
+  osmanthus: 0,
 };
 
 export const FARM_EXCLUDED_CHARACTER_IDS = new Set<string>([

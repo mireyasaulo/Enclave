@@ -79,6 +79,9 @@ import type {
   FarmConsumableId,
   FarmConsumablePurchaseResult,
   FarmCropId,
+  FarmDecorationId,
+  FarmDecorationPlaceResult,
+  FarmDecorationPurchaseResult,
   FarmDogPurchaseResult,
   FarmEventView,
   FarmHarvestResult,
@@ -3472,6 +3475,63 @@ export function feedFarmDog(baseUrl?: string) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: "{}",
+    },
+    baseUrl,
+  );
+}
+
+export function uprootFarmPlot(input: { plotIndex: number }, baseUrl?: string) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/uproot",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function buyFarmDecoration(
+  input: { decorationId: FarmDecorationId; quantity: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmDecorationPurchaseResult>(
+    "/games/farm/buy-decoration",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function placeFarmDecoration(
+  input: { decorationId: FarmDecorationId; x: number; y: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmDecorationPlaceResult>(
+    "/games/farm/place-decoration",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function removeFarmDecoration(
+  input: { placementId: string },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/remove-decoration",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
     },
     baseUrl,
   );

@@ -4,12 +4,15 @@ import { FarmEventService } from './farm-event.service';
 import { FarmNpcService } from './farm-npc.service';
 import { FarmStateService } from './farm-state.service';
 import { isFarmCropId } from './crop-catalog';
-import { isFarmConsumableId } from './crop-catalog';
+import { isFarmConsumableId, isFarmDecorationId } from './crop-catalog';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FarmConsumableId,
   FarmConsumablePurchaseResult,
   FarmCropId,
+  FarmDecorationId,
+  FarmDecorationPlaceResult,
+  FarmDecorationPurchaseResult,
   FarmDogPurchaseResult,
   FarmEventView,
   FarmHarvestResult,
@@ -37,6 +40,17 @@ interface SeedTransactionBody {
 interface ConsumableTransactionBody {
   consumableId: FarmConsumableId;
   quantity: number;
+}
+
+interface DecorationTransactionBody {
+  decorationId: FarmDecorationId;
+  quantity: number;
+}
+
+interface DecorationPlaceBody {
+  decorationId: FarmDecorationId;
+  x: number;
+  y: number;
 }
 
 @Controller('games/farm')
@@ -185,6 +199,56 @@ export class FarmController {
     return this.stateService.feedDog(ownerId);
   }
 
+  @Post('uproot')
+  async uproot(@Body() body: PlotActionBody): Promise<FarmPlayerStateView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const plotIndex = parsePlotIndex(body.plotIndex);
+    return this.stateService.uprootPlot(ownerId, plotIndex);
+  }
+
+  @Post('buy-decoration')
+  async buyDecoration(
+    @Body() body: DecorationTransactionBody,
+  ): Promise<FarmDecorationPurchaseResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const decorationId = parseDecorationId(body.decorationId);
+    return this.stateService.buyDecoration(
+      ownerId,
+      decorationId,
+      Math.floor(body.quantity),
+    );
+  }
+
+  @Post('place-decoration')
+  async placeDecoration(
+    @Body() body: DecorationPlaceBody,
+  ): Promise<FarmDecorationPlaceResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const decorationId = parseDecorationId(body.decorationId);
+    const x = Number(body.x);
+    const y = Number(body.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) {
+      throw new AppError('FARM_DECORATION_INVALID_COORD', {
+        legacyMessage: 'x/y 必须为数字',
+      });
+    }
+    return this.stateService.placeDecoration(ownerId, decorationId, x, y);
+  }
+
+  @Post('remove-decoration')
+  async removeDecoration(
+    @Body() body: { placementId: string },
+  ): Promise<FarmPlayerStateView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const placementId = String(body.placementId ?? '');
+    if (placementId.length === 0) {
+      throw new AppError('FARM_DECORATION_INVALID_ID', {
+        legacyMessage: 'placementId 必填',
+      });
+    }
+    return this.stateService.removeDecoration(ownerId, placementId);
+  }
+
   @Get('events')
   async listEvents(
     @Query('since') since?: string,
@@ -226,6 +290,16 @@ function parseConsumableId(raw: unknown): FarmConsumableId {
     throw new AppError('FARM_UNKNOWN_CONSUMABLE', {
       params: { consumableId: String(raw) },
       legacyMessage: `未知道具：${String(raw)}`,
+    });
+  }
+  return raw;
+}
+
+function parseDecorationId(raw: unknown): FarmDecorationId {
+  if (typeof raw !== 'string' || !isFarmDecorationId(raw)) {
+    throw new AppError('FARM_UNKNOWN_DECORATION', {
+      params: { decorationId: String(raw) },
+      legacyMessage: `未知装饰：${String(raw)}`,
     });
   }
   return raw;

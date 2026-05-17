@@ -8,6 +8,7 @@ const t = translateRuntimeMessage;
 import { FarmClockProvider, useSetFarmServerNow } from "./farm-clock-context";
 import { useFarmState } from "./use-farm-state";
 import { CoinDisplay } from "./components/coin-display";
+import { DecorationLayer } from "./components/decoration-layer";
 import { DogHouse } from "./components/dog-house";
 import { EventLogPanel } from "./components/event-log-panel";
 import { FarmIsoGrid } from "./components/farm-iso-grid";
@@ -247,6 +248,8 @@ function FarmPageInner() {
           {toast.leveledUp && ` · ${t(msg`升级！`)}`}
         </div>
       )}
+
+      <DecorationLayer placements={state.placedDecorations ?? []} />
 
       <SeedShopSheet
         state={state}

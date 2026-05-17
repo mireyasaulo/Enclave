@@ -10,6 +10,7 @@ import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FARM_CROP_CATALOG,
+  FARM_DECORATION_IDS,
   computeDogBlockRate,
   computeDogEnergy,
   computeLevelFromExperience,
@@ -19,8 +20,11 @@ import {
   createDefaultDog,
   getConsumableDefinition,
   getCropDefinition,
+  getDecorationDefinition,
+  isCropAvailableNow,
   isFarmConsumableId,
   isFarmCropId,
+  isFarmDecorationId,
 } from './crop-catalog';
 import {
   FARM_DEFAULT_PLAYER_COINS,
@@ -38,6 +42,10 @@ import {
   FarmConsumableId,
   FarmConsumablePurchaseResult,
   FarmCropId,
+  FarmDecorationId,
+  FarmDecorationPlaceResult,
+  FarmDecorationPlacement,
+  FarmDecorationPurchaseResult,
   FarmDogPurchaseResult,
   FarmDogState,
   FarmHarvestResult,
@@ -161,6 +169,12 @@ export class FarmStateService {
         legacyMessage: `等级不足：需 ${def.unlockLevel} 级才能种 ${def.nameZh}`,
       });
     }
+    if (!isCropAvailableNow(cropId)) {
+      throw new AppError('FARM_CROP_OUT_OF_SEASON', {
+        params: { cropName: def.nameZh },
+        legacyMessage: `${def.nameZh} 不在当季，过几个月再来`,
+      });
+    }
     const plots = ensurePlotsArray(state.plotsPayload, state.plotCount).map((p) => ({ ...p }));
     const plot = plots[plotIndex];
     if (!plot) {
@@ -269,7 +283,25 @@ export class FarmStateService {
     warehouse[plot.cropId] = (warehouse[plot.cropId] ?? 0) + amount;
     state.warehousePayload = warehouse;
 
-    plots[plotIndex] = createEmptyPlot(plotIndex);
+    // 多年生果树（apple_tree / peach_tree / ...）：收完不清空，进入下一茬周期。
+    if (def.isPerennial && def.perennialCycleHours && !isRotten) {
+      const nextMaturedAt = now + def.perennialCycleHours * 3_600_000;
+      plots[plotIndex] = {
+        ...plot,
+        maturedAt: nextMaturedAt,
+        plantedAt: now,
+        stage: 'seed',
+        watered: false,
+        weeds: 0,
+        bugs: 0,
+        stolenBy: [],
+        fertilized: false,
+        pesticideUntilMs: null,
+        harvestCount: (plot.harvestCount ?? 0) + 1,
+      };
+    } else {
+      plots[plotIndex] = createEmptyPlot(plotIndex);
+    }
     if (state.plotCount > plots.length) {
       for (let i = plots.length; i < state.plotCount; i += 1) {
         plots.push(createEmptyPlot(i));
@@ -621,6 +653,14 @@ export class FarmStateService {
         dog_food: state.consumablesPayload?.dog_food ?? 0,
       },
       dog,
+      decorationInventory: FARM_DECORATION_IDS.reduce(
+        (acc, id) => {
+          acc[id] = state.decorationInventoryPayload?.[id] ?? 0;
+          return acc;
+        },
+        {} as Record<FarmDecorationId, number>,
+      ),
+      placedDecorations: state.placedDecorationsPayload ?? [],
       weeklyStolenLog: pruneStolenLog(state.weeklyStolenLogPayload ?? []),
       serverNowMs: nowMs,
       updatedAt:
@@ -868,6 +908,166 @@ export class FarmStateService {
     return this.toPlayerView(saved);
   }
 
+  async uprootPlot(
+    ownerId: string,
+    plotIndex: number,
+  ): Promise<FarmPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    const plots = ensurePlotsArray(state.plotsPayload, state.plotCount).map((p) => ({ ...p }));
+    const plot = plots[plotIndex];
+    if (!plot) {
+      throw new AppError('FARM_PLOT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '田块不存在',
+      });
+    }
+    if (!plot.cropId) {
+      throw new AppError('FARM_PLOT_EMPTY', { legacyMessage: '该田块没有作物' });
+    }
+    const def = getCropDefinition(plot.cropId);
+    // 普通一年生作物也允许铲除（中途换种），但只是清空，没有惩罚。
+    // 多年生果树铲掉后空地可重新种别的。
+    plots[plotIndex] = createEmptyPlot(plotIndex);
+    state.plotsPayload = plots;
+    const saved = await this.playerRepo.save(state);
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'uproot',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      cropId: plot.cropId,
+      payload: { plotIndex, wasPerennial: !!def.isPerennial },
+    });
+    return this.toPlayerView(saved);
+  }
+
+  async buyDecoration(
+    ownerId: string,
+    decorationId: FarmDecorationId,
+    quantity: number,
+  ): Promise<FarmDecorationPurchaseResult> {
+    if (!isFarmDecorationId(decorationId)) {
+      throw new AppError('FARM_UNKNOWN_DECORATION', {
+        params: { decorationId: String(decorationId) },
+        legacyMessage: `未知装饰：${decorationId}`,
+      });
+    }
+    if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
+      throw new AppError('FARM_QUANTITY_INVALID', {
+        legacyMessage: '数量必须为正整数',
+      });
+    }
+    const def = getDecorationDefinition(decorationId);
+    const state = await this.getOrCreatePlayerState(ownerId);
+    if (state.level < def.unlockLevel) {
+      throw new AppError('FARM_DECORATION_LEVEL_TOO_LOW', {
+        status: HttpStatus.FORBIDDEN,
+        params: { unlockLevel: def.unlockLevel, name: def.nameZh },
+        legacyMessage: `等级不足：需 ${def.unlockLevel} 级才能购买 ${def.nameZh}`,
+      });
+    }
+    const totalCost = def.price * quantity;
+    if (state.coins < totalCost) {
+      throw new AppError('FARM_INSUFFICIENT_COINS', {
+        params: { required: totalCost },
+        legacyMessage: `金币不足：需 ${totalCost}`,
+      });
+    }
+    state.coins -= totalCost;
+    const inv = { ...(state.decorationInventoryPayload ?? {}) };
+    inv[decorationId] = (inv[decorationId] ?? 0) + quantity;
+    state.decorationInventoryPayload = inv;
+    const saved = await this.playerRepo.save(state);
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'buy',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      payload: { decorationId, quantity, totalCost },
+    });
+    return {
+      player: this.toPlayerView(saved),
+      decorationId,
+      quantity,
+      coinsSpent: totalCost,
+    };
+  }
+
+  async placeDecoration(
+    ownerId: string,
+    decorationId: FarmDecorationId,
+    x: number,
+    y: number,
+  ): Promise<FarmDecorationPlaceResult> {
+    if (!isFarmDecorationId(decorationId)) {
+      throw new AppError('FARM_UNKNOWN_DECORATION', {
+        params: { decorationId: String(decorationId) },
+        legacyMessage: `未知装饰：${decorationId}`,
+      });
+    }
+    const clampedX = clamp01Hundred(x);
+    const clampedY = clamp01Hundred(y);
+    const state = await this.getOrCreatePlayerState(ownerId);
+    const inv = { ...(state.decorationInventoryPayload ?? {}) };
+    if ((inv[decorationId] ?? 0) <= 0) {
+      throw new AppError('FARM_DECORATION_OUT_OF_STOCK', {
+        legacyMessage: '这个装饰你还没买',
+      });
+    }
+    inv[decorationId] = (inv[decorationId] ?? 0) - 1;
+    state.decorationInventoryPayload = inv;
+
+    const placement: FarmDecorationPlacement = {
+      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      type: decorationId,
+      x: clampedX,
+      y: clampedY,
+    };
+    const placed = [...(state.placedDecorationsPayload ?? []), placement];
+    state.placedDecorationsPayload = placed;
+    const saved = await this.playerRepo.save(state);
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'decorate',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      payload: { decorationId, x: clampedX, y: clampedY },
+    });
+    return { player: this.toPlayerView(saved), placement };
+  }
+
+  async removeDecoration(
+    ownerId: string,
+    placementId: string,
+  ): Promise<FarmPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    const placed = state.placedDecorationsPayload ?? [];
+    const idx = placed.findIndex((p) => p.id === placementId);
+    if (idx === -1) {
+      throw new AppError('FARM_DECORATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '找不到该装饰',
+      });
+    }
+    const removed = placed[idx]!;
+    state.placedDecorationsPayload = placed.filter((_, i) => i !== idx);
+    const inv = { ...(state.decorationInventoryPayload ?? {}) };
+    inv[removed.type] = (inv[removed.type] ?? 0) + 1;
+    state.decorationInventoryPayload = inv;
+    const saved = await this.playerRepo.save(state);
+    return this.toPlayerView(saved);
+  }
+
+  // 已放置装饰里是否包含 scarecrow（影响 NPC tick 的 bug 生成）。
+  async hasScarecrow(ownerId: string): Promise<boolean> {
+    const state = await this.playerRepo.findOneBy({ ownerId });
+    if (!state) return false;
+    return (state.placedDecorationsPayload ?? []).some((p) => p.type === 'scarecrow');
+  }
+
   // 公用：NPC 偷玩家时调用，返回 true 表示被狗拦住，应在调用方撤销偷菜战果。
   // 单独抽出来让 npc-tick 不直接复制 dog 计算逻辑。
   async tryBlockNpcSteal(
@@ -1018,5 +1218,10 @@ export function pruneStolenLog(
 function rollYield([lo, hi]: [number, number]): number {
   if (lo >= hi) return lo;
   return lo + Math.floor(Math.random() * (hi - lo + 1));
+}
+
+function clamp01Hundred(value: number): number {
+  if (!Number.isFinite(value)) return 50;
+  return Math.max(0, Math.min(100, value));
 }
 // i18n-ignore-end

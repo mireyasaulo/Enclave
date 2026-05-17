@@ -3,6 +3,7 @@ import {
   applyFarmFertilizer,
   applyFarmPesticide,
   buyFarmConsumable,
+  buyFarmDecoration,
   buyFarmDog,
   buyFarmSeed,
   debugFarmPlot,
@@ -12,14 +13,20 @@ import {
   getFarmNeighbors,
   getFarmState,
   harvestFarmPlot,
+  placeFarmDecoration,
   plantFarmCrop,
+  removeFarmDecoration,
   sellFarmCrop,
   stealFromNeighbor,
+  uprootFarmPlot,
   waterFarmPlot,
   weedFarmPlot,
   type FarmConsumableId,
   type FarmConsumablePurchaseResult,
   type FarmCropId,
+  type FarmDecorationId,
+  type FarmDecorationPlaceResult,
+  type FarmDecorationPurchaseResult,
   type FarmDogPurchaseResult,
   type FarmEventView,
   type FarmHarvestResult,
@@ -183,6 +190,46 @@ export function useFeedFarmDog() {
   const invalidate = useInvalidateFarm();
   return useMutation<FarmPlayerStateView, Error, void>({
     mutationFn: () => feedFarmDog(),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useUprootFarmPlot() {
+  const invalidate = useInvalidateFarm();
+  return useMutation({
+    mutationFn: (input: { plotIndex: number }) => uprootFarmPlot(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useBuyFarmDecoration() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<
+    FarmDecorationPurchaseResult,
+    Error,
+    { decorationId: FarmDecorationId; quantity: number }
+  >({
+    mutationFn: (input) => buyFarmDecoration(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function usePlaceFarmDecoration() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<
+    FarmDecorationPlaceResult,
+    Error,
+    { decorationId: FarmDecorationId; x: number; y: number }
+  >({
+    mutationFn: (input) => placeFarmDecoration(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useRemoveFarmDecoration() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<FarmPlayerStateView, Error, { placementId: string }>({
+    mutationFn: (input) => removeFarmDecoration(input),
     onSuccess: () => invalidate(),
   });
 }

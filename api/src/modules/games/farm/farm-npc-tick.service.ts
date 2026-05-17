@@ -84,6 +84,10 @@ export class FarmNpcTickService {
     let incidentBroadcastCount = 0;
 
     const characterById = new Map(characters.map((c) => [c.id, c]));
+    // 玩家的稻草人：影响 NPC 偷菜后给玩家自家长虫的概率；稻草人在 = 一半。
+    const ownerHasScarecrow = await this.stateService.hasScarecrow(owner.id);
+    // 顺手给玩家自己的菜地长点杂草和（除非有稻草人的）害虫，让浇水/除草/杀虫/农药/稻草人都用得上。
+    await this.degradePlayerPlots(owner.id, ownerHasScarecrow);
 
     for (const character of characters) {
       const npc = await this.npcRepo.findOneBy({ characterId: character.id });
@@ -279,6 +283,7 @@ export class FarmNpcTickService {
     const player = await this.playerRepo.findOneBy({ ownerId });
     if (!player) return noResult;
     const plots = ensurePlotsArray(player.plotsPayload, player.plotCount).map((p) => ({ ...p }));
+    // 多年生果树只有第一次成熟才让偷（避免一棵树被反复偷成空）。
     const ripe = findStealablePlot(plots, thief.id);
     if (!ripe) return noResult;
     // 看家狗拦截：先掷一把骰子，挡住了就只写 steal_blocked 事件，菜地不动。
@@ -409,6 +414,38 @@ export class FarmNpcTickService {
       amount,
     });
     return { stolen: true, broadcasted };
+  }
+
+  // 给玩家自己的菜地按概率长杂草和虫；有稻草人时虫概率减半。
+  // 农药免疫期内 bug 增长完全静默。
+  private async degradePlayerPlots(
+    ownerId: string,
+    hasScarecrow: boolean,
+  ): Promise<void> {
+    const player = await this.playerRepo.findOneBy({ ownerId });
+    if (!player) return;
+    const plots = ensurePlotsArray(player.plotsPayload, player.plotCount).map((p) => ({ ...p }));
+    let mutated = false;
+    const nowMs = Date.now();
+    const bugChance = hasScarecrow ? 0.015 : 0.03;
+    for (let i = 0; i < plots.length; i += 1) {
+      const plot = plots[i]!;
+      if (!plot.cropId) continue;
+      if (Math.random() < 0.05) {
+        plot.weeds = Math.min(3, plot.weeds + 1);
+        mutated = true;
+      }
+      const pesticideActive =
+        plot.pesticideUntilMs != null && nowMs < plot.pesticideUntilMs;
+      if (!pesticideActive && Math.random() < bugChance) {
+        plot.bugs = Math.min(3, plot.bugs + 1);
+        mutated = true;
+      }
+    }
+    if (mutated) {
+      player.plotsPayload = plots;
+      await this.playerRepo.save(player);
+    }
   }
 
   private maybeMaintainPlots(npc: FarmNpcStateEntity): number {
