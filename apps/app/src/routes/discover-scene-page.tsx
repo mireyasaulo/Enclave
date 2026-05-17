@@ -207,6 +207,19 @@ function MobileDiscoverScenePage() {
       setMessage(""); // i18n-ignore-line: clearing state
       setLastRequestId(null);
     },
+    onError: (error) => {
+      // 走查 R1-Round1：server 端 SOCIAL_SCENE_COOLDOWN（1.5s 间隔）和客户端
+      // 2.5s cooldown 不对齐：服务端先于客户端给出 cooldown（用户跨设备 / 跨
+      // 标签页 / 客户端时钟回拨），grid 不灰，用户继续点 → 每次都是 429。
+      // 这里把客户端冷却条手动顶起来 2.5s，让用户看到倒计时而不是错误条循环。
+      if (
+        isApiRequestError(error) &&
+        error.errorCode === "SOCIAL_SCENE_COOLDOWN"
+      ) {
+        setCooldownUntil(Date.now() + COOLDOWN_MS);
+        setNow(Date.now());
+      }
+    },
     onSuccess: ({ request, matchSource, scene, capturedBaseUrl }) => {
       if (capturedBaseUrl !== baseUrl) {
         // 走查 R2-Round2：在 await 期间用户切了 world，settle 已经不属于当前
@@ -311,7 +324,16 @@ function MobileDiscoverScenePage() {
   const cooldownRemainSec = cooldownActive
     ? Math.max(1, Math.ceil((cooldownUntil - now) / 1000))
     : 0;
-  const disabled = sceneMutation.isPending || cooldownActive;
+  // 走查 R1-Round1：DAILY_LIMIT 是 owner 级硬墙（30/天，跨 16 个场景共享），
+  // 一旦撞墙再点任何按钮服务端都返回 429 不会再生成相遇。grid 必须整体灰掉，
+  // 否则用户会把剩下 15 个按钮也戳一遍各扣一次 API（实测 4 个按钮全部 429），
+  // server 端每次仍会跑 owner / count / cooldown 三条 DB 查询白白消耗。
+  const dailyLimitHit =
+    sceneMutation.isError &&
+    isApiRequestError(sceneMutation.error) &&
+    sceneMutation.error.errorCode === "SOCIAL_SCENE_DAILY_LIMIT";
+  const disabled =
+    sceneMutation.isPending || cooldownActive || dailyLimitHit;
 
   return (
     <MobileDiscoverToolShell
@@ -369,7 +391,18 @@ function MobileDiscoverScenePage() {
         看到全 16 个按钮齐刷刷灰掉但找不到原因。把冷却条搬到 button grid 之上，
         紧跟 notice 后面，第一屏直接可见。
       */}
-      {cooldownActive && !sceneMutation.isPending ? (
+      {/*
+        走查 R1-Round1：DAILY_LIMIT 命中后，整面 grid 灰掉，单独在头部贴一条
+        "明天再来"的提示。下面 InlineNotice (danger) 已经写过同样意思 + 一个
+        "回发现页"按钮；但灰掉的 grid 第一屏要先告诉用户"为什么灰"，否则
+        2 列 8 行 870px 的灰按钮把 danger notice 推到屏幕外，用户只看到一大坨
+        灰按钮一脸懵。比 cooldown 提示优先级更高（同时存在时只显示这条）。
+      */}
+      {dailyLimitHit ? (
+        <div className="text-center text-[11px] text-[color:var(--text-secondary)]">
+          {t(msg`今天的场景相遇次数已经用完，明天再试试。`)}
+        </div>
+      ) : cooldownActive && !sceneMutation.isPending ? (
         <div className="text-center text-[11px] text-[color:var(--text-secondary)]">
           {t(msg`稍等 ${cooldownRemainSec} 秒再出发吧。`)}
         </div>
