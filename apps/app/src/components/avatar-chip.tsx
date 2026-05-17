@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import defaultAvatarDusk from "../assets/default-avatar-dusk.svg";
 import defaultAvatarEmber from "../assets/default-avatar-ember.svg";
 import defaultAvatarMint from "../assets/default-avatar-mint.svg";
@@ -32,7 +32,13 @@ export function AvatarChip({
           : size === "lg"
             ? "h-14 w-14 rounded-full text-xl"
             : "h-11 w-11 rounded-full text-base";
-  const trimmedSrc = src?.trim() ?? "";
+  // 第三轮新会话 R2：之前 src?.trim() 在 render 函数体里裸跑——AvatarChip 全
+  // 站用 113 次，profile-info-avatar-page 用户在 URL 输入框敲字时，1MB data URL
+  // 头像每个 keystroke 都被 trim() 复制一次（O(n) 但生成新字符串副本，更重）。
+  // 长列表（contacts / chat / moments）滚动时每个可视 chip 同样命中，CPU 抖动
+  // 肉眼可感。src 多数时候是稳定引用（store / contract data），用 useMemo([src])
+  // 就能把 trim 成本控在「src 真换了才再跑」。
+  const trimmedSrc = useMemo(() => src?.trim() ?? "", [src]);
 
   useEffect(() => {
     setLoadFailed(false);
