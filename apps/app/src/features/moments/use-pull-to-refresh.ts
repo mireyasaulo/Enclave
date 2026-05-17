@@ -69,6 +69,9 @@ export function usePullToRefresh({
   // 直接读 state 会拿到旧值，touchmove 在 refreshing 期间还会 preventDefault，
   // 导致 iOS Safari 把整段手势锁成"非滚动"，用户上滑就划不动了。
   const refreshingRef = useRef(false);
+  // 走查 R3：handleTouchEnd 用 ref 读最新 offset，免得依赖 state.offset 触发
+  // useEffect 重挂监听器；handleTouchMove 已经在算 offset，顺手同步到 ref。
+  const offsetRef = useRef(0);
   const safetyTimerRef = useRef<number | null>(null);
   // onRefresh 在调用方多数是 inline 箭头（() => Promise.all([...refetch()])），
   // 每次父组件 re-render 引用都新——若 handleTouchEnd 直接依赖它，useEffect
@@ -150,6 +153,7 @@ export function usePullToRefresh({
       activePullRef.current = true;
       const offset = Math.min(dy * RESISTANCE, MAX_PULL);
       const progress = Math.min(offset / TRIGGER_DISTANCE, 1);
+      offsetRef.current = offset;
       // Block native overscroll while pulling
       if (event.cancelable) {
         event.preventDefault();
@@ -171,37 +175,43 @@ export function usePullToRefresh({
     activePullRef.current = false;
     startYRef.current = null;
 
-    setState((prev) => {
-      if (prev.refreshing) {
-        // Already refreshing — pulling down again should not fire another refresh.
-        return prev;
+    // 走查 R3：触发刷新的副作用（onRefresh / setTimeout 注册）必须在 setState
+    // updater **外**。React 18 StrictMode 在 dev 会把 updater 跑两遍来检测
+    // 不纯实现——如果 onRefreshRef.current() 写在 updater 里，pull-to-refresh
+    // 一次就会触发两次 refresh 请求（/api/moments + /api/social/blocks 各 2 次
+    // = 4 个 RTT），CDP 走查实测重现。把 trigger 判定基于 refreshingRef +
+    // 当前 offset state 在 updater 外做，updater 只是纯状态切换。
+    if (refreshingRef.current) {
+      return;
+    }
+    const finalOffset = offsetRef.current;
+    offsetRef.current = 0;
+    if (finalOffset >= TRIGGER_DISTANCE) {
+      refreshingRef.current = true;
+      const result = onRefreshRef.current();
+      Promise.resolve(result).finally(() => {
+        window.setTimeout(finishRefresh, 250);
+      });
+      if (safetyTimerRef.current !== null) {
+        window.clearTimeout(safetyTimerRef.current);
       }
-      if (prev.offset >= TRIGGER_DISTANCE) {
-        refreshingRef.current = true;
-        const result = onRefreshRef.current();
-        Promise.resolve(result).finally(() => {
-          window.setTimeout(finishRefresh, 250);
-        });
-        if (safetyTimerRef.current !== null) {
-          window.clearTimeout(safetyTimerRef.current);
-        }
-        safetyTimerRef.current = window.setTimeout(
-          finishRefresh,
-          REFRESH_SAFETY_TIMEOUT_MS,
-        );
-        return {
-          pulling: false,
-          refreshing: true,
-          offset: TRIGGER_DISTANCE,
-          progress: 1,
-        };
-      }
-      return {
+      safetyTimerRef.current = window.setTimeout(
+        finishRefresh,
+        REFRESH_SAFETY_TIMEOUT_MS,
+      );
+      setState({
         pulling: false,
-        refreshing: false,
-        offset: 0,
-        progress: 0,
-      };
+        refreshing: true,
+        offset: TRIGGER_DISTANCE,
+        progress: 1,
+      });
+      return;
+    }
+    setState({
+      pulling: false,
+      refreshing: false,
+      offset: 0,
+      progress: 0,
     });
   }, [finishRefresh]);
 
