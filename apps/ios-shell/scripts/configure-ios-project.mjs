@@ -1183,9 +1183,26 @@ function pickConfigured(envName, ...configCandidates) {
   return optionalEnv(envName) ?? optionalShellString(...configCandidates);
 }
 
+// 真机走查 Round 2 (2026-05-17)：老版本 escape 写的是
+//   key.replace(/[.*+?^${}()|[\\\\]]/g, "\\$&")
+// 看似 escape 全部 regex metacharacters，实际上 character class 里第二个 `]`
+// 提前关掉了 class —— regex 真实语义变成「matacharacter + `]` 两个字符」，
+// 单独的 `.` 跟 `(` 都不会被 match → 不会被 escape。当前 callers 用的 keys
+// 全是 ALL_CAPS_WITH_UNDERSCORES（PRODUCT_BUNDLE_IDENTIFIER /
+// MARKETING_VERSION / DEVELOPMENT_TEAM / CODE_SIGN_STYLE ...），刚好没踩
+// 这个雷；但下一个想加点号或括号的 build-setting key（譬如 Xcode 工具链常见
+// 的 "com.apple.product-type.application"）会被静默搞挂 —— replaceBuildSetting
+// 拿到字面值 `.` 在 pattern 里被当通配符，覆盖到 pbxproj 里别的位置。
+//
+// 改成显式列举 regex 元字符的安全 escape 模式（`-` 用 hyphen 收尾避免被
+// 当成 range；`]` / `\` 在 class 里显式 backslash escape）。
+function escapeForRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&");
+}
+
 function replaceBuildSetting(source, key, value) {
   const pattern = new RegExp(
-    `(${key.replace(/[.*+?^${}()|[\\\\]]/g, "\\$&")}\\s*=\\s*)(\"[^\"\\n]*\"|[^;\\n]+)(;)`,
+    `(${escapeForRegex(key)}\\s*=\\s*)(\"[^\"\\n]*\"|[^;\\n]+)(;)`,
     "g",
   );
   if (!pattern.test(source)) {
