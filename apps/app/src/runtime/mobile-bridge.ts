@@ -154,8 +154,25 @@ export async function shareWithNativeShell(payload: MobileBridgeSharePayload) {
     return false;
   }
 
+  // 走查新一轮 R1：mobileBridge.share 是 capacitor JS-Native 桥的 RPC 调用，
+  // 没有超时兜底。Android 上系统 share sheet 被低优先级线程吃住 / WebView
+  // 进程被 OS 切到后台 / native 那侧 listener 异常没回 callback 时，整条
+  // Promise 永不结算 — 广场/朋友圈/视频号的「分享」按钮 await 它 → handler
+  // 永远不 setNotice，UI 看着像点了没反应。8s 强超时（capacitor 自家系统
+  // share sheet 正常 < 1s 出，>3s 已经不正常），超时算 false 让上层降级到
+  // 复制摘要兜底链路。原本 try/catch 已经把 throw 兜成 false，超时 reject
+  // 沿同一路径降级，UX 一致。
+  const SHARE_TIMEOUT_MS = 8_000;
   try {
-    await mobileBridge.share(payload);
+    await Promise.race([
+      mobileBridge.share(payload),
+      new Promise<never>((_, reject) =>
+        window.setTimeout(
+          () => reject(new Error("native share timeout")),
+          SHARE_TIMEOUT_MS,
+        ),
+      ),
+    ]);
     return true;
   } catch {
     return false;

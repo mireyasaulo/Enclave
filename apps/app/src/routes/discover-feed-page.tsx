@@ -875,11 +875,30 @@ export function DiscoverFeedPage() {
   );
   const visiblePosts = useMemo(
     () =>
-      feedPosts.filter(
-        (post) =>
-          post.authorType !== "character" ||
-          !blockedCharacterIds.has(post.authorId),
-      ),
+      feedPosts.filter((post) => {
+        if (
+          post.authorType === "character" &&
+          blockedCharacterIds.has(post.authorId)
+        ) {
+          return false;
+        }
+        // 走查新一轮 R1：AI 角色把 `[TOOL_CALL] {...}` / `<tool_call>...` 当
+        // 正文发出来时，stripToolCallSyntax 把整段吃光；若该 post 也没媒体
+        // 兜底（最常见：character 主动生成的纯文本动态 + 模型 hallucinate 出
+        // tool-call syntax），渲到 mobile feed 上是一张完全空白的卡：
+        // body 区无 badge / 无 text / 无 media，只剩头像 + meta + 右下角
+        // 「更多操作」按钮孤零零浮着。DB 里实测就有这种 post（例：界闻
+        // 84b58f51-...，text 以 `[TOOL_CALL]` 起头 + media=[]）。moments-page
+        // 的 visibleMoments 早就有同款 filter（line 858-865），feed 这边漏了。
+        // 对齐：strip 后空 + 无媒体 → 整条 post 不渲染（与 channels 页同 post
+        // 的行为可能略有不同，但 channels 走的是 getVisibleChannelPosts 单
+        // 独路径，互不影响）。
+        const stripped = stripToolCallSyntax(post.text);
+        if (!stripped && post.media.length === 0) {
+          return false;
+        }
+        return true;
+      }),
     [feedPosts, blockedCharacterIds],
   );
   // 走查新一轮 Round 2 (perf)：mobile 路径直接 visiblePosts.map 展 JSX，
