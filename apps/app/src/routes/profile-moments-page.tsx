@@ -713,7 +713,17 @@ export function ProfileMomentsPage() {
 
   const { containerRef, state: pullState } = usePullToRefresh({
     onRefresh: async () => {
-      await momentsQuery.refetch();
+      // 走查 R2：和 mobile-friend-moments-page R2 / moments-page mobile 同款 ——
+      // refetch() 在 TanStack Query v5 默认不抛错（错误落到 result.error），
+      // 之前裸 await 网络挂死时用户只看指示器走完一遍消失，根本不知道列表
+      // 没换。和其它朋友圈页 pull-to-refresh 失败的 danger notice 通道对齐。
+      const result = await momentsQuery.refetch();
+      if (result.isError && result.error instanceof Error) {
+        setNotice({
+          tone: "danger",
+          message: t(msg`刷新失败：${result.error.message}`),
+        });
+      }
     },
     enabled: !isDesktopLayout,
   });
