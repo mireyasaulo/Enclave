@@ -5,7 +5,12 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import type { Moment, MomentsPageResponse } from "@yinjie/contracts";
+import {
+  isApiRequestError,
+  type Moment,
+  type MomentsPageResponse,
+} from "@yinjie/contracts";
+import { translateAppErrorCode } from "../lib/error-translate";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ChevronRight, Play, Plus, X } from "lucide-react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
@@ -357,10 +362,17 @@ export function MobileMomentsPublishPage() {
   }
 
   const canSubmit = composeDraft.hasContent && !createMutation.isPending;
+  // 走查 R2：createMutation.error 是 AppError 时优先走 translateAppErrorCode
+  // 命中 i18n 字典出当前 locale 文案；非 AppError / 字典 miss 时回退到 raw
+  // err.message（server legacyMessage 中文兜底）。和主朋友圈/好友朋友圈页同模式，
+  // 把非 zh-CN 用户看到的硬编码中文错误堵掉。
   const errorMessage =
     composeDraft.mediaError ??
     (createMutation.isError && createMutation.error instanceof Error
-      ? createMutation.error.message
+      ? isApiRequestError(createMutation.error)
+        ? (translateAppErrorCode(createMutation.error) ??
+          createMutation.error.message)
+        : createMutation.error.message
       : null);
 
   const imageCount = composeDraft.imageDrafts.length;

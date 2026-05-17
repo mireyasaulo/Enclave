@@ -112,12 +112,26 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`需先加为好友才能互动。`);
     case "MOMENTS_EMPTY":
       return translateRuntimeMessage(msg`朋友圈内容和媒体不能同时为空。`);
+    case "MOMENTS_TEXT_TOO_LONG":
+      // 走查 R1：backend 抛 MOMENTS_TEXT_TOO_LONG（带 max=2000 params），但之前
+      // 此 case 缺失 → 走 default 返回 null → 前端只能 fallback 到 server 的
+      // legacyMessage「朋友圈正文最多 2000 字。」。zh-CN 用户看着没毛病，但
+      // en-US / ja-JP / ko-KR locale 等于直接糊一段中文上去。和其它 MOMENTS_*
+      // 错误风格对齐。
+      return translateRuntimeMessage(
+        msg`朋友圈正文最多 ${String(params.max ?? 2000)} 字。`,
+      );
     case "MOMENTS_TEXT_NO_MEDIA":
       return translateRuntimeMessage(msg`纯文本朋友圈不能附带图片或视频。`);
     case "MOMENTS_VIDEO_SINGLE":
       return translateRuntimeMessage(msg`视频朋友圈必须且只能包含 1 条视频。`);
     case "MOMENTS_VIDEO_TOO_LONG":
       return translateRuntimeMessage(msg`朋友圈视频时长不能超过 5 分钟。`);
+    case "MOMENTS_AUDIO_SINGLE":
+      // 走查 R1：和 MOMENTS_TEXT_TOO_LONG 同一类 i18n 漏接——contracts 里
+      // 声明了，backend 抛了，但前端 case 缺失，非 zh-CN locale 拿到的是
+      // backend legacyMessage 的中文。补上后所有 locale 都走 lingui 字典翻译。
+      return translateRuntimeMessage(msg`音乐朋友圈必须且只能包含 1 条音频。`);
     case "MOMENTS_IMAGES_MAX":
       return translateRuntimeMessage(
         msg`图片朋友圈最多支持 ${String(params.max ?? 9)} 张图片。`,

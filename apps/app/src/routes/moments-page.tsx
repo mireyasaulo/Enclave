@@ -23,12 +23,14 @@ import {
   deleteMoment,
   getBlockedCharacters,
   getMomentsPage,
+  isApiRequestError,
   toggleMomentLike,
   type Moment,
   type MomentComment,
   type MomentLike,
   type MomentsPageResponse,
 } from "@yinjie/contracts";
+import { translateAppErrorCode } from "../lib/error-translate";
 import type { MessageDescriptor } from "@lingui/core";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice } from "@yinjie/ui";
@@ -395,9 +397,16 @@ export function MomentsPage() {
       setNoticeActionLabel(t(msg`重试点赞`));
       setNoticeAction(() => () => likeMutation.mutate(momentId));
       setNotice(
-        error instanceof Error
-          ? t(msg`点赞失败：${error.message}`)
-          : t(msg`点赞失败，请稍后重试。`),
+        // 走查 R2：之前直拼 error.message 等于把 server 的 legacyMessage（始终
+        // 中文）原样塞给非 zh-CN locale 用户。AppError 已经带 errorCode，先走
+        // translateAppErrorCode 命中 i18n 字典走当前 locale，miss 时回退到原
+        // error.message 兜底。和 profile-info-name-page / discover-scene-page
+        // 同模式。
+        isApiRequestError(error)
+          ? t(msg`点赞失败：${translateAppErrorCode(error) ?? error.message}`)
+          : error instanceof Error
+            ? t(msg`点赞失败：${error.message}`)
+            : t(msg`点赞失败，请稍后重试。`),
       );
     },
     onSuccess: (_data, _momentId, context) => {
@@ -635,9 +644,13 @@ export function MomentsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(
-        err instanceof Error
-          ? t(msg`评论失败：${err.message}`)
-          : t(msg`评论失败，请稍后重试。`),
+        // 走查 R2 同 likeMutation 处理：translateAppErrorCode 优先走 i18n 字典
+        // 拿当前 locale 文案，miss 才回退 raw err.message（server legacyMessage 中文）。
+        isApiRequestError(err)
+          ? t(msg`评论失败：${translateAppErrorCode(err) ?? err.message}`)
+          : err instanceof Error
+            ? t(msg`评论失败：${err.message}`)
+            : t(msg`评论失败，请稍后重试。`),
       );
     },
     onSuccess: (realComment, momentId, context) => {
@@ -785,9 +798,13 @@ export function MomentsPage() {
       setNoticeActionLabel(t(msg`重试删除`));
       setNoticeAction(() => () => deleteMutation.mutate(momentId));
       setNotice(
-        error instanceof Error
-          ? t(msg`删除失败：${error.message}`)
-          : t(msg`删除失败，请稍后重试。`),
+        // 走查 R2 同 like/comment：err 是 AppError 时优先走 translateAppErrorCode
+        // 拿当前 locale 文案，miss 才回退 raw err.message。
+        isApiRequestError(error)
+          ? t(msg`删除失败：${translateAppErrorCode(error) ?? error.message}`)
+          : error instanceof Error
+            ? t(msg`删除失败：${error.message}`)
+            : t(msg`删除失败，请稍后重试。`),
       );
     },
     onSuccess: (_data, _momentId, context) => {
@@ -1593,10 +1610,19 @@ export function MomentsPage() {
       // 显示在 textarea 上方；只在 bar 真在当前 mutate 的 moment 上打开时显示——
       // 用户切到别条 moment 的 bar 时显示旧错误反而误导。
       commentErrorForBar={
+        // 走查 R4：commentBar 内 textarea 上方错误条 — 之前直拼 server
+        // legacyMessage（中文），非 zh-CN locale 用户看到的就是中文。和上方
+        // commentMutation.onError 的 translateAppErrorCode 处理同步。
         commentMutation.isError &&
-        commentMutation.error instanceof Error &&
         commentMutation.variables === commentBarTarget?.momentId
-          ? commentMutation.error.message
+          ? isApiRequestError(commentMutation.error)
+            ? (translateAppErrorCode(commentMutation.error) ??
+              (commentMutation.error instanceof Error
+                ? commentMutation.error.message
+                : null))
+            : commentMutation.error instanceof Error
+              ? commentMutation.error.message
+              : null
           : null
       }
       notice={notice}
@@ -1746,9 +1772,12 @@ export function MomentsPage() {
           setNoticeActionLabel(null);
           setNoticeAction(null);
           setNotice(
-            error instanceof Error
-              ? t(msg`刷新失败：${error.message}`)
-              : t(msg`刷新失败，请稍后重试。`),
+            // 走查 R2 同其它 mutation onError：i18n locale 一致性。
+            isApiRequestError(error)
+              ? t(msg`刷新失败：${translateAppErrorCode(error) ?? error.message}`)
+              : error instanceof Error
+                ? t(msg`刷新失败：${error.message}`)
+                : t(msg`刷新失败，请稍后重试。`),
           );
         }
       }}

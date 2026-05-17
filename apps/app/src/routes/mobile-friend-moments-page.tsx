@@ -8,11 +8,13 @@ import {
   getCharacter,
   getCharacterMoments,
   getFriends,
+  isApiRequestError,
   toggleMomentLike,
   type Moment,
   type MomentComment,
   type MomentLike,
 } from "@yinjie/contracts";
+import { translateAppErrorCode } from "../lib/error-translate";
 import { translateRuntimeMessage, useAppLocale } from "@yinjie/i18n";
 import {
   AppPage,
@@ -169,8 +171,13 @@ export function MobileFriendMomentsPage() {
       }
       setNotice({
         tone: "danger",
-        message:
-          error instanceof Error
+        // 走查 R2：translateAppErrorCode 优先按 errorCode 命中 i18n 字典出
+        // 当前 locale 文案；非 AppError / 字典 miss 时回退到 raw err.message
+        // （server legacyMessage 中文兜底）。和 moments-page 主页同模式，把
+        // 非 zh-CN 用户看到的硬编码中文错误堵掉。
+        message: isApiRequestError(error)
+          ? t(msg`点赞失败：${translateAppErrorCode(error) ?? error.message}`)
+          : error instanceof Error
             ? t(msg`点赞失败：${error.message}`)
             : t(msg`点赞失败，请稍后重试。`),
         actionLabel: t(msg`重试点赞`),
@@ -444,8 +451,10 @@ export function MobileFriendMomentsPage() {
       // 「发送」就能再试，跟主朋友圈页处理一致。
       setNotice({
         tone: "danger",
-        message:
-          error instanceof Error
+        // 走查 R2：同 likeMutation 的 translateAppErrorCode 处理。
+        message: isApiRequestError(error)
+          ? t(msg`评论失败：${translateAppErrorCode(error) ?? error.message}`)
+          : error instanceof Error
             ? t(msg`评论失败：${error.message}`)
             : t(msg`评论失败，请稍后重试。`),
       });
@@ -519,18 +528,33 @@ export function MobileFriendMomentsPage() {
     ? commentMutation.variables
     : null;
 
+  // 走查 R3：跟 mutation onError 同一类 i18n 一致化——4 个 query 失败信息显示
+  // 在 ErrorBlock 列表上，之前直拼 server legacyMessage（始终中文），非 zh-CN
+  // locale 用户看到的就是中文。和 profile-moments-page 同模式：先按 errorCode
+  // 命中字典，miss 才回退 raw message。
+  const resolveQueryErrorMessage = (error: unknown): string | null => {
+    if (!(error instanceof Error)) return null;
+    if (isApiRequestError(error)) {
+      return translateAppErrorCode(error) ?? error.message;
+    }
+    return error.message;
+  };
   const errors: string[] = [];
-  if (characterQuery.isError && characterQuery.error instanceof Error) {
-    errors.push(characterQuery.error.message);
+  if (characterQuery.isError) {
+    const m = resolveQueryErrorMessage(characterQuery.error);
+    if (m) errors.push(m);
   }
-  if (friendsQuery.isError && friendsQuery.error instanceof Error) {
-    errors.push(friendsQuery.error.message);
+  if (friendsQuery.isError) {
+    const m = resolveQueryErrorMessage(friendsQuery.error);
+    if (m) errors.push(m);
   }
-  if (momentsQuery.isError && momentsQuery.error instanceof Error) {
-    errors.push(momentsQuery.error.message);
+  if (momentsQuery.isError) {
+    const m = resolveQueryErrorMessage(momentsQuery.error);
+    if (m) errors.push(m);
   }
-  if (blockedQuery.isError && blockedQuery.error instanceof Error) {
-    errors.push(blockedQuery.error.message);
+  if (blockedQuery.isError) {
+    const m = resolveQueryErrorMessage(blockedQuery.error);
+    if (m) errors.push(m);
   }
 
   useEffect(() => {
@@ -675,9 +699,15 @@ export function MobileFriendMomentsPage() {
       ]);
       const failed = results.find((r) => r.isError && r.error instanceof Error);
       if (failed?.error instanceof Error) {
+        const failedError = failed.error;
         setNotice({
           tone: "danger",
-          message: t(msg`刷新失败：${failed.error.message}`),
+          // 走查 R2：translateAppErrorCode 同 mutation onError 处理。
+          message: isApiRequestError(failedError)
+            ? t(
+                msg`刷新失败：${translateAppErrorCode(failedError) ?? failedError.message}`,
+              )
+            : t(msg`刷新失败：${failedError.message}`),
         });
       }
     },
@@ -883,9 +913,8 @@ export function MobileFriendMomentsPage() {
                 {t(msg`朋友圈暂时不可用`)}
               </div>
               <div className="mt-2 text-[12px] text-[#9A9A9A]">
-                {momentsQuery.error instanceof Error
-                  ? momentsQuery.error.message
-                  : t(msg`读取这位角色的朋友圈时出错了。`)}
+                {resolveQueryErrorMessage(momentsQuery.error) ??
+                  t(msg`读取这位角色的朋友圈时出错了。`)}
               </div>
               <div className="mt-4 flex justify-center gap-2">
                 <Button
@@ -1066,10 +1095,11 @@ export function MobileFriendMomentsPage() {
           // 设回去，但失败信息只在顶 notice 里显示，被 bar 的 z=1000 backdrop
           // 盖死。透传给 bar 内 textarea 上方 errorMessage 槽；用 variables ===
           // 当前 bar 上的 momentId gate 住，切到另一条 moment 重开 bar 不带旧错误。
+          // 走查 R4：用 resolveQueryErrorMessage 走 i18n 字典，让非 zh-CN 用户
+          // 看到本地化文案而不是 server legacyMessage 的中文。
           commentMutation.isError &&
-          commentMutation.error instanceof Error &&
           commentMutation.variables === commentBarTarget?.momentId
-            ? commentMutation.error.message
+            ? resolveQueryErrorMessage(commentMutation.error)
             : null
         }
         onSubmit={() => {

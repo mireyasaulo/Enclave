@@ -12,12 +12,26 @@ import {
   addMomentComment,
   deleteMoment,
   getOwnMoments,
+  isApiRequestError,
   toggleMomentLike,
   type Moment,
   type MomentComment,
   type MomentLike,
   type MomentsPageResponse,
 } from "@yinjie/contracts";
+import { translateAppErrorCode } from "../lib/error-translate";
+
+// 走查 R3：和 moments-page / mobile-friend-moments-page / mobile-moments-publish-page
+// 同款 i18n 一致性兜底。把 mutation/query.error 优先按 errorCode 命中 i18n 字典
+// 取当前 locale 文案；非 AppError / 字典 miss 时回退到 raw err.message
+// （server legacyMessage 中文）。该页有 7 处直接拼 err.message，全部统一走它。
+function resolveMomentsErrorMessage(error: unknown): string | null {
+  if (!(error instanceof Error)) return null;
+  if (isApiRequestError(error)) {
+    return translateAppErrorCode(error) ?? error.message;
+  }
+  return error.message;
+}
 import { useAppLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
@@ -719,9 +733,10 @@ export function ProfileMomentsPage() {
       // 没换。和其它朋友圈页 pull-to-refresh 失败的 danger notice 通道对齐。
       const result = await momentsQuery.refetch();
       if (result.isError && result.error instanceof Error) {
+        const localized = resolveMomentsErrorMessage(result.error) ?? "";
         setNotice({
           tone: "danger",
-          message: t(msg`刷新失败：${result.error.message}`),
+          message: t(msg`刷新失败：${localized}`),
         });
       }
     },
@@ -757,8 +772,11 @@ export function ProfileMomentsPage() {
 
   if (isDesktopLayout) {
     const desktopErrors: string[] = [];
-    if (momentsQuery.isError && momentsQuery.error instanceof Error) {
-      desktopErrors.push(momentsQuery.error.message);
+    if (momentsQuery.isError) {
+      const localized = resolveMomentsErrorMessage(momentsQuery.error);
+      if (localized) {
+        desktopErrors.push(localized);
+      }
     }
 
     async function handleDesktopImageFilesSelected(files: FileList | null) {
@@ -798,23 +816,23 @@ export function ProfileMomentsPage() {
         <DesktopProfileMomentsWorkspace
           commentDrafts={commentDrafts}
           commentErrorMessage={
-            commentMutation.isError && commentMutation.error instanceof Error
-              ? commentMutation.error.message
+            commentMutation.isError
+              ? resolveMomentsErrorMessage(commentMutation.error)
               : null
           }
           commentPendingMomentId={pendingCommentMomentId}
           commentReplyTarget={desktopReplyTarget}
           composeErrorMessage={
             composeDraft.mediaError ??
-            (createMutation.isError && createMutation.error instanceof Error
-              ? createMutation.error.message
+            (createMutation.isError
+              ? resolveMomentsErrorMessage(createMutation.error)
               : null)
           }
           createPending={createMutation.isPending}
           deletePendingMomentId={pendingDeleteMomentId}
           deleteErrorMessage={
-            deleteMutation.isError && deleteMutation.error instanceof Error
-              ? deleteMutation.error.message
+            deleteMutation.isError
+              ? resolveMomentsErrorMessage(deleteMutation.error)
               : null
           }
           errors={desktopErrors}
@@ -822,16 +840,16 @@ export function ProfileMomentsPage() {
           isLoading={momentsQuery.isLoading}
           // 首屏失败 + 0 条时空态优先渲「重试读取」（feed Round 2 同款）。
           loadErrorMessage={
-            momentsQuery.isError && momentsQuery.error instanceof Error
-              ? momentsQuery.error.message
+            momentsQuery.isError
+              ? resolveMomentsErrorMessage(momentsQuery.error)
               : null
           }
           onRetryLoad={() => {
             void momentsQuery.refetch();
           }}
           likeErrorMessage={
-            likeMutation.isError && likeMutation.error instanceof Error
-              ? likeMutation.error.message
+            likeMutation.isError
+              ? resolveMomentsErrorMessage(likeMutation.error)
               : null
           }
           likePendingMomentId={pendingLikeMomentId}
@@ -1197,10 +1215,10 @@ export function ProfileMomentsPage() {
           // 回去，但失败信息只走顶 notice，被 bar 的 z=1000 backdrop 盖死。透
           // 传给 bar 内 textarea 上方 errorMessage 槽；variables === 当前 bar
           // 上的 momentId gate 住，切到另一条 moment 重开 bar 不带旧错误。
+          // 走查 R3：先走 resolveMomentsErrorMessage 做 i18n 一致化。
           commentMutation.isError &&
-          commentMutation.error instanceof Error &&
           commentMutation.variables === commentBarTarget?.momentId
-            ? commentMutation.error.message
+            ? resolveMomentsErrorMessage(commentMutation.error)
             : null
         }
         onSubmit={() => {
