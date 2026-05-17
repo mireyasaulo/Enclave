@@ -118,19 +118,24 @@ export class FarmQuestService {
     const existing = await this.questRepo.findBy({ ownerId });
     const haveIds = new Set(existing.map((r) => r.questId));
     const today = todayLocalDate();
-    const created: FarmQuestProgressEntity[] = [];
+    // 第一次访问 /quests 要 seed N=任务总数 行，之前是 N 次串行 await save
+    // = N 次独立 transaction。改成单次 save([...]) 走一次 batch insert。
+    const toCreate: FarmQuestProgressEntity[] = [];
     for (const id of FARM_QUEST_IDS) {
       if (haveIds.has(id)) continue;
       const def = FARM_QUEST_CATALOG[id];
-      const row = this.questRepo.create({
-        ownerId,
-        questId: id,
-        progress: 0,
-        claimed: false,
-        dailyResetDate: def.kind === 'daily' ? today : null,
-      });
-      created.push(await this.questRepo.save(row));
+      toCreate.push(
+        this.questRepo.create({
+          ownerId,
+          questId: id,
+          progress: 0,
+          claimed: false,
+          dailyResetDate: def.kind === 'daily' ? today : null,
+        }),
+      );
     }
+    if (toCreate.length === 0) return existing;
+    const created = await this.questRepo.save(toCreate);
     return [...existing, ...created];
   }
 
