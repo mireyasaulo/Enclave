@@ -77,6 +77,8 @@ import { GameSubmissionEntity } from './modules/games/game-submission.entity';
 import { FarmPlayerStateEntity } from './modules/games/farm/entities/farm-player-state.entity';
 import { FarmNpcStateEntity } from './modules/games/farm/entities/farm-npc-state.entity';
 import { FarmEventLogEntity } from './modules/games/farm/entities/farm-event-log.entity';
+import { FarmCheckinEntity } from './modules/games/farm/entities/farm-checkin.entity';
+import { FarmQuestProgressEntity } from './modules/games/farm/entities/farm-quest-progress.entity';
 import { ParkingWarPlayerStateEntity } from './modules/games/parking-war/entities/parking-war-player-state.entity';
 import { ParkingWarNpcStateEntity } from './modules/games/parking-war/entities/parking-war-npc-state.entity';
 import { ParkingWarOccupancyEntity } from './modules/games/parking-war/entities/parking-war-occupancy.entity';
@@ -199,6 +201,8 @@ import {
           FarmPlayerStateEntity,
           FarmNpcStateEntity,
           FarmEventLogEntity,
+          FarmCheckinEntity,
+          FarmQuestProgressEntity,
           ParkingWarPlayerStateEntity,
           ParkingWarNpcStateEntity,
           ParkingWarOccupancyEntity,
