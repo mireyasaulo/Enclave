@@ -10,6 +10,7 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { InlineNotice, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
+import { invalidateFriendVisibilityQueries } from "../invalidate-friend-display";
 
 type Props = {
   characterId: string;
@@ -56,10 +57,17 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
       momentsHiddenFromThem?: boolean;
       chatOnly?: boolean;
     }) => updateFriendPermissions(characterId, payload, baseUrl),
+    // 走查第五轮 R1：三个开关之前只 invalidate app-friends，是因为以前
+    // momentsHiddenFromMe / momentsHiddenFromThem / chatOnly 是 dead flag，
+    // 改了等于没改，缓存不动也没人察觉。前几轮把三个 flag 全部激活后，
+    // 用户从这里勾「我不看 TA 的朋友圈」立刻翻回 /tabs/moments 或
+    // /friend-moments/$id，仍然能看到 TA 的旧帖子——直到 moments query 自然
+    // staleTime 过期或下一次手动刷新。
+    // R2 复检：用专门给可见性更新的 invalidateFriendVisibilityQueries，
+    // 不要复用 invalidateFriendDisplayQueries——后者会清 app-conversation-messages，
+    // 而权限改动不影响任何消息文本，全量重拉所有打开会话的消息既慢又没必要。
     onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["app-friends", baseUrl],
-      });
+      void invalidateFriendVisibilityQueries(queryClient, baseUrl);
     },
   });
 
