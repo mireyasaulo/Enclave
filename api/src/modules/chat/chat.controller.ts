@@ -19,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { AppError } from '../../common/app-error.exception';
 import { SystemConfigService } from '../config/config.service';
+import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
 import {
   FavoritesService,
@@ -49,6 +50,7 @@ export class ChatController {
   constructor(
     private readonly chatService: ChatService,
     private readonly groupService: GroupService,
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   @Get()
@@ -100,25 +102,50 @@ export class ChatController {
   }
 
   @Post(':conversationId/messages/:messageId/recall')
-  recallMessage(
+  async recallMessage(
     @Param('conversationId') conversationId: string,
     @Param('messageId') messageId: string,
   ) {
-    return this.chatService.recallConversationMessage(
+    const recalled = await this.chatService.recallConversationMessage(
       conversationId,
       messageId,
     );
+    // 走查 R4：和 group.service.recallOwnerMessage line 697 对齐。原版单聊撤回
+    // 走 REST API 完事，不发任何 socket 事件；同账号多端在线（web + iOS shell
+    // / 双 tab）时只有触发撤回的那一端能看到「消息变成 系统-你撤回了一条消息」，
+    // 另一端要等 socket 没事件、conversations 60s 兜底轮询拉到 lastMessage 改了
+    // 才会 invalidate messages 重拉。再次 emit new_message 让另一端 onChatMessage
+    // upsertIncomingDirectMessage exact-id 替换为 system 撤回消息，UI 即时同步。
+    this.chatGateway.emitThreadMessage(conversationId, recalled);
+    return recalled;
   }
 
   @Delete(':conversationId/messages/:messageId')
-  deleteMessage(
+  async deleteMessage(
     @Param('conversationId') conversationId: string,
     @Param('messageId') messageId: string,
   ) {
-    return this.chatService.deleteConversationMessage(
+    const result = await this.chatService.deleteConversationMessage(
       conversationId,
       messageId,
     );
+    // 走查 R4：和 group.service.deleteMessage line 733 对齐。原版单聊删除消息
+    // 走 REST 完事不 emit；多端在线时另一端 chat-list 的 lastMessage 预览 / 未读
+    // 角标要等 60s 兜底轮询；尤其删的是会话最后一条消息时另一端 chat-list 上
+    // 仍显示已删消息内容 ≤60s。emit conversation_updated 让另一端立刻
+    // invalidate ["app-conversations"] 重拉新 lastMessage。client onChatMessage
+    // 路径没有「message_deleted」事件，删一条非最后消息的话另一端 thread 内
+    // 仍要等下次进会话 refetch 才会同步（和 group 同名行为一致）。
+    const conversation = await this.chatService.getConversation(conversationId);
+    if (conversation && conversation.type === 'direct') {
+      this.chatGateway.emitConversationUpdated({
+        id: conversation.id,
+        type: 'direct',
+        title: conversation.title,
+        participants: conversation.participants,
+      });
+    }
+    return result;
   }
 
   @Post(':id/read')
