@@ -111,6 +111,9 @@ export function MobileFriendMomentsPage() {
     queryKey: ["app-character", baseUrl, resolvedCharacterId],
     queryFn: () => getCharacter(resolvedCharacterId, baseUrl),
     enabled: Boolean(resolvedCharacterId),
+    // 走查 R1：跟 friendsQuery 同款 15s staleTime —— 用户从 contacts /
+    // character-detail 过来时该角色资料几秒前刚拉过，回退再进不需要重打 RTT。
+    staleTime: 15_000,
   });
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
@@ -132,6 +135,9 @@ export function MobileFriendMomentsPage() {
     queryKey: ["app-moments-blocked-characters", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: Boolean(resolvedCharacterId),
+    // 走查 R1：屏蔽列表变更频率低（用户手动操作），15s staleTime 让 contacts /
+    // 朋友圈页之间互跳不每次都打这一次 RTT。
+    staleTime: 15_000,
   });
 
   const optimisticLike = useOptimisticMomentLikeHandlers({
@@ -263,7 +269,10 @@ export function MobileFriendMomentsPage() {
         queryKey: ["app-moments-paged", baseUrl],
       });
 
-      const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
+      // 走查 R1：Date.now() 同毫秒能撞 —— 用户快速回复两条评论 / 公网慢链路下
+      // 评论 mutation 失败后立刻重试，前后两次 tempId 落到同一毫秒会让 onSuccess
+      // 找到错误的 optimistic 行替换。加 random 后缀让碰撞概率退化到可忽略。
+      const tempId = `optimistic-comment-${ownerId}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const tempComment: MomentComment = {
         id: tempId,
         postId: momentId,

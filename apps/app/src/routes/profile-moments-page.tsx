@@ -309,7 +309,8 @@ export function ProfileMomentsPage() {
         queryKey: ["app-moments-character", baseUrl],
       });
 
-      const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
+      // 走查 R1：Date.now() 同毫秒能撞 —— 同 mobile-friend-moments / moments-page。
+      const tempId = `optimistic-comment-${ownerId}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const tempComment: MomentComment = {
         id: tempId,
         postId: momentId,

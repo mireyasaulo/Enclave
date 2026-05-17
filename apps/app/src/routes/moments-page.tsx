@@ -505,7 +505,10 @@ export function MomentsPage() {
         queryKey: ["app-moments-character", baseUrl],
       });
 
-      const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
+      // 走查 R1：Date.now() 同毫秒能撞 —— 公网 600ms RTT 下用户连续点 2 次发送，
+      // 或同一帖下两条不同评论的 optimistic 行会落到同一 tempId，onSuccess 替换会
+      // 命中错的那条。加 random 后缀让碰撞概率退化到可忽略。
+      const tempId = `optimistic-comment-${ownerId}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const tempComment: MomentComment = {
         id: tempId,
         postId: momentId,
