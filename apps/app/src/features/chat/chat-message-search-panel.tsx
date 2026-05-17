@@ -202,10 +202,36 @@ export function ChatMessageSearchPanel({
     [localMessageActionState, locale, messages, reminderMap],
   );
 
+  // 走查 R1：原版 senderKey 用 senderName 去重——但用户改"我在本群的昵称"
+  // 后，老消息落库的 senderName 还是旧名（yz），新消息 senderName 是新名
+  // (w)。同一个 senderId 在 dropdown 里冒出"w"和"yz"两条 chip，选"w"
+  // 时拉不到 senderName="yz" 的历史；连后端 Character 改名的群成员也会被
+  // 撕成两份。统一改用 senderId 去重，label 取该 id 最近一条消息的
+  // senderName。空/missing senderId 一律落到 UNKNOWN_SENDER_FILTER。
+  const senderOptions = useMemo(() => {
+    if (!enableSenderFilter) {
+      return [];
+    }
+
+    // 已经按 createdAt desc 排好序了，第一条命中的就是最近一条
+    const idToLabel = new Map<string, string>();
+    for (const item of indexedMessages) {
+      const senderId = item.message.senderId?.trim() || UNKNOWN_SENDER_FILTER;
+      if (idToLabel.has(senderId)) {
+        continue;
+      }
+      const label = item.message.senderName?.trim() || "";
+      idToLabel.set(senderId, label);
+    }
+    return Array.from(idToLabel.entries())
+      .map(([id, label]) => ({ id, label }))
+      .sort((left, right) => compareByLocale(left.label, right.label));
+  }, [enableSenderFilter, indexedMessages]);
+
   const matchedMessages = useMemo(() => {
     return indexedMessages.filter((item) => {
       const senderKey =
-        item.message.senderName?.trim() || UNKNOWN_SENDER_FILTER;
+        item.message.senderId?.trim() || UNKNOWN_SENDER_FILTER;
 
       if (
         enableSenderFilter &&
@@ -248,19 +274,6 @@ export function ChatMessageSearchPanel({
     specificDate,
     trimmedKeyword,
   ]);
-  const senderOptions = useMemo(() => {
-    if (!enableSenderFilter) {
-      return [];
-    }
-
-    return Array.from(
-      new Set(
-        indexedMessages.map(
-          (item) => item.message.senderName?.trim() || UNKNOWN_SENDER_FILTER,
-        ),
-      ),
-    ).sort((left, right) => compareByLocale(left, right));
-  }, [enableSenderFilter, indexedMessages]);
   const availableMessageTypeFilters = useMemo(() => {
     const counts = indexedMessages.reduce<
       Record<Exclude<SearchMessageTypeFilter, "all">, number>
@@ -329,8 +342,15 @@ export function ChatMessageSearchPanel({
   );
   const isKeywordSearch = Boolean(trimmedKeyword);
   const isPartialResult = results.length > visibleResults.length;
+  // senderFilter 现在存的是 senderId（或 UNKNOWN_SENDER_FILTER），label 要
+  // 反查 senderOptions；找不到说明对应 sender 的消息被 local-action 过滤掉
+  // 了（撤回/隐藏），保留 senderFilter 状态但显示 unknownSenderLabel 兜底，
+  // 不让筛选条上裸 uuid 漏给用户。
   const senderFilterDisplayLabel =
-    senderFilter === UNKNOWN_SENDER_FILTER ? unknownSenderLabel : senderFilter;
+    senderFilter === UNKNOWN_SENDER_FILTER
+      ? unknownSenderLabel
+      : senderOptions.find((option) => option.id === senderFilter)?.label?.trim() ||
+        unknownSenderLabel;
   const activeFilterLabels = useMemo(() => {
     const labels: string[] = [];
 
@@ -532,11 +552,11 @@ export function ChatMessageSearchPanel({
                   className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none"
                 >
                   <option value="all">{t(msg`全部成员`)}</option>
-                  {senderOptions.map((senderKey) => (
-                    <option key={senderKey} value={senderKey}>
-                      {senderKey === UNKNOWN_SENDER_FILTER
+                  {senderOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.id === UNKNOWN_SENDER_FILTER
                         ? unknownSenderLabel
-                        : senderKey}
+                        : option.label || unknownSenderLabel}
                     </option>
                   ))}
                 </select>
