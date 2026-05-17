@@ -2138,9 +2138,17 @@ export function ChatMessageList({
     if (attachment.kind === "feed_post_card") {
       // 视频号转发卡片点开 → 跳到对应视频号详情。复用 channels-route-state
       // 的 hash 编码（postId / section / returnPath）。
+      //
+      // 走查 R4：原 channelsHash 没带 returnPath / returnHash，用户在聊天里点
+      // 视频号卡跳到 /discover/channels 后，ChannelsPage 的「返回」按钮拿不到
+      // safeReturnPath 兜底落到 /tabs/discover，把用户从「上一条对话」甩到发现
+      // 首页，下一句不知道往哪回。带上当前 chat 的 pathname + hash，让返回能回
+      // 到这条对话原来的位置。
       const channelsHash = buildDesktopChannelsRouteHash({
         postId: attachment.postId,
         section: "recommended",
+        returnPath: pathname,
+        returnHash: hash || undefined,
       });
       // 走查 R3 新一轮：原注释/代码两路对调了——channels-page 的 URL hash
       // 同步 effect 是「桌面走 /tabs/channels（effect L1196 cond `!isDesktopLayout
