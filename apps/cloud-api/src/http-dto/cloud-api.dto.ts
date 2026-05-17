@@ -125,6 +125,16 @@ function trimString({ value }: { value: unknown }) {
   return typeof value === "string" ? value.trim() : value;
 }
 
+// 给 @IsOptional() 字段用：客户端把空字符串当"没值"传过来时，@IsOptional 不
+// 认空字符串、@MinLength(1) 又会 400 把整个请求拒了——结果就是老客户端发
+// inviteCode:"" 时连注册都过不了。先把空字符串归一成 undefined，IsOptional
+// 才能正确跳过下游校验。
+function trimStringOptional({ value }: { value: unknown }) {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
 function trimStringArray({ value }: { value: unknown }) {
   if (!Array.isArray(value)) {
     return value;
@@ -177,7 +187,7 @@ export class VerifyCodeDto {
   @Matches(CODE_PATTERN, { message: "code 格式不正确。" })
   code: string;
 
-  @Transform(trimString)
+  @Transform(trimStringOptional)
   @IsOptional()
   @IsString({ message: "inviteCode 必须是字符串。" })
   @MinLength(1, { message: "inviteCode 不能为空。" })
@@ -236,7 +246,7 @@ export class VerifyEmailCodeDto {
   @Matches(CODE_PATTERN, { message: "code 格式不正确。" })
   code: string;
 
-  @Transform(trimString)
+  @Transform(trimStringOptional)
   @IsOptional()
   @IsString({ message: "inviteCode 必须是字符串。" })
   @MinLength(1, { message: "inviteCode 不能为空。" })
@@ -311,7 +321,7 @@ export class VerifyGoogleIdTokenDto {
   @MaxLength(8192, { message: "idToken 不能超过 8192 个字符。" })
   idToken: string;
 
-  @Transform(trimString)
+  @Transform(trimStringOptional)
   @IsOptional()
   @IsString({ message: "inviteCode 必须是字符串。" })
   @MinLength(1, { message: "inviteCode 不能为空。" })

@@ -293,13 +293,19 @@ export class InviteService {
         this.cloudConfig.getString("app.publicBaseUrl", ""),
       ]);
 
+    // 被管理员 deactivate 的 code 不能再被兑换（findCodeByCodeString 会过滤掉
+    // isActive=false），但 summary 里如果照样回这个 code，邀请人发出去的 share
+    // URL 朋友点开就 404"邀请码不存在或已停用"。这里跟兑换端对齐：deactivate
+    // 的 code 一律视作"没 code"，让 UI 进入空态，不要给用户一条死链。
+    const shareableCode = code?.isActive ? code : null;
+
     const trimmedBaseUrl = publicBaseUrl.replace(/\/+$/, "");
     const isPlaceholderBase =
       !trimmedBaseUrl || trimmedBaseUrl === "https://app.example.com";
     const effectiveBaseUrl = isPlaceholderBase ? null : trimmedBaseUrl;
     const shareUrl =
-      effectiveBaseUrl && code
-        ? `${effectiveBaseUrl}/?invite=${encodeURIComponent(code.code)}`
+      effectiveBaseUrl && shareableCode
+        ? `${effectiveBaseUrl}/?invite=${encodeURIComponent(shareableCode.code)}`
         : null;
 
     // 客户端 recentRedemptions 要把 email 用户的合成手机替换成邮箱脱敏/昵称，
@@ -317,12 +323,15 @@ export class InviteService {
 
     return {
       enabled,
-      code: code?.code ?? null,
+      code: shareableCode?.code ?? null,
       shareTitle,
       shareBody,
       shareUrl,
       publicAppBaseUrl: effectiveBaseUrl,
       rewardDays,
+      // redeemCount / rewardDaysGranted 是历史累计统计，即使 code 被 deactivate
+      // 也保留展示——隐藏会让"我邀请过多少人"这一栏在 deactivate 后突然清零，
+      // 比展示活动 code 的旧数据更诡异。
       redeemCount: code?.redeemCount ?? 0,
       rewardDaysGranted: code?.rewardDaysGranted ?? 0,
       recentRedemptions: redemptions.map((record) =>
