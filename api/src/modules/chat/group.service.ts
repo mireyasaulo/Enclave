@@ -958,9 +958,20 @@ export class GroupService {
     userMessage: GroupMessage,
   ): Promise<void> {
     await this.requireAccessibleGroup(groupId);
-    const members = await this.memberRepo.find({
-      where: { groupId, memberType: 'character' },
-    });
+    const members = (
+      await this.memberRepo.find({
+        where: { groupId, memberType: 'character' },
+      })
+    )
+      // 走查 R3：addMember 已在 R1 起拦截 SELF_CHARACTER_ID 作为 character 入群，
+      // 但 yuanzui0728 等老账号在 R1 前建的群里历史落了 memberType=character 的
+      // char-default-self 行（实测群 78a3d894-dd62-... 修复前一直挂着 SELF 行）。
+      // 这里在 AI 选 actor 阶段再兜一层：planner.selectReplyActorsForTurn 会按
+      // 群成员里的 character 抽 reply actor，SELF 入选后用户在群里发完一条消息
+      // 会立刻看到 "我自己 正在回复..."、AI 用"我自己"角色身份回一条——本质是
+      // 用户在自言自语。先在 source 处过掉，运行时永远不再让 SELF 作为 reply
+      // actor，给历史脏数据留缓冲（用户可以手动从 群成员→移除 把 SELF 行清掉）。
+      .filter((member) => member.memberId !== SELF_CHARACTER_ID);
     if (!members.length) {
       return;
     }
