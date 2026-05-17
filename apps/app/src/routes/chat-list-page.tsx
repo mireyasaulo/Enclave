@@ -1003,6 +1003,12 @@ function MobileChatListPage() {
                     );
                   }
 
+                  // 走查 R1：跟 contacts-page + 菜单同款，disabled 仍能 Tab 聚焦但
+                  // Enter 没反应；tabIndex=-1 跳过 + aria-label 合并 「暂未开放」让
+                  // 屏阅器一次播报"功能 + 暂未开放"，避免 Tab 进来不知所云。
+                  const disabledItemLabel = item.disabled && item.disabledLabel
+                    ? `${t(item.label)}，${t(item.disabledLabel)}`
+                    : undefined;
                   return (
                     <button
                       key={item.key}
@@ -1010,6 +1016,8 @@ function MobileChatListPage() {
                       role="menuitem"
                       disabled={item.disabled}
                       aria-disabled={item.disabled || undefined}
+                      aria-label={disabledItemLabel}
+                      tabIndex={item.disabled ? -1 : undefined}
                       className={cn(
                         "flex w-full items-center gap-2 rounded-[9px] px-2.5 py-2 text-left text-[12px] text-white transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
                         item.disabled

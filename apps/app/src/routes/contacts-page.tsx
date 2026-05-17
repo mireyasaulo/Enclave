@@ -2625,6 +2625,16 @@ export function ContactsPage() {
                       );
                     }
 
+                    // 走查 R1：disabled menuitem（扫一扫 / 收付款）只设 disabled
+                      // 在 iOS Safari + 部分 Android 壳里依旧能被 Tab 聚焦，键盘 / 屏
+                      // 阅用户 Tab 到这里按 Enter 完全没反应，无法理解 "为什么聚到
+                      // 这里又不能用"。tabIndex=-1 让 Tab 序列跳过这两项，仅靠视觉
+                      // 「暂未开放」+ aria-disabled 提示功能未上线；以后开放时去掉
+                      // disabled 即可恢复 Tab 顺序。aria-label 把主标题 + 「暂未开
+                      // 放」合并播报，避免屏阅器只读到主标题就误以为可点。
+                      const disabledItemLabel = item.disabled && item.disabledLabel
+                        ? `${t(item.label)}，${t(item.disabledLabel)}`
+                        : undefined;
                     return (
                       <button
                         key={item.key}
@@ -2632,6 +2642,8 @@ export function ContactsPage() {
                         role="menuitem"
                         disabled={item.disabled}
                         aria-disabled={item.disabled || undefined}
+                        aria-label={disabledItemLabel}
+                        tabIndex={item.disabled ? -1 : undefined}
                         className={cn(
                           "flex w-full items-center gap-2 rounded-[9px] px-2.5 py-2 text-left text-[12px] text-white transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
                           item.disabled
