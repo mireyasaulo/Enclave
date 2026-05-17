@@ -39,7 +39,7 @@ import {
 import { buildDesktopContactsRouteHash } from "../features/desktop/contacts/desktop-contacts-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { parseCreateGroupRouteHash } from "../lib/create-group-route-state";
-import { isDesktopOnlyPath } from "../lib/history-back";
+import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const DesktopCreateGroupDialog = lazy(async () => {
@@ -250,60 +250,71 @@ export function CreateGroupPage() {
     [filteredFriends],
   );
 
+  // 走查 R1：handleBack 原本一律走 navigate({to: ...}) push 一条新 history
+  // 项。用户路径是 /tabs/contacts → 点 + → /group/new → 点返回 ⇒ history 变成
+  // [/tabs/contacts, /group/new, /tabs/contacts]，再按浏览器后退又落回
+  // /group/new 死循环。mobile-add-friend-page / friend-requests-page 都已统一
+  // 走 navigateBackOrFallback：能 history.back() 就 back，安全兜不住时再
+  // 用 fallback 里的 fresh navigate。这里把整段重写成同模式，每个 source
+  // 对应一条 fallback navigate。
   const handleBack = () => {
-    if (safeReturnPath) {
-      void navigate({
-        to: safeReturnPath,
-        ...(safeReturnHash ? { hash: safeReturnHash } : {}),
-      });
-      return;
-    }
+    const performFallbackNavigate = () => {
+      if (safeReturnPath) {
+        void navigate({
+          to: safeReturnPath,
+          ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+        });
+        return;
+      }
 
-    if (isDesktopLayout && routeState.source === "chat-details" && routeState.conversationId) {
-      void navigate({
-        to: "/tabs/chat",
-        hash: buildDesktopChatRouteHash({
-          conversationId: routeState.conversationId,
-          panel: "details",
-        }),
-      });
-      return;
-    }
+      if (isDesktopLayout && routeState.source === "chat-details" && routeState.conversationId) {
+        void navigate({
+          to: "/tabs/chat",
+          hash: buildDesktopChatRouteHash({
+            conversationId: routeState.conversationId,
+            panel: "details",
+          }),
+        });
+        return;
+      }
 
-    if (routeState.source === "chat-details" && routeState.conversationId) {
-      void navigate({
-        to: "/chat/$conversationId/details",
-        params: { conversationId: routeState.conversationId },
-      });
-      return;
-    }
+      if (routeState.source === "chat-details" && routeState.conversationId) {
+        void navigate({
+          to: "/chat/$conversationId/details",
+          params: { conversationId: routeState.conversationId },
+        });
+        return;
+      }
 
-    if (routeState.source === "desktop-chat" && routeState.conversationId) {
-      void navigate({
-        to: buildDesktopChatThreadPath({
-          conversationId: routeState.conversationId,
-        }),
-      });
-      return;
-    }
+      if (routeState.source === "desktop-chat" && routeState.conversationId) {
+        void navigate({
+          to: buildDesktopChatThreadPath({
+            conversationId: routeState.conversationId,
+          }),
+        });
+        return;
+      }
 
-    if (isDesktopLayout && routeState.source === "group-contacts") {
-      void navigate({
-        to: "/tabs/contacts",
-        hash: buildDesktopContactsRouteHash({
-          pane: "groups",
-          showWorldCharacters: false,
-        }),
-      });
-      return;
-    }
+      if (isDesktopLayout && routeState.source === "group-contacts") {
+        void navigate({
+          to: "/tabs/contacts",
+          hash: buildDesktopContactsRouteHash({
+            pane: "groups",
+            showWorldCharacters: false,
+          }),
+        });
+        return;
+      }
 
-    if (routeState.source === "group-contacts") {
-      void navigate({ to: "/contacts/groups" });
-      return;
-    }
+      if (routeState.source === "group-contacts") {
+        void navigate({ to: "/contacts/groups" });
+        return;
+      }
 
-    void navigate({ to: "/tabs/chat" });
+      void navigate({ to: "/tabs/chat" });
+    };
+
+    navigateBackOrFallback(performFallbackNavigate, safeReturnPath);
   };
 
   const statusBackLabel = safeReturnPath

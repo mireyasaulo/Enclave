@@ -642,13 +642,20 @@ function MobileAddFriendWelcomeState({
   const t = useRuntimeTranslator();
   // chip 必须是「真能搜的字符串」而不是描述用法的标签。原来用 ["角色名",
   // "隐界号", "关系描述"]——点击就把这些 label 作为 keyword 提交，几乎永远
-  // 命中不到东西。对齐桌面 DesktopAddFriendWelcomeState 的示例：1 个隐界号
-  // 前缀格式（教用户隐界号长什么样）+ 几个角色名/资料关键词示例。
+  // 命中不到东西。第二轮换成 ["yinjie_1234abcd","白石","数字人","治愈系"]
+  // 依然全部命中 0：fake yinjie_ ID 必定不匹配，"白石/数字人/治愈系" 在当前
+  // 世界角色池里没有任何角色名 / 资料 / expertDomains 命中。点一下就直接
+  // 落到 "没有找到 X" 空态，比不放 chip 还误导用户。
+  // 改成默认 seed 角色池里高命中的关键词（角色名前缀 / 关系描述 / expert
+  // domain 都会命中）：林 = 13 命中（林佑/林医生/林晨…），老师 = 11 命中
+  // （苏老师 + profile.relationship 含「老师」一片），导师 = 6 命中，复盘 =
+  // 6 命中。隐界号格式提示由顶端 placeholder「隐界号 / 角色名」承担，不再
+  // 硬编码 fake yinjie_ chip。
   const examples = [
-    "yinjie_1234abcd",
-    t(msg`白石`),
-    t(msg`数字人`),
-    t(msg`治愈系`),
+    t(msg`林`),
+    t(msg`老师`),
+    t(msg`导师`),
+    t(msg`复盘`),
   ];
 
   return (
