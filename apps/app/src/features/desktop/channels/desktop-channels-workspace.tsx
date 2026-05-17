@@ -428,15 +428,17 @@ export function DesktopChannelsWorkspace({
                   onToggleUnmuted={toggleUnmuted}
                   onLike={() => onLike(post.id)}
                   onOpenAuthor={() => onOpenAuthor(post.authorId)}
-                  onShare={() =>
+                  onShare={() => {
+                    // 走查 2026-05-17 R2：移动端 handleSharePost 早就用 stripToolCallSyntax
+                    // 把 <tool_call> / [TOOL_CALL] 这类残留过滤掉再当转发面板顶部摘要；
+                    // 桌面这里一直拿原文，AI 生成贴里夹的工具调用语法会原样塞进
+                    // 转发预览，看着像乱码。和移动端对齐一道清洗。
+                    const cleanText = stripToolCallSyntax(post.text ?? "");
                     setForwardPickerPost({
                       id: post.id,
-                      excerpt: `${post.authorName}：${post.text ?? ""}`.slice(
-                        0,
-                        80,
-                      ),
-                    })
-                  }
+                      excerpt: `${post.authorName}：${cleanText}`.slice(0, 80),
+                    });
+                  }}
                   onToggleAuthorFollow={() =>
                     onToggleAuthorFollow(
                       post.authorId,
@@ -684,6 +686,30 @@ function ChannelMediaSurface({
         unmuted={unmuted}
         onToggleUnmuted={onToggleUnmuted}
       />
+    );
+  }
+
+  // 走查 2026-05-17 R2：mediaType='image' / 'text' 这两种 server 实际会返回但
+  // 桌面 surface 一直直接 fall through 到下面"暂无可播放内容"——前端 contracts
+  // 里 FeedMediaType 包含 image 且 isPostMediaPlayable 对非视频/音频统一放行，
+  // 移动端 MobileChannelMediaSurface 已经按 image 渲成多图 pictorial 占位。
+  // 桌面 surface 至少把 cover/首图 当成静态背景显示出来，别让作者发了图集 / 仅
+  // 文字的视频号直接黑屏。
+  const imageAssets = (post.media ?? []).filter(
+    (asset): asset is Extract<typeof asset, { kind: "image" }> =>
+      asset.kind === "image",
+  );
+  const fallbackImage =
+    post.coverUrl ?? imageAssets[0]?.url ?? post.mediaUrl ?? null;
+  if (fallbackImage) {
+    return (
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gradient-to-b from-[#1f2533] to-[#0a0c10]">
+        <img
+          src={resolveAppMediaUrl(fallbackImage)}
+          alt={post.title ?? post.authorName}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
     );
   }
 
