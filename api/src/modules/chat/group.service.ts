@@ -280,6 +280,27 @@ export class GroupService {
     dto: AddMemberDto,
   ): Promise<GroupMemberEntity> {
     await this.requireOwnedGroup(groupId);
+    // 走查 R2：原版没卡 memberId / memberType 必填——POST /groups/$id/members
+    // body={} 或 body 缺字段时，下面 findOne({ where: { memberId: undefined }})
+    // 会被 TypeORM 当成"只按 groupId 过滤"返回任意一条已存在成员（实测返回 owner
+    // 那一条 memberType=user），handler 直接 200 + 别人的成员行——调用方误以为
+    // 添加成功。前端 group-member-picker 不会发这种 body，但任何直连 API /
+    // 老客户端 / 第三方客户端用错请求时无明显报错最坏。补 400 让 callsite
+    // 主动暴露错误。
+    const trimmedMemberId = dto.memberId?.trim();
+    if (!trimmedMemberId) {
+      throw new AppError('GROUP_MEMBER_REQUIRES_ID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Group member requires a non-empty memberId',
+      });
+    }
+    if (dto.memberType !== 'character' && dto.memberType !== 'user') {
+      throw new AppError('GROUP_MEMBER_REQUIRES_TYPE', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage:
+          'Group member requires memberType of either "character" or "user"',
+      });
+    }
     // 走查 R1：char-default-self（"我自己"自我镜像）本质就是用户自身，owner
     // 已经以 memberType=user 在群里。前端 create-group-page / 群成员 picker /
     // mention picker / group-chat-thread-panel 都已经按 SELF_CHARACTER_ID 过滤
@@ -291,7 +312,7 @@ export class GroupService {
     // 和 createGroup R2 同口径，服务端硬挡：character 类型 SELF_CHARACTER_ID 直接 400。
     if (
       dto.memberType === 'character' &&
-      dto.memberId === SELF_CHARACTER_ID
+      trimmedMemberId === SELF_CHARACTER_ID
     ) {
       throw new AppError('GROUP_CANNOT_ADD_SELF_AS_MEMBER', {
         status: HttpStatus.BAD_REQUEST,
@@ -299,7 +320,7 @@ export class GroupService {
       });
     }
     const existing = await this.memberRepo.findOne({
-      where: { groupId, memberId: dto.memberId },
+      where: { groupId, memberId: trimmedMemberId },
     });
 
     if (existing) {
@@ -307,10 +328,13 @@ export class GroupService {
       return existing;
     }
 
-    const resolvedMember = await this.resolveMemberProfile(dto);
+    const resolvedMember = await this.resolveMemberProfile({
+      ...dto,
+      memberId: trimmedMemberId,
+    });
     const member = this.memberRepo.create({
       groupId,
-      memberId: dto.memberId,
+      memberId: trimmedMemberId,
       memberType: dto.memberType,
       memberName: resolvedMember.memberName,
       memberAvatar: resolvedMember.memberAvatar,
@@ -318,7 +342,7 @@ export class GroupService {
     });
 
     await this.memberRepo.save(member);
-    this.logger.log(`Added member ${dto.memberId} to group ${groupId}`);
+    this.logger.log(`Added member ${trimmedMemberId} to group ${groupId}`);
     await this.emitGroupConversationUpdated(groupId);
     return member;
   }
