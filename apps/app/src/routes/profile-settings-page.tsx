@@ -33,14 +33,14 @@ const ProfileSettingsDesktop = lazy(() =>
 );
 
 export function ProfileSettingsPage() {
-  const t = useRuntimeTranslator();
-  const navigate = useNavigate();
+  // 第四轮 R1：之前路由组件顶层同时订阅 runtimeConfig / worldOwner.id /
+  // cloudSession.accessToken / cloudSession.phone / useAppLocale 五路状态——
+  // 但桌面分支根本不读，全部走 lazy 出去的 ProfileSettingsDesktop。结果是
+  // 桌面用户切到 /desktop/settings 时，每次 cloud-session 心跳 / world-owner
+  // hydrate / locale 激活，都拽着这个外壳 re-render（虽然只重渲 Suspense
+  // 节点，但还是触发 React 调度 + zustand 比对）。把 mobile-only 状态搬进
+  // ProfileSettingsMobileEntry, 桌面外壳只订阅 useDesktopLayout 这一个信号。
   const isDesktopLayout = useDesktopLayout();
-  const runtimeConfig = useAppRuntimeConfig();
-  const ownerId = useWorldOwnerStore((state) => state.id);
-  const cloudAccessToken = useCloudSessionStore((state) => state.accessToken);
-  const cloudPhone = useCloudSessionStore((state) => state.phone);
-  const { requestedLocale } = useAppLocale();
 
   if (isDesktopLayout) {
     // Suspense fallback 给空——桌面 utility shell 切到 settings 的瞬间空一两帧
@@ -52,6 +52,18 @@ export function ProfileSettingsPage() {
       </Suspense>
     );
   }
+
+  return <ProfileSettingsMobileEntry />;
+}
+
+function ProfileSettingsMobileEntry() {
+  const t = useRuntimeTranslator();
+  const navigate = useNavigate();
+  const runtimeConfig = useAppRuntimeConfig();
+  const ownerId = useWorldOwnerStore((state) => state.id);
+  const cloudAccessToken = useCloudSessionStore((state) => state.accessToken);
+  const cloudPhone = useCloudSessionStore((state) => state.phone);
+  const { requestedLocale } = useAppLocale();
 
   const showCloudAccountEntries = shouldShowCloudAccountControls({
     worldAccessMode: runtimeConfig.worldAccessMode,
