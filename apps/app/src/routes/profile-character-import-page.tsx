@@ -50,6 +50,12 @@ export function ProfileCharacterImportPage() {
   const [result, setResult] = useState<Result | null>(null);
   const [preview, setPreview] = useState<FilePreview | null>(null);
   const [dragging, setDragging] = useState(false);
+  // 新轮次 R2：用户在 file picker / 拖拽里快速换两张文件时，readFile 是
+  // fire-and-forget，第一次的 file.text() 还在跑、第二次已经开始；如果 file2
+  // （较小）先 resolve、file1（较大）后 resolve，最终 setPreview 会被 file1
+  // 的回填覆盖，用户在预览卡里看到 file1 的内容、文件名却是 file2 选的那个。
+  // 拿一个自增 id 标记 "最新一次 readFile 调用"，过期那条 fall through 直接早退。
+  const latestReadIdRef = useRef(0);
 
   const goBack = () =>
     navigateBackOrFallback(
@@ -60,7 +66,9 @@ export function ProfileCharacterImportPage() {
     );
 
   async function readFile(file: File) {
-    // 清掉之前的预览和结果，避免新文件解析失败时还残留上一张预览卡误导用户
+    const readId = ++latestReadIdRef.current;
+    // 同步先把旧的清掉——避免新文件 file.text() 还没跑出来时，旧的预览卡 / 失败
+    // 提示还挂着误导用户。后续每次 await 之后都要再校 readId 防止 stale 回填。
     setResult(null);
     setPreview(null);
     // 防御性：bundle 实际只有几十 KB，超过 5 MB 几乎一定是用户选错文件
@@ -68,6 +76,7 @@ export function ProfileCharacterImportPage() {
     // 浏览器内存里把页面卡死。
     const MAX_BYTES = 5 * 1024 * 1024;
     if (file.size > MAX_BYTES) {
+      if (readId !== latestReadIdRef.current) return;
       setResult({
         kind: "danger",
         message: t(
@@ -80,12 +89,14 @@ export function ProfileCharacterImportPage() {
     try {
       text = await file.text();
     } catch (err) {
+      if (readId !== latestReadIdRef.current) return;
       setResult({
         kind: "danger",
         message: t(msg`读取文件失败：${(err as Error).message}`),
       });
       return;
     }
+    if (readId !== latestReadIdRef.current) return;
     let payload: unknown;
     try {
       payload = JSON.parse(text);
