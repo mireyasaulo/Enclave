@@ -15,6 +15,7 @@ import { ModerationModule } from './modules/moderation/moderation.module';
 import { FeedModule } from './modules/feed/feed.module';
 import { GamesModule } from './modules/games/games.module';
 import { FarmModule } from './modules/games/farm/farm.module';
+import { ParkingWarModule } from './modules/games/parking-war/parking-war.module';
 import { OfficialAccountsModule } from './modules/official-accounts/official-accounts.module';
 import { WorldModule } from './modules/world/world.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
@@ -76,6 +77,10 @@ import { GameSubmissionEntity } from './modules/games/game-submission.entity';
 import { FarmPlayerStateEntity } from './modules/games/farm/entities/farm-player-state.entity';
 import { FarmNpcStateEntity } from './modules/games/farm/entities/farm-npc-state.entity';
 import { FarmEventLogEntity } from './modules/games/farm/entities/farm-event-log.entity';
+import { ParkingWarPlayerStateEntity } from './modules/games/parking-war/entities/parking-war-player-state.entity';
+import { ParkingWarNpcStateEntity } from './modules/games/parking-war/entities/parking-war-npc-state.entity';
+import { ParkingWarOccupancyEntity } from './modules/games/parking-war/entities/parking-war-occupancy.entity';
+import { ParkingWarEventLogEntity } from './modules/games/parking-war/entities/parking-war-event-log.entity';
 import { WorldContextEntity } from './modules/world/world-context.entity';
 import { NarrativeArcEntity } from './modules/narrative/narrative-arc.entity';
 import { AIBehaviorLogEntity } from './modules/analytics/ai-behavior-log.entity';
@@ -194,6 +199,10 @@ import {
           FarmPlayerStateEntity,
           FarmNpcStateEntity,
           FarmEventLogEntity,
+          ParkingWarPlayerStateEntity,
+          ParkingWarNpcStateEntity,
+          ParkingWarOccupancyEntity,
+          ParkingWarEventLogEntity,
           WorldContextEntity,
           NarrativeArcEntity,
           AIBehaviorLogEntity,
@@ -256,6 +265,7 @@ import {
     FeedModule,
     GamesModule,
     FarmModule,
+    ParkingWarModule,
     OfficialAccountsModule,
     WorldModule,
     SchedulerModule,
