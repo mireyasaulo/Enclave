@@ -140,6 +140,19 @@ export class InviteService {
       return { status: "rejected", rejectReason: rejected.rejectReason, rewardDays: 0 };
     }
 
+    // 防 sockpuppet 套现：被封 / 归档的邀请人即使有活动 code、即使被邀请人是真人，
+    // 也不发奖励。否则封号只挡了登录，攒着的旧 code 还能继续 farm 出 invite_reward
+    // 订阅。redemption 行落库（status=rejected）便于运营审计，但不动 codeStats。
+    const inviter = await this.userRepo.findOne({ where: { id: payload.inviterUserId } });
+    if (!inviter || inviter.status !== "active") {
+      const rejected = await this.persistRedemption(
+        payload,
+        "rejected",
+        inviter ? "邀请人账号已停用" : "邀请人不存在",
+      );
+      return { status: "rejected", rejectReason: rejected.rejectReason, rewardDays: 0 };
+    }
+
     const [maxPerCode, maxIp, maxDevice, rewardDays] = await Promise.all([
       this.cloudConfig.getNumber("invite.maxRedeemPerCode", 50),
       this.cloudConfig.getNumber("invite.maxRedeemPerIpPerDay", 3),
