@@ -349,18 +349,24 @@ export class SubscriptionService {
       this.loadCopy(),
     ]);
 
+    // 跟 InviteService.buildClientSummary 对齐：isActive=false 的 code 一律
+    // 当作"没 code"，避免管理员 deactivate 后用户在订阅页看到死链可分享。
     let inviteCodeValue: string | null = null;
     if (user.inviteCodeId) {
       const inviteCode = await this.inviteCodeRepo.findOne({
         where: { id: user.inviteCodeId },
       });
-      inviteCodeValue = inviteCode?.code ?? null;
+      if (inviteCode?.isActive) {
+        inviteCodeValue = inviteCode.code;
+      }
     }
     if (!inviteCodeValue) {
       const inviteCode = await this.inviteCodeRepo.findOne({
         where: { ownerUserId: user.id },
       });
-      inviteCodeValue = inviteCode?.code ?? null;
+      if (inviteCode?.isActive) {
+        inviteCodeValue = inviteCode.code;
+      }
     }
 
     const planMap = new Map(plans.map((plan) => [plan.code, plan]));

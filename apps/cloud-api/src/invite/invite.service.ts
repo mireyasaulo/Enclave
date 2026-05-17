@@ -287,6 +287,17 @@ export class InviteService {
     await this.codeRepo.save(code);
   }
 
+  // 跟 bumpCodeStats(rewarded=true) 对称：admin 撤销一条已发放奖励的兑换时调用，
+  // 把当初加上去的 redeemCount + rewardDaysGranted 减回去。Math.max 兜底负值，
+  // 防御历史数据脏（迁移前的旧行 codeId 找不到等）。
+  private async unbumpCodeStats(codeId: string, rewardDays: number) {
+    const code = await this.codeRepo.findOne({ where: { id: codeId } });
+    if (!code) return;
+    code.redeemCount = Math.max(0, code.redeemCount - 1);
+    code.rewardDaysGranted = Math.max(0, code.rewardDaysGranted - rewardDays);
+    await this.codeRepo.save(code);
+  }
+
   async buildClientSummary(userId: string): Promise<InviteSummaryResponse> {
     const [enabled, rewardDays, code, redemptions, shareTitle, shareBody, publicBaseUrl] =
       await Promise.all([
@@ -451,11 +462,24 @@ export class InviteService {
     const record = await this.redemptionRepo.findOne({ where: { id: redemptionId } });
     if (!record) return null;
     if (record.status === "rejected") return record;
+    const wasRewarded = record.status === "rewarded";
     record.status = "rejected";
     record.rejectReason = reason;
     const note = `${actor ?? "admin"}: ${reason}`;
-    if (record.rewardSubscriptionId) {
-      await this.subscription.revokeSubscription(record.rewardSubscriptionId, note);
+    // 撤回前先抓住 inviter 那张订阅的实际 grant 天数，用于稍后回滚 code 累计
+    // 统计。inviter / invitee 两张是同时同长 grant，挑任意一张算就行。
+    let rewardDaysToRevert = 0;
+    if (wasRewarded && record.rewardSubscriptionId) {
+      const revoked = await this.subscription.revokeSubscription(
+        record.rewardSubscriptionId,
+        note,
+      );
+      if (revoked) {
+        rewardDaysToRevert = Math.round(
+          (revoked.expiresAt.getTime() - revoked.startsAt.getTime()) /
+            (24 * 60 * 60 * 1000),
+        );
+      }
       record.rewardSubscriptionId = null;
     }
     if (record.inviteeRewardSubscriptionId) {
@@ -464,6 +488,12 @@ export class InviteService {
         note,
       );
       record.inviteeRewardSubscriptionId = null;
+    }
+    // 当初 grant 时 bumpCodeStats 在 inviter 的 invite_codes 上 +1 redeemCount
+    // / +rewardDays。撤销时必须对称回退，否则 /summary 上 inviter 看到的"我邀
+    // 请了 N 人 / 累计 M 天"长期虚高、跟实际能用的 active 订阅对不上。
+    if (wasRewarded && record.codeId) {
+      await this.unbumpCodeStats(record.codeId, rewardDaysToRevert);
     }
     // 同步把 invitee.invitedRewardGranted 翻回 false，运维之后想给同一个被邀
     // 请人补发（换个 inviter 重新跑兑换）才不会被 grant 时的 guard 拦掉。
