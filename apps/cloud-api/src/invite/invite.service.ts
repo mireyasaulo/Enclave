@@ -119,7 +119,12 @@ export class InviteService {
   }
 
   async hasRedemptionForInvitee(inviteeUserId: string) {
-    const existing = await this.redemptionRepo.findOne({ where: { inviteeUserId } });
+    // 只看 rewarded 行——admin 拒兑后留下的 rejected 行不该再挡受邀人去用别的
+    // 合法邀请码（之前是直接 findOne 任何 status，导致 fraud 清理后受邀人永远
+    // 失去再被邀请的资格）。partial unique 索引也是同样的口径只保护 rewarded 唯一。
+    const existing = await this.redemptionRepo.findOne({
+      where: { inviteeUserId, status: "rewarded" },
+    });
     return !!existing;
   }
 
