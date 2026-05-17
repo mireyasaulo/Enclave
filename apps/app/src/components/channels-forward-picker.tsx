@@ -152,6 +152,19 @@ export function ChannelsForwardPicker({
         translatedMessage = t(msg`只支持转发视频号帖子。`);
       } else if (code === "FEED_POST_NOT_PUBLISHED") {
         translatedMessage = t(msg`帖子尚未发布，稍后再试。`);
+      } else if (code === "FEED_POST_NOT_FOUND") {
+        // 走查 2026-05-17 R1：home 拉到本地后，server 端这条 post 被
+        // not-interested / 删除 / cleanupBrokenChannelPosts 隐藏，用户再点
+        // 转发就是 404。原来吃到通用 "转发失败，请稍后重试"——用户重试只会
+        // 一直 404，体感「我按一万次都失败」。明确告知"已经不在了"，并促
+        // 使用户关闭面板。
+        translatedMessage = t(msg`这条视频号已经不在了。`);
+      } else if (code === "FEED_FORWARD_TARGET_REQUIRED") {
+        // 走查 2026-05-17 R1：用户挑了好友后，被挑那位 character 已被删除 /
+        // hidden（getFriends 缓存 + 真实 character 表不同步的边界，30s
+        // staleTime 内可见）→ 404 FEED_FORWARD_TARGET_REQUIRED。让用户知
+        // 道是"挑的好友"出问题、换一个就行，不是后端集体挂了。
+        translatedMessage = t(msg`这位好友已不在通讯录，请换一位再试。`);
       } else {
         translatedMessage = t(msg`转发失败，请稍后重试。`);
       }

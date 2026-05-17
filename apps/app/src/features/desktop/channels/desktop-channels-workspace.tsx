@@ -38,7 +38,6 @@ import {
   VolumeX,
   X,
 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { AudioCard } from "../../../components/audio-card";
 import { ChannelsForwardPicker } from "../../../components/channels-forward-picker";
@@ -145,7 +144,6 @@ export function DesktopChannelsWorkspace({
   const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
-  const queryClient = useQueryClient();
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   // 视频号转发面板：null = 关闭。点 Share 按钮 → 设当前帖摘要。
   const [forwardPickerPost, setForwardPickerPost] = useState<{
@@ -497,10 +495,10 @@ export function DesktopChannelsWorkspace({
         onClose={() => setForwardPickerPost(null)}
         onForwarded={(target) => {
           setForwardNotice(t(msg`已转发给 ${target.name}。`));
-          // 让 channels-home 数据刷新出新的 shareCount
-          void queryClient.invalidateQueries({
-            queryKey: ["app-channels-home", baseUrl],
-          });
+          // 走查 2026-05-17 R1：原注释说要刷"shareCount"——但桌面端工作区
+          // 没有任何地方显示 post.shareCount / ownerState.hasShared，移动端同
+          // 流程已经在 channels-page.tsx 移除了同款 invalidate。这里也跟着
+          // 去掉，避免每次转发后白白拉一次 home 列表。
         }}
       />
       {forwardNotice ? (

@@ -1914,10 +1914,14 @@ export function ChannelsPage() {
           setNoticeActionLabel(null);
           setNoticeAction(null);
           setNotice(t(msg`已转发给 ${target.name}。`));
-          // 让"我点过转发"的小角标 / shareCount 立即体现
-          void queryClient.invalidateQueries({
-            queryKey: ["app-channels-home", baseUrl],
-          });
+          // 走查 2026-05-17 R1：原来这里 invalidate 整张 home，注释说要刷
+          // "shareCount 小角标"——但 MobileChannelsCard 上 Share2 按钮的 label
+          // 始终是 t(msg`分享`)，从不读 post.shareCount；ownerState.hasShared 也
+          // 只在乐观更新的兜底分支里被填 false，没有任何 UI 读它。整张 home
+          // refetch 在公网隧道下 ~150-400ms + ~100KB 流量，纯浪费，且会跟刚
+          // 出口"已转发"通知争用 React 渲染。移除——share 不影响视频号 home
+          // 的任何可见状态；用户回头看到的更新数据自然由其它 mutation /
+          // section 切换的 invalidate 推动。
         }}
         onForwardFailed={(input) => {
           // 走查 R9：picker 在 mutation pending 时不挡关闭，用户点完好友
