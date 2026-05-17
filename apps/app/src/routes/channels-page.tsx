@@ -3531,6 +3531,25 @@ function MobileChannelCommentsSheet({
     };
   }, [open]);
 
+  // 走查 R9：Esc 键关 sheet —— ChannelsForwardPicker (line 95-104) 早就有这套
+  // window keydown / Escape preventDefault + onClose 的兜底，但 MobileChannelComments
+  // Sheet 一直缺。桌面端 / iPad 接外接键盘 / 真机 PWA 在 web 嵌入下，用户按 Esc
+  // 想关评论 sheet 没反应，必须用鼠标点 backdrop / 右上 X，体感断了。
+  // 真机 mobile 浏览器没物理 Esc 也无害（window 上根本不会 fire），不会引入开销。
+  useEffect(() => {
+    if (!open || typeof window === "undefined") {
+      return;
+    }
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
   // Sheet 关闭时重置自动滚动 flag，下次再打开重新跑一次。previousCommentCountRef
   // 也复位以便下次打开时不会把首次 0→N 数据到位误判成"用户刚刚发了一条评论"。
   useEffect(() => {
