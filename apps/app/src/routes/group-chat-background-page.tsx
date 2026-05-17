@@ -119,8 +119,16 @@ export function GroupChatBackgroundPage() {
   }, [backgroundQuery.data]);
   // groupId 切换（同账号切到另一群）必须强制 re-seed，否则下一群的 draft
   // 还是上一群的；和上面那条 effect 配对。
+  // 走查 R1：仅 reset ref 不够——还得把 defaultDraft/groupMode/groupDraft 三个
+  // state 也回归到 initial（null/inherit/null），否则 backgroundQuery.data 还在
+  // 飞那几百 ms 内界面会先用 A 群的 draft 渲染 B 群的预览，包括 PresetGrid 上
+  // 高亮的也是上一群的选中项。uploadMutation 的取消挂起单独放在另一个 effect
+  // 里（声明顺序在它之下）。
   useEffect(() => {
     draftInitializedRef.current = false;
+    setDefaultDraft(null);
+    setGroupMode("inherit");
+    setGroupDraft(null);
   }, [baseUrl, groupId]);
 
   useEffect(() => {
@@ -170,6 +178,17 @@ export function GroupChatBackgroundPage() {
       setNotice(t(msg`背景图已上传，记得保存当前设置。`));
     },
   });
+
+  // 走查 R1：切群时取消挂起的 upload onSuccess 副作用——A 群上传 mutation 在
+  // 飞、用户切到 B 群、A 的 upload 回来 onSuccess 会 setDefaultDraft / setGroupDraft
+  // 把 B 群预览覆盖成 A 群上传的图。reset() 把 mutation 状态拨回 idle，等同丢弃
+  // in-flight 结果（compressChatBackgroundImage / uploadChatBackground 已经发出
+  // 的网络请求不取消，但成功后 onSuccess 不再触发）。
+  const uploadMutationResetRef = useRef(uploadMutation.reset);
+  uploadMutationResetRef.current = uploadMutation.reset;
+  useEffect(() => {
+    uploadMutationResetRef.current();
+  }, [baseUrl, groupId]);
 
   const saveDefaultMutation = useMutation({
     mutationFn: async () => {

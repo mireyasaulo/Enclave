@@ -1561,6 +1561,18 @@ export function MomentsPage() {
           : null
       }
       pendingCommentMomentId={pendingCommentMomentId}
+      // 走查 R1：评论失败时 onError 重开 commentBar、把错误信息送到顶部 notice，
+      // 但 bar 全屏 overlay 走 z=1000 把列表里的 notice 整张盖死。跟
+      // discover-feed-page R6 一致，把 commentMutation 的错误透传进 bar 内
+      // 显示在 textarea 上方；只在 bar 真在当前 mutate 的 moment 上打开时显示——
+      // 用户切到别条 moment 的 bar 时显示旧错误反而误导。
+      commentErrorForBar={
+        commentMutation.isError &&
+        commentMutation.error instanceof Error &&
+        commentMutation.variables === commentBarTarget?.momentId
+          ? commentMutation.error.message
+          : null
+      }
       notice={notice}
       noticeTone={noticeTone}
       noticeActionLabel={noticeActionLabel}
@@ -1746,6 +1758,7 @@ type MobileMomentsViewProps = {
   momentsLoading: boolean;
   momentsError: Error | null;
   pendingCommentMomentId: string | null | undefined;
+  commentErrorForBar: string | null;
   notice: string;
   noticeTone: "success" | "info" | "danger";
   noticeActionLabel: string | null;
@@ -1794,6 +1807,7 @@ function MobileMomentsView({
   momentsLoading,
   momentsError,
   pendingCommentMomentId,
+  commentErrorForBar,
   notice,
   noticeTone,
   noticeActionLabel,
@@ -2291,6 +2305,7 @@ function MobileMomentsView({
             ? pendingCommentMomentId === commentBarTarget.momentId
             : false
         }
+        errorMessage={commentErrorForBar}
         onSubmit={() => {
           if (commentBarTarget) {
             onCommentSubmit(commentBarTarget.momentId);

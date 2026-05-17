@@ -149,6 +149,19 @@ function MobileGroupMemberPickerPage({
     enabled: Boolean(groupId),
   });
 
+  // 走查 R1：tanstack-router 在 /group/A/members/add → /group/B/members/add 这种
+  // 只换 param 的跳转下不重挂载组件，selectedIds / keyword / removeConfirmOpen
+  // 仍保留上一群 A 的状态。selectedFriends 虽然按 candidateMap 过滤所以视觉上
+  // 看不到 A 的旧选项，但 selectedIds 仍带着 stale id，点"确定"会把 A 的成员
+  // POST 到 B；keyword 没清空导致搜索框留着 A 的关键字、候选直接被过滤成空——
+  // 用户以为没人能选。和 background/edit/announcement 几个姊妹页面对齐，
+  // groupId/baseUrl/mode 任一变化都重置一次。
+  useEffect(() => {
+    setSelectedIds([]);
+    setKeyword("");
+    setRemoveConfirmOpen(false);
+  }, [baseUrl, groupId, mode]);
+
   useEffect(() => {
     if (
       groupQuery.isLoading ||
