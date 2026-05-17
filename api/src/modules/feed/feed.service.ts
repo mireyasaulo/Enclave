@@ -280,6 +280,12 @@ export class FeedService implements OnModuleInit {
     // 负数) TypeORM 会忽略，但显式归一更可预测）。
     page = clampFeedPaginationPage(page);
     limit = clampFeedPaginationLimit(limit);
+    // 走查 R3：controller @Query surface 是 TS-only enum。?surface=asdf 实测
+    // 落到下面的 else 分支被当 channels 处理 — 用户 hit 广场 URL 但拿到的是
+    // 视频号数据，体感是「广场动态忽然全变视频卡片」。白名单兜回 'feed'。
+    if (surface !== 'feed' && surface !== 'channels') {
+      surface = 'feed';
+    }
     if (surface === 'channels') {
       await this.ensureChannelSeedData();
       await this.topUpChannelsIfNeeded();
@@ -584,6 +590,16 @@ export class FeedService implements OnModuleInit {
     },
   ): Promise<ReturnType<FeedService['serializePost']>> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
+    // 走查 R3：controller @Body surface 是 TS-only 'feed' | 'channels'，运行时
+    // any。curl `{"surface":"asdf"}` 会创建一条 surface='asdf' 的 post，既不
+    // 进 feed (WHERE surface='feed') 也不进 channels (WHERE surface='channels')
+    // → 永久变孤儿数据，占库不可见，老 user 看不到自己刚发的内容会困惑。
+    // 白名单兜底为 'feed'（与下游 createPost 的 default 对齐），让脏 enum
+    // 不污染 DB。
+    const normalizedSurface: FeedSurface =
+      options?.surface === 'feed' || options?.surface === 'channels'
+        ? options.surface
+        : 'feed';
     const post = await this.createPost({
       authorAvatar: owner.avatar ?? '',
       authorId: owner.id,
@@ -598,7 +614,7 @@ export class FeedService implements OnModuleInit {
       aspectRatio: options?.aspectRatio,
       topicTags: options?.topicTags,
       sourceKind: 'owner_upload',
-      surface: options?.surface,
+      surface: normalizedSurface,
       text: text ?? '',
     });
     // 必须串行化成 DTO 再返回：前端 createFeedPost 把响应直接 prepend 到广场
@@ -971,11 +987,23 @@ export class FeedService implements OnModuleInit {
   ): Promise<void> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.assertPostExists(postId);
+    // 走查 R3：controller @Body 的 enum 是 TS-only，运行时是 any。curl 实测可
+    // 以送 `channel=<script>...`、`channel=999`、`channel=null`（字符串）等等，
+    // 任意脏字符串都会落进 user_feed_interactions.payload + cyberAvatar
+    // captureSignal 的 summaryText。signal 文本最终能流向后续 LLM prompt /
+    // analytics 报表，留着脏字符串会污染下游。白名单兜底为 'unknown'。
+    const normalizedChannel: 'native' | 'copy' | 'system' | 'unknown' =
+      channel === 'native' ||
+      channel === 'copy' ||
+      channel === 'system' ||
+      channel === 'unknown'
+        ? channel
+        : 'unknown';
     const interaction = this.interactionRepo.create({
       ownerId: owner.id,
       postId,
       type: 'share',
-      payload: channel ? { channel } : null,
+      payload: { channel: normalizedChannel },
     });
     await this.interactionRepo.save(interaction);
     void this.cyberAvatar.captureSignal({
@@ -985,11 +1013,11 @@ export class FeedService implements OnModuleInit {
       sourceEntityType: 'feed_interaction',
       sourceEntityId: interaction.id,
       dedupeKey: `feed_interaction:${interaction.id}`,
-      summaryText: `分享动态到 ${channel ?? 'unknown'}`,
+      summaryText: `分享动态到 ${normalizedChannel}`,
       payload: {
         postId,
         type: 'share',
-        channel: channel ?? 'unknown',
+        channel: normalizedChannel,
       },
       occurredAt: interaction.createdAt ?? new Date(),
     });
