@@ -13,6 +13,8 @@ import type {
   ParkingWarPlayerStateView,
   ParkingWarRarity,
   ParkingWarRecallResult,
+  ParkingWarTicketResult,
+  ParkingWarTowResult,
 } from './parking-war.types';
 
 const CAR_TIERS = new Set<ParkingWarCarTier>([
@@ -113,6 +115,24 @@ export class ParkingWarController {
     const ownerId = await this.stateService.resolveOwnerId();
     const occupancyId = parseNonEmptyString(body.occupancyId, 'occupancyId');
     return this.stateService.recallOccupancy(ownerId, occupancyId);
+  }
+
+  @Post('ticket')
+  async ticket(
+    @Body() body: { occupancyId: string },
+  ): Promise<ParkingWarTicketResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const occupancyId = parseNonEmptyString(body.occupancyId, 'occupancyId');
+    return this.stateService.ticketOccupancy(ownerId, occupancyId);
+  }
+
+  @Post('tow')
+  async tow(
+    @Body() body: { occupancyId: string },
+  ): Promise<ParkingWarTowResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const occupancyId = parseNonEmptyString(body.occupancyId, 'occupancyId');
+    return this.stateService.towOccupancy(ownerId, occupancyId);
   }
 
   @Post('collect')

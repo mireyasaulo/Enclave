@@ -20,9 +20,12 @@ import {
   computeCarRatePerMinuteCents,
   computeCarUpgradeCostCents,
   PARKING_WAR_CAR_DEFAULT_DURABILITY,
+  PARKING_WAR_CAR_DURABILITY_LOSS_PER_TICKET,
+  PARKING_WAR_CAR_DURABILITY_LOSS_PER_TOW,
   PARKING_WAR_CAR_MAX_LEVEL,
   PARKING_WAR_CAR_REPAIR_COST_PER_POINT_CENTS,
   PARKING_WAR_DAILY_PARK_LIMIT,
+  PARKING_WAR_DAILY_TICKET_LIMIT,
   PARKING_WAR_DEFAULT_BALANCE_CENTS,
   PARKING_WAR_DEFAULT_GARAGE_SLOTS,
   PARKING_WAR_DEFAULT_LOT_MULTIPLIER_BP,
@@ -30,7 +33,13 @@ import {
   PARKING_WAR_DEFAULT_LOT_SURFACE,
   PARKING_WAR_OFFLINE_CATCHUP_CAP_MS,
   PARKING_WAR_PLAYER_ACTOR_ID,
+  PARKING_WAR_TICKET_AT_MS,
+  PARKING_WAR_TICKET_PENALTY_BP,
+  PARKING_WAR_TOWABLE_AT_MS,
+  PARKING_WAR_TOW_COOLDOWN_MS,
+  PARKING_WAR_TOW_FEE_CENTS,
   PARKING_WAR_VISITOR_SHARE_BP,
+  PARKING_WAR_WARNING_AT_MS,
 } from './parking-war.constants';
 import type {
   ParkingWarCarTier,
@@ -42,6 +51,8 @@ import type {
   ParkingWarPlayerStateView,
   ParkingWarRarity,
   ParkingWarRecallResult,
+  ParkingWarTicketResult,
+  ParkingWarTowResult,
 } from './parking-war.types';
 
 @Injectable()
@@ -247,6 +258,22 @@ export class ParkingWarStateService implements OnModuleInit {
       const delta = Math.round(ratePerMinute * minutes);
       if (delta > 0) {
         occ.pendingEarningsCents += delta;
+      }
+    }
+
+    // 推进 warningLevel：占位 5/10/20 分钟 → 1/2/3。Stage 4 把状态机放在 tick 里，
+    // 这样玩家进游戏一刷新就能看到「警告 / 罚单 / 可拖车」即时更新。
+    for (const occ of [...homeOccupancies, ...awayOccupancies]) {
+      const parkedFor = nowMs - Number(occ.parkedAtMs);
+      let target = 0;
+      if (parkedFor >= PARKING_WAR_TOWABLE_AT_MS) target = 3;
+      else if (parkedFor >= PARKING_WAR_TICKET_AT_MS) target = 2;
+      else if (parkedFor >= PARKING_WAR_WARNING_AT_MS) target = 1;
+      if (target > occ.warningLevel) {
+        occ.warningLevel = target;
+        if (target >= 1 && occ.warnedAtMs == null) occ.warnedAtMs = nowMs;
+        if (target >= 2 && occ.ticketedAtMs == null) occ.ticketedAtMs = nowMs;
+        if (target >= 3 && occ.towableAtMs == null) occ.towableAtMs = nowMs;
       }
     }
 
@@ -581,6 +608,198 @@ export class ParkingWarStateService implements OnModuleInit {
       gainedCents: playerShare,
       splitToHostCents: hostShare,
     };
+  }
+
+  // ============================================================
+  // Ticket / Tow（玩家作为场主对停在自家的访客车采取行动）
+  // ============================================================
+
+  /**
+   * 给停在自家的访客车贴罚单。访客是 NPC：扣 NPC 余额 30% of pending，
+   * 30% 入玩家钱包；访客车耐久 -10；occupancy.warningLevel 推到 2；pending 清零。
+   * 访客是玩家（Stage 4 暂不会出现）：同样扣 visitor.pending 30%。
+   */
+  async ticketOccupancy(
+    ownerId: string,
+    occupancyId: string,
+  ): Promise<ParkingWarTicketResult> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
+
+    await this.assertDailyTicketBudgetAvailable(ownerId);
+
+    const occ = await this.occupancyRepo.findOneBy({ id: occupancyId });
+    if (!occ) {
+      throw new AppError('PARKING_WAR_OCCUPANCY_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '车辆已不在车位上',
+      });
+    }
+    if (!(occ.lotOwnerKind === 'player' && occ.lotOwnerId === ownerId)) {
+      throw new AppError('PARKING_WAR_NOT_YOUR_LOT', {
+        status: HttpStatus.FORBIDDEN,
+        legacyMessage: '只能对停在自家车场的车贴条',
+      });
+    }
+    if (occ.warningLevel < 1) {
+      throw new AppError('PARKING_WAR_NO_WARNING_YET', {
+        legacyMessage: '该车占位时间还没到警告线，无法贴条',
+      });
+    }
+
+    const fineCents = Math.floor(
+      (occ.pendingEarningsCents * PARKING_WAR_TICKET_PENALTY_BP) / 10_000,
+    );
+    occ.pendingEarningsCents = 0;
+    occ.warningLevel = Math.max(occ.warningLevel, 2);
+    if (occ.ticketedAtMs == null) occ.ticketedAtMs = Date.now();
+    await this.occupancyRepo.save(occ);
+
+    state.balanceCents += fineCents;
+    state.totalEarnedCents += fineCents;
+    await this.playerRepo.save(state);
+
+    // 访客车 durability -10（仅在访客是玩家自己时改 OwnedCar payload；
+    // 访客是 NPC 时改 npc.ownedCarsPayload 暂不做—NPC 车耐久维度等 Stage 5 完整收口）
+    if (occ.visitorKind === 'player' && occ.visitorId === ownerId) {
+      const cars = (state.ownedCarsPayload ?? []).map((c) =>
+        c.carId === occ.carId
+          ? {
+              ...c,
+              durability: Math.max(
+                0,
+                c.durability - PARKING_WAR_CAR_DURABILITY_LOSS_PER_TICKET,
+              ),
+            }
+          : c,
+      );
+      state.ownedCarsPayload = cars;
+      await this.playerRepo.save(state);
+    }
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'ticket',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      targetKind: occ.visitorKind,
+      targetId: occ.visitorId,
+      amountCents: fineCents,
+      payload: {
+        carId: occ.carId,
+        slotIndex: occ.slotIndex,
+        carTier: occ.carTier,
+        carRarity: occ.carRarity,
+      },
+    });
+
+    return {
+      view: await this.toPlayerView(state),
+      finedCents: fineCents,
+    };
+  }
+
+  /**
+   * 拖走停在自家的车（warningLevel ≥ 3）。访客被收取 PARKING_WAR_TOW_FEE_CENTS 的拖车费
+   * 进玩家钱包，访客车进 30 min 冷却 unavailableUntilMs，耐久 -20，occupancy 清掉。
+   */
+  async towOccupancy(
+    ownerId: string,
+    occupancyId: string,
+  ): Promise<ParkingWarTowResult> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
+
+    const occ = await this.occupancyRepo.findOneBy({ id: occupancyId });
+    if (!occ) {
+      throw new AppError('PARKING_WAR_OCCUPANCY_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '车辆已不在车位上',
+      });
+    }
+    if (!(occ.lotOwnerKind === 'player' && occ.lotOwnerId === ownerId)) {
+      throw new AppError('PARKING_WAR_NOT_YOUR_LOT', {
+        status: HttpStatus.FORBIDDEN,
+        legacyMessage: '只能拖走停在自家车场的车',
+      });
+    }
+    if (occ.warningLevel < 3) {
+      throw new AppError('PARKING_WAR_NOT_TOWABLE_YET', {
+        legacyMessage: '该车占位时间还没到拖车线',
+      });
+    }
+
+    const nowMs = Date.now();
+    const fee = PARKING_WAR_TOW_FEE_CENTS;
+    state.balanceCents += fee;
+    state.totalEarnedCents += fee;
+
+    // 清 home 槽位 + 删 occupancy
+    const homeSlots = (state.homeSlotsPayload ?? []).map((s) =>
+      s.index === occ.slotIndex ? { ...s, occupancyId: null } : s,
+    );
+    state.homeSlotsPayload = homeSlots;
+    await this.occupancyRepo.delete({ id: occupancyId });
+
+    // 给访客车上冷却 + 扣耐久（访客是玩家时直接改 ownedCarsPayload）
+    if (occ.visitorKind === 'player' && occ.visitorId === ownerId) {
+      const cars = (state.ownedCarsPayload ?? []).map((c) =>
+        c.carId === occ.carId
+          ? {
+              ...c,
+              parkedRef: null,
+              durability: Math.max(
+                0,
+                c.durability - PARKING_WAR_CAR_DURABILITY_LOSS_PER_TOW,
+              ),
+              unavailableUntilMs: nowMs + PARKING_WAR_TOW_COOLDOWN_MS,
+            }
+          : c,
+      );
+      state.ownedCarsPayload = cars;
+    }
+
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'tow',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      targetKind: occ.visitorKind,
+      targetId: occ.visitorId,
+      amountCents: fee,
+      payload: {
+        carId: occ.carId,
+        slotIndex: occ.slotIndex,
+        carTier: occ.carTier,
+        carRarity: occ.carRarity,
+      },
+    });
+
+    return {
+      view: await this.toPlayerView(state),
+      finedCents: fee,
+    };
+  }
+
+  private async assertDailyTicketBudgetAvailable(
+    ownerId: string,
+  ): Promise<void> {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const rows = await this.eventService.listEvents(ownerId, {
+      since: startOfDay,
+      limit: 200,
+    });
+    const todayTicket = rows.filter((r) => r.kind === 'ticket');
+    if (todayTicket.length >= PARKING_WAR_DAILY_TICKET_LIMIT) {
+      throw new AppError('PARKING_WAR_DAILY_TICKET_LIMIT_REACHED', {
+        legacyMessage: `今日贴条次数已用完（${PARKING_WAR_DAILY_TICKET_LIMIT}/日）`,
+      });
+    }
   }
 
   // ============================================================
