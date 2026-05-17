@@ -359,7 +359,7 @@ export function AccountSecurityPanel() {
               setNewPassword(event.target.value);
               setFeedback(null);
             }}
-            placeholder={t(msg`8-32 位，任意字符（不含空格）`)}
+            placeholder={t(msg`8-32 位，不含空格`)}
             autoComplete="new-password"
             maxLength={32}
           />
