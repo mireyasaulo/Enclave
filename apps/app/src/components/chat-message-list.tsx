@@ -5609,6 +5609,12 @@ function FeedPostCardMessage({
   const cover = attachment.coverUrl
     ? resolveAppMediaUrl(attachment.coverUrl)
     : null;
+  // 走查 R5：跟视频号卡封面 img 同款问题——minimax cover 偶发 404 / cloud-api
+  // 反代 token 边界 401 / 资源被回收。原本浏览器原生 broken-image icon 直接
+  // 占满整条 feed_post_card，对方收到的转发卡看着像「这条视频号坏了」实际只是
+  // 缩略图没拉到。回退到无 cover 的渐变 + mediaLabel 占位（同款视觉），用户至少
+  // 能看到这条是「视频/音频/图文」并点开尝试播放。
+  const [coverFailed, setCoverFailed] = useState(false);
   const mediaLabel = (() => {
     if (attachment.mediaType === "video") return translateRuntimeMessage(msg`视频`);
     if (attachment.mediaType === "audio") return translateRuntimeMessage(msg`音频`);
@@ -5623,13 +5629,14 @@ function FeedPostCardMessage({
           : "w-[228px] rounded-[13px] border border-[color:var(--border-subtle)]"
       }`}
     >
-      {cover ? (
+      {cover && !coverFailed ? (
         <div className={isDesktop ? "h-[140px]" : "h-[124px]"}>
           <img
             src={cover}
             alt={attachment.title ?? attachment.authorName}
             loading="lazy"
             decoding="async"
+            onError={() => setCoverFailed(true)}
             className="h-full w-full object-cover"
           />
         </div>
