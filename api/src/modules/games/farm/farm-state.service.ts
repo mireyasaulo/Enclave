@@ -31,6 +31,7 @@ import {
   FARM_DEFAULT_PLAYER_COINS,
   FARM_DEFAULT_PLAYER_SEED_BAG,
   FARM_DEFAULT_PLOT_COUNT,
+  FARM_EXCLUDED_CHARACTER_IDS,
   FARM_DOG_BUY_COST,
   FARM_DOG_FEED_RESTORE,
   FARM_DOG_LEVEL_CAP,
@@ -512,6 +513,12 @@ export class FarmStateService {
     characterId: string,
     plotIndex: number,
   ): Promise<FarmStealResult> {
+    if (FARM_EXCLUDED_CHARACTER_IDS.has(characterId)) {
+      throw new AppError('FARM_CHARACTER_NOT_PARTICIPATING', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '该角色不参与农场',
+      });
+    }
     const character = await this.charactersService.findById(characterId);
     if (!character) {
       throw new AppError('FARM_CHARACTER_NOT_FOUND', {
@@ -1103,6 +1110,14 @@ export class FarmStateService {
         legacyMessage: `单次送礼不能超过 ${FARM_GIFT_DAILY_LIMIT_COINS} 金币`,
       });
     }
+    // 系统角色（我自己 / 小盯 / 界闻）不能收礼 — 否则金币会被实质性"销毁"，
+    // 玩家以为送给了邻居，实际是给一个没 farm state 的虚角色。
+    if (FARM_EXCLUDED_CHARACTER_IDS.has(characterId)) {
+      throw new AppError('FARM_CHARACTER_NOT_PARTICIPATING', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '该角色不参与农场',
+      });
+    }
     const character = await this.charactersService.findById(characterId);
     if (!character) {
       throw new AppError('FARM_CHARACTER_NOT_FOUND', {
@@ -1166,6 +1181,12 @@ export class FarmStateService {
     if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
       throw new AppError('FARM_GIFT_AMOUNT_INVALID', {
         legacyMessage: '数量必须为正整数',
+      });
+    }
+    if (FARM_EXCLUDED_CHARACTER_IDS.has(characterId)) {
+      throw new AppError('FARM_CHARACTER_NOT_PARTICIPATING', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '该角色不参与农场',
       });
     }
     const character = await this.charactersService.findById(characterId);
