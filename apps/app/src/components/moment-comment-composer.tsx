@@ -44,10 +44,19 @@ export function MomentCommentComposer({
   const canSubmit = Boolean(value.trim()) && !pending && !disabled;
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Enter" || event.shiftKey) {
+      return;
+    }
+    // 走查新 R3：跟 wechat-comment-bar R3 (bb9f3bda) / mobile-feed-publish R5
+    // / desktop-feed-compose-panel R1 同款 IME 兜底——Android Chrome 上搜狗 /
+    // 百度 输入法在 composing 期间按 Enter 选词时，nativeEvent.isComposing 不
+    // 一定置 true，只有 keyCode 走 229 信号。原本只看 isComposing 漏了 keyCode
+    // 这一支，中文用户敲拼音回车选词时半句被当评论提交，桌面广场 / 桌面朋友圈
+    // / 移动朋友圈 comment composer 都受影响（mobile 广场 evt 走 wechat-comment-
+    // bar 不走这里）。补 keyCode=229 双判定。
     if (
-      event.key !== "Enter" ||
-      event.shiftKey ||
-      event.nativeEvent.isComposing
+      event.nativeEvent.isComposing ||
+      event.nativeEvent.keyCode === 229
     ) {
       return;
     }
