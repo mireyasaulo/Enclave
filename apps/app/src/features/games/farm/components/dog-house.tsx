@@ -8,6 +8,7 @@ import {
   type FarmPlayerStateView,
 } from "@yinjie/contracts";
 import { useBuyFarmDog, useFeedFarmDog } from "../use-farm-state";
+import { playDogBark } from "../audio/farm-sfx";
 
 const t = translateRuntimeMessage;
 
@@ -45,7 +46,10 @@ export function DogHouse({ state }: DogHouseProps) {
 
   function handleFeed() {
     setErrorMsg(null);
-    feedMutation.mutate(undefined, { onError: handleError });
+    feedMutation.mutate(undefined, {
+      onSuccess: () => playDogBark(),
+      onError: handleError,
+    });
   }
 
   const energyPct = Math.max(0, Math.min(100, Math.round(dog.energy)));

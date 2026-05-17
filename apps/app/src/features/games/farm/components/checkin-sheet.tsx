@@ -3,6 +3,7 @@ import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { FARM_CONSUMABLE_CATALOG } from "@yinjie/contracts";
 import { useDoFarmCheckin, useFarmCheckin } from "../use-farm-state";
+import { playCheckin } from "../audio/farm-sfx";
 
 const t = translateRuntimeMessage;
 
@@ -36,6 +37,7 @@ export function CheckinSheet({ open, onClose }: CheckinSheetProps) {
     setSuccessMsg(null);
     doMutation.mutate(undefined, {
       onSuccess: (res) => {
+        playCheckin();
         const r = res.reward;
         const parts: string[] = [`🪙+${r.coins}`];
         if (r.consumableId && r.consumableCount) {

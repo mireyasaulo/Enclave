@@ -5,6 +5,7 @@ import { useFarmAdjustedNow } from "../farm-clock-context";
 
 const t = translateRuntimeMessage;
 import { formatRemainingMs, getStageEmoji } from "../crop-presentation";
+import { CropStageSvg } from "../svg/crop-stage-svg";
 import type { PlotPulseKind } from "./plot-action-bar";
 
 export interface FarmIsoTileProps {
@@ -69,7 +70,11 @@ export function FarmIsoTile({
 
       <span className="farm-iso-tile__content">
         <span className="farm-iso-tile__crop">
-          {getStageEmoji(stage, plot.cropId)}
+          {plot.cropId ? (
+            <CropStageSvg cropId={plot.cropId} stage={stage} size={40} />
+          ) : (
+            getStageEmoji(stage, plot.cropId)
+          )}
         </span>
 
         {plot.cropId && (

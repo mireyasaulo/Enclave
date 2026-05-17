@@ -12,8 +12,10 @@ import { CoinDisplay } from "./components/coin-display";
 import { DecorationLayer } from "./components/decoration-layer";
 import { DogHouse } from "./components/dog-house";
 import { EventLogPanel } from "./components/event-log-panel";
+import { FarmNotificationBanner } from "./components/farm-notification-banner";
 import { LeaderboardSheet } from "./components/leaderboard-sheet";
 import { QuestSheet } from "./components/quest-sheet";
+import { isFarmSfxMuted, setFarmSfxMuted } from "./audio/farm-sfx";
 import { FarmIsoGrid } from "./components/farm-iso-grid";
 import { FarmMascot } from "./components/farm-mascot";
 import { FarmSky } from "./components/farm-sky";
@@ -69,6 +71,7 @@ function FarmPageInner() {
   const [checkinOpen, setCheckinOpen] = useState(false);
   const [questsOpen, setQuestsOpen] = useState(false);
   const [activeNeighborId, setActiveNeighborId] = useState<string | null>(null);
+  const [sfxMuted, setSfxMuted] = useState(() => isFarmSfxMuted());
   const [toast, setToast] = useState<HarvestToast | null>(null);
   const [pulse, setPulse] = useState<{
     plotIndex: number;
@@ -176,10 +179,22 @@ function FarmPageInner() {
           <h1 className="flex-1 text-center text-lg font-semibold text-emerald-900">
             {t(msg`隐界农场`)}
           </h1>
-          <div className="w-12" />
+          <button
+            type="button"
+            onClick={() => {
+              const next = !sfxMuted;
+              setSfxMuted(next);
+              setFarmSfxMuted(next);
+            }}
+            title={sfxMuted ? t(msg`点开音效`) : t(msg`关掉音效`)}
+            className="w-12 rounded-full px-2 py-1 text-base text-stone-500 hover:bg-white/60"
+          >
+            {sfxMuted ? "🔇" : "🔊"}
+          </button>
         </header>
 
         <CoinDisplay state={state} />
+        <FarmNotificationBanner state={state} />
 
         <div className="grid gap-3 lg:grid-cols-3">
           <aside className="flex flex-col gap-3 lg:order-1">

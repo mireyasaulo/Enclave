@@ -17,6 +17,11 @@ import {
   useWaterFarmPlot,
   useWeedFarmPlot,
 } from "../use-farm-state";
+import {
+  playHarvestPop,
+  playLevelUp,
+  playWaterDrop,
+} from "../audio/farm-sfx";
 
 export type PlotPulseKind =
   | "plant"
@@ -96,6 +101,8 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
       {
         onSuccess: (result) => {
           onPulse?.(targetPlot, "harvest");
+          playHarvestPop();
+          if (result.harvested.leveledUp) playLevelUp();
           onHarvested?.({
             cropId: result.harvested.cropId,
             amount: result.harvested.amount,
@@ -220,7 +227,10 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
                 waterMutation.mutate(
                   { plotIndex: targetPlot },
                   {
-                    onSuccess: () => onPulse?.(targetPlot, "water"),
+                    onSuccess: () => {
+                      onPulse?.(targetPlot, "water");
+                      playWaterDrop();
+                    },
                     onError: handleError,
                   },
                 );

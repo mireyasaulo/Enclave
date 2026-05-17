@@ -14,6 +14,7 @@ import {
 import { useFarmAdjustedNow } from "../farm-clock-context";
 import { formatRemainingMs, getStageEmoji } from "../crop-presentation";
 import { GiftSheet } from "./gift-sheet";
+import { playStealSwoosh } from "../audio/farm-sfx";
 
 interface NeighborFarmModalProps {
   characterId: string | null;
@@ -77,6 +78,7 @@ export function NeighborFarmModal({
       { characterId: characterId!, plotIndex: plot.index },
       {
         onSuccess: (result) => {
+          playStealSwoosh();
           setToast({
             ...result.stolen,
             characterName: detailQuery.data!.characterName,
