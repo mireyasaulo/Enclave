@@ -23,18 +23,18 @@ msgid "音乐"
 msgstr "音乐"
 
 #: apps/app/src/components/audio-card.tsx:172
-#: apps/app/src/i18n/static-dom-seed.ts:349
-#: apps/app/src/routes/channels-page.tsx:2431
-#: apps/app/src/routes/channels-page.tsx:2659
-msgid "播放"
-msgstr "播放"
-
-#: apps/app/src/components/audio-card.tsx:172
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:107
 #: apps/app/src/routes/channels-page.tsx:2431
 #: apps/app/src/routes/channels-page.tsx:2659
 msgid "暂停"
 msgstr "暂停"
+
+#: apps/app/src/components/audio-card.tsx:172
+#: apps/app/src/i18n/static-dom-seed.ts:349
+#: apps/app/src/routes/channels-page.tsx:2431
+#: apps/app/src/routes/channels-page.tsx:2659
+msgid "播放"
+msgstr "播放"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:216
@@ -533,7 +533,7 @@ msgstr "发送"
 
 #: apps/app/src/components/chat-composer.tsx:3431
 #: apps/app/src/components/chat-composer.tsx:3520
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:857
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:865
 msgid "切换到键盘输入"
 msgstr "切换到键盘输入"
 
@@ -580,7 +580,7 @@ msgid "关闭发送收藏"
 msgstr "关闭发送收藏"
 
 #: apps/app/src/components/chat-composer.tsx:3712
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:664
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:672
 msgid "发送收藏"
 msgstr "发送收藏"
 
@@ -1214,7 +1214,6 @@ msgstr "系统分享暂时不可用，已复制笔记摘要。"
 #: apps/app/src/components/chat-message-list.tsx:4402
 #: apps/app/src/components/chat-message-list.tsx:4472
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:312
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:931
 #: apps/app/src/routes/chat-details-page.tsx:312
 msgid "对方"
 msgstr "对方"
@@ -1605,8 +1604,6 @@ msgid "发送失败"
 msgstr "发送失败"
 
 #: apps/app/src/components/chat-message-list.tsx:3591
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:312
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:546
 msgid "我的"
 msgstr "我的"
 
@@ -1628,6 +1625,7 @@ msgstr "我的"
 #: apps/app/src/features/desktop/feed/desktop-feed-compose-panel.tsx:145
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:107
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:299
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:134
 #: apps/app/src/lib/conversation-preview.ts:105
 #: apps/app/src/routes/character-detail-page.tsx:140
 #: apps/app/src/routes/chat-details-page.tsx:117
@@ -1811,7 +1809,6 @@ msgstr "来自你和 {0} 的 {1} 条消息"
 
 #: apps/app/src/components/chat-message-list.tsx:4471
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:63
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:846
 msgid "你"
 msgstr "你"
 
@@ -2052,7 +2049,7 @@ msgstr "继续聊"
 
 #: apps/app/src/components/chat-message-list.tsx:5434
 #: apps/app/src/components/chat-message-list.tsx:7406
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:644
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:615
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:663
 #: apps/app/src/routes/character-detail-page.tsx:337
 #: apps/app/src/routes/chat-details-page.tsx:316
@@ -2404,14 +2401,16 @@ msgid "未命名笔记"
 msgstr "未命名笔记"
 
 #: apps/app/src/components/chat-message-list.tsx:7153
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:846
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:854
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:141
 #: apps/app/src/components/mobile-document-shell.tsx:131
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
 #: apps/app/src/features/chat/mobile-chat-thread-header.tsx:40
 #: apps/app/src/features/contacts/management/contacts-management-modal.tsx:270
-#: apps/app/src/features/games/farm/farm-page.tsx:159
-#: apps/app/src/features/games/farm/farm-page.tsx:167
+#: apps/app/src/features/games/farm/farm-page.tsx:161
+#: apps/app/src/features/games/farm/farm-page.tsx:169
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:133
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:205
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:513
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:532
 #: apps/app/src/features/search/mobile-search-workspace.tsx:231
@@ -2573,11 +2572,13 @@ msgstr "关闭弹窗"
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:255
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:129
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:109
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:136
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:98
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:54
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:146
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:120
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:64
 #: apps/app/src/features/games/game-center-session-panel.tsx:123
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:793
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1359
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:150
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:124
 #: apps/app/src/i18n/static-dom-seed.ts:855
@@ -2825,37 +2826,37 @@ msgid "暂时没能读取联系人名片，请检查网络后重试。"
 msgstr "暂时没能读取联系人名片，请检查网络后重试。"
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:593
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:678
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:686
 msgid "重新读取"
 msgstr "重新读取"
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:597
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:682
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:690
 msgid "返回更多功能"
 msgstr "返回更多功能"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:654
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:662
 msgid "还没有可以分享的联系人名片。"
 msgstr "还没有可以分享的联系人名片。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:671
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:679
 #: apps/app/src/routes/favorites-page.tsx:850
 msgid "正在读取收藏..."
 msgstr "正在读取收藏..."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:676
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:684
 msgid "收藏读取失败"
 msgstr "收藏读取失败"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:677
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:685
 msgid "暂时没能读取收藏内容，请检查网络后重试。"
 msgstr "暂时没能读取收藏内容，请检查网络后重试。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:742
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:750
 msgid "还没有可发送的收藏内容，先在聊天或内容页里把消息加入收藏。"
 msgstr "还没有可发送的收藏内容，先在聊天或内容页里把消息加入收藏。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:752
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:760
 msgid "选择位置"
 msgstr "选择位置"
 
@@ -3475,7 +3476,6 @@ msgstr "今天"
 #: apps/app/src/components/official-article-viewer.tsx:521
 #: apps/app/src/components/wechat-moment-card.tsx:481
 #: apps/app/src/features/games/parking-war/parking-war-data.ts:117
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1019
 msgid "刚刚"
 msgstr "刚刚"
 
@@ -6445,7 +6445,6 @@ msgid "最近使用"
 msgstr "最近使用"
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:559
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:868
 msgid "最近"
 msgstr "最近"
 
@@ -8213,17 +8212,17 @@ msgid "批量管理"
 msgstr "批量管理"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
+#: apps/app/src/routes/channels-page.tsx:1680
+#: apps/app/src/routes/channels-page.tsx:1832
+msgid "生成中..."
+msgstr "生成中..."
+
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
 #: apps/app/src/i18n/static-dom-seed.ts:49
 #: apps/app/src/routes/channels-page.tsx:1680
 #: apps/app/src/routes/channels-page.tsx:1833
 msgid "换一批"
 msgstr "换一批"
-
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
-#: apps/app/src/routes/channels-page.tsx:1680
-#: apps/app/src/routes/channels-page.tsx:1832
-msgid "生成中..."
-msgstr "生成中..."
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:405
 #: apps/app/src/features/shell/desktop-nav-config.ts:89
@@ -9198,7 +9197,6 @@ msgstr "加入于 {0}"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:118
 #: apps/app/src/features/desktop/contacts/desktop-contacts-groups-pane.tsx:302
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:161
 #: apps/app/src/features/shell/desktop-nav-matching.ts:124
 #: apps/app/src/features/shell/desktop-nav-matching.ts:125
 #: apps/app/src/routes/games-page.tsx:749
@@ -11684,7 +11682,6 @@ msgstr "已经到底了"
 #: apps/app/src/features/games/forest-train/forest-train-game.tsx:106
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:106
 #: apps/app/src/features/games/night-market/night-market-game.tsx:107
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:135
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:92
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:113
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:113
@@ -12018,18 +12015,18 @@ msgstr "打开"
 
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:713
-#: apps/app/src/i18n/static-dom-seed.ts:195
-msgid "移出常用"
-msgstr "移出常用"
-
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:280
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:713
 #: apps/app/src/i18n/static-dom-seed.ts:197
 msgid "加入常用"
 msgstr "加入常用"
+
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:713
+#: apps/app/src/i18n/static-dom-seed.ts:195
+msgid "移出常用"
+msgstr "移出常用"
 
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:802
@@ -13187,7 +13184,7 @@ msgid "世界还没有动静。"
 msgstr "世界还没有动静。"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:66
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:263
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:279
 msgid "种了"
 msgstr "种了"
 
@@ -13200,22 +13197,22 @@ msgid "顺走了你家的"
 msgstr "顺走了你家的"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:72
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:267
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:283
 msgid "顺走了"
 msgstr "顺走了"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:74
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:269
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:285
 msgid "浇了水"
 msgstr "浇了水"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:76
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:271
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:287
 msgid "除了草"
 msgstr "除了草"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:78
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:273
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:289
 msgid "除了虫"
 msgstr "除了虫"
 
@@ -13224,14 +13221,14 @@ msgid "买了种子"
 msgstr "买了种子"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:265
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:267
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:277
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:281
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:283
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:293
 msgid "作物"
 msgstr "作物"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:277
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:293
 msgid "卖了"
 msgstr "卖了"
 
@@ -13248,7 +13245,7 @@ msgid "与对方好感度变化"
 msgstr "与对方好感度变化"
 
 #: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:77
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:193
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:204
 msgid "腐烂"
 msgstr "腐烂"
 
@@ -13332,57 +13329,139 @@ msgstr "入夜啦，记得防一下夜里来串门的人。"
 msgid "今天没啥事儿，世界角色们各自忙各自的。"
 msgstr "今天没啥事儿，世界角色们各自忙各自的。"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:100
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:91
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:139
+msgid "送礼"
+msgstr "送礼"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:91
+msgid "给"
+msgstr "给"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:114
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:17
+msgid "金币"
+msgstr "金币"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:116
+msgid "仓库作物"
+msgstr "仓库作物"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:118
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:194
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:133
+msgid "种子"
+msgstr "种子"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:119
+msgid "化肥/农药"
+msgstr "化肥/农药"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:130
+msgid "每 100 金币换 1 点好感。最多 2000 金币 / 次。"
+msgstr "每 100 金币换 1 点好感。最多 2000 金币 / 次。"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:154
+msgid "赠送 🪙"
+msgstr "赠送 🪙"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:175
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:202
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:229
+msgid "送 1"
+msgstr "送 1"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:181
+msgid "仓库空空如也"
+msgstr "仓库空空如也"
+
+#: apps/app/src/features/games/farm/components/gift-sheet.tsx:208
+msgid "种子袋空空如也"
+msgstr "种子袋空空如也"
+
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:15
+msgid "等级"
+msgstr "等级"
+
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:16
+msgid "总收获"
+msgstr "总收获"
+
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:48
+#: apps/app/src/features/games/farm/farm-page.tsx:207
+msgid "排行榜"
+msgstr "排行榜"
+
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:75
+msgid "你目前排名第"
+msgstr "你目前排名第"
+
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:80
+msgid "加载中…"
+msgstr "加载中…"
+
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:96
+msgid "级"
+msgstr "级"
+
+#: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:98
+#: apps/app/src/features/games/farm/farm-page.tsx:199
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:323
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:357
+#: apps/app/src/i18n/static-dom-seed.ts:257
+msgid "个"
+msgstr "个"
+
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:102
 msgid "正在串门……"
 msgstr "正在串门……"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:119
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:121
 msgid "的农场"
 msgstr "的农场"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:122
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:245
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:124
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:256
 msgid "好感"
 msgstr "好感"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:191
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:190
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:202
 msgid "空"
 msgstr "空"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:196
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:207
 msgid "已偷过"
 msgstr "已偷过"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:197
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:208
 msgid "可顺"
 msgstr "可顺"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:212
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:223
 msgid "点击成熟（金边）田块即可顺走一份。每天最多 10 次，对方对你的好感度会降。"
 msgstr "点击成熟（金边）田块即可顺走一份。每天最多 10 次，对方对你的好感度会降。"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:218
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:229
 msgid "近期动向"
 msgstr "近期动向"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:244
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:255
 msgid "顺走"
 msgstr "顺走"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:265
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:281
 msgid "收了"
 msgstr "收了"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:275
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:291
 msgid "进了种子"
 msgstr "进了种子"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:279
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:295
 msgid "升级了"
 msgstr "升级了"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:281
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:297
 msgid "好感度变化"
 msgstr "好感度变化"
 
@@ -13458,7 +13537,7 @@ msgid "还差"
 msgstr "还差"
 
 #: apps/app/src/features/games/farm/components/plot-action-bar.tsx:210
-#: apps/app/src/features/games/farm/farm-page.tsx:246
+#: apps/app/src/features/games/farm/farm-page.tsx:258
 msgid "收获"
 msgstr "收获"
 
@@ -13521,10 +13600,6 @@ msgstr "铲除"
 msgid "农资店"
 msgstr "农资店"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:133
-msgid "种子"
-msgstr "种子"
-
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:144
 msgid "化肥 / 农药 / 狗粮"
 msgstr "化肥 / 农药 / 狗粮"
@@ -13544,7 +13619,6 @@ msgstr "已摆"
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:192
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:260
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:316
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:967
 msgid "解锁"
 msgstr "解锁"
 
@@ -13596,7 +13670,7 @@ msgid "/ 包，售价"
 msgstr "/ 包，售价"
 
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:58
-#: apps/app/src/features/games/farm/farm-page.tsx:195
+#: apps/app/src/features/games/farm/farm-page.tsx:197
 msgid "仓库"
 msgstr "仓库"
 
@@ -13642,51 +13716,48 @@ msgstr "小时"
 msgid "天"
 msgstr "天"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:102
+#: apps/app/src/features/games/farm/farm-page.tsx:104
 msgid "正在准备隐界农场……"
 msgstr "正在准备隐界农场……"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:110
+#: apps/app/src/features/games/farm/farm-page.tsx:112
 msgid "农场加载失败"
 msgstr "农场加载失败"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:171
+#: apps/app/src/features/games/farm/farm-page.tsx:173
 #: apps/app/src/features/games/game-center-data.ts:250
 msgid "隐界农场"
 msgstr "隐界农场"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:185
+#: apps/app/src/features/games/farm/farm-page.tsx:187
 msgid "种子店"
 msgstr "种子店"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:187
+#: apps/app/src/features/games/farm/farm-page.tsx:189
 msgid "种子袋共"
 msgstr "种子袋共"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:187
+#: apps/app/src/features/games/farm/farm-page.tsx:189
 msgid "包"
 msgstr "包"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:197
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:323
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:357
-#: apps/app/src/i18n/static-dom-seed.ts:257
-msgid "个"
-msgstr "个"
-
-#: apps/app/src/features/games/farm/farm-page.tsx:197
+#: apps/app/src/features/games/farm/farm-page.tsx:199
 msgid "存货共"
 msgstr "存货共"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:202
+#: apps/app/src/features/games/farm/farm-page.tsx:209
+msgid "和邻居比一比"
+msgstr "和邻居比一比"
+
+#: apps/app/src/features/games/farm/farm-page.tsx:214
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。"
 msgstr "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:232
+#: apps/app/src/features/games/farm/farm-page.tsx:244
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 msgstr "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:248
+#: apps/app/src/features/games/farm/farm-page.tsx:260
 msgid "升级！"
 msgstr "升级！"
 
@@ -14059,7 +14130,7 @@ msgid "更适合长期养成和资源经营。"
 msgstr "更适合长期养成和资源经营。"
 
 #: apps/app/src/features/games/game-center-data.ts:117
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:143
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:213
 msgid "抢车位"
 msgstr "抢车位"
 
@@ -14326,6 +14397,7 @@ msgid "竞速"
 msgstr "竞速"
 
 #: apps/app/src/features/games/game-center-data.ts:189
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:78
 #: apps/app/src/i18n/static-dom-seed.ts:139
 msgid "榜单"
 msgstr "榜单"
@@ -15619,191 +15691,386 @@ msgstr "{0} 小时前"
 msgid "{0} 天前"
 msgstr "{0} 天前"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:148
-msgid "签到"
-msgstr "签到"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:152
-msgid "已签到"
-msgstr "已签到"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:173
-msgid "好友车场"
-msgstr "好友车场"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:188
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:378
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:75
 msgid "我的车场"
 msgstr "我的车场"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:191
-msgid "占"
-msgstr "占"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:76
+msgid "邻居"
+msgstr "邻居"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:223
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:535
-msgid "空位"
-msgstr "空位"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:381
-msgid "待收"
-msgstr "待收"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:389
-msgid "外来"
-msgstr "外来"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:397
-msgid "全部收钱"
-msgstr "全部收钱"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:400
-msgid "全部贴条"
-msgstr "全部贴条"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:407
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:625
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:931
-msgid "的车场"
-msgstr "的车场"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:411
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:706
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:919
-msgid "我的车"
-msgstr "我的车"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:419
-msgid "全部开走"
-msgstr "全部开走"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:492
-msgid "车库里还有空着的车"
-msgstr "车库里还有空着的车"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:506
-msgid "停"
-msgstr "停"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:546
-msgid "陌生人"
-msgstr "陌生人"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:576
-msgid "收钱"
-msgstr "收钱"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:585
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:630
-msgid "贴条"
-msgstr "贴条"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:592
-msgid "赶走"
-msgstr "赶走"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:629
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:938
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:967
-msgid "/分钟"
-msgstr "/分钟"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:630
-msgid "%/分钟"
-msgstr "%/分钟"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:672
-msgid "没空闲的车"
-msgstr "没空闲的车"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:687
-msgid "停进来"
-msgstr "停进来"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:725
-msgid "对方的车"
-msgstr "对方的车"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:734
-msgid "开走收钱"
-msgstr "开走收钱"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:761
-msgid "排行榜"
-msgstr "排行榜"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:762
-msgid "足迹"
-msgstr "足迹"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:763
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:77
 msgid "车库"
 msgstr "车库"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:821
-msgid "财富榜（NPC 含被动收益）"
-msgstr "财富榜（NPC 含被动收益）"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:108
+msgid "原存档已废弃，已为你开通云端车场"
+msgstr "原存档已废弃，已为你开通云端车场"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:868
-#: apps/app/src/i18n/static-dom-seed.ts:19
-msgid "条动态"
-msgstr "条动态"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:126
+msgid "车场连不上服务端"
+msgstr "车场连不上服务端"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:872
-msgid "还没有动静，先停一辆车试试。"
-msgstr "还没有动静，先停一辆车试试。"
+#. placeholder {0}: formatYuan(r.amountCents)
+#. placeholder {1}: r.streakDays
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:190
+msgid "日签 +{0}，连签 {1} 天"
+msgstr "日签 +{0}，连签 {1} 天"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:921
-msgid "最多同时拥有"
-msgstr "最多同时拥有"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:216
+msgid "完美复刻 · 服务端"
+msgstr "完美复刻 · 服务端"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:921
-msgid "辆，已拥有"
-msgstr "辆，已拥有"
+#. placeholder {0}: state.dailyShieldRemaining
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:232
+msgid "今日免罚 ×{0}"
+msgstr "今日免罚 ×{0}"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:921
-msgid "辆"
-msgstr "辆"
+#. placeholder {0}: state.streakDays
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:238
+msgid "连签 {0} 天"
+msgstr "连签 {0} 天"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:929
-msgid "自家位"
-msgstr "自家位"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:261
+msgid "领日签"
+msgstr "领日签"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:932
-msgid "车库待命"
-msgstr "车库待命"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:262
+msgid "已签到"
+msgstr "已签到"
 
+#. placeholder {0}: detail.homeOccupancies.length
+#. placeholder {0}: state.homeOccupancies.length
+#. placeholder {1}: detail.lotSize
+#. placeholder {1}: state.lotSize
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:335
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:857
+msgid "车位 {0} / {1}"
+msgstr "车位 {0} / {1}"
+
+#. placeholder {0}: formatYuan(state.totalEarnedCents)
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:338
+msgid "累计 {0}"
+msgstr "累计 {0}"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:401
+msgid "空位"
+msgstr "空位"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:421
+msgid "访客"
+msgstr "访客"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:421
+msgid "我的车"
+msgstr "我的车"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:442
+msgid "可拖车"
+msgstr "可拖车"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:442
+msgid "罚单"
+msgstr "罚单"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:442
+msgid "警告"
+msgstr "警告"
+
+#. placeholder {0}: formatYuan(r.gainedCents)
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:521
+msgid "车已收回，到账 {0}"
+msgstr "车已收回，到账 {0}"
+
+#. placeholder {0}: formatYuan(r.gainedCents)
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:531
+msgid "收入 {0}"
+msgstr "收入 {0}"
+
+#. placeholder {0}: formatYuan(r.finedCents)
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:542
+msgid "贴条收到 {0}"
+msgstr "贴条收到 {0}"
+
+#. placeholder {0}: formatYuan(r.finedCents)
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:551
+msgid "拖车费 {0}"
+msgstr "拖车费 {0}"
+
+#. placeholder {0}: occupancy.slotIndex + 1
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:568
+msgid "你的车，停在自家车位 #{0}"
+msgstr "你的车，停在自家车位 #{0}"
+
+#. placeholder {0}: occupancy.slotIndex + 1
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:569
+msgid "访客车，占用 #{0}"
+msgstr "访客车，占用 #{0}"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:574
+msgid "累积收益"
+msgstr "累积收益"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:576
+msgid "占用时长"
+msgstr "占用时长"
+
+#. placeholder {0}: Math.max(0, Math.floor((Date.now() - occupancy.parkedAtMs) / 60_000))
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:577
+msgid "{0} 分"
+msgstr "{0} 分"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:591
+msgid "收钱（不召回）"
+msgstr "收钱（不召回）"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:599
+msgid "召回车辆"
+msgstr "召回车辆"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:610
+msgid "贴罚单（需 ≥ 警告）"
+msgstr "贴罚单（需 ≥ 警告）"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:618
+msgid "拖车（需 ≥ 可拖车）"
+msgstr "拖车（需 ≥ 可拖车）"
+
+#. placeholder {0}: slotIndex + 1
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:668
+msgid "已停进邻居家 #{0}"
+msgstr "已停进邻居家 #{0}"
+
+#. placeholder {0}: slotIndex + 1
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:669
+msgid "已停在 #{0}"
+msgstr "已停在 #{0}"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:680
+msgid "挑一辆车停过去"
+msgstr "挑一辆车停过去"
+
+#. placeholder {0}: slotIndex + 1
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:681
+msgid "挑一辆车停 #{0}"
+msgstr "挑一辆车停 #{0}"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:685
+msgid "车库里没有闲置车（被外出 / 冷却中）。先收回一辆。"
+msgstr "车库里没有闲置车（被外出 / 冷却中）。先收回一辆。"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:736
+msgid "点谁的车场，把你的车停过去开始挂机"
+msgstr "点谁的车场，把你的车停过去开始挂机"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:753
+msgid "你的 world 里还没有可访问的角色 —— 添加些 contacts 再回来。"
+msgstr "你的 world 里还没有可访问的角色 —— 添加些 contacts 再回来。"
+
+#. placeholder {0}: n.emptySlotCount
+#. placeholder {1}: n.lotSize
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:807
+msgid "空 {0}/{1}"
+msgstr "空 {0}/{1}"
+
+#. placeholder {0}: n.intimacyLevel
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:809
+msgid "亲密度 {0}"
+msgstr "亲密度 {0}"
+
+#. placeholder {0}: state.ownedCars.length
+#. placeholder {1}: state.garageSlots
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:947
-msgid "买更高档的车，赚得更快"
-msgstr "买更高档的车，赚得更快"
+msgid "我的车（{0}/{1}）"
+msgstr "我的车（{0}/{1}）"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:983
-msgid "已拥有"
-msgstr "已拥有"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:993
+msgid "升级成功"
+msgstr "升级成功"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:983
-msgid "提车"
-msgstr "提车"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:998
+msgid "升级"
+msgstr "升级"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:991
-msgid "想从头来一遍？"
-msgstr "想从头来一遍？"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1009
+msgid "已换色"
+msgstr "已换色"
 
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:995
-msgid "确定要重置整个停车场吗？"
-msgstr "确定要重置整个停车场吗？"
-
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:999
-msgid "重置存档"
-msgstr "重置存档"
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1013
+msgid "换色"
+msgstr "换色"
 
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:1022
-msgid "{minutes} 分钟前"
-msgstr "{minutes} 分钟前"
+msgid "已修复"
+msgstr "已修复"
 
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:1026
-msgid "{hours} 小时前"
-msgstr "{hours} 小时前"
+msgid "维修"
+msgstr "维修"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1037
+msgid "车场升级"
+msgstr "车场升级"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1049
+msgid "车位扩到 {size}"
+msgstr "车位扩到 {size}"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1061
+msgid "{size} 车位"
+msgstr "{size} 车位"
+
+#. placeholder {0}: SURFACE_DISPLAY[sf].name
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1079
+msgid "已切到 {0}"
+msgstr "已切到 {0}"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1099
+msgid "车库 +1"
+msgstr "车库 +1"
+
+#. placeholder {0}: state.garageSlots
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1104
+msgid "车库扩容（当前 {0}）"
+msgstr "车库扩容（当前 {0}）"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1110
+msgid "买车"
+msgstr "买车"
+
+#. placeholder {0}: TIER_DISPLAY[tier].name
+#. placeholder {1}: RARITY_DISPLAY[r].name
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1125
+msgid "已购入 {0}（{1}）"
+msgstr "已购入 {0}（{1}）"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1139
+msgid "价格 = 档位 × 稀有度倍率（服务端计算）"
+msgstr "价格 = 档位 × 稀有度倍率（服务端计算）"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1165
+msgid "领奖成功"
+msgstr "领奖成功"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1174
+msgid "财富榜"
+msgstr "财富榜"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1188
+msgid "本 world"
+msgstr "本 world"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1188
+msgid "全服"
+msgstr "全服"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1218
+msgid "榜单加载中..."
+msgstr "榜单加载中..."
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1225
+msgid "每日任务"
+msgstr "每日任务"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1229
+msgid "今日任务即将刷新"
+msgstr "今日任务即将刷新"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1269
+msgid "已领"
+msgstr "已领"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1271
+msgid "领奖"
+msgstr "领奖"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1272
+msgid "未达成"
+msgstr "未达成"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1282
+msgid "事件"
+msgstr "事件"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1308
+msgid "暂时还没有事件"
+msgstr "暂时还没有事件"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1378
+msgid "操作失败"
+msgstr "操作失败"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1384
+msgid "今日停 3 次邻居车场"
+msgstr "今日停 3 次邻居车场"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1386
+msgid "今日贴 2 张罚单"
+msgstr "今日贴 2 张罚单"
+
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1388
+msgid "今日累计收益 ¥20"
+msgstr "今日累计收益 ¥20"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1404
+msgid "{0} 停了一辆自家车"
+msgstr "{0} 停了一辆自家车"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1405
+msgid "{0} 停进了 {tgt} 的车场"
+msgstr "{0} 停进了 {tgt} 的车场"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1407
+msgid "{0} 召回了一辆车"
+msgstr "{0} 召回了一辆车"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1409
+msgid "{0} 收了一波钱"
+msgstr "{0} 收了一波钱"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1411
+msgid "{0} 给 {tgt} 贴了张罚单"
+msgstr "{0} 给 {tgt} 贴了张罚单"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1413
+msgid "{0} 把 {tgt} 的车拖走了"
+msgstr "{0} 把 {tgt} 的车拖走了"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1415
+msgid "{0} 提了一辆新车"
+msgstr "{0} 提了一辆新车"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1417
+msgid "{0} 给爱车升级"
+msgstr "{0} 给爱车升级"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1419
+msgid "{0} 升级了车场"
+msgstr "{0} 升级了车场"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1421
+msgid "{0} 完成了今日签到"
+msgstr "{0} 完成了今日签到"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1423
+msgid "{0} 领取了任务奖励"
+msgstr "{0} 领取了任务奖励"
+
+#. placeholder {0}: e.actorName
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:1425
+msgid "{0} 把车停进了你车场"
+msgstr "{0} 把车停进了你车场"
 
 #: apps/app/src/features/games/pixel-arena/pixel-arena-data.ts:40
 msgid "一拳贴墙，特技节奏猛。"
@@ -19153,6 +19420,10 @@ msgstr "暂无签名"
 #: apps/app/src/i18n/static-dom-seed.ts:18
 msgid "当前共"
 msgstr "当前共"
+
+#: apps/app/src/i18n/static-dom-seed.ts:19
+msgid "条动态"
+msgstr "条动态"
 
 #: apps/app/src/i18n/static-dom-seed.ts:21
 msgid "广场概览"
