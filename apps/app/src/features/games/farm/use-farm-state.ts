@@ -9,9 +9,12 @@ import {
   debugFarmPlot,
   feedFarmDog,
   getFarmEvents,
+  getFarmLeaderboard,
   getFarmNeighborDetail,
   getFarmNeighbors,
   getFarmState,
+  giftFarmCoins,
+  giftFarmItem,
   harvestFarmPlot,
   placeFarmDecoration,
   plantFarmCrop,
@@ -29,7 +32,11 @@ import {
   type FarmDecorationPurchaseResult,
   type FarmDogPurchaseResult,
   type FarmEventView,
+  type FarmGiftCoinsResult,
+  type FarmGiftItemResult,
   type FarmHarvestResult,
+  type FarmLeaderboardType,
+  type FarmLeaderboardView,
   type FarmNeighborDetail,
   type FarmNeighborSummary,
   type FarmPlayerStateView,
@@ -230,6 +237,43 @@ export function useRemoveFarmDecoration() {
   const invalidate = useInvalidateFarm();
   return useMutation<FarmPlayerStateView, Error, { placementId: string }>({
     mutationFn: (input) => removeFarmDecoration(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useFarmLeaderboard(type: FarmLeaderboardType) {
+  return useQuery<FarmLeaderboardView>({
+    queryKey: ["farm", "leaderboard", type],
+    queryFn: () => getFarmLeaderboard({ type }),
+    staleTime: 30_000,
+  });
+}
+
+export function useGiftFarmCoins() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<
+    FarmGiftCoinsResult,
+    Error,
+    { characterId: string; amount: number }
+  >({
+    mutationFn: (input) => giftFarmCoins(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useGiftFarmItem() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<
+    FarmGiftItemResult,
+    Error,
+    {
+      characterId: string;
+      itemKind: "crop" | "seed" | "consumable";
+      itemId: string;
+      quantity: number;
+    }
+  >({
+    mutationFn: (input) => giftFarmItem(input),
     onSuccess: () => invalidate(),
   });
 }

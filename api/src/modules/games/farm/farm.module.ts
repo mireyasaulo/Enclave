@@ -7,6 +7,7 @@ import { FeedModule } from '../../feed/feed.module';
 import { FarmAdminController } from './farm-admin.controller';
 import { FarmController } from './farm.controller';
 import { FarmEventService } from './farm-event.service';
+import { FarmLeaderboardService } from './farm-leaderboard.service';
 import { FarmNpcService } from './farm-npc.service';
 import { FarmNpcTickService } from './farm-npc-tick.service';
 import { FarmStateService } from './farm-state.service';
@@ -31,6 +32,7 @@ import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
     FarmEventService,
     FarmNpcService,
     FarmNpcTickService,
+    FarmLeaderboardService,
     AdminGuard,
   ],
   exports: [
@@ -38,6 +40,7 @@ import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
     FarmEventService,
     FarmNpcService,
     FarmNpcTickService,
+    FarmLeaderboardService,
   ],
 })
 export class FarmModule {}

@@ -39,6 +39,9 @@ import {
   FARM_PESTICIDE_PROTECT_HOURS,
   FARM_PLAYER_ACTOR_ID,
   FARM_PLAYER_DAILY_STEAL_LIMIT,
+  FARM_GIFT_DAILY_LIMIT_COINS,
+  FARM_GIFT_INTIMACY_PER_100_COINS,
+  FARM_GIFT_INTIMACY_PER_ITEM,
   FarmConsumableId,
   FarmConsumablePurchaseResult,
   FarmCropId,
@@ -48,6 +51,8 @@ import {
   FarmDecorationPurchaseResult,
   FarmDogPurchaseResult,
   FarmDogState,
+  FarmGiftCoinsResult,
+  FarmGiftItemResult,
   FarmHarvestResult,
   FarmNeighborSummary,
   FarmPlayerStateView,
@@ -271,6 +276,7 @@ export class FarmStateService {
 
     state.coins += coinsGained;
     state.experience += xpGained;
+    state.totalHarvested = (state.totalHarvested ?? 0) + amount;
     const newLevel = computeLevelFromExperience(state.experience);
     const leveledUp = newLevel > state.level;
     state.level = newLevel;
@@ -1066,6 +1072,206 @@ export class FarmStateService {
     const state = await this.playerRepo.findOneBy({ ownerId });
     if (!state) return false;
     return (state.placedDecorationsPayload ?? []).some((p) => p.type === 'scarecrow');
+  }
+
+  async giftCoinsToNeighbor(
+    ownerId: string,
+    characterId: string,
+    amount: number,
+  ): Promise<FarmGiftCoinsResult> {
+    if (!Number.isFinite(amount) || amount <= 0 || !Number.isInteger(amount)) {
+      throw new AppError('FARM_GIFT_AMOUNT_INVALID', {
+        legacyMessage: '金额必须为正整数',
+      });
+    }
+    if (amount > FARM_GIFT_DAILY_LIMIT_COINS) {
+      throw new AppError('FARM_GIFT_LIMIT_EXCEEDED', {
+        params: { limit: FARM_GIFT_DAILY_LIMIT_COINS },
+        legacyMessage: `单次送礼不能超过 ${FARM_GIFT_DAILY_LIMIT_COINS} 金币`,
+      });
+    }
+    const character = await this.charactersService.findById(characterId);
+    if (!character) {
+      throw new AppError('FARM_CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { characterId },
+        legacyMessage: `角色不存在：${characterId}`,
+      });
+    }
+    const state = await this.getOrCreatePlayerState(ownerId);
+    if (state.coins < amount) {
+      throw new AppError('FARM_INSUFFICIENT_COINS', {
+        params: { required: amount },
+        legacyMessage: `金币不足：需 ${amount}`,
+      });
+    }
+    state.coins -= amount;
+    const npc = await this.npcRepo.findOneBy({ characterId });
+    if (npc) {
+      npc.coins += amount;
+      await this.npcRepo.save(npc);
+    }
+    const intimacyDelta = Math.max(
+      1,
+      Math.floor((amount / 100) * FARM_GIFT_INTIMACY_PER_100_COINS),
+    );
+    const oldIntimacy = character.intimacyLevel ?? 0;
+    const newIntimacy = Math.max(0, Math.min(100, oldIntimacy + intimacyDelta));
+    if (newIntimacy !== oldIntimacy) {
+      character.intimacyLevel = newIntimacy;
+      await this.charactersService.upsert(character);
+    }
+    const saved = await this.playerRepo.save(state);
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'intimacy_change',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      targetType: 'character',
+      targetId: characterId,
+      targetName: character.name,
+      intimacyDelta,
+      payload: { giftKind: 'coins', amount },
+    });
+    return {
+      player: this.toPlayerView(saved),
+      target: await this.buildNeighborSummary(character, npc),
+      coinsGifted: amount,
+      intimacyDelta,
+    };
+  }
+
+  async giftItemToNeighbor(
+    ownerId: string,
+    characterId: string,
+    itemKind: 'crop' | 'seed' | 'consumable',
+    itemId: string,
+    quantity: number,
+  ): Promise<FarmGiftItemResult> {
+    if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
+      throw new AppError('FARM_GIFT_AMOUNT_INVALID', {
+        legacyMessage: '数量必须为正整数',
+      });
+    }
+    const character = await this.charactersService.findById(characterId);
+    if (!character) {
+      throw new AppError('FARM_CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { characterId },
+        legacyMessage: `角色不存在：${characterId}`,
+      });
+    }
+    const state = await this.getOrCreatePlayerState(ownerId);
+    let displayName = itemId;
+    if (itemKind === 'crop' || itemKind === 'seed') {
+      if (!isFarmCropId(itemId)) {
+        throw new AppError('FARM_UNKNOWN_CROP', {
+          params: { cropId: itemId },
+          legacyMessage: `未知作物：${itemId}`,
+        });
+      }
+      displayName = getCropDefinition(itemId as FarmCropId).nameZh;
+      if (itemKind === 'crop') {
+        const wh = { ...(state.warehousePayload ?? {}) };
+        if ((wh[itemId] ?? 0) < quantity) {
+          throw new AppError('FARM_WAREHOUSE_INSUFFICIENT', {
+            params: { cropName: displayName },
+            legacyMessage: `仓库中 ${displayName} 不足`,
+          });
+        }
+        wh[itemId] = (wh[itemId] ?? 0) - quantity;
+        state.warehousePayload = wh;
+      } else {
+        const bag = { ...(state.seedBagPayload ?? {}) };
+        if ((bag[itemId] ?? 0) < quantity) {
+          throw new AppError('FARM_SEED_BAG_INSUFFICIENT', {
+            params: { cropName: displayName },
+            legacyMessage: `种子袋中 ${displayName} 不足`,
+          });
+        }
+        bag[itemId] = (bag[itemId] ?? 0) - quantity;
+        state.seedBagPayload = bag;
+      }
+    } else {
+      if (!isFarmConsumableId(itemId)) {
+        throw new AppError('FARM_UNKNOWN_CONSUMABLE', {
+          params: { consumableId: itemId },
+          legacyMessage: `未知道具：${itemId}`,
+        });
+      }
+      displayName = getConsumableDefinition(itemId as FarmConsumableId).nameZh;
+      const bag = { ...(state.consumablesPayload ?? {}) };
+      if ((bag[itemId as FarmConsumableId] ?? 0) < quantity) {
+        throw new AppError('FARM_CONSUMABLE_INSUFFICIENT', {
+          params: { name: displayName },
+          legacyMessage: `${displayName} 不足`,
+        });
+      }
+      bag[itemId as FarmConsumableId] = (bag[itemId as FarmConsumableId] ?? 0) - quantity;
+      state.consumablesPayload = bag;
+    }
+
+    const intimacyDelta = Math.max(1, quantity * FARM_GIFT_INTIMACY_PER_ITEM);
+    const oldIntimacy = character.intimacyLevel ?? 0;
+    const newIntimacy = Math.max(0, Math.min(100, oldIntimacy + intimacyDelta));
+    if (newIntimacy !== oldIntimacy) {
+      character.intimacyLevel = newIntimacy;
+      await this.charactersService.upsert(character);
+    }
+    const saved = await this.playerRepo.save(state);
+    const npc = await this.npcRepo.findOneBy({ characterId });
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'intimacy_change',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      targetType: 'character',
+      targetId: characterId,
+      targetName: character.name,
+      intimacyDelta,
+      payload: { giftKind: itemKind, itemId, quantity },
+    });
+    return {
+      player: this.toPlayerView(saved),
+      target: await this.buildNeighborSummary(character, npc),
+      itemKind,
+      itemId,
+      quantity,
+      intimacyDelta,
+    };
+  }
+
+  // 私有：给 npc 数据 + character 实体拼一个 FarmNeighborSummary。
+  // gift / steal 等场景都用得到，省去重复样板。
+  private async buildNeighborSummary(
+    character: { id: string; name: string; avatar?: string | null; intimacyLevel?: number; isOnline?: boolean; expertDomains?: string[]; relationship?: string | null },
+    npc: FarmNpcStateEntity | null,
+  ): Promise<FarmNeighborSummary> {
+    return {
+      characterId: character.id,
+      characterName: character.name,
+      characterAvatar: character.avatar ?? null,
+      intimacyLevel: character.intimacyLevel ?? 0,
+      isOnline: character.isOnline ?? false,
+      ripePlotCount: npc
+        ? ensurePlotsArray(npc.plotsPayload, npc.plotCount).filter(
+            (p) => p.cropId && p.maturedAt != null && Date.now() >= p.maturedAt,
+          ).length
+        : 0,
+      totalPlotCount: npc?.plotCount ?? 0,
+      level: npc?.level ?? 1,
+      coins: npc?.coins ?? 0,
+      lastActedAt:
+        npc?.lastActedAt instanceof Date
+          ? npc.lastActedAt.toISOString()
+          : npc?.lastActedAt
+            ? new Date(npc.lastActedAt).toISOString()
+            : null,
+      expertDomains: character.expertDomains ?? [],
+      relationship: character.relationship ?? null,
+    };
   }
 
   // 公用：NPC 偷玩家时调用，返回 true 表示被狗拦住，应在调用方撤销偷菜战果。

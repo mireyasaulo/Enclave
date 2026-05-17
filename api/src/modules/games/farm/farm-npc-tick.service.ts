@@ -208,6 +208,7 @@ export class FarmNpcTickService {
       const coinsGained = amount * def.sellPrice;
       warehouse[plot.cropId] = (warehouse[plot.cropId] ?? 0) + amount;
       npc.coins += coinsGained;
+      npc.totalHarvested = (npc.totalHarvested ?? 0) + amount;
       plots[i] = createEmptyNpcPlot(i);
       perCropCount[plot.cropId] = (perCropCount[plot.cropId] ?? 0) + 1;
     }

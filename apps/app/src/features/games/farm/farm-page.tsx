@@ -11,6 +11,7 @@ import { CoinDisplay } from "./components/coin-display";
 import { DecorationLayer } from "./components/decoration-layer";
 import { DogHouse } from "./components/dog-house";
 import { EventLogPanel } from "./components/event-log-panel";
+import { LeaderboardSheet } from "./components/leaderboard-sheet";
 import { FarmIsoGrid } from "./components/farm-iso-grid";
 import { FarmMascot } from "./components/farm-mascot";
 import { FarmSky } from "./components/farm-sky";
@@ -62,6 +63,7 @@ function FarmPageInner() {
   const [selectedPlotIndex, setSelectedPlotIndex] = useState<number | null>(null);
   const [seedShopOpen, setSeedShopOpen] = useState(false);
   const [warehouseOpen, setWarehouseOpen] = useState(false);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [activeNeighborId, setActiveNeighborId] = useState<string | null>(null);
   const [toast, setToast] = useState<HarvestToast | null>(null);
   const [pulse, setPulse] = useState<{
@@ -197,6 +199,16 @@ function FarmPageInner() {
                 {t(msg`存货共`)} {warehouseTotal} {t(msg`个`)}
               </div>
             </button>
+            <button
+              type="button"
+              onClick={() => setLeaderboardOpen(true)}
+              className="rounded-2xl border border-white/60 bg-white/75 px-3 py-2 text-left text-xs shadow-md backdrop-blur-md transition hover:bg-rose-50/85"
+            >
+              <div className="font-medium text-rose-700">🏆 {t(msg`排行榜`)}</div>
+              <div className="mt-0.5 text-stone-500">
+                {t(msg`和邻居比一比`)}
+              </div>
+            </button>
             <DogHouse state={state} />
             <p className="hidden rounded-2xl border border-white/60 bg-white/55 p-3 text-[11px] leading-relaxed text-stone-600 shadow-sm backdrop-blur-md lg:block">
               {t(msg`作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。`)}
@@ -260,6 +272,10 @@ function FarmPageInner() {
         state={state}
         open={warehouseOpen}
         onClose={() => setWarehouseOpen(false)}
+      />
+      <LeaderboardSheet
+        open={leaderboardOpen}
+        onClose={() => setLeaderboardOpen(false)}
       />
       <NeighborFarmModal
         characterId={activeNeighborId}

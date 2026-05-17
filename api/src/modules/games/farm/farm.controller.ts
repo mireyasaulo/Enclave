@@ -1,10 +1,14 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AppError } from '../../../common/app-error.exception';
 import { FarmEventService } from './farm-event.service';
+import { FarmLeaderboardService } from './farm-leaderboard.service';
 import { FarmNpcService } from './farm-npc.service';
 import { FarmStateService } from './farm-state.service';
-import { isFarmCropId } from './crop-catalog';
-import { isFarmConsumableId, isFarmDecorationId } from './crop-catalog';
+import {
+  isFarmConsumableId,
+  isFarmCropId,
+  isFarmDecorationId,
+} from './crop-catalog';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FarmConsumableId,
@@ -15,7 +19,11 @@ import {
   FarmDecorationPurchaseResult,
   FarmDogPurchaseResult,
   FarmEventView,
+  FarmGiftCoinsResult,
+  FarmGiftItemResult,
   FarmHarvestResult,
+  FarmLeaderboardType,
+  FarmLeaderboardView,
   FarmNeighborDetail,
   FarmNeighborSummary,
   FarmPlayerStateView,
@@ -59,6 +67,7 @@ export class FarmController {
     private readonly stateService: FarmStateService,
     private readonly eventService: FarmEventService,
     private readonly npcService: FarmNpcService,
+    private readonly leaderboardService: FarmLeaderboardService,
   ) {}
 
   @Get('state')
@@ -247,6 +256,80 @@ export class FarmController {
       });
     }
     return this.stateService.removeDecoration(ownerId, placementId);
+  }
+
+  @Get('leaderboard')
+  async getLeaderboard(
+    @Query('type') type?: string,
+    @Query('limit') limit?: string,
+  ): Promise<FarmLeaderboardView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const t = (type ?? 'level').toLowerCase();
+    if (t !== 'level' && t !== 'harvest' && t !== 'coins') {
+      throw new AppError('FARM_LEADERBOARD_UNKNOWN_TYPE', {
+        params: { type: t },
+        legacyMessage: `未知排行类型：${t}`,
+      });
+    }
+    const limitN = limit ? Math.max(1, Math.min(100, Number(limit))) : 30;
+    return this.leaderboardService.getLeaderboard(
+      ownerId,
+      t as FarmLeaderboardType,
+      limitN,
+    );
+  }
+
+  @Post('gift-coins')
+  async giftCoins(
+    @Body() body: { characterId: string; amount: number },
+  ): Promise<FarmGiftCoinsResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const characterId = String(body.characterId ?? '');
+    if (characterId.length === 0) {
+      throw new AppError('FARM_CHARACTER_REQUIRED', {
+        legacyMessage: 'characterId 必填',
+      });
+    }
+    return this.stateService.giftCoinsToNeighbor(
+      ownerId,
+      characterId,
+      Math.floor(Number(body.amount)),
+    );
+  }
+
+  @Post('gift-item')
+  async giftItem(
+    @Body()
+    body: {
+      characterId: string;
+      itemKind: 'crop' | 'seed' | 'consumable';
+      itemId: string;
+      quantity: number;
+    },
+  ): Promise<FarmGiftItemResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const characterId = String(body.characterId ?? '');
+    if (characterId.length === 0) {
+      throw new AppError('FARM_CHARACTER_REQUIRED', {
+        legacyMessage: 'characterId 必填',
+      });
+    }
+    if (
+      body.itemKind !== 'crop' &&
+      body.itemKind !== 'seed' &&
+      body.itemKind !== 'consumable'
+    ) {
+      throw new AppError('FARM_GIFT_KIND_INVALID', {
+        legacyMessage: 'itemKind 必须为 crop / seed / consumable',
+      });
+    }
+    return this.stateService.giftItemToNeighbor(
+      ownerId,
+      characterId,
+      body.itemKind,
+      String(body.itemId ?? ''),
+      Math.floor(Number(body.quantity)),
+    );
   }
 
   @Get('events')

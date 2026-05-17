@@ -13,6 +13,7 @@ import {
 } from "../use-farm-state";
 import { useFarmAdjustedNow } from "../farm-clock-context";
 import { formatRemainingMs, getStageEmoji } from "../crop-presentation";
+import { GiftSheet } from "./gift-sheet";
 
 interface NeighborFarmModalProps {
   characterId: string | null;
@@ -37,6 +38,7 @@ export function NeighborFarmModal({
   const nowMs = useFarmAdjustedNow();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [toast, setToast] = useState<StealToast | null>(null);
+  const [giftOpen, setGiftOpen] = useState(false);
 
   // 跟着 toast.expiresAt 走带 cleanup 的定时器；之前用裸 setTimeout，关掉模态或快连
   // 偷两次会留下野定时器，要么把后一个 toast 提前抹掉，要么对已卸载组件 setState。
@@ -128,13 +130,22 @@ export function NeighborFarmModal({
                   </div>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-full px-2 py-1 text-sm text-stone-500 hover:bg-stone-100"
-              >
-                {t(msg`关闭`)}
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setGiftOpen(true)}
+                  className="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-700 hover:bg-amber-200"
+                >
+                  🎁 {t(msg`送礼`)}
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="rounded-full px-2 py-1 text-sm text-stone-500 hover:bg-stone-100"
+                >
+                  {t(msg`关闭`)}
+                </button>
+              </div>
             </header>
 
             {errorMsg && (
@@ -245,6 +256,11 @@ export function NeighborFarmModal({
           🪙+{toast.coinsGained} · {toast.characterName} {t(msg`好感`)}{toast.intimacyDelta}
         </div>
       )}
+      <GiftSheet
+        neighbor={detailQuery.data ?? null}
+        open={giftOpen}
+        onClose={() => setGiftOpen(false)}
+      />
     </div>
   );
 }

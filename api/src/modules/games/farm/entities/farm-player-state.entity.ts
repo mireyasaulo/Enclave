@@ -33,6 +33,10 @@ export class FarmPlayerStateEntity {
   @Column({ type: 'integer', default: 1 })
   level: number;
 
+  // 累计收获作物数（用于排行榜），harvest 时 += amount。
+  @Column({ type: 'integer', default: 0 })
+  totalHarvested: number;
+
   @Column({ type: 'integer', default: FARM_DEFAULT_PLOT_COUNT })
   plotCount: number;
 

@@ -293,6 +293,47 @@ export interface FarmDecorationPlaceResult {
   placement: FarmDecorationPlacement;
 }
 
+export type FarmLeaderboardType = 'level' | 'harvest' | 'coins';
+
+export interface FarmLeaderboardEntry {
+  rank: number;
+  isOwner: boolean;
+  characterId: string | null; // null = 玩家自己
+  name: string;
+  avatar: string | null;
+  level: number;
+  totalHarvested: number;
+  coins: number;
+  intimacyLevel?: number | null;
+}
+
+export interface FarmLeaderboardView {
+  type: FarmLeaderboardType;
+  generatedAt: string;
+  entries: FarmLeaderboardEntry[];
+  ownerRank: number; // 玩家自己排第几
+}
+
+export interface FarmGiftCoinsResult {
+  player: FarmPlayerStateView;
+  target: FarmNeighborSummary;
+  coinsGifted: number;
+  intimacyDelta: number;
+}
+
+export interface FarmGiftItemResult {
+  player: FarmPlayerStateView;
+  target: FarmNeighborSummary;
+  itemKind: 'crop' | 'seed' | 'consumable';
+  itemId: string;
+  quantity: number;
+  intimacyDelta: number;
+}
+
+export const FARM_GIFT_DAILY_LIMIT_COINS = 2000;
+export const FARM_GIFT_INTIMACY_PER_100_COINS = 1;
+export const FARM_GIFT_INTIMACY_PER_ITEM = 2;
+
 export interface FarmTickSummary {
   scannedCharacterCount: number;
   actedCount: number;
