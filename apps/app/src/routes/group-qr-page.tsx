@@ -231,20 +231,32 @@ export function GroupQrPage() {
       t(msg`邀请码：${inviteCode}`),
     ].join("\n");
   }, [groupDisplayName, inviteCode, inviteLink, locale]);
+  // 走查新一轮 R1：originally subtitle="${members?.length ?? 0} 人群聊"——
+  // membersQuery.data 还在飞那几百 ms 内 SVG 邀请卡先生成一份"0 人群聊"，
+  // 等 count 到达再 rebuild 一次。用户点群二维码进来就能肉眼看见副标从
+  // "0 人群聊" 闪到真实 "N 人群聊"，截图分享出去也可能截到 0 那一帧。和
+  // group-chat-thread-panel 桌面 header 同款修法：loading 时退回中性
+  // "群邀请卡" 副标，等真值再换。deps 用 `memberCount`（number | undefined）
+  // 代替 `membersQuery.data?.length` (number)，避免 undefined 落进 ??0 的
+  // 那条路径漏判断。
+  const memberCount = membersQuery.data?.length;
   const qrSvgMarkup = useMemo(
     () =>
       buildInviteMatrixSvg({
         code: inviteCode,
         footerLabel: t(msg`群邀请卡`),
         label: groupQuery.data?.name ?? defaultGroupInviteLabel,
-        subtitle: t(msg`${membersQuery.data?.length ?? 0} 人群聊`),
+        subtitle:
+          memberCount !== undefined
+            ? t(msg`${memberCount} 人群聊`)
+            : t(msg`群邀请卡`),
       }),
     [
       defaultGroupInviteLabel,
       groupQuery.data?.name,
       inviteCode,
       locale,
-      membersQuery.data?.length,
+      memberCount,
     ],
   );
   const mobileLink = useMemo(
@@ -1240,9 +1252,15 @@ export function GroupQrPage() {
               <div className="text-lg font-semibold text-[color:var(--text-primary)]">
                 {groupQuery.data.name}
               </div>
-              <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                {t(msg`${membersQuery.data?.length ?? 0} 人群聊`)}
-              </div>
+              {/* 走查新一轮 R1：原本 `${members?.length ?? 0} 人群聊`——和
+                  上方 qrSvgMarkup 同款 loading flicker：membersQuery 飞行中
+                  群邀请卡顶部副标先闪一帧"0 人群聊"再跳到真实数字。loading
+                  时压根不渲这行副标，等数到达。 */}
+              {memberCount !== undefined ? (
+                <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
+                  {t(msg`${memberCount} 人群聊`)}
+                </div>
+              ) : null}
               <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                 {t(
                   msg`最近活跃 ${formatConversationTimestamp(groupQuery.data.lastActivityAt)}`,

@@ -424,9 +424,15 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
   );
   const totalMemberCount = membersQuery.data?.length ?? 0;
   const ownerDisplayName = ownerMember?.memberName?.trim() || t(msg`我`);
+  // 走查新一轮 R1：原版只看 group 数据就拼分享文本，membersQuery 还在飞时
+  // totalMemberCount=0 → 分享出去的摘要写着 "${group.name} 群聊\n0 人群聊"。
+  // 慢网下 groupQuery 先回（毫秒级 cache 命中）但 membersQuery 还没回时
+  // 用户已经点"分享群聊"，对方收到的就是 "0 人群聊" 摘要。等 membersQuery
+  // 到达后再生成 share summary，rightActions 顶部那颗分享按钮自然也在
+  // groupSummary 没准备好时隐藏。
   const groupSummary = useMemo(() => {
     const group = groupQuery.data;
-    if (!group) {
+    if (!group || !membersQuery.data) {
       return null;
     }
 
@@ -437,14 +443,14 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
       title: t(msg`${group.name} 群聊`),
       text: [
         t(msg`${group.name} 群聊`),
-        t(msg`${totalMemberCount} 人群聊`),
+        t(msg`${membersQuery.data.length} 人群聊`),
         groupUrl,
       ].join("\n"),
       url: groupUrl,
     };
     // locale 进 deps — t 是 stable ref，单独依赖 t 无法在切语言时触发重算。
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupId, groupQuery.data, locale, totalMemberCount]);
+  }, [groupId, groupQuery.data, locale, membersQuery.data]);
 
   async function handleShareGroup() {
     if (!groupSummary) {
