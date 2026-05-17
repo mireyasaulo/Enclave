@@ -317,8 +317,14 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     },
     [baseUrl, queryClient, resolvedGroupId],
   );
-  const invalidateConversationsCache = useCallback(async () => {
-    await queryClient.invalidateQueries({
+  // 本会话 R1：原版 await queryClient.invalidateQueries 会让 syncStatusMutation
+  // / endStatusMutation 的 onSuccess 直到 conversations refetch 完才 resolve
+  // (~600ms 公网隧道 RTT)；上面 handleEndCall await mutateAsync 后才 navigate
+  // 离屏，"挂断"按钮 → 等 600ms → 才跳回 thread。fire-and-forget 即可：
+  // mergeCallMessageIntoCache 已经把通话状态消息同步进 cache，conversations
+  // 的 lastMessage / lastActivityAt 慢一帧更新不影响功能。
+  const invalidateConversationsCache = useCallback(() => {
+    void queryClient.invalidateQueries({
       queryKey: ["app-conversations", baseUrl],
     });
   }, [baseUrl, queryClient]);
@@ -342,7 +348,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     onSuccess: async (message, counts) => {
       setLastPublishedCounts(counts);
       mergeCallMessageIntoCache(message);
-      await invalidateConversationsCache();
+      invalidateConversationsCache();
     },
   });
 
@@ -373,7 +379,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     onSuccess: async (message) => {
       setLastPublishedCounts(null);
       mergeCallMessageIntoCache(message);
-      await invalidateConversationsCache();
+      invalidateConversationsCache();
     },
   });
 

@@ -344,24 +344,29 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
 
   const leaveMutation = useMutation({
     mutationFn: () => leaveGroup(groupId, baseUrl),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["app-group", baseUrl, groupId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-group-members", baseUrl, groupId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-group-messages", baseUrl, groupId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-contact-groups", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        }),
-      ]);
+    onSuccess: () => {
+      // 本会话 R1：原版 await Promise.all 5 条 invalidate 才 navigate——5 条
+      // 中只有 app-conversations / app-contact-groups 在 navigate 目的地用得
+      // 上，其它 3 条（group / group-members / group-messages）是当前已卸载
+      // 页面的旧 cache，等不等都没意义。await 链下用户点"确认退出"后整页要
+      // 多卡 ~600ms 公网隧道 RTT 才会跳走。fire-and-forget 即可：服务端
+      // leaveGroup 已经触发 emit_conversation_updated，chat-list 那条 socket
+      // 订阅会自己 invalidate。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-group", baseUrl, groupId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-group-members", baseUrl, groupId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-group-messages", baseUrl, groupId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-contact-groups", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
       if (navigateToRouteStateReturn({ replace: true })) {
         return;
       }
@@ -379,24 +384,25 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
 
   const hideMutation = useMutation({
     mutationFn: () => hideGroup(groupId, baseUrl),
-    onSuccess: async () => {
+    onSuccess: () => {
       // 走查 Round 3：hideGroup 完成后 group-contacts-page 已经靠 socket
       // conversationUpdated 触发 invalidate；但 socket 断开 / cloud token
       // 失效那几百 ms 落到 hideGroup 后，事件投递不过来，contacts/groups
       // 列表会继续显示这条群（visibleGroups 过滤 isHidden=true 拿不到新
       // 的 isHidden 值）。和 pin/preferences/leave 几条同源对齐，显式
       // invalidate 一遍 app-contact-groups。
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["app-group", baseUrl, groupId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-contact-groups", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        }),
-      ]);
+      // 本会话 R1：和 leaveMutation 同款，原本 await 这 3 条让用户多等
+      // ~600ms 才跳走。fire-and-forget 即可，socket 路径 + invalidate 双保
+      // 险，进 /tabs/chat 后 conversationsQuery 会自然刷新。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-group", baseUrl, groupId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-contact-groups", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
       if (navigateToRouteStateReturn({ replace: true })) {
         return;
       }

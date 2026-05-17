@@ -1077,7 +1077,11 @@ export function GroupQrPage() {
       );
       setDeliveryTargets(readGroupInviteDeliveryTargets(groupId));
       showNotice(t(msg`已把群邀请发到 ${conversation.title}。`));
-      await queryClient.invalidateQueries({
+      // 本会话 R1：和直聊分支 (line ~1101) 对齐 fire-and-forget。原本 await
+      // 让 sendingConversationsRef per-conversation 锁多撑 ~600ms 公网隧道
+      // RTT；这条 invalidate 是为「其它页面」拉刷 conversations，本页不
+      // 直接消费，await 没必要。
+      void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
       return;

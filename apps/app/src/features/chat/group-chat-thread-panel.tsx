@@ -682,7 +682,14 @@ export function GroupChatThreadPanel({
       // 保留 conversations invalidate：群消息会改 lastMessage / lastActivityAt
       // / 在 socket echo 没到时仍要让消息列表 badge 即时同步。chat-list-page
       // 的 onChatMessage 也会触发同样的 invalidate，重复一次幂等。
-      await queryClient.invalidateQueries({
+      // 本会话 R1：原本 `await` 这条 invalidate，react-query mutation 的
+      // `isPending` 等 onSuccess promise 完全 resolve 才翻 false——也就是说
+      // 用户发出消息后，下一次"发送"按钮被解锁要等公网隧道再多走一个 RTT
+      // (~600ms) 去刷 conversations。和单聊 use-conversation-thread 的对应
+      // 路径口径对齐：消息已经走 setQueriesData 进 cache + thread 立刻渲染，
+      // conversations 的列表 badge 延迟一帧到达是可接受体验；下方 ChatComposer
+      // pending=isPending 把发送按钮卡住的是这条 await，去掉后连发体感顺畅。
+      void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
     },
@@ -723,7 +730,7 @@ export function GroupChatThreadPanel({
         },
         baseUrl,
       ),
-    onSuccess: async (message) => {
+    onSuccess: (message) => {
       // perf：和 sendMutation Round 3 同款修法——sendGroupMessage 服务端响应
       // 已经是 canonical GroupMessage，跟 socket onChatMessage echo 走同一个
       // upsertServerMessageInCache，不需要再 invalidate(["app-group-messages"])
@@ -735,7 +742,12 @@ export function GroupChatThreadPanel({
         { queryKey: ["app-group-messages", baseUrl, groupId] },
         (current) => upsertServerMessageInCache(current, message),
       );
-      await queryClient.invalidateQueries({
+      // 本会话 R1：和 sendMutation 同款——await invalidateQueries 把 mutation
+      // 的 isPending 一直撑到 conversations refetch 回来（公网隧道 ~600ms
+      // RTT），桌面群通话面板上"开始/邀请/同步/挂断"4 次按钮 disabled 直到
+      // invalidate 完成。fire-and-forget，inviteNoticePending / endNoticePending
+      // 能立刻翻 false 让用户继续下一步操作；scrollToBottom 也不再等 RTT。
+      void queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
       scrollToBottom("smooth");

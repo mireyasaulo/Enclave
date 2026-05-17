@@ -1,5 +1,12 @@
 import { msg } from "@lingui/macro";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   FileText,
   Image as ImageIcon,
@@ -187,7 +194,15 @@ export function ChatMessageSearchPanel({
     [reminders],
   );
 
-  const trimmedKeyword = keyword.trim().toLowerCase();
+  // 本会话 R1：keyword 是 input 受控值，立刻 setState；但下面 indexedMessages
+  // .filter() + categoryCounts 全表跑一遍 + resultSections 重建是这条 hot path
+  // 里最贵的一段——典型群聊 100+ 条 × 每个 keystroke 全跑一遍，活跃用户慢机
+  // 上能感觉到输入框卡顿。和 group-contacts / contacts / create-group / 群
+  // member-picker 同口径 useDeferredValue：input value 仍走 raw keyword 保持
+  // 响应，过滤/分类/分段排到下一个 idle 帧。空态条件渲染（line 690+）会跟着
+  // 短暂延后一帧，不影响正确性。
+  const deferredKeyword = useDeferredValue(keyword);
+  const trimmedKeyword = deferredKeyword.trim().toLowerCase();
   const indexedMessages = useMemo(
     () =>
       [...filterSearchableChatMessages(messages ?? [], localMessageActionState)]
