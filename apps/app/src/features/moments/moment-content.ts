@@ -30,17 +30,22 @@ export function stripToolCallSyntax(input: string): string {
   //    我需要用一句话自然地评论...
   //    Andrej Karpathy 的风格是：- 简洁..."
   //   "用户要求我作为沈砚角色...沈砚的风格是：- 稳、低..."
-  // 共性：开头是 "用户" / "我需要" / "让我" 这种第三人称叙述任务的 prose +
-  // 多段落 + > ~80 字。正常评论是 < 30 字的单句。命中模式直接清空，下游用
-  // emptyTextFallback 兜底；DB 里已经存进去的脏评论在 render 层一并过掉。
+  //   "用户想让我以闻樾的身份，对界闻的朋友圈评论进行回复..."
+  //   "用户发了一条朋友圈，内容是关于经济形势..."
+  //   "The user wants me to respond to a friend's moment..."
+  // 共性：开头是 "用户" / "The user" / "我需要" / "让我" / "Let me" 这种第三人称
+  // 叙述任务的 prose + 多段落（含换行）+ > ~80 字。正常评论 < 30 字的单句不会触发。
+  // 命中模式直接清空，下游用 emptyTextFallback 兜底；DB 里已经存进去的脏评论
+  // 在 render 层一并过掉。走查实测在 yuanzui0728 库里只 80+ 字阈值就发现 15 条
+  // 漏网（"用户发/让/想/要求/在", "The user wants me to ...", "让我分析" 等）。
   const trimmed = out.trim();
-  if (
+  const isCotProse =
     trimmed.length > 80 &&
-    /^(用户(让|要求|希望|给|需要)|我需要|让我(想|数|考虑)|我应该|我可以)/.test(
+    /\n/.test(trimmed) &&
+    /^(用户[发让想要求希望给需要在说作为问]|让我(想|数|考虑|分析|看看|思考)|我需要|我应该|我可以|我得|我会|我必须|我打算|这条朋友圈|这是一条|这条动态|The user (wants|is|asks|asked|said|told|wants me|is asking)|Let me (think|analy[sz]e|see|consider|look)|I (need|should|want|have|will|must) to|Looking at|Analy[sz]ing)/i.test(
       trimmed,
-    ) &&
-    /\n/.test(trimmed)
-  ) {
+    );
+  if (isCotProse) {
     return "";
   }
   return trimmed;
