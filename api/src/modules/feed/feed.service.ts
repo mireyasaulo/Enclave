@@ -2504,16 +2504,26 @@ export class FeedService implements OnModuleInit {
         forwarded: 0,
       };
     }
-    const blockedSet = new Set(
-      await this.socialService.getBlockedCharacterIds(owner.id),
-    );
+    const [blockedIds, chatOnlyHiddenIds] = await Promise.all([
+      this.socialService.getBlockedCharacterIds(owner.id),
+      // 走查再再 R2：channel_proactive_forward 决定哪位角色"主动"把视频号
+      // 帖子转发到 owner 的会话里。「仅聊天的朋友」(`chatOnly=true`) 的 UI
+      // 描述是「TA 不会出现在朋友圈、动态等场景」——视频号转发明显属于
+      // "动态"的语义边界内（用户没主动订阅，就是 TA 一厢情愿往会话推内容），
+      // 把这部分 char 也排除掉。复用 getMomentsHiddenFromThemCharacterIds，
+      // 那条已经把 chatOnly 一起 OR 进去了。
+      this.remarkResolver.getMomentsHiddenFromThemCharacterIds(owner.id),
+    ]);
+    const blockedSet = new Set(blockedIds);
     const allCharacters = await this.characters.findAllVisibleToOwner(owner.id);
     const characterById = new Map(allCharacters.map((c) => [c.id, c]));
     const friendCharacters = friendCharacterIds
       .map((id) => characterById.get(id))
       .filter(
         (c): c is (typeof allCharacters)[number] =>
-          Boolean(c) && !blockedSet.has(c!.id),
+          Boolean(c) &&
+          !blockedSet.has(c!.id) &&
+          !chatOnlyHiddenIds.has(c!.id),
       );
 
     let llmCallsRemaining = MAX_LLM_CALLS_PER_TICK;
