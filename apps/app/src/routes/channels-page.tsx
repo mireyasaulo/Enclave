@@ -3841,7 +3841,16 @@ function MobileChannelCommentsSheet({
               {t(msg`正在读取评论...`)}
             </div>
           ) : null}
-          {!isLoading && !comments.length ? (
+          {/*
+            走查 2026-05-17 新会话 R1：原条件只看 !isLoading && !comments.length，
+            mobileCommentsQuery 失败 + placeholderData 也是空（首次打开 sheet、
+            decorations 也还没回 / 没该 post 的 preview）时，红条已经渲了
+            "Failed to fetch comments..."，下面却同时出现"还没有评论，先发第一句。"
+            空态卡——用户既看到错误又看到"没有评论"的引导，矛盾且会让人以为
+            真的没人评论。"评论读失败"和"真没人评论"在 UI 上必须二选一：有 error
+            就只显示错误条+重试按钮，别再叠一行误导性空态。
+          */}
+          {!isLoading && !comments.length && !errorMessage ? (
             <div className="rounded-[16px] border border-dashed border-[color:var(--border-subtle)] bg-white px-4 py-5 text-center text-[12px] leading-6 text-[#6b7280]">
               {t(msg`还没有评论，先发第一句。`)}
             </div>
