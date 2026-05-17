@@ -1258,8 +1258,9 @@ export function MomentsPage() {
   //
   // 几个早返路径要小心：
   //   1) 已经在 visibleMoments 里 → snap 那条 effect 会处理；
-  //   2) 已经在 momentsData 里但被 blockedCharacterIds 过滤掉 → 用户主动屏蔽
-  //      了该角色，分享链接绕回来不要硬翻一路找永远不会出现的目标；
+  //   2) 已经在 momentsData 里但被 visibleMoments filter 剔除掉（blocked 角色
+  //      或 tool_call 泄漏空胶水帖）→ 用户角度看不到这条，分享链接绕回来不要
+  //      硬翻一路找永远不会出现的目标；
   //   3) 没下一页 / 正在 fetch / 上一次 fetch 出错 → 让位给底部错误条 + 用户
   //      重试，避免死循环。和 feed page Round 5/19 加的这两条等价。
   useEffect(() => {

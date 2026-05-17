@@ -1151,6 +1151,23 @@ export function ContactsPage() {
     );
   }, [isDesktopLayout, hasStarredFriends]);
 
+  // 走查 R2：移动端用户点开 + 快捷菜单后，大概率会落到「发起群聊」或
+  // 「添加朋友」其中一个。这两条路由在 router 里都是 lazy() 包的，chunk
+  // 没预热的话从点 + → 选项 → navigate 这段会卡在 TanStack Router 的 Suspense
+  // fallback（contact-page 整页白屏 → create-group / add-friend 才挂出来），
+  // 慢网下 1-2 秒明显可见。router 的 defaultPreload:"intent" 只对 <Link>
+  // 起 hover/focus 作用，这里两条都是 <button onClick={navigate}>，preload
+  // 永远不会触发。menu 一打开就 warm 这两条 chunk，等用户的手指从 + 移到
+  // 选项的几百毫秒里基本能拉完。React.lazy 内部对同一个 import URL 做了
+  // promise dedupe，重开 + menu 不会重新拉。
+  useEffect(() => {
+    if (isDesktopLayout || !isQuickMenuOpen) {
+      return;
+    }
+    void import("./create-group-page");
+    void import("./mobile-add-friend-page");
+  }, [isDesktopLayout, isQuickMenuOpen]);
+
   // 离开 new-friends 面板时清掉 success 提示。否则用户接受好友 → 切到其它
   // 面板 → 2.4s 内切回来，pane 重新挂载读到上次的 friendRequestSuccess，
   // 闪一遍旧确认条，看起来像新动作刚发生。
