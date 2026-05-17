@@ -500,6 +500,17 @@ export function DesktopChannelsWorkspace({
           // 流程已经在 channels-page.tsx 移除了同款 invalidate。这里也跟着
           // 去掉，避免每次转发后白白拉一次 home 列表。
         }}
+        onForwardFailed={(input) => {
+          // 走查 2026-05-17 新会话 R3：picker 在 mutation pending 时不挡关闭，
+          // 用户点完好友立刻关 picker → picker 内的红条已经不渲染。移动端在
+          // channels-page 上有 onForwardFailed → page 级 notice 兜底，桌面端
+          // 一直没接，等于失败被静默吞。借现成的 forwardNotice channel 兜
+          // 出来——成功是绿色文案，失败也用同一条 notice 通道把错误顶出来，
+          // 不让用户「按了转发什么都没发生」。
+          setForwardNotice(
+            t(msg`转发给 ${input.targetName} 失败：${input.message}`),
+          );
+        }}
       />
       {forwardNotice ? (
         <ForwardNotice
