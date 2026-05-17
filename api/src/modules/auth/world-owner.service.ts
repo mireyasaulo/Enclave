@@ -56,13 +56,25 @@ function sanitizeOwnerSignature(value: string): string {
   return value.replace(CONTROL_CHAR_REGEX, ' ').replace(/\s+/g, ' ').trim();
 }
 
+// 跟客户端 profile-info-avatar-page.tsx 的 MIN_AVATAR_DATA_URL_LENGTH 同步：
+// 短于 32 字符的 data URL（如 "data:image/x;," / "data:image/png;base64," 等）
+// 解码后没有像素内容，AvatarChip 加载会失败回 fallback——用户以为头像改好
+// 了 profile 里却是 initials，毫无线索可查。R2 走查实测 curl PATCH
+// `"data:image/x;,"` 服务端原样落库即印证。客户端 gate 同口径，但 curl /
+// 老客户端能绕过，所以这里再兜一次。
+const MIN_AVATAR_DATA_URL_LENGTH = 32;
+
 // avatar 字段允许的协议：http / https / data:image/*。其它（javascript: /
 // vbscript: / file: / ftp: / data:text/... 等）一律拒——即便 <img src> 不
 // 执行 javascript:，落库的脏值会被其它复用 owner.avatar 的组件（社交分享、
 // 第三方 webview、未来某个 <a href>）命中。
 function isSafeAvatarValue(value: string): boolean {
   if (!value) return true; // 空 = 恢复默认，安全
-  if (/^data:image\//i.test(value)) return true;
+  if (/^data:image\//i.test(value)) {
+    // 短 / 空 data URL 落库后 <img> 加载失败回 fallback；客户端早就 gate，
+    // 这里同口径兜底防绕过。
+    return value.length >= MIN_AVATAR_DATA_URL_LENGTH;
+  }
   const schemeMatch = /^([a-z][a-z0-9+.-]*):/i.exec(value);
   if (!schemeMatch) {
     // 无 scheme：可能是相对路径（/avatars/...）。允许 / 开头的同源相对路径，
@@ -70,7 +82,18 @@ function isSafeAvatarValue(value: string): boolean {
     return value.startsWith('/') && !value.startsWith('//');
   }
   const scheme = schemeMatch[1]!.toLowerCase();
-  return scheme === 'http' || scheme === 'https';
+  if (scheme !== 'http' && scheme !== 'https') return false;
+  // R2 走查实测 curl `"avatar":"http://"` 服务端 schemeMatch 通过原样落库——
+  // 客户端 `new URL("http://")` 一定抛 → blocked，但服务端只 sniff 前缀没
+  // 真正 parse。用 URL 构造器把 "http://" / "https:" 这种缺 host 的串挡掉，
+  // 跟客户端 checkAvatarUrlInput 同口径。
+  try {
+    const parsed = new URL(value);
+    if (!parsed.hostname) return false;
+  } catch {
+    return false;
+  }
+  return true;
 }
 
 type UpdateWorldOwnerInput = {
