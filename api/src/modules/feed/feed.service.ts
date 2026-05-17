@@ -3293,11 +3293,27 @@ export class FeedService implements OnModuleInit {
     // 校验路径自然报 400。assertCommentText 已经用同款 typeof 兜过，这条对齐。
     const rawText = typeof input.text === 'string' ? input.text : '';
     const text = rawText.trim();
+    // 走查新一轮 R2：text 那条已经按 typeof 兜过，但同一个 normalize 里 title /
+    // mediaUrl / coverUrl 仍然直接 `input.X?.trim()` —— 可选链只挡 null/undefined，
+    // 数字 / 数组 / 对象上 .trim 不是函数，curl 发 `{"text":"ok","title":123}` /
+    // `{"coverUrl":[1,2]}` / `{"mediaUrl":{"x":1}}` 都直接 500，legacyMessage
+    // 把 "input.title?.trim is not a function" 这条裸 JS 错飘到前端 InlineNotice
+    // 上。统一兜回 undefined 让下游 `|| null / || mediaUrl` 兜底分支走稳。
+    const title =
+      typeof input.title === 'string' ? input.title : undefined;
+    const inputMediaUrl =
+      typeof input.mediaUrl === 'string' ? input.mediaUrl : undefined;
+    const inputCoverUrl =
+      typeof input.coverUrl === 'string' ? input.coverUrl : undefined;
     const explicitMedia = this.normalizeFeedMediaInput(input.media);
     const media =
       explicitMedia.length > 0
         ? explicitMedia
-        : this.buildFeedMediaFromLegacyInput(input);
+        : this.buildFeedMediaFromLegacyInput({
+            ...input,
+            mediaUrl: inputMediaUrl,
+            coverUrl: inputCoverUrl,
+          });
     const mediaType = this.inferFeedMediaType(media, input.mediaType);
 
     if (!text && media.length === 0 && input.publishStatus !== 'draft') {
@@ -3322,7 +3338,7 @@ export class FeedService implements OnModuleInit {
 
     return {
       text,
-      title: input.title?.trim() || null,
+      title: title?.trim() || null,
       media,
       mediaType,
       mediaUrl: primaryMedia?.url || undefined,
@@ -4172,8 +4188,16 @@ function unique(values: string[]) {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
-function normalizeTags(tags?: string[] | null) {
-  const normalized = (tags ?? [])
+function normalizeTags(tags?: unknown) {
+  // 走查新一轮 R2：controller `body.topicTags` 是 TS-only string[]，运行时
+  // 是 any。curl 发 `{"topicTags":"foo"}` / `{"topicTags":[123,{}]}` 时旧
+  // 实现 `(tags ?? []).map(item => item.trim())` 抛 "(tags ?? []).map is
+  // not a function" / "item.trim is not a function" → 500，legacyMessage
+  // 把裸 JS 栈飘到前端 InlineNotice 上。前置 Array.isArray + per-item
+  // typeof guard，让无效输入悄悄退化成空，与 R1 给 text 同款兜底。
+  if (!Array.isArray(tags)) return null;
+  const normalized = tags
+    .filter((item): item is string => typeof item === 'string')
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 8);
