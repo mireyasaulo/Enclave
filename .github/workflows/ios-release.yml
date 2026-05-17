@@ -40,7 +40,10 @@ jobs:
     timeout-minutes: 60
 
     env:
-      # build-ios-ipa.mjs 的 requireEnv 必须能读到这些；secret 缺失则 step 自检会先 fail
+      # build-ios-ipa.mjs 的 requirePickConfigured 把 env 当第一优先级，secret
+      # 缺失则下面 "Validate required signing secrets" step 自检会先 fail。
+      # CI 走环境变量这条路而不是 ios-shell.config.local.json，是为了不让仓库
+      # 里 commit 一份带真实 Team ID / Bundle ID 的本地配置文件。
       YINJIE_IOS_BUNDLE_IDENTIFIER: ${{ secrets.IOS_BUNDLE_IDENTIFIER }}
       YINJIE_IOS_DEVELOPMENT_TEAM: ${{ secrets.IOS_DEVELOPMENT_TEAM }}
       YINJIE_IOS_CODE_SIGN_STYLE: 'Manual'
@@ -56,8 +59,6 @@ jobs:
           node-version: '22'
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 8
 
       - name: Show toolchain versions
         run: |
