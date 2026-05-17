@@ -1051,6 +1051,17 @@ export function MobileFriendMomentsPage() {
             ? pendingCommentMomentId === commentBarTarget.momentId
             : false
         }
+        errorMessage={
+          // 走查 R1：跟主朋友圈页同款——评论失败时 onError 把 savedBar 重新
+          // 设回去，但失败信息只在顶 notice 里显示，被 bar 的 z=1000 backdrop
+          // 盖死。透传给 bar 内 textarea 上方 errorMessage 槽；用 variables ===
+          // 当前 bar 上的 momentId gate 住，切到另一条 moment 重开 bar 不带旧错误。
+          commentMutation.isError &&
+          commentMutation.error instanceof Error &&
+          commentMutation.variables === commentBarTarget?.momentId
+            ? commentMutation.error.message
+            : null
+        }
         onSubmit={() => {
           if (commentBarTarget) {
             commentMutation.mutate(commentBarTarget.momentId);
