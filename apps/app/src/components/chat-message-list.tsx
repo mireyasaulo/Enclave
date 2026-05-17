@@ -2142,11 +2142,19 @@ export function ChatMessageList({
         postId: attachment.postId,
         section: "recommended",
       });
-      // 桌面走 /discover/channels；移动走 /tabs/channels（与 channels-page 保持一致）
+      // 走查 R3 新一轮：原注释/代码两路对调了——channels-page 的 URL hash
+      // 同步 effect 是「桌面走 /tabs/channels（effect L1196 cond `!isDesktopLayout
+      // || !isDesktopChannelsRoute` + navigate to /tabs/channels），移动走
+      // /discover/channels（effect L1237 cond `normalizedPathname !==
+      // "/discover/channels"`）」。原代码把 desktop 推到 /discover/channels、
+      // mobile 推到 /tabs/channels，结果用户在聊天里点 feed_post_card 跳到视频号后
+      // 改 section / 选 post，URL hash 永远不同步——刷新整页就退回 recommended，
+      // 转发链接也带不上 postId。和 discover-page 的入口（mobile 一直走
+      // /discover/channels，line 178）以及 channels-page 的 effect 保持一致。
       if (variant === "desktop") {
-        void navigate({ to: "/discover/channels", hash: channelsHash });
-      } else {
         void navigate({ to: "/tabs/channels", hash: channelsHash });
+      } else {
+        void navigate({ to: "/discover/channels", hash: channelsHash });
       }
       return;
     }
