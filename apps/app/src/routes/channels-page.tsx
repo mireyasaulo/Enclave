@@ -1559,6 +1559,8 @@ export function ChannelsPage() {
           errorMessage={errorMessage}
           isLoading={channelsQuery.isLoading}
           likePendingPostId={pendingLikePostId}
+          favoritePendingPostId={pendingFavoritePostId}
+          followPendingAuthorId={pendingFollowAuthorId}
           posts={desktopWorkspacePosts}
           routeSelectedAuthorId={syncedRouteSelectedAuthorId}
           routeSelectedPostId={routeSelectedPostId}

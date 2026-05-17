@@ -71,6 +71,14 @@ type DesktopChannelsWorkspaceProps = {
   errorMessage?: string | null;
   isLoading: boolean;
   likePendingPostId: string | null;
+  // 走查 2026-05-17 R1：原桌面 workspace 只接 likePending，关注/收藏完全没有
+  // pending 锁。channels-page 早就计算了 followPendingAuthorId / favoritePendingPostId
+  // 给移动端用，桌面端这两个按钮在 mutation 飞行期允许 rapid click，导致
+  // follow → unfollow → follow 三条并发请求落库时按谁先回来谁先生效，最终状态
+  // 跟用户最后一次点击意图对不上（同移动端 R1 已修过的同款问题）。补上 prop
+  // 透传，按钮按 mutation 锁。
+  favoritePendingPostId: string | null;
+  followPendingAuthorId: string | null;
   posts: FeedPostListItem[];
   refreshPending?: boolean;
   routeSelectedAuthorId?: string | null;
@@ -117,6 +125,8 @@ export function DesktopChannelsWorkspace({
   errorMessage,
   isLoading,
   likePendingPostId,
+  favoritePendingPostId,
+  followPendingAuthorId,
   posts,
   refreshPending = false,
   routeSelectedAuthorId = null,
@@ -412,6 +422,8 @@ export function DesktopChannelsWorkspace({
                   registerSlide={registerSlide}
                   isFavorite={isPostFavorite(post.id)}
                   likePending={likePendingPostId === post.id}
+                  favoritePending={favoritePendingPostId === post.id}
+                  followPending={followPendingAuthorId === post.authorId}
                   unmuted={unmuted}
                   onToggleUnmuted={toggleUnmuted}
                   onLike={() => onLike(post.id)}
@@ -479,6 +491,14 @@ export function DesktopChannelsWorkspace({
             errorMessage={authorProfileErrorMessage}
             isLoading={authorProfileLoading}
             profile={authorProfile}
+            // 走查 2026-05-17 R1：overlay 上的 +关注 / 已关注 按钮没有 pending
+            // 锁，rapid click 同样会让 toggle mutation 串行竞态。把 followPendingAuthorId
+            // 透过来，按当前展示的作者 id 锁按钮。
+            followPending={
+              followPendingAuthorId !== null &&
+              routeSelectedAuthorId !== null &&
+              followPendingAuthorId === routeSelectedAuthorId
+            }
             selectedPostId={selectedPost?.id ?? null}
             onClose={onCloseAuthor}
             onOpenPost={onOpenAuthorPost}
@@ -786,6 +806,8 @@ function ChannelFeedSlide({
   registerSlide,
   isFavorite,
   likePending,
+  favoritePending,
+  followPending,
   unmuted,
   onLike,
   onOpenAuthor,
@@ -801,6 +823,8 @@ function ChannelFeedSlide({
   registerSlide: (postId: string, node: HTMLDivElement | null) => void;
   isFavorite: boolean;
   likePending: boolean;
+  favoritePending: boolean;
+  followPending: boolean;
   unmuted: boolean;
   onLike: () => void;
   onOpenAuthor: () => void;
@@ -859,16 +883,19 @@ function ChannelFeedSlide({
                 <button
                   type="button"
                   onClick={onToggleAuthorFollow}
+                  disabled={followPending}
                   className={cn(
-                    "rounded-full px-3 py-1 text-[12px] transition",
+                    "rounded-full px-3 py-1 text-[12px] transition disabled:cursor-not-allowed disabled:opacity-70",
                     post.ownerState?.isFollowingAuthor
                       ? "border border-white/28 bg-transparent text-white/85 hover:bg-white/10"
                       : "bg-[color:var(--brand-primary)] text-white hover:opacity-95",
                   )}
                 >
-                  {post.ownerState?.isFollowingAuthor
-                    ? t(msg`已关注`)
-                    : t(msg`+ 关注`)}
+                  {followPending
+                    ? t(msg`处理中...`)
+                    : post.ownerState?.isFollowingAuthor
+                      ? t(msg`已关注`)
+                      : t(msg`+ 关注`)}
                 </button>
               ) : null}
             </div>
@@ -935,9 +962,24 @@ function ChannelFeedSlide({
           />
           <ChannelActionButton
             surface="dark"
-            icon={<Bookmark size={18} />}
-            label={isFavorite ? t(msg`已收藏`) : t(msg`收藏`)}
+            icon={
+              // 走查 2026-05-17 R1：原图标无论 active 与否都是空心 Bookmark，
+              // 仅外圈边框换色——夜色背景下绿色 border 跟未收藏态白边几乎区分不
+              // 出来。配合 hasLiked 用 fill-current 加强已激活语义。
+              <Bookmark
+                size={18}
+                className={isFavorite ? "fill-current" : undefined}
+              />
+            }
+            label={
+              favoritePending
+                ? t(msg`处理中`)
+                : isFavorite
+                  ? t(msg`已收藏`)
+                  : t(msg`收藏`)
+            }
             active={isFavorite}
+            pending={favoritePending}
             onClick={onToggleFavorite}
           />
         </div>
@@ -1034,6 +1076,7 @@ function ChannelCommentsDrawer({
 function ChannelAuthorOverlay({
   authorId,
   errorMessage,
+  followPending,
   isLoading,
   profile,
   selectedPostId,
@@ -1043,6 +1086,7 @@ function ChannelAuthorOverlay({
 }: {
   authorId: string | null;
   errorMessage?: string | null;
+  followPending: boolean;
   isLoading: boolean;
   profile: FeedChannelAuthorProfile | null;
   selectedPostId: string | null;
@@ -1063,6 +1107,7 @@ function ChannelAuthorOverlay({
         <DesktopChannelAuthorPanel
           authorId={authorId}
           errorMessage={errorMessage}
+          followPending={followPending}
           isLoading={isLoading}
           profile={profile}
           selectedPostId={selectedPostId}
@@ -1114,6 +1159,7 @@ function FeedNavArrows({
 function DesktopChannelAuthorPanel({
   authorId,
   errorMessage,
+  followPending,
   isLoading,
   profile,
   selectedPostId,
@@ -1123,6 +1169,7 @@ function DesktopChannelAuthorPanel({
 }: {
   authorId: string | null;
   errorMessage?: string | null;
+  followPending: boolean;
   isLoading: boolean;
   profile: FeedChannelAuthorProfile | null;
   selectedPostId: string | null;
@@ -1216,6 +1263,7 @@ function DesktopChannelAuthorPanel({
               <Button
                 variant={profile.isFollowing ? "secondary" : "primary"}
                 size="sm"
+                disabled={followPending}
                 onClick={() =>
                   onToggleFollow(profile.authorId, profile.isFollowing)
                 }
@@ -1225,7 +1273,11 @@ function DesktopChannelAuthorPanel({
                     : "bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
                 }
               >
-                {profile.isFollowing ? t(msg`已关注`) : t(msg`+关注`)}
+                {followPending
+                  ? t(msg`处理中...`)
+                  : profile.isFollowing
+                    ? t(msg`已关注`)
+                    : t(msg`+关注`)}
               </Button>
             ) : null}
             {/* 原来这里还有一个 "当前内容" 按钮 onClick={onClose}，跟头部的
