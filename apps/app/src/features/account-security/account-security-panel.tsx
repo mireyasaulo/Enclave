@@ -47,19 +47,32 @@ function writeResendEnd(token: string | null | undefined, endsAt: number) {
 }
 
 // 后端 429 走两条文案：
-//   1) "验证码发送过于频繁，请在 {n} 秒后重试。"（60 秒滑窗）
-//   2) "该邮箱验证码请求次数过多，请稍后再试。"（小时窗口超 5 条上限）
-// 第一条里能 parse 出真实 retryAfter；第二条只能给个保守冷却，避免按钮回弹后再来一发又被打回。
+//   1) "验证码发送过于频繁，请在 {n} 秒后重试。"（60 秒滑窗）— cloud-api-i18n.ts
+//      会按 Accept-Language 译成 en/ja/ko 版本（"in N seconds" / "N 秒後" /
+//      "N초 후"），所以匹配 retryAfter 数字时四语都要覆盖，否则 en/ko 用户全
+//      落到默认 60s。
+//   2) "该邮箱验证码请求次数过多，请稍后再试。"（小时窗口超 5 条上限）— 后端
+//      没在 i18n 表里映射，en/ja/ko 透传中文，但客户端逻辑只看 statusCode 429
+//      + 无 N 秒数字就当作小时窗口。这种情况下 60s 太短，按钮回弹后再点又
+//      触发同一条 429 → 用户陷在 60s 循环里浪费配额。给一个保守的 5 分钟
+//      冷却，等真实窗口慢慢滑过去；用户实在急可以刷新页面或换设备。
+// R1 走查（2026-05-17）：之前正则 /(\d+)\s*秒/ 只命中 zh/ja，en/ko 都 fallback 60s。
+const RATE_LIMIT_FALLBACK_COOLDOWN_SECONDS = 5 * 60;
 function resolveRateLimitCooldown(message: string | undefined): number {
-  if (!message) return RESEND_COOLDOWN_SECONDS;
-  const match = /(\d+)\s*秒/.exec(message);
-  if (match) {
-    const seconds = Number.parseInt(match[1], 10);
-    if (Number.isFinite(seconds) && seconds > 0) {
-      return Math.min(seconds, 600);
+  if (!message) return RATE_LIMIT_FALLBACK_COOLDOWN_SECONDS;
+  // i18n-ignore-next-line: 跨 locale 解析 cloud-api 已 i18n 化的 retry-after 文本。
+  const patterns = [/(\d+)\s*秒/, /(\d+)\s*초/, /\bin\s+(\d+)\s*seconds?\b/i];
+  for (const pattern of patterns) {
+    const match = pattern.exec(message);
+    if (match) {
+      const seconds = Number.parseInt(match[1], 10);
+      if (Number.isFinite(seconds) && seconds > 0) {
+        return Math.min(seconds, 600);
+      }
     }
   }
-  return RESEND_COOLDOWN_SECONDS;
+  // 没解析出 N 秒 → 当作小时窗口，给长冷却避免循环 429。
+  return RATE_LIMIT_FALLBACK_COOLDOWN_SECONDS;
 }
 
 function normalizeBaseUrl(value: string | undefined | null) {
