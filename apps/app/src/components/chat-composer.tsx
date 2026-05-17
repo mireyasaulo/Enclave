@@ -6730,8 +6730,10 @@ function loadImageElement(url: string, errorMessage?: string) {
     image.onerror = () =>
       reject(
         new Error(
+          // 默认沿用 createImageDraft 内 readImageDimensions onerror 同一条
+          // "图片解析失败，请换一张再试。"——已经有 en/ja/ko 翻译，不引新 string。
           errorMessage ??
-            translateRuntimeMessage(msg`图片解析失败，请重新选择。`),
+            translateRuntimeMessage(msg`图片解析失败，请换一张再试。`),
         ),
       );
     image.src = url;
