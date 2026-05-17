@@ -236,11 +236,20 @@ export function DesktopChannelsWorkspace({
     );
   }, [selectedPost?.id]);
 
+  // 走查 2026-05-17 新会话 R2：原依赖整个 posts 数组——每次 ChannelsPage 上
+  // 的 like/favorite/follow 乐观更新让 React Query setQueryData 返回新数组，
+  // 这条 effect 就把 IntersectionObserver 整张拆掉重建，下一帧再重新 observe
+  // 当前所有 slide。lots of churn for nothing：slide id 集合没变，重建毫无意义。
+  // 用 id 拼成的稳定 key 代替——只有真正插/删 slide 时才重建 observer。
+  const slideIdsKey = useMemo(
+    () => posts.map((post) => post.id).join(","),
+    [posts],
+  );
   // IntersectionObserver: keep selectedPostId in sync with whichever slide
   // is currently filling the viewport.
   useEffect(() => {
     const root = scrollContainerRef.current;
-    if (!root || posts.length === 0) {
+    if (!root || slideIdsKey.length === 0) {
       return;
     }
 
@@ -263,20 +272,38 @@ export function DesktopChannelsWorkspace({
 
     slideRefs.current.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [posts]);
+  }, [slideIdsKey]);
 
-  // When routeSelectedPostId changes (e.g. opened via #post=xxx),
-  // scroll the matching slide into view.
+  // 走查 2026-05-17 新会话 R2：原依赖 [routeSelectedPostId, posts]——每次
+  // 用户在桌面端点赞 / 收藏 / 关注 → ChannelsPage setQueryData → posts 是新
+  // 数组 → 这条 effect 又 fire → scrollIntoView(routeSelectedPostId) 把用户拽
+  // 回最初进入 channels 时的那条 slide。用户已经滑了几屏到第 5 张，一点赞就
+  // 被甩回第 1 张，体感「这个页面在跟我抢滚动控制权」。和移动端 R 同款思路：
+  // 用 scrolledRouteIdRef 记录"这个 route id 我已经滚到过了"，posts 后续变化
+  // 不重滚；只在 routeSelectedPostId 变 / 或目标 post 首次出现在 posts 里时
+  // 尝试一次。
+  const scrolledRouteIdRef = useRef<string | null>(null);
+  const hasRouteTargetInPosts = routeSelectedPostId
+    ? posts.some((post) => post.id === routeSelectedPostId)
+    : false;
   useEffect(() => {
     if (!routeSelectedPostId) {
+      scrolledRouteIdRef.current = null;
+      return;
+    }
+    if (scrolledRouteIdRef.current === routeSelectedPostId) {
+      return;
+    }
+    if (!hasRouteTargetInPosts) {
       return;
     }
 
     const node = slideRefs.current.get(routeSelectedPostId);
     if (node) {
       node.scrollIntoView({ behavior: "auto", block: "start" });
+      scrolledRouteIdRef.current = routeSelectedPostId;
     }
-  }, [routeSelectedPostId, posts]);
+  }, [routeSelectedPostId, hasRouteTargetInPosts]);
 
   // Esc closes whichever overlay is on top (drawer first, then author panel).
   useEffect(() => {
