@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
@@ -60,11 +60,12 @@ import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { buildPublicShareUrl } from "../lib/share-url";
 import { buildYinjieId } from "../lib/yinjie-id";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   translateCharacterActivity,
   translateCharacterBio,
@@ -121,7 +122,11 @@ async function buildDesktopContactsRouteHashOnDemand(input: {
 }
 
 export function CharacterDetailPage() {
-  const t = translateRuntimeMessage;
+  // 走查新 R5：原来用静态 translateRuntimeMessage，不订阅 locale。用户在这页时
+  // 切换语言（设置 → 语言）→ 整页 t(msg`xxx`) 表达式卡在旧 locale，直到下一次
+  // 因别的 state 推渲染才补上。chat-details-page (L96) 已经在用 useRuntimeTranslator
+  // 解决同样问题（背后 deps 列了 activationVersion + locale）。
+  const t = useRuntimeTranslator();
   const { characterId } = useParams({ from: "/character/$characterId" });
   const navigate = useNavigate();
   const pathname = useRouterState({
@@ -518,6 +523,42 @@ export function CharacterDetailPage() {
     });
   }, [characterId, friendship?.remarkName, friendshipTagsKey, isEditingProfile]);
 
+  // 走查新 R6：entryNotice（数字人入口提示）在页面顶部 inline 渲染，但用户触发
+  // 它的「视频通话」按钮在底部 action bar。底部点视频通话 → sheet 关掉 + entryNotice
+  // 出现在顶部 → 用户当前在底部根本看不到。当前 mock_iframe 模式下每次点视频通话
+  // 都会触发这条 notice，UX 影响实在。notice 出现就滚到它，让用户能看到。
+  const entryNoticeRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!entryNotice || !entryNoticeRef.current) {
+      return;
+    }
+    entryNoticeRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [entryNotice]);
+
+  // 走查新 R2：用户在备注/标签 inline 表单里输到一半按 Android 硬件返回 → 默认
+  // history.back 直接走出 /character/$id，没保存的输入丢光。MobileDetailsActionSheet
+  // 那条交互一直有同款 interceptor（mobile-details-action-sheet.tsx L39-L49）。
+  // 这里补上：表单打开时吃掉一次 back，关表单并把 form 重置回服务器值；用户再按
+  // 一次才真的退页。
+  useEffect(() => {
+    if (!isEditingProfile) {
+      return;
+    }
+    const unregister = registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      setIsEditingProfile(false);
+      setProfileForm({
+        remarkName: friendship?.remarkName ?? "",
+        tags: friendshipTagsKey,
+      });
+      return true;
+    });
+    return unregister;
+  }, [isEditingProfile, friendship?.remarkName, friendshipTagsKey]);
+
   // 走查 R4：getOrCreateConversation 后端有两个会改 conversation 行的副作用：
   // (a) 第一次跟某角色聊天会 INSERT 一条新 direct conversation；(b) 用户之前
   // 从 /chat 列表 hide 过的会话，再次 getOr* 会把 isHidden 翻回 false 并清
@@ -829,6 +870,18 @@ export function CharacterDetailPage() {
   }, [characterId]);
 
   const handleBack = () => {
+    // 走查新 R3：跟新 R2 的 Android back interceptor 对齐 —— 用户在 inline 备注/
+    // 标签表单输到一半点左上角箭头，跟硬件返回是同一份心智模型，应该先收回表单
+    // 不丢输入。Android back 走 registerAndroidBackInterceptor 自动收，软件按钮
+    // 走这里手动收一次再返回。
+    if (isEditingProfile) {
+      setIsEditingProfile(false);
+      setProfileForm({
+        remarkName: friendship?.remarkName ?? "",
+        tags: friendshipTagsKey,
+      });
+      return;
+    }
     const expectedPreviousPath = safeMobileReturnPath ?? "/tabs/contacts";
     navigateBackOrFallback(
       () => {
@@ -904,8 +957,13 @@ export function CharacterDetailPage() {
 
     const profilePath = `/character/${character.id}`;
     const profileUrl = buildPublicShareUrl(profilePath);
+    // 走查新 R4：原来分享 title/summary 用 displayName，但 displayName =
+    // remarkName || character.name —— 用户把对方备注成「妈妈」之后分享出去，
+    // 对方收到的是「妈妈 的隐界名片」，根本不知道是谁。备注是 viewer-local
+    // 概念，对外分享必须用 character 的真实 name。
+    const shareDisplayName = character.name || displayName;
     const profileSummary = [
-      t(msg`${displayName} 的隐界名片`),
+      t(msg`${shareDisplayName} 的隐界名片`),
       character.relationship?.trim() || worldContactLabel,
       t(msg`隐界号：${buildYinjieId(character.id)}`),
       profileUrl,
@@ -913,7 +971,7 @@ export function CharacterDetailPage() {
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
-        title: t(msg`${displayName} 的隐界名片`),
+        title: t(msg`${shareDisplayName} 的隐界名片`),
         text: profileSummary,
         url: profileUrl,
       });
@@ -1178,7 +1236,10 @@ export function CharacterDetailPage() {
               </div>
             ) : null}
             {entryNotice ? (
-              <div className="mx-auto w-full max-w-[640px] px-3">
+              <div
+                ref={entryNoticeRef}
+                className="mx-auto w-full max-w-[640px] px-3"
+              >
                 <DigitalHumanEntryNotice
                   tone={entryNotice.tone}
                   message={entryNotice.message}
@@ -1498,32 +1559,34 @@ export function CharacterDetailPage() {
               </InlineNotice>
             ) : null}
             {entryNotice ? (
-              <DigitalHumanEntryNotice
-                tone={entryNotice.tone}
-                message={entryNotice.message}
-                onDismiss={() => {
-                  resetEntryGuard();
-                }}
-                onContinue={() => {
-                  resetEntryGuard();
-                  openCallMutation.mutate("video");
-                }}
-                onSwitchToVoice={() => {
-                  resetEntryGuard();
-                  openCallMutation.mutate("voice");
-                }}
-                continueLabel={
-                  openCallMutation.isPending
-                    ? videoConnectingLabel
-                    : entryNotice.continueLabel
-                }
-                voiceLabel={
-                  openCallMutation.isPending
-                    ? voiceConnectingLabel
-                    : entryNotice.voiceLabel
-                }
-                compact={!isDesktopLayout}
-              />
+              <div ref={entryNoticeRef}>
+                <DigitalHumanEntryNotice
+                  tone={entryNotice.tone}
+                  message={entryNotice.message}
+                  onDismiss={() => {
+                    resetEntryGuard();
+                  }}
+                  onContinue={() => {
+                    resetEntryGuard();
+                    openCallMutation.mutate("video");
+                  }}
+                  onSwitchToVoice={() => {
+                    resetEntryGuard();
+                    openCallMutation.mutate("voice");
+                  }}
+                  continueLabel={
+                    openCallMutation.isPending
+                      ? videoConnectingLabel
+                      : entryNotice.continueLabel
+                  }
+                  voiceLabel={
+                    openCallMutation.isPending
+                      ? voiceConnectingLabel
+                      : entryNotice.voiceLabel
+                  }
+                  compact={!isDesktopLayout}
+                />
+              </div>
             ) : null}
             {friendsQuery.isError && friendsQuery.error instanceof Error ? (
               isDesktopLayout ? (
@@ -1785,7 +1848,16 @@ export function CharacterDetailPage() {
                         handleAddToContacts();
                       }}
                       className="h-11 rounded-[12px] bg-[#07c160] text-[15px] text-white shadow-none hover:bg-[#06ad56]"
+                      // 走查新 R1：disabled 没把 friendsQuery.isLoading 算进去。
+                      // characterQuery 命中缓存秒回时底部 bar 已经渲染，friendsQuery
+                      // 还在拉就 isAlreadyFriend=false 走非好友 layout，按钮显示
+                      // 「添加到通讯录」enabled。用户抢着点 → 后端 sendFriendRequest
+                      // 给已经是好友的 character 又创建一条 friend_request 行 +
+                      // cyber_avatar 一条 friend_request_auto_accept signal（虽然
+                      // activateFriendship 看到 status 已经是 'friend' 不会改 DB，
+                      // 但 audit 流水照样污染）。等 friendsQuery 回来再放行。
                       disabled={
+                        friendsQuery.isLoading ||
                         isBlocked ||
                         hasOutboundFriendRequest ||
                         (sendFriendRequestMutation.isPending &&
@@ -2164,7 +2236,13 @@ export function CharacterDetailPage() {
                           ? sendingLabel
                           : addToContactsLabel
                 }
+                // 走查新 R1：见上方 desktop add-button 的注释 —— characterQuery
+                // 缓存命中时底部 bar 就渲染，friendsQuery 还在拉就让 isAlreadyFriend
+                // 默认 false 走非好友 layout，按钮 enabled 给用户抢点的机会，给
+                // 已经是好友的 character 又发一次 friend_request。等 friendsQuery
+                // 回来再放行。
                 disabled={
+                  friendsQuery.isLoading ||
                   isBlocked ||
                   hasOutboundFriendRequest ||
                   (sendFriendRequestMutation.isPending &&
