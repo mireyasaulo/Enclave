@@ -149,15 +149,19 @@ export function computeCarRatePerMinuteCents(opts: {
   surface: ParkingWarLotSurface;
   lotMultiplierBp: number;
 }): number {
+  // 分步乘除避免 4 次连乘超过 Number.MAX_SAFE_INTEGER（2^53）。
   const base = PARKING_WAR_CAR_BASE_RATE_PER_MINUTE_CENTS[opts.tier];
   const rarityBp = PARKING_WAR_RARITY_MULTIPLIER_BP[opts.rarity];
   const surfaceBp = PARKING_WAR_SURFACE_MULTIPLIER_BP[opts.surface];
   const levelBonusBp =
-    10_000 + Math.max(0, opts.level - 1) * PARKING_WAR_CAR_LEVEL_BONUS_PER_LEVEL_BP;
-  const rate =
-    (base * rarityBp * surfaceBp * levelBonusBp * opts.lotMultiplierBp) /
-    10_000 ** 4;
-  return Math.max(0, Math.round(rate));
+    10_000 +
+    Math.max(0, opts.level - 1) * PARKING_WAR_CAR_LEVEL_BONUS_PER_LEVEL_BP;
+  let acc = base * 1_000_000; // 乘 10^6 提精度
+  acc = (acc * rarityBp) / 10_000;
+  acc = (acc * surfaceBp) / 10_000;
+  acc = (acc * levelBonusBp) / 10_000;
+  acc = (acc * opts.lotMultiplierBp) / 10_000;
+  return Math.max(0, Math.round(acc / 1_000_000));
 }
 
 export function computeCarUpgradeCostCents(level: number): number {

@@ -146,7 +146,11 @@ export function ProfilePage() {
               <div className="truncate text-[17px] font-medium text-[color:var(--text-primary)]">
                 {username?.trim() || t(msg`世界主人`)}
               </div>
-              {username ? (
+              {username?.trim() ? (
+                // 走查 R1：gate 用裸 username 时遇 legacy username = "   "（全空白），
+                // 名字行 trim 后回落到 t("世界主人") fallback，chip 仍然显示 t("世界主人")
+                // → 同一行出现两个相同字样，视觉上像 chip bug。改成 username?.trim() 跟
+                // 名字行的 fallback 判定口径对齐：只有真的有名字才显示 chip。
                 // shrink-0 + whitespace-nowrap：用户起了 20 字超长 username 时
                 // 父 flex 会把 chip 一起压缩，原本是单行的「世界主人」chip 会被
                 // 挤成「世界 / 主人」两行，视觉破。这里把 chip 钉成不可压缩 +

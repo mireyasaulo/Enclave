@@ -1,5 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
+  HttpStatus,
   Injectable,
   Logger,
   OnModuleInit,
@@ -7,22 +8,34 @@ import {
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { randomUUID } from 'node:crypto';
+import { AppError } from '../../../common/app-error.exception';
 import { WorldOwnerService } from '../../auth/world-owner.service';
 import { ParkingWarPlayerStateEntity } from './entities/parking-war-player-state.entity';
 import { ParkingWarOccupancyEntity } from './entities/parking-war-occupancy.entity';
+import { ParkingWarEventService } from './parking-war-event.service';
 import {
+  computeCarBuyPriceCents,
+  computeCarRatePerMinuteCents,
+  computeCarUpgradeCostCents,
   PARKING_WAR_CAR_DEFAULT_DURABILITY,
+  PARKING_WAR_CAR_MAX_LEVEL,
+  PARKING_WAR_CAR_REPAIR_COST_PER_POINT_CENTS,
   PARKING_WAR_DEFAULT_BALANCE_CENTS,
   PARKING_WAR_DEFAULT_GARAGE_SLOTS,
   PARKING_WAR_DEFAULT_LOT_MULTIPLIER_BP,
   PARKING_WAR_DEFAULT_LOT_SIZE,
   PARKING_WAR_DEFAULT_LOT_SURFACE,
+  PARKING_WAR_OFFLINE_CATCHUP_CAP_MS,
+  PARKING_WAR_PLAYER_ACTOR_ID,
 } from './parking-war.constants';
 import type {
+  ParkingWarCarTier,
+  ParkingWarCollectResult,
   ParkingWarHomeSlot,
   ParkingWarOccupancyView,
   ParkingWarOwnedCar,
   ParkingWarPlayerStateView,
+  ParkingWarRarity,
 } from './parking-war.types';
 
 @Injectable()
@@ -37,6 +50,7 @@ export class ParkingWarStateService implements OnModuleInit {
     @InjectDataSource()
     private readonly dataSource: DataSource,
     private readonly worldOwnerService: WorldOwnerService,
+    private readonly eventService: ParkingWarEventService,
   ) {}
 
   /**
@@ -69,6 +83,10 @@ export class ParkingWarStateService implements OnModuleInit {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     return owner.id;
   }
+
+  // ============================================================
+  // Init / Read
+  // ============================================================
 
   async getOrCreatePlayerState(
     ownerId: string,
@@ -104,21 +122,506 @@ export class ParkingWarStateService implements OnModuleInit {
       lotMultiplierBp: PARKING_WAR_DEFAULT_LOT_MULTIPLIER_BP,
       ownedCarsPayload: ownedCars,
       homeSlotsPayload: homeSlots,
-      lastTickAt: null,
+      lastTickAt: new Date(),
       lastDailyBonusKey: null,
       streakDays: 0,
       dailyTasksPayload: null,
       dailyShieldRemaining: 0,
     });
-    return this.playerRepo.save(state);
+    state = await this.playerRepo.save(state);
+
+    // 自动把起步车停进 slot 0，开始挂机产钱
+    try {
+      await this.parkOwnedCarAtHomeInternal(state, starterCarId, 0);
+      // re-read after side-effects
+      state = (await this.playerRepo.findOneBy({ ownerId })) ?? state;
+    } catch (error) {
+      this.logger.warn(
+        `parking-war auto-park starter car failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+    return state;
   }
 
   async getPlayerStateView(
     ownerId: string,
   ): Promise<ParkingWarPlayerStateView> {
     const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
     return this.toPlayerView(state);
   }
+
+  // ============================================================
+  // Tick / Collect
+  // ============================================================
+
+  /**
+   * 推进玩家自家车位上所有 occupancy 的 pendingEarnings。Stage 2 只处理 home，
+   * 不区分访客是自己还是 NPC（Stage 3 起 NPC visitor 会被 tick service 推进）。
+   *
+   * 离线补算：lastTickAt 到 now 的时间窗口被夹到 OFFLINE_CATCHUP_CAP_MS。
+   */
+  async tickPlayerHomeOccupancies(
+    state: ParkingWarPlayerStateEntity,
+    nowMs: number = Date.now(),
+  ): Promise<void> {
+    const lastTickMs = state.lastTickAt?.getTime() ?? nowMs;
+    const rawDelta = Math.max(0, nowMs - lastTickMs);
+    const cappedDelta = Math.min(rawDelta, PARKING_WAR_OFFLINE_CATCHUP_CAP_MS);
+    if (cappedDelta <= 0) {
+      state.lastTickAt = new Date(nowMs);
+      await this.playerRepo.save(state);
+      return;
+    }
+
+    const occupancies = await this.occupancyRepo.find({
+      where: { lotOwnerKind: 'player', lotOwnerId: state.ownerId },
+    });
+    if (occupancies.length === 0) {
+      state.lastTickAt = new Date(nowMs);
+      await this.playerRepo.save(state);
+      return;
+    }
+
+    for (const occ of occupancies) {
+      const ratePerMinute = computeCarRatePerMinuteCents({
+        tier: occ.carTier,
+        rarity: occ.carRarity,
+        level: occ.carLevel,
+        surface: state.lotSurface,
+        lotMultiplierBp: state.lotMultiplierBp,
+      });
+      const minutes = cappedDelta / 60_000;
+      const delta = Math.round(ratePerMinute * minutes);
+      if (delta > 0) {
+        occ.pendingEarningsCents += delta;
+      }
+    }
+    if (occupancies.length > 0) {
+      await this.occupancyRepo.save(occupancies);
+    }
+    state.lastTickAt = new Date(nowMs);
+    await this.playerRepo.save(state);
+  }
+
+  async collectFromSlot(
+    ownerId: string,
+    slotIndex?: number,
+  ): Promise<ParkingWarCollectResult> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
+
+    const where =
+      slotIndex == null
+        ? { lotOwnerKind: 'player' as const, lotOwnerId: ownerId }
+        : {
+            lotOwnerKind: 'player' as const,
+            lotOwnerId: ownerId,
+            slotIndex,
+          };
+    const occupancies = await this.occupancyRepo.find({ where });
+    if (occupancies.length === 0) {
+      throw new AppError('PARKING_WAR_NOTHING_TO_COLLECT', {
+        legacyMessage: '车位上没有可收的车',
+      });
+    }
+
+    let gained = 0;
+    for (const occ of occupancies) {
+      // 自己停自己家：100% 入自己钱包；
+      // Stage 3 起 NPC 访客停玩家家时，玩家不直接收，而是等被贴条/拖车才能从访客身上抽
+      if (occ.visitorKind === 'player' && occ.visitorId === ownerId) {
+        gained += occ.pendingEarningsCents;
+        occ.pendingEarningsCents = 0;
+      }
+    }
+    if (gained === 0) {
+      throw new AppError('PARKING_WAR_NOTHING_TO_COLLECT', {
+        legacyMessage: '车位上没有可收的车',
+      });
+    }
+    await this.occupancyRepo.save(occupancies);
+
+    state.balanceCents += gained;
+    state.totalEarnedCents += gained;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'collect',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: gained,
+      payload: { slotIndex: slotIndex ?? null },
+    });
+
+    return { view: await this.toPlayerView(state), gainedCents: gained };
+  }
+
+  // ============================================================
+  // Park / Recall (home only — Stage 3 adds neighbor variant)
+  // ============================================================
+
+  async parkOwnedCarAtHome(
+    ownerId: string,
+    carId: string,
+    slotIndex: number,
+  ): Promise<ParkingWarPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
+    await this.parkOwnedCarAtHomeInternal(state, carId, slotIndex);
+    const refreshed =
+      (await this.playerRepo.findOneBy({ ownerId })) ?? state;
+    return this.toPlayerView(refreshed);
+  }
+
+  private async parkOwnedCarAtHomeInternal(
+    state: ParkingWarPlayerStateEntity,
+    carId: string,
+    slotIndex: number,
+  ): Promise<void> {
+    const cars = [...(state.ownedCarsPayload ?? [])];
+    const carIdx = cars.findIndex((c) => c.carId === carId);
+    if (carIdx < 0) {
+      throw new AppError('PARKING_WAR_CAR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '找不到这辆车',
+      });
+    }
+    const car = cars[carIdx];
+    if (car.parkedRef) {
+      throw new AppError('PARKING_WAR_CAR_ALREADY_PARKED', {
+        legacyMessage: '该车已停在外面，无法再停',
+      });
+    }
+    const nowMs = Date.now();
+    if (car.unavailableUntilMs && car.unavailableUntilMs > nowMs) {
+      throw new AppError('PARKING_WAR_CAR_COOLDOWN', {
+        legacyMessage: '该车被拖走后正在冷却',
+      });
+    }
+    const homeSlots = [
+      ...(state.homeSlotsPayload ??
+        Array.from({ length: state.lotSize }, (_, i) => ({
+          index: i,
+          occupancyId: null,
+        }))),
+    ];
+    if (slotIndex < 0 || slotIndex >= homeSlots.length) {
+      throw new AppError('PARKING_WAR_SLOT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '车位不存在',
+      });
+    }
+    if (homeSlots[slotIndex].occupancyId) {
+      throw new AppError('PARKING_WAR_SLOT_OCCUPIED', {
+        legacyMessage: '车位已被占',
+      });
+    }
+
+    const occupancy = this.occupancyRepo.create({
+      lotOwnerKind: 'player',
+      lotOwnerId: state.ownerId,
+      slotIndex,
+      visitorKind: 'player',
+      visitorId: state.ownerId,
+      carId,
+      carTier: car.tier,
+      carRarity: car.rarity,
+      carLevel: car.level,
+      carPaintIndex: car.paintIndex,
+      carPlate: car.plate ?? null,
+      parkedAtMs: nowMs,
+      pendingEarningsCents: 0,
+      warningLevel: 0,
+    });
+    const saved = await this.occupancyRepo.save(occupancy);
+
+    homeSlots[slotIndex] = { index: slotIndex, occupancyId: saved.id };
+    cars[carIdx] = {
+      ...car,
+      parkedRef: {
+        occupancyId: saved.id,
+        lotOwnerKind: 'player',
+        lotOwnerId: state.ownerId,
+        slotIndex,
+        parkedAtMs: nowMs,
+      },
+    };
+    state.homeSlotsPayload = homeSlots;
+    state.ownedCarsPayload = cars;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId: state.ownerId,
+      kind: 'park',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      targetKind: 'player',
+      targetId: state.ownerId,
+      targetName: '自家车场',
+      payload: { carId, slotIndex, atHome: true },
+    });
+  }
+
+  /**
+   * 召回 occupancy。Stage 2 只处理「自停自家」的场景；
+   * Stage 3 会接管访客停 NPC 家的 70/30 分账。
+   */
+  async recallOccupancy(
+    ownerId: string,
+    occupancyId: string,
+  ): Promise<ParkingWarPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
+
+    const occ = await this.occupancyRepo.findOneBy({ id: occupancyId });
+    if (!occ) {
+      throw new AppError('PARKING_WAR_OCCUPANCY_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '车辆已不在车位上',
+      });
+    }
+    if (!(occ.visitorKind === 'player' && occ.visitorId === ownerId)) {
+      throw new AppError('PARKING_WAR_NOT_YOUR_CAR', {
+        status: HttpStatus.FORBIDDEN,
+        legacyMessage: '只能召回自己的车',
+      });
+    }
+
+    // pending 直接进玩家钱包（自停自家场景）
+    const gained = occ.pendingEarningsCents;
+    state.balanceCents += gained;
+    state.totalEarnedCents += gained;
+
+    // 把车从 OwnedCar 上解绑、清空 home 槽位
+    const cars = (state.ownedCarsPayload ?? []).map((c) =>
+      c.carId === occ.carId ? { ...c, parkedRef: null } : c,
+    );
+    state.ownedCarsPayload = cars;
+    if (occ.lotOwnerKind === 'player' && occ.lotOwnerId === ownerId) {
+      const homeSlots = (state.homeSlotsPayload ?? []).map((s) =>
+        s.index === occ.slotIndex ? { ...s, occupancyId: null } : s,
+      );
+      state.homeSlotsPayload = homeSlots;
+    }
+
+    await this.occupancyRepo.delete({ id: occupancyId });
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'recall',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: gained,
+      payload: { carId: occ.carId, slotIndex: occ.slotIndex },
+    });
+
+    return this.toPlayerView(state);
+  }
+
+  // ============================================================
+  // Garage: buy / upgrade / paint / repair
+  // ============================================================
+
+  async buyCar(
+    ownerId: string,
+    tier: ParkingWarCarTier,
+    rarity: ParkingWarRarity,
+  ): Promise<ParkingWarPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
+
+    const cars = [...(state.ownedCarsPayload ?? [])];
+    if (cars.length >= state.garageSlots) {
+      throw new AppError('PARKING_WAR_GARAGE_FULL', {
+        legacyMessage: '车库已满，先升级车库或卖车',
+      });
+    }
+    const price = computeCarBuyPriceCents(tier, rarity);
+    if (state.balanceCents < price) {
+      throw new AppError('PARKING_WAR_INSUFFICIENT_BALANCE', {
+        params: { required: price, balance: state.balanceCents },
+        legacyMessage: '余额不足',
+      });
+    }
+
+    const newCar: ParkingWarOwnedCar = {
+      carId: randomUUID(),
+      tier,
+      rarity,
+      level: 1,
+      paintIndex: 0,
+      durability: PARKING_WAR_CAR_DEFAULT_DURABILITY,
+      plate: null,
+      parkedRef: null,
+      unavailableUntilMs: null,
+    };
+    cars.push(newCar);
+    state.ownedCarsPayload = cars;
+    state.balanceCents -= price;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'buy_car',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: -price,
+      payload: { tier, rarity, carId: newCar.carId },
+    });
+    return this.toPlayerView(state);
+  }
+
+  async upgradeCar(
+    ownerId: string,
+    carId: string,
+  ): Promise<ParkingWarPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
+
+    const cars = [...(state.ownedCarsPayload ?? [])];
+    const idx = cars.findIndex((c) => c.carId === carId);
+    if (idx < 0) {
+      throw new AppError('PARKING_WAR_CAR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '找不到这辆车',
+      });
+    }
+    const car = cars[idx];
+    if (car.level >= PARKING_WAR_CAR_MAX_LEVEL) {
+      throw new AppError('PARKING_WAR_CAR_MAX_LEVEL', {
+        legacyMessage: '该车已满级',
+      });
+    }
+    const cost = computeCarUpgradeCostCents(car.level);
+    if (state.balanceCents < cost) {
+      throw new AppError('PARKING_WAR_INSUFFICIENT_BALANCE', {
+        params: { required: cost, balance: state.balanceCents },
+        legacyMessage: '余额不足',
+      });
+    }
+    cars[idx] = { ...car, level: car.level + 1 };
+    state.ownedCarsPayload = cars;
+    state.balanceCents -= cost;
+
+    // 升级后同步在场 occupancy 的 carLevel（确保收益马上生效）
+    if (car.parkedRef) {
+      await this.occupancyRepo.update(
+        { id: car.parkedRef.occupancyId },
+        { carLevel: car.level + 1 },
+      );
+    }
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'upgrade_car',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: -cost,
+      payload: { carId, newLevel: car.level + 1 },
+    });
+    return this.toPlayerView(state);
+  }
+
+  async paintCar(
+    ownerId: string,
+    carId: string,
+    paintIndex: number,
+  ): Promise<ParkingWarPlayerStateView> {
+    if (!Number.isInteger(paintIndex) || paintIndex < 0 || paintIndex > 2) {
+      throw new AppError('PARKING_WAR_INVALID_PAINT_INDEX', {
+        legacyMessage: 'paintIndex 仅支持 0/1/2',
+      });
+    }
+    const state = await this.getOrCreatePlayerState(ownerId);
+    const cars = [...(state.ownedCarsPayload ?? [])];
+    const idx = cars.findIndex((c) => c.carId === carId);
+    if (idx < 0) {
+      throw new AppError('PARKING_WAR_CAR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '找不到这辆车',
+      });
+    }
+    cars[idx] = { ...cars[idx], paintIndex };
+    state.ownedCarsPayload = cars;
+
+    const parkedRef = cars[idx].parkedRef;
+    if (parkedRef) {
+      await this.occupancyRepo.update(
+        { id: parkedRef.occupancyId },
+        { carPaintIndex: paintIndex },
+      );
+    }
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'paint_car',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      payload: { carId, paintIndex },
+    });
+    return this.toPlayerView(state);
+  }
+
+  async repairCar(
+    ownerId: string,
+    carId: string,
+  ): Promise<ParkingWarPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    const cars = [...(state.ownedCarsPayload ?? [])];
+    const idx = cars.findIndex((c) => c.carId === carId);
+    if (idx < 0) {
+      throw new AppError('PARKING_WAR_CAR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '找不到这辆车',
+      });
+    }
+    const car = cars[idx];
+    const missing = PARKING_WAR_CAR_DEFAULT_DURABILITY - car.durability;
+    if (missing <= 0) {
+      throw new AppError('PARKING_WAR_CAR_FULLY_REPAIRED', {
+        legacyMessage: '该车耐久已满',
+      });
+    }
+    const cost = missing * PARKING_WAR_CAR_REPAIR_COST_PER_POINT_CENTS;
+    if (state.balanceCents < cost) {
+      throw new AppError('PARKING_WAR_INSUFFICIENT_BALANCE', {
+        params: { required: cost, balance: state.balanceCents },
+        legacyMessage: '余额不足',
+      });
+    }
+    cars[idx] = { ...car, durability: PARKING_WAR_CAR_DEFAULT_DURABILITY };
+    state.ownedCarsPayload = cars;
+    state.balanceCents -= cost;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'repair_car',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: -cost,
+      payload: { carId, restoredPoints: missing },
+    });
+    return this.toPlayerView(state);
+  }
+
+  // ============================================================
+  // View
+  // ============================================================
 
   private async toPlayerView(
     state: ParkingWarPlayerStateEntity,

@@ -411,6 +411,13 @@ export function ProfileInfoAvatarPage() {
     // 同步回 initialDraft，让 X 真正意义上"取消"这次操作。
     // 第 2 轮新走查 W2R2.1 代码 review 实测命中。
     setDraft(initialDraft);
+    // 走查 R1：用户「选图 → 完成失败（banner 红字）→ X 取消」后，errorMessage
+    // 仍 fallthrough 到 saveMutation.isError / resetMutation.isError 这一支挂着
+    // 上次 attempt 的红字，视觉上「我撤销了刚才那次选择 + 那次保存」但底部
+    // 依旧挂着旧错误。跟 handlePickAvatar / URL onChange 两条路径已经做的 .reset()
+    // 不一致——X 取消本质也是「这次 attempt 翻篇」，对齐 reset。
+    saveMutation.reset();
+    resetMutation.reset();
   }
 
   if (isDesktopLayout) {
