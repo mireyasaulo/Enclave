@@ -14,6 +14,25 @@ type ConversationPreviewOptions = {
   emptyText?: string;
 };
 
+// 2026-05-17 R1：服务端 normalizeLegacyConversationEntity 在 direct 会话
+// title 全部 fallback 都失败时，写入字面量 '未知联系人' / 'Direct conversation'
+// 并持久化到 ConversationEntity.title。客户端切到 en/ja/ko 时，这些字面量
+// 不会被任何 i18n catalog 命中，UI 上仍然渲染原始中文，违反"语言偏好立即生效"
+// 的契约。服务端不知道当前用户的 locale，只能写一个稳定占位；这里在客户端
+// 渲染时统一把这两个 sentinel 翻译成当前 locale。
+const LEGACY_UNKNOWN_CONTACT_TITLE = "未知联系人";
+const LEGACY_DIRECT_CONVERSATION_TITLE = "Direct conversation";
+
+export function getConversationDisplayTitle(title: string): string {
+  if (title === LEGACY_UNKNOWN_CONTACT_TITLE) {
+    return translateRuntimeMessage(msg`未知联系人`);
+  }
+  if (title === LEGACY_DIRECT_CONVERSATION_TITLE) {
+    return translateRuntimeMessage(msg`私聊会话`);
+  }
+  return title;
+}
+
 export function getConversationVisibleLastMessage(
   conversation: ConversationListItem,
   localMessageActionState: LocalChatMessageActionState,

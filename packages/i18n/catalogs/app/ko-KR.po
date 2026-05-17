@@ -129,7 +129,7 @@ msgstr "채팅으로 전달"
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:472
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:225
 #: apps/app/src/routes/channels-page.tsx:3876
-#: apps/app/src/routes/character-detail-page.tsx:363
+#: apps/app/src/routes/character-detail-page.tsx:364
 #: apps/app/src/routes/contacts-page.tsx:2541
 #: apps/app/src/routes/contacts-page.tsx:2543
 #: apps/app/src/routes/mobile-add-friend-page.tsx:541
@@ -792,7 +792,7 @@ msgstr "원본으로 보내기 (Cmd/Ctrl+Enter)"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:114
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:169
 #: apps/app/src/routes/channels-page.tsx:3915
-#: apps/app/src/routes/character-detail-page.tsx:355
+#: apps/app/src/routes/character-detail-page.tsx:356
 #: apps/app/src/routes/discover-page.tsx:1071
 #: apps/app/src/routes/mobile-add-friend-page.tsx:899
 #: apps/app/src/routes/welcome-page.tsx:1184
@@ -1004,8 +1004,8 @@ msgstr "복사에 실패했습니다. 잠시 후 다시 시도하세요."
 #: apps/app/src/components/official-article-viewer.tsx:97
 #: apps/app/src/components/official-article-viewer.tsx:123
 #: apps/app/src/i18n/static-dom-seed.ts:879
-#: apps/app/src/routes/character-detail-page.tsx:941
-#: apps/app/src/routes/character-detail-page.tsx:965
+#: apps/app/src/routes/character-detail-page.tsx:942
+#: apps/app/src/routes/character-detail-page.tsx:966
 #: apps/app/src/routes/chat-details-page.tsx:398
 #: apps/app/src/routes/chat-details-page.tsx:422
 #: apps/app/src/routes/discover-feed-page.tsx:1664
@@ -1064,7 +1064,7 @@ msgstr "위치 정보가 복사되었습니다."
 #: apps/app/src/components/mobile-document-shell.tsx:63
 #: apps/app/src/components/official-article-viewer.tsx:144
 #: apps/app/src/i18n/static-dom-seed.ts:875
-#: apps/app/src/routes/character-detail-page.tsx:923
+#: apps/app/src/routes/character-detail-page.tsx:924
 #: apps/app/src/routes/chat-details-page.tsx:380
 #: apps/app/src/routes/discover-feed-page.tsx:1652
 #: apps/app/src/routes/games-page.tsx:437
@@ -1086,7 +1086,7 @@ msgstr "시스템 공유 패널을 열었습니다."
 #: apps/app/src/components/mobile-document-shell.tsx:77
 #: apps/app/src/components/official-article-viewer.tsx:93
 #: apps/app/src/i18n/static-dom-seed.ts:876
-#: apps/app/src/routes/character-detail-page.tsx:937
+#: apps/app/src/routes/character-detail-page.tsx:938
 #: apps/app/src/routes/chat-details-page.tsx:394
 #: apps/app/src/routes/discover-feed-page.tsx:1671
 #: apps/app/src/routes/games-page.tsx:449
@@ -1116,8 +1116,8 @@ msgstr "이 기기에서는 지금 시스템 공유를 열 수 없습니다. 잠
 #: apps/app/src/components/official-article-viewer.tsx:123
 #: apps/app/src/components/official-article-viewer.tsx:151
 #: apps/app/src/i18n/static-dom-seed.ts:878
-#: apps/app/src/routes/character-detail-page.tsx:940
-#: apps/app/src/routes/character-detail-page.tsx:964
+#: apps/app/src/routes/character-detail-page.tsx:941
+#: apps/app/src/routes/character-detail-page.tsx:965
 #: apps/app/src/routes/chat-details-page.tsx:397
 #: apps/app/src/routes/chat-details-page.tsx:421
 #: apps/app/src/routes/discover-feed-page.tsx:1664
@@ -1152,7 +1152,7 @@ msgstr "시스템 공유를 일시적으로 사용할 수 없어 위치 내용�
 #: apps/app/src/components/mobile-document-shell.tsx:101
 #: apps/app/src/components/official-article-viewer.tsx:119
 #: apps/app/src/i18n/static-dom-seed.ts:882
-#: apps/app/src/routes/character-detail-page.tsx:961
+#: apps/app/src/routes/character-detail-page.tsx:962
 #: apps/app/src/routes/chat-details-page.tsx:418
 #: apps/app/src/routes/discover-feed-page.tsx:1697
 #: apps/app/src/routes/games-page.tsx:466
@@ -1167,7 +1167,7 @@ msgid "系统分享失败，请稍后重试。"
 msgstr "시스템 공유에 실패했습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/components/chat-message-list.tsx:1419
-#: apps/app/src/routes/character-detail-page.tsx:955
+#: apps/app/src/routes/character-detail-page.tsx:956
 msgid "名片摘要已复制。"
 msgstr "명함 요약을 복사했습니다."
 
@@ -1178,7 +1178,7 @@ msgstr "{0}의 Yinjie 명함"
 
 #: apps/app/src/components/chat-message-list.tsx:1458
 #: apps/app/src/i18n/static-dom-seed.ts:953
-#: apps/app/src/routes/character-detail-page.tsx:954
+#: apps/app/src/routes/character-detail-page.tsx:955
 msgid "系统分享暂时不可用，已复制名片摘要。"
 msgstr "시스템 공유를 지금은 사용할 수 없어 명함 요약을 복사했습니다."
 
@@ -1536,7 +1536,7 @@ msgstr "전체 선택 해제"
 #: apps/app/src/features/search/search-types.ts:117
 #: apps/app/src/features/search/use-search-index.ts:474
 #: apps/app/src/i18n/static-dom-seed.ts:64
-#: apps/app/src/routes/character-detail-page.tsx:328
+#: apps/app/src/routes/character-detail-page.tsx:329
 #: apps/app/src/routes/chat-details-page.tsx:325
 #: apps/app/src/routes/create-group-page.tsx:565
 #: apps/app/src/routes/group-member-picker-page.tsx:731
@@ -1611,7 +1611,7 @@ msgstr "내 정보"
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:107
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:299
 #: apps/app/src/features/games/parking-war/parking-war-engine.ts:602
-#: apps/app/src/lib/conversation-preview.ts:86
+#: apps/app/src/lib/conversation-preview.ts:105
 #: apps/app/src/routes/character-detail-page.tsx:135
 #: apps/app/src/routes/chat-details-page.tsx:117
 #: apps/app/src/routes/discover-page.tsx:477
@@ -1846,8 +1846,8 @@ msgstr "내일 {timeLabel}"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:880
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:374
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:566
-#: apps/app/src/lib/conversation-preview.ts:87
-#: apps/app/src/lib/conversation-preview.ts:123
+#: apps/app/src/lib/conversation-preview.ts:106
+#: apps/app/src/lib/conversation-preview.ts:142
 #: apps/app/src/routes/group-member-picker-page.tsx:238
 #: apps/app/src/routes/group-member-picker-page.tsx:248
 #: apps/app/src/routes/group-member-picker-page.tsx:731
@@ -2037,7 +2037,7 @@ msgstr "계속 대화"
 #: apps/app/src/components/chat-message-list.tsx:7387
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:622
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:663
-#: apps/app/src/routes/character-detail-page.tsx:319
+#: apps/app/src/routes/character-detail-page.tsx:320
 #: apps/app/src/routes/chat-details-page.tsx:308
 #: apps/app/src/routes/chat-details-page.tsx:328
 #: apps/app/src/routes/create-group-page.tsx:690
@@ -2227,7 +2227,7 @@ msgstr "시작자"
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:169
 #: apps/app/src/i18n/static-dom-seed.ts:163
 #: apps/app/src/i18n/static-dom-seed.ts:900
-#: apps/app/src/routes/character-detail-page.tsx:377
+#: apps/app/src/routes/character-detail-page.tsx:378
 #: apps/app/src/routes/live-companion-page.tsx:282
 msgid "当前状态"
 msgstr "현재 상태"
@@ -2283,7 +2283,7 @@ msgstr "명"
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:775
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1143
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:100
-#: apps/app/src/routes/character-detail-page.tsx:1102
+#: apps/app/src/routes/character-detail-page.tsx:1103
 #: apps/app/src/routes/desktop-mobile-page.tsx:359
 msgid "视频通话"
 msgstr "영상 통화"
@@ -2297,8 +2297,8 @@ msgstr "영상 통화"
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:775
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1143
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:88
-#: apps/app/src/routes/character-detail-page.tsx:351
-#: apps/app/src/routes/character-detail-page.tsx:1093
+#: apps/app/src/routes/character-detail-page.tsx:352
+#: apps/app/src/routes/character-detail-page.tsx:1094
 #: apps/app/src/routes/desktop-mobile-page.tsx:360
 msgid "语音通话"
 msgstr "음성 통화"
@@ -2400,7 +2400,7 @@ msgstr "제목 없는 메모"
 #: apps/app/src/features/search/mobile-search-workspace.tsx:231
 #: apps/app/src/routes/channel-author-page.tsx:391
 #: apps/app/src/routes/channels-page.tsx:1633
-#: apps/app/src/routes/character-detail-page.tsx:341
+#: apps/app/src/routes/character-detail-page.tsx:342
 #: apps/app/src/routes/create-group-page.tsx:393
 #: apps/app/src/routes/discover-feed-page.tsx:2101
 #: apps/app/src/routes/friend-requests-page.tsx:223
@@ -2897,7 +2897,7 @@ msgstr "도구 공유"
 #: apps/app/src/routes/channels-page.tsx:1716
 #: apps/app/src/routes/channels-page.tsx:1749
 #: apps/app/src/routes/channels-page.tsx:1808
-#: apps/app/src/routes/character-detail-page.tsx:342
+#: apps/app/src/routes/character-detail-page.tsx:343
 #: apps/app/src/routes/chat-background-page.tsx:372
 #: apps/app/src/routes/chat-background-page.tsx:404
 #: apps/app/src/routes/chat-background-page.tsx:426
@@ -3845,7 +3845,7 @@ msgstr "구름 종이 여백"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:185
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:189
 #: apps/app/src/features/subscription/subscription-panel.tsx:487
-#: apps/app/src/routes/character-detail-page.tsx:318
+#: apps/app/src/routes/character-detail-page.tsx:319
 #: apps/app/src/routes/chat-details-page.tsx:306
 #: apps/app/src/routes/group-chat-details-page.tsx:908
 #: apps/app/src/routes/profile-subscription-page.tsx:553
@@ -4144,7 +4144,7 @@ msgstr "전체 멤버"
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:650
 #: apps/app/src/features/search/mobile-search-workspace.tsx:344
 #: apps/app/src/routes/channels-page.tsx:1758
-#: apps/app/src/routes/character-detail-page.tsx:344
+#: apps/app/src/routes/character-detail-page.tsx:345
 #: apps/app/src/routes/chat-background-page.tsx:339
 #: apps/app/src/routes/chat-details-page.tsx:847
 #: apps/app/src/routes/chat-list-page.tsx:1141
@@ -4199,7 +4199,7 @@ msgstr "채팅 기록을 일시적으로 사용할 수 없습니다"
 #: apps/app/src/i18n/static-dom-seed.ts:39
 #: apps/app/src/routes/channel-author-page.tsx:427
 #: apps/app/src/routes/channels-page.tsx:1740
-#: apps/app/src/routes/character-detail-page.tsx:340
+#: apps/app/src/routes/character-detail-page.tsx:341
 #: apps/app/src/routes/chat-background-page.tsx:364
 #: apps/app/src/routes/chat-background-page.tsx:396
 #: apps/app/src/routes/chat-background-page.tsx:464
@@ -6075,15 +6075,15 @@ msgid "当前为移动群通话工作台"
 msgstr "현재 모바일 그룹 통화 워크스페이스입니다"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:939
+#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:257
+msgid "解除静音"
+msgstr "음소거 해제"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:939
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:486
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:257
 msgid "静音麦克风"
 msgstr "마이크 음소거"
-
-#: apps/app/src/features/chat/mobile-group-call-screen.tsx:939
-#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:257
-msgid "解除静音"
-msgstr "음소거 해제"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:949
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:498
@@ -7480,7 +7480,7 @@ msgstr "연락처 정보를 업데이트했습니다."
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:391
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1432
 #: apps/app/src/features/search/use-search-index.ts:444
-#: apps/app/src/routes/character-detail-page.tsx:1696
+#: apps/app/src/routes/character-detail-page.tsx:1697
 #: apps/app/src/routes/chat-details-page.tsx:306
 #: apps/app/src/routes/contacts-page.tsx:2952
 #: apps/app/src/routes/create-group-page.tsx:621
@@ -7498,7 +7498,7 @@ msgstr "닉네임: {0}"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:60
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:168
 #: apps/app/src/features/search/desktop-search-launcher.tsx:900
-#: apps/app/src/routes/character-detail-page.tsx:320
+#: apps/app/src/routes/character-detail-page.tsx:321
 #: apps/app/src/routes/contacts-page.tsx:1738
 #: apps/app/src/routes/discover-encounter-page.tsx:115
 #: apps/app/src/routes/discover-page.tsx:329
@@ -7562,7 +7562,7 @@ msgstr "여는 중..."
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:82
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:916
 #: apps/app/src/features/shell/desktop-shell.tsx:987
-#: apps/app/src/routes/character-detail-page.tsx:350
+#: apps/app/src/routes/character-detail-page.tsx:351
 #: apps/app/src/routes/mobile-add-friend-page.tsx:864
 msgid "发消息"
 msgstr "메시지 보내기"
@@ -7572,7 +7572,7 @@ msgid "查看详细资料"
 msgstr "상세 프로필 보기"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:264
-#: apps/app/src/routes/character-detail-page.tsx:321
+#: apps/app/src/routes/character-detail-page.tsx:322
 msgid "朋友信息"
 msgstr "친구 정보"
 
@@ -7583,7 +7583,7 @@ msgstr "캐릭터 정보"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:280
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:656
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:184
-#: apps/app/src/routes/character-detail-page.tsx:359
+#: apps/app/src/routes/character-detail-page.tsx:360
 msgid "备注"
 msgstr "비고"
 
@@ -7612,7 +7612,7 @@ msgstr "Yinjie ID"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:288
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:680
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:246
-#: apps/app/src/routes/character-detail-page.tsx:366
+#: apps/app/src/routes/character-detail-page.tsx:367
 msgid "地区"
 msgstr "지역"
 
@@ -7620,7 +7620,7 @@ msgstr "지역"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:692
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:255
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:188
-#: apps/app/src/routes/character-detail-page.tsx:367
+#: apps/app/src/routes/character-detail-page.tsx:368
 msgid "来源"
 msgstr "출처"
 
@@ -7630,7 +7630,7 @@ msgstr "출처"
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1197
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:411
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:201
-#: apps/app/src/routes/character-detail-page.tsx:361
+#: apps/app/src/routes/character-detail-page.tsx:362
 #: apps/app/src/routes/contacts-page.tsx:1790
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1317
 #: apps/app/src/routes/tags-page.tsx:189
@@ -7665,7 +7665,7 @@ msgstr "소셜 및 콘텐츠"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
 #: apps/app/src/features/shell/desktop-shell.tsx:980
 #: apps/app/src/i18n/static-dom-seed.ts:33
-#: apps/app/src/routes/character-detail-page.tsx:369
+#: apps/app/src/routes/character-detail-page.tsx:370
 #: apps/app/src/routes/discover-page.tsx:118
 #: apps/app/src/routes/discover-page.tsx:703
 #: apps/app/src/routes/favorites-page.tsx:79
@@ -7681,7 +7681,7 @@ msgstr "모멘츠"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:331
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:734
-#: apps/app/src/routes/character-detail-page.tsx:370
+#: apps/app/src/routes/character-detail-page.tsx:371
 msgid "查看这位角色最近的朋友圈"
 msgstr "이 캐릭터의 최근 모멘츠 보기"
 
@@ -7690,7 +7690,7 @@ msgstr "이 캐릭터의 최근 모멘츠 보기"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:763
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:442
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:437
-#: apps/app/src/routes/character-detail-page.tsx:345
+#: apps/app/src/routes/character-detail-page.tsx:346
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:76
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:857
 #: apps/app/src/routes/world-characters-page.tsx:533
@@ -7700,7 +7700,7 @@ msgstr "캐릭터 정보 보기"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:341
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:738
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:267
-#: apps/app/src/routes/character-detail-page.tsx:376
+#: apps/app/src/routes/character-detail-page.tsx:377
 msgid "共同群聊"
 msgstr "공통 그룹 채팅"
 
@@ -7717,7 +7717,7 @@ msgstr "공통 그룹 채팅이 아직 없습니다"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:358
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:654
-#: apps/app/src/routes/character-detail-page.tsx:322
+#: apps/app/src/routes/character-detail-page.tsx:323
 #: apps/app/src/routes/chat-details-page.tsx:983
 msgid "详细资料"
 msgstr "상세 정보"
@@ -7743,7 +7743,7 @@ msgstr "개인 서명"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:376
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:272
-#: apps/app/src/routes/character-detail-page.tsx:375
+#: apps/app/src/routes/character-detail-page.tsx:376
 msgid "最近互动"
 msgstr "최근 상호작용"
 
@@ -7752,7 +7752,7 @@ msgid "暂无互动"
 msgstr ""
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:396
-#: apps/app/src/routes/character-detail-page.tsx:1969
+#: apps/app/src/routes/character-detail-page.tsx:1970
 msgid "火花"
 msgstr "스파크"
 
@@ -7786,7 +7786,7 @@ msgid "置顶聊天"
 msgstr "채팅 고정"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:432
-#: apps/app/src/routes/character-detail-page.tsx:2053
+#: apps/app/src/routes/character-detail-page.tsx:2054
 msgid "默认用语音回复"
 msgstr "기본적으로 음성으로 답장"
 
@@ -7795,9 +7795,9 @@ msgstr "기본적으로 음성으로 답장"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:581
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:584
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:878
-#: apps/app/src/routes/character-detail-page.tsx:1111
-#: apps/app/src/routes/character-detail-page.tsx:1118
-#: apps/app/src/routes/character-detail-page.tsx:2072
+#: apps/app/src/routes/character-detail-page.tsx:1112
+#: apps/app/src/routes/character-detail-page.tsx:1119
+#: apps/app/src/routes/character-detail-page.tsx:2073
 #: apps/app/src/routes/chat-details-page.tsx:811
 #: apps/app/src/routes/chat-details-page.tsx:814
 #: apps/app/src/routes/chat-details-page.tsx:1300
@@ -7805,14 +7805,14 @@ msgid "加入黑名单"
 msgstr "차단"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:446
-#: apps/app/src/routes/character-detail-page.tsx:384
+#: apps/app/src/routes/character-detail-page.tsx:385
 msgid "正在更新..."
 msgstr "업데이트 중..."
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:448
-#: apps/app/src/routes/character-detail-page.tsx:1111
-#: apps/app/src/routes/character-detail-page.tsx:1118
-#: apps/app/src/routes/character-detail-page.tsx:2072
+#: apps/app/src/routes/character-detail-page.tsx:1112
+#: apps/app/src/routes/character-detail-page.tsx:1119
+#: apps/app/src/routes/character-detail-page.tsx:2073
 msgid "移出黑名单"
 msgstr "차단 해제"
 
@@ -7823,9 +7823,9 @@ msgstr "이 연락처의 상호작용 받지 않기"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:467
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:477
-#: apps/app/src/routes/character-detail-page.tsx:387
-#: apps/app/src/routes/character-detail-page.tsx:1130
-#: apps/app/src/routes/character-detail-page.tsx:1141
+#: apps/app/src/routes/character-detail-page.tsx:388
+#: apps/app/src/routes/character-detail-page.tsx:1131
+#: apps/app/src/routes/character-detail-page.tsx:1142
 msgid "删除联系人"
 msgstr "연락처 삭제"
 
@@ -7833,12 +7833,12 @@ msgstr "연락처 삭제"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:548
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1210
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1306
-#: apps/app/src/routes/character-detail-page.tsx:388
+#: apps/app/src/routes/character-detail-page.tsx:389
 msgid "正在删除..."
 msgstr "삭제 중..."
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:469
-#: apps/app/src/routes/character-detail-page.tsx:389
+#: apps/app/src/routes/character-detail-page.tsx:390
 msgid "从通讯录移除"
 msgstr "연락처에서 제거"
 
@@ -7856,7 +7856,7 @@ msgstr "{displayName}을(를) 연락처에서 삭제하시겠어요?"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:537
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:359
-#: apps/app/src/routes/character-detail-page.tsx:1137
+#: apps/app/src/routes/character-detail-page.tsx:1138
 msgid "删除后将不会通知对方，可重新添加。"
 msgstr "상대방에게 알림이 가지 않으며 나중에 다시 추가할 수 있어요."
 
@@ -7894,7 +7894,7 @@ msgstr "Yinjie ID: {identifier}"
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:77
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:78
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1147
-#: apps/app/src/routes/character-detail-page.tsx:365
+#: apps/app/src/routes/character-detail-page.tsx:366
 #: apps/app/src/routes/group-chat-edit-page.tsx:458
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1180
 msgid "保存"
@@ -8086,7 +8086,7 @@ msgstr ""
 #: apps/app/src/features/contacts/management/contacts-management-modal.tsx:198
 #: apps/app/src/features/contacts/management/contacts-management-modal.tsx:201
 #: apps/app/src/features/contacts/management/management-root-screen.tsx:30
-#: apps/app/src/routes/character-detail-page.tsx:381
+#: apps/app/src/routes/character-detail-page.tsx:382
 msgid "朋友权限"
 msgstr "친구 권한"
 
@@ -8114,7 +8114,7 @@ msgid "被加入黑名单的联系人会出现在这里。"
 msgstr "차단된 연락처가 여기에 표시돼요."
 
 #: apps/app/src/features/contacts/management/management-blacklist-screen.tsx:131
-#: apps/app/src/lib/conversation-preview.ts:25
+#: apps/app/src/lib/conversation-preview.ts:28
 msgid "未知联系人"
 msgstr "알 수 없는 연락처"
 
@@ -8499,7 +8499,7 @@ msgstr "{title} 팝업 닫기"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:304
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2849
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:121
-#: apps/app/src/routes/character-detail-page.tsx:700
+#: apps/app/src/routes/character-detail-page.tsx:701
 #: apps/app/src/routes/chat-details-page.tsx:438
 #: apps/app/src/routes/chat-list-page.tsx:446
 #: apps/app/src/routes/contacts-page.tsx:1034
@@ -8508,7 +8508,7 @@ msgstr "채팅을 고정했습니다."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:304
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:121
-#: apps/app/src/routes/character-detail-page.tsx:700
+#: apps/app/src/routes/character-detail-page.tsx:701
 #: apps/app/src/routes/chat-details-page.tsx:438
 #: apps/app/src/routes/chat-list-page.tsx:446
 #: apps/app/src/routes/contacts-page.tsx:1034
@@ -8518,7 +8518,7 @@ msgstr "채팅 고정을 해제했습니다."
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:315
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2853
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:149
-#: apps/app/src/routes/character-detail-page.tsx:721
+#: apps/app/src/routes/character-detail-page.tsx:722
 #: apps/app/src/routes/chat-details-page.tsx:465
 #: apps/app/src/routes/chat-list-page.tsx:513
 #: apps/app/src/routes/contacts-page.tsx:1063
@@ -8528,7 +8528,7 @@ msgstr "채팅 알림 끄기를 켰습니다."
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:315
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2852
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:150
-#: apps/app/src/routes/character-detail-page.tsx:722
+#: apps/app/src/routes/character-detail-page.tsx:723
 #: apps/app/src/routes/chat-details-page.tsx:466
 #: apps/app/src/routes/chat-list-page.tsx:514
 #: apps/app/src/routes/contacts-page.tsx:1064
@@ -8537,14 +8537,14 @@ msgstr "채팅 알림 끄기를 해제했습니다."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:326
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:93
-#: apps/app/src/routes/character-detail-page.tsx:665
+#: apps/app/src/routes/character-detail-page.tsx:666
 #: apps/app/src/routes/contacts-page.tsx:1001
 msgid "已设为星标朋友。"
 msgstr "즐겨찾는 친구로 설정했습니다."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:326
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:94
-#: apps/app/src/routes/character-detail-page.tsx:665
+#: apps/app/src/routes/character-detail-page.tsx:666
 #: apps/app/src/routes/contacts-page.tsx:1001
 msgid "已取消星标朋友。"
 msgstr "즐겨찾는 친구에서 해제했습니다."
@@ -8562,7 +8562,7 @@ msgstr "신고를 제출했습니다."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:415
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:179
-#: apps/app/src/routes/character-detail-page.tsx:759
+#: apps/app/src/routes/character-detail-page.tsx:760
 #: apps/app/src/routes/chat-details-page.tsx:708
 #: apps/app/src/routes/contacts-page.tsx:890
 msgid "已加入黑名单。"
@@ -8647,13 +8647,13 @@ msgstr "차단 중..."
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:891
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:542
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:115
-#: apps/app/src/routes/character-detail-page.tsx:356
+#: apps/app/src/routes/character-detail-page.tsx:357
 msgid "添加到通讯录"
 msgstr "연락처에 추가"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:645
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:987
-#: apps/app/src/routes/character-detail-page.tsx:357
+#: apps/app/src/routes/character-detail-page.tsx:358
 msgid "资料"
 msgstr "정보"
 
@@ -8670,7 +8670,7 @@ msgid "内容入口"
 msgstr "콘텐츠 진입점"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:759
-#: apps/app/src/routes/character-detail-page.tsx:374
+#: apps/app/src/routes/character-detail-page.tsx:375
 msgid "更多资料"
 msgstr "추가 프로필 정보"
 
@@ -8746,8 +8746,8 @@ msgstr "연락처 관리"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:881
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:218
-#: apps/app/src/routes/character-detail-page.tsx:1795
-#: apps/app/src/routes/character-detail-page.tsx:2157
+#: apps/app/src/routes/character-detail-page.tsx:1796
+#: apps/app/src/routes/character-detail-page.tsx:2158
 #: apps/app/src/routes/chat-details-page.tsx:1300
 msgid "已加入黑名单"
 msgstr "차단됨"
@@ -10557,7 +10557,7 @@ msgstr "즐겨찾기에 저장됨"
 
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1147
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1435
-#: apps/app/src/routes/character-detail-page.tsx:364
+#: apps/app/src/routes/character-detail-page.tsx:365
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1513
 #: apps/app/src/routes/profile-settings-page.tsx:440
 #: apps/app/src/routes/profile-settings-page.tsx:572
@@ -10731,7 +10731,7 @@ msgid "暂无活动"
 msgstr "활동 없음"
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:178
-#: apps/app/src/routes/character-detail-page.tsx:378
+#: apps/app/src/routes/character-detail-page.tsx:379
 msgid "擅长领域"
 msgstr "전문 분야"
 
@@ -10766,7 +10766,7 @@ msgid "你好，我是{normalizedOwnerName}，想把你添加到通讯录里。"
 msgstr "안녕하세요, {normalizedOwnerName}입니다. 연락처에 추가하고 싶습니다."
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:144
-#: apps/app/src/routes/character-detail-page.tsx:636
+#: apps/app/src/routes/character-detail-page.tsx:637
 #: apps/app/src/routes/mobile-add-friend-page.tsx:256
 msgid "好友申请已发送。"
 msgstr "친구 요청을 보냈습니다."
@@ -10881,7 +10881,7 @@ msgstr "친구 검색 디렉터리 준비 중..."
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:548
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1227
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:453
-#: apps/app/src/routes/character-detail-page.tsx:1987
+#: apps/app/src/routes/character-detail-page.tsx:1988
 msgid "{0} 个"
 msgstr "{0}개"
 
@@ -11210,7 +11210,7 @@ msgid "来自标签页加入黑名单"
 msgstr "태그 페이지에서 차단 목록에 추가"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:179
-#: apps/app/src/routes/character-detail-page.tsx:759
+#: apps/app/src/routes/character-detail-page.tsx:760
 #: apps/app/src/routes/contacts-page.tsx:890
 msgid "已移出黑名单。"
 msgstr "차단 목록에서 해제했습니다."
@@ -13367,13 +13367,13 @@ msgid "h 成熟"
 msgstr "h 성숙"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ 봉지, 판매가"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ 개"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ 봉지, 판매가"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -21597,29 +21597,33 @@ msgstr "Meta 오픈소스 경량 모델. 엣지 기기나 실험형 캐릭터에
 msgid "、"
 msgstr ", "
 
-#: apps/app/src/lib/conversation-preview.ts:91
+#: apps/app/src/lib/conversation-preview.ts:31
+msgid "私聊会话"
+msgstr "1:1 대화"
+
+#: apps/app/src/lib/conversation-preview.ts:110
 msgid "{senderLabel}："
 msgstr "{senderLabel}:"
 
-#: apps/app/src/lib/conversation-preview.ts:107
+#: apps/app/src/lib/conversation-preview.ts:126
 msgid "打开群聊查看最近消息。"
 msgstr "그룹 채팅을 열어 최근 메시지를 확인하세요."
 
 #. placeholder {0}: getConversationThreadLabel(conversation)
-#: apps/app/src/lib/conversation-preview.ts:109
+#: apps/app/src/lib/conversation-preview.ts:128
 msgid "打开这个{0}查看最近聊天记录。"
 msgstr "이 {0}을(를) 열어 최근 채팅 기록을 확인하세요."
 
-#: apps/app/src/lib/conversation-preview.ts:118
+#: apps/app/src/lib/conversation-preview.ts:137
 msgid "你撤回了一条消息"
 msgstr "메시지를 취소했습니다"
 
 #. placeholder {0}: lastMessage.senderName || translateRuntimeMessage(msg`群成员`)
-#: apps/app/src/lib/conversation-preview.ts:123
+#: apps/app/src/lib/conversation-preview.ts:142
 msgid "{0}撤回了一条消息"
 msgstr "{0}님이 메시지를 취소했습니다"
 
-#: apps/app/src/lib/conversation-preview.ts:127
+#: apps/app/src/lib/conversation-preview.ts:146
 msgid "对方撤回了一条消息"
 msgstr "상대가 메시지를 취소했습니다"
 
@@ -22656,16 +22660,16 @@ msgstr "서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다�
 msgid "隐"
 msgstr "숨김"
 
-#: apps/app/src/lib/group-invite-delivery.ts:473
+#: apps/app/src/lib/group-invite-delivery.ts:492
 msgid "回到群邀请"
 msgstr "그룹 초대로 돌아가기"
 
 #. placeholder {0}: record.groupName
-#: apps/app/src/lib/group-invite-delivery.ts:475
+#: apps/app/src/lib/group-invite-delivery.ts:494
 msgid "这条会话最近收到过「{0}」的群邀请。"
 msgstr "이 대화는 최근 \"{0}\"의 그룹 초대를 받았습니다."
 
-#: apps/app/src/lib/group-invite-delivery.ts:476
+#: apps/app/src/lib/group-invite-delivery.ts:495
 msgid "这条会话最近收到过一个群邀请，可回到邀请页继续转发。"
 msgstr "이 대화는 최근 그룹 초대를 받았습니다. 초대 페이지로 돌아가 계속 전달할 수 있습니다."
 
@@ -23112,40 +23116,40 @@ msgstr ""
 msgid "说点什么..."
 msgstr "무엇이든 말하세요..."
 
-#: apps/app/src/routes/character-detail-page.tsx:323
+#: apps/app/src/routes/character-detail-page.tsx:324
 msgid "正在读取朋友资料..."
 msgstr "친구 정보를 불러오는 중..."
 
-#: apps/app/src/routes/character-detail-page.tsx:324
+#: apps/app/src/routes/character-detail-page.tsx:325
 msgid "正在读取朋友资料"
 msgstr "친구 정보를 불러오는 중"
 
-#: apps/app/src/routes/character-detail-page.tsx:326
+#: apps/app/src/routes/character-detail-page.tsx:327
 msgid "稍等一下，正在同步这个联系人的资料和关系状态。"
 msgstr "잠시만 기다려 주세요. 이 연락처의 정보와 관계 상태를 동기화하고 있습니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:329
+#: apps/app/src/routes/character-detail-page.tsx:330
 #: apps/app/src/routes/chat-details-page.tsx:872
 msgid "联系人资料暂时不可用"
 msgstr "연락처 정보를 지금 사용할 수 없습니다"
 
-#: apps/app/src/routes/character-detail-page.tsx:330
+#: apps/app/src/routes/character-detail-page.tsx:331
 msgid "角色不存在"
 msgstr "캐릭터가 존재하지 않습니다"
 
-#: apps/app/src/routes/character-detail-page.tsx:332
+#: apps/app/src/routes/character-detail-page.tsx:333
 msgid "这个资料暂时不可用，返回通讯录再试一次。"
 msgstr "이 프로필은 현재 사용할 수 없습니다. 연락처로 돌아가 다시 시도해 주세요."
 
-#: apps/app/src/routes/character-detail-page.tsx:335
+#: apps/app/src/routes/character-detail-page.tsx:336
 msgid "这个资料暂时不可用，可以先重试读取，或返回上一页后再试。"
 msgstr "이 프로필은 현재 사용할 수 없습니다. 먼저 다시 불러오거나 이전 페이지로 돌아가 다시 시도해 주세요."
 
-#: apps/app/src/routes/character-detail-page.tsx:338
+#: apps/app/src/routes/character-detail-page.tsx:339
 msgid "这个资料暂时不可用，可以先重试读取，或返回通讯录后再试。"
 msgstr "이 프로필은 현재 사용할 수 없습니다. 먼저 다시 불러오거나 연락처로 돌아가 다시 시도해 주세요."
 
-#: apps/app/src/routes/character-detail-page.tsx:343
+#: apps/app/src/routes/character-detail-page.tsx:344
 #: apps/app/src/routes/group-contacts-page.tsx:243
 #: apps/app/src/routes/group-contacts-page.tsx:320
 #: apps/app/src/routes/official-accounts-page.tsx:261
@@ -23155,202 +23159,202 @@ msgstr "이 프로필은 현재 사용할 수 없습니다. 먼저 다시 불러
 msgid "返回通讯录"
 msgstr "연락처로 돌아가기"
 
-#: apps/app/src/routes/character-detail-page.tsx:346
-#: apps/app/src/routes/character-detail-page.tsx:1101
+#: apps/app/src/routes/character-detail-page.tsx:347
+#: apps/app/src/routes/character-detail-page.tsx:1102
 msgid "正在接通视频..."
 msgstr "영상 연결 중..."
 
-#: apps/app/src/routes/character-detail-page.tsx:347
-#: apps/app/src/routes/character-detail-page.tsx:1092
+#: apps/app/src/routes/character-detail-page.tsx:348
+#: apps/app/src/routes/character-detail-page.tsx:1093
 msgid "正在接通语音..."
 msgstr "음성 연결 중..."
 
-#: apps/app/src/routes/character-detail-page.tsx:348
+#: apps/app/src/routes/character-detail-page.tsx:349
 msgid "正在打开..."
 msgstr "여는 중..."
 
-#: apps/app/src/routes/character-detail-page.tsx:349
+#: apps/app/src/routes/character-detail-page.tsx:350
 msgid "正在接通..."
 msgstr "연결 중..."
 
-#: apps/app/src/routes/character-detail-page.tsx:352
-#: apps/app/src/routes/character-detail-page.tsx:1086
+#: apps/app/src/routes/character-detail-page.tsx:353
+#: apps/app/src/routes/character-detail-page.tsx:1087
 msgid "音视频通话"
 msgstr "음성/영상 통화"
 
-#: apps/app/src/routes/character-detail-page.tsx:353
+#: apps/app/src/routes/character-detail-page.tsx:354
 #: apps/app/src/routes/contacts-page.tsx:1671
 msgid "查看好友申请"
 msgstr "친구 요청 보기"
 
-#: apps/app/src/routes/character-detail-page.tsx:354
+#: apps/app/src/routes/character-detail-page.tsx:355
 msgid "等待对方通过"
 msgstr "승인 대기 중"
 
-#: apps/app/src/routes/character-detail-page.tsx:358
+#: apps/app/src/routes/character-detail-page.tsx:359
 msgid "设置备注和标签"
 msgstr "메모와 태그 설정"
 
-#: apps/app/src/routes/character-detail-page.tsx:360
+#: apps/app/src/routes/character-detail-page.tsx:361
 msgid "给朋友设置备注名"
 msgstr "친구 메모 이름 설정"
 
-#: apps/app/src/routes/character-detail-page.tsx:362
+#: apps/app/src/routes/character-detail-page.tsx:363
 msgid "用逗号分隔，例如：同事，策展"
 msgstr "쉼표로 구분하세요. 예: 동료, 큐레이터"
 
-#: apps/app/src/routes/character-detail-page.tsx:368
+#: apps/app/src/routes/character-detail-page.tsx:369
 msgid "世界内自然认识"
 msgstr "세계 안에서 자연스럽게 알게 됨"
 
-#: apps/app/src/routes/character-detail-page.tsx:371
+#: apps/app/src/routes/character-detail-page.tsx:372
 #: apps/app/src/routes/chat-details-page.tsx:1015
 msgid "推荐给朋友"
 msgstr "친구에게 추천"
 
-#: apps/app/src/routes/character-detail-page.tsx:372
+#: apps/app/src/routes/character-detail-page.tsx:373
 #: apps/app/src/routes/chat-details-page.tsx:1018
 msgid "打开系统分享面板"
 msgstr "시스템 공유 패널 열기"
 
-#: apps/app/src/routes/character-detail-page.tsx:373
+#: apps/app/src/routes/character-detail-page.tsx:374
 msgid "复制这张隐界名片"
 msgstr "이 인계 명함 복사"
 
-#: apps/app/src/routes/character-detail-page.tsx:379
+#: apps/app/src/routes/character-detail-page.tsx:380
 msgid "角色简介"
 msgstr "캐릭터 소개"
 
-#: apps/app/src/routes/character-detail-page.tsx:380
+#: apps/app/src/routes/character-detail-page.tsx:381
 msgid "暂时没有更多介绍。"
 msgstr "지금은 추가 소개가 없습니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:382
+#: apps/app/src/routes/character-detail-page.tsx:383
 msgid "关系管理"
 msgstr "관계 관리"
 
-#: apps/app/src/routes/character-detail-page.tsx:383
+#: apps/app/src/routes/character-detail-page.tsx:384
 msgid "设为星标朋友"
 msgstr "즐겨찾는 친구로 설정"
 
-#: apps/app/src/routes/character-detail-page.tsx:385
-#: apps/app/src/routes/character-detail-page.tsx:1120
+#: apps/app/src/routes/character-detail-page.tsx:386
+#: apps/app/src/routes/character-detail-page.tsx:1121
 msgid "恢复正常联系"
 msgstr "정상 연락으로 복원"
 
-#: apps/app/src/routes/character-detail-page.tsx:386
+#: apps/app/src/routes/character-detail-page.tsx:387
 msgid "不再接收对方互动"
 msgstr "상대의 상호작용을 더 이상 받지 않음"
 
-#: apps/app/src/routes/character-detail-page.tsx:395
+#: apps/app/src/routes/character-detail-page.tsx:396
 #: apps/app/src/routes/friend-moments-page.tsx:499
 msgid "这个角色还没有个性签名。"
 msgstr "이 캐릭터에는 아직 서명이 없습니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:402
+#: apps/app/src/routes/character-detail-page.tsx:403
 msgid "暂无状态"
 msgstr "아직 상태가 없습니다"
 
-#: apps/app/src/routes/character-detail-page.tsx:618
+#: apps/app/src/routes/character-detail-page.tsx:619
 #: apps/app/src/routes/chat-details-page.tsx:567
 msgid "{ownerName} 想把你加到通讯录里。"
 msgstr "{ownerName}님이 연락처에 추가하려고 합니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:637
+#: apps/app/src/routes/character-detail-page.tsx:638
 #: apps/app/src/routes/chat-details-page.tsx:576
 msgid "已添加到通讯录。"
 msgstr "연락처에 추가했습니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:679
+#: apps/app/src/routes/character-detail-page.tsx:680
 msgid "已开启默认语音回复（消耗 token plan 配额）。"
 msgstr "기본 음성 답장이 켜졌어요 (token plan 할당량을 소비합니다)."
 
-#: apps/app/src/routes/character-detail-page.tsx:680
+#: apps/app/src/routes/character-detail-page.tsx:681
 msgid "已关闭默认语音回复。"
 msgstr "기본 음성 답장이 꺼졌어요."
 
-#: apps/app/src/routes/character-detail-page.tsx:735
+#: apps/app/src/routes/character-detail-page.tsx:736
 msgid "朋友资料已更新。"
 msgstr "친구 정보를 업데이트했습니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:907
-#: apps/app/src/routes/character-detail-page.tsx:915
+#: apps/app/src/routes/character-detail-page.tsx:908
+#: apps/app/src/routes/character-detail-page.tsx:916
 msgid "{displayName} 的隐界名片"
 msgstr "{displayName}의 인계 명함"
 
 #. placeholder {0}: buildYinjieId(character.id)
 #. placeholder {0}: buildYinjieId(targetCharacterId)
-#: apps/app/src/routes/character-detail-page.tsx:909
-#: apps/app/src/routes/character-detail-page.tsx:1705
+#: apps/app/src/routes/character-detail-page.tsx:910
+#: apps/app/src/routes/character-detail-page.tsx:1706
 #: apps/app/src/routes/chat-details-page.tsx:310
 #: apps/app/src/routes/chat-details-page.tsx:336
 msgid "隐界号：{0}"
 msgstr "Yinjie ID: {0}"
 
-#: apps/app/src/routes/character-detail-page.tsx:938
+#: apps/app/src/routes/character-detail-page.tsx:939
 msgid "当前环境暂不支持复制名片。"
 msgstr "현재 환경에서는 명함 복사를 아직 지원하지 않습니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:962
+#: apps/app/src/routes/character-detail-page.tsx:963
 msgid "复制名片失败，请稍后重试。"
 msgstr "명함 복사에 실패했습니다. 잠시 후 다시 시도해 주세요."
 
-#: apps/app/src/routes/character-detail-page.tsx:976
+#: apps/app/src/routes/character-detail-page.tsx:977
 msgid "确认把这个角色移出黑名单吗？"
 msgstr "이 캐릭터를 차단 목록에서 해제할까요?"
 
-#: apps/app/src/routes/character-detail-page.tsx:977
+#: apps/app/src/routes/character-detail-page.tsx:978
 msgid "加入黑名单后，将不再接收这个角色的互动。确认继续吗？"
 msgstr "차단하면 이 캐릭터의 상호작용을 더 이상 받지 않습니다. 계속할까요?"
 
-#: apps/app/src/routes/character-detail-page.tsx:991
+#: apps/app/src/routes/character-detail-page.tsx:992
 msgid "确认删除这个联系人吗？"
 msgstr "이 연락처를 삭제할까요?"
 
-#: apps/app/src/routes/character-detail-page.tsx:1087
+#: apps/app/src/routes/character-detail-page.tsx:1088
 msgid "选择要发起的通话方式。"
 msgstr "시작할 통화 방식을 선택하세요."
 
-#: apps/app/src/routes/character-detail-page.tsx:1094
+#: apps/app/src/routes/character-detail-page.tsx:1095
 msgid "进入语音通话"
 msgstr "음성 통화로 이동"
 
-#: apps/app/src/routes/character-detail-page.tsx:1103
+#: apps/app/src/routes/character-detail-page.tsx:1104
 msgid "进入视频通话"
 msgstr "영상 통화로 이동"
 
-#: apps/app/src/routes/character-detail-page.tsx:1113
+#: apps/app/src/routes/character-detail-page.tsx:1114
 msgid "移出后将恢复正常联系与互动。"
 msgstr "해제하면 정상적인 연락과 상호작용이 복원됩니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:1114
+#: apps/app/src/routes/character-detail-page.tsx:1115
 msgid "加入黑名单后，将不再接收这个角色的互动。"
 msgstr "차단하면 이 캐릭터의 상호작용을 더 이상 받지 않습니다."
 
-#: apps/app/src/routes/character-detail-page.tsx:1121
+#: apps/app/src/routes/character-detail-page.tsx:1122
 msgid "后续互动会被拦截"
 msgstr "이후 상호작용은 차단됩니다"
 
-#: apps/app/src/routes/character-detail-page.tsx:1142
+#: apps/app/src/routes/character-detail-page.tsx:1143
 msgid "对方不会收到通知"
 msgstr ""
 
 #. placeholder {0}: friendship?.region?.trim() || character?.region?.trim() || unsetLabel
-#: apps/app/src/routes/character-detail-page.tsx:1715
+#: apps/app/src/routes/character-detail-page.tsx:1716
 msgid "地区：{0}"
 msgstr "지역: {0}"
 
 #. placeholder {0}: character.relationship || worldRoleLabel
-#: apps/app/src/routes/character-detail-page.tsx:1718
+#: apps/app/src/routes/character-detail-page.tsx:1719
 msgid "身份：{0}"
 msgstr "신분: {0}"
 
-#: apps/app/src/routes/character-detail-page.tsx:1933
+#: apps/app/src/routes/character-detail-page.tsx:1934
 msgid "已不再看 TA 的朋友圈"
 msgstr ""
 
 #. placeholder {0}: friendship?.sparkStreak ?? 0
-#: apps/app/src/routes/character-detail-page.tsx:1977
+#: apps/app/src/routes/character-detail-page.tsx:1978
 msgid "已连续 {0} 天"
 msgstr "{0}일 연속"
 

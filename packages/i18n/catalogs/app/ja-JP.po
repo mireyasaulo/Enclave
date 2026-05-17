@@ -129,7 +129,7 @@ msgstr "チャットに転送"
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:472
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:225
 #: apps/app/src/routes/channels-page.tsx:3876
-#: apps/app/src/routes/character-detail-page.tsx:363
+#: apps/app/src/routes/character-detail-page.tsx:364
 #: apps/app/src/routes/contacts-page.tsx:2541
 #: apps/app/src/routes/contacts-page.tsx:2543
 #: apps/app/src/routes/mobile-add-friend-page.tsx:541
@@ -792,7 +792,7 @@ msgstr "元画像で送信 (Cmd/Ctrl+Enter)"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:114
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:169
 #: apps/app/src/routes/channels-page.tsx:3915
-#: apps/app/src/routes/character-detail-page.tsx:355
+#: apps/app/src/routes/character-detail-page.tsx:356
 #: apps/app/src/routes/discover-page.tsx:1071
 #: apps/app/src/routes/mobile-add-friend-page.tsx:899
 #: apps/app/src/routes/welcome-page.tsx:1184
@@ -1004,8 +1004,8 @@ msgstr "コピーに失敗しました。後でもう一度お試しください
 #: apps/app/src/components/official-article-viewer.tsx:97
 #: apps/app/src/components/official-article-viewer.tsx:123
 #: apps/app/src/i18n/static-dom-seed.ts:879
-#: apps/app/src/routes/character-detail-page.tsx:941
-#: apps/app/src/routes/character-detail-page.tsx:965
+#: apps/app/src/routes/character-detail-page.tsx:942
+#: apps/app/src/routes/character-detail-page.tsx:966
 #: apps/app/src/routes/chat-details-page.tsx:398
 #: apps/app/src/routes/chat-details-page.tsx:422
 #: apps/app/src/routes/discover-feed-page.tsx:1664
@@ -1064,7 +1064,7 @@ msgstr "位置情報をコピーしました。"
 #: apps/app/src/components/mobile-document-shell.tsx:63
 #: apps/app/src/components/official-article-viewer.tsx:144
 #: apps/app/src/i18n/static-dom-seed.ts:875
-#: apps/app/src/routes/character-detail-page.tsx:923
+#: apps/app/src/routes/character-detail-page.tsx:924
 #: apps/app/src/routes/chat-details-page.tsx:380
 #: apps/app/src/routes/discover-feed-page.tsx:1652
 #: apps/app/src/routes/games-page.tsx:437
@@ -1086,7 +1086,7 @@ msgstr "システム共有シートを開きました。"
 #: apps/app/src/components/mobile-document-shell.tsx:77
 #: apps/app/src/components/official-article-viewer.tsx:93
 #: apps/app/src/i18n/static-dom-seed.ts:876
-#: apps/app/src/routes/character-detail-page.tsx:937
+#: apps/app/src/routes/character-detail-page.tsx:938
 #: apps/app/src/routes/chat-details-page.tsx:394
 #: apps/app/src/routes/discover-feed-page.tsx:1671
 #: apps/app/src/routes/games-page.tsx:449
@@ -1116,8 +1116,8 @@ msgstr "この端末では今システム共有を開けません。後でもう
 #: apps/app/src/components/official-article-viewer.tsx:123
 #: apps/app/src/components/official-article-viewer.tsx:151
 #: apps/app/src/i18n/static-dom-seed.ts:878
-#: apps/app/src/routes/character-detail-page.tsx:940
-#: apps/app/src/routes/character-detail-page.tsx:964
+#: apps/app/src/routes/character-detail-page.tsx:941
+#: apps/app/src/routes/character-detail-page.tsx:965
 #: apps/app/src/routes/chat-details-page.tsx:397
 #: apps/app/src/routes/chat-details-page.tsx:421
 #: apps/app/src/routes/discover-feed-page.tsx:1664
@@ -1152,7 +1152,7 @@ msgstr "システム共有は一時的に利用できないため、位置情報
 #: apps/app/src/components/mobile-document-shell.tsx:101
 #: apps/app/src/components/official-article-viewer.tsx:119
 #: apps/app/src/i18n/static-dom-seed.ts:882
-#: apps/app/src/routes/character-detail-page.tsx:961
+#: apps/app/src/routes/character-detail-page.tsx:962
 #: apps/app/src/routes/chat-details-page.tsx:418
 #: apps/app/src/routes/discover-feed-page.tsx:1697
 #: apps/app/src/routes/games-page.tsx:466
@@ -1167,7 +1167,7 @@ msgid "系统分享失败，请稍后重试。"
 msgstr "システム共有に失敗しました。後でもう一度お試しください。"
 
 #: apps/app/src/components/chat-message-list.tsx:1419
-#: apps/app/src/routes/character-detail-page.tsx:955
+#: apps/app/src/routes/character-detail-page.tsx:956
 msgid "名片摘要已复制。"
 msgstr "名刺の概要をコピーしました。"
 
@@ -1178,7 +1178,7 @@ msgstr "{0} の Yinjie 連絡先カード"
 
 #: apps/app/src/components/chat-message-list.tsx:1458
 #: apps/app/src/i18n/static-dom-seed.ts:953
-#: apps/app/src/routes/character-detail-page.tsx:954
+#: apps/app/src/routes/character-detail-page.tsx:955
 msgid "系统分享暂时不可用，已复制名片摘要。"
 msgstr "システム共有は一時的に使えません。名刺の概要をコピーしました。"
 
@@ -1536,7 +1536,7 @@ msgstr "すべて選択解除"
 #: apps/app/src/features/search/search-types.ts:117
 #: apps/app/src/features/search/use-search-index.ts:474
 #: apps/app/src/i18n/static-dom-seed.ts:64
-#: apps/app/src/routes/character-detail-page.tsx:328
+#: apps/app/src/routes/character-detail-page.tsx:329
 #: apps/app/src/routes/chat-details-page.tsx:325
 #: apps/app/src/routes/create-group-page.tsx:565
 #: apps/app/src/routes/group-member-picker-page.tsx:731
@@ -1611,7 +1611,7 @@ msgstr "マイ"
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:107
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:299
 #: apps/app/src/features/games/parking-war/parking-war-engine.ts:602
-#: apps/app/src/lib/conversation-preview.ts:86
+#: apps/app/src/lib/conversation-preview.ts:105
 #: apps/app/src/routes/character-detail-page.tsx:135
 #: apps/app/src/routes/chat-details-page.tsx:117
 #: apps/app/src/routes/discover-page.tsx:477
@@ -1846,8 +1846,8 @@ msgstr "明日 {timeLabel}"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:880
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:374
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:566
-#: apps/app/src/lib/conversation-preview.ts:87
-#: apps/app/src/lib/conversation-preview.ts:123
+#: apps/app/src/lib/conversation-preview.ts:106
+#: apps/app/src/lib/conversation-preview.ts:142
 #: apps/app/src/routes/group-member-picker-page.tsx:238
 #: apps/app/src/routes/group-member-picker-page.tsx:248
 #: apps/app/src/routes/group-member-picker-page.tsx:731
@@ -2037,7 +2037,7 @@ msgstr "会話を続ける"
 #: apps/app/src/components/chat-message-list.tsx:7387
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:622
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:663
-#: apps/app/src/routes/character-detail-page.tsx:319
+#: apps/app/src/routes/character-detail-page.tsx:320
 #: apps/app/src/routes/chat-details-page.tsx:308
 #: apps/app/src/routes/chat-details-page.tsx:328
 #: apps/app/src/routes/create-group-page.tsx:690
@@ -2227,7 +2227,7 @@ msgstr "開始者"
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:169
 #: apps/app/src/i18n/static-dom-seed.ts:163
 #: apps/app/src/i18n/static-dom-seed.ts:900
-#: apps/app/src/routes/character-detail-page.tsx:377
+#: apps/app/src/routes/character-detail-page.tsx:378
 #: apps/app/src/routes/live-companion-page.tsx:282
 msgid "当前状态"
 msgstr "現在の状態"
@@ -2283,7 +2283,7 @@ msgstr "人"
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:775
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1143
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:100
-#: apps/app/src/routes/character-detail-page.tsx:1102
+#: apps/app/src/routes/character-detail-page.tsx:1103
 #: apps/app/src/routes/desktop-mobile-page.tsx:359
 msgid "视频通话"
 msgstr "ビデオ通話"
@@ -2297,8 +2297,8 @@ msgstr "ビデオ通話"
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:775
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1143
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:88
-#: apps/app/src/routes/character-detail-page.tsx:351
-#: apps/app/src/routes/character-detail-page.tsx:1093
+#: apps/app/src/routes/character-detail-page.tsx:352
+#: apps/app/src/routes/character-detail-page.tsx:1094
 #: apps/app/src/routes/desktop-mobile-page.tsx:360
 msgid "语音通话"
 msgstr "音声通話"
@@ -2400,7 +2400,7 @@ msgstr "無題のメモ"
 #: apps/app/src/features/search/mobile-search-workspace.tsx:231
 #: apps/app/src/routes/channel-author-page.tsx:391
 #: apps/app/src/routes/channels-page.tsx:1633
-#: apps/app/src/routes/character-detail-page.tsx:341
+#: apps/app/src/routes/character-detail-page.tsx:342
 #: apps/app/src/routes/create-group-page.tsx:393
 #: apps/app/src/routes/discover-feed-page.tsx:2101
 #: apps/app/src/routes/friend-requests-page.tsx:223
@@ -2897,7 +2897,7 @@ msgstr "ツールを共有"
 #: apps/app/src/routes/channels-page.tsx:1716
 #: apps/app/src/routes/channels-page.tsx:1749
 #: apps/app/src/routes/channels-page.tsx:1808
-#: apps/app/src/routes/character-detail-page.tsx:342
+#: apps/app/src/routes/character-detail-page.tsx:343
 #: apps/app/src/routes/chat-background-page.tsx:372
 #: apps/app/src/routes/chat-background-page.tsx:404
 #: apps/app/src/routes/chat-background-page.tsx:426
@@ -3845,7 +3845,7 @@ msgstr "雲紙の余白"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:185
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:189
 #: apps/app/src/features/subscription/subscription-panel.tsx:487
-#: apps/app/src/routes/character-detail-page.tsx:318
+#: apps/app/src/routes/character-detail-page.tsx:319
 #: apps/app/src/routes/chat-details-page.tsx:306
 #: apps/app/src/routes/group-chat-details-page.tsx:908
 #: apps/app/src/routes/profile-subscription-page.tsx:553
@@ -4144,7 +4144,7 @@ msgstr "すべてのメンバー"
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:650
 #: apps/app/src/features/search/mobile-search-workspace.tsx:344
 #: apps/app/src/routes/channels-page.tsx:1758
-#: apps/app/src/routes/character-detail-page.tsx:344
+#: apps/app/src/routes/character-detail-page.tsx:345
 #: apps/app/src/routes/chat-background-page.tsx:339
 #: apps/app/src/routes/chat-details-page.tsx:847
 #: apps/app/src/routes/chat-list-page.tsx:1141
@@ -4199,7 +4199,7 @@ msgstr "チャット履歴は一時的に利用できません"
 #: apps/app/src/i18n/static-dom-seed.ts:39
 #: apps/app/src/routes/channel-author-page.tsx:427
 #: apps/app/src/routes/channels-page.tsx:1740
-#: apps/app/src/routes/character-detail-page.tsx:340
+#: apps/app/src/routes/character-detail-page.tsx:341
 #: apps/app/src/routes/chat-background-page.tsx:364
 #: apps/app/src/routes/chat-background-page.tsx:396
 #: apps/app/src/routes/chat-background-page.tsx:464
@@ -6075,15 +6075,15 @@ msgid "当前为移动群通话工作台"
 msgstr "現在はモバイルグループ通話ワークスペースです"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:939
+#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:257
+msgid "解除静音"
+msgstr "ミュート解除"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:939
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:486
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:257
 msgid "静音麦克风"
 msgstr "マイクをミュート"
-
-#: apps/app/src/features/chat/mobile-group-call-screen.tsx:939
-#: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:257
-msgid "解除静音"
-msgstr "ミュート解除"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:949
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:498
@@ -7480,7 +7480,7 @@ msgstr "連絡先情報を更新しました。"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:391
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1432
 #: apps/app/src/features/search/use-search-index.ts:444
-#: apps/app/src/routes/character-detail-page.tsx:1696
+#: apps/app/src/routes/character-detail-page.tsx:1697
 #: apps/app/src/routes/chat-details-page.tsx:306
 #: apps/app/src/routes/contacts-page.tsx:2952
 #: apps/app/src/routes/create-group-page.tsx:621
@@ -7498,7 +7498,7 @@ msgstr "ニックネーム: {0}"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:60
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:168
 #: apps/app/src/features/search/desktop-search-launcher.tsx:900
-#: apps/app/src/routes/character-detail-page.tsx:320
+#: apps/app/src/routes/character-detail-page.tsx:321
 #: apps/app/src/routes/contacts-page.tsx:1738
 #: apps/app/src/routes/discover-encounter-page.tsx:115
 #: apps/app/src/routes/discover-page.tsx:329
@@ -7562,7 +7562,7 @@ msgstr "開いています..."
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:82
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:916
 #: apps/app/src/features/shell/desktop-shell.tsx:987
-#: apps/app/src/routes/character-detail-page.tsx:350
+#: apps/app/src/routes/character-detail-page.tsx:351
 #: apps/app/src/routes/mobile-add-friend-page.tsx:864
 msgid "发消息"
 msgstr "メッセージ"
@@ -7572,7 +7572,7 @@ msgid "查看详细资料"
 msgstr "詳細情報を表示"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:264
-#: apps/app/src/routes/character-detail-page.tsx:321
+#: apps/app/src/routes/character-detail-page.tsx:322
 msgid "朋友信息"
 msgstr "友だち情報"
 
@@ -7583,7 +7583,7 @@ msgstr "キャラクター情報"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:280
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:656
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:184
-#: apps/app/src/routes/character-detail-page.tsx:359
+#: apps/app/src/routes/character-detail-page.tsx:360
 msgid "备注"
 msgstr "備考"
 
@@ -7612,7 +7612,7 @@ msgstr "Yinjie ID"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:288
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:680
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:246
-#: apps/app/src/routes/character-detail-page.tsx:366
+#: apps/app/src/routes/character-detail-page.tsx:367
 msgid "地区"
 msgstr "地域"
 
@@ -7620,7 +7620,7 @@ msgstr "地域"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:692
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:255
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:188
-#: apps/app/src/routes/character-detail-page.tsx:367
+#: apps/app/src/routes/character-detail-page.tsx:368
 msgid "来源"
 msgstr "ソース"
 
@@ -7630,7 +7630,7 @@ msgstr "ソース"
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1197
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:411
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:201
-#: apps/app/src/routes/character-detail-page.tsx:361
+#: apps/app/src/routes/character-detail-page.tsx:362
 #: apps/app/src/routes/contacts-page.tsx:1790
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1317
 #: apps/app/src/routes/tags-page.tsx:189
@@ -7665,7 +7665,7 @@ msgstr "ソーシャルとコンテンツ"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
 #: apps/app/src/features/shell/desktop-shell.tsx:980
 #: apps/app/src/i18n/static-dom-seed.ts:33
-#: apps/app/src/routes/character-detail-page.tsx:369
+#: apps/app/src/routes/character-detail-page.tsx:370
 #: apps/app/src/routes/discover-page.tsx:118
 #: apps/app/src/routes/discover-page.tsx:703
 #: apps/app/src/routes/favorites-page.tsx:79
@@ -7681,7 +7681,7 @@ msgstr "モーメンツ"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:331
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:734
-#: apps/app/src/routes/character-detail-page.tsx:370
+#: apps/app/src/routes/character-detail-page.tsx:371
 msgid "查看这位角色最近的朋友圈"
 msgstr "このキャラクターの最近のモーメンツを見る"
 
@@ -7690,7 +7690,7 @@ msgstr "このキャラクターの最近のモーメンツを見る"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:763
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:442
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:437
-#: apps/app/src/routes/character-detail-page.tsx:345
+#: apps/app/src/routes/character-detail-page.tsx:346
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:76
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:857
 #: apps/app/src/routes/world-characters-page.tsx:533
@@ -7700,7 +7700,7 @@ msgstr "キャラクター資料を見る"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:341
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:738
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:267
-#: apps/app/src/routes/character-detail-page.tsx:376
+#: apps/app/src/routes/character-detail-page.tsx:377
 msgid "共同群聊"
 msgstr "共通のグループチャット"
 
@@ -7717,7 +7717,7 @@ msgstr "共通のグループチャットはまだありません"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:358
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:654
-#: apps/app/src/routes/character-detail-page.tsx:322
+#: apps/app/src/routes/character-detail-page.tsx:323
 #: apps/app/src/routes/chat-details-page.tsx:983
 msgid "详细资料"
 msgstr "詳細情報"
@@ -7743,7 +7743,7 @@ msgstr "シグネチャ"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:376
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:272
-#: apps/app/src/routes/character-detail-page.tsx:375
+#: apps/app/src/routes/character-detail-page.tsx:376
 msgid "最近互动"
 msgstr "最近のやり取り"
 
@@ -7752,7 +7752,7 @@ msgid "暂无互动"
 msgstr ""
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:396
-#: apps/app/src/routes/character-detail-page.tsx:1969
+#: apps/app/src/routes/character-detail-page.tsx:1970
 msgid "火花"
 msgstr "スパーク"
 
@@ -7786,7 +7786,7 @@ msgid "置顶聊天"
 msgstr "チャットをピン留め"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:432
-#: apps/app/src/routes/character-detail-page.tsx:2053
+#: apps/app/src/routes/character-detail-page.tsx:2054
 msgid "默认用语音回复"
 msgstr "デフォルトで音声で返信"
 
@@ -7795,9 +7795,9 @@ msgstr "デフォルトで音声で返信"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:581
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:584
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:878
-#: apps/app/src/routes/character-detail-page.tsx:1111
-#: apps/app/src/routes/character-detail-page.tsx:1118
-#: apps/app/src/routes/character-detail-page.tsx:2072
+#: apps/app/src/routes/character-detail-page.tsx:1112
+#: apps/app/src/routes/character-detail-page.tsx:1119
+#: apps/app/src/routes/character-detail-page.tsx:2073
 #: apps/app/src/routes/chat-details-page.tsx:811
 #: apps/app/src/routes/chat-details-page.tsx:814
 #: apps/app/src/routes/chat-details-page.tsx:1300
@@ -7805,14 +7805,14 @@ msgid "加入黑名单"
 msgstr "ブロック"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:446
-#: apps/app/src/routes/character-detail-page.tsx:384
+#: apps/app/src/routes/character-detail-page.tsx:385
 msgid "正在更新..."
 msgstr "更新中..."
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:448
-#: apps/app/src/routes/character-detail-page.tsx:1111
-#: apps/app/src/routes/character-detail-page.tsx:1118
-#: apps/app/src/routes/character-detail-page.tsx:2072
+#: apps/app/src/routes/character-detail-page.tsx:1112
+#: apps/app/src/routes/character-detail-page.tsx:1119
+#: apps/app/src/routes/character-detail-page.tsx:2073
 msgid "移出黑名单"
 msgstr "ブロック解除"
 
@@ -7823,9 +7823,9 @@ msgstr "この連絡先からのやり取りを受け取らない"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:467
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:477
-#: apps/app/src/routes/character-detail-page.tsx:387
-#: apps/app/src/routes/character-detail-page.tsx:1130
-#: apps/app/src/routes/character-detail-page.tsx:1141
+#: apps/app/src/routes/character-detail-page.tsx:388
+#: apps/app/src/routes/character-detail-page.tsx:1131
+#: apps/app/src/routes/character-detail-page.tsx:1142
 msgid "删除联系人"
 msgstr "連絡先を削除"
 
@@ -7833,12 +7833,12 @@ msgstr "連絡先を削除"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:548
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1210
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1306
-#: apps/app/src/routes/character-detail-page.tsx:388
+#: apps/app/src/routes/character-detail-page.tsx:389
 msgid "正在删除..."
 msgstr "削除中..."
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:469
-#: apps/app/src/routes/character-detail-page.tsx:389
+#: apps/app/src/routes/character-detail-page.tsx:390
 msgid "从通讯录移除"
 msgstr "連絡先から削除"
 
@@ -7856,7 +7856,7 @@ msgstr "{displayName} を連絡先から削除しますか？"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:537
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:359
-#: apps/app/src/routes/character-detail-page.tsx:1137
+#: apps/app/src/routes/character-detail-page.tsx:1138
 msgid "删除后将不会通知对方，可重新添加。"
 msgstr "相手には通知されず、後で再度追加できます。"
 
@@ -7894,7 +7894,7 @@ msgstr "Yinjie ID: {identifier}"
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:77
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:78
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1147
-#: apps/app/src/routes/character-detail-page.tsx:365
+#: apps/app/src/routes/character-detail-page.tsx:366
 #: apps/app/src/routes/group-chat-edit-page.tsx:458
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1180
 msgid "保存"
@@ -8086,7 +8086,7 @@ msgstr ""
 #: apps/app/src/features/contacts/management/contacts-management-modal.tsx:198
 #: apps/app/src/features/contacts/management/contacts-management-modal.tsx:201
 #: apps/app/src/features/contacts/management/management-root-screen.tsx:30
-#: apps/app/src/routes/character-detail-page.tsx:381
+#: apps/app/src/routes/character-detail-page.tsx:382
 msgid "朋友权限"
 msgstr "友だち権限"
 
@@ -8114,7 +8114,7 @@ msgid "被加入黑名单的联系人会出现在这里。"
 msgstr "ブロックした連絡先がここに表示されます。"
 
 #: apps/app/src/features/contacts/management/management-blacklist-screen.tsx:131
-#: apps/app/src/lib/conversation-preview.ts:25
+#: apps/app/src/lib/conversation-preview.ts:28
 msgid "未知联系人"
 msgstr "不明な連絡先"
 
@@ -8499,7 +8499,7 @@ msgstr "{title} のポップアップを閉じる"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:304
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2849
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:121
-#: apps/app/src/routes/character-detail-page.tsx:700
+#: apps/app/src/routes/character-detail-page.tsx:701
 #: apps/app/src/routes/chat-details-page.tsx:438
 #: apps/app/src/routes/chat-list-page.tsx:446
 #: apps/app/src/routes/contacts-page.tsx:1034
@@ -8508,7 +8508,7 @@ msgstr "チャットをピン留めしました。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:304
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:121
-#: apps/app/src/routes/character-detail-page.tsx:700
+#: apps/app/src/routes/character-detail-page.tsx:701
 #: apps/app/src/routes/chat-details-page.tsx:438
 #: apps/app/src/routes/chat-list-page.tsx:446
 #: apps/app/src/routes/contacts-page.tsx:1034
@@ -8518,7 +8518,7 @@ msgstr "チャットのピン留めを解除しました。"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:315
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2853
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:149
-#: apps/app/src/routes/character-detail-page.tsx:721
+#: apps/app/src/routes/character-detail-page.tsx:722
 #: apps/app/src/routes/chat-details-page.tsx:465
 #: apps/app/src/routes/chat-list-page.tsx:513
 #: apps/app/src/routes/contacts-page.tsx:1063
@@ -8528,7 +8528,7 @@ msgstr "チャット通知をサイレントにしました。"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:315
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2852
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:150
-#: apps/app/src/routes/character-detail-page.tsx:722
+#: apps/app/src/routes/character-detail-page.tsx:723
 #: apps/app/src/routes/chat-details-page.tsx:466
 #: apps/app/src/routes/chat-list-page.tsx:514
 #: apps/app/src/routes/contacts-page.tsx:1064
@@ -8537,14 +8537,14 @@ msgstr "チャット通知のサイレントをオフにしました。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:326
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:93
-#: apps/app/src/routes/character-detail-page.tsx:665
+#: apps/app/src/routes/character-detail-page.tsx:666
 #: apps/app/src/routes/contacts-page.tsx:1001
 msgid "已设为星标朋友。"
 msgstr "星付きの友だちに設定しました。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:326
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:94
-#: apps/app/src/routes/character-detail-page.tsx:665
+#: apps/app/src/routes/character-detail-page.tsx:666
 #: apps/app/src/routes/contacts-page.tsx:1001
 msgid "已取消星标朋友。"
 msgstr "星付きの友だちから外しました。"
@@ -8562,7 +8562,7 @@ msgstr "通報を送信しました。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:415
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:179
-#: apps/app/src/routes/character-detail-page.tsx:759
+#: apps/app/src/routes/character-detail-page.tsx:760
 #: apps/app/src/routes/chat-details-page.tsx:708
 #: apps/app/src/routes/contacts-page.tsx:890
 msgid "已加入黑名单。"
@@ -8647,13 +8647,13 @@ msgstr "ブロック中..."
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:891
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:542
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:115
-#: apps/app/src/routes/character-detail-page.tsx:356
+#: apps/app/src/routes/character-detail-page.tsx:357
 msgid "添加到通讯录"
 msgstr "連絡先に追加"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:645
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:987
-#: apps/app/src/routes/character-detail-page.tsx:357
+#: apps/app/src/routes/character-detail-page.tsx:358
 msgid "资料"
 msgstr "情報"
 
@@ -8670,7 +8670,7 @@ msgid "内容入口"
 msgstr "コンテンツ入口"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:759
-#: apps/app/src/routes/character-detail-page.tsx:374
+#: apps/app/src/routes/character-detail-page.tsx:375
 msgid "更多资料"
 msgstr "さらに詳しい情報"
 
@@ -8746,8 +8746,8 @@ msgstr "連絡先管理"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:881
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:218
-#: apps/app/src/routes/character-detail-page.tsx:1795
-#: apps/app/src/routes/character-detail-page.tsx:2157
+#: apps/app/src/routes/character-detail-page.tsx:1796
+#: apps/app/src/routes/character-detail-page.tsx:2158
 #: apps/app/src/routes/chat-details-page.tsx:1300
 msgid "已加入黑名单"
 msgstr "ブロック済み"
@@ -10557,7 +10557,7 @@ msgstr "お気に入りに保存しました"
 
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1147
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1435
-#: apps/app/src/routes/character-detail-page.tsx:364
+#: apps/app/src/routes/character-detail-page.tsx:365
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1513
 #: apps/app/src/routes/profile-settings-page.tsx:440
 #: apps/app/src/routes/profile-settings-page.tsx:572
@@ -10731,7 +10731,7 @@ msgid "暂无活动"
 msgstr "アクティビティなし"
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:178
-#: apps/app/src/routes/character-detail-page.tsx:378
+#: apps/app/src/routes/character-detail-page.tsx:379
 msgid "擅长领域"
 msgstr "得意分野"
 
@@ -10766,7 +10766,7 @@ msgid "你好，我是{normalizedOwnerName}，想把你添加到通讯录里。"
 msgstr "こんにちは、{normalizedOwnerName} です。連絡先に追加させてください。"
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:144
-#: apps/app/src/routes/character-detail-page.tsx:636
+#: apps/app/src/routes/character-detail-page.tsx:637
 #: apps/app/src/routes/mobile-add-friend-page.tsx:256
 msgid "好友申请已发送。"
 msgstr "友だち申請を送信しました。"
@@ -10881,7 +10881,7 @@ msgstr "友だち検索のディレクトリを準備中..."
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:548
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1227
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:453
-#: apps/app/src/routes/character-detail-page.tsx:1987
+#: apps/app/src/routes/character-detail-page.tsx:1988
 msgid "{0} 个"
 msgstr "{0}件"
 
@@ -11210,7 +11210,7 @@ msgid "来自标签页加入黑名单"
 msgstr "タグページからブロックリストに追加"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:179
-#: apps/app/src/routes/character-detail-page.tsx:759
+#: apps/app/src/routes/character-detail-page.tsx:760
 #: apps/app/src/routes/contacts-page.tsx:890
 msgid "已移出黑名单。"
 msgstr "ブロックリストから解除しました。"
@@ -13367,13 +13367,13 @@ msgid "h 成熟"
 msgstr "h で成熟"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
-msgid "/ 包，售价"
-msgstr "/ 袋、価格"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ 件"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ 袋、価格"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
@@ -21597,29 +21597,33 @@ msgstr "Meta のオープンソース軽量モデル。エッジデバイスや�
 msgid "、"
 msgstr "、"
 
-#: apps/app/src/lib/conversation-preview.ts:91
+#: apps/app/src/lib/conversation-preview.ts:31
+msgid "私聊会话"
+msgstr "ダイレクトメッセージ"
+
+#: apps/app/src/lib/conversation-preview.ts:110
 msgid "{senderLabel}："
 msgstr "{senderLabel}:"
 
-#: apps/app/src/lib/conversation-preview.ts:107
+#: apps/app/src/lib/conversation-preview.ts:126
 msgid "打开群聊查看最近消息。"
 msgstr "グループチャットを開いて最近のメッセージを表示します。"
 
 #. placeholder {0}: getConversationThreadLabel(conversation)
-#: apps/app/src/lib/conversation-preview.ts:109
+#: apps/app/src/lib/conversation-preview.ts:128
 msgid "打开这个{0}查看最近聊天记录。"
 msgstr "この{0}を開いて最近のチャット履歴を表示します。"
 
-#: apps/app/src/lib/conversation-preview.ts:118
+#: apps/app/src/lib/conversation-preview.ts:137
 msgid "你撤回了一条消息"
 msgstr "メッセージを取り消しました"
 
 #. placeholder {0}: lastMessage.senderName || translateRuntimeMessage(msg`群成员`)
-#: apps/app/src/lib/conversation-preview.ts:123
+#: apps/app/src/lib/conversation-preview.ts:142
 msgid "{0}撤回了一条消息"
 msgstr "{0} がメッセージを取り消しました"
 
-#: apps/app/src/lib/conversation-preview.ts:127
+#: apps/app/src/lib/conversation-preview.ts:146
 msgid "对方撤回了一条消息"
 msgstr "相手がメッセージを取り消しました"
 
@@ -22656,16 +22660,16 @@ msgstr "サービスは一時的に利用できません。後ほどお試しく
 msgid "隐"
 msgstr "隠"
 
-#: apps/app/src/lib/group-invite-delivery.ts:473
+#: apps/app/src/lib/group-invite-delivery.ts:492
 msgid "回到群邀请"
 msgstr "グループ招待に戻る"
 
 #. placeholder {0}: record.groupName
-#: apps/app/src/lib/group-invite-delivery.ts:475
+#: apps/app/src/lib/group-invite-delivery.ts:494
 msgid "这条会话最近收到过「{0}」的群邀请。"
 msgstr "この会話には最近「{0}」からのグループ招待が届いています。"
 
-#: apps/app/src/lib/group-invite-delivery.ts:476
+#: apps/app/src/lib/group-invite-delivery.ts:495
 msgid "这条会话最近收到过一个群邀请，可回到邀请页继续转发。"
 msgstr "この会話には最近グループ招待が届いています。招待ページに戻って引き続き転送できます。"
 
@@ -23112,40 +23116,40 @@ msgstr ""
 msgid "说点什么..."
 msgstr "何か書く..."
 
-#: apps/app/src/routes/character-detail-page.tsx:323
+#: apps/app/src/routes/character-detail-page.tsx:324
 msgid "正在读取朋友资料..."
 msgstr "友だち情報を読み込み中..."
 
-#: apps/app/src/routes/character-detail-page.tsx:324
+#: apps/app/src/routes/character-detail-page.tsx:325
 msgid "正在读取朋友资料"
 msgstr "友だち情報を読み込み中"
 
-#: apps/app/src/routes/character-detail-page.tsx:326
+#: apps/app/src/routes/character-detail-page.tsx:327
 msgid "稍等一下，正在同步这个联系人的资料和关系状态。"
 msgstr "少々お待ちください。この連絡先の情報と関係状態を同期しています。"
 
-#: apps/app/src/routes/character-detail-page.tsx:329
+#: apps/app/src/routes/character-detail-page.tsx:330
 #: apps/app/src/routes/chat-details-page.tsx:872
 msgid "联系人资料暂时不可用"
 msgstr "連絡先情報は一時的に利用できません"
 
-#: apps/app/src/routes/character-detail-page.tsx:330
+#: apps/app/src/routes/character-detail-page.tsx:331
 msgid "角色不存在"
 msgstr "キャラクターが存在しません"
 
-#: apps/app/src/routes/character-detail-page.tsx:332
+#: apps/app/src/routes/character-detail-page.tsx:333
 msgid "这个资料暂时不可用，返回通讯录再试一次。"
 msgstr "このプロフィールは一時的に利用できません。連絡先に戻ってもう一度お試しください。"
 
-#: apps/app/src/routes/character-detail-page.tsx:335
+#: apps/app/src/routes/character-detail-page.tsx:336
 msgid "这个资料暂时不可用，可以先重试读取，或返回上一页后再试。"
 msgstr "このプロフィールは一時的に利用できません。再読み込みするか、前のページに戻ってからもう一度お試しください。"
 
-#: apps/app/src/routes/character-detail-page.tsx:338
+#: apps/app/src/routes/character-detail-page.tsx:339
 msgid "这个资料暂时不可用，可以先重试读取，或返回通讯录后再试。"
 msgstr "このプロフィールは一時的に利用できません。再読み込みするか、連絡先に戻ってからもう一度お試しください。"
 
-#: apps/app/src/routes/character-detail-page.tsx:343
+#: apps/app/src/routes/character-detail-page.tsx:344
 #: apps/app/src/routes/group-contacts-page.tsx:243
 #: apps/app/src/routes/group-contacts-page.tsx:320
 #: apps/app/src/routes/official-accounts-page.tsx:261
@@ -23155,202 +23159,202 @@ msgstr "このプロフィールは一時的に利用できません。再読み
 msgid "返回通讯录"
 msgstr "連絡先に戻る"
 
-#: apps/app/src/routes/character-detail-page.tsx:346
-#: apps/app/src/routes/character-detail-page.tsx:1101
+#: apps/app/src/routes/character-detail-page.tsx:347
+#: apps/app/src/routes/character-detail-page.tsx:1102
 msgid "正在接通视频..."
 msgstr "ビデオ接続中..."
 
-#: apps/app/src/routes/character-detail-page.tsx:347
-#: apps/app/src/routes/character-detail-page.tsx:1092
+#: apps/app/src/routes/character-detail-page.tsx:348
+#: apps/app/src/routes/character-detail-page.tsx:1093
 msgid "正在接通语音..."
 msgstr "音声接続中..."
 
-#: apps/app/src/routes/character-detail-page.tsx:348
+#: apps/app/src/routes/character-detail-page.tsx:349
 msgid "正在打开..."
 msgstr "開いています..."
 
-#: apps/app/src/routes/character-detail-page.tsx:349
+#: apps/app/src/routes/character-detail-page.tsx:350
 msgid "正在接通..."
 msgstr "接続中..."
 
-#: apps/app/src/routes/character-detail-page.tsx:352
-#: apps/app/src/routes/character-detail-page.tsx:1086
+#: apps/app/src/routes/character-detail-page.tsx:353
+#: apps/app/src/routes/character-detail-page.tsx:1087
 msgid "音视频通话"
 msgstr "音声・ビデオ通話"
 
-#: apps/app/src/routes/character-detail-page.tsx:353
+#: apps/app/src/routes/character-detail-page.tsx:354
 #: apps/app/src/routes/contacts-page.tsx:1671
 msgid "查看好友申请"
 msgstr "友だち申請を見る"
 
-#: apps/app/src/routes/character-detail-page.tsx:354
+#: apps/app/src/routes/character-detail-page.tsx:355
 msgid "等待对方通过"
 msgstr "承認待ち"
 
-#: apps/app/src/routes/character-detail-page.tsx:358
+#: apps/app/src/routes/character-detail-page.tsx:359
 msgid "设置备注和标签"
 msgstr "備考とタグを設定"
 
-#: apps/app/src/routes/character-detail-page.tsx:360
+#: apps/app/src/routes/character-detail-page.tsx:361
 msgid "给朋友设置备注名"
 msgstr "友だちの備考名を設定"
 
-#: apps/app/src/routes/character-detail-page.tsx:362
+#: apps/app/src/routes/character-detail-page.tsx:363
 msgid "用逗号分隔，例如：同事，策展"
 msgstr "カンマ区切りで入力します。例: 同僚、キュレーター"
 
-#: apps/app/src/routes/character-detail-page.tsx:368
+#: apps/app/src/routes/character-detail-page.tsx:369
 msgid "世界内自然认识"
 msgstr "世界の中で自然に知り合った"
 
-#: apps/app/src/routes/character-detail-page.tsx:371
+#: apps/app/src/routes/character-detail-page.tsx:372
 #: apps/app/src/routes/chat-details-page.tsx:1015
 msgid "推荐给朋友"
 msgstr "友だちにすすめる"
 
-#: apps/app/src/routes/character-detail-page.tsx:372
+#: apps/app/src/routes/character-detail-page.tsx:373
 #: apps/app/src/routes/chat-details-page.tsx:1018
 msgid "打开系统分享面板"
 msgstr "システム共有シートを開く"
 
-#: apps/app/src/routes/character-detail-page.tsx:373
+#: apps/app/src/routes/character-detail-page.tsx:374
 msgid "复制这张隐界名片"
 msgstr "この隐界名刺をコピー"
 
-#: apps/app/src/routes/character-detail-page.tsx:379
+#: apps/app/src/routes/character-detail-page.tsx:380
 msgid "角色简介"
 msgstr "キャラクター紹介"
 
-#: apps/app/src/routes/character-detail-page.tsx:380
+#: apps/app/src/routes/character-detail-page.tsx:381
 msgid "暂时没有更多介绍。"
 msgstr "今のところこれ以上の紹介はありません。"
 
-#: apps/app/src/routes/character-detail-page.tsx:382
+#: apps/app/src/routes/character-detail-page.tsx:383
 msgid "关系管理"
 msgstr "関係管理"
 
-#: apps/app/src/routes/character-detail-page.tsx:383
+#: apps/app/src/routes/character-detail-page.tsx:384
 msgid "设为星标朋友"
 msgstr "星付きの友だちにする"
 
-#: apps/app/src/routes/character-detail-page.tsx:385
-#: apps/app/src/routes/character-detail-page.tsx:1120
+#: apps/app/src/routes/character-detail-page.tsx:386
+#: apps/app/src/routes/character-detail-page.tsx:1121
 msgid "恢复正常联系"
 msgstr "通常の連絡に戻す"
 
-#: apps/app/src/routes/character-detail-page.tsx:386
+#: apps/app/src/routes/character-detail-page.tsx:387
 msgid "不再接收对方互动"
 msgstr "相手からのやり取りを受け取らない"
 
-#: apps/app/src/routes/character-detail-page.tsx:395
+#: apps/app/src/routes/character-detail-page.tsx:396
 #: apps/app/src/routes/friend-moments-page.tsx:499
 msgid "这个角色还没有个性签名。"
 msgstr "このキャラクターにはまだ署名がありません。"
 
-#: apps/app/src/routes/character-detail-page.tsx:402
+#: apps/app/src/routes/character-detail-page.tsx:403
 msgid "暂无状态"
 msgstr "状態はまだありません"
 
-#: apps/app/src/routes/character-detail-page.tsx:618
+#: apps/app/src/routes/character-detail-page.tsx:619
 #: apps/app/src/routes/chat-details-page.tsx:567
 msgid "{ownerName} 想把你加到通讯录里。"
 msgstr "{ownerName} さんが連絡先に追加しようとしています。"
 
-#: apps/app/src/routes/character-detail-page.tsx:637
+#: apps/app/src/routes/character-detail-page.tsx:638
 #: apps/app/src/routes/chat-details-page.tsx:576
 msgid "已添加到通讯录。"
 msgstr "連絡先に追加しました。"
 
-#: apps/app/src/routes/character-detail-page.tsx:679
+#: apps/app/src/routes/character-detail-page.tsx:680
 msgid "已开启默认语音回复（消耗 token plan 配额）。"
 msgstr "デフォルト音声返信を有効化しました（token plan クォータを消費します）。"
 
-#: apps/app/src/routes/character-detail-page.tsx:680
+#: apps/app/src/routes/character-detail-page.tsx:681
 msgid "已关闭默认语音回复。"
 msgstr "デフォルト音声返信を無効化しました。"
 
-#: apps/app/src/routes/character-detail-page.tsx:735
+#: apps/app/src/routes/character-detail-page.tsx:736
 msgid "朋友资料已更新。"
 msgstr "友だち情報を更新しました。"
 
-#: apps/app/src/routes/character-detail-page.tsx:907
-#: apps/app/src/routes/character-detail-page.tsx:915
+#: apps/app/src/routes/character-detail-page.tsx:908
+#: apps/app/src/routes/character-detail-page.tsx:916
 msgid "{displayName} 的隐界名片"
 msgstr "{displayName}の隐界名刺"
 
 #. placeholder {0}: buildYinjieId(character.id)
 #. placeholder {0}: buildYinjieId(targetCharacterId)
-#: apps/app/src/routes/character-detail-page.tsx:909
-#: apps/app/src/routes/character-detail-page.tsx:1705
+#: apps/app/src/routes/character-detail-page.tsx:910
+#: apps/app/src/routes/character-detail-page.tsx:1706
 #: apps/app/src/routes/chat-details-page.tsx:310
 #: apps/app/src/routes/chat-details-page.tsx:336
 msgid "隐界号：{0}"
 msgstr "Yinjie ID：{0}"
 
-#: apps/app/src/routes/character-detail-page.tsx:938
+#: apps/app/src/routes/character-detail-page.tsx:939
 msgid "当前环境暂不支持复制名片。"
 msgstr "この環境では名刺のコピーにまだ対応していません。"
 
-#: apps/app/src/routes/character-detail-page.tsx:962
+#: apps/app/src/routes/character-detail-page.tsx:963
 msgid "复制名片失败，请稍后重试。"
 msgstr "名刺のコピーに失敗しました。しばらくしてからもう一度お試しください。"
 
-#: apps/app/src/routes/character-detail-page.tsx:976
+#: apps/app/src/routes/character-detail-page.tsx:977
 msgid "确认把这个角色移出黑名单吗？"
 msgstr "このキャラクターをブロックリストから解除しますか？"
 
-#: apps/app/src/routes/character-detail-page.tsx:977
+#: apps/app/src/routes/character-detail-page.tsx:978
 msgid "加入黑名单后，将不再接收这个角色的互动。确认继续吗？"
 msgstr "ブロックすると、このキャラクターからのやり取りは届かなくなります。続けますか？"
 
-#: apps/app/src/routes/character-detail-page.tsx:991
+#: apps/app/src/routes/character-detail-page.tsx:992
 msgid "确认删除这个联系人吗？"
 msgstr "この連絡先を削除しますか？"
 
-#: apps/app/src/routes/character-detail-page.tsx:1087
+#: apps/app/src/routes/character-detail-page.tsx:1088
 msgid "选择要发起的通话方式。"
 msgstr "開始する通話方式を選んでください。"
 
-#: apps/app/src/routes/character-detail-page.tsx:1094
+#: apps/app/src/routes/character-detail-page.tsx:1095
 msgid "进入语音通话"
 msgstr "音声通話に入る"
 
-#: apps/app/src/routes/character-detail-page.tsx:1103
+#: apps/app/src/routes/character-detail-page.tsx:1104
 msgid "进入视频通话"
 msgstr "ビデオ通話に入る"
 
-#: apps/app/src/routes/character-detail-page.tsx:1113
+#: apps/app/src/routes/character-detail-page.tsx:1114
 msgid "移出后将恢复正常联系与互动。"
 msgstr "解除すると通常の連絡とやり取りに戻ります。"
 
-#: apps/app/src/routes/character-detail-page.tsx:1114
+#: apps/app/src/routes/character-detail-page.tsx:1115
 msgid "加入黑名单后，将不再接收这个角色的互动。"
 msgstr "ブロックすると、このキャラクターからのやり取りは届かなくなります。"
 
-#: apps/app/src/routes/character-detail-page.tsx:1121
+#: apps/app/src/routes/character-detail-page.tsx:1122
 msgid "后续互动会被拦截"
 msgstr "今後のやり取りはブロックされます"
 
-#: apps/app/src/routes/character-detail-page.tsx:1142
+#: apps/app/src/routes/character-detail-page.tsx:1143
 msgid "对方不会收到通知"
 msgstr ""
 
 #. placeholder {0}: friendship?.region?.trim() || character?.region?.trim() || unsetLabel
-#: apps/app/src/routes/character-detail-page.tsx:1715
+#: apps/app/src/routes/character-detail-page.tsx:1716
 msgid "地区：{0}"
 msgstr "地域: {0}"
 
 #. placeholder {0}: character.relationship || worldRoleLabel
-#: apps/app/src/routes/character-detail-page.tsx:1718
+#: apps/app/src/routes/character-detail-page.tsx:1719
 msgid "身份：{0}"
 msgstr "肩書き: {0}"
 
-#: apps/app/src/routes/character-detail-page.tsx:1933
+#: apps/app/src/routes/character-detail-page.tsx:1934
 msgid "已不再看 TA 的朋友圈"
 msgstr ""
 
 #. placeholder {0}: friendship?.sparkStreak ?? 0
-#: apps/app/src/routes/character-detail-page.tsx:1977
+#: apps/app/src/routes/character-detail-page.tsx:1978
 msgid "已连续 {0} 天"
 msgstr "{0} 日連続"
 

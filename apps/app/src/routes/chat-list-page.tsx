@@ -91,6 +91,7 @@ import { useChatReminderEntries } from "../features/chat/use-chat-reminder-entri
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { normalizePathname } from "../lib/normalize-pathname";
 import {
+  getConversationDisplayTitle,
   getConversationPreviewParts,
   getConversationVisibleLastMessage,
 } from "../lib/conversation-preview";
@@ -1606,6 +1607,10 @@ function ConversationListItemLinkImpl({
       emptyText: t(msg`从这里开始第一句问候`),
     },
   );
+  // 服务端 normalizeLegacyConversationEntity 在 title 全部 fallback 失败时
+  // 持久化字面量 "未知联系人" / "Direct conversation"，切到英/日/韩 时仍渲染
+  // 原始中文。这里用本地 i18n 把这两个 sentinel 翻译成当前 locale。
+  const displayTitle = getConversationDisplayTitle(conversation.title);
 
   const updateSwipeOffset = (nextOffset: number) => {
     swipeOffsetRef.current = nextOffset;
@@ -1694,13 +1699,13 @@ function ConversationListItemLinkImpl({
           memberId 哈希出 4 格马赛克。 */}
       {isGroupConversation ? (
         <GroupAvatarChip
-          name={conversation.title}
+          name={displayTitle}
           members={conversation.participants}
           size="wechat"
         />
       ) : (
         <AvatarChip
-          name={conversation.title}
+          name={displayTitle}
           src={conversation.avatar}
           size="wechat"
         />
@@ -1709,7 +1714,7 @@ function ConversationListItemLinkImpl({
         <div className="flex items-start justify-between gap-2.5">
           <div className="min-w-0 flex-1">
             <div className="truncate text-[14px] font-normal leading-[1.25] text-[color:var(--text-primary)]">
-              {conversation.title}
+              {displayTitle}
             </div>
             <div className="mt-0.5 truncate text-[11px] leading-[1.35] text-[color:var(--text-muted)]">
               {preview.prefix}
