@@ -74,7 +74,10 @@ export function AccountSecurityPanel() {
   // sendCodeMutation.mutate() 同步会再触发请求——手快的用户点 3 下就真打到
   // cloud-api 3 条 /password/send-change-code，再被服务端 429 退回，体验差且
   // 浪费配额。用 ref 做同步守卫，settled 时复位。
+  // 更新密码 同款问题——三连击 type="submit" 也能同 tick 同步触发 3 个
+  // /password/change 请求。两个 mutation 都加 ref-guard。
   const sendInFlightRef = useRef(false);
+  const changeInFlightRef = useRef(false);
   const [feedback, setFeedback] = useState<{
     tone: "success" | "danger";
     message: string;
@@ -242,7 +245,15 @@ export function AccountSecurityPanel() {
       });
       return;
     }
-    changePasswordMutation.mutate();
+    // 同 tick 多次点 type="submit" / 按 Enter 时，isPending 还没 propagate，
+    // disabled 兜不住 → mutate 多次。ref 同步守卫。
+    if (changeInFlightRef.current) return;
+    changeInFlightRef.current = true;
+    changePasswordMutation.mutate(undefined, {
+      onSettled: () => {
+        changeInFlightRef.current = false;
+      },
+    });
   }
 
   // 把核心提交条件统一到一个 flag 上，避免 disabled / 视觉态各走各的。
