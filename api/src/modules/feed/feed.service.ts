@@ -115,6 +115,23 @@ const MAX_FEED_COMMENT_TEXT_LENGTH = 500;
 // whitespace-pre-wrap 把卡片撑到一屏多，列表滚动卡顿。对齐 moments 2000 字。
 const MAX_FEED_TEXT_LENGTH = 2000;
 
+// 走查 R1：getFeed 入参 clamp。前端固定 limit=20，但 curl / 反代 / 旧缓存能塞
+// ?limit=abc → Number(NaN) → TypeORM 抛 500，或 ?limit=999999 → 拉全表。
+// 100 是经验上限：moments 全屏 ~20，3 屏滚动一次性最多预期 60，给 100 留 buffer
+// 仍能挡住爆量；page < 1 兜回 1（.skip(负数) TypeORM 沉默跳过，但显式归一让下游
+// 行为可预测）。
+const MAX_FEED_PAGE_LIMIT = 100;
+function clampFeedPaginationPage(raw: unknown): number {
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 1) return 1;
+  return Math.floor(value);
+}
+function clampFeedPaginationLimit(raw: unknown): number {
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 1) return 20;
+  return Math.min(Math.floor(value), MAX_FEED_PAGE_LIMIT);
+}
+
 // 视觉为空：trim 后去掉零宽字符（U+200B–U+200D / U+FEFF / U+2060）和内部空白。
 // 防止"w：（空白）"这种 footer 仍在但正文空的鬼影评论。和 moments 一致。
 function isFeedCommentTextVisuallyEmpty(raw: string): boolean {
@@ -250,6 +267,13 @@ export class FeedService implements OnModuleInit {
     limit = 20,
     surface: FeedSurface = 'feed',
   ): Promise<{ posts: FeedListItem[]; total: number }> {
+    // 走查 R1：controller 把 `Number(query)` 直接灌进来 — ?limit=abc → NaN，
+    // TypeORM .take(NaN) 抛 "Provided skip value is not a number" → 500；
+    // ?limit=999999 → 无上限 DoS（前端硬编码 20，但 curl / 反代缓存能绕过）。
+    // 服务端自己再 clamp 一次，[1, 100] 兜底；page < 1 同样兜回 1（旧 .skip(
+    // 负数) TypeORM 会忽略，但显式归一更可预测）。
+    page = clampFeedPaginationPage(page);
+    limit = clampFeedPaginationLimit(limit);
     if (surface === 'channels') {
       await this.ensureChannelSeedData();
       await this.topUpChannelsIfNeeded();
@@ -317,8 +341,8 @@ export class FeedService implements OnModuleInit {
       ownerAvatar: owner.avatar,
     });
     const section = input?.section ?? 'recommended';
-    const page = input?.page ?? 1;
-    const limit = input?.limit ?? 20;
+    const page = clampFeedPaginationPage(input?.page ?? 1);
+    const limit = clampFeedPaginationLimit(input?.limit ?? 20);
 
     const postsForSection = await this.getVisibleChannelPosts(
       owner.id,
@@ -359,8 +383,8 @@ export class FeedService implements OnModuleInit {
       ownerAvatar: owner.avatar,
     });
     const section = input?.section ?? 'recommended';
-    const page = input?.page ?? 1;
-    const limit = input?.limit ?? 20;
+    const page = clampFeedPaginationPage(input?.page ?? 1);
+    const limit = clampFeedPaginationLimit(input?.limit ?? 20);
 
     const allVisiblePosts = await this.getVisibleChannelPosts(
       owner.id,
@@ -3934,15 +3958,22 @@ export class FeedService implements OnModuleInit {
     postId: string,
     key: 'favoriteCount' | 'likeCount',
   ) {
-    const post = await this.postRepo.findOneBy({ id: postId });
-    if (!post) {
-      return;
-    }
-
-    const currentValue = Number(post[key] ?? 0);
-    await this.postRepo.update(postId, {
-      [key]: currentValue > 0 ? currentValue - 1 : 0,
-    });
+    // 走查 R1：旧实现是 findOneBy + 内存里 `currentValue > 0 ? -1 : 0` + update —
+    // 经典 TOCTOU。两条并发 unlike（mid-flight 用户连点 / 桌面端两 row 同时
+    // 取消赞）都能读到 currentValue=1 → 都写回 0，但实际只有一行 interaction
+    // 被 deleted；下一次自然 refetch 时 likeCount 仍是 0 / DB interaction 0 行
+    // → 对得上。但反过来 like + unlike 撞包时：unlike 读到 0 → 写 0；like 后
+    // 到 → INSERT IGNORE 命中 unique 跳过 / counter 不动 → 用户看 hasLiked=true
+    // 但 likeCount=0 永久卡住，除非 ensureFeedUniqueIndexes 启动重算。
+    // 改成单条 SQL 原子 update：CASE 表达式直接在 DB 里做 clamp，绕开 read。
+    await this.postRepo
+      .createQueryBuilder()
+      .update(FeedPostEntity)
+      .set({
+        [key]: () => `CASE WHEN "${key}" > 0 THEN "${key}" - 1 ELSE 0 END`,
+      })
+      .where('id = :id', { id: postId })
+      .execute();
   }
 
 }

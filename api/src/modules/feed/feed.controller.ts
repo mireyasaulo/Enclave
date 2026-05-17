@@ -10,6 +10,20 @@ import {
 import { FeedService } from './feed.service';
 import type { MomentMediaAsset } from '../moments/moment-media.types';
 
+const MAX_FEED_LIMIT = 100;
+
+function clampPaginationPage(raw: unknown): number {
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 1) return 1;
+  return Math.floor(value);
+}
+
+function clampPaginationLimit(raw: unknown): number {
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 1) return 20;
+  return Math.min(Math.floor(value), MAX_FEED_LIMIT);
+}
+
 @Controller('feed')
 export class FeedController {
   constructor(private readonly feedService: FeedService) {}
@@ -23,8 +37,8 @@ export class FeedController {
   ) {
     return this.feedService.getChannelHome({
       section,
-      page: Number(page),
-      limit: Number(limit),
+      page: clampPaginationPage(page),
+      limit: clampPaginationLimit(limit),
     });
   }
 
@@ -37,8 +51,8 @@ export class FeedController {
   ) {
     return this.feedService.getChannelHomeDecorations({
       section,
-      page: Number(page),
-      limit: Number(limit),
+      page: clampPaginationPage(page),
+      limit: clampPaginationLimit(limit),
     });
   }
 
@@ -63,7 +77,16 @@ export class FeedController {
     @Query('limit') limit = '20',
     @Query('surface') surface: 'feed' | 'channels' | undefined,
   ) {
-    return this.feedService.getFeed(Number(page), Number(limit), surface);
+    // 走查 R1：?limit=abc 直接 Number(NaN) → TypeORM .take(NaN) 抛 "Provided
+    // skip value is not a number" → 500，老 client 不会发这种请求但 curl /
+    // 反代 / 旧缓存链路一旦塞进来，整条广场就 500；同时 ?limit=999999 这条
+    // DoS 路径之前 0 设防（前端硬编码 20，但服务端也得自己兜）。统一 clamp
+    // 到 [1, 100]，?page 同样兜 [1, …]。
+    return this.feedService.getFeed(
+      clampPaginationPage(page),
+      clampPaginationLimit(limit),
+      surface,
+    );
   }
 
   @Post()
