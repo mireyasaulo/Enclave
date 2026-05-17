@@ -12,7 +12,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { onChatMessage, onConversationUpdated } from "../lib/socket";
 import { ArrowLeft, MessageSquarePlus, Search } from "lucide-react";
-import { getGroups, type Group } from "@yinjie/contracts";
+import { getConversations, getGroups, type Group } from "@yinjie/contracts";
+import { isPersistedGroupConversation } from "../lib/conversation-route";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { GroupAvatarChip } from "../components/group-avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -117,6 +118,29 @@ function MobileGroupContactsPage() {
     staleTime: 30_000,
     refetchOnWindowFocus: true,
   });
+  // 走查 R3：本页的群行用 `<GroupAvatarChip name={group.name} />` 单 seed 渲染，
+  // 而 chat-list 的群行用 `members={conversation.participants}` 四 seed 渲染——
+  // 同一个群在「消息」tab 和「通讯录/群聊」tab 看到的 2×2 马赛克完全不一样，
+  // 切 tab 时肉眼可见的"是不是进错了群"。toGroup 后端 DTO 没带 participants
+  // 字段（getGroups 仅返回 Group 元数据），改后端会动太多调用方；客户端这里
+  // 借 conversations cache 找同 id 的会话 → 拿 participants → 喂给 chip，参与
+  // 者列表与 chat-list 完全对齐。conversations 是 chat-list / 群通话页 / 群信息
+  // 页都在用的共享 cache，进通讯录前用户大概率刚停过 chat-list，命中率高；
+  // 即使冷启 cache 没命中，落回单 seed 渲染（之前的行为），同时本页这次的
+  // useQuery 也会顺手把 cache 填上，下次稳态就一致了。
+  const conversationsQuery = useQuery({
+    queryKey: ["app-conversations", baseUrl],
+    queryFn: () => getConversations(baseUrl),
+  });
+  const groupParticipantsMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const conversation of conversationsQuery.data ?? []) {
+      if (isPersistedGroupConversation(conversation)) {
+        map.set(conversation.id, conversation.participants);
+      }
+    }
+    return map;
+  }, [conversationsQuery.data]);
 
   // 走查 Round 5：群被 AI 回复触发 touchGroupActivity → isHidden=false 翻回
   // 可见时，chat-list 通过 socket onChatMessage/onConversationUpdated 立即拉
@@ -375,7 +399,11 @@ function MobileGroupContactsPage() {
                     : undefined,
                 )}
               >
-                <GroupAvatarChip name={group.name} size="wechat" />
+                <GroupAvatarChip
+                  name={group.name}
+                  members={groupParticipantsMap.get(group.id)}
+                  size="wechat"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-3">
                     <div className="min-w-0 flex-1 truncate text-[14px] text-[color:var(--text-primary)]">
