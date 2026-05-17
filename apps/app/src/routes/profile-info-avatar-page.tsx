@@ -234,7 +234,14 @@ export function ProfileInfoAvatarPage() {
   const trimmed = draft.trim();
   // 优先使用本地选图；没选过 → 才看 URL 输入框
   const valueToSave = pickedLocal?.dataUrl || trimmed;
-  const baseline = hasCustomAvatar ? avatar.trim() : "";
+  // 第三轮新会话 R1：之前 `hasCustomAvatar ? avatar.trim() : ""` 每次 render
+  // 都跑一次 trim()——legacy 用户存了 ~1MB data URL 头像、又在 URL 输入框里
+  // 边敲边校验时，每个 keystroke 都触发 1MB 字符串 trim()/复制，肉眼可感卡顿。
+  // avatar 变化是稀有事件（只有 store hydrate 时），用 useMemo 缓存 trim 结果。
+  const baseline = useMemo(
+    () => (hasCustomAvatar ? avatar.trim() : ""),
+    [hasCustomAvatar, avatar],
+  );
   const dirty = valueToSave !== baseline;
   // pickedLocal 是 FileReader 给的 data URL，size 已经被 MAX_AVATAR_BYTES
   // (1MB) 拦过；只有用户手敲 / 粘贴的 draft 才需要校 URL 格式 + 长度。
