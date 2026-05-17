@@ -32,13 +32,30 @@ export type FarmEventKind =
   | "water"
   | "weed"
   | "debug"
+  | "fertilize"
+  | "pesticide"
   | "buy"
   | "sell"
   | "level_up"
   | "steal"
+  | "steal_blocked"
+  | "dog_buy"
+  | "dog_feed"
+  | "dog_upgrade"
   | "visit"
   | "intimacy_change"
   | "incident_broadcast";
+
+export type FarmConsumableId = "fertilizer" | "pesticide" | "dog_food";
+
+export interface FarmConsumableDefinition {
+  id: FarmConsumableId;
+  nameZh: string;
+  emoji: string;
+  price: number;
+  unlockLevel: number;
+  descriptionZh: string;
+}
 
 export interface FarmPlot {
   index: number;
@@ -52,6 +69,14 @@ export interface FarmPlot {
   stolenBy: string[];
   plantedBy?: string;
   yieldOverride?: number | null;
+  fertilized?: boolean;
+  pesticideUntilMs?: number | null;
+}
+
+export interface FarmDogState {
+  level: number;
+  energy: number;
+  lastFedAt: number | null;
 }
 
 export interface FarmCharacterMood {
@@ -82,6 +107,19 @@ export interface FarmCropDefinition {
   experience: number;
 }
 
+export interface FarmConsumablePurchaseResult {
+  player: FarmPlayerStateView;
+  consumableId: FarmConsumableId;
+  quantity: number;
+  coinsSpent: number;
+}
+
+export interface FarmDogPurchaseResult {
+  player: FarmPlayerStateView;
+  dog: FarmDogState;
+  coinsSpent: number;
+}
+
 export interface FarmPlayerStateView {
   ownerId: string;
   coins: number;
@@ -91,6 +129,8 @@ export interface FarmPlayerStateView {
   plots: FarmPlot[];
   warehouse: Record<string, number>;
   seedBag: Record<string, number>;
+  consumables: Record<FarmConsumableId, number>;
+  dog: FarmDogState;
   weeklyStolenLog: FarmStolenLogEntry[];
   serverNowMs: number;
   updatedAt: string;
@@ -445,3 +485,46 @@ export function computePlotCountForLevel(level: number): number {
   }
   return plotCount;
 }
+
+export const FARM_CONSUMABLE_CATALOG: Record<FarmConsumableId, FarmConsumableDefinition> = {
+  fertilizer: {
+    id: "fertilizer",
+    nameZh: "化肥",
+    emoji: "💩",
+    price: 120,
+    unlockLevel: 2,
+    descriptionZh: "把作物剩余成长时间砍掉一半，每株作物只能用一次。",
+  },
+  pesticide: {
+    id: "pesticide",
+    nameZh: "农药",
+    emoji: "🧴",
+    price: 80,
+    unlockLevel: 2,
+    descriptionZh: "立刻清掉害虫，并在 12 小时内免疫虫害。",
+  },
+  dog_food: {
+    id: "dog_food",
+    nameZh: "狗粮",
+    emoji: "🦴",
+    price: 50,
+    unlockLevel: 5,
+    descriptionZh: "喂一次看家狗：回复 60 点能量，让它继续帮你看菜地。",
+  },
+};
+
+export const FARM_CONSUMABLE_IDS: FarmConsumableId[] = Object.keys(
+  FARM_CONSUMABLE_CATALOG,
+) as FarmConsumableId[];
+
+export const FARM_DOG_LEVEL_CAP = 5;
+export const FARM_DOG_BUY_COST = 800;
+export const FARM_DOG_UPGRADE_COSTS: ReadonlyArray<number> = [
+  0, 800, 1600, 3200, 6400, 12800,
+];
+export const FARM_DOG_FOOD_COST = 50;
+export const FARM_DOG_UNLOCK_LEVEL = 5;
+export const FARM_DOG_ENERGY_DECAY_PER_HOUR = 4;
+export const FARM_DOG_FEED_RESTORE = 60;
+export const FARM_FERTILIZER_SHRINK_RATIO = 0.5;
+export const FARM_PESTICIDE_PROTECT_HOURS = 12;

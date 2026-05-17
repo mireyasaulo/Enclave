@@ -4,9 +4,13 @@ import { FarmEventService } from './farm-event.service';
 import { FarmNpcService } from './farm-npc.service';
 import { FarmStateService } from './farm-state.service';
 import { isFarmCropId } from './crop-catalog';
+import { isFarmConsumableId } from './crop-catalog';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
+  FarmConsumableId,
+  FarmConsumablePurchaseResult,
   FarmCropId,
+  FarmDogPurchaseResult,
   FarmEventView,
   FarmHarvestResult,
   FarmNeighborDetail,
@@ -27,6 +31,11 @@ interface PlotActionBody {
 
 interface SeedTransactionBody {
   cropId: FarmCropId;
+  quantity: number;
+}
+
+interface ConsumableTransactionBody {
+  consumableId: FarmConsumableId;
   quantity: number;
 }
 
@@ -137,6 +146,45 @@ export class FarmController {
     return this.stateService.sellCrop(ownerId, cropId, Math.floor(body.quantity));
   }
 
+  @Post('buy-consumable')
+  async buyConsumable(
+    @Body() body: ConsumableTransactionBody,
+  ): Promise<FarmConsumablePurchaseResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const consumableId = parseConsumableId(body.consumableId);
+    return this.stateService.buyConsumable(
+      ownerId,
+      consumableId,
+      Math.floor(body.quantity),
+    );
+  }
+
+  @Post('apply-fertilizer')
+  async applyFertilizer(@Body() body: PlotActionBody): Promise<FarmPlayerStateView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const plotIndex = parsePlotIndex(body.plotIndex);
+    return this.stateService.applyFertilizer(ownerId, plotIndex);
+  }
+
+  @Post('apply-pesticide')
+  async applyPesticide(@Body() body: PlotActionBody): Promise<FarmPlayerStateView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const plotIndex = parsePlotIndex(body.plotIndex);
+    return this.stateService.applyPesticide(ownerId, plotIndex);
+  }
+
+  @Post('buy-dog')
+  async buyDog(): Promise<FarmDogPurchaseResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.stateService.buyOrUpgradeDog(ownerId);
+  }
+
+  @Post('feed-dog')
+  async feedDog(): Promise<FarmPlayerStateView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.stateService.feedDog(ownerId);
+  }
+
   @Get('events')
   async listEvents(
     @Query('since') since?: string,
@@ -168,6 +216,16 @@ function parseCropId(raw: unknown): FarmCropId {
     throw new AppError('FARM_UNKNOWN_CROP', {
       params: { cropId: String(raw) },
       legacyMessage: `未知作物：${String(raw)}`,
+    });
+  }
+  return raw;
+}
+
+function parseConsumableId(raw: unknown): FarmConsumableId {
+  if (typeof raw !== 'string' || !isFarmConsumableId(raw)) {
+    throw new AppError('FARM_UNKNOWN_CONSUMABLE', {
+      params: { consumableId: String(raw) },
+      legacyMessage: `未知道具：${String(raw)}`,
     });
   }
   return raw;

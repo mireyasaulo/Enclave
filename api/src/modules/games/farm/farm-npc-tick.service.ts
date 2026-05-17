@@ -7,6 +7,7 @@ import { CharacterEntity } from '../../characters/character.entity';
 import { WorldOwnerService } from '../../auth/world-owner.service';
 import { FarmEventService } from './farm-event.service';
 import { FarmNpcService } from './farm-npc.service';
+import { FarmStateService } from './farm-state.service';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ensurePlotsArray,
@@ -44,6 +45,7 @@ export class FarmNpcTickService {
     private readonly worldOwnerService: WorldOwnerService,
     private readonly npcService: FarmNpcService,
     private readonly eventService: FarmEventService,
+    private readonly stateService: FarmStateService,
   ) {}
 
   @Cron(FARM_NPC_TICK_CRON)
@@ -279,6 +281,23 @@ export class FarmNpcTickService {
     const plots = ensurePlotsArray(player.plotsPayload, player.plotCount).map((p) => ({ ...p }));
     const ripe = findStealablePlot(plots, thief.id);
     if (!ripe) return noResult;
+    // 看家狗拦截：先掷一把骰子，挡住了就只写 steal_blocked 事件，菜地不动。
+    // 这里要先 save 一下"被狗赶走"的事件流让玩家看到，但实际状态没变。
+    const block = await this.stateService.tryBlockNpcSteal(player, Date.now());
+    if (block.blocked) {
+      await this.eventService.recordEvent({
+        ownerId,
+        kind: 'steal_blocked',
+        actorType: 'character',
+        actorId: thief.id,
+        actorName: thief.name,
+        targetType: 'owner',
+        targetId: FARM_PLAYER_ACTOR_ID,
+        targetName: '我',
+        payload: { dogLevel: block.dogLevel, dogEnergy: block.energy },
+      });
+      return noResult;
+    }
     const def = getCropDefinition(ripe.cropId!);
     const amount = Math.max(1, Math.floor((ripe.yieldOverride ?? def.yieldRange[0]) / 2));
     const coinsGained = amount * Math.max(1, Math.floor(def.sellPrice / 2));
@@ -396,6 +415,7 @@ export class FarmNpcTickService {
     const diligence = (npc.moodPayload?.diligence ?? 50) / 100;
     const plots = ensurePlotsArray(npc.plotsPayload, npc.plotCount).map((p) => ({ ...p }));
     let mutated = 0;
+    const nowMs = Date.now();
     for (let i = 0; i < plots.length; i += 1) {
       const plot = plots[i]!;
       if (!plot.cropId) continue;
@@ -411,9 +431,13 @@ export class FarmNpcTickService {
         plot.watered = true;
         mutated += 1;
       }
-      // 偶发自然增加杂草/虫
+      // 偶发自然增加杂草/虫——但农药免疫期内不再随机长虫。
       if (Math.random() < 0.05) plot.weeds = Math.min(3, plot.weeds + 1);
-      if (Math.random() < 0.03) plot.bugs = Math.min(3, plot.bugs + 1);
+      const pesticideActive =
+        plot.pesticideUntilMs != null && nowMs < plot.pesticideUntilMs;
+      if (!pesticideActive && Math.random() < 0.03) {
+        plot.bugs = Math.min(3, plot.bugs + 1);
+      }
     }
     npc.plotsPayload = plots;
     return mutated;

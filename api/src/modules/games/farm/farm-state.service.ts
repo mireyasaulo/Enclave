@@ -10,20 +10,36 @@ import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FARM_CROP_CATALOG,
+  computeDogBlockRate,
+  computeDogEnergy,
   computeLevelFromExperience,
   computeMaturedAtMs,
   computePlotCountForLevel,
   computeRottenAtMs,
+  createDefaultDog,
+  getConsumableDefinition,
   getCropDefinition,
+  isFarmConsumableId,
   isFarmCropId,
 } from './crop-catalog';
 import {
   FARM_DEFAULT_PLAYER_COINS,
   FARM_DEFAULT_PLAYER_SEED_BAG,
   FARM_DEFAULT_PLOT_COUNT,
+  FARM_DOG_BUY_COST,
+  FARM_DOG_FEED_RESTORE,
+  FARM_DOG_LEVEL_CAP,
+  FARM_DOG_UNLOCK_LEVEL,
+  FARM_DOG_UPGRADE_COSTS,
+  FARM_FERTILIZER_SHRINK_RATIO,
+  FARM_PESTICIDE_PROTECT_HOURS,
   FARM_PLAYER_ACTOR_ID,
   FARM_PLAYER_DAILY_STEAL_LIMIT,
+  FarmConsumableId,
+  FarmConsumablePurchaseResult,
   FarmCropId,
+  FarmDogPurchaseResult,
+  FarmDogState,
   FarmHarvestResult,
   FarmNeighborSummary,
   FarmPlayerStateView,
@@ -66,6 +82,9 @@ export class FarmStateService {
         plotsPayload: createEmptyPlots(FARM_DEFAULT_PLOT_COUNT),
         warehousePayload: {},
         seedBagPayload: { ...FARM_DEFAULT_PLAYER_SEED_BAG },
+        // 起步赠 2 包化肥 + 1 瓶农药，鼓励玩家试用，狗粮要到 5 级解锁后自己买。
+        consumablesPayload: { fertilizer: 2, pesticide: 1, dog_food: 0 },
+        dogPayload: createDefaultDog(),
         weeklyStolenLogPayload: [],
         lastTickAt: null,
       });
@@ -95,6 +114,14 @@ export class FarmStateService {
       const stolen = pruneStolenLog(state.weeklyStolenLogPayload ?? []);
       if (stolen !== state.weeklyStolenLogPayload) {
         state.weeklyStolenLogPayload = stolen;
+        mutated = true;
+      }
+      if (!state.consumablesPayload) {
+        state.consumablesPayload = { fertilizer: 0, pesticide: 0, dog_food: 0 };
+        mutated = true;
+      }
+      if (!state.dogPayload) {
+        state.dogPayload = createDefaultDog();
         mutated = true;
       }
       if (mutated) {
@@ -570,8 +597,15 @@ export class FarmStateService {
   }
 
   toPlayerView(state: FarmPlayerStateEntity): FarmPlayerStateView {
+    const nowMs = Date.now();
     const plots = ensurePlotsArray(state.plotsPayload, state.plotCount);
-    const refreshed = plots.map((p) => refreshPlotStage(p, Date.now()));
+    const refreshed = plots.map((p) => refreshPlotStage(p, nowMs));
+    const rawDog = state.dogPayload ?? createDefaultDog();
+    const dog: FarmDogState = {
+      level: rawDog.level,
+      energy: computeDogEnergy(rawDog, nowMs),
+      lastFedAt: rawDog.lastFedAt ?? null,
+    };
     return {
       ownerId: state.ownerId,
       coins: state.coins,
@@ -581,12 +615,276 @@ export class FarmStateService {
       plots: refreshed,
       warehouse: state.warehousePayload ?? {},
       seedBag: state.seedBagPayload ?? {},
+      consumables: {
+        fertilizer: state.consumablesPayload?.fertilizer ?? 0,
+        pesticide: state.consumablesPayload?.pesticide ?? 0,
+        dog_food: state.consumablesPayload?.dog_food ?? 0,
+      },
+      dog,
       weeklyStolenLog: pruneStolenLog(state.weeklyStolenLogPayload ?? []),
-      serverNowMs: Date.now(),
+      serverNowMs: nowMs,
       updatedAt:
         state.updatedAt instanceof Date
           ? state.updatedAt.toISOString()
           : new Date(state.updatedAt).toISOString(),
+    };
+  }
+
+  async buyConsumable(
+    ownerId: string,
+    consumableId: FarmConsumableId,
+    quantity: number,
+  ): Promise<FarmConsumablePurchaseResult> {
+    if (!isFarmConsumableId(consumableId)) {
+      throw new AppError('FARM_UNKNOWN_CONSUMABLE', {
+        params: { consumableId: String(consumableId) },
+        legacyMessage: `未知道具：${consumableId}`,
+      });
+    }
+    if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
+      throw new AppError('FARM_QUANTITY_INVALID', {
+        legacyMessage: '数量必须为正整数',
+      });
+    }
+    const def = getConsumableDefinition(consumableId);
+    const state = await this.getOrCreatePlayerState(ownerId);
+    if (state.level < def.unlockLevel) {
+      throw new AppError('FARM_CONSUMABLE_LEVEL_TOO_LOW', {
+        status: HttpStatus.FORBIDDEN,
+        params: { unlockLevel: def.unlockLevel, name: def.nameZh },
+        legacyMessage: `等级不足：需 ${def.unlockLevel} 级才能购买 ${def.nameZh}`,
+      });
+    }
+    const totalCost = def.price * quantity;
+    if (state.coins < totalCost) {
+      throw new AppError('FARM_INSUFFICIENT_COINS', {
+        params: { required: totalCost },
+        legacyMessage: `金币不足：需 ${totalCost}`,
+      });
+    }
+    state.coins -= totalCost;
+    const bag = { ...(state.consumablesPayload ?? {}) };
+    bag[consumableId] = (bag[consumableId] ?? 0) + quantity;
+    state.consumablesPayload = bag;
+    const saved = await this.playerRepo.save(state);
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'buy',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      payload: { consumableId, quantity, totalCost },
+    });
+    return {
+      player: this.toPlayerView(saved),
+      consumableId,
+      quantity,
+      coinsSpent: totalCost,
+    };
+  }
+
+  async applyFertilizer(
+    ownerId: string,
+    plotIndex: number,
+  ): Promise<FarmPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    const plots = ensurePlotsArray(state.plotsPayload, state.plotCount).map((p) => ({ ...p }));
+    const plot = plots[plotIndex];
+    if (!plot) {
+      throw new AppError('FARM_PLOT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '田块不存在',
+      });
+    }
+    if (!plot.cropId || plot.plantedAt == null || plot.maturedAt == null) {
+      throw new AppError('FARM_PLOT_EMPTY', { legacyMessage: '该田块没有作物' });
+    }
+    const nowMs = Date.now();
+    if (nowMs >= plot.maturedAt) {
+      throw new AppError('FARM_FERTILIZER_TOO_LATE', {
+        legacyMessage: '作物已经成熟，再施肥也没意义',
+      });
+    }
+    if (plot.fertilized) {
+      throw new AppError('FARM_ALREADY_FERTILIZED', {
+        legacyMessage: '这株作物已经施过肥了',
+      });
+    }
+    const bag = { ...(state.consumablesPayload ?? {}) };
+    if ((bag.fertilizer ?? 0) <= 0) {
+      throw new AppError('FARM_NO_FERTILIZER', {
+        legacyMessage: '化肥不足，去农资店买一点',
+      });
+    }
+    bag.fertilizer = (bag.fertilizer ?? 0) - 1;
+    state.consumablesPayload = bag;
+
+    const remaining = plot.maturedAt - nowMs;
+    const shrink = Math.floor(remaining * FARM_FERTILIZER_SHRINK_RATIO);
+    plot.maturedAt = plot.maturedAt - shrink;
+    plot.fertilized = true;
+    plots[plotIndex] = plot;
+    state.plotsPayload = plots;
+    const saved = await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'fertilize',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      cropId: plot.cropId,
+      payload: { plotIndex, shrinkMs: shrink },
+    });
+
+    return this.toPlayerView(saved);
+  }
+
+  async applyPesticide(
+    ownerId: string,
+    plotIndex: number,
+  ): Promise<FarmPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    const plots = ensurePlotsArray(state.plotsPayload, state.plotCount).map((p) => ({ ...p }));
+    const plot = plots[plotIndex];
+    if (!plot) {
+      throw new AppError('FARM_PLOT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '田块不存在',
+      });
+    }
+    if (!plot.cropId) {
+      throw new AppError('FARM_PLOT_EMPTY', { legacyMessage: '该田块没有作物' });
+    }
+    const bag = { ...(state.consumablesPayload ?? {}) };
+    if ((bag.pesticide ?? 0) <= 0) {
+      throw new AppError('FARM_NO_PESTICIDE', {
+        legacyMessage: '农药不足，去农资店买一瓶',
+      });
+    }
+    bag.pesticide = (bag.pesticide ?? 0) - 1;
+    state.consumablesPayload = bag;
+
+    const nowMs = Date.now();
+    plot.bugs = 0;
+    plot.pesticideUntilMs = nowMs + FARM_PESTICIDE_PROTECT_HOURS * 3_600_000;
+    plots[plotIndex] = plot;
+    state.plotsPayload = plots;
+    const saved = await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'pesticide',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      cropId: plot.cropId,
+      payload: { plotIndex, protectUntilMs: plot.pesticideUntilMs },
+    });
+
+    return this.toPlayerView(saved);
+  }
+
+  async buyOrUpgradeDog(ownerId: string): Promise<FarmDogPurchaseResult> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    if (state.level < FARM_DOG_UNLOCK_LEVEL) {
+      throw new AppError('FARM_DOG_LEVEL_TOO_LOW', {
+        status: HttpStatus.FORBIDDEN,
+        params: { unlockLevel: FARM_DOG_UNLOCK_LEVEL },
+        legacyMessage: `等级不足：需 ${FARM_DOG_UNLOCK_LEVEL} 级才能养狗`,
+      });
+    }
+    const dog = state.dogPayload ?? createDefaultDog();
+    if (dog.level >= FARM_DOG_LEVEL_CAP) {
+      throw new AppError('FARM_DOG_MAX_LEVEL', {
+        legacyMessage: '看家狗已经满级啦',
+      });
+    }
+    const nextLevel = dog.level + 1;
+    const cost = FARM_DOG_UPGRADE_COSTS[nextLevel] ?? FARM_DOG_BUY_COST;
+    if (state.coins < cost) {
+      throw new AppError('FARM_INSUFFICIENT_COINS', {
+        params: { required: cost },
+        legacyMessage: `金币不足：需 ${cost}`,
+      });
+    }
+    state.coins -= cost;
+    const isFirstPurchase = dog.level === 0;
+    const newDog: FarmDogState = {
+      level: nextLevel,
+      energy: isFirstPurchase ? 100 : Math.min(100, dog.energy + 40),
+      lastFedAt: Date.now(),
+    };
+    state.dogPayload = newDog;
+    const saved = await this.playerRepo.save(state);
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: isFirstPurchase ? 'dog_buy' : 'dog_upgrade',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      payload: { level: nextLevel, cost },
+    });
+    return {
+      player: this.toPlayerView(saved),
+      dog: { ...newDog, energy: computeDogEnergy(newDog, Date.now()) },
+      coinsSpent: cost,
+    };
+  }
+
+  async feedDog(ownerId: string): Promise<FarmPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    const dog = state.dogPayload ?? createDefaultDog();
+    if (dog.level <= 0) {
+      throw new AppError('FARM_NO_DOG', { legacyMessage: '你还没养狗' });
+    }
+    const bag = { ...(state.consumablesPayload ?? {}) };
+    if ((bag.dog_food ?? 0) <= 0) {
+      throw new AppError('FARM_NO_DOG_FOOD', {
+        legacyMessage: '狗粮不足，去农资店买一些',
+      });
+    }
+    bag.dog_food = (bag.dog_food ?? 0) - 1;
+    state.consumablesPayload = bag;
+
+    const nowMs = Date.now();
+    const decayed = computeDogEnergy(dog, nowMs);
+    const newDog: FarmDogState = {
+      level: dog.level,
+      energy: Math.min(100, decayed + FARM_DOG_FEED_RESTORE),
+      lastFedAt: nowMs,
+    };
+    state.dogPayload = newDog;
+    const saved = await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'dog_feed',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      payload: { energy: newDog.energy, level: newDog.level },
+    });
+    return this.toPlayerView(saved);
+  }
+
+  // 公用：NPC 偷玩家时调用，返回 true 表示被狗拦住，应在调用方撤销偷菜战果。
+  // 单独抽出来让 npc-tick 不直接复制 dog 计算逻辑。
+  async tryBlockNpcSteal(
+    state: FarmPlayerStateEntity,
+    nowMs: number,
+  ): Promise<{ blocked: boolean; dogLevel: number; energy: number }> {
+    const dog = state.dogPayload ?? createDefaultDog();
+    if (dog.level <= 0) {
+      return { blocked: false, dogLevel: 0, energy: 0 };
+    }
+    const energy = computeDogEnergy(dog, nowMs);
+    const blockRate = computeDogBlockRate(dog, nowMs);
+    const roll = Math.random();
+    return {
+      blocked: roll < blockRate,
+      dogLevel: dog.level,
+      energy,
     };
   }
 

@@ -6,6 +6,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import {
+  FarmConsumableId,
+  FarmDogState,
   FarmPlot,
   FarmStolenLogEntry,
   FARM_DEFAULT_PLAYER_COINS,
@@ -43,6 +45,14 @@ export class FarmPlayerStateEntity {
 
   @Column('simple-json', { nullable: true })
   weeklyStolenLogPayload?: FarmStolenLogEntry[] | null;
+
+  // 化肥 / 农药 / 狗粮 数量，按 FarmConsumableId 索引。
+  @Column('simple-json', { nullable: true })
+  consumablesPayload?: Partial<Record<FarmConsumableId, number>> | null;
+
+  // 看家狗：level=0 表示未购买；energy 0-100；lastFedAt ms。
+  @Column('simple-json', { nullable: true })
+  dogPayload?: FarmDogState | null;
 
   @Column({ type: 'datetime', nullable: true })
   lastTickAt?: Date | null;

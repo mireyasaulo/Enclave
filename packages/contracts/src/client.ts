@@ -76,7 +76,10 @@ import type {
   FeedViewRequest,
 } from "./feed";
 import type {
+  FarmConsumableId,
+  FarmConsumablePurchaseResult,
   FarmCropId,
+  FarmDogPurchaseResult,
   FarmEventView,
   FarmHarvestResult,
   FarmNeighborDetail,
@@ -3400,6 +3403,75 @@ export function sellFarmCrop(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function buyFarmConsumable(
+  input: { consumableId: FarmConsumableId; quantity: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmConsumablePurchaseResult>(
+    "/games/farm/buy-consumable",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function applyFarmFertilizer(
+  input: { plotIndex: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/apply-fertilizer",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function applyFarmPesticide(
+  input: { plotIndex: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/apply-pesticide",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function buyFarmDog(baseUrl?: string) {
+  return requestLegacyApi<FarmDogPurchaseResult>(
+    "/games/farm/buy-dog",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    },
+    baseUrl,
+  );
+}
+
+export function feedFarmDog(baseUrl?: string) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/feed-dog",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
     },
     baseUrl,
   );

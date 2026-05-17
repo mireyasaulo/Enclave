@@ -8,6 +8,7 @@ const t = translateRuntimeMessage;
 import { FarmClockProvider, useSetFarmServerNow } from "./farm-clock-context";
 import { useFarmState } from "./use-farm-state";
 import { CoinDisplay } from "./components/coin-display";
+import { DogHouse } from "./components/dog-house";
 import { EventLogPanel } from "./components/event-log-panel";
 import { FarmIsoGrid } from "./components/farm-iso-grid";
 import { FarmMascot } from "./components/farm-mascot";
@@ -195,6 +196,7 @@ function FarmPageInner() {
                 {t(msg`存货共`)} {warehouseTotal} {t(msg`个`)}
               </div>
             </button>
+            <DogHouse state={state} />
             <p className="hidden rounded-2xl border border-white/60 bg-white/55 p-3 text-[11px] leading-relaxed text-stone-600 shadow-sm backdrop-blur-md lg:block">
               {t(msg`作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。`)}
             </p>

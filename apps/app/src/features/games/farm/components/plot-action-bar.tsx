@@ -8,6 +8,8 @@ import { FARM_CROP_CATALOG } from "@yinjie/contracts";
 import { useFarmAdjustedNow } from "../farm-clock-context";
 import { formatRemainingMs } from "../crop-presentation";
 import {
+  useApplyFarmFertilizer,
+  useApplyFarmPesticide,
   useDebugFarmPlot,
   useHarvestFarmPlot,
   usePlantFarmCrop,
@@ -15,7 +17,14 @@ import {
   useWeedFarmPlot,
 } from "../use-farm-state";
 
-export type PlotPulseKind = "plant" | "water" | "weed" | "debug" | "harvest";
+export type PlotPulseKind =
+  | "plant"
+  | "water"
+  | "weed"
+  | "debug"
+  | "fertilize"
+  | "pesticide"
+  | "harvest";
 
 interface PlotActionBarProps {
   state: FarmPlayerStateView;
@@ -36,6 +45,8 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
   const weedMutation = useWeedFarmPlot();
   const debugMutation = useDebugFarmPlot();
   const harvestMutation = useHarvestFarmPlot();
+  const fertilizerMutation = useApplyFarmFertilizer();
+  const pesticideMutation = useApplyFarmPesticide();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const plot: FarmPlot | null = useMemo(() => {
@@ -58,7 +69,12 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
     waterMutation.isPending ||
     weedMutation.isPending ||
     debugMutation.isPending ||
+    fertilizerMutation.isPending ||
+    pesticideMutation.isPending ||
     harvestMutation.isPending;
+
+  const fertilizerCount = state.consumables?.fertilizer ?? 0;
+  const pesticideCount = state.consumables?.pesticide ?? 0;
 
   function handleError(err: unknown) {
     setErrorMsg(err instanceof Error ? err.message : String(err));
@@ -237,6 +253,62 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
               className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-rose-500 px-3.5 py-2 text-sm text-white shadow-sm hover:bg-rose-600 disabled:opacity-60"
             >
               🐛 {t(msg`除虫`)}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                clearError();
+                const targetPlot = plotIndex!;
+                fertilizerMutation.mutate(
+                  { plotIndex: targetPlot },
+                  {
+                    onSuccess: () => onPulse?.(targetPlot, "fertilize"),
+                    onError: handleError,
+                  },
+                );
+              }}
+              disabled={
+                isPending ||
+                plot.fertilized === true ||
+                fertilizerCount <= 0
+              }
+              title={
+                plot.fertilized
+                  ? t(msg`这株作物已经施过肥`)
+                  : fertilizerCount <= 0
+                    ? t(msg`化肥不足`)
+                    : t(msg`施肥`)
+              }
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-amber-600 px-3.5 py-2 text-sm text-white shadow-sm hover:bg-amber-700 disabled:opacity-60"
+            >
+              💩 {t(msg`施肥`)}
+              {fertilizerCount > 0 && (
+                <span className="text-xs text-amber-100">×{fertilizerCount}</span>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                clearError();
+                const targetPlot = plotIndex!;
+                pesticideMutation.mutate(
+                  { plotIndex: targetPlot },
+                  {
+                    onSuccess: () => onPulse?.(targetPlot, "pesticide"),
+                    onError: handleError,
+                  },
+                );
+              }}
+              disabled={isPending || pesticideCount <= 0}
+              title={
+                pesticideCount <= 0 ? t(msg`农药不足`) : t(msg`喷洒农药`)
+              }
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-lime-600 px-3.5 py-2 text-sm text-white shadow-sm hover:bg-lime-700 disabled:opacity-60"
+            >
+              🧴 {t(msg`农药`)}
+              {pesticideCount > 0 && (
+                <span className="text-xs text-lime-100">×{pesticideCount}</span>
+              )}
             </button>
           </>
         )}

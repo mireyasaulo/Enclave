@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
-import type { FarmCropId, FarmPlayerStateView } from "@yinjie/contracts";
+import {
+  FARM_CONSUMABLE_CATALOG,
+  FARM_CONSUMABLE_IDS,
+  type FarmConsumableId,
+  type FarmCropId,
+  type FarmPlayerStateView,
+} from "@yinjie/contracts";
 import { listCropPresentations } from "../crop-presentation";
-import { useBuyFarmSeed } from "../use-farm-state";
+import { useBuyFarmConsumable, useBuyFarmSeed } from "../use-farm-state";
 
 const t = translateRuntimeMessage;
 
@@ -16,7 +22,11 @@ interface SeedShopSheetProps {
 export function SeedShopSheet({ state, open, onClose }: SeedShopSheetProps) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pendingCropId, setPendingCropId] = useState<FarmCropId | null>(null);
+  const [pendingConsumableId, setPendingConsumableId] =
+    useState<FarmConsumableId | null>(null);
+  const [tab, setTab] = useState<"seed" | "consumable">("seed");
   const buyMutation = useBuyFarmSeed();
+  const buyConsumableMutation = useBuyFarmConsumable();
   const presentations = listCropPresentations();
 
   useEffect(() => {
@@ -42,6 +52,18 @@ export function SeedShopSheet({ state, open, onClose }: SeedShopSheetProps) {
     );
   }
 
+  function handleBuyConsumable(consumableId: FarmConsumableId, quantity: number) {
+    setErrorMsg(null);
+    setPendingConsumableId(consumableId);
+    buyConsumableMutation.mutate(
+      { consumableId, quantity },
+      {
+        onSettled: () => setPendingConsumableId(null),
+        onError: (err) => setErrorMsg((err as Error).message),
+      },
+    );
+  }
+
   return (
     <div
       className="fixed inset-0 z-40 flex items-end justify-center bg-stone-900/30 sm:items-center"
@@ -52,7 +74,7 @@ export function SeedShopSheet({ state, open, onClose }: SeedShopSheetProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
-          <h2 className="text-base font-semibold">{t(msg`种子商店`)}</h2>
+          <h2 className="text-base font-semibold">{t(msg`农资店`)}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -61,11 +83,92 @@ export function SeedShopSheet({ state, open, onClose }: SeedShopSheetProps) {
             {t(msg`关闭`)}
           </button>
         </header>
+        <div className="flex gap-1 border-b border-stone-100 px-4 py-2">
+          <button
+            type="button"
+            onClick={() => setTab("seed")}
+            className={`rounded-full px-3 py-1 text-xs ${
+              tab === "seed"
+                ? "bg-emerald-600 text-white"
+                : "bg-stone-100 text-stone-600"
+            }`}
+          >
+            🌱 {t(msg`种子`)}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("consumable")}
+            className={`rounded-full px-3 py-1 text-xs ${
+              tab === "consumable"
+                ? "bg-emerald-600 text-white"
+                : "bg-stone-100 text-stone-600"
+            }`}
+          >
+            🧴 {t(msg`化肥 / 农药 / 狗粮`)}
+          </button>
+        </div>
         {errorMsg && (
           <div className="bg-rose-50 px-4 py-2 text-xs text-rose-600">
             {errorMsg}
           </div>
         )}
+        {tab === "consumable" ? (
+          <ul className="flex-1 overflow-y-auto px-4 py-2">
+            {FARM_CONSUMABLE_IDS.map((id) => {
+              const def = FARM_CONSUMABLE_CATALOG[id];
+              const locked = state.level < def.unlockLevel;
+              const owned = state.consumables?.[id] ?? 0;
+              const affordable = state.coins >= def.price;
+              const isPending = pendingConsumableId === id;
+              return (
+                <li
+                  key={id}
+                  className="flex items-center gap-3 border-b border-stone-100 py-3 last:border-b-0"
+                >
+                  <span className="text-2xl">{def.emoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="font-medium">{def.nameZh}</span>
+                      <span className="text-xs text-stone-500">
+                        🪙 {def.price} {t(msg`/ 个`)}
+                      </span>
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-stone-500">
+                      {def.descriptionZh}
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-stone-400">
+                      {t(msg`已存`)} {owned}
+                      {locked && (
+                        <span className="ml-2 text-amber-600">
+                          Lv.{def.unlockLevel} {t(msg`解锁`)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleBuyConsumable(id, 1)}
+                    disabled={locked || !affordable || isPending}
+                    className={[
+                      "rounded-full px-3 py-1 text-xs font-medium transition",
+                      locked || !affordable
+                        ? "cursor-not-allowed bg-stone-100 text-stone-400"
+                        : "bg-emerald-600 text-white hover:bg-emerald-700",
+                    ].join(" ")}
+                  >
+                    {isPending
+                      ? t(msg`购买中`)
+                      : locked
+                        ? t(msg`未解锁`)
+                        : !affordable
+                          ? t(msg`金币不足`)
+                          : t(msg`购买 1`)}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
         <ul className="flex-1 overflow-y-auto px-4 py-2">
           {presentations.map((crop) => {
             const locked = state.level < crop.unlockLevel;
@@ -114,6 +217,7 @@ export function SeedShopSheet({ state, open, onClose }: SeedShopSheetProps) {
             );
           })}
         </ul>
+        )}
       </div>
     </div>
   );

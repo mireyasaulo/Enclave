@@ -1,10 +1,15 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   FARM_DEFAULT_PLOT_COUNT,
+  FARM_DOG_BLOCK_BASE_RATE,
+  FARM_DOG_ENERGY_DECAY_PER_HOUR,
   FARM_LEVEL_EXPERIENCE_THRESHOLDS,
   FARM_LEVEL_PLOT_UNLOCKS,
+  FarmConsumableDefinition,
+  FarmConsumableId,
   FarmCropDefinition,
   FarmCropId,
+  FarmDogState,
 } from './farm.types';
 
 export const FARM_CROP_CATALOG: Record<FarmCropId, FarmCropDefinition> = {
@@ -230,5 +235,69 @@ export function computePlotCountForLevel(level: number): number {
     if (level >= entry.level) plotCount = entry.plotCount;
   }
   return plotCount;
+}
+
+export const FARM_CONSUMABLE_CATALOG: Record<FarmConsumableId, FarmConsumableDefinition> = {
+  fertilizer: {
+    id: 'fertilizer',
+    nameZh: '化肥',
+    emoji: '💩',
+    price: 120,
+    unlockLevel: 2,
+    descriptionZh: '把作物剩余成长时间砍掉一半，每株作物只能用一次。',
+  },
+  pesticide: {
+    id: 'pesticide',
+    nameZh: '农药',
+    emoji: '🧴',
+    price: 80,
+    unlockLevel: 2,
+    descriptionZh: '立刻清掉害虫，并在 12 小时内免疫虫害。',
+  },
+  dog_food: {
+    id: 'dog_food',
+    nameZh: '狗粮',
+    emoji: '🦴',
+    price: 50,
+    unlockLevel: 5,
+    descriptionZh: '喂一次看家狗：回复 60 点能量，让它继续帮你看菜地。',
+  },
+};
+
+export const FARM_CONSUMABLE_IDS: FarmConsumableId[] = Object.keys(
+  FARM_CONSUMABLE_CATALOG,
+) as FarmConsumableId[];
+
+export function getConsumableDefinition(id: FarmConsumableId): FarmConsumableDefinition {
+  const def = FARM_CONSUMABLE_CATALOG[id];
+  if (!def) throw new Error(`Unknown consumable id: ${id}`);
+  return def;
+}
+
+export function isFarmConsumableId(value: string): value is FarmConsumableId {
+  return Object.prototype.hasOwnProperty.call(FARM_CONSUMABLE_CATALOG, value);
+}
+
+export function createDefaultDog(): FarmDogState {
+  return { level: 0, energy: 0, lastFedAt: null };
+}
+
+// 按 (now - lastFedAt) 算出当前能量，不写库，纯计算函数。
+export function computeDogEnergy(dog: FarmDogState | null | undefined, nowMs: number): number {
+  if (!dog || dog.level <= 0) return 0;
+  if (dog.lastFedAt == null) return dog.energy;
+  const hours = Math.max(0, (nowMs - dog.lastFedAt) / 3_600_000);
+  const decayed = dog.energy - FARM_DOG_ENERGY_DECAY_PER_HOUR * hours;
+  return Math.max(0, Math.min(100, decayed));
+}
+
+// 看家狗拦截偷菜：能量越足、等级越高，拦截率越高。
+// energy<30 防御减半（狗饿了）；level=0 直接 0。
+export function computeDogBlockRate(dog: FarmDogState | null | undefined, nowMs: number): number {
+  if (!dog || dog.level <= 0) return 0;
+  const energy = computeDogEnergy(dog, nowMs);
+  const baseRate = FARM_DOG_BLOCK_BASE_RATE * dog.level;
+  const energyMultiplier = energy < 30 ? 0.5 : 1;
+  return Math.min(0.92, baseRate * energyMultiplier);
 }
 // i18n-ignore-end

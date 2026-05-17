@@ -1,7 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  applyFarmFertilizer,
+  applyFarmPesticide,
+  buyFarmConsumable,
+  buyFarmDog,
   buyFarmSeed,
   debugFarmPlot,
+  feedFarmDog,
   getFarmEvents,
   getFarmNeighborDetail,
   getFarmNeighbors,
@@ -12,7 +17,10 @@ import {
   stealFromNeighbor,
   waterFarmPlot,
   weedFarmPlot,
+  type FarmConsumableId,
+  type FarmConsumablePurchaseResult,
   type FarmCropId,
+  type FarmDogPurchaseResult,
   type FarmEventView,
   type FarmHarvestResult,
   type FarmNeighborDetail,
@@ -131,6 +139,50 @@ export function useStealFromNeighbor() {
   const invalidate = useInvalidateFarm();
   return useMutation<FarmStealResult, Error, { characterId: string; plotIndex: number }>({
     mutationFn: (input) => stealFromNeighbor(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useBuyFarmConsumable() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<
+    FarmConsumablePurchaseResult,
+    Error,
+    { consumableId: FarmConsumableId; quantity: number }
+  >({
+    mutationFn: (input) => buyFarmConsumable(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useApplyFarmFertilizer() {
+  const invalidate = useInvalidateFarm();
+  return useMutation({
+    mutationFn: (input: { plotIndex: number }) => applyFarmFertilizer(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useApplyFarmPesticide() {
+  const invalidate = useInvalidateFarm();
+  return useMutation({
+    mutationFn: (input: { plotIndex: number }) => applyFarmPesticide(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useBuyFarmDog() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<FarmDogPurchaseResult, Error, void>({
+    mutationFn: () => buyFarmDog(),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useFeedFarmDog() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<FarmPlayerStateView, Error, void>({
+    mutationFn: () => feedFarmDog(),
     onSuccess: () => invalidate(),
   });
 }
