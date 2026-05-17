@@ -143,6 +143,61 @@ export class ParkingWarEventService {
     });
   }
 
+  /**
+   * 精确统计今日某类事件数量（不受 listEvents 200 条窗口限制）。
+   * NPC tick 一天能产 2000+ 事件，旧实现的 listEvents+filter 会漏算清晨用户操作。
+   */
+  async countTodayEventsOfKind(
+    ownerId: string,
+    kind: ParkingWarEventKind,
+    since: Date,
+    extra?: {
+      targetKind?: 'player' | 'npc';
+      actorKind?: 'player' | 'npc';
+    },
+  ): Promise<number> {
+    const qb = this.repo
+      .createQueryBuilder('event')
+      .where('event.ownerId = :ownerId', { ownerId })
+      .andWhere('event.kind = :kind', { kind })
+      .andWhere('event.createdAt > :since', { since });
+    if (extra?.targetKind) {
+      qb.andWhere('event.targetKind = :targetKind', {
+        targetKind: extra.targetKind,
+      });
+    }
+    if (extra?.actorKind) {
+      qb.andWhere('event.actorKind = :actorKind', {
+        actorKind: extra.actorKind,
+      });
+    }
+    return qb.getCount();
+  }
+
+  /**
+   * 精确求今日某类事件的 amountCents 总和（用于「今日累计收益」类任务进度）。
+   */
+  async sumTodayAmountOfKind(
+    ownerId: string,
+    kind: ParkingWarEventKind,
+    since: Date,
+    extra?: { actorKind?: 'player' | 'npc' },
+  ): Promise<number> {
+    const qb = this.repo
+      .createQueryBuilder('event')
+      .select('COALESCE(SUM(event.amountCents), 0)', 'total')
+      .where('event.ownerId = :ownerId', { ownerId })
+      .andWhere('event.kind = :kind', { kind })
+      .andWhere('event.createdAt > :since', { since });
+    if (extra?.actorKind) {
+      qb.andWhere('event.actorKind = :actorKind', {
+        actorKind: extra.actorKind,
+      });
+    }
+    const row = await qb.getRawOne<{ total: string | number | null }>();
+    return Number(row?.total ?? 0);
+  }
+
   async pruneOldEvents(ownerId: string, keepDays: number): Promise<number> {
     const cutoff = new Date(Date.now() - keepDays * 24 * 3600 * 1000);
     const result = await this.repo.delete({

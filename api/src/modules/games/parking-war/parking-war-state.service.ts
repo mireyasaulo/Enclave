@@ -215,19 +215,20 @@ export class ParkingWarStateService implements OnModuleInit {
     if (!state.dailyTasksPayload) return;
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
-    const events = await this.eventService.listEvents(state.ownerId, {
-      since: startOfDay,
-      limit: 200,
-    });
-    const todayParkAway = events.filter(
-      (e) =>
-        e.kind === 'park' &&
-        (e.payloadJson as { atHome?: boolean } | null)?.atHome === false,
-    ).length;
-    const todayTickets = events.filter((e) => e.kind === 'ticket').length;
-    const todayCollectCents = events
-      .filter((e) => e.kind === 'collect' && typeof e.amountCents === 'number')
-      .reduce((acc, e) => acc + (e.amountCents ?? 0), 0);
+    // 用精确 COUNT/SUM 而不是 listEvents+filter ——
+    // NPC tick 一天能产 2000+ 事件，limit:200 的窗口会漏算清晨用户操作
+    const [todayParkAway, todayTickets, todayCollectCents] = await Promise.all([
+      this.eventService.countTodayEventsOfKind(state.ownerId, 'park', startOfDay, {
+        targetKind: 'npc',
+        actorKind: 'player',
+      }),
+      this.eventService.countTodayEventsOfKind(state.ownerId, 'ticket', startOfDay, {
+        actorKind: 'player',
+      }),
+      this.eventService.sumTodayAmountOfKind(state.ownerId, 'collect', startOfDay, {
+        actorKind: 'player',
+      }),
+    ]);
 
     const tasks = state.dailyTasksPayload.tasks.map((t) => {
       if (t.claimed) return t;
@@ -275,12 +276,19 @@ export class ParkingWarStateService implements OnModuleInit {
       return;
     }
 
+    // away 必须排除 lotOwnerKind=player —— 玩家把自己车停在自家时，occupancy
+    // 同时满足 home(lotOwnerKind=player) 和 away(visitorKind=player) 两边的过滤条件，
+    // 会被双重计费 / 双重 save / 双重出现在 view 里。强制 npc-only 才算真"在外面"。
     const [homeOccupancies, awayOccupancies] = await Promise.all([
       this.occupancyRepo.find({
         where: { lotOwnerKind: 'player', lotOwnerId: state.ownerId },
       }),
       this.occupancyRepo.find({
-        where: { visitorKind: 'player', visitorId: state.ownerId },
+        where: {
+          visitorKind: 'player',
+          visitorId: state.ownerId,
+          lotOwnerKind: 'npc',
+        },
       }),
     ]);
 
@@ -501,16 +509,15 @@ export class ParkingWarStateService implements OnModuleInit {
   private async assertDailyParkBudgetAvailable(ownerId: string): Promise<void> {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
-    const rows = await this.eventService.listEvents(ownerId, {
-      since: startOfDay,
-      limit: 200,
-    });
-    const todayPark = rows.filter(
-      (r) =>
-        r.kind === 'park' &&
-        (r.payloadJson as { atHome?: boolean } | null)?.atHome === false,
+    // 精确 COUNT 而不是 listEvents+filter —— NPC tick 一天能产 2000+ 事件，
+    // 之前 limit:200 的窗口会漏算清晨用户操作，每日上限形同虚设
+    const todayParkAway = await this.eventService.countTodayEventsOfKind(
+      ownerId,
+      'park',
+      startOfDay,
+      { targetKind: 'npc', actorKind: 'player' },
     );
-    if (todayPark.length >= PARKING_WAR_DAILY_PARK_LIMIT) {
+    if (todayParkAway >= PARKING_WAR_DAILY_PARK_LIMIT) {
       throw new AppError('PARKING_WAR_DAILY_PARK_LIMIT_REACHED', {
         legacyMessage: `今日停别人家次数已用完（${PARKING_WAR_DAILY_PARK_LIMIT}/日）`,
       });
@@ -872,12 +879,15 @@ export class ParkingWarStateService implements OnModuleInit {
   ): Promise<void> {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
-    const rows = await this.eventService.listEvents(ownerId, {
-      since: startOfDay,
-      limit: 200,
-    });
-    const todayTicket = rows.filter((r) => r.kind === 'ticket');
-    if (todayTicket.length >= PARKING_WAR_DAILY_TICKET_LIMIT) {
+    // 精确 COUNT，同 park budget 的修复理由
+    // 仅统计玩家手动贴条 —— NPC 自动罚单也写同一事件流但不应该占玩家额度
+    const todayTicket = await this.eventService.countTodayEventsOfKind(
+      ownerId,
+      'ticket',
+      startOfDay,
+      { actorKind: 'player' },
+    );
+    if (todayTicket >= PARKING_WAR_DAILY_TICKET_LIMIT) {
       throw new AppError('PARKING_WAR_DAILY_TICKET_LIMIT_REACHED', {
         legacyMessage: `今日贴条次数已用完（${PARKING_WAR_DAILY_TICKET_LIMIT}/日）`,
       });
@@ -1324,12 +1334,17 @@ export class ParkingWarStateService implements OnModuleInit {
   private async toPlayerView(
     state: ParkingWarPlayerStateEntity,
   ): Promise<ParkingWarPlayerStateView> {
+    // 同 tickPlayerHomeOccupancies：away 仅指停在 NPC 邻居家的车，避免与 home 重叠
     const [homeOccupancies, awayOccupancies] = await Promise.all([
       this.occupancyRepo.find({
         where: { lotOwnerKind: 'player', lotOwnerId: state.ownerId },
       }),
       this.occupancyRepo.find({
-        where: { visitorKind: 'player', visitorId: state.ownerId },
+        where: {
+          visitorKind: 'player',
+          visitorId: state.ownerId,
+          lotOwnerKind: 'npc',
+        },
       }),
     ]);
 

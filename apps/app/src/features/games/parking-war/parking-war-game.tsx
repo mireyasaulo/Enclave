@@ -574,7 +574,7 @@ function OccupancySheet({
         <Stat label={t(msg`累积收益`)} value={formatYuan(occupancy.pendingEarningsCents)} />
         <Stat
           label={t(msg`占用时长`)}
-          value={t(msg`${Math.max(0, Math.floor((Date.now() - occupancy.parkedAtMs) / 60_000))} 分`)}
+          value={t(msg`${Math.max(0, Math.floor((state.serverNowMs - occupancy.parkedAtMs) / 60_000))} 分`)}
         />
       </div>
       <div className="mt-4 flex flex-col gap-2">
@@ -604,10 +604,19 @@ function OccupancySheet({
             <button
               type="button"
               onClick={handleTicket}
-              disabled={ticket.isPending || occupancy.warningLevel < 1}
+              disabled={
+                ticket.isPending ||
+                occupancy.warningLevel < 1 ||
+                occupancy.warningLevel >= 2 ||
+                occupancy.pendingEarningsCents <= 0
+              }
               className="rounded-xl bg-orange-500 px-4 py-3 text-white disabled:bg-zinc-200 disabled:text-zinc-400"
             >
-              {t(msg`贴罚单（需 ≥ 警告）`)}
+              {occupancy.warningLevel >= 2
+                ? t(msg`已开过罚单`)
+                : occupancy.pendingEarningsCents <= 0
+                  ? t(msg`暂无收益可罚`)
+                  : t(msg`贴罚单（需 ≥ 警告）`)}
             </button>
             <button
               type="button"
@@ -1346,7 +1355,7 @@ function BottomSheet({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-t-2xl bg-white p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-xl"
+        className="relative w-full max-w-xl rounded-t-2xl bg-white p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-2 flex justify-center">

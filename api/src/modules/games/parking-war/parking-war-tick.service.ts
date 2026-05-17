@@ -374,10 +374,12 @@ export class ParkingWarTickService {
     if (candidates.length === 0) return false;
     const car = candidates[Math.floor(Math.random() * candidates.length)];
 
-    // 找玩家家的空槽位
+    // 找玩家家的空槽位。给玩家留至少 1 个空位 —— 否则 20 个 NPC 把 4 个车位全占满，
+    // 玩家买了新车都没地方停，只能等罚单 / 拖车冷却（20 分钟一轮），体验崩。
     const homeSlots = playerState.homeSlotsPayload ?? [];
-    const emptyIndex = homeSlots.find((s) => !s.occupancyId)?.index ?? null;
-    if (emptyIndex == null) return false;
+    const emptySlots = homeSlots.filter((s) => !s.occupancyId);
+    if (emptySlots.length <= 1) return false;
+    const emptyIndex = emptySlots[0].index;
 
     const nowMs = Date.now();
     const occupancy = this.occupancyRepo.create({

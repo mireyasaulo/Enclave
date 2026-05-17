@@ -39,8 +39,11 @@ export function useParkingWarState() {
     queryKey: STATE_KEY,
     queryFn: () => getParkingWarState(),
     // 服务端每次 GET /state 都跑一次 tick，所以前端不必频繁 poll；
-    // 30s stale 是个折中，玩家来回切 tab 时只要 staleTime 过期就再拉一次看新 pending
+    // 30s stale 是个折中，玩家来回切 tab 时只要 staleTime 过期就再拉一次看新 pending。
+    // 玩家长开页面挂机时，每 60s 静默拉一次让累计收益数字保持鲜活
     staleTime: 30_000,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
 }
