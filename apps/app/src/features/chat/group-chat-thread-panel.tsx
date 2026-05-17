@@ -20,6 +20,7 @@ import {
   type FriendListItem,
   type GroupMessage,
   markGroupRead,
+  SELF_CHARACTER_ID,
   sendGroupMessage,
   type SendGroupMessageRequest,
   type StickerAttachment,
@@ -1232,6 +1233,18 @@ export function GroupChatThreadPanel({
 
     for (const member of membersQuery.data ?? []) {
       if (member.memberType !== "character") {
+        continue;
+      }
+
+      // 走查 R7：char-default-self 是用户的自我镜像，本质就是"自己"。
+      // create-group-page / group-member-picker-page (add 模式) 都已经在选人
+      // 阶段把它过滤掉，但 yuanzui0728 这种老账号在 R1 前建的群里仍然落了
+      // memberType=character 的 SELF 行（实测 78a3d894 群里挂着「我自己」），
+      // 之前漏掉的 mention picker 还能看到「@我自己」候选——选了就在群里
+      // 插出一条 @自己 的消息，加上 typing 走 character 路径还会冒出
+      // "我自己 正在回复..."，本质就是用户在自言自语。和姊妹页选人阶段的
+      // 过滤口径对齐，渲染时直接跳过 SELF。
+      if (member.memberId === SELF_CHARACTER_ID) {
         continue;
       }
 
