@@ -317,9 +317,16 @@ export function ChatMessageSearchPanel({
     () => buildSearchResultSections(visibleResults),
     [locale, visibleResults],
   );
-  const reminderCount = indexedMessages.filter((item) =>
-    Boolean(item.reminderAt),
-  ).length;
+  // 走查 R5：keyword/filter/sender 每改一次都触发本组件 re-render，原版每帧都
+  // 对 indexedMessages 全表跑一遍 filter——本页常态下 100+ 条群聊记录 ×
+  // 每个 keystroke 重算一次，输入框打字时这条 hot path 累出来不小。memoize 一
+  // 下，只有 indexedMessages 引用变化（local 撤回/隐藏 / messages prop 变 /
+  // reminders 变）才重算。
+  const reminderCount = useMemo(
+    () =>
+      indexedMessages.filter((item) => Boolean(item.reminderAt)).length,
+    [indexedMessages],
+  );
   const isKeywordSearch = Boolean(trimmedKeyword);
   const isPartialResult = results.length > visibleResults.length;
   const senderFilterDisplayLabel =
