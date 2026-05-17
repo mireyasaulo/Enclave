@@ -101,6 +101,7 @@ import {
 import { buildMobileNoteEditorRouteHash } from "../features/notes/mobile-note-editor-route-state";
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { buildDesktopChannelsRouteHash } from "../features/channels/channels-route-state";
+import { stripToolCallSyntax } from "../features/moments/moment-content";
 import { resolveAppMediaUrl } from "../lib/media-url";
 import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import {
@@ -5609,6 +5610,12 @@ function FeedPostCardMessage({
   const cover = attachment.coverUrl
     ? resolveAppMediaUrl(attachment.coverUrl)
     : null;
+  // 走查 2026-05-17 新会话 R5：attachment.excerpt 由 server forwardChannelPost
+  // ToChat 写入，直接是 post.text.slice(0,160)，没过 stripToolCallSyntax。
+  // AI 生成的视频号偶发把 <tool_call>...</tool_call> / [TOOL_CALL] 等当成
+  // 正文落到 post.text，转发卡会把这串 XML/JSON 当成"动态摘要"原样塞到
+  // line-clamp-2 里炸开。视频号 home / 评论 sheet 都已经走 stripToolCallSyntax
+  // 过滤，这条聊天里"二次展现"的入口也要对齐。
   // 走查 R5：跟视频号卡封面 img 同款问题——minimax cover 偶发 404 / cloud-api
   // 反代 token 边界 401 / 资源被回收。原本浏览器原生 broken-image icon 直接
   // 占满整条 feed_post_card，对方收到的转发卡看着像「这条视频号坏了」实际只是
@@ -5658,7 +5665,7 @@ function FeedPostCardMessage({
           }`}
         >
           {attachment.title?.trim() ||
-            attachment.excerpt ||
+            stripToolCallSyntax(attachment.excerpt ?? "") ||
             translateRuntimeMessage(msg`视频号动态`)}
         </div>
         <div
