@@ -228,21 +228,44 @@ export function MobileMomentsPublishPage() {
   // - 空内容 → performBack（navigate 回 Moments）
   // 不让默认 BACK chain 走 history.back，避免 publish 直接进 + history 不够
   // 时把 app minimize 到桌面。
+  //
+  // 走查再一轮 R1：原 useEffect 没 deps array → 每次父组件 re-render（输入 textarea
+  // 每个字符都会 setText 触发）都把 Android back interceptor unregister + re-register
+  // 一遍。Set.delete + Set.add 单次微秒级、看似无所谓，但写长草稿打 200 字就是 200
+  // 次反复装卸，CPU/锁竞争白烧。改 ref 模式：interceptor 闭包稳定，最新 handler /
+  // state 走 ref 读，effect 只在 mount/unmount 跑一次。
+  const backInterceptorContextRef = useRef({
+    discardConfirmOpen,
+    mediaPickerOpen,
+    dismissDiscardConfirm,
+    setMediaPickerOpen,
+    handleBack,
+  });
+  useEffect(() => {
+    backInterceptorContextRef.current = {
+      discardConfirmOpen,
+      mediaPickerOpen,
+      dismissDiscardConfirm,
+      setMediaPickerOpen,
+      handleBack,
+    };
+  });
   useEffect(() => {
     return registerAndroidBackInterceptor((event) => {
       event.preventDefault();
-      if (discardConfirmOpen) {
-        dismissDiscardConfirm();
+      const ctx = backInterceptorContextRef.current;
+      if (ctx.discardConfirmOpen) {
+        ctx.dismissDiscardConfirm();
         return true;
       }
-      if (mediaPickerOpen) {
-        setMediaPickerOpen(false);
+      if (ctx.mediaPickerOpen) {
+        ctx.setMediaPickerOpen(false);
         return true;
       }
-      handleBack();
+      ctx.handleBack();
       return true;
     });
-  });
+  }, []);
 
   function performBack() {
     navigateBackOrFallback(
