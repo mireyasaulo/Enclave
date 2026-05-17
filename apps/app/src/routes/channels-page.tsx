@@ -3580,6 +3580,11 @@ function MobileChannelCommentsSheet({
   // replyTarget——这些只影响底部 textarea，敲字时直接返回上轮缓存的 element 树，
   // React 在子树上 bailout 跳过整个 142 条评论的重渲。stripToolCallSyntax 也跟着
   // 缓存住，不每次 keypress 都跑 142 次 regex。
+  // 新一轮走查 R5：把 post.canInteract 也拿进来——非好友帖里，「回复」和「赞」
+  // 按钮原来照样可点，点完 ChannelsPage 兜底 setNotice 提示，但 sheet z-50 把
+  // page notice 盖死，用户没任何反馈。改成 cannotInteract 时两个按钮全 disable，
+  // 维持「能看不能动」的明确边界。
+  const cannotInteract = post?.canInteract === false;
   const commentsListNode = useMemo<ReactNode>(() => {
     if (!comments.length) return null;
     return (
@@ -3636,20 +3641,26 @@ function MobileChannelCommentsSheet({
                   <div className="mt-2 flex items-center gap-4 text-[11px] text-[#6b7280]">
                     <button
                       type="button"
+                      disabled={cannotInteract}
                       onClick={() => stableOnReply(comment)}
-                      className="transition active:text-[#111827]"
+                      className="transition active:text-[#111827] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {t(msg`回复`)}
                     </button>
                     <button
                       type="button"
-                      disabled={comment.likedByOwner || liking}
+                      disabled={
+                        cannotInteract || comment.likedByOwner || liking
+                      }
                       onClick={() => stableOnLikeComment(comment)}
                       className={cn(
-                        "inline-flex items-center gap-1 transition",
+                        "inline-flex items-center gap-1 transition disabled:cursor-not-allowed",
                         comment.likedByOwner
                           ? "text-[#07c160]"
                           : "active:text-[#111827]",
+                        cannotInteract && !comment.likedByOwner
+                          ? "opacity-50"
+                          : null,
                       )}
                     >
                       <ThumbsUp size={12} />
@@ -3668,6 +3679,7 @@ function MobileChannelCommentsSheet({
       </div>
     );
   }, [
+    cannotInteract,
     comments,
     commentAuthorNameMap,
     likePendingCommentId,
