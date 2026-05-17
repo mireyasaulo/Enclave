@@ -1081,6 +1081,7 @@ function ChannelCommentsDrawer({
           ) : null}
           <DesktopChannelCommentsPanel
             comments={comments}
+            commentsHasError={Boolean(commentsErrorMessage)}
             commentsLoading={commentsLoading}
             draft={draft}
             likePendingCommentId={likePendingCommentId}
@@ -1408,6 +1409,7 @@ function formatChannelMeta(post: FeedPostListItem) {
 
 function DesktopChannelCommentsPanel({
   comments,
+  commentsHasError,
   commentsLoading,
   draft,
   likePendingCommentId,
@@ -1421,6 +1423,7 @@ function DesktopChannelCommentsPanel({
   onSubmit,
 }: {
   comments: FeedComment[];
+  commentsHasError: boolean;
   commentsLoading: boolean;
   draft: string;
   likePendingCommentId: string | null;
@@ -1605,7 +1608,13 @@ function DesktopChannelCommentsPanel({
           {t(msg`正在读取评论...`)}
         </div>
       ) : null}
-      {!commentsLoading && !comments.length ? (
+      {/*
+        走查 2026-05-17 R5：原条件只看 !commentsLoading && !comments.length，
+        commentsErrorMessage 设值时（ChannelCommentsDrawer 顶部已经渲了红色
+        ErrorBlock），这条空态卡也会同时冒出来。用户既看到错误又看到「还没
+        有评论」，矛盾且会让人以为真的没人评论（同移动端 R1 修复同款问题）。
+      */}
+      {!commentsLoading && !comments.length && !commentsHasError ? (
         <div className="rounded-[14px] border border-dashed border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-4 text-xs leading-6 text-[color:var(--text-muted)]">
           {t(msg`这条内容还没有评论，你可以先开口。`)}
         </div>
