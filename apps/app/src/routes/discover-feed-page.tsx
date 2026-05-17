@@ -902,6 +902,13 @@ export function DiscoverFeedPage() {
   // commentDrafts 敲键 / inflightSets 翻动 / pull-refresh state / actionBubble
   // 抖动这些高频 setState 全部跳过 Intl。formattedCreatedAt 跟 displayText /
   // summaryText 一起按 [visiblePosts] 缓存，post 引用真换才重算。
+  // 走查新一轮 R1：i18n 切换后 stale。getFeedSummaryText 内部走 translate-
+  // RuntimeMessage（"分享了一段视频"/"分享了一段音乐"/"分享了 N 张图片"），
+  // formatTimestamp → formatDateTime 用 Intl.DateTimeFormat（locale 敏感）。两
+  // 者都依赖运行时 locale 但 useMemo deps 之前只看 [visiblePosts]。用户在广场
+  // 上切语言（系统设置 → 语言或语言切换器），visiblePosts 引用不变 → memo 不
+  // 重算 → 卡片底部 summary 和顶上时间戳还是旧语言。把 t 加进 deps：t 由
+  // useRuntimeTranslator 出，identity 仅在 [activationVersion, locale] 翻动时换。
   const processedPosts = useMemo(() => {
     return visiblePosts.map((post) => {
       const displayText = stripToolCallSyntax(post.text);
@@ -909,7 +916,7 @@ export function DiscoverFeedPage() {
       const formattedCreatedAt = formatTimestamp(post.createdAt);
       return { post, displayText, summaryText, formattedCreatedAt };
     });
-  }, [visiblePosts]);
+  }, [visiblePosts, t]);
   const processedCommentsByPostId = useMemo(() => {
     const result = new Map<
       string,

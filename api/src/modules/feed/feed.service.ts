@@ -108,6 +108,12 @@ const FEED_DEAD_MEDIA_HOSTS = new Set<string>([
 // 或超长字符串。和 moments.service.ts 的 MOMENT_COMMENT_TOO_LONG 对齐。
 const MAX_FEED_COMMENT_TEXT_LENGTH = 500;
 
+// 走查 R1：getComments 一次性兜底上限。前端「查看全部 N 条评论」展开本就
+// 是用户主动行为；后端在角色密集互动 / 长寿命 post 上能堆出上千条评论，无
+// take SELECT * + serialize 全跑会卡。500 是经验值，覆盖绝大多数真实贴；
+// 超过时只渲最近 500 条（按时间倒取），前端 commentCount 字段还是从 post 拿。
+const MAX_FEED_COMMENT_FETCH_LIMIT = 500;
+
 // R2 走查：广场正文也要硬上限。前端 mobile-feed-publish-page 的 textarea
 // 之前完全没卡 maxLength，curl / 第三方端无限制能往 post.text 写几 MB；AI 角色
 // 走 character 路径生成 post 时偶发 CoT 漏文（gpt-4.1 等非推理模型把整段思考
@@ -520,10 +526,18 @@ export class FeedService implements OnModuleInit {
         ownerId: owner.id,
         ownerAvatar: owner.avatar,
       }));
-    const comments = await this.commentRepo.find({
+    // 走查 R1：旧实现 .find() 无 take，单条 post 累积 N 万条评论时（角色密集
+    // 反应 + 用户长期堆 reply）一次性 SELECT *、序列化 + 排序 + reply-map
+    // 全跑一遍 → 内存峰值 + 响应巨慢。前端「查看全部 N 条评论」展开本身就
+    // 是低频操作，硬上限 MAX_FEED_COMMENT_FETCH_LIMIT 兜底；超过时取最近
+    // 的一批（按 createdAt DESC 取 limit 再倒回 ASC），并在响应里通过 .length
+    // 让前端能感知（DB 实际数还是从 commentCount 字段读，老 cache 不变）。
+    const rawComments = await this.commentRepo.find({
       where: { postId, status: 'published' },
-      order: { createdAt: 'ASC' },
+      order: { createdAt: 'DESC' },
+      take: MAX_FEED_COMMENT_FETCH_LIMIT,
     });
+    const comments = rawComments.reverse();
     const likedCommentIds = await this.buildLikedCommentIdSet(
       comments.map((comment) => comment.id),
       owner.id,
@@ -3225,7 +3239,13 @@ export class FeedService implements OnModuleInit {
     aspectRatio?: number;
     publishStatus?: 'draft' | 'published' | 'hidden' | 'deleted';
   }) {
-    const text = input.text.trim();
+    // 走查 R1：controller 把 `body.text` 不验证类型直接灌进来；curl 发
+    // `{"text": 123}` / `{"text": {"a":1}}` / `{"text": [1,2]}` 时 `.trim()` 抛
+    // "input.text.trim is not a function" → 500（实测过）。前端 textarea 必出
+    // string，但 curl / 第三方端 / 旧缓存能塞别的；兜回 ""，让下面 FEED_EMPTY
+    // 校验路径自然报 400。assertCommentText 已经用同款 typeof 兜过，这条对齐。
+    const rawText = typeof input.text === 'string' ? input.text : '';
+    const text = rawText.trim();
     const explicitMedia = this.normalizeFeedMediaInput(input.media);
     const media =
       explicitMedia.length > 0
