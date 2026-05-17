@@ -511,6 +511,16 @@ function MobileAddFriend() {
               className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
               autoFocus
               enterKeyHint="search"
+              // 隐界号是带下划线的小写英数 ID（yinjie_alice123）；iOS 默认会
+              // 自动大写句首字母 + 自动纠正"alice"→"Alice"，用户键入完按"搜
+              // 索"被静默改成"Yinjie_Alice123"，跟服务端存的 ID 永远 case-
+              // mismatch（matchCharacter 内部已经 toLowerCase，所以 case 不是
+              // 直接致命，但 autocorrect 把"alice123"换成"alike123"才是真坑——
+              // 用户根本意识不到自己敲的不是原 ID）。同 profile-info-name /
+              // mobile-search-workspace 同款关 autocorrect / autocaps / spell。
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
             />
             {searchText ? (
               <button
@@ -999,6 +1009,21 @@ function MobileAddFriendSendSheet({
     });
     return unregister;
   }, [open, onClose, pending]);
+
+  // 走查 R1：sheet 是 fixed inset-0，但没锁 body scroll —— iOS Safari WKWebView
+  // 上用户用手指在半透明遮罩 / sheet 之外区域滑动会"穿透"滚动底层 /add-friend
+  // 的搜索结果列表，遮罩看着不动、底下列表却在飘。同 share-card-modal /
+  // channels-forward-picker 同款 body.style.overflow="hidden" 兜一下。
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
 
   if (!open || !result) {
     return null;

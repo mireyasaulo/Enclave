@@ -489,6 +489,17 @@ export function CreateGroupPage() {
               placeholder={t(msg`搜索`)}
               // text-[16px]: iOS Safari focus 时 <16px 会强制 viewport zoom-in。
               className="min-w-0 flex-1 bg-transparent text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
+              // 备注名 / 角色名 / 关系关键词常常是 ASCII（"wangxiaoming"、
+              // "zhang yang"）或者带英文姓名缩写，iOS 默认会句首大写 +
+              // autocorrect，用户敲"wang"被改成"Wang"或者"Want"，
+              // matchesFriendSearch 内部已 toLowerCase 所以 case 不致命，但
+              // autocorrect 把字直接改掉是真坑；同 mobile-search-workspace /
+              // mobile-add-friend 同款关掉。enterKeyHint=search 让软键盘的
+              // Return 键长得像"搜索"，跟"搜索结果列表"语义对齐。
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              enterKeyHint="search"
             />
           </label>
         </div>
