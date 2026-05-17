@@ -7,7 +7,7 @@ import {
   useAppLocale,
   useRuntimeTranslator,
 } from "@yinjie/i18n";
-import { AppPage, Button } from "@yinjie/ui";
+import { AppPage } from "@yinjie/ui";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { shouldShowCloudAccountControls } from "../lib/cloud-session";
@@ -69,7 +69,13 @@ export function ProfileSettingsPage() {
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
-          <Button
+          // 第三轮 R1：之前用 UI <Button variant="ghost"> + className "shadow-none"
+          // 直接把 tokens.css 全局 :focus-visible 的 box-shadow 焦点环压成 0——
+          // 键盘 tab 到 back 按钮看不见任何高亮（语言/账号安全两个子页都已经走
+          // 朴素 <button>，三页样式不一致）。改成跟两个子页同款 plain <button>，
+          // a11y 一致。
+          <button
+            type="button"
             onClick={() =>
               // 与其他 /profile/* 子页保持同款返回逻辑（navigateBackOrFallback）：
               // history.back() 优先以保留 /tabs/profile 滚动位置；否则降级到 navigate。
@@ -80,13 +86,11 @@ export function ProfileSettingsPage() {
                 "/tabs/profile",
               )
             }
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none active:bg-black/[0.05]"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--text-primary)] transition-colors active:bg-black/[0.05]"
             aria-label={t(msg`返回资料页`)}
           >
             <ArrowLeft size={17} />
-          </Button>
+          </button>
         }
       />
       <div className="mt-1 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
