@@ -1007,6 +1007,21 @@ export function GroupQrPage() {
     sendingConversationsRef.current.add(conversation.id);
     try {
       await doSendToConversation(conversation);
+    } catch (error) {
+      // 走查 R1：群投递分支里 await sendGroupMessage 抛错（公网隧道超时 /
+      // cloud token 失效重连 / 服务端 5xx）会一路冒到 caller 的 `void
+      // sendToConversation(...)`——void 不接 rejection，落到 window.
+      // unhandledrejection 污染 telemetry；用户也不会看到任何提示，按钮上
+      // 没有任何反馈，第二下又被同步锁拦住，看着像"卡住了"。catch 这里就地
+      // 翻成 danger notice，同时让上层 finally 正常解锁释放重试入口。
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : t(msg`发送群邀请失败，请稍后重试。`);
+      showNotice(
+        t(msg`未能把群邀请发到 ${conversation.title}：${message}`),
+        "danger",
+      );
     } finally {
       sendingConversationsRef.current.delete(conversation.id);
     }
