@@ -38,6 +38,7 @@ import {
   joinConversationRoom,
   onChatError,
   onChatMessage,
+  onChatSocketConnect,
   onConversationUpdated,
   onTypingStart,
   onTypingStop,
@@ -271,6 +272,16 @@ export function useConversationThread(conversationId: string) {
     setSocketError(null);
     setTypingState(null);
     joinConversationRoom({ conversationId });
+    // 走查新一轮 R3：socket disconnect+reconnect 后 server 端是全新的 Socket
+    // 实例，原先的 room 全部丢掉；client 这里只在 conversationId 变化时 emit
+    // 一次 join_conversation，重连后再没机会重 join。结果：网络抖一下 / 后台
+    // 切前台 / 公网隧道 token 续期 → 用户停在原会话上，AI 回复、撤回、
+    // conversation_updated 全部送不到，要等他手动切走再切回才恢复。监听 connect
+    // 事件（reconnect 也走这个）重新 emit join_conversation；socket.io 的 join
+    // 是 Set 幂等，重复 emit 无副作用。
+    const offConnect = onChatSocketConnect(() => {
+      joinConversationRoom({ conversationId });
+    });
     // 这里不直接调 markConversationRead——下面 [messagesQuery.data?.length]
     // 那个 effect 会在挂载和每次 cache 长度变化时统一触发一次。和
     // group-chat-thread-panel 的写法对齐，避免角色连发 5 条消息就打 5 次
@@ -390,6 +401,7 @@ export function useConversationThread(conversationId: string) {
     });
 
     return () => {
+      offConnect();
       offMessage();
       offTypingStart();
       offTypingStop();

@@ -162,6 +162,17 @@ export function onConversationUpdated(handler: (payload: ConversationUpdatedPayl
   return () => active.off(CHAT_EVENTS.conversationUpdated, handler);
 }
 
+// socket.io-client 重连时 server 不知道该 socket 之前 join 了哪些 room
+// （server 端 Socket 实例每次都是新的）；调用方需要在 connect 事件里重新
+// emit join_conversation 才能继续收到 newMessage / typing / conversation_updated。
+// fire 时机：socket 从断开变成连上时（包括 reconnect）；如果 socket 已经
+// 连上时挂 listener，本次不会触发，下次重连才触发——这正是我们想要的。
+export function onChatSocketConnect(handler: () => void) {
+  const active = getChatSocket();
+  active.on('connect', handler);
+  return () => active.off('connect', handler);
+}
+
 export function onChatError(handler: (payload: ChatErrorPayload) => void) {
   const active = getChatSocket();
   const listener = (payload: ChatErrorPayload | string) => {
