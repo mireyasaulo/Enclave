@@ -443,9 +443,20 @@ function MobileNoteEditor({
     if (activeDraftId) {
       return;
     }
+    // 走查 R1：路由切走（用户点返回 / hash 被清）后 React 19 + TanStack Router
+    // 的 reconnectPassiveEffects 会让这条 effect 在 routeState=null 时再跑一遍。
+    // 此时 draftIdParam / selectedNoteId 都是 undefined，createDesktopNoteDraft()
+    // 会生成完全无意义的随机 UUID 空草稿落地 LS；每次返回都攒 2 条（StrictMode
+    // 双跑），用户多点几次「+ → 新建笔记 → 返回」就在 localStorage 攒一堆空草稿。
+    // 没 draftId 也没 noteId 的情况下根本不该 init —— 直接 return。
+    const normalizedDraftId = draftIdParam?.trim();
+    const normalizedNoteId = selectedNoteId?.trim();
+    if (!normalizedDraftId && !normalizedNoteId) {
+      return;
+    }
     const draft = createDesktopNoteDraft({
-      draftId: draftIdParam,
-      noteId: selectedNoteId,
+      draftId: normalizedDraftId,
+      noteId: normalizedNoteId,
     });
     setActiveDraftId(draft.draftId);
   }, [activeDraftId, draftIdParam, selectedNoteId]);
