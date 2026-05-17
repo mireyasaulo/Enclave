@@ -136,6 +136,10 @@ export const PARKING_WAR_CAR_DURABILITY_LOSS_PER_TICKET = 10;
 export const PARKING_WAR_CAR_DURABILITY_LOSS_PER_TOW = 20;
 export const PARKING_WAR_CAR_REPAIR_COST_PER_POINT_CENTS = 80; // 每点 ¥0.8
 
+// 车库扩容：每个新槽位的成本（递增）
+export const PARKING_WAR_GARAGE_SLOT_BASE_COST_CENTS = 100_000; // ¥1000 / 槽
+export const PARKING_WAR_GARAGE_MAX_SLOTS = 8;
+
 // 升级车辆：基础消耗 × level²（分）
 export const PARKING_WAR_CAR_UPGRADE_BASE_COST_CENTS = 20_000; // ¥200
 export const PARKING_WAR_CAR_MAX_LEVEL = 10;

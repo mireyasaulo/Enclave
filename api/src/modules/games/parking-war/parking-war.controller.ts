@@ -8,6 +8,7 @@ import type {
   ParkingWarCarTier,
   ParkingWarCollectResult,
   ParkingWarEventView,
+  ParkingWarLotSurface,
   ParkingWarNeighborDetail,
   ParkingWarNeighborSummary,
   ParkingWarPlayerStateView,
@@ -30,6 +31,12 @@ const RARITIES = new Set<ParkingWarRarity>([
   'rare',
   'epic',
   'legend',
+]);
+const SURFACES = new Set<ParkingWarLotSurface>([
+  'concrete',
+  'grass',
+  'asphalt',
+  'vip',
 ]);
 
 interface ParkBody {
@@ -185,6 +192,49 @@ export class ParkingWarController {
     const ownerId = await this.stateService.resolveOwnerId();
     const carId = parseNonEmptyString(body.carId, 'carId');
     return this.stateService.repairCar(ownerId, carId);
+  }
+
+  @Post('upgrade-lot')
+  async upgradeLot(
+    @Body()
+    body: {
+      target: 'size' | 'surface';
+      value: number | ParkingWarLotSurface;
+    },
+  ): Promise<ParkingWarPlayerStateView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    if (body.target === 'size') {
+      const size = Number(body.value);
+      if (!Number.isInteger(size)) {
+        throw new AppError('PARKING_WAR_INVALID_LOT_SIZE', {
+          legacyMessage: '车场容量必须为整数',
+        });
+      }
+      return this.stateService.upgradeLotSize(ownerId, size);
+    }
+    if (body.target === 'surface') {
+      if (
+        typeof body.value !== 'string' ||
+        !SURFACES.has(body.value as ParkingWarLotSurface)
+      ) {
+        throw new AppError('PARKING_WAR_INVALID_SURFACE', {
+          legacyMessage: '地砖类型不识别',
+        });
+      }
+      return this.stateService.upgradeLotSurface(
+        ownerId,
+        body.value as ParkingWarLotSurface,
+      );
+    }
+    throw new AppError('PARKING_WAR_INVALID_UPGRADE_TARGET', {
+      legacyMessage: 'upgrade-lot 仅支持 target=size | surface',
+    });
+  }
+
+  @Post('upgrade-garage')
+  async upgradeGarage(): Promise<ParkingWarPlayerStateView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.stateService.upgradeGarage(ownerId);
   }
 }
 

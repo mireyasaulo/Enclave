@@ -31,13 +31,20 @@ import {
   PARKING_WAR_DEFAULT_LOT_MULTIPLIER_BP,
   PARKING_WAR_DEFAULT_LOT_SIZE,
   PARKING_WAR_DEFAULT_LOT_SURFACE,
+  PARKING_WAR_GARAGE_MAX_SLOTS,
+  PARKING_WAR_GARAGE_SLOT_BASE_COST_CENTS,
+  PARKING_WAR_LOT_SIZE_TIERS,
+  PARKING_WAR_LOT_SIZE_UPGRADE_COST_CENTS,
+  PARKING_WAR_LOT_SURFACE_UPGRADE_COST_CENTS,
   PARKING_WAR_OFFLINE_CATCHUP_CAP_MS,
   PARKING_WAR_PLAYER_ACTOR_ID,
+  PARKING_WAR_SURFACE_MULTIPLIER_BP,
   PARKING_WAR_TICKET_AT_MS,
   PARKING_WAR_TICKET_PENALTY_BP,
   PARKING_WAR_TOWABLE_AT_MS,
   PARKING_WAR_TOW_COOLDOWN_MS,
   PARKING_WAR_TOW_FEE_CENTS,
+  PARKING_WAR_VIP_DAILY_SHIELD,
   PARKING_WAR_VISITOR_SHARE_BP,
   PARKING_WAR_WARNING_AT_MS,
 } from './parking-war.constants';
@@ -167,8 +174,27 @@ export class ParkingWarStateService implements OnModuleInit {
     ownerId: string,
   ): Promise<ParkingWarPlayerStateView> {
     const state = await this.getOrCreatePlayerState(ownerId);
+    await this.refreshDailyShield(state);
     await this.tickPlayerHomeOccupancies(state);
     return this.toPlayerView(state);
+  }
+
+  /**
+   * 每天首次读取 state 时跑一次的轻量「每日重置」：
+   *  - dailyTasksPayload.dateKey != today → 重置为今天 + 空 tasks（Stage 6 会填）
+   *  - VIP 地砖：dailyShieldRemaining = 1（护盾不累积，每天 1 张）
+   *  - 非 VIP：dailyShieldRemaining = 0
+   * 用 dailyTasksPayload.dateKey 当作「今天已重置」的单一锚点，避免与 lastDailyBonusKey 耦合。
+   */
+  private async refreshDailyShield(
+    state: ParkingWarPlayerStateEntity,
+  ): Promise<void> {
+    const todayKey = formatDateKey(new Date());
+    if (state.dailyTasksPayload?.dateKey === todayKey) return;
+    state.dailyTasksPayload = { dateKey: todayKey, tasks: [] };
+    state.dailyShieldRemaining =
+      state.lotSurface === 'vip' ? PARKING_WAR_VIP_DAILY_SHIELD : 0;
+    await this.playerRepo.save(state);
   }
 
   // ============================================================
@@ -647,6 +673,8 @@ export class ParkingWarStateService implements OnModuleInit {
       });
     }
 
+    // 玩家是 lotOwner 给自己家访客贴条 → shield 不消耗 (shield 是「被贴条时免一次」)
+    // shield 实际生效场景在 Stage 8 NPC tick 给玩家车贴条时（这里仅保留 pending 30% 罚款逻辑）
     const fineCents = Math.floor(
       (occ.pendingEarningsCents * PARKING_WAR_TICKET_PENALTY_BP) / 10_000,
     );
@@ -947,6 +975,139 @@ export class ParkingWarStateService implements OnModuleInit {
       actorId: PARKING_WAR_PLAYER_ACTOR_ID,
       actorName: '世界主人',
       payload: { carId, paintIndex },
+    });
+    return this.toPlayerView(state);
+  }
+
+  /**
+   * 升级车场尺寸（4 → 6 → 8 → 12）。新增的 home slot 都是空的。
+   */
+  async upgradeLotSize(
+    ownerId: string,
+    targetSize: number,
+  ): Promise<ParkingWarPlayerStateView> {
+    if (!PARKING_WAR_LOT_SIZE_TIERS.includes(targetSize)) {
+      throw new AppError('PARKING_WAR_INVALID_LOT_SIZE', {
+        params: { targetSize },
+        legacyMessage: `车场容量只能是 ${PARKING_WAR_LOT_SIZE_TIERS.join('/')}`,
+      });
+    }
+    const state = await this.getOrCreatePlayerState(ownerId);
+    if (targetSize <= state.lotSize) {
+      throw new AppError('PARKING_WAR_LOT_SIZE_NOT_UPGRADE', {
+        legacyMessage: '只能往更大档位扩容',
+      });
+    }
+    const cost = PARKING_WAR_LOT_SIZE_UPGRADE_COST_CENTS[targetSize];
+    if (state.balanceCents < cost) {
+      throw new AppError('PARKING_WAR_INSUFFICIENT_BALANCE', {
+        params: { required: cost, balance: state.balanceCents },
+        legacyMessage: '余额不足',
+      });
+    }
+
+    state.balanceCents -= cost;
+    state.lotSize = targetSize;
+    const currentSlots = state.homeSlotsPayload ?? [];
+    const newSlots: ParkingWarHomeSlot[] = Array.from(
+      { length: targetSize },
+      (_, index) => currentSlots[index] ?? { index, occupancyId: null },
+    );
+    state.homeSlotsPayload = newSlots;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'upgrade_lot',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: -cost,
+      payload: { kind: 'size', value: targetSize },
+    });
+    return this.toPlayerView(state);
+  }
+
+  /**
+   * 升级车场地砖。VIP 地砖一次性切换，每天首登给 1 张免贴条护盾。
+   */
+  async upgradeLotSurface(
+    ownerId: string,
+    targetSurface: ParkingWarLotSurface,
+  ): Promise<ParkingWarPlayerStateView> {
+    if (!(targetSurface in PARKING_WAR_LOT_SURFACE_UPGRADE_COST_CENTS)) {
+      throw new AppError('PARKING_WAR_INVALID_SURFACE', {
+        params: { targetSurface },
+        legacyMessage: `地砖类型不识别：${targetSurface}`,
+      });
+    }
+    const state = await this.getOrCreatePlayerState(ownerId);
+    if (state.lotSurface === targetSurface) {
+      throw new AppError('PARKING_WAR_SURFACE_ALREADY_APPLIED', {
+        legacyMessage: '已经是该地砖了',
+      });
+    }
+    const cost = PARKING_WAR_LOT_SURFACE_UPGRADE_COST_CENTS[targetSurface];
+    if (state.balanceCents < cost) {
+      throw new AppError('PARKING_WAR_INSUFFICIENT_BALANCE', {
+        params: { required: cost, balance: state.balanceCents },
+        legacyMessage: '余额不足',
+      });
+    }
+    state.balanceCents -= cost;
+    state.lotSurface = targetSurface;
+    state.lotMultiplierBp = PARKING_WAR_SURFACE_MULTIPLIER_BP[targetSurface];
+    // 切到 VIP 当天立即享受 shield；切走 VIP 立即归零
+    state.dailyShieldRemaining =
+      targetSurface === 'vip' ? PARKING_WAR_VIP_DAILY_SHIELD : 0;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'upgrade_lot',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: -cost,
+      payload: { kind: 'surface', value: targetSurface },
+    });
+    return this.toPlayerView(state);
+  }
+
+  /**
+   * 扩车库：成本随当前 garageSlots 递增。上限 PARKING_WAR_GARAGE_MAX_SLOTS。
+   */
+  async upgradeGarage(
+    ownerId: string,
+  ): Promise<ParkingWarPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    if (state.garageSlots >= PARKING_WAR_GARAGE_MAX_SLOTS) {
+      throw new AppError('PARKING_WAR_GARAGE_AT_MAX', {
+        legacyMessage: `车库已达上限 ${PARKING_WAR_GARAGE_MAX_SLOTS} 个槽位`,
+      });
+    }
+    const next = state.garageSlots + 1;
+    // 第 5 个 ¥1000，第 6 个 ¥2000，第 7 个 ¥4000，第 8 个 ¥8000
+    const stepMultiplier = next - PARKING_WAR_DEFAULT_GARAGE_SLOTS;
+    const cost = PARKING_WAR_GARAGE_SLOT_BASE_COST_CENTS * 2 ** (stepMultiplier - 1);
+    if (state.balanceCents < cost) {
+      throw new AppError('PARKING_WAR_INSUFFICIENT_BALANCE', {
+        params: { required: cost, balance: state.balanceCents },
+        legacyMessage: '余额不足',
+      });
+    }
+    state.balanceCents -= cost;
+    state.garageSlots = next;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'upgrade_lot',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: -cost,
+      payload: { kind: 'garage', value: next },
     });
     return this.toPlayerView(state);
   }
