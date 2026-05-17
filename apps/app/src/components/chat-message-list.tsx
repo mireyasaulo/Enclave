@@ -7123,10 +7123,16 @@ function NoteViewerOverlay({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [actionMenuOpen, onClose]);
+  // 走查 R2：上方 NoteCardAttachment（消息气泡里的笔记缩略卡）已经把
+  // 同 queryKey 的 noteQuery 设了 staleTime: 30_000；这条「全屏查看器」
+  // 没设 → 用户在聊天里点缩略卡打开查看器时，react-query 看到 observer
+  // 的 staleTime=0 立刻重发一次 getFavoriteNote。两份 observer 共享同一
+  // cache，新的那条没必要再发。对齐 30s。
   const noteQuery = useQuery({
     queryKey: ["favorite-note", baseUrl, attachment.noteId],
     queryFn: () => getFavoriteNote(attachment.noteId, baseUrl),
     enabled: Boolean(attachment.noteId),
+    staleTime: 30_000,
   });
   const document: FavoriteNoteDocument | undefined = noteQuery.data;
   const noteMissing = isFavoriteNoteMissingError(noteQuery.error);
