@@ -603,9 +603,12 @@ export class FarmStateService {
     player.weeklyStolenLogPayload = stolenLog;
     const savedPlayer = await this.playerRepo.save(player);
 
-    const intimacyDelta = -3;
-    const newIntimacy = Math.max(0, Math.min(100, (character.intimacyLevel ?? 0) + intimacyDelta));
-    if (newIntimacy !== character.intimacyLevel) {
+    // 跟 gift 一样，response.intimacyDelta 用 newIntimacy - oldIntimacy；
+    // 若对方好感已经 0，"再扣 -3" 实际不变化，事件流和返回值就不再撒谎 -3。
+    const oldIntimacy = character.intimacyLevel ?? 0;
+    const newIntimacy = Math.max(0, Math.min(100, oldIntimacy - 3));
+    const intimacyDelta = newIntimacy - oldIntimacy;
+    if (newIntimacy !== oldIntimacy) {
       character.intimacyLevel = newIntimacy;
       await this.charactersService.upsert(character);
     }
