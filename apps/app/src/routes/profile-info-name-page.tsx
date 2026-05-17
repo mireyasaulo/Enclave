@@ -44,7 +44,11 @@ export function ProfileInfoNamePage() {
   const username = useWorldOwnerStore((state) => state.username);
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
 
-  const [draft, setDraft] = useState(username ?? "");
+  // 跟 profile-info-signature-page 同款：进页面前先 sanitize 一遍，避免
+  // legacy 用户的 "foo\nbar" 直接灌进 <input>——单行 input 里 \r\n\t 显示成
+  // 不可见空白，但 React state 仍保留原字符，光标点位跟可视字符不对应，
+  // 用户改一个字位置会跳。同时 dirty 比对、initial 值都基于同样的 sanitize 形态。
+  const [draft, setDraft] = useState(() => sanitizeOwnerName(username ?? ""));
   // 用户进页面时 store 可能还没 hydrate（cold start / 重置 cloud session），
   // username 之后才被异步灌进来。这时候想让 draft 同步成"刚 hydrate 出来的
   // username"。但如果用户已经在输入框里改过字了，再被外部 store 更新覆盖回
@@ -63,7 +67,7 @@ export function ProfileInfoNamePage() {
 
   useEffect(() => {
     if (!userTouchedRef.current) {
-      setDraft(username ?? "");
+      setDraft(sanitizeOwnerName(username ?? ""));
     }
   }, [username]);
 
