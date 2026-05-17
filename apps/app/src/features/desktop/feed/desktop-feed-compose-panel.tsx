@@ -61,6 +61,18 @@ export function DesktopFeedComposePanel({
   // 事件冒到 backdrop 上 → target===backdrop → 误关闭，用户输入大半的草稿被这层
   // 弱判定吃掉（草稿本身留着，但要重开还得多一步）。
   const downedOnBackdropRef = useRef(false);
+  // 走查新一轮 R1：父组件 DesktopFeedWorkspace 把 inline `onClose={() =>
+  // setShowCompose(false)}` 当 prop 直传过来 — workspace 在用户敲 compose 文本
+  // (onTextChange → composeDraft.setText → page 重渲) / 评论 row 敲键 (commentDrafts
+  // 变) / like optimistic 写 cache 等高频路径上都重渲，每次都换一份 onClose
+  // identity。原 effect deps=[onClose] → 每次都 removeEventListener("keydown")
+  // → addEventListener("keydown") 一圈，跟 wechat-comment-bar R1 (b630be4d3) /
+  // wechat-action-bubble R1 (630be4d3) 同款 cleanup-storm。
+  // ref 兜最新 onClose；effect deps 走 [] 让 listener 全程只挂一次。
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") {
@@ -79,14 +91,14 @@ export function DesktopFeedComposePanel({
       ) {
         return;
       }
-      onClose();
+      onCloseRef.current();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <div
