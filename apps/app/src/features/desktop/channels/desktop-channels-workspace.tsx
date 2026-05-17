@@ -1524,7 +1524,7 @@ function DesktopChannelAuthorPanel({
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
                       <span>{formatTimestamp(post.createdAt)}</span>
                       <span>·</span>
-                      <span>{formatChannelMeta(post)}</span>
+                      <span>{formatChannelMeta(post, { includeTopicTag: true })}</span>
                       {selectedPostId === post.id ? (
                         <>
                           <span>·</span>
@@ -1555,7 +1555,18 @@ function DesktopChannelAuthorPanel({
   );
 }
 
-function formatChannelMeta(post: FeedPostListItem) {
+// 走查 R1（本轮）：原一律 `pieces.push(\`#${topicTags[0]}\`)` 在 slide overlay
+// （ChannelFeedSlide L1054）和 author overlay 的 recent posts 列表（L1527）都生效。
+// slide overlay 紧跟着就把 topicTags 渲成一排彩色 pill chip（L1107-1118），meta
+// 行已经写了 "... · #音乐" 又重复出现一次 "#音乐" pill，体感像「同一个 tag 出现
+// 两次」；author overlay 的 recent posts 列表没渲 pill，meta 行带 #tag 是必要的。
+// 移动端 formatChannelMeta 早就只在没 pill 的位置加 tag（mobile channels-page.tsx
+// L4002 注释明确说"不要拼 topicTags，上面已经渲成 chip 了"）。给一个 includeTag
+// 开关让两个 call site 各按需要决定。
+function formatChannelMeta(
+  post: FeedPostListItem,
+  options?: { includeTopicTag?: boolean },
+) {
   const viewCount = post.viewCount ?? 0;
   const pieces = [translateRuntimeMessage(msg`${viewCount} 播放`)];
 
@@ -1564,7 +1575,7 @@ function formatChannelMeta(post: FeedPostListItem) {
     pieces.push(translateRuntimeMessage(msg`${seconds} 秒`));
   }
 
-  if (post.topicTags?.length) {
+  if (options?.includeTopicTag && post.topicTags?.length) {
     pieces.push(`#${post.topicTags[0]}`);
   }
 

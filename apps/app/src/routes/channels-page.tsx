@@ -394,10 +394,14 @@ export function ChannelsPage() {
           : t(msg`视频号评论已发送。`),
       );
       // fire-and-forget：await 会让"发送"按钮一直 disabled。
-      // 主接口刷新 commentCount，decorations 刷新 commentsPreview 卡底"最近评论"。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-channels-home", baseUrl],
-      });
+      // 走查 R1（本轮）：原来连 home 也一起 invalidate，注释说要"刷 commentCount"——
+      // 但 commentCount 已经在 onMutate 里 per-post +1 乐观更新过了，server 那一
+      // 端真值也就是 +1，refetch 回来跟本地一致没差。home 一次 refetch ~35KB
+      // (7 张 audio post 序列化 + ownerState/avatarContext 全跑一遍) + ~2-5 RTT 跨
+      // 公网隧道；like 那条 onSuccess 早已注明「optimistic 已对应、完全省掉 invalidate」
+      // 同样适用这里。decorations 仍然需要——commentsPreview 卡底"最近评论"要把
+      // 刚发的这条加进去；feed-comments 当然要 invalidate（评论 sheet 当前打开列表）。
+      // 同步去掉 home invalidate，省掉每次评论附带的全量重拉。
       void queryClient.invalidateQueries({
         queryKey: ["app-channels-home-decorations", baseUrl],
       });
@@ -547,7 +551,7 @@ export function ChannelsPage() {
           : t(msg`收藏失败，请稍后重试。`),
       );
     },
-    onSuccess: async (_, input) => {
+    onSuccess: (_, input) => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -556,9 +560,13 @@ export function ChannelsPage() {
           ? t(msg`已取消收藏。`)
           : t(msg`已收藏这条视频号内容。`),
       );
-      await queryClient.invalidateQueries({
-        queryKey: ["app-channels-home", baseUrl],
-      });
+      // 走查 R1（本轮）：原来 onSuccess 还 await invalidate home —— 但 favoriteCount
+      // 在 mobile / desktop 都没有任何 UI 入口显示（grep 全工程只有 channels-page
+      // 自己的 optimistic update 在读写它），收藏 toggle 真正可见的是 ownerState
+      // .hasFavorited（按钮态）+ 本地 desktop-favorites localStorage（收藏列表入口），
+      // 两者都已经在 onMutate / toggleFavorite 里同步过。home 一次 refetch ~35KB +
+      // 公网隧道 RTT 完全打水漂；like 那条 onSuccess 早已注明「optimistic 已对应、
+      // 完全省掉 invalidate」同款逻辑搬过来。
     },
   });
   const followMutation = useMutation({
