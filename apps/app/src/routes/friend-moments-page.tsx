@@ -20,11 +20,13 @@ import {
   getCharacter,
   getCharacterMoments,
   getFriends,
+  isApiRequestError,
   toggleMomentLike,
   type Moment,
   type MomentComment,
   type MomentsPageResponse,
 } from "@yinjie/contracts";
+import { translateAppErrorCode } from "../lib/error-translate";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AppPage, Button, ErrorBlock, LoadingBlock } from "@yinjie/ui";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -162,6 +164,15 @@ export function FriendMomentsPage() {
     enabled: isDesktopLayout && Boolean(ownerId),
   });
 
+  // 走查 R1：跟 moments-page / profile-moments-page / mobile-friend-moments-page 同思路 ——
+  // 钉住 mutation 触发时刻的 baseUrl，mid-flight 切账户后旧账户的 success/danger toast
+  // 不要落到新账户 UI。本页之前完全没有这层 guard，切到 B 后 A 的点赞/评论成功仍会冒
+  // 「朋友圈互动已更新。」绿条；A 的点赞失败还会在 B 上挂「重试点赞」按钮（闭包指向
+  // 旧 momentId，重试时 404）。
+  const mutationBaseUrlRef = useRef(baseUrl);
+  useEffect(() => {
+    mutationBaseUrlRef.current = baseUrl;
+  }, [baseUrl]);
   const createMutation = useMutation({
     // 走查新 Round 1：跟 1b285789 / moments-page / profile-moments-page 同类 bug。
     // 慢网下旧 mutation 的 onSuccess 跑回来会抹掉用户重开后输入的新草稿。
@@ -177,16 +188,13 @@ export function FriendMomentsPage() {
         videoDraft: input.videoDraft,
         baseUrl,
       }),
-    onSuccess: (newMoment, input) => {
-      const draftStillMatchesPublish =
-        composeDraft.text === input.text &&
-        composeDraft.imageDrafts === input.imageDrafts &&
-        composeDraft.videoDraft === input.videoDraft;
-      if (draftStillMatchesPublish) {
-        composeDraft.reset();
-        setShowCompose(false);
-      }
-      setNotice({ tone: "success", message: t(msg`朋友圈已发布。`) });
+    onMutate: () => {
+      // 钉住 publish 目标账户 —— mid-flight 切账户后 cache prepend / invalidate
+      // 仍落到旧账户（切回去第一帧就能看到刚发的），但 toast / draft reset 留给当前账户。
+      return { mutationBaseUrl: baseUrl };
+    },
+    onSuccess: (newMoment, input, context) => {
+      const mutationBaseUrl = context?.mutationBaseUrl ?? baseUrl;
       // 立刻 prepend 到共享 flat / paged / mine 三套 cache：本页按好友 characterId 过滤
       // 不显示用户自己的动态，但用户随手切到 /tabs/moments、/profile/moments 时应该
       // 能直接看到刚发的内容。
@@ -194,15 +202,15 @@ export function FriendMomentsPage() {
       // cache 标 stale，用户下次跳过去仍要付一次 RTT refetch 才能看到新帖。改用
       // setQueryData 在 page 1 头部 prepend，命中 momentsData useMemo 的 id 去重
       // 兜底不会出现重复条；跟 moments-page.tsx createMutation 模板对齐。
-      queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
+      queryClient.setQueryData<Moment[]>(["app-moments", mutationBaseUrl], (current) =>
         current ? [newMoment, ...current] : current,
       );
       queryClient.setQueryData<Moment[]>(
-        ["app-moments-mine", baseUrl],
+        ["app-moments-mine", mutationBaseUrl],
         (current) => (current ? [newMoment, ...current] : current),
       );
       queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
-        ["app-moments-paged", baseUrl],
+        ["app-moments-paged", mutationBaseUrl],
         (current) =>
           current && current.pages.length > 0
             ? {
@@ -216,13 +224,25 @@ export function FriendMomentsPage() {
               }
             : current,
       );
-      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
+      void queryClient.invalidateQueries({ queryKey: ["app-moments", mutationBaseUrl] });
       void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
+        queryKey: ["app-moments-paged", mutationBaseUrl],
       });
       void queryClient.invalidateQueries({
-        queryKey: ["app-moments-mine", baseUrl],
+        queryKey: ["app-moments-mine", mutationBaseUrl],
       });
+      if (mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
+      const draftStillMatchesPublish =
+        composeDraft.text === input.text &&
+        composeDraft.imageDrafts === input.imageDrafts &&
+        composeDraft.videoDraft === input.videoDraft;
+      if (draftStillMatchesPublish) {
+        composeDraft.reset();
+        setShowCompose(false);
+      }
+      setNotice({ tone: "success", message: t(msg`朋友圈已发布。`) });
     },
   });
   const optimisticLike = useOptimisticMomentLikeHandlers({
@@ -233,24 +253,53 @@ export function FriendMomentsPage() {
   });
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
-    onMutate: optimisticLike.onMutate,
+    onMutate: (momentId: string) => {
+      const mutationBaseUrl = baseUrl;
+      const inner = optimisticLike.onMutate(momentId);
+      return Promise.resolve(inner).then((snapshots) => ({
+        ...snapshots,
+        mutationBaseUrl,
+      }));
+    },
     onError: (error, momentId, context) => {
       optimisticLike.onError(error, momentId, context);
+      // mid-flight 切账户：当时点赞的 momentId 在新账户里不存在，弹「重试点赞」按钮
+      // 闭包指着旧 momentId（重试 → 新账户 404）只会把用户搞糊涂。和 moments-page
+      // / mobile-friend-moments-page 的同思路：静默跳过。
+      if (
+        context &&
+        (context as { mutationBaseUrl?: string }).mutationBaseUrl !==
+          mutationBaseUrlRef.current
+      ) {
+        return;
+      }
       // 失败统一走 danger notice + 重试按钮——之前只回滚 cache 不更新 notice，
       // 上一条 success "朋友圈互动已更新。" 还挂着 2.4s，新失败的 likeErrorMessage
       // 落到下方 ErrorBlock 显示成红条，一红一绿同屏。跟 mobile-friend-moments-page
       // (Round 5) / moments-page / chat Round 6 / contacts Round 3 同类 bug。
+      // 走查 R1（本轮）：原文案直拼 raw error.message，server 的 legacyMessage 永远
+      // 是中文，非 zh-CN locale 用户拿到的就是裸中文。优先 translateAppErrorCode
+      // 命中 i18n 字典；miss 才回退 raw message，跟 moments-page R2 / profile-moments
+      // R3 同模板。
       setNotice({
         tone: "danger",
-        message:
-          error instanceof Error
+        message: isApiRequestError(error)
+          ? t(msg`点赞失败：${translateAppErrorCode(error) ?? error.message}`)
+          : error instanceof Error
             ? t(msg`点赞失败：${error.message}`)
             : t(msg`点赞失败，请稍后重试。`),
         actionLabel: t(msg`重试点赞`),
         action: () => likeMutation.mutate(momentId),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, _momentId, context) => {
+      if (
+        context &&
+        (context as { mutationBaseUrl?: string }).mutationBaseUrl !==
+          mutationBaseUrlRef.current
+      ) {
+        return;
+      }
       setNotice({ tone: "success", message: t(msg`朋友圈互动已更新。`) });
       // 点赞 toggle 是 boolean，optimistic 已把 likes 切对。完全省掉 invalidate，
       // 避免拉回 GET /api/moments 全量 + 30+ media 条件请求 RTT。
@@ -314,7 +363,11 @@ export function FriendMomentsPage() {
         queryKey: ["app-moments-character", baseUrl],
       });
 
-      const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
+      // 走查 R1：Date.now() 同毫秒能撞 —— 公网 600ms RTT 下用户连续点 2 次发送，
+      // 或同一帖下两条不同评论的 optimistic 行会落到同一 tempId，onSuccess 替换会
+      // 命中错的那条。加 random 后缀让碰撞概率退化到可忽略。跟 moments-page /
+      // profile-moments-page 同模板。
+      const tempId = `optimistic-comment-${ownerId}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const tempComment: MomentComment = {
         id: tempId,
         postId: momentId,
@@ -365,6 +418,11 @@ export function FriendMomentsPage() {
         desktopReplyTarget && desktopReplyTarget.postId === momentId
           ? desktopReplyTarget
           : null;
+      // 钉住 mutation 触发时刻的 baseUrl —— mid-flight 切账户后 onError 比对，
+      // 旧账户的失败不要在新账户里弹「评论失败」红条；onSuccess 也跳过避免在新
+      // 账户冒「朋友圈互动已更新」绿条 + 往新账户 cache 写 temp 替换（no-op，
+      // 但仍然要把 toast 错位拦下来）。
+      const mutationBaseUrl = baseUrl;
 
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setDesktopReplyTarget((current) =>
@@ -381,6 +439,7 @@ export function FriendMomentsPage() {
         tempId,
         savedDraft,
         savedReply,
+        mutationBaseUrl,
       };
     },
     mutationFn: (momentId: string) => {
@@ -404,6 +463,12 @@ export function FriendMomentsPage() {
       if (!context || context.skipped) {
         return;
       }
+      // mid-flight 切账户：旧账户的失败不要在新账户里 reopen 一个指着别的账户帖子
+      // 的状态，也不该弹「评论失败」红条。cache 回滚也跳过 —— 旧 baseUrl 的 cache
+      // 用户已经看不到了。和 moments-page / mobile-friend-moments-page 同模板。
+      if (context.mutationBaseUrl !== mutationBaseUrlRef.current) {
+        return;
+      }
       context.flatSnapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
@@ -425,16 +490,25 @@ export function FriendMomentsPage() {
         setDesktopReplyTarget(context.savedReply);
       }
       // 评论失败：danger notice，跟 like 失败同色调，避免红 ErrorBlock + 绿 notice 同屏。
+      // 走查 R1：i18n 一致性，跟 likeMutation onError 同处理。
       setNotice({
         tone: "danger",
-        message:
-          error instanceof Error
+        message: isApiRequestError(error)
+          ? t(msg`评论失败：${translateAppErrorCode(error) ?? error.message}`)
+          : error instanceof Error
             ? t(msg`评论失败：${error.message}`)
             : t(msg`评论失败，请稍后重试。`),
       });
     },
     onSuccess: (realComment, momentId, context) => {
       delete commentSubmitArgsRef.current[momentId];
+      if (
+        context &&
+        !context.skipped &&
+        context.mutationBaseUrl !== mutationBaseUrlRef.current
+      ) {
+        return;
+      }
       setNotice({ tone: "success", message: t(msg`朋友圈互动已更新。`) });
       // 把 optimistic temp 原地换成 server 真实评论 —— 跟 moments-page 一样
       // **完全省掉**一次 invalidate 触发的 GET /api/moments/character/X refetch
@@ -525,6 +599,12 @@ export function FriendMomentsPage() {
     setCommentDrafts({});
     setShowCompose(false);
     setNotice(null);
+    // 走查 R1：跟 moments-page / profile-moments-page 同模板 —— 切账户 / 切角色时
+    // mid-flight 评论 args 不能残留（onSuccess/onError 会清掉自己那条，但切走时
+    // 仍 in-flight 的会泄漏），desktopReplyTarget 也得收（不然新角色页打开
+    // 还挂着上一个角色帖子的 reply 状态，textarea placeholder 显示错误的目标）。
+    commentSubmitArgsRef.current = {};
+    setDesktopReplyTarget(null);
   }, [baseUrl, characterId, resetComposeDraft]);
 
   useEffect(() => {

@@ -79,6 +79,20 @@ import { normalizePathname } from "../lib/normalize-pathname";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
+// 走查 R1（本轮）：朋友圈页 mutation/query 失败时多处把 raw error.message 直接
+// 透到 props（commentErrorMessage / composeErrorMessage / deleteErrorMessage /
+// loadErrorMessage / likeErrorMessage / errors[]）—— 这些 message 是 server
+// AppError 的 legacyMessage（始终中文），非 zh-CN locale 用户拿到的就是裸中文。
+// 统一走 translateAppErrorCode 命中 i18n 字典，miss 才回退 raw。和 profile-moments
+// resolveMomentsErrorMessage 同模板。
+function resolveMomentsErrorMessage(error: unknown): string | null {
+  if (!(error instanceof Error)) return null;
+  if (isApiRequestError(error)) {
+    return translateAppErrorCode(error) ?? error.message;
+  }
+  return error.message;
+}
+
 const DesktopMomentsWorkspace = lazy(async () => {
   const mod =
     await import("../features/desktop/moments/desktop-moments-workspace");
@@ -1330,8 +1344,25 @@ export function MomentsPage() {
 
     const errors: string[] = [];
 
-    if (momentsQuery.isError && momentsQuery.error instanceof Error) {
-      errors.push(momentsQuery.error.message);
+    // 走查 R1（本轮）：首页失败且空列表时 desktop-moments-feed 已经渲「朋友圈
+    // 暂时不可用 / 重试读取」EmptyState（loadErrorMessage 走它），toolbar 这里
+    // 再推同文 ErrorBlock = 同屏两条红色错误（一张大空态卡 + 一条窄红条），
+    // 用户读着像"系统连发两次同错误"。已有内容时 toolbar ErrorBlock 仍有用
+    // （EmptyState 不出现），所以按 visibleMoments.length > 0 做 gate。
+    // i18n 一致性 —— raw error.message 是 server legacyMessage（中文），
+    // 非 zh-CN locale 用户拿到的就是裸中文，先走 translateAppErrorCode。
+    if (
+      momentsQuery.isError &&
+      !momentsQuery.isFetchNextPageError &&
+      momentsQuery.error instanceof Error &&
+      visibleMoments.length > 0
+    ) {
+      errors.push(
+        isApiRequestError(momentsQuery.error)
+          ? translateAppErrorCode(momentsQuery.error) ??
+            momentsQuery.error.message
+          : momentsQuery.error.message,
+      );
     }
     // 桌面 auto-prefetch 中途某页失败：之前 isFetchNextPageError 完全没暴露到 UI ——
     // 用户看到列表停在 100/240 条，刷新按钮就在那，但没线索告诉他「下一页加载失败」。
@@ -1342,13 +1373,22 @@ export function MomentsPage() {
       momentsQuery.isFetchNextPageError &&
       momentsQuery.error instanceof Error
     ) {
+      const localized = isApiRequestError(momentsQuery.error)
+        ? translateAppErrorCode(momentsQuery.error) ??
+          momentsQuery.error.message
+        : momentsQuery.error.message;
       errors.push(
-        t(msg`部分朋友圈加载失败，请点击刷新重试：${momentsQuery.error.message}`),
+        t(msg`部分朋友圈加载失败，请点击刷新重试：${localized}`),
       );
     }
 
     if (blockedQuery.isError && blockedQuery.error instanceof Error) {
-      errors.push(blockedQuery.error.message);
+      errors.push(
+        isApiRequestError(blockedQuery.error)
+          ? translateAppErrorCode(blockedQuery.error) ??
+            blockedQuery.error.message
+          : blockedQuery.error.message,
+      );
     }
 
     return (
@@ -1364,22 +1404,22 @@ export function MomentsPage() {
         <DesktopMomentsWorkspace
           commentDrafts={commentDrafts}
           commentErrorMessage={
-            commentMutation.isError && commentMutation.error instanceof Error
-              ? commentMutation.error.message
+            commentMutation.isError
+              ? resolveMomentsErrorMessage(commentMutation.error)
               : null
           }
           commentPendingMomentId={pendingCommentMomentId}
           composeErrorMessage={
             composeDraft.mediaError ??
-            (createMutation.isError && createMutation.error instanceof Error
-              ? createMutation.error.message
+            (createMutation.isError
+              ? resolveMomentsErrorMessage(createMutation.error)
               : null)
           }
           createPending={createMutation.isPending}
           deletePendingMomentId={pendingDeleteMomentId}
           deleteErrorMessage={
-            deleteMutation.isError && deleteMutation.error instanceof Error
-              ? deleteMutation.error.message
+            deleteMutation.isError
+              ? resolveMomentsErrorMessage(deleteMutation.error)
               : null
           }
           errors={errors}
@@ -1389,15 +1429,13 @@ export function MomentsPage() {
           // isFetchNextPageError 单独走 toolbar 的 errors 通道（已加载内容时不该
           // 把 empty-state 弹出来）。
           loadErrorMessage={
-            momentsQuery.isError &&
-            !momentsQuery.isFetchNextPageError &&
-            momentsQuery.error instanceof Error
-              ? momentsQuery.error.message
+            momentsQuery.isError && !momentsQuery.isFetchNextPageError
+              ? resolveMomentsErrorMessage(momentsQuery.error)
               : null
           }
           likeErrorMessage={
-            likeMutation.isError && likeMutation.error instanceof Error
-              ? likeMutation.error.message
+            likeMutation.isError
+              ? resolveMomentsErrorMessage(likeMutation.error)
               : null
           }
           likePendingMomentId={pendingLikeMomentId}
