@@ -697,10 +697,13 @@ export function MobileChatPlusPanel({
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <div className="truncate text-[13px] text-[color:var(--text-primary)]">
+                      {/* 走查 R3：truncate 在 flex 子项里要自带 min-w-0；不然 default
+                          min-width:auto = 内容宽度，长标题不省略号反而把右边 badge
+                          挤出 row。badge 跟着 shrink-0，避免被长标题挤变形。 */}
+                      <div className="min-w-0 flex-1 truncate text-[13px] text-[color:var(--text-primary)]">
                         {item.title}
                       </div>
-                      <span className="rounded-full bg-[rgba(7,193,96,0.10)] px-2 py-0.5 text-[10px] text-[#07c160]">
+                      <span className="shrink-0 rounded-full bg-[rgba(7,193,96,0.10)] px-2 py-0.5 text-[10px] text-[#07c160]">
                         {item.badge}
                       </span>
                     </div>
