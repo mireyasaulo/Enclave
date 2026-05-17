@@ -381,6 +381,14 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
         activeCount,
         totalCount,
       });
+    } catch {
+      // 走查 R2：syncCurrentStatus 在 panel-opened effect / 1200ms deferred
+      // effect / "重试同步状态" / "同步最新状态" 按钮四条路径上都被 `void
+      // syncCurrentStatus()` fire-and-forget 触发。mutateAsync rejection 没人
+      // 接 → window.unhandledrejection 污染 telemetry。错误状态本身已经通过
+      // syncStatusMutation.error 在面板上挂出 danger notice + "重试同步状态"
+      // 按钮（line ~984），业务上不需要 await rejection。和姊妹文件
+      // group-chat-thread-panel.tsx submitOutgoingGroupMessage Round 4 同款修法。
     } finally {
       syncStatusBusyRef.current = false;
     }
