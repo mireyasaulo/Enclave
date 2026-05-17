@@ -98,4 +98,39 @@ export class FriendRemarkResolver {
     if (authorType !== 'character') return originalName;
     return map.get(authorId) ?? originalName;
   }
+
+  // 走查第六轮 R1：moments.service.buildMomentAvatarContext 每次需要同时拿
+  // remarkMap + momentsHiddenFromMe 集合，分别调 getOwnerRemarkMap +
+  // getMomentsHiddenFromMeCharacterIds —— 两条 SQL 都跑在同一张 friendships
+  // 表、同一 ownerId 上，第二条只是多一个 momentsHiddenFromMe=true OR
+  // chatOnly=true 的 where 子句。SQLite 上同 owner 50+ 好友时两次 indexed
+  // scan 也 2-3ms × 2 起步，在 /moments getFeed 的热路径上每次都跑。把两条
+  // 查询合并成一次 select，让一行同时贡献到 remarkMap 和 hidden set：
+  // 单 select，~30% 的拉数据时间砍掉一半。
+  async getOwnerRemarkAndMomentsContext(ownerId: string): Promise<{
+    remarkMap: FriendRemarkMap;
+    momentsHiddenFromMeCharacterIds: Set<string>;
+  }> {
+    const rows = await this.friendshipRepo.find({
+      where: { ownerId, status: Not(In(['blocked', 'removed'])) },
+      select: [
+        'characterId',
+        'remarkName',
+        'momentsHiddenFromMe',
+        'chatOnly',
+      ],
+    });
+    const remarkMap: FriendRemarkMap = new Map();
+    const momentsHiddenFromMeCharacterIds = new Set<string>();
+    for (const row of rows) {
+      const remark = row.remarkName?.trim();
+      if (remark) {
+        remarkMap.set(row.characterId, remark);
+      }
+      if (row.momentsHiddenFromMe || row.chatOnly) {
+        momentsHiddenFromMeCharacterIds.add(row.characterId);
+      }
+    }
+    return { remarkMap, momentsHiddenFromMeCharacterIds };
+  }
 }

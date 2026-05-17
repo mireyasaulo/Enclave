@@ -1481,16 +1481,19 @@ export class MomentsService implements OnModuleInit {
             id: input.ownerId,
             avatar: input.ownerAvatar ?? '',
           };
+    // 走查第六轮 R1：getOwnerRemarkMap + getMomentsHiddenFromMeCharacterIds
+    // 之前是两条独立 SQL 跑同一张 friendships 表、同 ownerId。每次 /moments
+    // /moments?character / getPost / assertOwnerCanInteractWithPost 入口都
+    // 走这里，热路径双倍 round-trip。合并成 getOwnerRemarkAndMomentsContext
+    // 一次 select 后在 JS 里 fan-out，砍掉一半的 friendship 读。
     const [
       visibleCharacters,
       ownerFriendCharacterIds,
-      remarkMap,
-      momentsHiddenFromMeCharacterIds,
+      { remarkMap, momentsHiddenFromMeCharacterIds },
     ] = await Promise.all([
       this.characters.findAllVisibleToOwner(owner.id),
       this.characters.getActiveFriendCharacterIdSet(owner.id),
-      this.remarkResolver.getOwnerRemarkMap(owner.id),
-      this.remarkResolver.getMomentsHiddenFromMeCharacterIds(owner.id),
+      this.remarkResolver.getOwnerRemarkAndMomentsContext(owner.id),
     ]);
 
     let ownerUsername =
