@@ -211,13 +211,23 @@ export function DesktopChannelsWorkspace({
 
   useEffect(() => {
     onSelectedPostChange(selectedPost?.id ?? null);
+  }, [onSelectedPostChange, selectedPost?.id]);
 
-    if (!selectedPost?.id) {
+  // 走查 2026-05-17 新会话 R1：原 useEffect 在 selectedPost.id 一变就立刻 POST
+  // /feed/:id/view，鼠标滚轮快速滚过 5-10 张 slide 时一秒就能打掉 5-10 次没人
+  // 真在看的"观看"——后端 viewFeedPost 每条都做 owner-interaction findOneBy +
+  // 落库 + （首次）viewCount/watchCount 自增，纯浪费 RTT。和移动端
+  // MobileChannelsViewport 同款，加 600ms 防抖：停留够久才算 view，扫过的卡不发。
+  useEffect(() => {
+    const postId = selectedPost?.id;
+    if (!postId) {
       return;
     }
-
-    onViewPost(selectedPost.id);
-  }, [onSelectedPostChange, onViewPost, selectedPost?.id]);
+    const timer = window.setTimeout(() => {
+      onViewPost(postId);
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [onViewPost, selectedPost?.id]);
 
   // Close the comment drawer whenever the active post changes
   useEffect(() => {
@@ -756,6 +766,13 @@ function ChannelVideoPlayer({
     }
   };
 
+  // 走查 2026-05-17 新会话 R1：跟移动端 ChannelVideoSurface 同坑——解锁后 play()
+  // 失败一律 muted-retry 会把 video.muted 卡死，而 unmuted state 仍 true 不会触发
+  // 下面的 unmuted-effect 重置 muted，结果用户看到画面渲好却永远没声音、点了静音
+  // 按钮也救不回。用 ref 缓存最新 unmuted，仅在没解锁过时才走 muted 兜底。
+  const unmutedRef = useRef(unmuted);
+  unmutedRef.current = unmuted;
+
   // 进入视口的 slide 自动播放，离开的暂停。
   useEffect(() => {
     const video = videoRef.current;
@@ -763,17 +780,26 @@ function ChannelVideoPlayer({
       return;
     }
 
-    if (isActive) {
+    if (isActive && url) {
       const playResult = video.play();
       if (playResult && typeof playResult.catch === "function") {
         playResult.catch(() => {
-          // 自动播放被阻断时静默失败；用户点击切换静音会再次触发 play。
+          if (!unmutedRef.current) {
+            video.muted = true;
+            video.play().catch(() => undefined);
+          }
         });
       }
     } else {
       video.pause();
       video.currentTime = 0;
+      // 走查 2026-05-17 新会话 R1：同移动端 ChannelVideoSurface R1——pause 不释
+      // 放浏览器已下载的 video buffer。video 单条 ~1-2MB，10+ 张 slide 全曾激活
+      // 一遍累计能挂十几 MB 在 channels 页直到用户离开。load() 强制重置 media
+      // element 释放缓冲；无 src 时只触发 emptied 事件、不发请求，安全。
+      video.load();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, url]);
 
   useEffect(() => {
@@ -793,19 +819,59 @@ function ChannelVideoPlayer({
     }
   }, [unmuted, isActive]);
 
+  // 走查 2026-05-17 新会话 R1：跟移动端 ChannelVideoSurface R3 / ChannelAudio
+  // Pictorial R3 同款——组件 unmount 时主动 pause。React 把 <video> 从 DOM 摘掉
+  // 后 Chromium / Firefox 不会自动 pause，音轨会一直 loop 到刷新整页。用户在
+  // active 卡上点「减少推荐」/ 切到别的 section 导致 slide 整张 unmount 时尤其
+  // 明显——画面没了但声音还在。cleanup 时现读 videoRef.current（React unmount
+  // 顺序：先跑 effect cleanup 再 unmount 子树，此时 ref 仍指向最新元素）。
+  useEffect(() => {
+    return () => {
+      videoRef.current?.pause();
+    };
+  }, []);
+
+  // 走查 2026-05-17 新会话 R1：tab 切到后台时主动 pause，回前台按切走前状态恢
+  // 复——desktop Chrome 默认背景标签里 HTML5 video 不会自动暂停，视频号 BGM
+  // 会一直跟着用户去别的标签里响。和移动端 R 同款。
+  useEffect(() => {
+    if (!isActive || !url) return;
+    const video = videoRef.current;
+    if (!video) return;
+    let wasPlayingBeforeHide = false;
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        wasPlayingBeforeHide = !video.paused;
+        if (wasPlayingBeforeHide) video.pause();
+      } else if (wasPlayingBeforeHide) {
+        video.play().catch(() => undefined);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [isActive, url]);
+
+  // 走查 2026-05-17 新会话 R1：原 src/preload 一律挂在每张 slide 上——10 张视
+  // 频 slide 一起 preload="auto"，公网隧道下首屏并发 10+ 个 ~MB 级 minimax 视
+  // 频拉取，离开 channels 页时全 ERR_ABORTED 纯浪费带宽。和移动端 ChannelVideo
+  // Surface 同款：仅 active 卡挂 src + preload="auto"，其它卡 src 留空 / preload
+  // ="none"，由 isActive 翻转 + 上面 effect 的 .play() 触发。poster 始终可见
+  // 保持视觉。
   return (
     <>
       <video
         ref={setVideoNode}
         // key 让 src 变化时强制重建 video element，避免上一个视频的 buffered range 干扰
-        key={url}
-        src={url}
+        key={`video:${url}`}
+        src={isActive && url ? url : undefined}
         poster={posterUrl}
         autoPlay
         muted
         loop
         playsInline
-        preload="auto"
+        preload={isActive ? "auto" : "none"}
         onClick={onToggleUnmuted}
         className="absolute inset-0 h-full w-full cursor-pointer bg-black object-contain"
       />
