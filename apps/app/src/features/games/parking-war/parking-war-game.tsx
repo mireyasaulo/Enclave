@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
@@ -94,6 +94,24 @@ export function ParkingWarGame({
     setToast(msgText);
     window.setTimeout(() => setToast(null), 2400);
   };
+
+  // 老 localStorage 一次性清理。旧版本（≤ Stage 6）数据完全是本机的，
+  // 现在迁服务端后这些 key 没用了；保留下去只会让用户的浏览器存里多一坨
+  // 永远不会被读的状态。
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const keys = ["yinjie.parking-war.v1", "yinjie.parking-war.v2"];
+      const hadLegacy = keys.some((k) => window.localStorage.getItem(k));
+      for (const k of keys) window.localStorage.removeItem(k);
+      if (hadLegacy) {
+        setToast(t(msg`原存档已废弃，已为你开通云端车场`));
+        window.setTimeout(() => setToast(null), 3200);
+      }
+    } catch {
+      /* private mode / quota — 静默忽略 */
+    }
+  }, []);
 
   if (isLoading) {
     return (

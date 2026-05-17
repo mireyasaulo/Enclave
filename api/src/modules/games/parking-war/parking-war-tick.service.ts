@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { randomUUID } from 'node:crypto';
 import { sleepForWorldJitter } from '../../../common/cron-jitter.util';
 import { WorldOwnerService } from '../../auth/world-owner.service';
+import { CharactersService } from '../../characters/characters.service';
 import { ParkingWarNpcStateEntity } from './entities/parking-war-npc-state.entity';
 import { ParkingWarOccupancyEntity } from './entities/parking-war-occupancy.entity';
 import { ParkingWarPlayerStateEntity } from './entities/parking-war-player-state.entity';
@@ -45,6 +46,7 @@ export class ParkingWarTickService {
     private readonly worldOwnerService: WorldOwnerService,
     private readonly neighborService: ParkingWarNeighborService,
     private readonly eventService: ParkingWarEventService,
+    private readonly charactersService: CharactersService,
   ) {}
 
   @Cron(PARKING_WAR_TICK_CRON)
@@ -262,6 +264,21 @@ export class ParkingWarTickService {
             triggeredBy: 'auto',
           },
         });
+        // 拖车永远是值得吐槽的——直接 8% 概率走 Feed
+        const character = await this.charactersService.findById(
+          npc.characterId,
+        );
+        if (character) {
+          await this.eventService.maybeBroadcastIncident({
+            ownerId: playerState.ownerId,
+            character,
+            kind: 'tow',
+            targetName: '世界主人',
+            carTier: occ.carTier,
+            carRarity: occ.carRarity,
+            amountCents: payable,
+          });
+        }
         tows += 1;
         continue;
       }
@@ -427,6 +444,21 @@ export class ParkingWarTickService {
         carRarity: car.rarity,
       },
     });
+
+    // 把 epic/legend 车的访问 8% 概率广播到 Feed
+    if (car.rarity === 'epic' || car.rarity === 'legend') {
+      const character = await this.charactersService.findById(npc.characterId);
+      if (character) {
+        await this.eventService.maybeBroadcastIncident({
+          ownerId: playerState.ownerId,
+          character,
+          kind: 'npc_visit',
+          targetName: '世界主人',
+          carTier: car.tier,
+          carRarity: car.rarity,
+        });
+      }
+    }
     return true;
   }
 
