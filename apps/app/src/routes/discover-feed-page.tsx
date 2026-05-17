@@ -893,11 +893,21 @@ export function DiscoverFeedPage() {
   // 只有数据真变（cache 写入、自然 refetch、expand 完成）才重算，
   // commentDrafts / inflightSets / actionBubble / pull-refresh state 这些
   // 高频 setState 都不触发 strip。
+  // 新一轮走查 R1 (perf)：formatTimestamp 内每次都 `new Intl.DateTimeFormat(...)`
+  // —— 60 条 post 一屏 → 每个 render 60 次 Intl 实例化（实测 Chrome 桌面 ~3ms
+  // ，老安卓 / iOS 上 6-8ms）。原本就只在 visiblePosts 变时才需要重算（post.
+  // createdAt 是字符串字面量，post 引用稳定时格式化结果完全一样），但 meta
+  // 字段 inline 用 `${formatTimestamp(post.createdAt)} · ...` 现算，跟 R2 perf
+  // 修过的 stripToolCallSyntax 路径同款坑。一并 hoist 进 processedPosts，让
+  // commentDrafts 敲键 / inflightSets 翻动 / pull-refresh state / actionBubble
+  // 抖动这些高频 setState 全部跳过 Intl。formattedCreatedAt 跟 displayText /
+  // summaryText 一起按 [visiblePosts] 缓存，post 引用真换才重算。
   const processedPosts = useMemo(() => {
     return visiblePosts.map((post) => {
       const displayText = stripToolCallSyntax(post.text);
       const summaryText = displayText ? "" : getFeedSummaryText(post);
-      return { post, displayText, summaryText };
+      const formattedCreatedAt = formatTimestamp(post.createdAt);
+      return { post, displayText, summaryText, formattedCreatedAt };
     });
   }, [visiblePosts]);
   const processedCommentsByPostId = useMemo(() => {
@@ -2267,11 +2277,13 @@ export function DiscoverFeedPage() {
             />
           ) : null}
 
-          {processedPosts.map(({ post, displayText, summaryText }) => {
-            // displayText / summaryText 来自 processedPosts useMemo（见上方 Round
-            // 2 perf 注释）。Round 4 (a21a4e2a) 把 summary 那一支 lazy 化的判定
-            // 一并迁进 useMemo：displayText 非空时 summaryText="" 不再调
-            // getFeedSummaryText 走 media 兜底正则。
+          {processedPosts.map(({ post, displayText, summaryText, formattedCreatedAt }) => {
+            // displayText / summaryText / formattedCreatedAt 来自 processedPosts
+            // useMemo（见上方 Round 2 perf / 新走查 R1 perf 注释）。Round 4
+            // (a21a4e2a) 把 summary 那一支 lazy 化的判定一并迁进 useMemo：
+            // displayText 非空时 summaryText="" 不再调 getFeedSummaryText 走
+            // media 兜底正则。formattedCreatedAt 同样进 memo，避免每次 render
+            // 都给 60 条 post 各 new 一个 Intl.DateTimeFormat。
 
             return (
               <div key={post.id} className="yj-list-item-virtual-card">
@@ -2285,7 +2297,7 @@ export function DiscoverFeedPage() {
                         openCharacterDetail(post.authorId, post.authorType)
                     : undefined
                 }
-                meta={`${formatTimestamp(post.createdAt)} · ${
+                meta={`${formattedCreatedAt} · ${
                   post.authorType === "user"
                     ? t(msg`世界主人`)
                     : t(msg`居民动态`)
