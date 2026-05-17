@@ -2,12 +2,15 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AppError } from '../../../common/app-error.exception';
 import { ParkingWarEventService } from './parking-war-event.service';
+import { ParkingWarLeaderboardService } from './parking-war-leaderboard.service';
 import { ParkingWarNeighborService } from './parking-war-neighbor.service';
 import { ParkingWarStateService } from './parking-war-state.service';
 import type {
   ParkingWarCarTier,
   ParkingWarCollectResult,
+  ParkingWarDailyBonusResult,
   ParkingWarEventView,
+  ParkingWarLeaderboardRow,
   ParkingWarLotSurface,
   ParkingWarNeighborDetail,
   ParkingWarNeighborSummary,
@@ -52,7 +55,35 @@ export class ParkingWarController {
     private readonly stateService: ParkingWarStateService,
     private readonly eventService: ParkingWarEventService,
     private readonly neighborService: ParkingWarNeighborService,
+    private readonly leaderboardService: ParkingWarLeaderboardService,
   ) {}
+
+  @Get('leaderboard')
+  async leaderboard(
+    @Query('scope') scope?: string,
+    @Query('limit') limit?: string,
+  ): Promise<ParkingWarLeaderboardRow[]> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const scopeN: 'global' | 'friends' =
+      scope === 'global' ? 'global' : 'friends';
+    const limitN = limit ? Math.max(1, Math.min(200, Number(limit))) : 50;
+    return this.leaderboardService.getRichBoard(ownerId, scopeN, limitN);
+  }
+
+  @Post('daily-bonus')
+  async dailyBonus(): Promise<ParkingWarDailyBonusResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.stateService.claimDailyBonus(ownerId);
+  }
+
+  @Post('daily-task/claim')
+  async claimDailyTask(
+    @Body() body: { taskId: string },
+  ): Promise<ParkingWarPlayerStateView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const taskId = parseNonEmptyString(body.taskId, 'taskId');
+    return this.stateService.claimDailyTask(ownerId, taskId);
+  }
 
   @Get('neighbors')
   async listNeighbors(

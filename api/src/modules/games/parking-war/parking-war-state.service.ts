@@ -19,6 +19,9 @@ import {
   computeCarBuyPriceCents,
   computeCarRatePerMinuteCents,
   computeCarUpgradeCostCents,
+  PARKING_WAR_DAILY_BONUS_BASE_CENTS,
+  PARKING_WAR_DAILY_BONUS_STREAK_BONUS_CENTS,
+  PARKING_WAR_DAILY_BONUS_STREAK_CAP,
   PARKING_WAR_CAR_DEFAULT_DURABILITY,
   PARKING_WAR_CAR_DURABILITY_LOSS_PER_TICKET,
   PARKING_WAR_CAR_DURABILITY_LOSS_PER_TOW,
@@ -51,6 +54,8 @@ import {
 import type {
   ParkingWarCarTier,
   ParkingWarCollectResult,
+  ParkingWarDailyBonusResult,
+  ParkingWarDailyTask,
   ParkingWarHomeSlot,
   ParkingWarLotSurface,
   ParkingWarOccupancyView,
@@ -181,20 +186,69 @@ export class ParkingWarStateService implements OnModuleInit {
 
   /**
    * 每天首次读取 state 时跑一次的轻量「每日重置」：
-   *  - dailyTasksPayload.dateKey != today → 重置为今天 + 空 tasks（Stage 6 会填）
-   *  - VIP 地砖：dailyShieldRemaining = 1（护盾不累积，每天 1 张）
-   *  - 非 VIP：dailyShieldRemaining = 0
-   * 用 dailyTasksPayload.dateKey 当作「今天已重置」的单一锚点，避免与 lastDailyBonusKey 耦合。
+   *  - dailyTasksPayload.dateKey != today → 重置为今天 + 3 个 daily tasks
+   *  - VIP 地砖：dailyShieldRemaining = 1（护盾不累积，每天 1 张）；非 VIP = 0
+   *  - 之后每次进 state 都按 event 日志重算 tasks.progress（懒计算）
    */
   private async refreshDailyShield(
     state: ParkingWarPlayerStateEntity,
   ): Promise<void> {
     const todayKey = formatDateKey(new Date());
-    if (state.dailyTasksPayload?.dateKey === todayKey) return;
-    state.dailyTasksPayload = { dateKey: todayKey, tasks: [] };
-    state.dailyShieldRemaining =
-      state.lotSurface === 'vip' ? PARKING_WAR_VIP_DAILY_SHIELD : 0;
-    await this.playerRepo.save(state);
+    if (state.dailyTasksPayload?.dateKey !== todayKey) {
+      state.dailyTasksPayload = {
+        dateKey: todayKey,
+        tasks: createDefaultDailyTasks(),
+      };
+      state.dailyShieldRemaining =
+        state.lotSurface === 'vip' ? PARKING_WAR_VIP_DAILY_SHIELD : 0;
+      await this.playerRepo.save(state);
+    }
+    await this.recomputeDailyTaskProgress(state);
+  }
+
+  /**
+   * 根据今天的事件日志重算 task.progress（已 claim 的不动）。
+   */
+  private async recomputeDailyTaskProgress(
+    state: ParkingWarPlayerStateEntity,
+  ): Promise<void> {
+    if (!state.dailyTasksPayload) return;
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const events = await this.eventService.listEvents(state.ownerId, {
+      since: startOfDay,
+      limit: 200,
+    });
+    const todayParkAway = events.filter(
+      (e) =>
+        e.kind === 'park' &&
+        (e.payloadJson as { atHome?: boolean } | null)?.atHome === false,
+    ).length;
+    const todayTickets = events.filter((e) => e.kind === 'ticket').length;
+    const todayCollectCents = events
+      .filter((e) => e.kind === 'collect' && typeof e.amountCents === 'number')
+      .reduce((acc, e) => acc + (e.amountCents ?? 0), 0);
+
+    const tasks = state.dailyTasksPayload.tasks.map((t) => {
+      if (t.claimed) return t;
+      if (t.id === 'park_neighbor_3') return { ...t, progress: todayParkAway };
+      if (t.id === 'ticket_2') return { ...t, progress: todayTickets };
+      if (t.id === 'collect_cents_2000')
+        return { ...t, progress: todayCollectCents };
+      return t;
+    });
+    const changed =
+      tasks.some(
+        (t, i) =>
+          t.progress !== (state.dailyTasksPayload?.tasks[i].progress ?? 0),
+      );
+    if (changed) {
+      state.dailyTasksPayload = {
+        dateKey: state.dailyTasksPayload.dateKey,
+        tasks,
+      };
+      await this.playerRepo.save(state);
+    }
   }
 
   // ============================================================
@@ -831,6 +885,113 @@ export class ParkingWarStateService implements OnModuleInit {
   }
 
   // ============================================================
+  // Daily bonus / Daily tasks
+  // ============================================================
+
+  /**
+   * 日签：当日首次领取，给 base(¥50) + (streakDays - 1) × 10 加成，封顶 +¥70。
+   * 中断一天 streak 归 1；连领 streak 累加（封顶 7）。
+   */
+  async claimDailyBonus(
+    ownerId: string,
+  ): Promise<ParkingWarDailyBonusResult> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.refreshDailyShield(state);
+    const todayKey = formatDateKey(new Date());
+    if (state.lastDailyBonusKey === todayKey) {
+      throw new AppError('PARKING_WAR_DAILY_BONUS_ALREADY_CLAIMED', {
+        legacyMessage: '今日签到已完成',
+      });
+    }
+    const yesterdayKey = formatDateKey(new Date(Date.now() - 86_400_000));
+    const continued = state.lastDailyBonusKey === yesterdayKey;
+    const nextStreak = continued
+      ? Math.min(state.streakDays + 1, PARKING_WAR_DAILY_BONUS_STREAK_CAP)
+      : 1;
+
+    const streakBonus =
+      Math.max(0, nextStreak - 1) *
+      PARKING_WAR_DAILY_BONUS_STREAK_BONUS_CENTS;
+    const amount = PARKING_WAR_DAILY_BONUS_BASE_CENTS + streakBonus;
+
+    state.balanceCents += amount;
+    state.totalEarnedCents += amount;
+    state.lastDailyBonusKey = todayKey;
+    state.streakDays = nextStreak;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'daily_bonus',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: amount,
+      payload: { streakDays: nextStreak, dateKey: todayKey },
+    });
+    return {
+      view: await this.toPlayerView(state),
+      amountCents: amount,
+      streakDays: nextStreak,
+    };
+  }
+
+  /**
+   * 领取已完成的每日任务奖励。重复领取报错。
+   */
+  async claimDailyTask(
+    ownerId: string,
+    taskId: string,
+  ): Promise<ParkingWarPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.refreshDailyShield(state);
+    const payload = state.dailyTasksPayload;
+    if (!payload) {
+      throw new AppError('PARKING_WAR_NO_DAILY_TASKS', {
+        legacyMessage: '今日没有任务',
+      });
+    }
+    const taskIdx = payload.tasks.findIndex((t) => t.id === taskId);
+    if (taskIdx < 0) {
+      throw new AppError('PARKING_WAR_TASK_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { taskId },
+        legacyMessage: `任务不存在：${taskId}`,
+      });
+    }
+    const task = payload.tasks[taskIdx];
+    if (task.claimed) {
+      throw new AppError('PARKING_WAR_TASK_ALREADY_CLAIMED', {
+        legacyMessage: '该任务奖励已领取',
+      });
+    }
+    if (task.progress < task.goal) {
+      throw new AppError('PARKING_WAR_TASK_NOT_COMPLETED', {
+        params: { progress: task.progress, goal: task.goal },
+        legacyMessage: `任务还没完成（${task.progress}/${task.goal}）`,
+      });
+    }
+    const tasks = payload.tasks.map((t, i) =>
+      i === taskIdx ? { ...t, claimed: true } : t,
+    );
+    state.dailyTasksPayload = { dateKey: payload.dateKey, tasks };
+    state.balanceCents += task.rewardCents;
+    state.totalEarnedCents += task.rewardCents;
+    await this.playerRepo.save(state);
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'task_claim',
+      actorKind: 'player',
+      actorId: PARKING_WAR_PLAYER_ACTOR_ID,
+      actorName: '世界主人',
+      amountCents: task.rewardCents,
+      payload: { taskId, dateKey: payload.dateKey },
+    });
+    return this.toPlayerView(state);
+  }
+
+  // ============================================================
   // Garage: buy / upgrade / paint / repair
   // ============================================================
 
@@ -1238,5 +1399,31 @@ function formatDateKey(date: Date): string {
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
+}
+
+function createDefaultDailyTasks(): ParkingWarDailyTask[] {
+  return [
+    {
+      id: 'park_neighbor_3',
+      progress: 0,
+      goal: 3,
+      claimed: false,
+      rewardCents: 8_000, // ¥80
+    },
+    {
+      id: 'ticket_2',
+      progress: 0,
+      goal: 2,
+      claimed: false,
+      rewardCents: 6_000, // ¥60
+    },
+    {
+      id: 'collect_cents_2000',
+      progress: 0,
+      goal: 2_000,
+      claimed: false,
+      rewardCents: 5_000, // ¥50
+    },
+  ];
 }
 // i18n-ignore-end
