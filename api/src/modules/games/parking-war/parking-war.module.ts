@@ -5,6 +5,7 @@ import { CharactersModule } from '../../characters/characters.module';
 import { FeedModule } from '../../feed/feed.module';
 import { ParkingWarController } from './parking-war.controller';
 import { ParkingWarEventService } from './parking-war-event.service';
+import { ParkingWarNeighborService } from './parking-war-neighbor.service';
 import { ParkingWarStateService } from './parking-war-state.service';
 import { ParkingWarEventLogEntity } from './entities/parking-war-event-log.entity';
 import { ParkingWarNpcStateEntity } from './entities/parking-war-npc-state.entity';
@@ -24,7 +25,15 @@ import { ParkingWarPlayerStateEntity } from './entities/parking-war-player-state
     FeedModule,
   ],
   controllers: [ParkingWarController],
-  providers: [ParkingWarStateService, ParkingWarEventService],
-  exports: [ParkingWarStateService, ParkingWarEventService],
+  providers: [
+    ParkingWarStateService,
+    ParkingWarEventService,
+    ParkingWarNeighborService,
+  ],
+  exports: [
+    ParkingWarStateService,
+    ParkingWarEventService,
+    ParkingWarNeighborService,
+  ],
 })
 export class ParkingWarModule {}

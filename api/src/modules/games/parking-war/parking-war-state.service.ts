@@ -11,8 +11,10 @@ import { randomUUID } from 'node:crypto';
 import { AppError } from '../../../common/app-error.exception';
 import { WorldOwnerService } from '../../auth/world-owner.service';
 import { ParkingWarPlayerStateEntity } from './entities/parking-war-player-state.entity';
+import { ParkingWarNpcStateEntity } from './entities/parking-war-npc-state.entity';
 import { ParkingWarOccupancyEntity } from './entities/parking-war-occupancy.entity';
 import { ParkingWarEventService } from './parking-war-event.service';
+import { ParkingWarNeighborService } from './parking-war-neighbor.service';
 import {
   computeCarBuyPriceCents,
   computeCarRatePerMinuteCents,
@@ -20,6 +22,7 @@ import {
   PARKING_WAR_CAR_DEFAULT_DURABILITY,
   PARKING_WAR_CAR_MAX_LEVEL,
   PARKING_WAR_CAR_REPAIR_COST_PER_POINT_CENTS,
+  PARKING_WAR_DAILY_PARK_LIMIT,
   PARKING_WAR_DEFAULT_BALANCE_CENTS,
   PARKING_WAR_DEFAULT_GARAGE_SLOTS,
   PARKING_WAR_DEFAULT_LOT_MULTIPLIER_BP,
@@ -27,15 +30,18 @@ import {
   PARKING_WAR_DEFAULT_LOT_SURFACE,
   PARKING_WAR_OFFLINE_CATCHUP_CAP_MS,
   PARKING_WAR_PLAYER_ACTOR_ID,
+  PARKING_WAR_VISITOR_SHARE_BP,
 } from './parking-war.constants';
 import type {
   ParkingWarCarTier,
   ParkingWarCollectResult,
   ParkingWarHomeSlot,
+  ParkingWarLotSurface,
   ParkingWarOccupancyView,
   ParkingWarOwnedCar,
   ParkingWarPlayerStateView,
   ParkingWarRarity,
+  ParkingWarRecallResult,
 } from './parking-war.types';
 
 @Injectable()
@@ -51,6 +57,7 @@ export class ParkingWarStateService implements OnModuleInit {
     private readonly dataSource: DataSource,
     private readonly worldOwnerService: WorldOwnerService,
     private readonly eventService: ParkingWarEventService,
+    private readonly neighborService: ParkingWarNeighborService,
   ) {}
 
   /**
@@ -158,8 +165,9 @@ export class ParkingWarStateService implements OnModuleInit {
   // ============================================================
 
   /**
-   * 推进玩家自家车位上所有 occupancy 的 pendingEarnings。Stage 2 只处理 home，
-   * 不区分访客是自己还是 NPC（Stage 3 起 NPC visitor 会被 tick service 推进）。
+   * 推进所有与玩家相关的 occupancy 的 pendingEarnings：
+   *  - home occupancies：visitor 是谁都按玩家自己 lot 的 surface/multiplier 计费
+   *  - away occupancies：玩家车停在 NPC 家，按那家 NPC 的 surface/multiplier 计费
    *
    * 离线补算：lastTickAt 到 now 的时间窗口被夹到 OFFLINE_CATCHUP_CAP_MS。
    */
@@ -176,16 +184,18 @@ export class ParkingWarStateService implements OnModuleInit {
       return;
     }
 
-    const occupancies = await this.occupancyRepo.find({
-      where: { lotOwnerKind: 'player', lotOwnerId: state.ownerId },
-    });
-    if (occupancies.length === 0) {
-      state.lastTickAt = new Date(nowMs);
-      await this.playerRepo.save(state);
-      return;
-    }
+    const [homeOccupancies, awayOccupancies] = await Promise.all([
+      this.occupancyRepo.find({
+        where: { lotOwnerKind: 'player', lotOwnerId: state.ownerId },
+      }),
+      this.occupancyRepo.find({
+        where: { visitorKind: 'player', visitorId: state.ownerId },
+      }),
+    ]);
 
-    for (const occ of occupancies) {
+    const minutes = cappedDelta / 60_000;
+
+    for (const occ of homeOccupancies) {
       const ratePerMinute = computeCarRatePerMinuteCents({
         tier: occ.carTier,
         rarity: occ.carRarity,
@@ -193,14 +203,58 @@ export class ParkingWarStateService implements OnModuleInit {
         surface: state.lotSurface,
         lotMultiplierBp: state.lotMultiplierBp,
       });
-      const minutes = cappedDelta / 60_000;
       const delta = Math.round(ratePerMinute * minutes);
       if (delta > 0) {
         occ.pendingEarningsCents += delta;
       }
     }
-    if (occupancies.length > 0) {
-      await this.occupancyRepo.save(occupancies);
+
+    // away：取每个 NPC 的 surface/multiplier
+    const awayHostIds = Array.from(
+      new Set(
+        awayOccupancies
+          .filter((o) => o.lotOwnerKind === 'npc')
+          .map((o) => o.lotOwnerId),
+      ),
+    );
+    let hostMap = new Map<
+      string,
+      { surface: ParkingWarLotSurface; lotMultiplierBp: number }
+    >();
+    if (awayHostIds.length > 0) {
+      const npcStates = await Promise.all(
+        awayHostIds.map((id) => this.neighborService.getNpcState(id)),
+      );
+      hostMap = new Map(
+        npcStates
+          .filter((n): n is ParkingWarNpcStateEntity => n != null)
+          .map((n) => [
+            n.characterId,
+            { surface: n.lotSurface, lotMultiplierBp: n.lotMultiplierBp },
+          ]),
+      );
+    }
+    for (const occ of awayOccupancies) {
+      const host = hostMap.get(occ.lotOwnerId);
+      if (!host) continue;
+      const ratePerMinute = computeCarRatePerMinuteCents({
+        tier: occ.carTier,
+        rarity: occ.carRarity,
+        level: occ.carLevel,
+        surface: host.surface,
+        lotMultiplierBp: host.lotMultiplierBp,
+      });
+      const delta = Math.round(ratePerMinute * minutes);
+      if (delta > 0) {
+        occ.pendingEarningsCents += delta;
+      }
+    }
+
+    if (homeOccupancies.length + awayOccupancies.length > 0) {
+      await this.occupancyRepo.save([
+        ...homeOccupancies,
+        ...awayOccupancies,
+      ]);
     }
     state.lastTickAt = new Date(nowMs);
     await this.playerRepo.save(state);
@@ -276,6 +330,84 @@ export class ParkingWarStateService implements OnModuleInit {
     const refreshed =
       (await this.playerRepo.findOneBy({ ownerId })) ?? state;
     return this.toPlayerView(refreshed);
+  }
+
+  /**
+   * 把玩家的某辆车停进 NPC 邻居的指定车位。每日上限 8 次（按事件日志计）。
+   */
+  async parkOwnedCarAtNeighbor(
+    ownerId: string,
+    carId: string,
+    characterId: string,
+    slotIndex: number,
+  ): Promise<ParkingWarPlayerStateView> {
+    const state = await this.getOrCreatePlayerState(ownerId);
+    await this.tickPlayerHomeOccupancies(state);
+
+    await this.assertDailyParkBudgetAvailable(ownerId);
+
+    const cars = [...(state.ownedCarsPayload ?? [])];
+    const carIdx = cars.findIndex((c) => c.carId === carId);
+    if (carIdx < 0) {
+      throw new AppError('PARKING_WAR_CAR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '找不到这辆车',
+      });
+    }
+    const car = cars[carIdx];
+    if (car.parkedRef) {
+      throw new AppError('PARKING_WAR_CAR_ALREADY_PARKED', {
+        legacyMessage: '该车已停在外面，无法再停',
+      });
+    }
+    const nowMs = Date.now();
+    if (car.unavailableUntilMs && car.unavailableUntilMs > nowMs) {
+      throw new AppError('PARKING_WAR_CAR_COOLDOWN', {
+        legacyMessage: '该车被拖走后正在冷却',
+      });
+    }
+
+    const saved = await this.neighborService.createOccupancyForNeighborPark({
+      ownerId,
+      characterId,
+      slotIndex,
+      car,
+      nowMs,
+    });
+
+    cars[carIdx] = {
+      ...car,
+      parkedRef: {
+        occupancyId: saved.id,
+        lotOwnerKind: 'npc',
+        lotOwnerId: characterId,
+        slotIndex,
+        parkedAtMs: nowMs,
+      },
+    };
+    state.ownedCarsPayload = cars;
+    await this.playerRepo.save(state);
+
+    return this.toPlayerView(state);
+  }
+
+  private async assertDailyParkBudgetAvailable(ownerId: string): Promise<void> {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const rows = await this.eventService.listEvents(ownerId, {
+      since: startOfDay,
+      limit: 200,
+    });
+    const todayPark = rows.filter(
+      (r) =>
+        r.kind === 'park' &&
+        (r.payloadJson as { atHome?: boolean } | null)?.atHome === false,
+    );
+    if (todayPark.length >= PARKING_WAR_DAILY_PARK_LIMIT) {
+      throw new AppError('PARKING_WAR_DAILY_PARK_LIMIT_REACHED', {
+        legacyMessage: `今日停别人家次数已用完（${PARKING_WAR_DAILY_PARK_LIMIT}/日）`,
+      });
+    }
   }
 
   private async parkOwnedCarAtHomeInternal(
@@ -369,13 +501,14 @@ export class ParkingWarStateService implements OnModuleInit {
   }
 
   /**
-   * 召回 occupancy。Stage 2 只处理「自停自家」的场景；
-   * Stage 3 会接管访客停 NPC 家的 70/30 分账。
+   * 召回 occupancy。
+   * - 自停自家：pending 100% 入玩家钱包
+   * - 停在 NPC 邻居家：pending 按 VISITOR_SHARE_BP(70%) 给玩家、剩余给 NPC
    */
   async recallOccupancy(
     ownerId: string,
     occupancyId: string,
-  ): Promise<ParkingWarPlayerStateView> {
+  ): Promise<ParkingWarRecallResult> {
     const state = await this.getOrCreatePlayerState(ownerId);
     await this.tickPlayerHomeOccupancies(state);
 
@@ -393,24 +526,36 @@ export class ParkingWarStateService implements OnModuleInit {
       });
     }
 
-    // pending 直接进玩家钱包（自停自家场景）
-    const gained = occ.pendingEarningsCents;
-    state.balanceCents += gained;
-    state.totalEarnedCents += gained;
+    const totalPending = occ.pendingEarningsCents;
+    const isHome =
+      occ.lotOwnerKind === 'player' && occ.lotOwnerId === ownerId;
+    const playerShare = isHome
+      ? totalPending
+      : Math.floor((totalPending * PARKING_WAR_VISITOR_SHARE_BP) / 10_000);
+    const hostShare = totalPending - playerShare;
 
-    // 把车从 OwnedCar 上解绑、清空 home 槽位
+    state.balanceCents += playerShare;
+    state.totalEarnedCents += playerShare;
+
+    // 把车从 OwnedCar 上解绑
     const cars = (state.ownedCarsPayload ?? []).map((c) =>
       c.carId === occ.carId ? { ...c, parkedRef: null } : c,
     );
     state.ownedCarsPayload = cars;
-    if (occ.lotOwnerKind === 'player' && occ.lotOwnerId === ownerId) {
+
+    // 清空场主一侧的 home 槽位 + 给 NPC 那 30%
+    if (isHome) {
       const homeSlots = (state.homeSlotsPayload ?? []).map((s) =>
         s.index === occ.slotIndex ? { ...s, occupancyId: null } : s,
       );
       state.homeSlotsPayload = homeSlots;
+      await this.occupancyRepo.delete({ id: occupancyId });
+    } else if (occ.lotOwnerKind === 'npc') {
+      await this.neighborService.releaseOccupancyOnNeighbor(occ);
+      if (hostShare > 0) {
+        await this.neighborService.creditNpcBalance(occ.lotOwnerId, hostShare);
+      }
     }
-
-    await this.occupancyRepo.delete({ id: occupancyId });
     await this.playerRepo.save(state);
 
     await this.eventService.recordEvent({
@@ -419,11 +564,23 @@ export class ParkingWarStateService implements OnModuleInit {
       actorKind: 'player',
       actorId: PARKING_WAR_PLAYER_ACTOR_ID,
       actorName: '世界主人',
-      amountCents: gained,
-      payload: { carId: occ.carId, slotIndex: occ.slotIndex },
+      targetKind: occ.lotOwnerKind,
+      targetId: occ.lotOwnerId,
+      targetName: isHome ? '自家车场' : null,
+      amountCents: playerShare,
+      payload: {
+        carId: occ.carId,
+        slotIndex: occ.slotIndex,
+        atHome: isHome,
+        hostShareCents: hostShare,
+      },
     });
 
-    return this.toPlayerView(state);
+    return {
+      view: await this.toPlayerView(state),
+      gainedCents: playerShare,
+      splitToHostCents: hostShare,
+    };
   }
 
   // ============================================================

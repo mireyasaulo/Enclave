@@ -1,14 +1,18 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AppError } from '../../../common/app-error.exception';
 import { ParkingWarEventService } from './parking-war-event.service';
+import { ParkingWarNeighborService } from './parking-war-neighbor.service';
 import { ParkingWarStateService } from './parking-war-state.service';
 import type {
   ParkingWarCarTier,
   ParkingWarCollectResult,
   ParkingWarEventView,
+  ParkingWarNeighborDetail,
+  ParkingWarNeighborSummary,
   ParkingWarPlayerStateView,
   ParkingWarRarity,
+  ParkingWarRecallResult,
 } from './parking-war.types';
 
 const CAR_TIERS = new Set<ParkingWarCarTier>([
@@ -38,7 +42,30 @@ export class ParkingWarController {
   constructor(
     private readonly stateService: ParkingWarStateService,
     private readonly eventService: ParkingWarEventService,
+    private readonly neighborService: ParkingWarNeighborService,
   ) {}
+
+  @Get('neighbors')
+  async listNeighbors(
+    @Query('limit') limit?: string,
+  ): Promise<ParkingWarNeighborSummary[]> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const limitN = limit
+      ? Math.max(1, Math.min(200, Number(limit)))
+      : undefined;
+    return this.neighborService.listNeighbors(ownerId, { limit: limitN });
+  }
+
+  @Get('neighbors/:characterId')
+  async getNeighbor(
+    @Param('characterId') characterId: string,
+  ): Promise<ParkingWarNeighborDetail> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.neighborService.getNeighborDetail(
+      ownerId,
+      parseNonEmptyString(characterId, 'characterId'),
+    );
+  }
 
   @Get('state')
   async getState(): Promise<ParkingWarPlayerStateView> {
@@ -68,9 +95,13 @@ export class ParkingWarController {
     const carId = parseNonEmptyString(body.carId, 'carId');
     const slotIndex = parseSlotIndex(body.slotIndex);
     if (body.characterId) {
-      throw new AppError('PARKING_WAR_FEATURE_NOT_READY', {
-        legacyMessage: '邻居车场互访将在下一阶段开放',
-      });
+      const characterId = parseNonEmptyString(body.characterId, 'characterId');
+      return this.stateService.parkOwnedCarAtNeighbor(
+        ownerId,
+        carId,
+        characterId,
+        slotIndex,
+      );
     }
     return this.stateService.parkOwnedCarAtHome(ownerId, carId, slotIndex);
   }
@@ -78,7 +109,7 @@ export class ParkingWarController {
   @Post('recall')
   async recall(
     @Body() body: { occupancyId: string },
-  ): Promise<ParkingWarPlayerStateView> {
+  ): Promise<ParkingWarRecallResult> {
     const ownerId = await this.stateService.resolveOwnerId();
     const occupancyId = parseNonEmptyString(body.occupancyId, 'occupancyId');
     return this.stateService.recallOccupancy(ownerId, occupancyId);

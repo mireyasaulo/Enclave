@@ -282,6 +282,29 @@ export class WorldOwnerService {
 
   async updateOwner(input: UpdateWorldOwnerInput): Promise<WorldOwnerProfile> {
     const owner = await this.getOwnerOrThrow();
+    // 类型守卫：controller 拿 `@Body() body: {...}` 是 TypeScript 编译期类型，
+    // 运行时不做校验。curl/老客户端/恶意请求发 `{"username":123}` 这种非字符串
+    // 直接走到下面 sanitizeOwnerName/Signature 的 `.replace(...)` 会 throw
+    // `value.replace is not a function` → 全局过滤器吐 500 + 内部错误堆栈，
+    // 信息泄漏（R3 走查实测）。这里提前判类型，统一抛清楚的 400。
+    if (input.username !== undefined && typeof input.username !== 'string') {
+      throw new AppError('WORLD_OWNER_NAME_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '世界主人昵称必须是字符串。',
+      });
+    }
+    if (input.avatar !== undefined && typeof input.avatar !== 'string') {
+      throw new AppError('WORLD_OWNER_AVATAR_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '头像必须是字符串（URL 或 data:image/ 数据）。',
+      });
+    }
+    if (input.signature !== undefined && typeof input.signature !== 'string') {
+      throw new AppError('WORLD_OWNER_SIGNATURE_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: '个性签名必须是字符串。',
+      });
+    }
     // username: 先 sanitize（剥控制字符 + 折叠空白）再校长度，跟前端
     // profile-info-name-page 同款；这样 curl 直调 / 老客户端 PATCH
     // "foo\nbar" 时落库的也是 "foo bar"，不会污染 chat sender 渲染。

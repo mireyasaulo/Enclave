@@ -549,6 +549,14 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(
         msg`头像链接必须是 http/https 图片地址，或 data:image/ 开头的图片数据。`,
       );
+    case "WORLD_OWNER_NAME_INVALID":
+      return translateRuntimeMessage(msg`世界主人昵称必须是字符串。`);
+    case "WORLD_OWNER_SIGNATURE_INVALID":
+      return translateRuntimeMessage(msg`个性签名必须是字符串。`);
+    case "WORLD_OWNER_AVATAR_INVALID":
+      return translateRuntimeMessage(
+        msg`头像必须是字符串（URL 或 data:image/ 数据）。`,
+      );
     case "OFFICIAL_ACCOUNT_FOLLOW_NOT_FOUND":
       return translateRuntimeMessage(msg`公众号关注关系不存在。`);
     case "OFFICIAL_ACCOUNT_PUSH_NOT_FOUND":
