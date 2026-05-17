@@ -226,8 +226,25 @@ export function ChannelsForwardPicker({
               {t(msg`正在加载好友列表…`)}
             </div>
           ) : friendsQuery.isError ? (
+            // 走查 2026-05-17 R2：原来只显示一行错误文案、没有重试按钮。
+            // staleTime 30s 内即使关 picker 再开同一条 post 的分享，friendsQuery
+            // 不会自动重拉——用户得退回 channels home、等 30s 再点 share 才能
+            // 再试。加一个内联重试按钮直接 refetch，落地体感跟其它读失败状态
+            // 卡（视频号 home/作者主页）保持一致。
             <div className="py-10 text-center text-[13px] text-[color:var(--text-muted)]">
-              {t(msg`好友列表暂时拉不下来，请稍后重试。`)}
+              <div>{t(msg`好友列表暂时拉不下来，请稍后重试。`)}</div>
+              <button
+                type="button"
+                onClick={() => {
+                  void friendsQuery.refetch();
+                }}
+                disabled={friendsQuery.isFetching}
+                className="mt-3 inline-flex items-center rounded-full border border-[color:var(--border-faint)] bg-white px-3.5 py-1 text-[12px] font-medium text-[color:var(--text-primary)] transition hover:bg-[color:var(--surface-subtle,#F4F4F5)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {friendsQuery.isFetching
+                  ? t(msg`重试中...`)
+                  : t(msg`重试加载`)}
+              </button>
             </div>
           ) : friendList.length === 0 ? (
             <div className="py-10 text-center text-[13px] text-[color:var(--text-muted)]">
