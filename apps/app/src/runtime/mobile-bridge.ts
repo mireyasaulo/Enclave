@@ -197,14 +197,33 @@ export async function shareFileWithNativeShell(
     };
   }
 
+  // 走查新一轮 R1：跟上一轮给 shareWithNativeShell 加 8s 超时同款问题——
+  // 广场动态 / 朋友圈 ShareCardModal 走「保存 / 分享图片」按钮时会拉到这个
+  // 桥。base64 编码本身有 FileReader 兜底正常结算，但 mobileBridge.shareFile
+  // 是 capacitor JS-Native RPC，Android 系统 share sheet 被低优先级线程吃住 /
+  // native listener 没回 callback / WebView 进程被切后台时整条 Promise 永不
+  // 结算，用户视感是「点了保存/分享按钮，按钮高亮一下就死那儿了，关 modal
+  // 重开按钮还是按不动（pngDataUrl 还在但 saveError 也没出）」。12s 强超时
+  // 兜底（比 shareWithNativeShell 的 8s 稍宽，文件 payload 比纯文本大、
+  // 系统 sheet 决定也偏慢），超时算 false 让上层降级到 navigator.share /
+  // 浏览器 <a download> 兜底，UX 与 shareWithNativeShell 一致。
+  const SHARE_FILE_TIMEOUT_MS = 12_000;
   try {
     const base64Data = await encodeBlobAsBase64(payload.blob);
-    await mobileBridge.shareFile({
-      base64Data,
-      fileName: normalizedFileName,
-      mimeType: payload.mimeType?.trim() || undefined,
-      title: payload.title?.trim() || undefined,
-    });
+    await Promise.race([
+      mobileBridge.shareFile({
+        base64Data,
+        fileName: normalizedFileName,
+        mimeType: payload.mimeType?.trim() || undefined,
+        title: payload.title?.trim() || undefined,
+      }),
+      new Promise<never>((_, reject) =>
+        window.setTimeout(
+          () => reject(new Error("native share file timeout")),
+          SHARE_FILE_TIMEOUT_MS,
+        ),
+      ),
+    ]);
     return {
       shared: true,
       error: null,
