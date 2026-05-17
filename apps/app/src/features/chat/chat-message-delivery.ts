@@ -433,23 +433,31 @@ export function buildGroupRetryPayload(
   return null;
 }
 
+// mergeThreadMessageWindow 在批量合并历史消息窗口（initial 60 / "查看更多消息"
+// 100/140/... / aroundMessageId window）时被调用，每次都拿 60+ 条 incoming 在循环
+// 里 upsert。原版 upsertIncomingThreadMessage 每次内部都 sortThreadMessages 一次
+// → 60 条 incoming 触发 60 次 Map+sort（每次都是 O(N log N) parseTimestamp 调用，
+// 长聊天滚到 200 条时 ≈ 656K parseTimestamp + Map.set 调用）；socket 单条消息
+// 进 cache 也会重跑这段。改成循环里只做 upsert（O(1) 替换 / O(N) 查找），最末
+// 统一 sortThreadMessages 一次。public 的 upsertIncomingThreadMessage 仍保持单
+// 次 sort 语义，让 socket onMessage 单条投递的 caller 不用关心顺序。
 function mergeThreadMessageWindow<
   TLocalMessage extends ThreadMessageLike & ChatLocalMessageState,
   TServerMessage extends ThreadMessageLike,
 >(current: TLocalMessage[], incoming: TServerMessage[]) {
-  let nextMessages = [...current];
+  let nextMessages: TLocalMessage[] = [...current];
 
   for (const message of incoming) {
-    nextMessages = upsertIncomingThreadMessage(nextMessages, message);
+    nextMessages = upsertIncomingThreadMessageWithoutSort(nextMessages, message);
   }
 
   return sortThreadMessages(nextMessages);
 }
 
-function upsertIncomingThreadMessage<
+function upsertIncomingThreadMessageWithoutSort<
   TLocalMessage extends ThreadMessageLike & ChatLocalMessageState,
   TServerMessage extends ThreadMessageLike,
->(current: TLocalMessage[] | undefined, incoming: TServerMessage) {
+>(current: TLocalMessage[] | undefined, incoming: TServerMessage): TLocalMessage[] {
   if (!current?.length) {
     return [incoming as unknown as TLocalMessage];
   }
@@ -458,7 +466,7 @@ function upsertIncomingThreadMessage<
   if (exactIndex >= 0) {
     const nextMessages = [...current];
     nextMessages[exactIndex] = incoming as unknown as TLocalMessage;
-    return sortThreadMessages(nextMessages);
+    return nextMessages;
   }
 
   const optimisticIndex = current.findIndex((message) =>
@@ -467,13 +475,19 @@ function upsertIncomingThreadMessage<
   if (optimisticIndex >= 0) {
     const nextMessages = [...current];
     nextMessages[optimisticIndex] = incoming as unknown as TLocalMessage;
-    return sortThreadMessages(nextMessages);
+    return nextMessages;
   }
 
-  return sortThreadMessages([
-    ...current,
-    incoming as unknown as TLocalMessage,
-  ]);
+  return [...current, incoming as unknown as TLocalMessage];
+}
+
+function upsertIncomingThreadMessage<
+  TLocalMessage extends ThreadMessageLike & ChatLocalMessageState,
+  TServerMessage extends ThreadMessageLike,
+>(current: TLocalMessage[] | undefined, incoming: TServerMessage) {
+  return sortThreadMessages(
+    upsertIncomingThreadMessageWithoutSort(current, incoming),
+  );
 }
 
 function replaceLocalThreadMessage<
