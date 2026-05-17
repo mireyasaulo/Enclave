@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Search, X } from "lucide-react";
 import {
@@ -48,6 +48,17 @@ export function DesktopNoteSendDialog({
 }: DesktopNoteSendDialogProps) {
   const t = translateRuntimeMessage;
   const [searchTerm, setSearchTerm] = useState("");
+  // 走查新一轮 R2：会话行按钮原本只靠 disabled={pending} 兜双击，pending 是
+  // 父组件 sendMutation.isPending 经 React commit 才进 DOM。同帧连点同一行 2 次
+  // 同时通过 disabled=false → 两次 onSend(conversation) → sendMutation 飞 2 次，
+  // 单聊走 emitChatMessage 直接给对端发 2 条一样的笔记卡片，群聊走 POST 也是
+  // 2 条。和 forward-dialog 的 forwardSubmittingRef 同款修法。
+  const sendSubmittingRef = useRef(false);
+  useEffect(() => {
+    if (!pending) {
+      sendSubmittingRef.current = false;
+    }
+  }, [pending]);
 
   useEffect(() => {
     if (!open) {
@@ -174,7 +185,13 @@ export function DesktopNoteSendDialog({
                     key={conversation.id}
                     type="button"
                     disabled={pending}
-                    onClick={() => onSend(conversation)}
+                    onClick={() => {
+                      if (sendSubmittingRef.current || pending) {
+                        return;
+                      }
+                      sendSubmittingRef.current = true;
+                      onSend(conversation);
+                    }}
                     className="flex w-full items-center justify-between gap-3 rounded-[14px] border border-[color:var(--border-faint)] bg-white px-4 py-3 text-left transition hover:bg-[color:var(--surface-console)] hover:shadow-[var(--shadow-soft)] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <div className="flex min-w-0 items-center gap-3">
