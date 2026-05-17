@@ -72,6 +72,13 @@ import {
 } from "../lib/character-i18n";
 
 const CHARACTER_DETAIL_BLOCK_REASON = "character_detail_block";
+// 走查 R1：备注/标签后端 social.service updateFriendProfile 走 normalizeOptionalText
+// + normalizeTags，不卡长度也不卡条目数 —— 之前测过粘 500 字 / 200 条标签都能落库。
+// remarkName 跟随 profile-info-name-page 的 NAME_MAX_LENGTH=20；tags 输入框是一整段
+// "tag1, tag2, ..." 字符串，给 200 字符足够放十几条短 tag，再加 disable + counter 让
+// 用户看见上限。后端缺校验是更深的问题，但作为前端兜底先把超长粘贴挡在表单层。
+const REMARK_NAME_MAX_LENGTH = 20;
+const TAGS_INPUT_MAX_LENGTH = 200;
 
 type FriendProfileFormState = {
   remarkName: string;
@@ -203,6 +210,16 @@ export function CharacterDetailPage() {
     queryFn: () => getFriendRequests(baseUrl, { direction: "all" }),
     enabled: !friendsQuery.isLoading && !isAlreadyFriend,
   });
+  // 走查 R2 试过按 isAlreadyFriend gate 这条 query 省一次后台往返，但 R3 复查
+  // 发现会留 TOCTOU 窗口：用户在好友页点「加入黑名单」→ blockMutation.onSuccess
+  // 同时 invalidate friends + blocked → friendsQuery 先回（isAlreadyFriend=false）
+  // → blockedQuery 这一刻才被 enabled，开始重新发车 → 中间一拍 isBlocked 仍是
+  // false，底部按钮翻成「添加到通讯录」enabled。用户那一秒点下去 → 后端
+  // activateFriendship 看到 existing.status='blocked' 不在 ACTIVE_FRIENDSHIP_
+  // STATUSES（'friend'/'close'/'best'）里，直接 existing.status='friend' 把
+  // 刚拉黑的 friendship 重置回来，绕过黑名单 —— 正是 line 2147-2152 的注释
+  // 提前提防住的场景。一次 /social/blocks 不值得这种正确性 regression，保持
+  // 始终 enabled。
   const blockedQuery = useQuery({
     queryKey: ["app-chat-details-blocked", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
@@ -837,6 +854,15 @@ export function CharacterDetailPage() {
   // remarkName 和 tags，跟服务器值完全等价就 setIsEditingProfile(false) 直接关
   // 面板，跟桌面 DesktopContactTextEditDialog 的 confirmDisabled 行为对齐。
   const handleSaveProfile = async () => {
+    // 走查 R1：input maxLength 拦的是键盘 / 常规粘贴，但 IME 合成态、自动填充、
+    // 编程式 setValue 都能绕开。Save 之前再卡一次硬上限，超限直接吃掉（避免
+    // 把超长 remarkName/tags 写进后端 — social.service 现在不会拒）。
+    if (
+      profileForm.remarkName.length > REMARK_NAME_MAX_LENGTH ||
+      profileForm.tags.length > TAGS_INPUT_MAX_LENGTH
+    ) {
+      return;
+    }
     const nextRemarkName = profileForm.remarkName.trim() || null;
     const nextTags = profileForm.tags
       .split(/[，,]/)
@@ -1103,12 +1129,18 @@ export function CharacterDetailPage() {
         : mobileSheetAction === "delete"
           ? {
               title: t(msg`删除联系人`),
-              description: t(msg`删除后会从通讯录移除这个联系人。`),
+              // 走查 R1：原 sheet 主标题写「删除后会从通讯录移除这个联系人。」，
+              // 二级 description 写「此操作不可恢复」—— 后者是错的：后端
+              // deleteFriend 只是把 friendship.status='removed'，再发一次好友
+              // 申请就能恢复。桌面 ContactDetailPane 的 DangerConfirmDialog 一直
+              // 用「删除后将不会通知对方，可重新添加。」，两端拉齐，避免用户被
+              // "不可恢复"四个字吓住不敢操作。
+              description: t(msg`删除后将不会通知对方，可重新添加。`),
               actions: [
                 {
                   key: "confirm",
                   label: t(msg`删除联系人`),
-                  description: t(msg`此操作不可恢复`),
+                  description: t(msg`对方不会收到通知`),
                   danger: true,
                   disabled: deleteFriendMutation.isPending,
                   onClick: () => deleteFriendMutation.mutate(),
@@ -1808,6 +1840,7 @@ export function CharacterDetailPage() {
                         }))
                       }
                       compact={!isDesktopLayout}
+                      maxLength={REMARK_NAME_MAX_LENGTH}
                     />
                     <DetailInputField
                       label={tagsLabel}
@@ -1820,6 +1853,7 @@ export function CharacterDetailPage() {
                         }))
                       }
                       compact={!isDesktopLayout}
+                      maxLength={TAGS_INPUT_MAX_LENGTH}
                     />
                   </div>
                   <div className="mt-3 flex items-center gap-2">
@@ -1841,7 +1875,12 @@ export function CharacterDetailPage() {
                       variant="primary"
                       onClick={() => void handleSaveProfile()}
                       className="h-9 flex-1 rounded-[10px] bg-[#07c160] px-3 text-[13px] text-white shadow-none hover:bg-[#06ad56]"
-                      disabled={updateProfileMutation.isPending}
+                      disabled={
+                        updateProfileMutation.isPending ||
+                        profileForm.remarkName.length >
+                          REMARK_NAME_MAX_LENGTH ||
+                        profileForm.tags.length > TAGS_INPUT_MAX_LENGTH
+                      }
                     >
                       {updateProfileMutation.isPending
                         ? savingLabel
@@ -2460,27 +2499,48 @@ function DetailInputField({
   placeholder,
   onChange,
   compact = false,
+  maxLength,
 }: {
   label: string;
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
   compact?: boolean;
+  maxLength?: number;
 }) {
+  // 走查 R1：备注 / 标签输入框原本没设 maxLength，用户粘 500+ 字符直接落 friendship 表，
+  // displayName / chat 列表标题 / 聊天 header 全被撑爆。后端 social.service.updateFriendProfile
+  // 只做 trim 不卡长度，前端先兜底。maxLength 一并喂到 <input> 让浏览器/IME 直接截断，
+  // 旁边再画一条 length/max 的 counter 给用户反馈。
+  const showCounter = typeof maxLength === "number";
+  const overLimit = showCounter && value.length > (maxLength as number);
   return (
     <label className="block">
       <div
         className={cn(
-          "mb-2 text-[color:var(--text-muted)]",
+          "mb-2 flex items-center justify-between gap-2 text-[color:var(--text-muted)]",
           compact ? "text-[11px]" : "text-xs uppercase tracking-[0.12em]",
         )}
       >
-        {label}
+        <span>{label}</span>
+        {showCounter ? (
+          <span
+            className={cn(
+              "tabular-nums",
+              overLimit
+                ? "text-[color:var(--state-danger-text)]"
+                : "text-[color:var(--text-dim)]",
+            )}
+          >
+            {value.length}/{maxLength}
+          </span>
+        ) : null}
       </div>
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
+        maxLength={maxLength}
         // text-[16px]: iOS Safari/WKWebView focus 时 <16px 会强制 viewport
         // zoom-in。原本 compact (mobile) 给 text-[13px]、desktop 给 text-sm
         // (14px) 都不够；mobile 走 DetailInputField 在角色详情页里铺了 10+ 处
