@@ -6194,7 +6194,19 @@ function collapseGroupCallMessages(messages: ChatRenderableMessage[]) {
 
 function resolveGroupCallInvite(message: ChatRenderableMessage) {
   const isSystem = message.type === "system" || message.senderType === "system";
-  if (isSystem || message.senderType === "user") {
+  // 走查新一轮 R1：原版还排除了 `senderType === "user"`——但 yinjie 架构里群
+  // 通话邀请永远是 user 发出（mobile-group-call-screen 的 syncStatus/endStatus +
+  // group-chat-thread-panel.sendCallInviteMutation 走 sendGroupMessage →
+  // sendOwnerMessage → senderType:'user'，character 这边没有发起群通话的代码
+  // 路径）。结果整套 collapseGroupCallMessages 在所有真实群通话场景下都不工作：
+  // mobile-group-call-screen panel-opened 立刻 fire 一份 "ongoing"，1200ms
+  // 后 deferred sync effect 再发一份，counts 每变一次又一份，每按一下"同步最
+  // 新状态"又一份——yuanzui 实测群 (group-douyin-d2-trio) 一轮通话里堆出 10+
+  // 张 "进行中" 卡片不折叠。SQLite 一查全是 senderType=user 的群语音/群视频
+  // invite 消息。摘掉 user 排除，剩下 status==="ongoing" 的 prev 规则就够：
+  // ongoing→ongoing 同类同群名 → 折叠成最新一张；ongoing→ended 收口成 ended；
+  // ended→ongoing 是新一轮通话，自然不折叠。
+  if (isSystem) {
     return null;
   }
 
