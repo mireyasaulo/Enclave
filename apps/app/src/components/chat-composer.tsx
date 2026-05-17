@@ -1710,26 +1710,42 @@ export function ChatComposer({
   };
 
   const applyImageDraftFiles = async (files: File[]) => {
-    try {
-      const draftItems = await Promise.all(
-        files.map((file) => createImageDraft(file)),
-      );
-      releaseAttachmentDraft(attachmentDraft);
-      setAttachmentError(null);
-      setMobilePlusNotice(null);
-      setPlusPanelOpen(false);
-      setDesktopPlusMenuOpen(false);
-      setAttachmentDraft({
-        kind: "images",
-        items: draftItems,
-      });
-    } catch (fileError) {
+    // Promise.all 在第一张图 reject 时就抛，已经 resolve 的若干张 ImageDraft
+    // 里的 blob: previewUrl 拿不到引用也 revoke 不掉 —— 用户从相册选 9 张里
+    // 第 5 张坏（readImageDimensions 解码失败）就会泄漏前 4 张的 blob。改成
+    // allSettled 把成功的拿出来；失败时把已 resolve 的 previewUrl 显式释放。
+    const results = await Promise.allSettled(
+      files.map((file) => createImageDraft(file)),
+    );
+    const drafts: ImageDraft[] = [];
+    let firstError: unknown = null;
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        drafts.push(result.value);
+      } else if (!firstError) {
+        firstError = result.reason;
+      }
+    }
+    if (firstError) {
+      for (const draft of drafts) {
+        URL.revokeObjectURL(draft.previewUrl);
+      }
       setAttachmentError(
-        fileError instanceof Error
-          ? fileError.message
+        firstError instanceof Error
+          ? firstError.message
           : t(msg`读取图片失败，请换一张再试。`),
       );
+      return;
     }
+    releaseAttachmentDraft(attachmentDraft);
+    setAttachmentError(null);
+    setMobilePlusNotice(null);
+    setPlusPanelOpen(false);
+    setDesktopPlusMenuOpen(false);
+    setAttachmentDraft({
+      kind: "images",
+      items: drafts,
+    });
   };
 
   const handleGenericFileSelection = (fileList: FileList | null) => {
