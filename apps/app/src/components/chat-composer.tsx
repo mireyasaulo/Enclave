@@ -1730,6 +1730,11 @@ export function ChatComposer({
       for (const draft of drafts) {
         URL.revokeObjectURL(draft.previewUrl);
       }
+      // 必须关掉 + 面板，否则 mobileComposerStatus 在 plusPanelOpen 时 return
+      // null，attachmentError 永远不会被 status rail 显示出来 —— 用户从相册
+      // 选了几张图，其中有损坏的，看上去就是"啥也没发生"。
+      setPlusPanelOpen(false);
+      setDesktopPlusMenuOpen(false);
       setAttachmentError(
         firstError instanceof Error
           ? firstError.message
