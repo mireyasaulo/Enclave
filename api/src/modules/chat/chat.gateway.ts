@@ -324,10 +324,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private async emitConversationFailure(conversationId: string) {
-    const messages = await this.chatService.getMessages(conversationId);
-    const latestUserMessage = [...messages]
-      .reverse()
-      .find((message) => message.senderType === 'user');
+    // 走查 R3：原版 getMessages(convId) 拉整条会话的所有消息再 reverse().find 出
+    // 最后一条 user msg。长聊天（1000+ 条）这里是一次完整的全表 SELECT + JS
+    // 全表 reverse + 全表 find，server 端跟着卡。reply 失败回放路径在 AI 不稳
+    // / cloud token 过期时高频触发。直接走 chat.service.getLastUserMessage
+    // (ORDER BY createdAt DESC LIMIT 1) 一条出来。
+    const latestUserMessage =
+      await this.chatService.getLastUserMessage(conversationId);
 
     if (latestUserMessage) {
       this.server.to(conversationId).emit('new_message', latestUserMessage);

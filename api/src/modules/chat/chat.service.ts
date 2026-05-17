@@ -700,6 +700,32 @@ export class ChatService {
     return searchVisibleMessages(messages, query);
   }
 
+  // 给 chat.gateway.emitConversationFailure 用：reply 生成失败时需要把"刚刚
+  // 落库的那条用户消息"重新 emit 一次，让客户端把 local_* 乐观消息 dedup 替
+  // 掉，否则会一直停在 sending 状态。原版走 getMessages(convId) 拉全表后
+  // [...messages].reverse().find(senderType==='user')，长聊天 1000+ 条时这里
+  // 是纯浪费。直接 findOne ORDER BY createdAt DESC LIMIT 1 + senderType='user'
+  // + visibility cutoff 后再 serialize 一条出来。
+  async getLastUserMessage(
+    conversationId: string,
+  ): Promise<Message | undefined> {
+    const conversation = await this.requireOwnedConversation(conversationId);
+    const entity = await this.msgRepo.findOne({
+      where: this.buildMessageWhere(
+        conversationId,
+        this.getVisibleMessageCutoff(conversation),
+        {
+          senderType: 'user',
+        },
+      ),
+      order: { createdAt: 'DESC' },
+    });
+    if (!entity) {
+      return undefined;
+    }
+    return this.serializeMessage(entity);
+  }
+
   async saveUploadedAttachment(
     file: UploadedAttachmentFile,
     metadata: { width?: number; height?: number; durationMs?: number },
