@@ -674,6 +674,8 @@ export function MobileChatPlusPanel({
             />
           ) : null}
           {favoriteRecords.length ? (
+            // 走查 R3：title 是 flex row 第一子项，要带 min-w-0/flex-1 才能让
+            // truncate 真起作用；badge 加 shrink-0 防被长标题挤变形。
             <div className="mx-2.5 max-h-[40dvh] overflow-auto rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
               {favoriteRecords.map((item, index) => (
                 <button
@@ -697,9 +699,6 @@ export function MobileChatPlusPanel({
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      {/* 走查 R3：truncate 在 flex 子项里要自带 min-w-0；不然 default
-                          min-width:auto = 内容宽度，长标题不省略号反而把右边 badge
-                          挤出 row。badge 跟着 shrink-0，避免被长标题挤变形。 */}
                       <div className="min-w-0 flex-1 truncate text-[13px] text-[color:var(--text-primary)]">
                         {item.title}
                       </div>
