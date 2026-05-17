@@ -314,9 +314,24 @@ function DesktopFeedRowInner({
 
           <div className="mt-3 flex items-center justify-between gap-4">
             <div className="text-[12px] text-[color:var(--text-muted)]">
-              {post.likeCount > 0 || post.commentCount > 0
-                ? t(msg`${post.likeCount} 赞 · ${post.commentCount} 评论`)
-                : mediaSummaryText || t(msg`还没有互动`)}
+              {(() => {
+                // 走查 R2：旧逻辑 likeCount/commentCount 任一 > 0 就 unconditional
+                // 渲染两段 → 点赞 0 评论 3 渲成 "0 赞 · 3 评论"，反过来同样尴尬。
+                // 移动端走查 R2 (98ec134b) 已经把这条 fix 套上了，桌面 row 当时
+                // 漏了同款修复。跟微信原生朋友圈对齐：只渲非零的那段，两者都 0
+                // 时让位给 mediaSummaryText / "还没有互动" 兜底。
+                const parts: string[] = [];
+                if (post.likeCount > 0) {
+                  parts.push(t(msg`${post.likeCount} 赞`));
+                }
+                if (post.commentCount > 0) {
+                  parts.push(t(msg`${post.commentCount} 评论`));
+                }
+                if (parts.length > 0) {
+                  return parts.join(" · ");
+                }
+                return mediaSummaryText || t(msg`还没有互动`);
+              })()}
             </div>
             <div className="flex items-center gap-1.5">
               <button
