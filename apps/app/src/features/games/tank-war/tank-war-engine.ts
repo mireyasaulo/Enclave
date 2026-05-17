@@ -547,7 +547,9 @@ function moveBullets(world: GameWorld, audio: AudioHook | null): void {
   if (removed.size > 0) {
     world.bullets = world.bullets.filter((b) => !removed.has(b.id));
   }
-  // 子弹-子弹
+  // 子弹-子弹：只在 player ↔ enemy 之间互消，p1-p2 是同阵营不能互相抵消
+  // (双人 co-op 一起朝同方向打同一只敌坦克时，p1 和 p2 的子弹经过同一格
+  //  就两发同归于尽，玩家眼里"打了个空炮"——FC 原版双人友军弹不互消)。
   const consumed: Set<number> = new Set();
   for (let i = 0; i < world.bullets.length; i++) {
     for (let j = i + 1; j < world.bullets.length; j++) {
@@ -555,6 +557,8 @@ function moveBullets(world: GameWorld, audio: AudioHook | null): void {
       const c = world.bullets[j];
       if (!a || !c) continue;
       if (a.owner === c.owner) continue;
+      // 双方都是玩家阵营（p1/p2）— 同队，跳过互消
+      if (a.owner !== "enemy" && c.owner !== "enemy") continue;
       if (Math.abs(a.x - c.x) < 6 && Math.abs(a.y - c.y) < 6) {
         consumed.add(a.id);
         consumed.add(c.id);
