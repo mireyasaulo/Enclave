@@ -373,6 +373,15 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
     <div
       ref={cardRef}
       style={style}
+      // 走查新一轮 R1：popover 通过 createPortal 渲染到 document.body，
+      // 不在 desktop-chat-workspace 的 threadSectionRef DOM 子树里。
+      // workspace 的 onPointerDownCapture 和 document pointerdown(capture)
+      // 兜底逻辑都靠 ref.contains(target) 判断「点击是否落在 thread 区」，
+      // portal 出来的 popover DOM 不在那条链上 → 用户点 popover 卡片任意
+      // 空白处（不是按钮 / 非可关闭区域）的瞬间 workspace 就把背后的
+      // 「聊天信息」侧栏 dismiss 掉。给 popover 卡片打 data-yj-portal-shield
+      // 标记，workspace 那边 closest() 一查就跳过 dismiss。
+      data-yj-portal-shield="avatar-popover"
       className="w-[320px] rounded-[18px] border border-[rgba(0,0,0,0.08)] bg-[rgba(255,255,255,0.98)] shadow-[0_18px_50px_rgba(15,23,42,0.18)] backdrop-blur-xl"
     >
       <div

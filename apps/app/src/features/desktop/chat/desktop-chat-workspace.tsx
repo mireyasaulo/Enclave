@@ -616,6 +616,17 @@ export function DesktopChatWorkspace({
         return;
       }
 
+      // 走查新一轮 R1：avatar popover 等通过 createPortal 渲染到 document.body
+      // 的浮层不在 threadSectionRef DOM 子树里——用户点 popover 卡片任意空白
+      // 处时这里 dismiss 会把背后的「聊天信息」侧栏一起关掉。popover 自己打了
+      // data-yj-portal-shield 标记，closest 命中就跳过 dismiss。
+      if (
+        target instanceof Element &&
+        target.closest('[data-yj-portal-shield]')
+      ) {
+        return;
+      }
+
       dismissSidePanel();
     },
     [dismissSidePanel, rightPanelMode],
@@ -932,6 +943,15 @@ export function DesktopChatWorkspace({
       // 点发送按钮会先 dismiss 让 section padding 收回去，composer 整栏右
       // 移，原 mousedown 落点上的 DOM 已经换人，click 不 fire，消息没发出。
       if (threadSectionRef.current?.contains(target)) {
+        return;
+      }
+
+      // 同 handleWorkspacePointerDownCapture：portal 浮层 (avatar popover 等)
+      // 不在 threadSectionRef 子树里，用 data-yj-portal-shield 跳过 dismiss。
+      if (
+        target instanceof Element &&
+        target.closest('[data-yj-portal-shield]')
+      ) {
         return;
       }
 
