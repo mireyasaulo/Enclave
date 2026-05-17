@@ -549,7 +549,15 @@ export function ChannelAuthorPage() {
               </div>
             </section>
 
-            {featuredLivePost ? (
+            {/*
+              走查 R1（本轮）：原 featuredLivePost hero 卡无条件渲染，但用户点击
+              「直播回放」tab 后，下面 visiblePosts 也按 sourceKind==='live_clip'
+              过滤——featuredLivePost 是 recentPosts.find(live_clip)，正是 visiblePosts
+              的第一条。结果同一条直播回放在 hero 卡 + 列表第一行各显示一次，
+              用户两次点击进同一个 post detail，体感像 "为什么这条占两个位置"。
+              tab=live 时 hero 已经被列表完全覆盖，直接隐掉避免重复。
+            */}
+            {featuredLivePost && activeCollection !== "live" ? (
               <button
                 type="button"
                 onClick={() => openChannelPost(featuredLivePost)}
