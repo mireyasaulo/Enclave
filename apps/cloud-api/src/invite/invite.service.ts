@@ -206,13 +206,15 @@ export class InviteService {
     });
 
     // 邀请奖励是双边的（share 文案承诺"我们都能获得 30 天会员奖励"），所以这里
-    // 给被邀请人也发一份 invite_reward；inviter 那张的 id 落到 redemption.rewardSubscriptionId
-    // 仅作为审计指针，不影响双方账面。失败只 warn 不影响主流程——inviter 已经拿到
-    // 奖励，重发被邀请人的奖励可以靠 invitedRewardGranted=false 的兜底脚本补。
+    // 给被邀请人也发一份 invite_reward。两张订阅都把 id 挂回 redemption 行
+    // （rewardSubscriptionId / inviteeRewardSubscriptionId），admin 拒兑时双边
+    // 一起 revoke。invitee 失败只 warn 不影响主流程——inviter 已经拿到奖励，重
+    // 发被邀请人的奖励可以靠 invitedRewardGranted=false 的兜底脚本补。
+    let inviteeRewardId: string | null = null;
     const invitee = await this.userRepo.findOne({ where: { id: payload.inviteeUserId } });
     if (invitee && !invitee.invitedRewardGranted) {
       try {
-        await this.subscription.grantSubscription({
+        const inviteeReward = await this.subscription.grantSubscription({
           userId: payload.inviteeUserId,
           source: "invite_reward",
           durationDays: rewardDays,
@@ -220,6 +222,7 @@ export class InviteService {
           note: `受邀奖励：来自邀请码 ${payload.code.code}`,
           createdBy: "invite-service",
         });
+        inviteeRewardId = inviteeReward.id;
         invitee.invitedRewardGranted = true;
         await this.userRepo.save(invitee);
       } catch (error) {
@@ -229,7 +232,13 @@ export class InviteService {
       }
     }
 
-    const redemption = await this.persistRedemption(payload, "rewarded", null, reward.id);
+    const redemption = await this.persistRedemption(
+      payload,
+      "rewarded",
+      null,
+      reward.id,
+      inviteeRewardId,
+    );
     await this.bumpCodeStats(payload.code.id, true, rewardDays);
 
     return { status: redemption.status as InviteRedemptionStatus, rejectReason: null, rewardDays };
@@ -245,6 +254,7 @@ export class InviteService {
     status: InviteRedemptionStatus,
     rejectReason: string | null,
     rewardSubscriptionId: string | null = null,
+    inviteeRewardSubscriptionId: string | null = null,
   ) {
     return this.redemptionRepo.save(
       this.redemptionRepo.create({
@@ -257,6 +267,7 @@ export class InviteService {
         status,
         rejectReason,
         rewardSubscriptionId,
+        inviteeRewardSubscriptionId,
       }),
     );
   }
@@ -437,12 +448,26 @@ export class InviteService {
     if (record.status === "rejected") return record;
     record.status = "rejected";
     record.rejectReason = reason;
+    const note = `${actor ?? "admin"}: ${reason}`;
     if (record.rewardSubscriptionId) {
-      await this.subscription.revokeSubscription(
-        record.rewardSubscriptionId,
-        `${actor ?? "admin"}: ${reason}`,
-      );
+      await this.subscription.revokeSubscription(record.rewardSubscriptionId, note);
       record.rewardSubscriptionId = null;
+    }
+    if (record.inviteeRewardSubscriptionId) {
+      await this.subscription.revokeSubscription(
+        record.inviteeRewardSubscriptionId,
+        note,
+      );
+      record.inviteeRewardSubscriptionId = null;
+    }
+    // 同步把 invitee.invitedRewardGranted 翻回 false，运维之后想给同一个被邀
+    // 请人补发（换个 inviter 重新跑兑换）才不会被 grant 时的 guard 拦掉。
+    if (record.inviteeUserId) {
+      const invitee = await this.userRepo.findOne({ where: { id: record.inviteeUserId } });
+      if (invitee && invitee.invitedRewardGranted) {
+        invitee.invitedRewardGranted = false;
+        await this.userRepo.save(invitee);
+      }
     }
     return this.redemptionRepo.save(record);
   }

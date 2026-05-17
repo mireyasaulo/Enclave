@@ -58,6 +58,7 @@ import { AddCloudUserPassword1778660500000 } from "./migrations/1778660500000-ad
 import { AddCloudWorldLastUserMessageAt1778661000000 } from "./migrations/1778661000000-add-cloud-world-last-user-message-at";
 import { CreateCloudMinimaxQuotaExhaustion1778662000000 } from "./migrations/1778662000000-create-cloud-minimax-quota-exhaustion";
 import { FixAppPublicBaseUrlEnclaveai1778663000000 } from "./migrations/1778663000000-fix-app-public-base-url-enclaveai";
+import { AddInviteeRewardSubscriptionId1778664000000 } from "./migrations/1778664000000-add-invitee-reward-subscription-id";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -126,6 +127,7 @@ export const cloudMigrations = [
   AddCloudWorldLastUserMessageAt1778661000000,
   CreateCloudMinimaxQuotaExhaustion1778662000000,
   FixAppPublicBaseUrlEnclaveai1778663000000,
+  AddInviteeRewardSubscriptionId1778664000000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {
