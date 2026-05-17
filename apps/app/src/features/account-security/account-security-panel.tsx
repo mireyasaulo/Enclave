@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import {
   changeCloudPassword,
   isApiRequestError,
@@ -8,6 +9,7 @@ import {
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, TextField } from "@yinjie/ui";
+import { clearCloudRuntimeSession } from "../../lib/cloud-session";
 import { describeRequestError } from "../../lib/request-error";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import {
@@ -66,6 +68,7 @@ function normalizeBaseUrl(value: string | undefined | null) {
 
 export function AccountSecurityPanel() {
   const t = useRuntimeTranslator();
+  const navigate = useNavigate();
   const runtimeConfig = useAppRuntimeConfig();
   const cloudApiBaseUrl = normalizeBaseUrl(runtimeConfig.cloudApiBaseUrl);
   const accessToken = useCloudSessionStore((state) => state.accessToken);
@@ -75,6 +78,16 @@ export function AccountSecurityPanel() {
   // 退回——浪费一次填表 + 等响应。socket.ts / media-url.ts / runtime-config.ts
   // 早就按 isCloudSessionExpired 拦了，账号安全 panel 不该是唯一例外。
   const sessionExpired = !accessToken || isCloudSessionExpired(expiresAt);
+
+  // R1（2026-05-17 移动端 我-设置走查）：sessionExpired 时之前只渲染一条 danger
+  // banner + 整页 disabled 表单，用户没有任何前进路径——既不能改密码也不知道下
+  // 一步该去哪。subscription-page 在同样的"没 cloud session"分支下早就走的是
+  // "info banner + 去登录云账号 CTA"。这里同款收口：清掉残留 cloud session 并
+  // 跳回 /welcome 让用户重新登录。
+  const handleGoLogin = useCallback(() => {
+    clearCloudRuntimeSession();
+    void navigate({ to: "/welcome", replace: true });
+  }, [navigate]);
 
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -273,21 +286,33 @@ export function AccountSecurityPanel() {
     !newPassword ||
     !confirmPassword;
 
-  return (
-    <div className="space-y-4">
-      {sessionExpired ? (
-        // session 失效时把通用提示换成 danger banner，提前告知用户「先回去登录
-        // 再来改密码」，而不是让用户填完整页表单点提交才被 401 退回。
+  // R1：session 失效（或本地世界从来没登过云账号）时整页全 disabled、用户却
+  // 看不到下一步该往哪走——subscription-page 在同样分支已是 "info banner + 去
+  // 登录云账号 CTA"，这里同款收口，让用户能离开死路自己回 /welcome。
+  if (sessionExpired) {
+    return (
+      <div className="space-y-3">
         <InlineNotice tone="danger" role="alert">
           {t(msg`云账号会话已失效，请重新登录后再尝试修改密码。`)}
         </InlineNotice>
-      ) : (
-        <InlineNotice tone="muted">
-          {t(
-            msg`修改密码需要邮箱验证码确认；验证码会发送至当前账号绑定的邮箱。`,
-          )}
-        </InlineNotice>
-      )}
+        <Button
+          onClick={handleGoLogin}
+          size="lg"
+          className="w-full rounded-2xl"
+        >
+          {t(msg`去登录云账号`)}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <InlineNotice tone="muted">
+        {t(
+          msg`修改密码需要邮箱验证码确认；验证码会发送至当前账号绑定的邮箱。`,
+        )}
+      </InlineNotice>
 
       <form
         className="space-y-3 rounded-2xl border border-[color:var(--border-faint)] bg-white p-4"
