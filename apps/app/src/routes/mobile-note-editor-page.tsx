@@ -10,7 +10,7 @@ import {
 } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useBlocker, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Bold,
@@ -934,6 +934,29 @@ function MobileNoteEditor({
     };
   }, []);
 
+  // 走查 R4：dirty 时点浏览器 back / iOS 边滑返回，编辑器直接 unmount，没机会
+  // 弹「这条笔记还没有保存」确认。auto-save 220ms 兜底过 LS 草稿不会真丢失
+  // （下次 /tabs/notes 还能恢复），但用户视觉上像是 dirty 内容被吃掉，
+  // 跟应用左上 back 走的 requestClose 行为不一致。
+  // useBlocker 拦截 SPA 内导航；shouldBlockFn 在 dirty 时返回 true，配合下面
+  // 的 closeConfirmOpen 弹层让用户决定保存/不保存/取消；beforeunload 兜外层
+  // tab close / 刷新（桌面 desktop-notes-workspace 已经用同样思路）。
+  // skipBlockerRef = true 之后允许程序化跳转（用户在弹层里点了"不保存"或
+  // "保存并关闭"后真正 leaveEditor 时不能再被拦下）。
+  const skipBlockerRef = useRef(false);
+  useBlocker({
+    shouldBlockFn: () => {
+      if (skipBlockerRef.current) return false;
+      if (!isDirty) return false;
+      // 已经在弹未保存确认了就不再重复拦，避免 close confirm 自身的"取消"
+      // 二次触发 blocker 死锁。
+      if (closeConfirmOpen) return false;
+      setCloseConfirmOpen(true);
+      return true;
+    },
+    enableBeforeUnload: () => isDirty,
+  });
+
   // 走查 R1：Android 原生壳硬件 Back 之前完全不被这页拦截 —— 用户从 + 菜单进
   // 编辑器随便打了字按物理返回，history.back 直接走掉，dirty 内容静默丢失没
   // 任何提示；即使没编辑也漏掉 requestClose 里的空草稿清理（chat-list-page
@@ -990,6 +1013,11 @@ function MobileNoteEditor({
       return;
     }
     setCloseConfirmOpen(false);
+    // 保存成功后 isDirty 已经回到 false（savedSnapshot 等于 currentSnapshot），
+    // 理论上 useBlocker shouldBlockFn 会返回 false 让 leaveEditor 直接通过；
+    // 但 React state 同步要等 commit，立刻 leaveEditor 时 isDirty 可能还是 true
+    // → blocker 再次拦截 → 二次确认。skipBlockerRef 短路一次确保通过。
+    skipBlockerRef.current = true;
     await leaveEditor();
   }
 
@@ -998,6 +1026,9 @@ function MobileNoteEditor({
       clearDesktopNoteDraft(activeDraftId);
     }
     setCloseConfirmOpen(false);
+    // 用户主动放弃，isDirty 仍是 true（editorState 没被清），需要短路 blocker
+    // 才能真正 leaveEditor。
+    skipBlockerRef.current = true;
     await leaveEditor();
   }
 
