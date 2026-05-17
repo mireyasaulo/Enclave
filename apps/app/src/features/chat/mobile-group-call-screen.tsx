@@ -372,6 +372,19 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     if (!resolvedGroupId || !groupQuery.data || !totalCount) {
       return;
     }
+    // 走查新一轮 R1：「同步最新状态」按钮 inline onClick (line ~1150) 没像
+    // handleRetrySyncStatus / panel-opened effect / 1200ms deferred effect
+    // 那样守 leavingScreen——同帧先点「同步最新状态」紧接着点「结束通话」时，
+    // handleEndCall 把 leavingScreenRef.current 翻 true 那一瞬已经晚于
+    // syncCurrentStatus 内部 syncStatusBusyRef = true，sync 的 mutateAsync
+    // 已经 in-flight。两份 sendGroupMessage 同时投出（一份 ongoing 一份
+    // ended），公网隧道 RTT 下顺序不定，可能 ongoing 后到 → 群里"已结束"
+    // 后面紧跟一条 stray"画面进行中"，跟 R2 修过的 init-effect-reseed 是
+    // 同一类问题。把守 leavingScreen 沉到 syncCurrentStatus 入口，任何
+    // caller 漏守都兜底。
+    if (leavingScreenRef.current) {
+      return;
+    }
     if (syncStatusBusyRef.current) {
       return;
     }
