@@ -14,6 +14,7 @@ import {
   getOrCreateConversation,
   markFollowupRecommendationChatStarted,
   markFollowupRecommendationFriendRequestPending,
+  SELF_CHARACTER_ID,
   sendFriendRequest,
   setCharacterDefaultVoiceReply,
   setConversationMuted,
@@ -274,6 +275,21 @@ export function CharacterDetailPage() {
   const isBlocked = (blockedQuery.data ?? []).some(
     (item) => item.characterId === characterId,
   );
+  // 走查 R5：char-default-self 是用户在隐界里的"自我镜像"角色，本质就是用户
+  // 自己。后端 social.service.ts 已在 blockCharacter/deleteFriend 这两个端口
+  // 走 SELF_CHARACTER_ID 守卫直接抛 400（SOCIAL_CANNOT_BLOCK_SELF /
+  // SOCIAL_CANNOT_DELETE_SELF），但前端这页对这两个按钮没做任何 gate。如果
+  // 用户从通讯录列表 / 私聊详情 / 群成员里点到「我自己」并误触：
+  //   (a) 老 world child 还没装上后端守卫的版本会真把"自己"拉黑 / 删掉，
+  //       自我镜像 friendship 永久变 'blocked'/'removed'，自我对谈链路彻底断；
+  //   (b) 装上守卫的世界会回 400 + 英文 legacyMessage "Cannot block self
+  //       mirror character"，用户看到一条很技术、看不懂的报错。
+  // 跟桌面 ContactDetailPane 的"通过不传 onToggleBlock/onDeleteFriend 来隐
+  // 藏 row"思路一致：这里识别自我镜像，对应 row / 按钮整体不渲染。
+  // 桌面分支不传 onToggleBlock/onDeleteFriend；移动分支条件渲染。
+  // 其它操作（备注 / 标签 / 星标 / 默认语音回复 / 推荐名片）后端没禁，对自我
+  // 镜像也有合理语义（自己给自己起备注、把自己的隐界名片复制出去），保留。
+  const isSelfMirror = characterId === SELF_CHARACTER_ID;
   const pendingFriendRequest = (friendRequestsQuery.data ?? []).find(
     (item) => item.characterId === characterId && item.status === "pending",
   );
@@ -1276,14 +1292,22 @@ export function CharacterDetailPage() {
               }}
               isBlocked={isBlocked}
               blockPending={blockMutation.isPending}
-              onToggleBlock={() => {
-                setNotice(null);
-                blockMutation.mutate(isBlocked);
-              }}
+              onToggleBlock={
+                isSelfMirror
+                  ? undefined
+                  : () => {
+                      setNotice(null);
+                      blockMutation.mutate(isBlocked);
+                    }
+              }
               deletePending={deleteFriendMutation.isPending}
-              onDeleteFriend={() => {
-                handleDeleteFriendAction();
-              }}
+              onDeleteFriend={
+                isSelfMirror
+                  ? undefined
+                  : () => {
+                      handleDeleteFriendAction();
+                    }
+              }
             />
           </div>
         </div>
@@ -1999,21 +2023,29 @@ export function CharacterDetailPage() {
                   compact={!isDesktopLayout}
                 />
               ) : null}
-              <ProfileRow
-                label={isBlocked ? t(msg`移出黑名单`) : t(msg`加入黑名单`)}
-                value={
-                  blockMutation.isPending
-                    ? updatingLabel
-                    : isBlocked
-                      ? restoreNormalContactLabel
-                      : stopReceivingInteractionLabel
-                }
-                danger
-                onClick={handleBlockAction}
-                disabled={blockMutation.isPending}
-                compact={!isDesktopLayout}
-              />
-              {isFriend ? (
+              {/* 走查 R5：char-default-self 是用户自我镜像，后端 social.service
+                  在 block / delete 两端都装了 SELF_CHARACTER_ID 守卫；前端必须
+                  对应把这两 row 整体隐藏，不然用户从通讯录或私聊点到自我镜像
+                  会看到误导性按钮 → 误触后要么破坏自我对谈链路、要么看到一条
+                  英文 legacyMessage。和桌面 ContactDetailPane 通过不传
+                  onToggleBlock/onDeleteFriend 来隐藏 row 的思路对齐。 */}
+              {!isSelfMirror ? (
+                <ProfileRow
+                  label={isBlocked ? t(msg`移出黑名单`) : t(msg`加入黑名单`)}
+                  value={
+                    blockMutation.isPending
+                      ? updatingLabel
+                      : isBlocked
+                        ? restoreNormalContactLabel
+                        : stopReceivingInteractionLabel
+                  }
+                  danger
+                  onClick={handleBlockAction}
+                  disabled={blockMutation.isPending}
+                  compact={!isDesktopLayout}
+                />
+              ) : null}
+              {isFriend && !isSelfMirror ? (
                 <ProfileRow
                   label={deleteContactLabel}
                   value={
