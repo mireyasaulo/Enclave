@@ -998,13 +998,22 @@ export function DiscoverFeedPage() {
 
     resetFeedToFirstPage();
     void feedQuery.refetch();
-    void blockedQuery.refetch();
+    // 新一轮 R1 走查：blockedQuery enabled 闸门是 Boolean(ownerId)，但
+    // .refetch() 不看 enabled —— 没 ownerId 时仍会触发 getBlockedCharacters，
+    // 服务端要么 401 要么返回空，纯白烧一次 RTT。handlePullRefresh (L1046)
+    // 和桌面 onRefresh (L2013) 都按 ownerId gate，这两条「重试读取 / 返回
+    // 上一页」兜底路径漏了同款 gate，补齐保持一致。
+    if (ownerId) {
+      void blockedQuery.refetch();
+    }
   }
 
   function handleRetryLoad() {
     resetFeedToFirstPage();
     void feedQuery.refetch();
-    void blockedQuery.refetch();
+    if (ownerId) {
+      void blockedQuery.refetch();
+    }
   }
 
   // 下拉刷新：只替换头部 page 1，保留已加载的 page 2+，避免列表瞬间变短引发
