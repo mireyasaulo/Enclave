@@ -233,14 +233,29 @@ export function MobileFavoritesPage({
       return { item, nextLocalFavorites };
     },
     onSuccess: async ({ item, nextLocalFavorites }) => {
-      const nextRemoteFavorites =
-        item.category === "messages" || item.category === "notes"
-          ? await queryClient.fetchQuery({
-              queryKey: ["app-favorites", baseUrl],
-              queryFn: () => getFavorites(baseUrl),
-              staleTime: 0,
-            })
-          : (favoritesQuery.data ?? []);
+      // 走查 R1：之前 await fetchQuery 直接 throw 会让 onSuccess 整支抛、
+      // setFavorites/setNotice 都不跑——但此时服务端 removeFavorite 已成功 +
+      // 本地 removeDesktopFavorite 也写完了，数据真没了，UI 却还挂着被删项。
+      // 用户再点同一个 → 服务端 404 / 500 一通报错；要么手动刷新页面、要么
+      // 切走再回来才正常。这里给 fetchQuery 一层 try/catch：refetch 挂了就
+      // 用 cached - removed 兜底，UI 仍然立即反映出删除结果。
+      let nextRemoteFavorites: DesktopFavoriteRecord[];
+      if (item.category === "messages" || item.category === "notes") {
+        try {
+          nextRemoteFavorites = await queryClient.fetchQuery({
+            queryKey: ["app-favorites", baseUrl],
+            queryFn: () => getFavorites(baseUrl),
+            staleTime: 0,
+          });
+        } catch {
+          const cached = favoritesQuery.data ?? [];
+          nextRemoteFavorites = cached.filter(
+            (record) => record.sourceId !== item.sourceId,
+          );
+        }
+      } else {
+        nextRemoteFavorites = favoritesQuery.data ?? [];
+      }
 
       setFavorites(
         mergeDesktopFavoriteRecords(nextRemoteFavorites, nextLocalFavorites),

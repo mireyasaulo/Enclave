@@ -12,6 +12,7 @@ import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { translateAppErrorCode } from "../lib/error-translate";
 import { navigateBackOrFallback } from "../lib/history-back";
+import { describeRequestError } from "../lib/request-error";
 import { pickImageFiles } from "../runtime/native-image-picker";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
@@ -449,11 +450,13 @@ export function ProfileInfoAvatarPage() {
   // 跟 name / signature 页同款：先用 translateAppErrorCode 把后端 AppError
   // 翻译到当前 locale；命中 LEGACY_ERROR / 未知 code 才退回 raw message。
   // resetMutation 跟 saveMutation 同途同 backend，复用同一份翻译。
+  // 走查 R1：非 ApiRequestError 分支走 describeRequestError，让 "Failed to fetch" /
+  // 5xx / SyntaxError 在 en/ja/ko 下也是本地化文案。
   function translateMutationError(err: unknown): string | null {
     if (isApiRequestError(err)) {
       return translateAppErrorCode(err) ?? err.message;
     }
-    return err instanceof Error ? err.message : null;
+    return err instanceof Error ? describeRequestError(err) : null;
   }
   const errorMessage =
     localError ??

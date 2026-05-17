@@ -10,6 +10,7 @@ import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { translateAppErrorCode } from "../lib/error-translate";
 import { navigateBackOrFallback } from "../lib/history-back";
+import { describeRequestError } from "../lib/request-error";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -119,13 +120,18 @@ export function ProfileInfoNamePage() {
   // backend 抛 AppError 时优先用 translateAppErrorCode 命中 KnownAppErrorCode
   // 的 i18n（同一份 error-translate.ts 给非中文 locale 出本地化文案），
   // miss 时回退 raw error.message（多半是后端塞的 legacyMessage 中文兜底）。
+  // 走查 R1：非 ApiRequestError 分支之前直出 err.message，"Failed to fetch" /
+  // SyntaxError "Unexpected token <" 等浏览器原生错误 en/ja/ko 用户也只能看
+  // 裸英文。改走 describeRequestError 给网络错误 / 5xx / SyntaxError 一组 locale
+  // 兜底文案；ApiRequestError 一支保留原 server legacyMessage 中文兜底（注释里说
+  // 的"后端兜底"路径）。
   const errorMessage = (() => {
     if (!saveMutation.isError) return null;
     const err = saveMutation.error;
     if (isApiRequestError(err)) {
       return translateAppErrorCode(err) ?? err.message;
     }
-    return err instanceof Error ? err.message : null;
+    return err instanceof Error ? describeRequestError(err) : null;
   })();
 
   return (

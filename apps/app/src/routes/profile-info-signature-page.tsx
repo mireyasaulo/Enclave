@@ -10,6 +10,7 @@ import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { translateAppErrorCode } from "../lib/error-translate";
 import { navigateBackOrFallback } from "../lib/history-back";
+import { describeRequestError } from "../lib/request-error";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -104,13 +105,15 @@ export function ProfileInfoSignaturePage() {
 
   // 优先 translateAppErrorCode（命中 KnownAppErrorCode 出当前 locale 文案），
   // miss 才退到 raw error.message。详见 profile-info-name-page 同款注释。
+  // 走查 R1：非 ApiRequestError 分支走 describeRequestError，让 "Failed to fetch" /
+  // 5xx / SyntaxError 在 en/ja/ko 下也是本地化文案。
   const errorMessage = (() => {
     if (!saveMutation.isError) return null;
     const err = saveMutation.error;
     if (isApiRequestError(err)) {
       return translateAppErrorCode(err) ?? err.message;
     }
-    return err instanceof Error ? err.message : null;
+    return err instanceof Error ? describeRequestError(err) : null;
   })();
 
   return (
