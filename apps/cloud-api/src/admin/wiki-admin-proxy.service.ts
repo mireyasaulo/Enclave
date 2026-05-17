@@ -7,11 +7,11 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-// TODO: contracts 还没暴露这 3 个类型（见 api/src/modules/admin/wiki-users-admin.*），
-// 占位一下让 cloud-api 能 build；等 contracts 那边补好后改回 import type from "@yinjie/contracts"。
-type WikiUserListQuery = { q?: string; page?: number; pageSize?: number };
-type WikiUserListResponse = unknown;
-type WikiUserPrivateCharacterListResponse = unknown;
+import type {
+  WikiUserListQuery,
+  WikiUserListResponse,
+  WikiUserPrivateCharacterListResponse,
+} from "@yinjie/contracts";
 import { resolveWorldAdminSecret } from "./admin-bootstrap-resolver";
 
 // dev 默认指向 apps/wiki vite 配置里 /api 代理的同一个端口（3045）：

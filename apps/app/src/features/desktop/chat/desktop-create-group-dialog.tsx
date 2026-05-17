@@ -464,11 +464,30 @@ export function DesktopCreateGroupDialog({
     );
   };
 
+  // 走查新一轮 R3：「完成」按钮 + Cmd/Ctrl+Enter 快捷键都只靠
+  // disabled/createMutation.isPending 兜双触发，isPending 是 React state
+  // 要等 commit 才进 DOM。同帧连点 / 同帧两次快捷键都能同时通过
+  // !isPending → createMutation.mutate() 飞两次 → 后端建出 2 个名字/成员
+  // 完全一样但 id 不同的群，消息列表里多冒出一个孤立群。
+  // 用 sync ref 锁同帧；onSuccess/onError 都会让 isPending 翻 false，
+  // useEffect 跟着复位 ref。
+  const createSubmittingRef = useRef(false);
+  useEffect(() => {
+    if (!createMutation.isPending) {
+      createSubmittingRef.current = false;
+    }
+  }, [createMutation.isPending]);
+
   const handleCreate = () => {
-    if (!selectedIds.length || createMutation.isPending) {
+    if (
+      !selectedIds.length ||
+      createMutation.isPending ||
+      createSubmittingRef.current
+    ) {
       return;
     }
 
+    createSubmittingRef.current = true;
     createMutation.mutate();
   };
 

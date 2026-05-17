@@ -88,6 +88,9 @@ import type {
   UpsertCloudConfigRequest,
   UpsertRevenuePayeeRequest,
   UpsertSubscriptionPlanRequest,
+  WikiUserListQuery,
+  WikiUserListResponse,
+  WikiUserPrivateCharacterListResponse,
   WorldLifecycleJobSummary,
 } from "@yinjie/contracts";
 import {
@@ -1584,5 +1587,19 @@ export const cloudAdminApi = {
     adminFetch<CloudTokenPricingSyncResult>(
       "/token-usage/pricing/sync-n1n",
       { method: "POST" },
+    ),
+
+  listWikiUsers: (query?: WikiUserListQuery) =>
+    adminFetch<WikiUserListResponse>(
+      `/wiki/users${buildQueryString({
+        q: query?.q,
+        page: query?.page,
+        pageSize: query?.pageSize,
+      })}`,
+    ),
+
+  listWikiUserPrivateCharacters: (userId: string) =>
+    adminFetch<WikiUserPrivateCharacterListResponse>(
+      `/wiki/users/${encodeURIComponent(userId)}/private-characters`,
     ),
 };
