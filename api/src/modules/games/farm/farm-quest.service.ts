@@ -36,6 +36,19 @@ export class FarmQuestService {
 
   async getView(ownerId: string): Promise<FarmQuestsView> {
     const rows = await this.ensureAll(ownerId);
+    // syncLevelAchievements 只在 harvest 触发 level-up 时跑；如果玩家在 Phase4
+    // 上线时已经 >5 级，achievement_level_5 永远停在 0/5 — 等他下次升级才会同步。
+    // 在 getView 兜底拉一次，确保打开任务列表看到正确的进度。
+    const player = await this.stateService.getOrCreatePlayerState(ownerId);
+    if (player.level > 0) {
+      await this.syncLevelAchievements(ownerId, player.level);
+      for (const row of rows) {
+        if (row.questId === 'achievement_level_5' || row.questId === 'achievement_level_10') {
+          const def = getQuestDefinition(row.questId);
+          row.progress = Math.min(def.goal, Math.max(row.progress ?? 0, player.level));
+        }
+      }
+    }
     return {
       ownerId,
       generatedAt: new Date().toISOString(),
