@@ -5626,6 +5626,11 @@ function FeedPostCardMessage({
     if (attachment.mediaType === "video") return translateRuntimeMessage(msg`视频`);
     if (attachment.mediaType === "audio") return translateRuntimeMessage(msg`音频`);
     if (attachment.mediaType === "image") return translateRuntimeMessage(msg`图文`);
+    // 走查 R2（本轮）：text 类型走到这条默认分支只能拿"视频号"——但那是品牌名、
+    // 跟 video/audio/image 的"内容形态标签"风格不一致。yuanzui R3 测试 text 帖被
+    // 转发到聊天里时占位卡上写"视频号"，对方看不出这是文字动态。给 text 一条
+    // 明确的"文字动态"标签，对齐其它形态。
+    if (attachment.mediaType === "text") return translateRuntimeMessage(msg`文字动态`);
     return translateRuntimeMessage(msg`视频号`);
   })();
   const card = (
