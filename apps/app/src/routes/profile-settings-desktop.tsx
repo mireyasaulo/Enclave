@@ -9,11 +9,7 @@ import {
   setWorldOwnerApiKey,
   updateWorldOwner,
 } from "@yinjie/contracts";
-import {
-  LanguageSwitcher,
-  useAppLocale,
-  useRuntimeTranslator,
-} from "@yinjie/i18n";
+import { LanguageSwitcher, useRuntimeTranslator } from "@yinjie/i18n";
 import {
   Button,
   ErrorBlock,
@@ -134,7 +130,6 @@ export function ProfileSettingsDesktop() {
   const setSendMessageShortcut = useChatPreferencesStore(
     (state) => state.setSendMessageShortcut,
   );
-  useAppLocale();
 
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
   const [activeLegalTab, setActiveLegalTab] = useState<LegalTab>("privacy");
