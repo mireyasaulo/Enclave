@@ -276,13 +276,26 @@ export function useSearchIndex(
       ) as SearchMessageRow[];
     },
   });
+  // 走查 R1：跟 messageSearchIndexQuery 同款。当 activeCategory 是「联系人」/
+  // 「朋友圈」/「广场动态」/「收藏」/「小程序」时，公众号文章命中根本不会进入
+  // visibleResults，但这条 query 还是会对 N 个 official_accounts fan-out N 个
+  // /:id/articles GET——用户从「通讯录」按搜索进来、马上点「联系人」chip 时尤其
+  // 浪费（这是最常见路径）。跟 messageSearchIndexQuery 一样按 activeCategory 收
+  // 窄；切回「全部」/「公众号」时再 enable，placeholderData 不在这条上是因为
+  // articles 不带 keyword 参数（拉一次随后客户端按 keyword 过滤），keyword 抖
+  // 不影响 queryKey、缓存自然续命。
+  const officialAccountArticlesEnabledForCategory =
+    activeCategory === "all" || activeCategory === "officialAccounts";
   const officialAccountArticlesQuery = useQuery({
     queryKey: [
       "app-search-official-account-articles",
       baseUrl,
       officialAccountsSearchKey,
     ],
-    enabled: Boolean(normalizedSearchText) && officialAccounts.length > 0,
+    enabled:
+      Boolean(normalizedSearchText) &&
+      officialAccounts.length > 0 &&
+      officialAccountArticlesEnabledForCategory,
     staleTime: 60_000,
     // 同 messageSearchIndexQuery：keyword 一变 queryKey 变，没 placeholderData
     // 的话上一批文章命中瞬时消失。
@@ -642,7 +655,15 @@ export function useSearchIndex(
   ]);
 
   const messageGroups = useMemo<SearchMessageGroup[]>(() => {
-    if (!normalizedSearchText) {
+    // 走查 R1：messageGroups 全代码库只有 desktop-search-workspace 一个消费者，
+    // mobile-search-workspace 走 groupedResults / visibleResults 自己分类。但
+    // 这条 useMemo 之前不分平台地跑：过滤两次 indexedResults（按 messages
+    // 子前缀），再 filterSearchResults+sort，再建 Map 分组，再排序。indexedResults
+    // 在大账户上能到 conversations(123) + globalMessageResults(8/会话 × 多会话)
+    // + characters(154) + officialAccount + moments(21) + feed(200) 量级，
+    // 每次按键都全跑一次浪费。isDesktopLayout=false 时直接返回空数组，省一整段
+    // 排序工作；desktop 行为不变。
+    if (!isDesktopLayout || !normalizedSearchText) {
       return [] as SearchMessageGroup[];
     }
 
@@ -720,10 +741,13 @@ export function useSearchIndex(
           normalizedSearchText,
         );
       });
-  }, [indexedResults, normalizedSearchText]);
+  }, [indexedResults, isDesktopLayout, normalizedSearchText]);
 
   const officialAccountGroups = useMemo<SearchOfficialAccountGroup[]>(() => {
-    if (!normalizedSearchText) {
+    // 走查 R1：同 messageGroups——只 desktop-search-workspace 消费这个。mobile
+    // 不去算分组结构，省两次 indexedResults 过滤 + filterSearchResults + map
+    // 排序。
+    if (!isDesktopLayout || !normalizedSearchText) {
       return [] as SearchOfficialAccountGroup[];
     }
 
@@ -797,7 +821,7 @@ export function useSearchIndex(
           normalizedSearchText,
         );
       });
-  }, [indexedResults, normalizedSearchText]);
+  }, [indexedResults, isDesktopLayout, normalizedSearchText]);
 
   const allMatchedResults = useMemo(
     () => filterSearchResults(indexedResults, normalizedSearchText, "all"),
