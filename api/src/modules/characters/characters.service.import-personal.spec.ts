@@ -78,6 +78,17 @@ describe('CharactersService.importPersonalCharacter', () => {
     ).rejects.toThrow(/受保护/);
   });
 
+  it('rejects names containing control characters (\\n, \\t, \\r)', async () => {
+    // 走查 R1：原来 name 没卡控制字符，"line1\nline2" 被允许写入，落库后
+    // 通讯录单行 title 渲染会撑高列表项，AI prompt 也会被多行指令注入。
+    const { svc } = makeService({ existing: null });
+    for (const bad of ['line1\nline2', 'tab\there', 'cr\rdone', '\x01start']) {
+      await expect(svc.importPersonalCharacter({ name: bad })).rejects.toThrow(
+        /换行符或控制字符/,
+      );
+    }
+  });
+
   it('overwrites when existing is private_import', async () => {
     const { svc, repo } = makeService({
       existing: {

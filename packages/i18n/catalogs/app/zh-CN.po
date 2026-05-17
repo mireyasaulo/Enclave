@@ -23,18 +23,18 @@ msgid "音乐"
 msgstr "音乐"
 
 #: apps/app/src/components/audio-card.tsx:172
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:107
-#: apps/app/src/routes/channels-page.tsx:2431
-#: apps/app/src/routes/channels-page.tsx:2659
-msgid "暂停"
-msgstr "暂停"
-
-#: apps/app/src/components/audio-card.tsx:172
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:2431
 #: apps/app/src/routes/channels-page.tsx:2659
 msgid "播放"
 msgstr "播放"
+
+#: apps/app/src/components/audio-card.tsx:172
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:107
+#: apps/app/src/routes/channels-page.tsx:2431
+#: apps/app/src/routes/channels-page.tsx:2659
+msgid "暂停"
+msgstr "暂停"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:216
@@ -413,7 +413,7 @@ msgstr "表情"
 #: apps/app/src/components/chat-message-list.tsx:3018
 #: apps/app/src/components/chat-message-list.tsx:3626
 #: apps/app/src/components/chat-message-list.tsx:3897
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:176
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:177
 #: apps/app/src/components/official-article-card.tsx:123
 #: apps/app/src/components/official-article-viewer.tsx:263
 #: apps/app/src/components/official-article-viewer.tsx:321
@@ -469,7 +469,7 @@ msgstr "图片"
 #: apps/app/src/components/chat-composer.tsx:3336
 #: apps/app/src/components/chat-message-list.tsx:4601
 #: apps/app/src/components/chat-message-list.tsx:5753
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:170
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:171
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:105
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:133
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:134
@@ -533,7 +533,7 @@ msgstr "发送"
 
 #: apps/app/src/components/chat-composer.tsx:3431
 #: apps/app/src/components/chat-composer.tsx:3520
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:847
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:857
 msgid "切换到键盘输入"
 msgstr "切换到键盘输入"
 
@@ -570,7 +570,7 @@ msgid "按住说话"
 msgstr "按住说话"
 
 #: apps/app/src/components/chat-composer.tsx:3551
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:348
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:358
 #: apps/app/src/features/shell/desktop-shell.tsx:633
 msgid "更多功能"
 msgstr "更多功能"
@@ -580,7 +580,7 @@ msgid "关闭发送收藏"
 msgstr "关闭发送收藏"
 
 #: apps/app/src/components/chat-composer.tsx:3712
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:654
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:664
 msgid "发送收藏"
 msgstr "发送收藏"
 
@@ -1886,7 +1886,7 @@ msgid "语音"
 msgstr "语音"
 
 #: apps/app/src/components/chat-message-list.tsx:4609
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:146
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:147
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:108
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1039
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1102
@@ -1898,7 +1898,7 @@ msgstr "名片"
 
 #: apps/app/src/components/chat-message-list.tsx:4613
 #: apps/app/src/components/chat-message-list.tsx:5798
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:152
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:153
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:109
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1043
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1106
@@ -2054,7 +2054,7 @@ msgstr "继续聊"
 
 #: apps/app/src/components/chat-message-list.tsx:5434
 #: apps/app/src/components/chat-message-list.tsx:7406
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:634
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:644
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:663
 #: apps/app/src/routes/character-detail-page.tsx:337
 #: apps/app/src/routes/chat-details-page.tsx:316
@@ -2294,7 +2294,7 @@ msgid "人"
 msgstr "人"
 
 #: apps/app/src/components/chat-message-list.tsx:6563
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:114
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:115
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:530
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1381
@@ -2308,7 +2308,7 @@ msgid "视频通话"
 msgstr "视频通话"
 
 #: apps/app/src/components/chat-message-list.tsx:6563
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:158
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:159
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:524
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1367
@@ -2406,7 +2406,7 @@ msgid "未命名笔记"
 msgstr "未命名笔记"
 
 #: apps/app/src/components/chat-message-list.tsx:7153
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:836
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:846
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:141
 #: apps/app/src/components/mobile-document-shell.tsx:131
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
@@ -2715,100 +2715,100 @@ msgstr "发送图片"
 msgid "发送文件"
 msgstr "发送文件"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:102
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:103
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:291
 msgid "相册"
 msgstr "相册"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:108
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:109
 msgid "拍摄"
 msgstr "拍摄"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:118
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:130
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:140
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:162
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:119
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:131
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:141
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:163
 msgid "待接入"
 msgstr "待接入"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:119
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:120
 msgid "视频通话暂未接入"
 msgstr "视频通话暂未接入"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:120
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:121
 msgid "视频通话功能开发中，敬请期待。"
 msgstr "视频通话功能开发中，敬请期待。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:121
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:122
 msgid "改为拍摄"
 msgstr "改为拍摄"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:126
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:127
 msgid "红包"
 msgstr "红包"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:131
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:132
 msgid "红包暂未接入"
 msgstr "红包暂未接入"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:132
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:133
 msgid "支付与到账链路还没接入，这里先保留和微信一致的能力入口。"
 msgstr "支付与到账链路还没接入，这里先保留和微信一致的能力入口。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:136
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:137
 msgid "转账"
 msgstr "转账"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:141
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:142
 msgid "转账暂未接入"
 msgstr "转账暂未接入"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:142
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:143
 msgid "后续会补金额确认、到账反馈和会话内转账记录，这一版先保留入口。"
 msgstr "后续会补金额确认、到账反馈和会话内转账记录，这一版先保留入口。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:163
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:164
 msgid "语音通话暂未接入"
 msgstr "语音通话暂未接入"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:164
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:165
 msgid "当前可以先用按住说话发送语音消息，实时语音通话会在后续单独接入。"
 msgstr "当前可以先用按住说话发送语音消息，实时语音通话会在后续单独接入。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:165
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:166
 msgid "改发语音消息"
 msgstr "改发语音消息"
 
 #. placeholder {0}: t(item.label)
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:405
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:415
 msgid "{0} 暂未接入。"
 msgstr "{0} 暂未接入。"
 
 #. placeholder {0}: pageIndex + 1
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:506
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:516
 msgid "切换到第 {0} 页"
 msgstr "切换到第 {0} 页"
 
 #. placeholder {0}: t(unavailableAction.label)
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:527
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:537
 msgid "{0} 暂未接入"
 msgstr "{0} 暂未接入"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:532
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:542
 msgid "功能开发中，敬请期待。"
 msgstr "功能开发中，敬请期待。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:557
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:567
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:98
 #: apps/app/src/routes/discover-feed-page.tsx:2222
 msgid "知道了"
 msgstr "知道了"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:569
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:579
 msgid "选择名片"
 msgstr "选择名片"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:576
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:586
 #: apps/app/src/features/contacts/management/management-permissions-detail-screen.tsx:137
 #: apps/app/src/features/contacts/management/management-permissions-screen.tsx:112
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:817
@@ -2818,46 +2818,46 @@ msgstr "选择名片"
 msgid "正在读取联系人..."
 msgstr "正在读取联系人..."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:581
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:591
 msgid "联系人读取失败"
 msgstr "联系人读取失败"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:582
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:592
 msgid "暂时没能读取联系人名片，请检查网络后重试。"
 msgstr "暂时没能读取联系人名片，请检查网络后重试。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:583
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:668
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:593
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:678
 msgid "重新读取"
 msgstr "重新读取"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:587
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:672
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:597
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:682
 msgid "返回更多功能"
 msgstr "返回更多功能"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:644
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:654
 msgid "还没有可以分享的联系人名片。"
 msgstr "还没有可以分享的联系人名片。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:661
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:671
 #: apps/app/src/routes/favorites-page.tsx:850
 msgid "正在读取收藏..."
 msgstr "正在读取收藏..."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:666
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:676
 msgid "收藏读取失败"
 msgstr "收藏读取失败"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:667
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:677
 msgid "暂时没能读取收藏内容，请检查网络后重试。"
 msgstr "暂时没能读取收藏内容，请检查网络后重试。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:732
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:742
 msgid "还没有可发送的收藏内容，先在聊天或内容页里把消息加入收藏。"
 msgstr "还没有可发送的收藏内容，先在聊天或内容页里把消息加入收藏。"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:742
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:752
 msgid "选择位置"
 msgstr "选择位置"
 
@@ -8211,17 +8211,17 @@ msgid "批量管理"
 msgstr "批量管理"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
-#: apps/app/src/routes/channels-page.tsx:1680
-#: apps/app/src/routes/channels-page.tsx:1832
-msgid "生成中..."
-msgstr "生成中..."
-
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
 #: apps/app/src/i18n/static-dom-seed.ts:49
 #: apps/app/src/routes/channels-page.tsx:1680
 #: apps/app/src/routes/channels-page.tsx:1833
 msgid "换一批"
 msgstr "换一批"
+
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
+#: apps/app/src/routes/channels-page.tsx:1680
+#: apps/app/src/routes/channels-page.tsx:1832
+msgid "生成中..."
+msgstr "生成中..."
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:405
 #: apps/app/src/features/shell/desktop-nav-config.ts:89
@@ -13217,16 +13217,16 @@ msgid "买了种子"
 msgstr "买了种子"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:277
+msgid "卖了"
+msgstr "卖了"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:265
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:267
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:277
 msgid "作物"
 msgstr "作物"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:277
-msgid "卖了"
-msgstr "卖了"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -14652,17 +14652,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "守住基地，消灭 20 辆敌方坦克。"
 
 #: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:269
-msgid "双人"
-msgstr "双人"
-
-#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "像素"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "动作"
+
+#: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:269
+msgid "双人"
+msgstr "双人"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"

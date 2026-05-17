@@ -513,6 +513,14 @@ export class CharactersService implements OnModuleInit {
         legacyMessage: 'name 不能是仅零宽字符的空白文本。',
       });
     }
+    // 走查 R1：含 \n / \r / \t 等控制字符的 name 会破坏通讯录单行渲染、并把
+    // 多行指令塞进 AI prompt。trim 之前判断（trim 只剥首尾空白，不剥中间）。
+    if (containsControlChar(input.name ?? '')) {
+      throw new AppError('PRIVATE_IMPORT_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'name 不能包含换行符或控制字符。',
+      });
+    }
     // 防御性长度校验：DB 是 text 列没硬限，但用户填的 bio/persona 直接拼到
     // AI prompt 里，过长会撑爆 context cost；同时 60+KB 的 recipe/profile JSON
     // 几乎一定是误传。在这里挡一道，比上线后被 prompt cost 烧出 P0 强。
@@ -1001,6 +1009,15 @@ function isPrivateImportNameVisuallyEmpty(raw: string): boolean {
   const trimmed = raw.trim();
   if (!trimmed) return true;
   return trimmed.replace(/[​-‍﻿⁠]/g, '').length === 0;
+}
+
+// 走查 R1：原来 name 没卡控制字符，"line1\nline2" 被允许写入；落库后通讯录
+// /聊天列表/朋友圈的单行 title 渲染会把换行展开成换行符或撑高列表项，且
+// 用 ${name} 拼 AI prompt 也会被 LLM 当成多行指令。统一在 import 前 reject
+// (含 \n \r \t \v \f 和 0x00-0x1F / 0x7F 控制字符)。
+const NAME_CONTROL_CHAR_RE = /[\x00-\x1F\x7F]/;
+function containsControlChar(raw: string): boolean {
+  return NAME_CONTROL_CHAR_RE.test(raw);
 }
 
 // 字段长度上限。后端 entity 是 text/json 列没硬限，但用户填的内容直接进

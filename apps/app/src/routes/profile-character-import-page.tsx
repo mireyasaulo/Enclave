@@ -121,6 +121,17 @@ export function ProfileCharacterImportPage() {
       });
       return;
     }
+    // 走查 R1：name 带换行符 / 控制字符会撑爆通讯录单行渲染，也会把多行指令
+    // 注入 AI prompt。后端已经会拒，前端先拒避免一次无谓的网络往返。
+    if (/[\x00-\x1F\x7F]/.test(p.name)) {
+      setResult({
+        kind: "danger",
+        message: t(
+          msg`name 不能包含换行符或控制字符，请编辑文件后再试。`,
+        ),
+      });
+      return;
+    }
     setPreview({
       fileName: file.name,
       fileSize: file.size,
@@ -307,9 +318,7 @@ export function ProfileCharacterImportPage() {
             // 末尾的 friendship upsert）。"世界角色"目录的过滤是
             // !friendIds.has(character.id)，导入后的角色已经是好友，
             // 在那里反而看不到 —— 跳通讯录才是用户真正能找到它的地方。
-            onGoCharacters={() =>
-              void navigate({ to: "/tabs/contacts" as never })
-            }
+            onGoCharacters={() => void navigate({ to: "/tabs/contacts" })}
           />
         )}
         {result?.kind === "danger" && (
@@ -349,6 +358,10 @@ function FilePreviewCard({
     : [];
   const schema = typeof p.$schema === "string" ? p.$schema : null;
   const hasExpectedSchema = schema === "yinjie-private-character/v1";
+  // 后端 characters.controller#parsePrivateCharacterImportBody 对"$schema 非空
+  // 且不匹配"直接抛 400 — 早期 UI 只 warn"仍可尝试导入"导致用户点完撞 400。
+  // 这里区分：missing 仍允许（后端也允许），mismatch 直接 disable 导入按钮。
+  const schemaMismatch = schema !== null && !hasExpectedSchema;
   return (
     <div className="space-y-3 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] p-4">
       <div className="flex items-center gap-2 text-[12px] text-[color:var(--text-muted)]">
@@ -385,14 +398,26 @@ function FilePreviewCard({
               {d}
             </span>
           ))}
+          {expertDomains.length > 6 && (
+            <span className="rounded-full bg-[color:var(--surface-soft)] px-2 py-0.5 text-[10px] text-[color:var(--text-muted)]">
+              {t(msg`+${expertDomains.length - 6}`)}
+            </span>
+          )}
         </div>
       )}
 
       {!hasExpectedSchema && (
-        <div className="rounded-lg bg-[rgba(245,158,11,0.10)] px-3 py-2 text-[11px] leading-relaxed text-[#92400e]">
-          {schema
+        <div
+          className={cn(
+            "rounded-lg px-3 py-2 text-[11px] leading-relaxed",
+            schemaMismatch
+              ? "bg-[rgba(220,38,38,0.08)] text-[#b42318]"
+              : "bg-[rgba(245,158,11,0.10)] text-[#92400e]",
+          )}
+        >
+          {schemaMismatch
             ? t(
-                msg`文件 $schema 是 "${schema}"，期望 "yinjie-private-character/v1"。仍可尝试导入，但可能字段不完整。`,
+                msg`文件 $schema 是 "${schema}"，与期望的 "yinjie-private-character/v1" 不一致。请使用「世界角色管理平台」重新导出文件。`,
               )
             : t(
                 msg`文件缺少 $schema 标识；仍可尝试导入，但建议检查内容是否齐全。`,
@@ -405,7 +430,7 @@ function FilePreviewCard({
           type="button"
           variant="primary"
           onClick={onConfirm}
-          disabled={submitting}
+          disabled={submitting || schemaMismatch}
         >
           {submitting ? t(msg`导入中…`) : t(msg`✅ 导入到我的世界`)}
         </Button>

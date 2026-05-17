@@ -23,18 +23,18 @@ msgid "音乐"
 msgstr "음악"
 
 #: apps/app/src/components/audio-card.tsx:172
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:107
-#: apps/app/src/routes/channels-page.tsx:2431
-#: apps/app/src/routes/channels-page.tsx:2659
-msgid "暂停"
-msgstr "일시정지"
-
-#: apps/app/src/components/audio-card.tsx:172
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:2431
 #: apps/app/src/routes/channels-page.tsx:2659
 msgid "播放"
 msgstr "재생"
+
+#: apps/app/src/components/audio-card.tsx:172
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:107
+#: apps/app/src/routes/channels-page.tsx:2431
+#: apps/app/src/routes/channels-page.tsx:2659
+msgid "暂停"
+msgstr "일시정지"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:216
@@ -413,7 +413,7 @@ msgstr "스티커"
 #: apps/app/src/components/chat-message-list.tsx:3018
 #: apps/app/src/components/chat-message-list.tsx:3626
 #: apps/app/src/components/chat-message-list.tsx:3897
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:176
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:177
 #: apps/app/src/components/official-article-card.tsx:123
 #: apps/app/src/components/official-article-viewer.tsx:263
 #: apps/app/src/components/official-article-viewer.tsx:321
@@ -469,7 +469,7 @@ msgstr "이미지"
 #: apps/app/src/components/chat-composer.tsx:3336
 #: apps/app/src/components/chat-message-list.tsx:4601
 #: apps/app/src/components/chat-message-list.tsx:5753
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:170
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:171
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:105
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:133
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:134
@@ -533,7 +533,7 @@ msgstr "보내기"
 
 #: apps/app/src/components/chat-composer.tsx:3431
 #: apps/app/src/components/chat-composer.tsx:3520
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:847
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:857
 msgid "切换到键盘输入"
 msgstr "키보드 입력으로 전환"
 
@@ -570,7 +570,7 @@ msgid "按住说话"
 msgstr "길게 눌러 말하기"
 
 #: apps/app/src/components/chat-composer.tsx:3551
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:348
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:358
 #: apps/app/src/features/shell/desktop-shell.tsx:633
 msgid "更多功能"
 msgstr "더 많은 기능"
@@ -580,7 +580,7 @@ msgid "关闭发送收藏"
 msgstr "즐겨찾기 보내기 닫기"
 
 #: apps/app/src/components/chat-composer.tsx:3712
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:654
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:664
 msgid "发送收藏"
 msgstr "즐겨찾기 보내기"
 
@@ -1886,7 +1886,7 @@ msgid "语音"
 msgstr "음성"
 
 #: apps/app/src/components/chat-message-list.tsx:4609
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:146
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:147
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:108
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1039
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1102
@@ -1898,7 +1898,7 @@ msgstr "연락처 카드"
 
 #: apps/app/src/components/chat-message-list.tsx:4613
 #: apps/app/src/components/chat-message-list.tsx:5798
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:152
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:153
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:109
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1043
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1106
@@ -2054,7 +2054,7 @@ msgstr "계속 대화"
 
 #: apps/app/src/components/chat-message-list.tsx:5434
 #: apps/app/src/components/chat-message-list.tsx:7406
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:634
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:644
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:663
 #: apps/app/src/routes/character-detail-page.tsx:337
 #: apps/app/src/routes/chat-details-page.tsx:316
@@ -2294,7 +2294,7 @@ msgid "人"
 msgstr "명"
 
 #: apps/app/src/components/chat-message-list.tsx:6563
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:114
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:115
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:530
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1381
@@ -2308,7 +2308,7 @@ msgid "视频通话"
 msgstr "영상 통화"
 
 #: apps/app/src/components/chat-message-list.tsx:6563
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:158
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:159
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:524
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1367
@@ -2406,7 +2406,7 @@ msgid "未命名笔记"
 msgstr "제목 없는 메모"
 
 #: apps/app/src/components/chat-message-list.tsx:7153
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:836
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:846
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:141
 #: apps/app/src/components/mobile-document-shell.tsx:131
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
@@ -2715,100 +2715,100 @@ msgstr "이미지 보내기"
 msgid "发送文件"
 msgstr "파일 보내기"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:102
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:103
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:291
 msgid "相册"
 msgstr "앨범"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:108
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:109
 msgid "拍摄"
 msgstr "촬영"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:118
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:130
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:140
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:162
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:119
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:131
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:141
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:163
 msgid "待接入"
 msgstr "연결 대기"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:119
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:120
 msgid "视频通话暂未接入"
 msgstr "영상 통화 아직 연결되지 않음"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:120
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:121
 msgid "视频通话功能开发中，敬请期待。"
 msgstr "영상 통화 기능 개발 중입니다. 기대해 주세요."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:121
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:122
 msgid "改为拍摄"
 msgstr "촬영으로 변경"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:126
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:127
 msgid "红包"
 msgstr "홍바오"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:131
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:132
 msgid "红包暂未接入"
 msgstr "홍바오 아직 연결되지 않음"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:132
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:133
 msgid "支付与到账链路还没接入，这里先保留和微信一致的能力入口。"
 msgstr "결제 및 입금 경로는 아직 연결되지 않았습니다. 여기서는 먼저 위챗과 동일한 기능 진입점만 유지합니다."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:136
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:137
 msgid "转账"
 msgstr "송금"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:141
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:142
 msgid "转账暂未接入"
 msgstr "송금 아직 연결되지 않음"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:142
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:143
 msgid "后续会补金额确认、到账反馈和会话内转账记录，这一版先保留入口。"
 msgstr "이후에 금액 확인, 입금 피드백, 대화 내 송금 기록을 보완할 예정입니다. 이번 버전에서는 진입점만 유지합니다."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:163
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:164
 msgid "语音通话暂未接入"
 msgstr "음성 통화 아직 연결되지 않음"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:164
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:165
 msgid "当前可以先用按住说话发送语音消息，实时语音通话会在后续单独接入。"
 msgstr "현재는 누르고 말하기로 음성 메시지를 보낼 수 있으며, 실시간 음성 통화는 추후 별도로 연동됩니다."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:165
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:166
 msgid "改发语音消息"
 msgstr "음성 메시지로 변경"
 
 #. placeholder {0}: t(item.label)
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:405
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:415
 msgid "{0} 暂未接入。"
 msgstr "{0} 아직 연결되지 않았습니다."
 
 #. placeholder {0}: pageIndex + 1
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:506
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:516
 msgid "切换到第 {0} 页"
 msgstr "{0}페이지로 전환"
 
 #. placeholder {0}: t(unavailableAction.label)
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:527
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:537
 msgid "{0} 暂未接入"
 msgstr "{0} 아직 연결되지 않음"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:532
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:542
 msgid "功能开发中，敬请期待。"
 msgstr "기능 개발 중입니다. 기대해 주세요."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:557
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:567
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:98
 #: apps/app/src/routes/discover-feed-page.tsx:2222
 msgid "知道了"
 msgstr "확인"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:569
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:579
 msgid "选择名片"
 msgstr "명함 선택"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:576
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:586
 #: apps/app/src/features/contacts/management/management-permissions-detail-screen.tsx:137
 #: apps/app/src/features/contacts/management/management-permissions-screen.tsx:112
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:817
@@ -2818,46 +2818,46 @@ msgstr "명함 선택"
 msgid "正在读取联系人..."
 msgstr "연락처 불러오는 중..."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:581
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:591
 msgid "联系人读取失败"
 msgstr "연락처 읽기 실패"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:582
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:592
 msgid "暂时没能读取联系人名片，请检查网络后重试。"
 msgstr "연락처 명함을 일시적으로 불러올 수 없습니다. 네트워크를 확인한 뒤 다시 시도하세요."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:583
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:668
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:593
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:678
 msgid "重新读取"
 msgstr "다시 읽기"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:587
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:672
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:597
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:682
 msgid "返回更多功能"
 msgstr "더 많은 기능으로 돌아가기"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:644
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:654
 msgid "还没有可以分享的联系人名片。"
 msgstr "아직 공유할 수 있는 연락처 명함이 없습니다."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:661
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:671
 #: apps/app/src/routes/favorites-page.tsx:850
 msgid "正在读取收藏..."
 msgstr "즐겨찾기 읽는 중..."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:666
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:676
 msgid "收藏读取失败"
 msgstr "즐겨찾기 읽기 실패"
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:667
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:677
 msgid "暂时没能读取收藏内容，请检查网络后重试。"
 msgstr "즐겨찾기 콘텐츠를 일시적으로 불러올 수 없습니다. 네트워크를 확인한 뒤 다시 시도하세요."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:732
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:742
 msgid "还没有可发送的收藏内容，先在聊天或内容页里把消息加入收藏。"
 msgstr "아직 보낼 수 있는 즐겨찾기 콘텐츠가 없습니다. 먼저 채팅이나 콘텐츠 페이지에서 메시지를 즐겨찾기에 추가하세요."
 
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:742
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:752
 msgid "选择位置"
 msgstr "위치 선택"
 
@@ -8211,17 +8211,17 @@ msgid "批量管理"
 msgstr "일괄 관리"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
-#: apps/app/src/routes/channels-page.tsx:1680
-#: apps/app/src/routes/channels-page.tsx:1832
-msgid "生成中..."
-msgstr "생성 중..."
-
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
 #: apps/app/src/i18n/static-dom-seed.ts:49
 #: apps/app/src/routes/channels-page.tsx:1680
 #: apps/app/src/routes/channels-page.tsx:1833
 msgid "换一批"
 msgstr "새로 보기"
+
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:395
+#: apps/app/src/routes/channels-page.tsx:1680
+#: apps/app/src/routes/channels-page.tsx:1832
+msgid "生成中..."
+msgstr "생성 중..."
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:405
 #: apps/app/src/features/shell/desktop-nav-config.ts:89
@@ -13217,16 +13217,16 @@ msgid "买了种子"
 msgstr "씨앗 구매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:277
+msgid "卖了"
+msgstr "판매 완료"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:265
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:267
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:277
 msgid "作物"
 msgstr "작물"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:277
-msgid "卖了"
-msgstr "판매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -14652,17 +14652,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "본진을 지키고 적 탱크 20대를 격파하라."
 
 #: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:269
-msgid "双人"
-msgstr "2P"
-
-#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "픽셀"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "액션"
+
+#: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:269
+msgid "双人"
+msgstr "2P"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -28231,7 +28231,7 @@ msgstr ""
 
 #: apps/app/src/routes/profile-character-import-page.tsx:420
 msgid "文件 $schema 是 \"{schema}\"，与期望的 \"yinjie-private-character/v1\" 不一致。请使用「世界角色管理平台」重新导出文件。"
-msgstr ""
+msgstr "파일의 $schema 가 \"{schema}\" 인데 기대값은 \"yinjie-private-character/v1\" 입니다. 「세계 캐릭터 관리 플랫폼」에서 다시 내보내 주세요."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:423
 msgid "文件缺少 $schema 标识；仍可尝试导入，但建议检查内容是否齐全。"
@@ -28370,7 +28370,7 @@ msgstr ""
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:623
 msgid "图片链接需要带路径（如 /avatar.png），裸域名不是图片地址。"
-msgstr ""
+msgstr "이미지 URL에는 경로가 필요합니다(예: /avatar.png). 호스트 이름만으로는 이미지 주소가 아닙니다."
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:648
 msgid "从相册选择"
