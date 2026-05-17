@@ -2319,13 +2319,23 @@ export function DiscoverFeedPage() {
                     ) : null}
                   </div>
                 }
-                summary={
-                  post.likeCount > 0 || post.commentCount > 0
-                    ? `${t(msg`${post.likeCount} 赞`)} · ${t(
-                        msg`${post.commentCount} 评论`,
-                      )}`
-                    : summaryText || undefined
-                }
+                summary={(() => {
+                  // 走查 R2：旧逻辑 likeCount/commentCount 任一 > 0 就 unconditional
+                  // 渲染两段 → 点赞 0 评论 3 渲成 "0 赞 · 3 评论"，反过来同样尴尬。
+                  // 跟微信原生朋友圈对齐：只渲非零的那段，两者都 0 时让位给 media
+                  // summaryText（"分享了 N 张图片" 之类），全空就完全不渲 summary。
+                  const parts: string[] = [];
+                  if (post.likeCount > 0) {
+                    parts.push(t(msg`${post.likeCount} 赞`));
+                  }
+                  if (post.commentCount > 0) {
+                    parts.push(t(msg`${post.commentCount} 评论`));
+                  }
+                  if (parts.length > 0) {
+                    return parts.join(" · ");
+                  }
+                  return summaryText || undefined;
+                })()}
                 actions={
                   post.canInteract ? (
                     <div className="flex w-full justify-end">
