@@ -154,6 +154,16 @@ export function AccountSecurityPanel() {
       });
       return;
     }
+    // code onChange 已经 strip 非数字 + slice 6，所以走到这里只可能是「输了 < 6
+    // 位就提交」。不在客户端拦的话，cloud-api 会返回通用 "验证码错误。"，用户
+    // 容易误以为是验证码本身写错（typo / 用了旧码），而不是少打了一位。
+    if (code.length < 6) {
+      setFeedback({
+        tone: "danger",
+        message: t(msg`请输入完整的 6 位验证码。`),
+      });
+      return;
+    }
     if (newPassword.length < 8 || newPassword.length > 32) {
       setFeedback({
         tone: "danger",
