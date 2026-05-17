@@ -2661,7 +2661,7 @@ function ChannelVideoSurface({
           useEffect 的 .play() 触发，poster 始终可见保持视觉。 */}
       <video
         ref={videoRef}
-        key={videoUrl}
+        key={`video:${videoUrl ?? ""}`}
         src={active && videoUrl ? resolveAppMediaUrl(videoUrl) : undefined}
         poster={posterUrl ? resolveAppMediaUrl(posterUrl) : undefined}
         playsInline
@@ -2680,14 +2680,21 @@ function ChannelVideoSurface({
         </div>
       ) : null}
 
-      {/* 走查 新一轮 R4：<video> 用 key={videoUrl} 在 videoUrl 切换时强制
+      {/* 走查 新一轮 R4：<video> 用 key 在 videoUrl 切换时强制
           remount，但 MediaProgressBar 内部的 useEffect deps 是 [mediaRef]——
           mediaRef 是稳定的 ref 对象、identity 不变，effect 不再 fire 给新
           的 video element 绑 timeupdate / loadedmetadata / durationchange 监听。
           老监听挂在已销毁的 element 上，新 element 没有监听，进度条卡死在 0%。
           同步把 key 传给 MediaProgressBar 让它跟随 videoUrl 一起 remount，
-          effect 重跑、监听挂到新 element。 */}
-      <MediaProgressBar key={videoUrl ?? ""} mediaRef={videoRef} active={active} />
+          effect 重跑、监听挂到新 element。
+          走查 2026-05-17 R2：原来 <video> 和 MediaProgressBar 这两个兄弟节点
+          都用 key={videoUrl} —— 同 parent children list 里 key 撞车，React 抛
+          "Encountered two children with the same key" warning（实测 R2 走查
+          扫到 12 条），后果是 React 会随机舍弃一个组件实例（reconcile 时只
+          认第一个匹配 key），video 或 ProgressBar 可能错位复用老实例 → poster
+          / 进度条挂在错误 videoUrl 的元素上。给两边的 key 加 `video:` /
+          `progress:` 前缀消歧义。 */}
+      <MediaProgressBar key={`progress:${videoUrl ?? ""}`} mediaRef={videoRef} active={active} />
     </div>
   );
 }
