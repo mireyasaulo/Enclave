@@ -151,7 +151,13 @@ function MobileAddFriend() {
   //    "切世界了" 之类提示，看着像点击没生效。
   // 3) 旧的 notice（来自上个世界的 "好友申请已发送。"）2.4s 内还会在新世界顶端
   //    继续吊着，跟新世界毫无关系。
-  // 上述三条本质都是"旧世界 UI 状态泄漏到新世界"，统一在 baseUrl 翻面那一刻清掉。
+  // 4) 走查 R3 补：旧世界踩过的 sendRequest/openChat 4xx 错误，mutation.isError
+  //    依然是 true，page-level ErrorBlock（line ~544）会把旧世界的错误一路挂在新
+  //    世界顶端（SOCIAL_FRIEND_TARGET_NOT_FOUND 之类，文案完全跟新世界对不上）。
+  //    mutation.reset() 在 baseUrl 翻面时一并把这两条 mutation 的 isError/error 清掉。
+  //    实际 reset 调用放在两条 mutation 声明之后的下一条 useEffect，这里只先做 UI
+  //    state 的同步清理；如果在这里直接引用 mutation.reset 会读到 use-before-init。
+  // 上述四条本质都是"旧世界 UI 状态泄漏到新世界"，统一在 baseUrl 翻面那一刻清掉。
   useEffect(() => {
     if (previousBaseUrlRef.current === baseUrl) {
       return;
@@ -275,6 +281,25 @@ function MobileAddFriend() {
     sendRequestMutation.isPending,
     sendDialogCharacterId,
   ]);
+
+  // 走查 R3：baseUrl 翻面时把 sendRequest / openChat 两条 mutation 的 isError
+  // 也清掉。上面那条 UI state 清理 effect 跑得早，那时 mutation 还没初始化，
+  // 这里独立一条 effect、放在 mutation 声明之后；走 ref 把 reset 函数固化避免
+  // 把 mutation 本身当成 dep 触发无关 re-run。详细动机见上方 baseUrl effect
+  // 第 4 条注释。
+  const sendRequestResetRef = useRef(sendRequestMutation.reset);
+  sendRequestResetRef.current = sendRequestMutation.reset;
+  const openChatResetRef = useRef(openChatMutation.reset);
+  openChatResetRef.current = openChatMutation.reset;
+  const baseUrlMutationResetRef = useRef(baseUrl);
+  useEffect(() => {
+    if (baseUrlMutationResetRef.current === baseUrl) {
+      return;
+    }
+    baseUrlMutationResetRef.current = baseUrl;
+    sendRequestResetRef.current();
+    openChatResetRef.current();
+  }, [baseUrl]);
 
   const friendshipMap = useMemo(
     () =>
