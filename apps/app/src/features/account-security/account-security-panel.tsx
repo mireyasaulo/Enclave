@@ -86,6 +86,13 @@ export function AccountSecurityPanel() {
   const cloudApiBaseUrl = normalizeBaseUrl(runtimeConfig.cloudApiBaseUrl);
   const accessToken = useCloudSessionStore((state) => state.accessToken);
   const expiresAt = useCloudSessionStore((state) => state.expiresAt);
+  // R2 走查（2026-05-17）：cloud-api password-policy.ts assertPasswordStrength
+  // 会把 newPassword 跟 user.email / user.phone 比对（case-insensitive）并抛
+  // "密码不能与手机号或邮箱相同。"。但这条文案没进 cloud-api-i18n.ts 表，en/ja/ko
+  // 用户原样拿到裸中文 → describeRequestError fallthrough 也只能透传。客户端直接
+  // 拿 cloudSession.email / phone 同款比对，提前在当前 locale 给出 t() 提示。
+  const sessionEmail = useCloudSessionStore((state) => state.email);
+  const sessionPhone = useCloudSessionStore((state) => state.phone);
   // 走查 R2：原本 panel 只看 !accessToken 决定 disabled，但 expiresAt < now 时
   // accessToken 字符串还在 store 里，按钮全亮，用户点了「发送验证码」再被 401
   // 退回——浪费一次填表 + 等响应。socket.ts / media-url.ts / runtime-config.ts
@@ -277,6 +284,20 @@ export function AccountSecurityPanel() {
       setFeedback({
         tone: "danger",
         message: t(msg`两次输入的密码不一致。`),
+      });
+      return;
+    }
+    // R2：cloud-api password-policy 会比对 newPassword vs email/phone 抛
+    // "密码不能与手机号或邮箱相同。"，但该文案不在 i18n 表里（en/ja/ko 用户
+    // 拿到裸中文）。同款比对放客户端，错误文案走 t()。
+    const newPasswordLower = newPassword.toLowerCase();
+    if (
+      (sessionEmail && newPasswordLower === sessionEmail.toLowerCase()) ||
+      (sessionPhone && newPasswordLower === sessionPhone.toLowerCase())
+    ) {
+      setFeedback({
+        tone: "danger",
+        message: t(msg`新密码不能与邮箱或手机号相同。`),
       });
       return;
     }
