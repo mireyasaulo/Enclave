@@ -1185,13 +1185,22 @@ export class FeedService implements OnModuleInit {
     body: { targetCharacterId: string; note?: string },
   ): Promise<{ messageId: string; conversationId: string }> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
-    const targetCharacterId = body.targetCharacterId?.trim();
+    // 走查 R4：旧 `body.targetCharacterId?.trim()` 假设 string。curl 实测 `{
+    // "targetCharacterId":123}` / `[1,2]` 直接抛 "trim is not a function" →
+    // 500。同款问题前两轮在 createPost 改过。typeof 兜底 + 友好中文 legacy
+    // Message（旧 'targetCharacterId is required' 英文飘到前端 InlineNotice 跟
+    // 其他错误条不齐整）。note 同样兜回 undefined 防 .trim 链路抛。
+    const rawTarget = body?.targetCharacterId;
+    const targetCharacterId =
+      typeof rawTarget === 'string' ? rawTarget.trim() : '';
     if (!targetCharacterId) {
       throw new AppError('FEED_FORWARD_TARGET_REQUIRED', {
         status: HttpStatus.BAD_REQUEST,
-        legacyMessage: 'targetCharacterId is required',
+        legacyMessage: '请选择要转发到的好友。',
       });
     }
+    const rawNote = body?.note;
+    const note = typeof rawNote === 'string' ? rawNote : undefined;
     return this.forwardChannelPostToChat({
       actorType: 'user',
       actorId: owner.id,
@@ -1199,7 +1208,7 @@ export class FeedService implements OnModuleInit {
       actorAvatar: owner.avatar ?? undefined,
       postId,
       targetCharacterId,
-      note: body.note,
+      note,
     });
   }
 
