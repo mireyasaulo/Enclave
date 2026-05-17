@@ -233,7 +233,21 @@ function writeState(
     return;
   }
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  // 走查新一轮 R4：本地隐藏/撤回/提醒状态被群聊 + 单聊的消息长按菜单
+  // 「删除」/「撤回」/「提醒」共用，hideLocalChatMessage / markLocalChat* /
+  // setChatMessageReminder 全部走这里。setItem 在配额满 / Safari iOS 隐私
+  // 模式都抛——React 17+ 合成事件 handler 抛错不会崩组件树但会冒到
+  // window.onerror 污染 telemetry，更糟糕的是 dispatchEvent(CHANGE_EVENT)
+  // 永远不会发出，订阅 CHANGE_EVENT 的全部 useLocalChatMessageActionState
+  // 都拿不到本次更新，UI 上 "删除" / "撤回" 操作看着没反应。
+  // 同 R2/R3 修法：setItem 裹 try/catch 静默降级；CHANGE_EVENT 仍然 dispatch
+  // 让 hook 订阅方至少能读到最新 in-memory state（同帧内被 readState 读到
+  // 上一个 localStorage 落库值——下次写成功再覆盖即可）。
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // 配额满 / Safari 隐私模式 —— 静默降级
+  }
   if (options?.syncNative !== false) {
     queueNativeLocalChatMessageActionStateWrite(state);
   }
