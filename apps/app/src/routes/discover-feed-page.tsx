@@ -2533,8 +2533,11 @@ export function DiscoverFeedPage() {
                             </div>
                           );
                         })}
-                        {post.commentCount > renderedComments.length &&
-                        !expandedComments ? (
+                        {/* 走查 R7：之前这里又写了一遍 `post.commentCount > renderedComments.length
+                            && !expandedComments` —— 跟上面 L2388 算的 showExpandButton 重复一份，
+                            渲染时 React 多跑一次条件求值，且修一处忘改另一处的风险白白挂着。
+                            直接复用 showExpandButton。 */}
+                        {showExpandButton ? (
                           <button
                             type="button"
                             onClick={() => {
