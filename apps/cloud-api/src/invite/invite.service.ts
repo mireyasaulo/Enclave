@@ -192,14 +192,32 @@ export class InviteService {
       createdBy: "invite-service",
     });
 
-    const redemption = await this.persistRedemption(payload, "rewarded", null, reward.id);
-    await this.bumpCodeStats(payload.code.id, true, rewardDays);
-
+    // 邀请奖励是双边的（share 文案承诺"我们都能获得 30 天会员奖励"），所以这里
+    // 给被邀请人也发一份 invite_reward；inviter 那张的 id 落到 redemption.rewardSubscriptionId
+    // 仅作为审计指针，不影响双方账面。失败只 warn 不影响主流程——inviter 已经拿到
+    // 奖励，重发被邀请人的奖励可以靠 invitedRewardGranted=false 的兜底脚本补。
     const invitee = await this.userRepo.findOne({ where: { id: payload.inviteeUserId } });
     if (invitee && !invitee.invitedRewardGranted) {
-      invitee.invitedRewardGranted = true;
-      await this.userRepo.save(invitee);
+      try {
+        await this.subscription.grantSubscription({
+          userId: payload.inviteeUserId,
+          source: "invite_reward",
+          durationDays: rewardDays,
+          planCode: "invite_reward",
+          note: `受邀奖励：来自邀请码 ${payload.code.code}`,
+          createdBy: "invite-service",
+        });
+        invitee.invitedRewardGranted = true;
+        await this.userRepo.save(invitee);
+      } catch (error) {
+        this.logger.warn(
+          `Invitee reward grant failed for user=${payload.inviteeUserId}: ${(error as Error).message}`,
+        );
+      }
     }
+
+    const redemption = await this.persistRedemption(payload, "rewarded", null, reward.id);
+    await this.bumpCodeStats(payload.code.id, true, rewardDays);
 
     return { status: redemption.status as InviteRedemptionStatus, rejectReason: null, rewardDays };
   }

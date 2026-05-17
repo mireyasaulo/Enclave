@@ -21,6 +21,7 @@ import {
 } from "../config/cloud-runtime-config";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { PhoneVerificationSessionEntity } from "../entities/phone-verification-session.entity";
+import { CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE } from "./cloud-jwt.constants";
 import { MockSmsProviderService } from "./mock-sms-provider.service";
 
 const DEV_BYPASS_CODE = "123456";
@@ -88,10 +89,13 @@ export class PhoneAuthService {
     let session: PhoneVerificationSessionEntity;
 
     if (normalizedCode === DEV_BYPASS_CODE) {
-      // dev bypass 在内存构造 session，与普通路径一起在末尾 save。
+      // dev bypass 在内存构造 session，与普通路径一起在末尾 save。purpose 必须
+      // 显式写——TypeORM 列默认值只在 INSERT 时生效，签 token 在 save 之前会读到
+      // undefined，让 CloudClientAuthGuard 一律 401。
       session = this.sessionRepo.create({
         phone: normalizedPhone,
         code: normalizedCode,
+        purpose: CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE,
         expiresAt: new Date(Date.now() + this.getCodeTtlSeconds() * 1000),
         verifiedAt: null,
       });
