@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
@@ -104,6 +111,12 @@ function MobileGroupMemberPickerPage({
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const [keyword, setKeyword] = useState("");
+  // 走查 R1：filteredCandidateItems 直接吃 keyword，add 模式好友 100+
+  // 时每个 keystroke 都同步重新 createFriendDirectoryItems + filter +
+  // matchesFriendSearch 一遍——其中 createFriendDirectoryItems 内部还要
+  // 重新算 indexLabel/sort，是这段流程里最贵的一步。和 create-group-page /
+  // group-contacts-page 同口径补 useDeferredValue。
+  const deferredKeyword = useDeferredValue(keyword);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [removeConfirmOpen, setRemoveConfirmOpen] = useState(false);
   const routeState = parseMobileGroupRouteState(hash);
@@ -228,7 +241,7 @@ function MobileGroupMemberPickerPage({
   }, [friendMap, friendsQuery.data, memberIds, membersQuery.data, mode, t]);
 
   const filteredCandidateItems = useMemo(() => {
-    const normalizedKeyword = keyword.trim().toLowerCase();
+    const normalizedKeyword = deferredKeyword.trim().toLowerCase();
     if (!normalizedKeyword) {
       return allCandidateItems;
     }
@@ -260,7 +273,7 @@ function MobileGroupMemberPickerPage({
         value.toLowerCase().includes(normalizedKeyword),
       ),
     );
-  }, [allCandidateItems, friendsQuery.data, keyword, memberIds, mode, t]);
+  }, [allCandidateItems, deferredKeyword, friendsQuery.data, memberIds, mode, t]);
 
   const candidateSections = useMemo(() => {
     return buildContactSections(

@@ -1,6 +1,7 @@
 import {
   Suspense,
   lazy,
+  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
@@ -60,6 +61,12 @@ export function CreateGroupPage() {
   const [name, setName] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  // 走查 R1：filteredFriends 直接吃 searchTerm，好友 100+ 时每个 keystroke 都
+  // 同步 toLowerCase + filter + buildContactSections 一遍，输入框肉眼可见的卡
+  // 顿。和 group-contacts-page / contacts-page / favorites-page / search-page
+  // 同口径补 useDeferredValue，让 React 优先把字打进输入框、过滤排到下一个
+  // idle 帧。
+  const deferredSearchTerm = useDeferredValue(searchTerm);
   const previousBaseUrlRef = useRef(baseUrl);
   const seededSelectionRef = useRef("");
   const safeReturnPath =
@@ -235,7 +242,7 @@ export function CreateGroupPage() {
   }, [friendsQuery.data, selectedFriendMap]);
 
   const filteredFriends = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase();
+    const keyword = deferredSearchTerm.trim().toLowerCase();
     if (!keyword) {
       return sortedFriendItems;
     }
@@ -243,7 +250,7 @@ export function CreateGroupPage() {
     return sortedFriendItems.filter((item) =>
       matchesFriendSearch(item, keyword),
     );
-  }, [searchTerm, sortedFriendItems]);
+  }, [deferredSearchTerm, sortedFriendItems]);
 
   const filteredSections = useMemo(
     () => buildContactSections(filteredFriends),
