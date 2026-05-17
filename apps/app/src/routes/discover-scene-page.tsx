@@ -13,6 +13,7 @@ import {
   Landmark,
   Laptop,
   Library,
+  LoaderCircle,
   MapPin,
   Moon,
   NotebookPen,
@@ -426,8 +427,20 @@ function MobileDiscoverScenePage() {
                   disabled && !busy && "opacity-60",
                 )}
               >
+                {/*
+                  走查 R2-Round1：scene 按钮 busy 时只有文字变成"正在前往咖啡馆..."，
+                  绿色 Coffee/Gym 图标原样不动。但 AI greeting 端到端 4-20s（推理
+                  + sanitize + DB 写入），中间用户在公网隧道 + 移动端经常以为页面
+                  卡死，戳同一个按钮没反应又怀疑断网。对齐 [[shake]] 即
+                  discover-encounter-page 的视觉：busy 时把场景图标替成 LoaderCircle
+                  自旋，明确告诉用户"正在跑、不要乱点"。
+                */}
                 <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[rgba(7,193,96,0.12)] text-[#07c160]">
-                  <Icon size={18} />
+                  {busy ? (
+                    <LoaderCircle size={18} className="animate-spin" />
+                  ) : (
+                    <Icon size={18} />
+                  )}
                 </div>
                 <div className="mt-3 text-[15px] font-medium text-[#111827]">
                   {busy
