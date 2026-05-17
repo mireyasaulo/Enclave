@@ -28,12 +28,11 @@ export class FarmLeaderboardService {
     const player = await this.playerRepo.findOneBy({ ownerId });
     const npcs = await this.npcRepo.find();
     const characterIds = npcs.map((n) => n.characterId);
-    const characters = await Promise.all(
-      characterIds.map((id) => this.charactersService.findById(id)),
-    );
-    const characterById = new Map(
-      characters.filter((c) => c != null).map((c) => [c!.id, c!]),
-    );
+    // 之前对每个 NPC 都 findById 一次 — 145 个角色就是 145 次 SQL，
+    // 排行榜 / 邻居列表本来是热路径（leaderboard sheet 一开就触发 3 tab + neighbor 列表）。
+    // findManyByIds 走一次 WHERE id IN (...) ，量级降一个数量级。
+    const characters = await this.charactersService.findManyByIds(characterIds);
+    const characterById = new Map(characters.map((c) => [c.id, c]));
 
     // 拼成统一 entry 数组
     const entries: Omit<FarmLeaderboardEntry, 'rank'>[] = [];
