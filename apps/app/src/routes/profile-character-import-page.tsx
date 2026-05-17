@@ -241,7 +241,7 @@ export function ProfileCharacterImportPage() {
             </span>
             <span>
               {t(
-                msg`在「世界角色管理平台」编辑或新建角色，点「📤 导出 JSON」下载文件`,
+                msg`在「世界角色管理平台 → 我的私有角色」编辑或新建角色，点「📤 导出 JSON」下载文件`,
               )}
             </span>
           </li>
@@ -429,7 +429,7 @@ function FilePreviewCard({
         >
           {schemaMismatch
             ? t(
-                msg`文件 $schema 是 "${schema}"，与期望的 "yinjie-private-character/v1" 不一致。请使用「世界角色管理平台」重新导出文件。`,
+                msg`文件 $schema 是 "${schema}"，与期望的 "yinjie-private-character/v1" 不一致。请到「世界角色管理平台 → 我的私有角色」重新导出文件。`,
               )
             : t(
                 msg`文件缺少 $schema 标识；仍可尝试导入，但建议检查内容是否齐全。`,

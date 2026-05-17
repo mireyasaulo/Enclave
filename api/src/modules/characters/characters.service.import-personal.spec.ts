@@ -132,6 +132,31 @@ describe('CharactersService.importPersonalCharacter', () => {
     ).resolves.toBeDefined();
   });
 
+  it('rejects currentActivity / triggerScenes items containing control characters', async () => {
+    // 第 4 次走查 R2：currentActivity 是状态 chip（"working"/"sleeping" 等），
+    // triggerScenes 是 scene id 列表（"coffee_shop"/"gym"），都是单行 UI 文本。
+    // 和 relationship / expertDomains items 同档拒控制字符。
+    const { svc } = makeService({ existing: null });
+    await expect(
+      svc.importPersonalCharacter({
+        name: '小白',
+        currentActivity: 'sleeping\nworking',
+      }),
+    ).rejects.toThrow(/currentActivity/);
+    await expect(
+      svc.importPersonalCharacter({
+        name: '小白',
+        triggerScenes: ['coffee_shop', 'gym\nlibrary'],
+      }),
+    ).rejects.toThrow(/triggerScenes/);
+    // triggerScenes 空字符串元素也要 filter
+    const out = await svc.importPersonalCharacter({
+      name: '小蓝',
+      triggerScenes: ['coffee_shop', '', '  ', 'gym'],
+    });
+    expect(out.character.triggerScenes).toEqual(['coffee_shop', 'gym']);
+  });
+
   it('rejects relationship / relationshipType containing control characters', async () => {
     // 第 3 次走查 R1：name 已卡，但 relationship / relationshipType 这俩单行
     // UI 文本字段没卡，"我的\n朋友" 落库后通讯录单行 chip 渲染撑高、AI prompt
@@ -412,5 +437,58 @@ describe('CharactersService.importPersonalCharacter', () => {
     expect(profile.coreLogic).toBe('新的 coreLogic');
     expect((profile.memory as Record<string, unknown>)?.coreMemory).toBe('老的核心记忆');
     expect((profile.memory as Record<string, unknown>)?.recentSummary).toBe('老的近期记忆');
+  });
+
+  // 第 4 次走查 R1：之前的"new profile 没 memory 就保留 existing" 条件
+  // `!patch.profile.memory` 在 recipe 派生路径下永远 false（applyRecipeToCharacter
+  // 总会写一个 memory={recentSummary:'', coreMemory:'', forgettingCurve:N, ...Prompt}
+  // 子对象，wiki strip 后运行时字段是空串）。结果：用户聊一段累出 recentSummary，
+  // 重新导入 wiki bundle（即便只改 bio）就把 chat memory 冲没。
+  // 修复后：运行时字段（recentSummary/coreMemory）patch 为空时保留 existing，
+  // 配置字段（forgettingCurve/recentSummaryPrompt/coreMemoryPrompt）正常用 patch。
+  it('preserves runtime memory when re-imported profile has empty memory fields', async () => {
+    const existingProfile = {
+      characterId: 'private-old',
+      name: '苏然',
+      memory: {
+        coreMemory: '用户每周三晚 8 点聊天',
+        recentSummary: '她记得用户喜欢冷笑话',
+        forgettingCurve: 70,
+      },
+    };
+    const { svc } = makeService({
+      existing: {
+        id: 'private-old',
+        name: '苏然',
+        sourceType: 'private_import',
+        deletionPolicy: 'archive_allowed',
+        profile: existingProfile,
+      } as Char,
+    });
+    const out = await svc.importPersonalCharacter({
+      name: '苏然',
+      // 模拟 recipe 派生出来的 profile：memory 子对象存在但运行时字段是空
+      // string，配置字段被 wiki UI 改过。
+      profile: {
+        characterId: 'private-old',
+        name: '苏然',
+        memory: {
+          recentSummary: '',
+          coreMemory: '',
+          forgettingCurve: 85, // 用户调过
+          recentSummaryPrompt: '新的提示词',
+        },
+      } as never,
+    });
+    const memory = (out.character as Char).profile?.memory as Record<
+      string,
+      unknown
+    >;
+    // 运行时字段：保留 existing（patch 是空串，不覆盖）
+    expect(memory.coreMemory).toBe('用户每周三晚 8 点聊天');
+    expect(memory.recentSummary).toBe('她记得用户喜欢冷笑话');
+    // 配置字段：用 patch
+    expect(memory.forgettingCurve).toBe(85);
+    expect(memory.recentSummaryPrompt).toBe('新的提示词');
   });
 });

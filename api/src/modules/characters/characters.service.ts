@@ -594,8 +594,27 @@ export class CharactersService implements OnModuleInit {
       }
       patch.expertDomains = cleaned;
     }
+    // triggerScenes：每项是 scene id（如 "coffee_shop" / "gym"），用作场景匹配 + UI chip。
+    // 第 4 次走查 R2：和 expertDomains 同档 — 元素带 "\n" 会破坏 chip / scene 匹配。
+    // null 表示显式清空（保持现有语义）。
     if (input.triggerScenes !== undefined) {
-      patch.triggerScenes = input.triggerScenes ?? undefined;
+      if (Array.isArray(input.triggerScenes)) {
+        const cleaned: string[] = [];
+        for (const item of input.triggerScenes) {
+          if (typeof item !== 'string') continue;
+          if (containsControlChar(item)) {
+            throw new AppError('PRIVATE_IMPORT_INVALID', {
+              status: HttpStatus.BAD_REQUEST,
+              legacyMessage: 'triggerScenes 元素不能包含换行符或控制字符。',
+            });
+          }
+          const trimmed = item.trim();
+          if (trimmed.length > 0) cleaned.push(trimmed);
+        }
+        patch.triggerScenes = cleaned;
+      } else {
+        patch.triggerScenes = undefined;
+      }
     }
     // profile 优先级最高（用户已经在 wiki 端 finalize 过的 PersonalityProfile）。
     // 没传 profile 但传了 recipe → 实时用 blueprint service 把 recipe → profile，
@@ -623,10 +642,45 @@ export class CharactersService implements OnModuleInit {
     // recipe / explicit profile 路径强制覆盖时，把现存 row 的 memory 子树 merge
     // 回来：用户改个 bio 重新导入，不能把"她还记得上次说过 xxx"这种运行时积累
     // 的对话记忆一起冲掉。
-    if (patch.profile && existing?.profile?.memory && !patch.profile.memory) {
+    //
+    // 第 4 次走查 R1：原条件 `!patch.profile.memory` 在 recipe 派生路径下永远是
+    // false —— applyRecipeToCharacter 总会写一个 memory={...} 子对象（即使
+    // recentSummary/coreMemory 是空串，因为 wiki strip 过 memorySeed.recentSummarySeed/
+    // coreMemory）。结果保留逻辑根本不触发，用户聊一段时间累出 recentSummary
+    // 后重新导入 bundle（即便只改 bio）就把 chat memory 冲没。
+    // 正确语义：
+    //   - recentSummary / coreMemory 是运行时累积的对话记忆（chat compression 写入），
+    //     bundle 里 wiki 永远导不出（被 strip），patch 里只可能是空串。空串不该覆盖。
+    //   - forgettingCurve / recentSummaryPrompt / coreMemoryPrompt 是 seed 配置
+    //     （wiki UI 暴露给用户填的提示词模板），bundle 显式带值就应该覆盖。
+    // 所以走"运行时字段优先 existing，配置字段优先 patch"的细粒度 merge。
+    if (patch.profile && existing?.profile?.memory) {
+      type MemorySubset = { recentSummary?: string; coreMemory?: string };
+      const existingMem = existing.profile.memory as Record<string, unknown> &
+        MemorySubset;
+      const patchMem = (patch.profile.memory ?? {}) as Record<string, unknown> &
+        MemorySubset;
+      const mergedMemory: Record<string, unknown> = {
+        ...existingMem,
+        ...patchMem,
+      };
+      // 运行时字段：patch 为空 → 用 existing。这样 wiki strip 过 memorySeed
+      // 后导出的 bundle re-import 不会清掉 chat memory。
+      if (
+        (!patchMem.recentSummary || patchMem.recentSummary === '') &&
+        existingMem.recentSummary
+      ) {
+        mergedMemory.recentSummary = existingMem.recentSummary;
+      }
+      if (
+        (!patchMem.coreMemory || patchMem.coreMemory === '') &&
+        existingMem.coreMemory
+      ) {
+        mergedMemory.coreMemory = existingMem.coreMemory;
+      }
       patch.profile = {
         ...patch.profile,
-        memory: { ...existing.profile.memory },
+        memory: mergedMemory as (typeof patch.profile)['memory'],
       };
     }
 
@@ -639,7 +693,18 @@ export class CharactersService implements OnModuleInit {
     if (typeof input.activityMode === 'string') {
       patch.activityMode = input.activityMode as CharacterEntity['activityMode'];
     }
+    // currentActivity 是 UI 状态 chip（"working" / "sleeping" 等），单行渲染。
+    // 第 4 次走查 R2：和 relationship 同档拒控制字符。null 表示显式清空。
     if (input.currentActivity !== undefined) {
+      if (
+        typeof input.currentActivity === 'string' &&
+        containsControlChar(input.currentActivity)
+      ) {
+        throw new AppError('PRIVATE_IMPORT_INVALID', {
+          status: HttpStatus.BAD_REQUEST,
+          legacyMessage: 'currentActivity 不能包含换行符或控制字符。',
+        });
+      }
       patch.currentActivity = (input.currentActivity ??
         undefined) as CharacterEntity['currentActivity'];
     }
