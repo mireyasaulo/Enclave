@@ -38,16 +38,22 @@ export class FarmQuestService {
     const rows = await this.ensureAll(ownerId);
     // syncLevelAchievements 只在 harvest 触发 level-up 时跑；如果玩家在 Phase4
     // 上线时已经 >5 级，achievement_level_5 永远停在 0/5 — 等他下次升级才会同步。
-    // 在 getView 兜底拉一次，确保打开任务列表看到正确的进度。
+    // 在 getView 兜底就地补；但 syncLevelAchievements 之前是 2×(find+save)，每次
+    // 打开任务面板都跑 4 次 DB op。改成只在 row.progress < level 时才真去 setProgress，
+    // 没差异就只在内存里把 row.progress 顶到 level 让返回值对。
     const player = await this.stateService.getOrCreatePlayerState(ownerId);
     if (player.level > 0) {
-      await this.syncLevelAchievements(ownerId, player.level);
+      const updates: Promise<unknown>[] = [];
       for (const row of rows) {
-        if (row.questId === 'achievement_level_5' || row.questId === 'achievement_level_10') {
-          const def = getQuestDefinition(row.questId);
-          row.progress = Math.min(def.goal, Math.max(row.progress ?? 0, player.level));
+        if (row.questId !== 'achievement_level_5' && row.questId !== 'achievement_level_10') continue;
+        const def = getQuestDefinition(row.questId);
+        const target = Math.min(def.goal, player.level);
+        if ((row.progress ?? 0) < target) {
+          row.progress = target;
+          updates.push(this.questRepo.save(row));
         }
       }
+      if (updates.length > 0) await Promise.all(updates);
     }
     return {
       ownerId,

@@ -19,7 +19,10 @@ interface BannerItem {
 }
 
 export function FarmNotificationBanner({ state }: NotificationBannerProps) {
-  const eventsQuery = useFarmEvents({ limit: 30 });
+  // EventLogPanel 默认 limit=20，banner 之前用 30 是另一个 queryKey，
+  // farm 首页打开会把 /events 跑两次 — 改成共享一个缓存条目。
+  // banner 只看最近 30 分钟里的 steal / steal_blocked，20 条事件够用。
+  const eventsQuery = useFarmEvents({ limit: 20 });
   const nowMs = useFarmAdjustedNow();
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
