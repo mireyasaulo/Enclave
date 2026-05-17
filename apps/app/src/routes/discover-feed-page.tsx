@@ -1602,12 +1602,20 @@ export function DiscoverFeedPage() {
     const sharePath = `${pathname}${shareHash ? `#${shareHash}` : ""}`;
     const shareUrl = buildPublicShareUrl(sharePath);
     const postSummary = getFeedSummaryText(post);
-    const summaryText = `${post.authorName}：${postSummary}\n${shareUrl}`;
+    // 走查 R3：postSummary 在 stripToolCallSyntax 把 post.text 整段吃掉
+    // （AI 角色把 CoT prose 当广场动态发、`[TOOL_CALL] ...` 直发等）+ 没媒体
+    // 时会落到 ""，旧拼法 `${authorName}：${summary}` 就渲成 "yz：" 单一冒
+    // 号兜底，复制 / 系统分享 text 字段都是这副尴尬样。给空 summary 加一条
+    // 文案兜底（与 mobile feed 卡片本体被 strip 吃光时空白态对齐），让分享
+    // 的对方至少看到一句话告诉他这是一条公开动态。
+    const sharePostBody =
+      postSummary || t(msg`分享了一条广场动态`);
+    const summaryText = `${post.authorName}：${sharePostBody}\n${shareUrl}`;
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
         title: t(msg`${post.authorName} 的广场动态`),
-        text: t(msg`${post.authorName}：${postSummary}`),
+        text: t(msg`${post.authorName}：${sharePostBody}`),
         url: shareUrl,
       });
 
