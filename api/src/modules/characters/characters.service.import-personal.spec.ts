@@ -78,6 +78,60 @@ describe('CharactersService.importPersonalCharacter', () => {
     ).rejects.toThrow(/受保护/);
   });
 
+  it('ignores user-supplied deletionPolicy and isTemplate (footgun guards)', async () => {
+    // 走查 R1：手工 bundle 加 "deletionPolicy":"protected" 会让下次 re-import 永远 409；
+    // "isTemplate":true 让角色在 friend list / 通讯录 / 角色目录全消失。
+    // import-personal 直接丢弃这俩字段，让 entity 的默认值 (archive_allowed / false) 生效。
+    const { svc, repo } = makeService({ existing: null });
+    const out = await svc.importPersonalCharacter({
+      name: '小狗',
+      deletionPolicy: 'protected',
+      isTemplate: true,
+    });
+    expect(out.character.deletionPolicy).toBe('archive_allowed');
+    expect(out.character.isTemplate).toBe(false);
+    // 当然，重新 import 同名应该能覆盖
+    const created = (repo.create as jest.Mock).mock.calls[0][0] as Char;
+    expect(created.deletionPolicy).toBe('archive_allowed');
+    expect(created.isTemplate).toBe(false);
+  });
+
+  it('rejects bad onlineMode / activityMode enum values', async () => {
+    // 走查 R1：socialOpenness 走 enum 白名单，但 onlineMode / activityMode 历史上接
+    // 任意字符串。下游 === 'manual' 检查会让脏值都掉到 auto 分支，功能上不崩，但 DB
+    // 里堆 "ALWAYS_ONLINE_OMG" 这种垃圾枚举。和 socialOpenness 同样走白名单。
+    const { svc } = makeService({ existing: null });
+    await expect(
+      svc.importPersonalCharacter({ name: '小白', onlineMode: 'ALWAYS_ON' }),
+    ).rejects.toThrow(/onlineMode/);
+    await expect(
+      svc.importPersonalCharacter({ name: '小黑', activityMode: 'YOLO' }),
+    ).rejects.toThrow(/activityMode/);
+    // auto / manual 都 OK
+    await expect(
+      svc.importPersonalCharacter({ name: '小灰', onlineMode: 'manual' }),
+    ).resolves.toBeDefined();
+  });
+
+  it('rejects aiRelationships above the size cap', async () => {
+    // 走查 R1：aiRelationships 是独立列、不进 profile JSON cap，500+ relation
+    // 都能落库；social-graph tick 会按这个数组迭代，超量值是显著 CPU 放大器。
+    const { svc } = makeService({ existing: null });
+    const tooMany = Array.from({ length: 60 }, (_, i) => ({
+      characterId: `private-fake-${i}`,
+      relationshipType: 'friend',
+      strength: 0.5,
+    }));
+    await expect(
+      svc.importPersonalCharacter({ name: '小红', aiRelationships: tooMany }),
+    ).rejects.toThrow(/aiRelationships/);
+    // 50 个正好等于上限，应该通过
+    const exact = tooMany.slice(0, 50);
+    await expect(
+      svc.importPersonalCharacter({ name: '小绿', aiRelationships: exact }),
+    ).resolves.toBeDefined();
+  });
+
   it('rejects names containing control characters (\\n, \\t, \\r)', async () => {
     // 走查 R1：原来 name 没卡控制字符，"line1\nline2" 被允许写入，落库后
     // 通讯录单行 title 渲染会撑高列表项，AI prompt 也会被多行指令注入。

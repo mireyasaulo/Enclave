@@ -18,6 +18,7 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { navigateBackOrFallback } from "../lib/history-back";
+import { resolveAppMediaUrl } from "../lib/media-url";
 import { describeRequestError } from "../lib/request-error";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -506,9 +507,14 @@ function PreviewAvatar({ avatar, name }: { avatar: string; name: string }) {
     setImgFailed(false);
   }, [trimmed]);
   if (isUrl && !imgFailed) {
+    // 走 resolveAppMediaUrl 与 AvatarChip 保持一致：相对路径
+    // (例：/api/wiki/avatars/xxx.png) 用裸 <img src> 会按 page origin 解析，
+    // 在多租户公网代理场景下打不到当前 world 的 /api/*。这里 absolutize 后
+    // 预览跟导入后角色卡里的真实头像一致，不会出现"预览裂图 / 入库后正常"
+    // 的诡异断层。
     return (
       <img
-        src={trimmed}
+        src={resolveAppMediaUrl(trimmed) || trimmed}
         alt=""
         className="h-12 w-12 shrink-0 rounded-2xl object-cover"
         onError={() => setImgFailed(true)}

@@ -613,13 +613,13 @@ export class CharactersService implements OnModuleInit {
       patch.currentActivity = (input.currentActivity ??
         undefined) as CharacterEntity['currentActivity'];
     }
-    if (typeof input.deletionPolicy === 'string') {
-      patch.deletionPolicy =
-        input.deletionPolicy as CharacterEntity['deletionPolicy'];
-    }
-    if (typeof input.isTemplate === 'boolean') {
-      patch.isTemplate = input.isTemplate;
-    }
+    // deletionPolicy / isTemplate：admin-only 字段，private_import 路径不允许改写。
+    // 走查 R1：手工 bundle 加 "deletionPolicy":"protected" 落库后会让下次
+    // re-import 永远 409 PRIVATE_IMPORT_NAME_RESERVED（service.ts:535 拒覆盖 protected），
+    // 用户自己导入的角色也救不回；"isTemplate":true 则会让角色在 friend list /
+    // 通讯录 / 角色目录全消失（findAllVisibleToOwner 默认 filter 掉 template）。
+    // 这俩都是用户自己点不到的开关——既然 wiki bundle 也不导出（apps/wiki/src/lib/wiki-api.ts
+    // PrivateCharacterDto 注释明确排除），import-personal 直接忽略掉。
     if (typeof input.socialOpenness === 'string') {
       patch.socialOpenness =
         input.socialOpenness as CharacterEntity['socialOpenness'];
@@ -1036,6 +1036,9 @@ const PRIVATE_CHARACTER_FIELD_LIMITS = {
   triggerSceneCount: 50,
   recipeJsonBytes: 64 * 1024,
   profileJsonBytes: 64 * 1024,
+  // aiRelationships 是独立列，不进 profile JSON cap；走查 R1 发现传 500 个
+  // forwards-reference relation 也能落库，对 social graph tick 是开销放大器。
+  aiRelationshipsCount: 50,
 } as const;
 
 /**
@@ -1054,6 +1057,11 @@ function isSafeAvatarValueBackend(raw: string): boolean {
 }
 
 const SOCIAL_OPENNESS_VALUES = ['open', 'normal', 'private'] as const;
+// 下游 reply-logic / scheduler / blueprint 都做 `=== 'manual'` 检查，任意非 manual
+// 字符串都被当 auto 用，功能上不崩，但 DB 里堆垃圾枚举值，admin 排查 / 数据迁移
+// 时一头雾水。和 socialOpenness 同样走白名单。
+const ONLINE_MODE_VALUES = ['auto', 'manual'] as const;
+const ACTIVITY_MODE_VALUES = ['auto', 'manual'] as const;
 
 export function assertPrivateCharacterFieldLimits(input: {
   name?: string;
@@ -1069,6 +1077,11 @@ export function assertPrivateCharacterFieldLimits(input: {
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
+  onlineMode?: string;
+  activityMode?: string;
+  aiRelationships?:
+    | { characterId: string; relationshipType: string; strength: number }[]
+    | null;
 }): void {
   const L = PRIVATE_CHARACTER_FIELD_LIMITS;
   const tooLong = (label: string, max: number) =>
@@ -1172,6 +1185,39 @@ export function assertPrivateCharacterFieldLimits(input: {
         status: HttpStatus.BAD_REQUEST,
         legacyMessage: 'proactiveBrowseChance 必须在 0 - 1 之间。',
       });
+    }
+  }
+  // onlineMode / activityMode 走 'auto' | 'manual' 白名单。下游
+  // reply-logic / scheduler / blueprint 都做 `=== 'manual'` 检查，任意非 manual
+  // 字符串都被当 auto 用——功能上不崩，但 DB 里堆 "ALWAYS_ONLINE_OMG" 这种垃圾
+  // 枚举值，admin 数据排查 / 后续迁移时一头雾水。
+  if (
+    input.onlineMode !== undefined &&
+    !ONLINE_MODE_VALUES.includes(
+      input.onlineMode as (typeof ONLINE_MODE_VALUES)[number],
+    )
+  ) {
+    throw new AppError('PRIVATE_IMPORT_INVALID', {
+      status: HttpStatus.BAD_REQUEST,
+      legacyMessage: `onlineMode 取值只能是 ${ONLINE_MODE_VALUES.join(' / ')}。`,
+    });
+  }
+  if (
+    input.activityMode !== undefined &&
+    !ACTIVITY_MODE_VALUES.includes(
+      input.activityMode as (typeof ACTIVITY_MODE_VALUES)[number],
+    )
+  ) {
+    throw new AppError('PRIVATE_IMPORT_INVALID', {
+      status: HttpStatus.BAD_REQUEST,
+      legacyMessage: `activityMode 取值只能是 ${ACTIVITY_MODE_VALUES.join(' / ')}。`,
+    });
+  }
+  // aiRelationships 独立列，不进 profile JSON cap，500+ relation 也能落库。
+  // social-graph tick 会按这个数组迭代，超量值是显著的 CPU 放大器。
+  if (Array.isArray(input.aiRelationships)) {
+    if (input.aiRelationships.length > L.aiRelationshipsCount) {
+      throw tooLong('aiRelationships 个数', L.aiRelationshipsCount);
     }
   }
   // intimacyLevel ∈ [0, 100]，整数。世界运行时会自动调整，初值越界会让
