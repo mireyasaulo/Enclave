@@ -167,7 +167,6 @@ export class InviteService {
 
     if (payload.code.redeemCount >= maxPerCode) {
       const rejected = await this.persistRedemption(payload, "rejected", "邀请码累计兑换已达上限");
-      await this.bumpCodeStats(payload.code.id, false);
       return { status: "rejected", rejectReason: rejected.rejectReason, rewardDays: 0 };
     }
 
@@ -182,7 +181,6 @@ export class InviteService {
       });
       if (ipCount >= maxIp) {
         const rejected = await this.persistRedemption(payload, "rejected", "同一 IP 兑换次数过多");
-        await this.bumpCodeStats(payload.code.id, false);
         return { status: "rejected", rejectReason: rejected.rejectReason, rewardDays: 0 };
       }
     }
@@ -196,7 +194,6 @@ export class InviteService {
       });
       if (deviceCount >= maxDevice) {
         const rejected = await this.persistRedemption(payload, "rejected", "同一设备兑换次数过多");
-        await this.bumpCodeStats(payload.code.id, false);
         return { status: "rejected", rejectReason: rejected.rejectReason, rewardDays: 0 };
       }
     }
@@ -244,7 +241,7 @@ export class InviteService {
       reward.id,
       inviteeRewardId,
     );
-    await this.bumpCodeStats(payload.code.id, true, rewardDays);
+    await this.bumpCodeStats(payload.code.id, rewardDays);
 
     return { status: redemption.status as InviteRedemptionStatus, rejectReason: null, rewardDays };
   }
@@ -277,13 +274,16 @@ export class InviteService {
     );
   }
 
-  private async bumpCodeStats(codeId: string, rewarded: boolean, rewardDays = 0) {
+  // 只在 rewarded 路径调用：让 redeemCount 真正等价于"成功邀请人数"（与 UI 的
+  // "成功邀请: N" 语义一致），fraud / rate-limit / banned-inviter 等被拒兑换都
+  // 留 invite_redemptions 行供运营审计，但不污染 inviter 的计数。早先 IP / device
+  // / maxPerCode 这三条 rejection 也 bump 过，结果同一 IP 的 4 次注册让 inviter
+  // 看见 "成功邀请: 4 / 累计奖励: 90 天"——天数对、人数虚高 1。
+  private async bumpCodeStats(codeId: string, rewardDays: number) {
     const code = await this.codeRepo.findOne({ where: { id: codeId } });
     if (!code) return;
     code.redeemCount += 1;
-    if (rewarded) {
-      code.rewardDaysGranted += rewardDays;
-    }
+    code.rewardDaysGranted += rewardDays;
     await this.codeRepo.save(code);
   }
 
