@@ -69,7 +69,17 @@ export function AvatarChip({
     );
   }
 
-  const fallbackSrc = pickFallbackAvatar(name, trimmedSrc);
+  // 第三轮新会话 R3：pickFallbackAvatar 之前裸跑每次 render。其中
+  //   for (const character of seed) hash = ... char.codePointAt(0) ...
+  // 把整段 seed（含 src）一字一字过一遍。1MB data URL 头像走这条 = 1M+ 次
+  // codePointAt，hash 用不上时也照样跑（图片加载成功的常规路径就不需要 fallback）。
+  // useMemo([name, trimmedSrc]) 让 fallbackSrc 只在 src 真变化时重算；
+  // pickFallbackAvatar 内部把 seed 截到 256 字符上限（短串保持原 hash 行为，
+  //   长 data URL 也只过头 256 个 byte 算 hash，足够分散）。
+  const fallbackSrc = useMemo(
+    () => pickFallbackAvatar(name, trimmedSrc),
+    [name, trimmedSrc],
+  );
   const resolvedSrc =
     !loadFailed && isLikelyImageSource(trimmedSrc)
       ? resolveAvatarSource(trimmedSrc)
@@ -148,9 +158,18 @@ function resolveAvatarSource(value: string) {
   return resolveAppMediaUrl(value);
 }
 
+// 第三轮新会话 R3：fallback hash 只是用来从 4 个备用头像里挑一个，整个串过
+// codePointAt 是浪费——前 256 字符给 4 个 bucket 分散已经足够（其实更短都够）。
+// legacy 1MB data URL 头像走这条之前要 1M+ 次迭代，截短到 256 是 4000x 提速。
+const PICK_FALLBACK_SEED_MAX = 256;
+
 function pickFallbackAvatar(name?: string | null, src?: string | null) {
   const seedParts = [name?.trim(), src?.trim()].filter(Boolean);
-  const seed = seedParts.join(":") || "yinjie-avatar";
+  const seedRaw = seedParts.join(":") || "yinjie-avatar";
+  const seed =
+    seedRaw.length > PICK_FALLBACK_SEED_MAX
+      ? seedRaw.slice(0, PICK_FALLBACK_SEED_MAX)
+      : seedRaw;
   let hash = 0;
 
   for (const character of seed) {
