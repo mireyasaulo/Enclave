@@ -45,6 +45,17 @@ function sanitizeOwnerName(value: string): string {
   return value.replace(CONTROL_CHAR_REGEX, ' ').replace(/\s+/g, ' ').trim();
 }
 
+// signature 也按单行存：前端 profile-info-signature-page.tsx 早就 sanitize
+// 把 \r\n\t 折成空格、压连续空白；profile-page / profile-info-page 都是单行
+// truncate / line-clamp-1 展示。但 R1 走查实测 curl 直 PATCH
+// `{"signature":"foo\nbar\n\n\tbaz"}` 服务端只 trim() 不剥换行，原样落库——
+// 下游 desktop-message-avatar-popover / desktop-friend-moments-workspace 等
+// 把 signature 渲染成原文（不带 truncate）的位置就会出现意外断行。同款 sanitize
+// 兜底，挡住老客户端 / curl 直调，跟 username 一致。
+function sanitizeOwnerSignature(value: string): string {
+  return value.replace(CONTROL_CHAR_REGEX, ' ').replace(/\s+/g, ' ').trim();
+}
+
 // avatar 字段允许的协议：http / https / data:image/*。其它（javascript: /
 // vbscript: / file: / ftp: / data:text/... 等）一律拒——即便 <img src> 不
 // 执行 javascript:，落库的脏值会被其它复用 owner.avatar 的组件（社交分享、
@@ -256,7 +267,10 @@ export class WorldOwnerService {
         ? undefined
         : sanitizeOwnerName(input.username);
     const nextAvatar = input.avatar?.trim();
-    const nextSignature = input.signature?.trim();
+    const nextSignature =
+      input.signature === undefined
+        ? undefined
+        : sanitizeOwnerSignature(input.signature);
 
     // 历史上前端只校验 trim() 非空，导致大量用户用单字 "w" 过 onboarding。
     // 后端在这里兜底：写入 username 时必须 ≥ 2 个字符，过短直接拒绝。
