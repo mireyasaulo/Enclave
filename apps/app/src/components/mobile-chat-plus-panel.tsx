@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { msg } from "@lingui/macro";
 import {
@@ -293,10 +293,19 @@ export function MobileChatPlusPanel({
     }
   }, [activeView]);
 
-  const rootActionPages = buildRootActionPages({
-    hasVoiceCall: Boolean(onStartVoiceCall),
-    hasVideoCall: Boolean(onStartVideoCall),
-  });
+  // 父级 ChatComposer 任意 state（输入框聚焦、socket 重连、消息到达）都会触发
+  // 重渲；buildRootActionPages 每次 render 都跑两个 filter + 一次 chunk，
+  // 但 hasVoiceCall / hasVideoCall 在单次会话生命周期里其实是常量
+  // （callers 总是同步传 onStartVoiceCall / onStartVideoCall）。memo 掉省掉
+  // 这条每帧重排的小开销，更重要的是 rootActionPages 数组引用稳定后，下面
+  // pages.map 的 page 引用也稳定，里面 button 的 props identity 不会因为父级
+  // 重渲被打断。
+  const hasVoiceCall = Boolean(onStartVoiceCall);
+  const hasVideoCall = Boolean(onStartVideoCall);
+  const rootActionPages = useMemo(
+    () => buildRootActionPages({ hasVoiceCall, hasVideoCall }),
+    [hasVoiceCall, hasVideoCall],
+  );
 
   if (!open) {
     return null;
