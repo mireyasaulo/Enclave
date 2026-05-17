@@ -57,8 +57,6 @@ type MobileChatPlusPanelProps = {
     attachment: LocationCardAttachment,
   ) => void | Promise<void>;
   onUnavailableAction?: (message: string) => void;
-  unavailableBackActionLabel?: string;
-  onUnavailableBack?: () => void;
   onUnavailableFallback?: (
     action: RootActionFallbackAction,
     source: RootAction["key"],
@@ -209,8 +207,6 @@ export function MobileChatPlusPanel({
   onSelectContactCard,
   onSelectLocationCard,
   onUnavailableAction,
-  unavailableBackActionLabel,
-  onUnavailableBack,
   onUnavailableFallback,
   excludeCharacterIds,
 }: MobileChatPlusPanelProps) {
@@ -532,18 +528,6 @@ export function MobileChatPlusPanel({
                     className="mr-2 rounded-full bg-[#07c160] px-3 py-1.5 text-[11px] font-medium text-white transition active:opacity-90"
                   >
                     {t(unavailableFallbackLabel)}
-                  </button>
-                ) : null}
-                {unavailableBackActionLabel && onUnavailableBack ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUnavailableAction(null);
-                      onUnavailableBack();
-                    }}
-                    className="mr-2 rounded-full bg-[color:var(--surface-panel)] px-3 py-1.5 text-[11px] font-medium text-[#5f5f5f] transition active:bg-[color:var(--surface-card-hover)]"
-                  >
-                    {unavailableBackActionLabel}
                   </button>
                 ) : null}
                 <button
