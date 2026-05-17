@@ -33,10 +33,15 @@ export function DesktopChatWindowPage() {
     () => parseDesktopChatWindowRouteHash(hash),
     [hash],
   );
+  // 走查 R3：standaloneWindow 是独立 Tauri 窗口，react-query cache 与主窗口
+  // 不共享，冷启动确实要拉一次。但用户从主窗口右键「在独立窗口打开聊天」
+  // 后再关掉重开（debugging / multi-monitor 工作流）时，给 15s staleTime
+  // 让此窗口自己的 cache 复用一下，避免每次 reopen 都 RTT。
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: Boolean(routeState),
+    staleTime: 15_000,
   });
   const activeConversation =
     routeState && conversationsQuery.data

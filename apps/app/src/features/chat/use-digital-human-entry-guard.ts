@@ -18,10 +18,14 @@ export function useDigitalHumanEntryGuard({
   const [videoGuardKey, setVideoGuardKey] = useState<string | null>(
     null,
   );
+  // 走查 R3：每进一段单聊都触发 systemStatus 重发判断 digital human gateway
+  // 是否可用——用户在多个单聊间切换时这条会重复跑很多次。gateway 状态变化
+  // 是分钟级的，30s staleTime 足够新鲜，可以省掉切会话的重复 RTT。
   const systemStatusQuery = useQuery({
     queryKey: ["system-status", baseUrl],
     queryFn: () => getSystemStatus(baseUrl),
     enabled: enabled && Boolean(baseUrl),
+    staleTime: 30_000,
   });
 
   const resetEntryGuard = useCallback(() => {
