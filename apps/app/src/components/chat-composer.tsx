@@ -6310,7 +6310,10 @@ async function createEditedScreenshotPayload(
   const sourceHeight = crop
     ? Math.max(1, Math.round(crop.height * height))
     : height;
-  const image = await loadImageElement(draft.previewUrl);
+  const image = await loadImageElement(
+    draft.previewUrl,
+    translateRuntimeMessage(msg`截图解析失败，请重新截图。`),
+  );
   const canvas = document.createElement("canvas");
   canvas.width = sourceWidth;
   canvas.height = sourceHeight;
@@ -6720,13 +6723,16 @@ function buildEditedScreenshotFileName(
   return `${normalized.slice(0, extensionIndex)}${suffix || "-edited"}.png`;
 }
 
-function loadImageElement(url: string) {
+function loadImageElement(url: string, errorMessage?: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
     image.onerror = () =>
       reject(
-        new Error(translateRuntimeMessage(msg`截图解析失败，请重新截图。`)),
+        new Error(
+          errorMessage ??
+            translateRuntimeMessage(msg`图片解析失败，请重新选择。`),
+        ),
       );
     image.src = url;
   });
