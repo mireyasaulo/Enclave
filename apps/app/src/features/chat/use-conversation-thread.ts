@@ -114,10 +114,16 @@ export function useConversationThread(conversationId: string) {
     refetchOnMount: "always",
   });
 
+  // 走查 R5：本 hook 在桌面侧由 ConversationThreadPanel 调用——desktop-chat-
+  // workspace 同一个 baseUrl 已经把 app-conversations 拉热（15s staleTime +
+  // 60s polling）。这条 observer 没 staleTime → 进/切单聊都触发一次冗余
+  // GET /conversations（公网隧道 ~600ms）。对齐 workspace 同款 15s。
+  // 同样适用于 mobile 路径（chat-room-page 进入时 chat-list-page 刚拉过）。
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: Boolean(ownerId),
+    staleTime: 15_000,
   });
   const activeConversation = conversationsQuery.data?.find(
     (item) => item.id === conversationId,
