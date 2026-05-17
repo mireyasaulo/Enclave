@@ -1264,6 +1264,10 @@ export function CharacterDetailPage() {
                       ? voiceConnectingLabel
                       : entryNotice.voiceLabel
                   }
+                  // 走查第四轮 R1：mutation pending 中按钮 label 已换成
+                  // 「正在接通...」但按钮 enabled 不变，双击就再发一次
+                  // openCallMutation.mutate(...)。disabled 收尾防一次。
+                  disabled={openCallMutation.isPending}
                   compact={false}
                 />
               </div>
@@ -1580,6 +1584,9 @@ export function CharacterDetailPage() {
                       ? voiceConnectingLabel
                       : entryNotice.voiceLabel
                   }
+                  // 见上方 desktop entryNotice 的注释 —— mobile/desktop 都走
+                  // 同一份 mutate 直调，双击同样会开两路。
+                  disabled={openCallMutation.isPending}
                   compact={!isDesktopLayout}
                 />
               </div>
