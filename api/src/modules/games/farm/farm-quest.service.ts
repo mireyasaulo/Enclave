@@ -28,6 +28,9 @@ export class FarmQuestService {
     private readonly questRepo: Repository<FarmQuestProgressEntity>,
     @InjectRepository(FarmPlayerStateEntity)
     private readonly playerRepo: Repository<FarmPlayerStateEntity>,
+    // 对侧的 FarmStateService 已经 forwardRef 注入 FarmQuestService，
+    // 这边不加 forwardRef → Nest 起 child 时全 world DI 直接挂掉。
+    @Inject(forwardRef(() => FarmStateService))
     private readonly stateService: FarmStateService,
   ) {}
 
