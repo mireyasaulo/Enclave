@@ -199,7 +199,14 @@ export function DiscoverFeedPage() {
       }
     | null
   >(null);
-  const routeState = parseFeedRouteHash(hash);
+  // 走查 R6：parseFeedRouteHash 之前每次 render 都现算，hash 没动也照样 new
+  // URLSearchParams + 重建对象。本身不贵，但 routeState 是 hot path 的源头—
+  // desktopSelectedPostId 同步 effect / 桌面/移动两条 "目标驱动翻页" effect /
+  // 移动 snap effect / safeReturnPath 兜底链路都依赖它的派生值。包一层 useMemo
+  // 让 routeState 引用稳定到 hash 真变才换；effect deps 看到的 routeSelectedPostId
+  // 仍按字符串值比较不受影响，但 routeState 引用稳定后下游派生（routeSelectionAlreadySynced
+  // 等）也更可预测。
+  const routeState = useMemo(() => parseFeedRouteHash(hash), [hash]);
   const normalizedDesktopReturnPath =
     isDesktopLayout && routeState.returnPath === "/discover/feed"
       ? "/tabs/feed"
