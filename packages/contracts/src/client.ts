@@ -76,6 +76,8 @@ import type {
   FeedViewRequest,
 } from "./feed";
 import type {
+  FarmCheckinResult,
+  FarmCheckinView,
   FarmConsumableId,
   FarmConsumablePurchaseResult,
   FarmCropId,
@@ -92,6 +94,8 @@ import type {
   FarmNeighborDetail,
   FarmNeighborSummary,
   FarmPlayerStateView,
+  FarmQuestClaimResult,
+  FarmQuestsView,
   FarmStealResult,
 } from "./farm";
 import type { GameCenterHomeResponse, GameCenterOwnerState } from "./games";
@@ -3582,6 +3586,49 @@ export function giftFarmItem(
 ) {
   return requestLegacyApi<FarmGiftItemResult>(
     "/games/farm/gift-item",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function getFarmCheckin(baseUrl?: string) {
+  return requestLegacyApi<FarmCheckinView>(
+    "/games/farm/checkin",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function doFarmCheckin(baseUrl?: string) {
+  return requestLegacyApi<FarmCheckinResult>(
+    "/games/farm/checkin",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    },
+    baseUrl,
+  );
+}
+
+export function getFarmQuests(baseUrl?: string) {
+  return requestLegacyApi<FarmQuestsView>(
+    "/games/farm/quests",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function claimFarmQuest(
+  input: { questId: string },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmQuestClaimResult>(
+    "/games/farm/quests/claim",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

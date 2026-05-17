@@ -6,12 +6,16 @@ import {
   buyFarmDecoration,
   buyFarmDog,
   buyFarmSeed,
+  claimFarmQuest,
   debugFarmPlot,
+  doFarmCheckin,
   feedFarmDog,
+  getFarmCheckin,
   getFarmEvents,
   getFarmLeaderboard,
   getFarmNeighborDetail,
   getFarmNeighbors,
+  getFarmQuests,
   getFarmState,
   giftFarmCoins,
   giftFarmItem,
@@ -24,6 +28,8 @@ import {
   uprootFarmPlot,
   waterFarmPlot,
   weedFarmPlot,
+  type FarmCheckinResult,
+  type FarmCheckinView,
   type FarmConsumableId,
   type FarmConsumablePurchaseResult,
   type FarmCropId,
@@ -40,6 +46,8 @@ import {
   type FarmNeighborDetail,
   type FarmNeighborSummary,
   type FarmPlayerStateView,
+  type FarmQuestClaimResult,
+  type FarmQuestsView,
   type FarmStealResult,
 } from "@yinjie/contracts";
 
@@ -274,6 +282,38 @@ export function useGiftFarmItem() {
     }
   >({
     mutationFn: (input) => giftFarmItem(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useFarmCheckin() {
+  return useQuery<FarmCheckinView>({
+    queryKey: ["farm", "checkin"],
+    queryFn: () => getFarmCheckin(),
+    staleTime: 60_000,
+  });
+}
+
+export function useDoFarmCheckin() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<FarmCheckinResult, Error, void>({
+    mutationFn: () => doFarmCheckin(),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useFarmQuests() {
+  return useQuery<FarmQuestsView>({
+    queryKey: ["farm", "quests"],
+    queryFn: () => getFarmQuests(),
+    staleTime: 30_000,
+  });
+}
+
+export function useClaimFarmQuest() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<FarmQuestClaimResult, Error, { questId: string }>({
+    mutationFn: (input) => claimFarmQuest(input),
     onSuccess: () => invalidate(),
   });
 }

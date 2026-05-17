@@ -1,8 +1,10 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AppError } from '../../../common/app-error.exception';
+import { FarmCheckinService } from './farm-checkin.service';
 import { FarmEventService } from './farm-event.service';
 import { FarmLeaderboardService } from './farm-leaderboard.service';
 import { FarmNpcService } from './farm-npc.service';
+import { FarmQuestService } from './farm-quest.service';
 import { FarmStateService } from './farm-state.service';
 import {
   isFarmConsumableId,
@@ -11,6 +13,8 @@ import {
 } from './crop-catalog';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
+  FarmCheckinResult,
+  FarmCheckinView,
   FarmConsumableId,
   FarmConsumablePurchaseResult,
   FarmCropId,
@@ -27,6 +31,8 @@ import {
   FarmNeighborDetail,
   FarmNeighborSummary,
   FarmPlayerStateView,
+  FarmQuestClaimResult,
+  FarmQuestsView,
   FarmStealResult,
 } from './farm.types';
 
@@ -68,6 +74,8 @@ export class FarmController {
     private readonly eventService: FarmEventService,
     private readonly npcService: FarmNpcService,
     private readonly leaderboardService: FarmLeaderboardService,
+    private readonly checkinService: FarmCheckinService,
+    private readonly questService: FarmQuestService,
   ) {}
 
   @Get('state')
@@ -295,6 +303,32 @@ export class FarmController {
       characterId,
       Math.floor(Number(body.amount)),
     );
+  }
+
+  @Get('checkin')
+  async getCheckin(): Promise<FarmCheckinView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.checkinService.getView(ownerId);
+  }
+
+  @Post('checkin')
+  async doCheckin(): Promise<FarmCheckinResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.checkinService.checkin(ownerId);
+  }
+
+  @Get('quests')
+  async getQuests(): Promise<FarmQuestsView> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.questService.getView(ownerId);
+  }
+
+  @Post('quests/claim')
+  async claimQuest(
+    @Body() body: { questId: string },
+  ): Promise<FarmQuestClaimResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.questService.claim(ownerId, String(body.questId ?? ''));
   }
 
   @Post('gift-item')

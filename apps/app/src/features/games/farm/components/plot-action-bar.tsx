@@ -4,7 +4,7 @@ import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FarmCropId, FarmPlayerStateView, FarmPlot } from "@yinjie/contracts";
 
 const t = translateRuntimeMessage;
-import { FARM_CROP_CATALOG } from "@yinjie/contracts";
+import { FARM_CROP_CATALOG, isFarmCropInSeason } from "@yinjie/contracts";
 import { useFarmAdjustedNow } from "../farm-clock-context";
 import { formatRemainingMs } from "../crop-presentation";
 import {
@@ -124,6 +124,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
     const eligibleCrops = (Object.keys(FARM_CROP_CATALOG) as FarmCropId[]).filter(
       (id) =>
         FARM_CROP_CATALOG[id].unlockLevel <= state.level &&
+        isFarmCropInSeason(id) &&
         ((state.seedBag[id] ?? 0) > 0 ||
           state.coins >= FARM_CROP_CATALOG[id].seedCost),
     );

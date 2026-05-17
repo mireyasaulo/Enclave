@@ -1,10 +1,11 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CharactersService } from '../../characters/characters.service';
 import { WorldOwnerService } from '../../auth/world-owner.service';
 import { FarmEventService } from './farm-event.service';
+import { FarmQuestService } from './farm-quest.service';
 import { FarmNpcStateEntity } from './entities/farm-npc-state.entity';
 import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
 import {
@@ -79,6 +80,9 @@ export class FarmStateService {
     private readonly worldOwnerService: WorldOwnerService,
     private readonly eventService: FarmEventService,
     private readonly charactersService: CharactersService,
+    // 任务推进：避开循环依赖，让 FarmQuestService 后注入（同模块；forwardRef）。
+    @Inject(forwardRef(() => FarmQuestService))
+    private readonly questService: FarmQuestService,
   ) {}
 
   async getOrCreatePlayerState(
@@ -240,6 +244,7 @@ export class FarmStateService {
       cropId,
       payload: { plotIndex, viaSeedBag: haveSeeds },
     });
+    await this.questService.recordAction(ownerId, 'plant');
 
     return this.toPlayerView(saved);
   }
@@ -336,7 +341,10 @@ export class FarmStateService {
         actorName: '我',
         payload: { level: state.level, plotCount: state.plotCount },
       });
+      await this.questService.syncLevelAchievements(ownerId, state.level);
     }
+    // harvest 任务按 plot 次数算（一次收获 = 一次推进），不按 amount
+    await this.questService.recordAction(ownerId, 'harvest', 1);
 
     return {
       player: this.toPlayerView(saved),
@@ -622,6 +630,8 @@ export class FarmStateService {
       relationship: character.relationship ?? null,
     };
 
+    await this.questService.recordAction(ownerId, 'steal');
+
     return {
       player: this.toPlayerView(savedPlayer),
       target,
@@ -871,6 +881,9 @@ export class FarmStateService {
       actorName: '我',
       payload: { level: nextLevel, cost },
     });
+    if (isFirstPurchase) {
+      await this.questService.recordAction(ownerId, 'buy_dog');
+    }
     return {
       player: this.toPlayerView(saved),
       dog: { ...newDog, energy: computeDogEnergy(newDog, Date.now()) },
@@ -1134,6 +1147,7 @@ export class FarmStateService {
       intimacyDelta,
       payload: { giftKind: 'coins', amount },
     });
+    await this.questService.recordAction(ownerId, 'gift');
     return {
       player: this.toPlayerView(saved),
       target: await this.buildNeighborSummary(character, npc),
@@ -1233,6 +1247,7 @@ export class FarmStateService {
       intimacyDelta,
       payload: { giftKind: itemKind, itemId, quantity },
     });
+    await this.questService.recordAction(ownerId, 'gift');
     return {
       player: this.toPlayerView(saved),
       target: await this.buildNeighborSummary(character, npc),
@@ -1350,6 +1365,9 @@ export class FarmStateService {
       cropId: plot.cropId ?? null,
       payload: { plotIndex },
     });
+    if (action === 'water') {
+      await this.questService.recordAction(ownerId, 'water');
+    }
 
     return this.toPlayerView(saved);
   }

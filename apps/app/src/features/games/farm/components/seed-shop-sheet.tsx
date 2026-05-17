@@ -6,6 +6,7 @@ import {
   FARM_CONSUMABLE_IDS,
   FARM_DECORATION_CATALOG,
   FARM_DECORATION_IDS,
+  isFarmCropInSeason,
   type FarmConsumableId,
   type FarmCropId,
   type FarmDecorationId,
@@ -287,7 +288,7 @@ export function SeedShopSheet({ state, open, onClose }: SeedShopSheetProps) {
           </ul>
         ) : (
         <ul className="flex-1 overflow-y-auto px-4 py-2">
-          {presentations.map((crop) => {
+          {presentations.filter((c) => isFarmCropInSeason(c.id)).map((crop) => {
             const locked = state.level < crop.unlockLevel;
             const owned = state.seedBag[crop.id] ?? 0;
             const affordable = state.coins >= crop.seedCost;

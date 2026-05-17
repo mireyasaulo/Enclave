@@ -334,6 +334,91 @@ export const FARM_GIFT_DAILY_LIMIT_COINS = 2000;
 export const FARM_GIFT_INTIMACY_PER_100_COINS = 1;
 export const FARM_GIFT_INTIMACY_PER_ITEM = 2;
 
+export interface FarmCheckinDayReward {
+  day: number; // 1-7
+  coins: number;
+  consumableId?: 'fertilizer' | 'pesticide' | 'dog_food';
+  consumableCount?: number;
+  seedCropId?: string;
+  seedCount?: number;
+}
+
+// 七日连签奖励曲线：QQ农场签到的经典节奏——前几天小礼，第 7 天大礼包。
+export const FARM_CHECKIN_REWARDS: ReadonlyArray<FarmCheckinDayReward> = [
+  { day: 1, coins: 50 },
+  { day: 2, coins: 80 },
+  { day: 3, coins: 120, consumableId: 'fertilizer', consumableCount: 1 },
+  { day: 4, coins: 160 },
+  { day: 5, coins: 220, consumableId: 'pesticide', consumableCount: 1 },
+  { day: 6, coins: 300 },
+  { day: 7, coins: 500, consumableId: 'fertilizer', consumableCount: 2 },
+];
+
+export interface FarmCheckinView {
+  ownerId: string;
+  lastCheckinDate: string | null;
+  streak: number;
+  totalCheckins: number;
+  canCheckinToday: boolean;
+  todayReward: FarmCheckinDayReward; // 今天签到能领什么
+  rewards: ReadonlyArray<FarmCheckinDayReward>;
+}
+
+export interface FarmCheckinResult {
+  player: FarmPlayerStateView;
+  checkin: FarmCheckinView;
+  reward: FarmCheckinDayReward;
+}
+
+export type FarmQuestId =
+  | 'daily_plant_3'
+  | 'daily_water_5'
+  | 'daily_harvest_3'
+  | 'daily_steal_1'
+  | 'daily_gift_1'
+  | 'achievement_harvest_100'
+  | 'achievement_harvest_1000'
+  | 'achievement_level_5'
+  | 'achievement_level_10'
+  | 'achievement_buy_dog';
+
+export type FarmQuestKind = 'daily' | 'achievement';
+
+export interface FarmQuestDefinition {
+  id: FarmQuestId;
+  kind: FarmQuestKind;
+  nameZh: string;
+  descriptionZh: string;
+  goal: number;
+  rewardCoins: number;
+  rewardExperience: number;
+}
+
+export interface FarmQuestProgress {
+  id: FarmQuestId;
+  progress: number;
+  goal: number;
+  kind: FarmQuestKind;
+  nameZh: string;
+  descriptionZh: string;
+  rewardCoins: number;
+  rewardExperience: number;
+  claimed: boolean;
+  // daily 任务的"今天"日期；achievement 则是 null。
+  dailyResetDate?: string | null;
+}
+
+export interface FarmQuestsView {
+  ownerId: string;
+  generatedAt: string;
+  quests: FarmQuestProgress[];
+}
+
+export interface FarmQuestClaimResult {
+  player: FarmPlayerStateView;
+  quest: FarmQuestProgress;
+}
+
 export interface FarmTickSummary {
   scannedCharacterCount: number;
   actedCount: number;
@@ -358,10 +443,17 @@ export const FARM_LEVEL_PLOT_UNLOCKS: ReadonlyArray<{ level: number; plotCount: 
   { level: 1, plotCount: 6 },
   { level: 4, plotCount: 9 },
   { level: 8, plotCount: 12 },
+  { level: 12, plotCount: 15 },
+  { level: 16, plotCount: 18 },
+  { level: 20, plotCount: 22 },
+  { level: 25, plotCount: 26 },
+  { level: 30, plotCount: 30 },
 ];
 
 export const FARM_LEVEL_EXPERIENCE_THRESHOLDS: ReadonlyArray<number> = [
   0, 100, 260, 480, 760, 1120, 1560, 2080, 2680, 3360,
+  4120, 4960, 5880, 6880, 7960, 9120, 10360, 11680, 13080, 14560,
+  16120, 17760, 19480, 21280, 23160, 25120, 27160, 29280, 31480, 33760,
 ];
 
 export const FARM_DEFAULT_PLAYER_SEED_BAG: Record<FarmCropId, number> = {
