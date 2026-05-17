@@ -170,6 +170,20 @@ export class GroupService {
 
   async createGroup(dto: CreateGroupDto): Promise<Group> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
+    // 走查 Round 新 R1：原版 `name: dto.name` 直接写进 DB，没 trim 也没校验，
+    // POST /groups {"name":""} / {"name":"   "} 都成功创建——会话列表 / 通讯录
+    // 群聊 / 群聊室 header / 群信息页 8 处全是裸渲染 group.name (?? 落不进 ""
+    // 这种 truthy-empty)，UI 上整条群行渲染成空白。mobile create-group-page
+    // 客户端有 `name.trim() || defaultGroupName` 兜底所以不触发，但任何一个
+    // 直连 API / 老版本客户端 / 未来的第三方客户端都会留下空名脏数据。
+    // 现在统一 trim + 400 reject，跟下面 memberIds 必须非空一个口径。
+    const trimmedName = dto.name?.trim();
+    if (!trimmedName) {
+      throw new AppError('GROUP_REQUIRES_NAME', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Group requires a non-empty name',
+      });
+    }
     // 走查 Round 2：dedupe 之后再剔除 char-default-self —— 用户自身就是
     // owner role=owner 这一条 member 行；如果把"我自己"也作为 character member 加进群，
     // 你跟自己同时在群里、还能跟自己 @、自己回复自己。空 memberIds 同样不允许：
@@ -204,7 +218,7 @@ export class GroupService {
         const memberRepo = manager.getRepository(GroupMemberEntity);
 
         const groupEntity = groupRepo.create({
-          name: dto.name,
+          name: trimmedName,
           creatorId: owner.id,
           creatorType: 'user',
           isHidden: false,
@@ -449,6 +463,17 @@ export class GroupService {
 
   async updateGroup(groupId: string, dto: UpdateGroupDto): Promise<Group> {
     const group = await this.requireOwnedGroup(groupId);
+    // 走查 Round 新 R1：原版 `name: nextName || group.name` 在 dto.name 显式传
+    // "" / 纯空白时沉默保留旧名——用户在群聊名称编辑页清空保存，原版返回 200
+    // + 同一份旧名 group，client 跳回 details 但名称没变，看着像"保存按钮不
+    // 响应"。和 createGroup 同口径：dto.name === undefined（partial update 没
+    // 想动）就跳过；显式传过来但 trim 为空就 400 让 client 报错给用户。
+    if (dto.name !== undefined && !dto.name.trim()) {
+      throw new AppError('GROUP_REQUIRES_NAME', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Group requires a non-empty name',
+      });
+    }
     const nextName = dto.name?.trim();
     const nextAnnouncement =
       dto.announcement === undefined
