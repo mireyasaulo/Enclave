@@ -1193,6 +1193,10 @@ export function ContactsPage() {
   // 菜单展开时点 "我" 之类的底部 tab，第一下被 overlay 吃掉只关菜单、第二下
   // 才真的导航。改用 document pointerdown 监听 + 容器 ref，菜单外侧任何位置
   // 的点击都正常落到目标元素（tab/链接/按钮），同时也把菜单收起。
+  // 走查新一轮 R1：跟 chat-list-page b45435c2 对齐补 ESC——aria-haspopup="menu"
+  // 摆好了但 ESC 完全不起作用。外接键盘 / Bluetooth 键盘用户没法 dismiss；屏幕
+  // 阅读器用户被困在菜单里。Android 硬件 Back 已经在上一条 effect 兜了，这里
+  // 只补 ESC。
   useEffect(() => {
     if (isDesktopLayout || !isQuickMenuOpen) {
       return;
@@ -1207,9 +1211,17 @@ export function ContactsPage() {
       }
       setIsQuickMenuOpen(false);
     };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsQuickMenuOpen(false);
+      }
+    };
     document.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [isDesktopLayout, isQuickMenuOpen]);
 
@@ -2566,7 +2578,15 @@ export function ContactsPage() {
               {isQuickMenuOpen && !bulkMode ? (
                 // bg 必须完全不透明：rgba(44,44,44,0.96) 时 “新的朋友” 的红色 6 badge
                 // 会从下层穿透到 “添加朋友” 行的右侧，看着像 + 菜单自己有红点。
-                <div className="absolute right-0 top-[calc(100%+0.3rem)] z-40 w-[10rem] overflow-hidden rounded-[11px] bg-[#2c2c2c] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.2)]">
+                // 走查新一轮 R1：role="menu" + role="menuitem" 对齐 trigger 的
+                // aria-haspopup="menu"。原本 trigger 声明了 menu popup 但弹层
+                // 没 menu 语义，屏幕阅读器把整块当通用 region，听不到「4 个菜单项
+                // 里第 1 项」之类导航。跟 chat-list-page b45435c2 修复对齐。
+                <div
+                  role="menu"
+                  aria-label={t(msg`快捷操作`)}
+                  className="absolute right-0 top-[calc(100%+0.3rem)] z-40 w-[10rem] overflow-hidden rounded-[11px] bg-[#2c2c2c] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.2)]"
+                >
                   {mobileQuickActionItems.map((item) => {
                     const Icon = item.icon;
 
@@ -2576,6 +2596,7 @@ export function ContactsPage() {
                         <button
                           key={item.key}
                           type="button"
+                          role="menuitem"
                           onClick={() => handleMobileQuickActionNavigate(to)}
                           className="flex w-full items-center gap-2 rounded-[9px] px-2.5 py-2 text-left text-[12px] text-white transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-white/10 active:bg-white/12"
                         >
@@ -2591,7 +2612,9 @@ export function ContactsPage() {
                       <button
                         key={item.key}
                         type="button"
+                        role="menuitem"
                         disabled={item.disabled}
+                        aria-disabled={item.disabled || undefined}
                         className={cn(
                           "flex w-full items-center gap-2 rounded-[9px] px-2.5 py-2 text-left text-[12px] text-white transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
                           item.disabled
