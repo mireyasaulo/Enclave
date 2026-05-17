@@ -1240,9 +1240,17 @@ export function ChannelsPage() {
       return;
     }
 
+    // 走查 2026-05-17 R1：用户带 `#post=ID` 直达 /discover/channels 但 URL 里
+    // 没写 section= 时，routeState.section 是 undefined，而本地 activeSection
+    // 初始就是默认值 "recommended"，原代码用 `routeState.section === activeSection`
+    // 做严格相等会判 false，于是 postId 被强写成 undefined，整段 URL 在挂载后
+    // 立刻被 replace 成 `#section=recommended`，把用户带过来的 post= 锚点擦掉，
+    // routeSelectedPostId 也变 null → scroll-to-route 永远跑不到。
+    // 对齐桌面 effect（line 1204）把 "URL 没 section" 视同 "recommended"。
+    const urlSection = routeState.section ?? "recommended";
+    const sectionMatches = urlSection === activeSection;
     const nextHash = buildDesktopChannelsRouteHash({
-      postId:
-        routeState.section === activeSection ? routeSelectedPostId : undefined,
+      postId: sectionMatches ? routeSelectedPostId : undefined,
       returnPath: safeReturnPath,
       returnHash: safeReturnHash,
       section: activeSection,
