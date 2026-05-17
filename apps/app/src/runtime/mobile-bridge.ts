@@ -154,25 +154,36 @@ export async function shareWithNativeShell(payload: MobileBridgeSharePayload) {
     return false;
   }
 
-  // 走查新一轮 R1：mobileBridge.share 是 capacitor JS-Native 桥的 RPC 调用，
-  // 没有超时兜底。Android 上系统 share sheet 被低优先级线程吃住 / WebView
-  // 进程被 OS 切到后台 / native 那侧 listener 异常没回 callback 时，整条
-  // Promise 永不结算 — 广场/朋友圈/视频号的「分享」按钮 await 它 → handler
-  // 永远不 setNotice，UI 看着像点了没反应。8s 强超时（capacitor 自家系统
-  // share sheet 正常 < 1s 出，>3s 已经不正常），超时算 false 让上层降级到
-  // 复制摘要兜底链路。原本 try/catch 已经把 throw 兜成 false，超时 reject
-  // 沿同一路径降级，UX 一致。
-  const SHARE_TIMEOUT_MS = 8_000;
+  // 真机走查 R1（iOS 真机走查 2026-05-18）：之前 8s timeout 跨平台无差别套。
+  // iOS 侧 YinjieMobileBridgePlugin.share 用 completionWithItemsHandler 在 sheet
+  // dismiss 才 resolve（这是 iOS 原生 UIActivityViewController 的契约——
+  // 选好分享目标 / 用户主动取消 → 才走回调）。真机上 AirDrop 选好接收设备 /
+  // Messages 选好联系人 / 选好回复内容这些步骤经常 10-30s，8s 强超时直接
+  // 把 native 路径打成 false：
+  //   - native-share.ts 接到 false 后跌进 navigator.share 兜底 → WKWebView 又
+  //     弹一次同款 UIActivityViewController，叠在原 sheet 上；
+  //   - share-card-modal、official-article-viewer 等调用方 catch 到失败展示
+  //     「分享失败」toast，可是 iOS 原 sheet 还在屏幕上、用户最终也确实分享
+  //     成功。
+  // Android 侧那条超时是真实存在的：低优先级线程吃住 / WebView 进程被 OS
+  // 切到后台 / native listener 异常没回 callback，所以 Android 保留 8s 超时
+  // 兜底。iOS 干掉超时，直接 await 原生 callback，让 sheet 真正 dismiss 才结算。
+  const platform = Capacitor.getPlatform();
   try {
-    await Promise.race([
-      mobileBridge.share(payload),
-      new Promise<never>((_, reject) =>
-        window.setTimeout(
-          () => reject(new Error("native share timeout")),
-          SHARE_TIMEOUT_MS,
+    if (platform === "ios") {
+      await mobileBridge.share(payload);
+    } else {
+      const SHARE_TIMEOUT_MS = 8_000;
+      await Promise.race([
+        mobileBridge.share(payload),
+        new Promise<never>((_, reject) =>
+          window.setTimeout(
+            () => reject(new Error("native share timeout")),
+            SHARE_TIMEOUT_MS,
+          ),
         ),
-      ),
-    ]);
+      ]);
+    }
     return true;
   } catch {
     return false;
@@ -197,33 +208,42 @@ export async function shareFileWithNativeShell(
     };
   }
 
-  // 走查新一轮 R1：跟上一轮给 shareWithNativeShell 加 8s 超时同款问题——
-  // 广场动态 / 朋友圈 ShareCardModal 走「保存 / 分享图片」按钮时会拉到这个
-  // 桥。base64 编码本身有 FileReader 兜底正常结算，但 mobileBridge.shareFile
-  // 是 capacitor JS-Native RPC，Android 系统 share sheet 被低优先级线程吃住 /
-  // native listener 没回 callback / WebView 进程被切后台时整条 Promise 永不
-  // 结算，用户视感是「点了保存/分享按钮，按钮高亮一下就死那儿了，关 modal
-  // 重开按钮还是按不动（pngDataUrl 还在但 saveError 也没出）」。12s 强超时
-  // 兜底（比 shareWithNativeShell 的 8s 稍宽，文件 payload 比纯文本大、
-  // 系统 sheet 决定也偏慢），超时算 false 让上层降级到 navigator.share /
-  // 浏览器 <a download> 兜底，UX 与 shareWithNativeShell 一致。
-  const SHARE_FILE_TIMEOUT_MS = 12_000;
+  // 真机走查 R1（iOS 真机走查 2026-05-18）：跟 shareWithNativeShell 的 8s 超时
+  // 同款问题，iOS 侧 YinjieMobileBridgePlugin.shareFile 用 completionWithItemsHandler
+  // 在 sheet dismiss 才 resolve，文件比纯文本场景更慢（用户拣 AirDrop / 选
+  // Files 目录 / 写 Mail 附带正文 → 单次决策常 20-60s 起），12s 强超时把
+  // ShareCardModal 「保存/分享图片」 / save-remote-file / save-generated-file
+  // 的真机正常路径全打成 false，调用方 saveError 上屏「分享失败」、可 iOS sheet
+  // 还在屏上、用户最终也成功保存到了 Files / 发到了微信。
+  // Android 侧那条超时仍然有效（WebView 进程被切后台 / native listener 没回
+  // callback 的 hang 场景），分平台处理。
+  const platform = Capacitor.getPlatform();
   try {
     const base64Data = await encodeBlobAsBase64(payload.blob);
-    await Promise.race([
-      mobileBridge.shareFile({
+    if (platform === "ios") {
+      await mobileBridge.shareFile({
         base64Data,
         fileName: normalizedFileName,
         mimeType: payload.mimeType?.trim() || undefined,
         title: payload.title?.trim() || undefined,
-      }),
-      new Promise<never>((_, reject) =>
-        window.setTimeout(
-          () => reject(new Error("native share file timeout")),
-          SHARE_FILE_TIMEOUT_MS,
+      });
+    } else {
+      const SHARE_FILE_TIMEOUT_MS = 12_000;
+      await Promise.race([
+        mobileBridge.shareFile({
+          base64Data,
+          fileName: normalizedFileName,
+          mimeType: payload.mimeType?.trim() || undefined,
+          title: payload.title?.trim() || undefined,
+        }),
+        new Promise<never>((_, reject) =>
+          window.setTimeout(
+            () => reject(new Error("native share file timeout")),
+            SHARE_FILE_TIMEOUT_MS,
+          ),
         ),
-      ),
-    ]);
+      ]);
+    }
     return {
       shared: true,
       error: null,
