@@ -521,7 +521,28 @@ export function createGroupInviteDeliveryBatchId() {
     .slice(2, 8)}`;
 }
 
+// 走查 R1：原版返回 "?from=...&title=..." 字符串，被 routes/group-chat-
+// details-page.tsx / desktop-chat-details-panel.tsx 直接喂给
+// `navigate({ search })`。TanStack Router 的 search 参数期望对象，传字符串
+// 会被 Object.entries 当成 indexed iterable 拆成 `?0=%3F&1=f&2=r…` 一坨字符
+// 级 entries，进而导致 GroupQrPage 接到非预期 URL → 全树错误边界兜底，
+// 控制台一片 "useAppLocale must be used inside AppLocaleProvider"。这里
+// 拆成两个函数：navigate 用对象版本，路径手动拼接走 string 版本。
 export function buildGroupInviteReturnSearch(input?: {
+  conversationPath?: string;
+  conversationTitle?: string;
+}): { from?: string; title?: string } | undefined {
+  const result: { from?: string; title?: string } = {};
+  if (input?.conversationPath) {
+    result.from = input.conversationPath;
+  }
+  if (input?.conversationTitle) {
+    result.title = input.conversationTitle;
+  }
+  return result.from || result.title ? result : undefined;
+}
+
+function buildGroupInviteReturnSearchString(input?: {
   conversationPath?: string;
   conversationTitle?: string;
 }) {
@@ -556,7 +577,7 @@ function buildGroupInviteReturnPath(
     inviteRouteHash?: string;
   },
 ) {
-  const search = buildGroupInviteReturnSearch(input);
+  const search = buildGroupInviteReturnSearchString(input);
   const hash = normalizeHash(input?.inviteRouteHash);
   const path = search ? `/group/${groupId}/qr${search}` : `/group/${groupId}/qr`;
   return hash ? `${path}#${hash}` : path;
