@@ -16,13 +16,25 @@ import { useWorldOwnerStore } from "../store/world-owner-store";
 
 const SIGNATURE_MAX_LENGTH = 30;
 
-// 把 CR/LF/Tab 折叠成普通空格、压缩连续空白、再 trim。
+// 把所有 ASCII / Unicode 控制字符折叠成空格、压缩连续空白、再 trim。
 // 抽到 component 外是为了让 dirty 比较和 initial draft 都走同一份逻辑（之前
 // 比较时 baseline 用 `signature.trim()`，sanitized 已去 \n，legacy 用户存的是
 // 带 \n 的签名 → 一打开页面 dirty 就为 true、「完成」绿着 → 用户没改任何东西
 // 也能误点保存）。
+// 走查 R1：之前只剥 \r\n\t，跟服务端 sanitizeOwnerSignature 用的 CONTROL_CHAR_REGEX
+// (U+0000..U+001F / U+007F..U+009F) 不一致——curl 直 PATCH 进来的旧脏数据如
+// "abcdef"（BEL），客户端打开页面 sanitized=raw，下次保存就把 BEL 原样
+// 上传，服务端剥成 "abc def" 又 hydrate 回来，draft 跟着变；用户体感是「我没改
+// 什么，怎么签名突然变了」。跟服务端同口径剥控制字符，且跟同目录 name-page 的
+// CONTROL_CHAR_PATTERN 完全对齐。eslint no-control-regex 故意 disable —— 这里
+// 就是要拿控制字符 codepoint 范围做 sanitize，不是误写。
+const CONTROL_CHAR_PATTERN = new RegExp(
+  // eslint-disable-next-line no-control-regex
+  "[\\u0000-\\u001f\\u007f-\\u009f]+",
+  "g",
+);
 function sanitizeOwnerSignature(value: string): string {
-  return value.replace(/[\r\n\t]+/g, " ").replace(/  +/g, " ").trim();
+  return value.replace(CONTROL_CHAR_PATTERN, " ").replace(/\s+/g, " ").trim();
 }
 
 export function ProfileInfoSignaturePage() {
@@ -219,6 +231,13 @@ export function ProfileInfoSignaturePage() {
       {draft.length > 0 && sanitized.length < draft.length ? (
         <div className="px-4 pt-2 text-[11px] leading-5 text-[color:var(--text-muted)]">
           {t(msg`签名按单行保存：换行和多余空白会被折叠为一个空格。`)}
+        </div>
+      ) : null}
+
+      {/* overLimit 走查 R1：legacy DB >30 字符的旧签名（之前没卡上限）进编辑页时 sanitized 直接超限、「完成」灰着但没文字说明，跟 name-page 同款修。i18n-ignore-line */}
+      {overLimit ? (
+        <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
+          {t(msg`签名太长啦，最多 ${SIGNATURE_MAX_LENGTH} 个字符，请删掉一些。`)}
         </div>
       ) : null}
 

@@ -1184,22 +1184,6 @@ msgstr "ファイルサイズが大きすぎます ({sizeMb} MB)。上限は 5 M
 msgid "JSON 解析失败：{reason}"
 msgstr "JSON のパースに失敗しました：{reason}"
 
-#: apps/wiki/src/main.tsx:39
-msgid "未知错误"
-msgstr "不明なエラー"
-
-#: apps/wiki/src/main.tsx:58
-msgid "页面发生错误"
-msgstr "ページでエラーが発生しました"
-
-#: apps/wiki/src/main.tsx:85
-msgid "重试"
-msgstr "再試行"
-
-#: apps/wiki/src/main.tsx:102
-msgid "刷新页面"
-msgstr "ページを再読み込み"
-
 #: apps/wiki/src/router.tsx:25
 msgid "页面不存在"
 msgstr "ページが見つかりません"

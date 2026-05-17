@@ -1184,22 +1184,6 @@ msgstr "文件太大（{sizeMb} MB），上限 5 MB。确认是 .character.json 
 msgid "JSON 解析失败：{reason}"
 msgstr "JSON 解析失败：{reason}"
 
-#: apps/wiki/src/main.tsx:39
-msgid "未知错误"
-msgstr "未知错误"
-
-#: apps/wiki/src/main.tsx:58
-msgid "页面发生错误"
-msgstr "页面发生错误"
-
-#: apps/wiki/src/main.tsx:85
-msgid "重试"
-msgstr "重试"
-
-#: apps/wiki/src/main.tsx:102
-msgid "刷新页面"
-msgstr "刷新页面"
-
 #: apps/wiki/src/router.tsx:25
 msgid "页面不存在"
 msgstr "页面不存在"

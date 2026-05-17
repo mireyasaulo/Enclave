@@ -28792,7 +28792,7 @@ msgstr "名前が短すぎます — 最低 {NAME_MIN_LENGTH} 文字必要です
 
 #: apps/app/src/routes/profile-info-name-page.tsx:255
 msgid "名字太长啦，最多 {NAME_MAX_LENGTH} 个字符，请删掉一些。"
-msgstr ""
+msgstr "名前が長すぎます — 最大 {NAME_MAX_LENGTH} 文字以内にしてください。"
 
 #: apps/app/src/routes/profile-info-page.tsx:68
 msgid "已复制隐界号"
@@ -28841,7 +28841,7 @@ msgstr "署名は 1 行で保存されます。改行や余分な空白は 1 つ
 
 #: apps/app/src/routes/profile-info-signature-page.tsx:243
 msgid "签名太长啦，最多 {SIGNATURE_MAX_LENGTH} 个字符，请删掉一些。"
-msgstr ""
+msgstr "署名が長すぎます — 最大 {SIGNATURE_MAX_LENGTH} 文字以内にしてください。"
 
 #: apps/app/src/routes/profile-moments-page.tsx:740
 msgid "刷新失败：{localized}"

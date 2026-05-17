@@ -246,6 +246,14 @@ export function ProfileInfoNamePage() {
         <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
           {t(msg`名字太短啦，至少要 ${NAME_MIN_LENGTH} 个字符。`)}
         </div>
+      ) : overLimit ? (
+        // 走查 R1：input maxLength=20 挡 user input/paste，但 legacy DB 有 >20 字符
+        // 的旧 username（早期版本没卡上限）。这类用户一进编辑页 sanitized 立刻超限、
+        // 「完成」永远灰着、计数器虽然变红但没文字说明，跟之前"clear 后看灰按钮以为
+        // 是 bug"的体验同款。补一条 banner，让用户明确知道要删掉几个字。
+        <div className="mx-4 mt-3 rounded-[10px] border border-[rgba(245,158,11,0.20)] bg-[rgba(255,251,235,0.96)] px-3 py-2 text-[12px] leading-5 text-[#92400e]">
+          {t(msg`名字太长啦，最多 ${NAME_MAX_LENGTH} 个字符，请删掉一些。`)}
+        </div>
       ) : null}
 
       {errorMessage ? (

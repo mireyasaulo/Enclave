@@ -1184,22 +1184,6 @@ msgstr "File too large ({sizeMb} MB) — limit is 5 MB. Make sure it's a .charac
 msgid "JSON 解析失败：{reason}"
 msgstr "Failed to parse JSON: {reason}"
 
-#: apps/wiki/src/main.tsx:39
-msgid "未知错误"
-msgstr "Unknown error"
-
-#: apps/wiki/src/main.tsx:58
-msgid "页面发生错误"
-msgstr "Page encountered an error"
-
-#: apps/wiki/src/main.tsx:85
-msgid "重试"
-msgstr "Try again"
-
-#: apps/wiki/src/main.tsx:102
-msgid "刷新页面"
-msgstr "Reload page"
-
 #: apps/wiki/src/router.tsx:25
 msgid "页面不存在"
 msgstr "Page not found"
