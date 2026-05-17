@@ -749,6 +749,31 @@ function ChannelMediaSurface({
     );
   }
 
+  // 走查 R1（本轮）：和 mobile MobileChannelMediaSurface 同款修法——
+  // 纯 mediaType='text' 帖（无 coverUrl / mediaUrl / image media）历来直接
+  // fall through 到下方"暂无可播放内容"黑屏，用户在桌面工作区主区看到自己写
+  // 的文字帖完全空白，体感「内容丢了」。把 title + text 渲到暗色卡上至少把
+  // 文字显示出来；正文走 stripToolCallSyntax 过 AI 思考残留。
+  const textContent = stripToolCallSyntax(post.text ?? "");
+  if (post.title?.trim() || textContent.trim()) {
+    return (
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gradient-to-b from-[#1f2533] to-[#0a0c10] px-10">
+        <div className="max-w-[28rem] text-center text-white">
+          {post.title?.trim() ? (
+            <div className="text-[24px] font-semibold leading-[1.6]">
+              {post.title}
+            </div>
+          ) : null}
+          {textContent.trim() && textContent !== post.title ? (
+            <div className="mt-3 text-[15px] leading-[1.7] text-white/82 line-clamp-[10]">
+              {textContent}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-1 items-center justify-center text-center">
       <div className="px-6">

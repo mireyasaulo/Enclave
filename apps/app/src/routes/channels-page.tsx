@@ -2031,6 +2031,32 @@ function MobileChannelMediaSurface({
     );
   }
 
+  // 走查 R1（本轮）：用户自己用 createOwnerPost(surface='channels', mediaType='text')
+  // 发的纯文字帖（yuanzui R3 测试用过；任何走 curl/第三方端的客户端都能造）会
+  // 落到 home 推荐流里——前端历来直接 fall through 到下方"暂无可播放内容"黑屏，
+  // 用户看到自己写的 42 赞、6 评论那条帖完全空白，体感「我发的贴坏了」/「别人
+  // 看不到内容」。和 image 帖的兜底思路一致：用 post.title / post.text 拼一张
+  // 暗色文字卡，至少把内容显示出来；正文走 stripToolCallSyntax 过 AI 思考残留。
+  const textContent = stripToolCallSyntax(post.text ?? "");
+  if (post.title?.trim() || textContent.trim()) {
+    return (
+      <div className="relative flex h-full min-h-[calc(100dvh-12rem)] w-full items-center justify-center overflow-hidden bg-gradient-to-b from-[#1f2533] to-[#0a0c10] px-8">
+        <div className="max-w-[22rem] text-center text-white">
+          {post.title?.trim() ? (
+            <div className="text-[22px] font-semibold leading-[1.6]">
+              {post.title}
+            </div>
+          ) : null}
+          {textContent.trim() && textContent !== post.title ? (
+            <div className="mt-3 text-[14px] leading-[1.7] text-white/82 line-clamp-[8]">
+              {textContent}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-[calc(100dvh-12rem)] w-full items-center justify-center bg-black px-6 text-center">
       <div>

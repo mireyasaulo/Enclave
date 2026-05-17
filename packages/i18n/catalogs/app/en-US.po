@@ -18,21 +18,21 @@ msgstr ""
 #: apps/app/src/routes/channel-author-page.tsx:905
 #: apps/app/src/routes/channel-author-page.tsx:965
 #: apps/app/src/routes/channels-page.tsx:1982
-#: apps/app/src/routes/channels-page.tsx:3403
+#: apps/app/src/routes/channels-page.tsx:3429
 msgid "音乐"
 msgstr "Music"
 
 #: apps/app/src/components/audio-card.tsx:172
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:107
-#: apps/app/src/routes/channels-page.tsx:2431
-#: apps/app/src/routes/channels-page.tsx:2659
+#: apps/app/src/routes/channels-page.tsx:2457
+#: apps/app/src/routes/channels-page.tsx:2685
 msgid "暂停"
 msgstr "Pause"
 
 #: apps/app/src/components/audio-card.tsx:172
 #: apps/app/src/i18n/static-dom-seed.ts:349
-#: apps/app/src/routes/channels-page.tsx:2431
-#: apps/app/src/routes/channels-page.tsx:2659
+#: apps/app/src/routes/channels-page.tsx:2457
+#: apps/app/src/routes/channels-page.tsx:2685
 msgid "播放"
 msgstr "Play"
 
@@ -120,7 +120,7 @@ msgstr "Forward to chat"
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:151
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:321
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:369
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1841
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1866
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:101
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:164
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1095
@@ -136,7 +136,7 @@ msgstr "Forward to chat"
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:173
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:472
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:225
-#: apps/app/src/routes/channels-page.tsx:3954
+#: apps/app/src/routes/channels-page.tsx:3980
 #: apps/app/src/routes/character-detail-page.tsx:381
 #: apps/app/src/routes/contacts-page.tsx:2558
 #: apps/app/src/routes/contacts-page.tsx:2560
@@ -398,8 +398,8 @@ msgstr "Expand input box"
 #: apps/app/src/components/chat-composer.tsx:3279
 #: apps/app/src/components/chat-composer.tsx:3521
 #: apps/app/src/components/chat-message-list.tsx:4621
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:107
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1051
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:114
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1066
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:621
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1055
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1110
@@ -421,7 +421,7 @@ msgstr "Sticker"
 #: apps/app/src/features/chat/group-message-context-menu.tsx:72
 #: apps/app/src/features/chat/group-message-context-menu.tsx:87
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:57
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1140
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1165
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:376
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:372
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:273
@@ -436,7 +436,7 @@ msgstr "Sticker"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
 #: apps/app/src/i18n/static-dom-seed.ts:65
-#: apps/app/src/routes/channels-page.tsx:3236
+#: apps/app/src/routes/channels-page.tsx:3262
 #: apps/app/src/routes/desktop-chat-files-page.tsx:767
 #: apps/app/src/routes/favorites-page.tsx:562
 #: apps/app/src/routes/mobile-favorites-page.tsx:317
@@ -452,8 +452,8 @@ msgstr "Favorites"
 #: apps/app/src/components/chat-message-list.tsx:4597
 #: apps/app/src/features/chat/chat-image-viewer-route-state.ts:42
 #: apps/app/src/features/chat/chat-image-viewer-route-state.ts:205
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:104
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1027
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:111
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1042
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1090
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1140
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:165
@@ -470,10 +470,10 @@ msgstr "Image"
 #: apps/app/src/components/chat-message-list.tsx:4601
 #: apps/app/src/components/chat-message-list.tsx:5753
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:171
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:105
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:133
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:134
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1031
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:112
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:140
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:141
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1046
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:374
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1003
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1094
@@ -518,13 +518,13 @@ msgstr "Enter to send"
 #: apps/app/src/components/chat-composer.tsx:4229
 #: apps/app/src/components/moment-comment-composer.tsx:39
 #: apps/app/src/components/wechat-comment-bar.tsx:262
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1895
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1920
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:410
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:206
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1138
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:169
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:206
-#: apps/app/src/routes/channels-page.tsx:3993
+#: apps/app/src/routes/channels-page.tsx:4019
 #: apps/app/src/routes/discover-page.tsx:1072
 #: apps/app/src/routes/mobile-add-friend-page.tsx:1084
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1166
@@ -805,11 +805,11 @@ msgstr "Send original (Cmd/Ctrl+Enter)"
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:109
 #: apps/app/src/components/moment-comment-composer.tsx:40
 #: apps/app/src/features/account-security/account-security-panel.tsx:430
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1895
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1920
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1138
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:114
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:169
-#: apps/app/src/routes/channels-page.tsx:3993
+#: apps/app/src/routes/channels-page.tsx:4019
 #: apps/app/src/routes/character-detail-page.tsx:373
 #: apps/app/src/routes/discover-page.tsx:1071
 #: apps/app/src/routes/mobile-add-friend-page.tsx:915
@@ -1476,7 +1476,7 @@ msgstr "Adding to Favorites..."
 #: apps/app/src/components/chat-message-list.tsx:3635
 #: apps/app/src/features/chat/group-message-context-menu.tsx:166
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:150
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1121
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1146
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:411
 #: apps/app/src/i18n/static-dom-seed.ts:934
 msgid "转发"
@@ -1587,7 +1587,7 @@ msgstr "Chat history"
 
 #: apps/app/src/components/chat-message-list.tsx:3357
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:233
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1215
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1227
 #: apps/app/src/features/chat/group-message-context-menu.tsx:62
 #: apps/app/src/features/chat/message-quote-selection-sheet.tsx:118
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:49
@@ -1612,8 +1612,8 @@ msgstr "Me"
 #: apps/app/src/components/chat-message-list.tsx:4561
 #: apps/app/src/components/mobile-shell.tsx:34
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:311
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:760
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1282
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:772
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1294
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1334
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1597
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1363
@@ -1739,10 +1739,10 @@ msgstr "Save attachment"
 #: apps/app/src/components/chat-message-list.tsx:4582
 #: apps/app/src/components/chat-message-list.tsx:4624
 #: apps/app/src/components/mobile-shell.tsx:31
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:184
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:191
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:965
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1718
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1944
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1730
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1956
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:750
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:976
 #: apps/app/src/features/shell/desktop-nav-matching.ts:34
@@ -1846,9 +1846,9 @@ msgid "明天 {timeLabel}"
 msgstr "Tomorrow {timeLabel}"
 
 #: apps/app/src/components/chat-message-list.tsx:4564
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:810
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1259
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1283
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:822
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1271
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1295
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1106
 #: apps/app/src/features/chat/mobile-mention-picker-sheet.tsx:78
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1352
@@ -1869,8 +1869,8 @@ msgid "群成员"
 msgstr "Group members"
 
 #: apps/app/src/components/chat-message-list.tsx:4605
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:106
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1035
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:113
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1050
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1098
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1327
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1148
@@ -1882,8 +1882,8 @@ msgstr "Voice"
 
 #: apps/app/src/components/chat-message-list.tsx:4609
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:147
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:108
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1039
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:115
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1054
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1102
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1152
 #: apps/app/src/lib/message-attachment-semantic.ts:282
@@ -1894,8 +1894,8 @@ msgstr "Contact card"
 #: apps/app/src/components/chat-message-list.tsx:4613
 #: apps/app/src/components/chat-message-list.tsx:5798
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:153
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:109
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1043
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:116
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1058
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1106
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1159
 #: apps/app/src/i18n/static-dom-seed.ts:751
@@ -1907,8 +1907,8 @@ msgstr "Location"
 #: apps/app/src/components/chat-message-list.tsx:4617
 #: apps/app/src/components/chat-message-list.tsx:5571
 #: apps/app/src/components/chat-message-list.tsx:7158
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:110
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1047
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:117
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1062
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1156
 #: apps/app/src/features/desktop/chat/desktop-note-window-route-state.ts:77
 #: apps/app/src/features/favorites/note-editor-helpers.ts:265
@@ -2027,9 +2027,9 @@ msgstr "[Chat history]"
 #: apps/app/src/components/wechat-moment-card.tsx:392
 #: apps/app/src/features/chat/group-message-context-menu.tsx:152
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:143
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2079
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2104
 #: apps/app/src/i18n/static-dom-seed.ts:935
-#: apps/app/src/routes/channels-page.tsx:3759
+#: apps/app/src/routes/channels-page.tsx:3785
 #: apps/app/src/routes/discover-feed-page.tsx:2553
 msgid "回复"
 msgstr "Reply"
@@ -2087,7 +2087,7 @@ msgstr " file(s)"
 #: apps/app/src/components/chat-message-list.tsx:5626
 #: apps/app/src/components/moment-compose-media-preview.tsx:119
 #: apps/app/src/components/moment-media-gallery.tsx:217
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1480
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1505
 #: apps/app/src/i18n/static-dom-seed.ts:862
 #: apps/app/src/lib/character-i18n.ts:44
 #: apps/app/src/routes/channel-author-page.tsx:327
@@ -2129,7 +2129,7 @@ msgid "视频号 · {0}"
 msgstr "Channels · {0}"
 
 #: apps/app/src/components/chat-message-list.tsx:5680
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1476
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1488
 #: apps/app/src/features/chat/mobile-reminder-toast-host.tsx:319
 #: apps/app/src/i18n/static-dom-seed.ts:814
 msgid "查看"
@@ -2176,8 +2176,8 @@ msgid "桌面发起"
 msgstr "Desktop initiated"
 
 #: apps/app/src/components/chat-message-list.tsx:6063
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:482
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:799
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:497
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:814
 msgid "时间"
 msgstr "Time"
 
@@ -2292,7 +2292,7 @@ msgstr " people"
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:115
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:530
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1381
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1393
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:378
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:775
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1143
@@ -2306,7 +2306,7 @@ msgstr "Video call"
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:159
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:524
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1367
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1379
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:378
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:775
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1143
@@ -2407,8 +2407,8 @@ msgstr "Untitled note"
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
 #: apps/app/src/features/chat/mobile-chat-thread-header.tsx:40
 #: apps/app/src/features/contacts/management/contacts-management-modal.tsx:270
-#: apps/app/src/features/games/farm/farm-page.tsx:165
-#: apps/app/src/features/games/farm/farm-page.tsx:173
+#: apps/app/src/features/games/farm/farm-page.tsx:168
+#: apps/app/src/features/games/farm/farm-page.tsx:176
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:133
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:205
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:513
@@ -2572,10 +2572,10 @@ msgstr "Close dialog"
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:255
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:129
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:109
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:69
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:71
 #: apps/app/src/features/games/farm/components/gift-sheet.tsx:98
 #: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:54
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:146
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:148
 #: apps/app/src/features/games/farm/components/quest-sheet.tsx:58
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:121
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:64
@@ -2629,8 +2629,8 @@ msgid "保存图片到相册，发到 X / 小红书 / 微博 引发更多人来�
 msgstr "Save it to your photos and post to X / RedNote / Weibo to invite more readers"
 
 #: apps/app/src/components/feed-post-share-card-modal.tsx:73
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1402
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2048
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1427
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2073
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2454
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:92
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:197
@@ -2672,7 +2672,7 @@ msgstr "Resident post"
 #. placeholder {0}: post.likeCount
 #: apps/app/src/components/feed-post-share-card-modal.tsx:157
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:325
-#: apps/app/src/routes/channels-page.tsx:3408
+#: apps/app/src/routes/channels-page.tsx:3434
 #: apps/app/src/routes/discover-feed-page.tsx:2391
 msgid "{0} 赞"
 msgstr "{0} likes"
@@ -2681,7 +2681,7 @@ msgstr "{0} likes"
 #: apps/app/src/components/feed-post-share-card-modal.tsx:160
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:328
 #: apps/app/src/routes/channel-author-page.tsx:706
-#: apps/app/src/routes/channels-page.tsx:3409
+#: apps/app/src/routes/channels-page.tsx:3435
 #: apps/app/src/routes/discover-feed-page.tsx:2394
 msgid "{0} 评论"
 msgstr "{0} comments"
@@ -2900,13 +2900,13 @@ msgstr "Share tool"
 
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:186
 #: apps/app/src/components/mobile-document-shell.tsx:185
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:604
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:619
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:160
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:768
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:825
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:192
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1783
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1825
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1795
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1837
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:334
 #: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:258
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:682
@@ -3227,7 +3227,7 @@ msgstr "Moment image"
 #: apps/app/src/components/moment-compose-media-preview.tsx:300
 #: apps/app/src/components/moment-media-gallery.tsx:608
 #: apps/app/src/i18n/static-dom-seed.ts:868
-#: apps/app/src/routes/channels-page.tsx:2470
+#: apps/app/src/routes/channels-page.tsx:2496
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1079
 msgid "上一张"
 msgstr "Previous image"
@@ -3235,7 +3235,7 @@ msgstr "Previous image"
 #: apps/app/src/components/moment-compose-media-preview.tsx:309
 #: apps/app/src/components/moment-media-gallery.tsx:617
 #: apps/app/src/i18n/static-dom-seed.ts:869
-#: apps/app/src/routes/channels-page.tsx:2481
+#: apps/app/src/routes/channels-page.tsx:2507
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1090
 msgid "下一张"
 msgstr "Next image"
@@ -3340,14 +3340,14 @@ msgid "订阅号"
 msgstr "Subscription account"
 
 #: apps/app/src/components/official-account-list-item.tsx:75
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1058
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1445
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1083
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1470
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:740
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:885
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1089
 #: apps/app/src/i18n/static-dom-seed.ts:778
 #: apps/app/src/routes/channel-author-page.tsx:557
-#: apps/app/src/routes/channels-page.tsx:3319
+#: apps/app/src/routes/channels-page.tsx:3345
 #: apps/app/src/routes/official-account-detail-page.tsx:492
 msgid "已关注"
 msgstr "Following"
@@ -3386,11 +3386,11 @@ msgstr "Pin"
 #: apps/app/src/components/official-article-card.tsx:123
 #: apps/app/src/components/official-article-viewer.tsx:263
 #: apps/app/src/components/official-article-viewer.tsx:321
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1139
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1164
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:376
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:372
 #: apps/app/src/i18n/static-dom-seed.ts:920
-#: apps/app/src/routes/channels-page.tsx:3235
+#: apps/app/src/routes/channels-page.tsx:3261
 msgid "已收藏"
 msgstr "Saved"
 
@@ -3450,7 +3450,7 @@ msgstr "Copy link"
 #: apps/app/src/components/official-article-viewer.tsx:335
 #: apps/app/src/components/wechat-action-bubble.tsx:200
 #: apps/app/src/i18n/static-dom-seed.ts:460
-#: apps/app/src/routes/channels-page.tsx:3247
+#: apps/app/src/routes/channels-page.tsx:3273
 msgid "分享"
 msgstr "Share"
 
@@ -3464,8 +3464,8 @@ msgid "文章来源于 {0}"
 msgstr "Article from {0}"
 
 #: apps/app/src/components/official-article-viewer.tsx:521
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:94
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1251
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:101
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1266
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:430
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:983
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1057
@@ -3581,7 +3581,7 @@ msgstr "Like"
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:396
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:426
 #: apps/app/src/i18n/static-dom-seed.ts:318
-#: apps/app/src/routes/channels-page.tsx:3829
+#: apps/app/src/routes/channels-page.tsx:3855
 msgid "评论"
 msgstr "Comment"
 
@@ -3960,43 +3960,43 @@ msgstr "Gym"
 msgid "器械区和跑步机旁都有人来来往往。"
 msgstr "People come and go around the weight area and treadmills."
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:93
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:100
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:429
 msgid "全部时间"
 msgstr "All time"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:95
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:102
 msgid "7天内"
 msgstr "Last 7 days"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:96
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:103
 msgid "30天内"
 msgstr "Last 30 days"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:102
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:109
 msgid "全部类型"
 msgstr "All types"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:103
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1058
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:110
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1073
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1117
 #: apps/app/src/routes/desktop-chat-history-page.tsx:633
 msgid "文本"
 msgstr "Text"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:111
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1055
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:118
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1070
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1114
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1132
 #: apps/app/src/routes/desktop-chat-history-page.tsx:630
 msgid "系统"
 msgstr "System"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:119
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:126
 msgid "全部消息"
 msgstr "All messages"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:120
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:127
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2099
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2145
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:358
@@ -4014,64 +4014,64 @@ msgstr "All messages"
 msgid "全部"
 msgstr "All"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:121
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:128
 msgid "搜文本、附件和系统提示"
 msgstr "Search text, attachments, and system notices"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:126
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:127
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:133
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:134
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:366
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:999
 msgid "图片与视频"
 msgstr "Images and videos"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:128
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:135
 msgid "先按图片消息聚合浏览"
 msgstr "Browse image messages first"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:135
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:142
 msgid "按文件名和文件消息筛选"
 msgstr "Filter by file name and file messages"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:140
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:141
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:147
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:148
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:382
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1007
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1122
 msgid "链接"
 msgstr "Link"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:142
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:149
 msgid "把聊天里的 URL 单独拎出来"
 msgstr "Pull URLs out of the chat on their own"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:358
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:373
 msgid "成员 · {senderFilterDisplayLabel}"
 msgstr "Members · {senderFilterDisplayLabel}"
 
 #. placeholder {0}: searchMessageTypeFilters.find( (item) => item.id === messageTypeFilter, )?.label ?? unknownSenderLabel
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:364
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:379
 msgid "类型 · {0}"
 msgstr "Type · {0}"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:374
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:389
 msgid "日期 · {specificDate}"
 msgstr "Date · {specificDate}"
 
 #. placeholder {0}: searchDateFilters.find((item) => item.id === dateFilter)?.label ?? t(msg`时间筛选`)
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:378
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:393
 msgid "时间 · {0}"
 msgstr "Time · {0}"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:380
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:395
 msgid "时间筛选"
 msgstr "Time filter"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:402
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:417
 msgid "没有来自 {senderFilterDisplayLabel} 的"
 msgstr "No items from {senderFilterDisplayLabel}"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:414
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:429
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1581
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:69
 #: apps/app/src/features/desktop/chat/desktop-chat-history-dialog.tsx:70
@@ -4081,10 +4081,10 @@ msgstr "No items from {senderFilterDisplayLabel}"
 msgid "查找聊天记录"
 msgstr "Search chat history"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:418
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:430
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:582
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:720
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:433
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:445
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:597
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:735
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:597
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:311
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1612
@@ -4102,30 +4102,30 @@ msgid "搜索"
 msgstr "Search"
 
 #. placeholder {0}: indexedMessages.length
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:439
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:454
 msgid "当前范围 {0} 条"
 msgstr "Current scope {0} items"
 
 #. placeholder {0}: results.length
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:444
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:459
 msgid "搜索命中 {0} 条"
 msgstr "{0} search hits"
 
 #. placeholder {0}: results.length
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:445
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:460
 msgid "当前分类 {0} 条"
 msgstr "Current category {0} items"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:451
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:466
 msgid "提醒 {reminderCount} 条"
 msgstr "{reminderCount} reminders"
 
 #. placeholder {0}: activeFilterLabels.length
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:460
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:475
 msgid "已筛选 {0} 项"
 msgstr "{0} filters active"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:469
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:484
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:977
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:559
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:152
@@ -4138,33 +4138,33 @@ msgstr "{0} filters active"
 msgid "清空"
 msgstr "Clear"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:503
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:769
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:518
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:784
 msgid "类型"
 msgstr "Type"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:527
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:542
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:478
 msgid "指定日期"
 msgstr "Specific date"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:545
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:744
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1693
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:560
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:759
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1705
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:680
 #: apps/app/src/routes/group-chat-details-page.tsx:709
 #: apps/app/src/routes/group-qr-page.tsx:1174
 msgid "成员"
 msgstr "Member"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:554
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:569
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:582
 msgid "全部成员"
 msgstr "All members"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:572
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:587
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:694
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1706
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1718
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:392
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:650
 #: apps/app/src/features/search/mobile-search-workspace.tsx:344
@@ -4194,15 +4194,15 @@ msgstr "All members"
 msgid "读取中"
 msgstr "Loading"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:574
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:589
 msgid "稍等一下，正在整理这段聊天里的消息索引。"
 msgstr "One moment. Building the message index for this chat."
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:583
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:598
 msgid "聊天记录暂时不可用"
 msgstr "Chat history is temporarily unavailable"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:595
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:610
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:174
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:208
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1001
@@ -4271,7 +4271,7 @@ msgstr "Chat history is temporarily unavailable"
 msgid "重试读取"
 msgstr "Retry loading"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:617
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:632
 #: apps/app/src/features/chat/chat-reminder-entries.ts:70
 #: apps/app/src/features/chat/chat-reminder-entries.ts:95
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:777
@@ -4281,112 +4281,112 @@ msgstr "Retry loading"
 msgid "聊天"
 msgstr "Chat"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:618
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:633
 msgid "当前会话还没有聊天记录"
 msgstr "This conversation has no chat history yet"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:620
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:635
 msgid "等有消息后，这里会按关键词、图片、文件和链接帮你集中查找。"
 msgstr "Once messages arrive, you can search them here by keyword, images, files, and links."
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:631
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:646
 msgid "分类浏览"
 msgstr "Browse by category"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:680
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:695
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:21
 #: apps/app/src/features/search/mobile-search-workspace.tsx:621
 msgid "条"
 msgstr "items"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:680
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:695
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:788
 msgid "当前"
 msgstr "Current"
 
 #. placeholder {0}: activeCategoryMeta.shortLabel
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:699
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:714
 msgid "还没有{0}"
 msgstr "No {0} yet"
 
 #. placeholder {0}: activeCategoryMeta.shortLabel
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:701
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:716
 msgid "当前会话里暂时没有可浏览的{0}消息。"
 msgstr "There are no {0} messages to browse in this conversation yet."
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:710
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:725
 msgid "查看全部消息"
 msgstr "View all messages"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:730
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:745
 #: apps/app/src/features/search/desktop-search-workspace.tsx:1378
 msgid "清空关键词"
 msgstr "Clear keyword"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:746
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:761
 msgid "换个成员试试，或者切回全部成员继续浏览。"
 msgstr "Try another member, or switch back to all members to keep browsing."
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:754
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:769
 msgid "查看全部成员"
 msgstr "View all members"
 
 #. placeholder {0}: searchMessageTypeFilters.find( (item) => item.id === messageTypeFilter, )?.label ?? unknownSenderLabel
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:771
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:786
 msgid "没有匹配的{0}"
 msgstr "No matching {0}"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:778
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:793
 msgid "换个消息类型试试，或者切回全部类型继续浏览。"
 msgstr "Try another message type, or switch back to all types to keep browsing."
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:787
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:802
 msgid "查看全部类型"
 msgstr "View all types"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:800
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:815
 msgid "这个时间范围内没有匹配消息"
 msgstr "No matching messages in this time range"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:801
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:816
 msgid "换个时间试试，或者清空时间筛选继续浏览。"
 msgstr "Try a different time range, or clear the time filter to keep browsing."
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:812
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:827
 msgid "清空时间筛选"
 msgstr "Clear time filter"
 
 #. placeholder {0}: formatMessageTimestamp(item.reminderAt)
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:877
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:892
 #: apps/app/src/routes/desktop-chat-history-page.tsx:475
 msgid "提醒 · {0}"
 msgstr "Reminder · {0}"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:902
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:917
 msgid "当前仅展示前 {MAX_VISIBLE_RESULTS} 条结果，请继续缩小范围查找。"
 msgstr "Showing only the first {MAX_VISIBLE_RESULTS} results. Narrow the scope to find more."
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:980
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:995
 msgid "{typeLabel}消息"
 msgstr "{typeLabel} message"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1088
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1103
 msgid "搜索结果 · {count} 条"
 msgstr "Search results · {count} items"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1089
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1104
 msgid "最近消息 · {count} 条"
 msgstr "Recent messages · {count} items"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1093
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1108
 msgid "{categoryLabel} · {count} 条"
 msgstr "{categoryLabel} · {count} items"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1094
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1109
 msgid "最近{categoryLabel} · {count} 条"
 msgstr "Recent {categoryLabel} · {count} items"
 
-#: apps/app/src/features/chat/chat-message-search-panel.tsx:1242
+#: apps/app/src/features/chat/chat-message-search-panel.tsx:1257
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1048
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1252
 msgid "未知时间"
@@ -4394,14 +4394,14 @@ msgstr "Unknown time"
 
 #: apps/app/src/features/chat/chat-reminder-entries.ts:70
 #: apps/app/src/features/chat/chat-reminder-entries.ts:95
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1337
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1344
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1360
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1569
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1613
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1677
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1736
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1792
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1349
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1356
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1372
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1581
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1625
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1689
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1748
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1804
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:205
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:642
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:731
@@ -4543,8 +4543,8 @@ msgstr "Sent a new message"
 #. placeholder {0}: membersQuery.data.length
 #. placeholder {0}: participants.length
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:203
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:850
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1343
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:862
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1355
 #: apps/app/src/routes/group-chat-details-page.tsx:446
 #: apps/app/src/routes/group-chat-details-page.tsx:647
 msgid "{0} 人群聊"
@@ -4603,23 +4603,23 @@ msgid "直接说：明早8点提醒我吃药"
 msgstr "Try: remind me to take medicine at 8 tomorrow morning"
 
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:816
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1820
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1832
 #: apps/app/src/i18n/static-dom-seed.ts:736
 msgid "输入消息"
 msgstr "Type a message"
 
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:892
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1876
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1888
 msgid "视频通话功能开发中"
 msgstr "Video call feature in development"
 
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:893
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1877
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1889
 msgid "语音通话功能开发中"
 msgstr "Voice call feature in development"
 
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:895
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1879
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1891
 msgid "该功能暂未开放，敬请期待。"
 msgstr "This feature isn't available yet. Stay tuned."
 
@@ -5153,7 +5153,7 @@ msgstr "{0} and {1} other characters are taking turns replying..."
 msgid "{0} 等 {1} 位角色正在回复..."
 msgstr "{0} and {1} other characters are replying..."
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:711
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:718
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:818
 #: apps/app/src/features/mini-programs/group-relay-message.ts:75
 #: apps/app/src/routes/desktop-mobile-page.tsx:505
@@ -5165,43 +5165,43 @@ msgid "当前群聊"
 msgstr "Current group chat"
 
 #. placeholder {0}: membersQuery.data.length
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:849
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:861
 msgid "{0} 人群聊 · 免打扰"
 msgstr "{0}-member group · muted"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:854
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:866
 msgid "群聊 · 免打扰"
 msgstr "Group chat · Do not disturb"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:944
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:956
 #: apps/app/src/features/chat/use-conversation-thread.ts:683
 msgid "图片上传结果异常。"
 msgstr "Image upload result was abnormal."
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:963
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:975
 #: apps/app/src/features/chat/use-conversation-thread.ts:704
 msgid "文件上传结果异常。"
 msgstr "File upload result was abnormal."
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:985
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:997
 #: apps/app/src/features/chat/use-conversation-thread.ts:728
 msgid "语音上传结果异常。"
 msgstr "Voice upload result was abnormal."
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1085
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1097
 #: apps/app/src/features/chat/use-conversation-thread.ts:793
 msgid "这条消息暂时无法重试发送。"
 msgstr "This message can't be retried right now."
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1227
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1239
 msgid "所有人"
 msgstr "Everyone"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1228
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1240
 msgid "提醒全部群成员"
 msgstr "Remind all group members"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1259
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1271
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1105
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1352
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1356
@@ -5215,13 +5215,13 @@ msgstr "Remind all group members"
 msgid "管理员"
 msgstr "Admin"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1265
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1277
 #: apps/app/src/routes/group-member-picker-page.tsx:245
 msgid "昵称：{rawName} · {roleLabel}"
 msgstr "Nickname: {rawName} · {roleLabel}"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1415
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1470
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1427
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1482
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1553
 #: apps/app/src/routes/group-announcement-page.tsx:299
 #: apps/app/src/routes/group-announcement-page.tsx:487
@@ -5229,39 +5229,39 @@ msgstr "Nickname: {rawName} · {roleLabel}"
 msgid "群公告"
 msgstr "Group announcement"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1419
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1431
 msgid "暂无群公告，点击填写本群说明。"
 msgstr "No group announcement yet. Tap to add a description."
 
 #. placeholder {0}: formatTimestamp(groupQuery.data?.updatedAt)
 #. placeholder {0}: formatTimestamp(latestMoment.postedAt)
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1423
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1435
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:383
 msgid "最近更新 {0}"
 msgstr "Last updated {0}"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1424
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1436
 msgid "群接龙与群协作入口先收口到聊天信息侧栏"
 msgstr "Group sign-up chains and collaboration entries are consolidated in the chat info sidebar"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1446
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1447
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1458
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1459
 #: apps/app/src/i18n/static-dom-seed.ts:1038
 msgid "打开群公告页"
 msgstr "Open group announcement"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1449
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1461
 msgid "公告页"
 msgstr "Announcement page"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1678
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1690
 #: apps/app/src/routes/group-chat-details-page.tsx:699
 #: apps/app/src/routes/group-chat-edit-page.tsx:301
 #: apps/app/src/routes/group-member-picker-page.tsx:633
 msgid "群聊信息暂时不可用"
 msgstr "Group details are temporarily unavailable"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1694
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1706
 #: apps/app/src/routes/group-chat-details-page.tsx:710
 #: apps/app/src/routes/group-chat-edit-page.tsx:333
 #: apps/app/src/routes/group-member-picker-page.tsx:665
@@ -5269,27 +5269,27 @@ msgstr "Group details are temporarily unavailable"
 msgid "群成员信息暂时不可用"
 msgstr "Group member info is temporarily unavailable"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1703
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1715
 msgid "正在读取群消息..."
 msgstr "Loading group messages..."
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1707
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1719
 msgid "正在读取群消息"
 msgstr "Loading group messages"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1708
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1720
 msgid "稍等一下，正在同步这段群聊里的消息。"
 msgstr "Hang on — syncing the messages in this group chat."
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1719
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1731
 msgid "群消息暂时不可用"
 msgstr "Group messages unavailable for now"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1793
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1805
 msgid "群里还没有消息"
 msgstr "No messages in the group yet"
 
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1794
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1806
 msgid "发一条消息，让这个群先热起来。"
 msgstr "Send a message to warm up this group."
 
@@ -8082,15 +8082,15 @@ msgstr "{0} selected"
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:329
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:377
 #: apps/app/src/features/contacts/management/management-blacklist-screen.tsx:166
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1056
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1443
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1081
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1468
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:32
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:351
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:356
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:945
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:497
 #: apps/app/src/routes/channel-author-page.tsx:555
-#: apps/app/src/routes/channels-page.tsx:3317
+#: apps/app/src/routes/channels-page.tsx:3343
 #: apps/app/src/routes/discover-page.tsx:1025
 #: apps/app/src/routes/official-account-detail-page.tsx:510
 msgid "处理中..."
@@ -8252,151 +8252,151 @@ msgstr "Forwarded to {0}."
 msgid "转发给 {0} 失败：{1}"
 msgstr "Failed to forward to {0}: {1}"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:756
-#: apps/app/src/routes/channels-page.tsx:2038
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:781
+#: apps/app/src/routes/channels-page.tsx:2064
 msgid "暂无可播放内容"
 msgstr "No playable content available"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:759
-#: apps/app/src/routes/channels-page.tsx:2041
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:784
+#: apps/app/src/routes/channels-page.tsx:2067
 msgid "稍后再来看看"
 msgstr "Check back later"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:788
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:813
 msgid "封面暂时无法显示"
 msgstr "Cover unavailable"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:944
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:969
 msgid "静音"
 msgstr "Mute"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:944
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:969
 msgid "取消静音"
 msgstr "Unmute"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1059
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1084
 msgid "+ 关注"
 msgstr "+ Follow"
 
 #. placeholder {0}: post.likeCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1104
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1129
 msgid "已点赞，当前 {0} 赞"
 msgstr "Liked, currently {0} likes"
 
 #. placeholder {0}: post.likeCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1105
-#: apps/app/src/routes/channels-page.tsx:3206
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1130
+#: apps/app/src/routes/channels-page.tsx:3232
 msgid "点赞，当前 {0} 赞"
 msgstr "Like, currently {0} likes"
 
 #. placeholder {0}: post.commentCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1115
-#: apps/app/src/routes/channels-page.tsx:3224
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1140
+#: apps/app/src/routes/channels-page.tsx:3250
 msgid "打开评论，当前 {0} 条"
 msgstr "Open comments, currently {0}"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1137
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2099
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1162
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2124
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1395
-#: apps/app/src/routes/channels-page.tsx:3202
-#: apps/app/src/routes/channels-page.tsx:3233
-#: apps/app/src/routes/channels-page.tsx:3779
+#: apps/app/src/routes/channels-page.tsx:3228
+#: apps/app/src/routes/channels-page.tsx:3259
+#: apps/app/src/routes/channels-page.tsx:3805
 msgid "处理中"
 msgstr "Processing"
 
 #. placeholder {0}: selectedPost.commentCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1195
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1220
 msgid "评论 {0}"
 msgstr "Comment on {0}"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1203
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1228
 msgid "关闭评论"
 msgstr "Close comments"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1264
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1289
 msgid "关闭作者主页"
 msgstr "Close author profile"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1301
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1326
 msgid "上一条"
 msgstr "Previous"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1310
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1335
 msgid "下一条"
 msgstr "Next"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1345
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1370
 #: apps/app/src/routes/channel-author-page.tsx:320
 msgid "这位居民暂时还没有填写视频号简介。"
 msgstr "This resident hasn't written a Channels bio yet."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1346
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1371
 #: apps/app/src/routes/channel-author-page.tsx:321
 msgid "这个视频号作者暂时还没有填写简介。"
 msgstr "This Channels author hasn't written a bio yet."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1357
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1382
 #: apps/app/src/i18n/static-dom-seed.ts:350
 #: apps/app/src/routes/channel-author-page.tsx:382
 msgid "作者主页"
 msgstr "Author profile"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1361
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1386
 msgid "回到内容"
 msgstr "Back to content"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1367
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1392
 #: apps/app/src/routes/channel-author-page.tsx:409
 msgid "正在读取作者主页..."
 msgstr "Loading author profile..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1380
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1405
 #: apps/app/src/routes/channel-author-page.tsx:416
 msgid "作者主页暂时不可用"
 msgstr "Author profile unavailable for now"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1381
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1406
 msgid "这位作者的信息还没有准备好，稍后再试。"
 msgstr "This author's info isn't ready yet — try again later."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1401
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1426
 #: apps/app/src/routes/channel-author-page.tsx:498
 msgid "居民作者"
 msgstr "Resident author"
 
 #. placeholder {0}: profile.followerCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1413
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1438
 msgid "{0} 关注者"
 msgstr "{0} followers"
 
 #. placeholder {0}: profile.recentPosts.length
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1416
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1441
 msgid "{0} 条内容"
 msgstr "{0} items"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1419
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1444
 msgid "{liveClipCount} 条直播回放"
 msgstr "{liveClipCount} live replays"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1446
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1471
 #: apps/app/src/i18n/static-dom-seed.ts:347
 #: apps/app/src/routes/channel-author-page.tsx:558
-#: apps/app/src/routes/channels-page.tsx:3320
+#: apps/app/src/routes/channels-page.tsx:3346
 msgid "+关注"
 msgstr "+ Follow"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1456
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1481
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1273
 #: apps/app/src/i18n/static-dom-seed.ts:826
 #: apps/app/src/routes/channel-author-page.tsx:513
 msgid "最近内容"
 msgstr "Recent content"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1474
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1499
 msgid "查看这条内容"
 msgstr "View this item"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1478
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1503
 #: apps/app/src/i18n/static-dom-seed.ts:1051
 #: apps/app/src/routes/channel-author-page.tsx:333
 #: apps/app/src/routes/channel-author-page.tsx:518
@@ -8405,7 +8405,7 @@ msgstr "View this item"
 msgid "直播回放"
 msgstr "Live replay"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1481
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1506
 #: apps/app/src/i18n/static-dom-seed.ts:1052
 #: apps/app/src/routes/channel-author-page.tsx:332
 #: apps/app/src/routes/channel-author-page.tsx:922
@@ -8413,137 +8413,137 @@ msgstr "Live replay"
 msgid "动态"
 msgstr "Posts"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1507
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1532
 msgid "当前内容"
 msgstr "Current content"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1516
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1541
 msgid "这位作者暂时还没有可以展示的内容。"
 msgstr "This author has nothing to show yet."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1524
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1549
 msgid "当前路由和作者数据还在同步，稍后会自动收敛到最新作者资料。"
 msgstr "The route and author data are syncing; will converge to the latest author profile shortly."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1535
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1560
 msgid "{viewCount} 播放"
 msgstr "{viewCount} plays"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1539
-#: apps/app/src/routes/channels-page.tsx:4012
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1564
+#: apps/app/src/routes/channels-page.tsx:4038
 msgid "{seconds} 秒"
 msgstr "{seconds} sec"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1747
-#: apps/app/src/routes/channels-page.tsx:3899
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1772
+#: apps/app/src/routes/channels-page.tsx:3925
 msgid "正在读取评论..."
 msgstr "Loading comments..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1758
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1783
 #: apps/app/src/i18n/static-dom-seed.ts:357
 msgid "这条内容还没有评论，你可以先开口。"
 msgstr "No comments yet. You can start the conversation."
 
 #. placeholder {0}: threadIdsWithReplies.length
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1764
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1789
 msgid "共 {0} 个可折叠线程"
 msgstr "{0} collapsible threads"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1772
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1797
 msgid "全部展开"
 msgstr "Expand all"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1779
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1804
 msgid "全部收起"
 msgstr "Collapse all"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1828
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1853
 #: apps/app/src/lib/error-translate.ts:112
 #: apps/app/src/lib/error-translate.ts:613
 #: apps/app/src/routes/channels-page.tsx:864
-#: apps/app/src/routes/channels-page.tsx:3933
+#: apps/app/src/routes/channels-page.tsx:3959
 msgid "需先加为好友才能互动。"
 msgstr "You need to be friends to interact."
 
 #. placeholder {0}: activeReply.authorName
 #. placeholder {0}: replyTarget.authorName
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1834
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1859
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:522
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:497
-#: apps/app/src/routes/channels-page.tsx:3947
+#: apps/app/src/routes/channels-page.tsx:3973
 msgid "正在回复 {0}"
 msgstr "Replying to {0}"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1873
-#: apps/app/src/routes/channels-page.tsx:3967
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1898
+#: apps/app/src/routes/channels-page.tsx:3993
 msgid "需先加为好友才能评论"
 msgstr "Add as friend before commenting"
 
 #. placeholder {0}: activeReply.authorName
 #. placeholder {0}: replyTarget.authorName
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1875
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1900
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:552
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:530
-#: apps/app/src/routes/channels-page.tsx:3969
+#: apps/app/src/routes/channels-page.tsx:3995
 msgid "回复 {0}..."
 msgstr "Reply {0}..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1877
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1902
 #: apps/app/src/i18n/static-dom-seed.ts:637
 msgid "写下你对这条视频号内容的评论..."
 msgstr "Write your comment on this Channels post..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1878
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1903
 msgid "先选择一条内容"
 msgstr "Pick an item first"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1941
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1966
 #: apps/app/src/i18n/static-dom-seed.ts:815
 msgid "楼中楼"
 msgstr "Threaded replies"
 
 #. placeholder {0}: replies.length
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1945
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1970
 msgid "展开 {0} 条跟帖"
 msgstr "Expand {0} replies"
 
 #. placeholder {0}: replies.length
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1946
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1971
 msgid "收起 {0} 条跟帖"
 msgstr "Collapse {0} replies"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1959
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1984
 msgid "这个线程里还有跟帖。"
 msgstr "More replies in this thread."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2047
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2072
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:290
 #: apps/app/src/i18n/static-dom-seed.ts:173
 msgid "居民"
 msgstr "Residents"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2052
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2077
 msgid "回复层"
 msgstr "Reply thread"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2056
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2081
 msgid "主评论"
 msgstr "Top comment"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2066
-#: apps/app/src/routes/channels-page.tsx:3746
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2091
+#: apps/app/src/routes/channels-page.tsx:3772
 msgid "回复 {replyTargetName}"
 msgstr "Reply to {replyTargetName}"
 
 #. placeholder {0}: comment.likeCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2101
-#: apps/app/src/routes/channels-page.tsx:3781
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2126
+#: apps/app/src/routes/channels-page.tsx:3807
 msgid "已赞 {0}"
 msgstr "{0} liked"
 
 #. placeholder {0}: comment.likeCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2102
-#: apps/app/src/routes/channels-page.tsx:3782
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:2127
+#: apps/app/src/routes/channels-page.tsx:3808
 msgid "赞 {0}"
 msgstr "{0} likes"
 
@@ -9295,7 +9295,7 @@ msgstr "Search failed"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:675
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:399
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:429
-#: apps/app/src/routes/channels-page.tsx:3832
+#: apps/app/src/routes/channels-page.tsx:3858
 #: apps/app/src/routes/desktop-chat-history-page.tsx:408
 #: apps/app/src/routes/desktop-chat-history-page.tsx:411
 #: apps/app/src/routes/desktop-mobile-page.tsx:943
@@ -12957,7 +12957,7 @@ msgid "帮邻居浇水 3 次"
 msgstr "Help water a neighbor 3 times"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:37
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:77
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:82
 msgid "成熟"
 msgstr "Ripe"
 
@@ -13012,7 +13012,7 @@ msgid "点空地开始种植…"
 msgstr "Tap an empty plot to start planting…"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:323
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:81
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:86
 msgid "空地"
 msgstr "Empty plot"
 
@@ -13112,17 +13112,9 @@ msgstr "Visit cooldown — wait another {left}s."
 msgid "帮邻居浇了一次水（+{NEIGHBOR_HELP_REWARD} 花圃币）。"
 msgstr "Helped water a neighbor (+{NEIGHBOR_HELP_REWARD} garden coins)."
 
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:46
-msgid "签到成功！"
-msgstr "Checked in!"
-
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:46
-msgid "连签"
-msgstr "Streak"
-
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:46
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:88
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:108
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:48
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:90
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:110
 #: apps/app/src/features/games/farm/crop-presentation.ts:65
 #: apps/app/src/features/games/farm/crop-presentation.ts:65
 #: apps/app/src/features/subscription/subscription-panel.tsx:238
@@ -13132,42 +13124,50 @@ msgstr "Streak"
 msgid "天"
 msgstr "days"
 
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:63
-#: apps/app/src/features/games/farm/farm-page.tsx:221
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:48
+msgid "签到成功！"
+msgstr "Checked in!"
+
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:48
+msgid "连签"
+msgstr "Streak"
+
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:65
+#: apps/app/src/features/games/farm/farm-page.tsx:236
 msgid "每日签到"
 msgstr "Daily check-in"
 
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:79
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:81
 #: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:80
 #: apps/app/src/features/games/farm/components/quest-sheet.tsx:88
 msgid "加载中…"
 msgstr "Loading…"
 
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:84
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:86
 msgid "已连续签到"
 msgstr "Checked in for"
 
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:88
-msgid "累计"
-msgstr "Total"
-
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:88
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:90
 #: apps/app/src/features/games/game-center-session-panel.tsx:153
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:182
 msgid "次"
 msgstr "times"
 
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:108
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:134
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:187
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:90
+msgid "累计"
+msgstr "Total"
+
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:110
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:141
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:194
 msgid "第"
 msgstr "No."
 
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:129
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:131
 msgid "点击签到"
 msgstr "Check in"
 
-#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:130
+#: apps/app/src/features/games/farm/components/checkin-sheet.tsx:132
 msgid "今天已签到，明天再来"
 msgstr "Done today — see you tomorrow"
 
@@ -13190,41 +13190,41 @@ msgstr "Retrieve {0}? It’ll stay in stock and can be placed again."
 msgid "点一下收回"
 msgstr "Tap to retrieve"
 
-#: apps/app/src/features/games/farm/components/dog-house.tsx:71
+#: apps/app/src/features/games/farm/components/dog-house.tsx:75
 msgid "狗窝"
 msgstr "Doghouse"
 
 #. placeholder {0}: dog.level
-#: apps/app/src/features/games/farm/components/dog-house.tsx:71
+#: apps/app/src/features/games/farm/components/dog-house.tsx:75
 msgid "看家狗 Lv.{0}"
 msgstr "Guard dog Lv.{0}"
 
-#: apps/app/src/features/games/farm/components/dog-house.tsx:75
+#: apps/app/src/features/games/farm/components/dog-house.tsx:79
 msgid "能量"
 msgstr "Energy"
 
-#: apps/app/src/features/games/farm/components/dog-house.tsx:101
+#: apps/app/src/features/games/farm/components/dog-house.tsx:105
 msgid "等级达到 {FARM_DOG_UNLOCK_LEVEL} 级即可买狗看家"
 msgstr "Reach Lv.{FARM_DOG_UNLOCK_LEVEL} to buy a guard dog"
 
-#: apps/app/src/features/games/farm/components/dog-house.tsx:108
+#: apps/app/src/features/games/farm/components/dog-house.tsx:112
 msgid "狗会随机拦截想偷你菜的人；能量越足越凶。能量低于 30 时防御减半。"
 msgstr "The dog randomly blocks thieves — the higher its energy, the fiercer it gets. Defense halves below 30 energy."
 
-#: apps/app/src/features/games/farm/components/dog-house.tsx:122
+#: apps/app/src/features/games/farm/components/dog-house.tsx:126
 msgid "买狗"
 msgstr "Buy dog"
 
-#: apps/app/src/features/games/farm/components/dog-house.tsx:123
+#: apps/app/src/features/games/farm/components/dog-house.tsx:127
 msgid "升到 Lv.{nextLevel}"
 msgstr "Upgrade to Lv.{nextLevel}"
 
-#: apps/app/src/features/games/farm/components/dog-house.tsx:132
+#: apps/app/src/features/games/farm/components/dog-house.tsx:136
 msgid "狗粮不足，先去农资店买"
 msgstr "Out of dog food — buy some at the supply store"
 
-#: apps/app/src/features/games/farm/components/dog-house.tsx:132
 #: apps/app/src/features/games/farm/components/dog-house.tsx:136
+#: apps/app/src/features/games/farm/components/dog-house.tsx:140
 msgid "喂狗"
 msgstr "Feed dog"
 
@@ -13245,7 +13245,7 @@ msgid "世界还没有动静。"
 msgstr "Nothing's happening in the world yet."
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:66
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:279
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:281
 msgid "种了"
 msgstr "Planted"
 
@@ -13258,22 +13258,22 @@ msgid "顺走了你家的"
 msgstr "Stole from your"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:72
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:283
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:285
 msgid "顺走了"
 msgstr "Stolen"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:74
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:285
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:287
 msgid "浇了水"
 msgstr "Watered"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:76
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:287
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:289
 msgid "除了草"
 msgstr "Cleared weeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:78
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:289
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:291
 msgid "除了虫"
 msgstr "Cleared bugs"
 
@@ -13282,14 +13282,14 @@ msgid "买了种子"
 msgstr "Bought seeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:281
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:283
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:293
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:285
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:295
 msgid "作物"
 msgstr "Crops"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:293
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:295
 msgid "卖了"
 msgstr "Sold"
 
@@ -13305,32 +13305,32 @@ msgstr "'s gossip has been spread"
 msgid "与对方好感度变化"
 msgstr "Affinity change with the other party"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:77
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:204
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:206
 msgid "腐烂"
 msgstr "Rotted"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:85
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:90
 msgid "杂草"
 msgstr "Weeds"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:86
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:91
 msgid "害虫"
 msgstr "Pests"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:87
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:92
 msgid "已浇水"
 msgstr "Watered"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:89
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:94
 msgid "已施肥"
 msgstr "Fertilized"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:93
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:98
 msgid "农药生效中"
 msgstr "Pesticide active"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:96
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:101
 msgid "被偷过"
 msgstr "Has been stolen"
 
@@ -13390,8 +13390,46 @@ msgstr "Night has fallen — watch out for nighttime visitors."
 msgid "今天没啥事儿，世界角色们各自忙各自的。"
 msgstr "Nothing going on today — world characters are each doing their own thing."
 
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:37
+msgid "有 {ripeCount} 块田熟了，去收菜！"
+msgstr "{ripeCount} plots are ripe — go harvest!"
+
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:44
+msgid "有 {ripeCount} 块田熟了，记得回来收。"
+msgstr "{ripeCount} plots ripe — come back to harvest."
+
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:55
+msgid "{bugPlots} 块田长虫了，喷点农药"
+msgstr "{bugPlots} plots have bugs — spray pesticide"
+
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:64
+msgid "{weedPlots} 块田长草了"
+msgstr "{weedPlots} plots have weeds"
+
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:73
+msgid "{rottenPlots} 块田作物腐烂，记得铲掉重种"
+msgstr "{rottenPlots} plots are rotten — uproot and replant"
+
+#. placeholder {0}: Math.round(state.dog.energy)
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:83
+msgid "狗能量只剩 {0}，喂它吃点东西"
+msgstr "Dog energy: {0} — feed it"
+
+#. placeholder {0}: recentSteals[0]!.actorName
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:100
+msgid "刚才被 {0} 顺走了菜"
+msgstr "{0} just stole your crops"
+
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:111
+msgid "狗刚拦住一个想偷菜的"
+msgstr "Your dog just blocked a thief"
+
+#: apps/app/src/features/games/farm/components/farm-notification-banner.tsx:141
+msgid "忽略"
+msgstr "Dismiss"
+
 #: apps/app/src/features/games/farm/components/gift-sheet.tsx:91
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:139
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:141
 msgid "送礼"
 msgstr "Gift"
 
@@ -13449,7 +13487,7 @@ msgid "总收获"
 msgstr "Total harvest"
 
 #: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:48
-#: apps/app/src/features/games/farm/farm-page.tsx:211
+#: apps/app/src/features/games/farm/farm-page.tsx:226
 msgid "排行榜"
 msgstr "Leaderboard"
 
@@ -13462,63 +13500,63 @@ msgid "级"
 msgstr "Lv"
 
 #: apps/app/src/features/games/farm/components/leaderboard-sheet.tsx:98
-#: apps/app/src/features/games/farm/farm-page.tsx:203
+#: apps/app/src/features/games/farm/farm-page.tsx:218
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:323
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:357
 #: apps/app/src/i18n/static-dom-seed.ts:257
 msgid "个"
 msgstr "items"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:102
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:104
 msgid "正在串门……"
 msgstr "Visiting neighbors..."
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:121
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:123
 msgid "的农场"
 msgstr "'s farm"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:124
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:256
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:126
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:258
 msgid "好感"
 msgstr "Affinity"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:202
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:204
 msgid "空"
 msgstr "Empty"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:207
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:209
 msgid "已偷过"
 msgstr "Already stolen"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:208
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:210
 msgid "可顺"
 msgstr "Steal-able"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:223
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:225
 msgid "点击成熟（金边）田块即可顺走一份。每天最多 10 次，对方对你的好感度会降。"
 msgstr "Tap a ripe (gold-bordered) plot to steal a share. Max 10 times per day; their affinity for you will drop."
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:229
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:231
 msgid "近期动向"
 msgstr "Recent activity"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:255
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:257
 msgid "顺走"
 msgstr "Steal"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:281
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:283
 msgid "收了"
 msgstr "Harvested"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:291
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:293
 msgid "进了种子"
 msgstr "Got seeds"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:295
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:297
 msgid "升级了"
 msgstr "Leveled up"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:297
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:299
 msgid "好感度变化"
 msgstr "Affinity change"
 
@@ -13551,105 +13589,105 @@ msgstr "plots ripe"
 msgid "块田，暂无成熟"
 msgstr "plots, none ripe yet"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:63
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:68
 msgid "点一块田看看能干啥"
 msgstr "Tap a plot to see what you can do"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:134
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:141
 msgid "块田 · 选个种子下地"
 msgstr "plots · pick a seed to plant"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:137
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:144
 msgid "上一茬已腐烂"
 msgstr "Last batch rotted"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:149
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:156
 msgid "金币和种子都不够，先去仓库卖点东西"
 msgstr "Not enough coins or seeds — go sell something from the warehouse first"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:187
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:194
 msgid "块田 ·"
 msgstr "plots ·"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:190
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:197
 msgid "已收"
 msgstr "Harvested"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:190
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:197
 msgid "茬"
 msgstr "round(s)"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:195
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:202
 #: apps/app/src/features/games/farm/crop-presentation.ts:50
 msgid "已成熟"
 msgstr "Ripe"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:195
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:202
 msgid "还差"
 msgstr "Still need"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:211
-#: apps/app/src/features/games/farm/farm-page.tsx:282
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:218
+#: apps/app/src/features/games/farm/farm-page.tsx:297
 msgid "收获"
 msgstr "Harvest"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:231
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:241
 msgid "浇水"
 msgstr "Water"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:249
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:259
 msgid "除草"
 msgstr "Clear weeds"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:267
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:277
 msgid "除虫"
 msgstr "Clear bugs"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:289
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:299
 msgid "这株作物已经施过肥"
 msgstr "This crop has already been fertilized"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:291
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:301
 msgid "化肥不足"
 msgstr "Out of fertilizer"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:292
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:296
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:302
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:306
 msgid "施肥"
 msgstr "Fertilize"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:316
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:326
 msgid "农药不足"
 msgstr "Out of pesticide"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:316
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:326
 msgid "喷洒农药"
 msgstr "Spray pesticide"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:320
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:330
 msgid "农药"
 msgstr "Pesticide"
 
 #. placeholder {0}: def.nameZh
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:331
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:341
 msgid "确定砍掉这棵{0}？已收 {harvestCount} 茬，砍了就清空。"
 msgstr "Cut down this {0}? You’ve harvested {harvestCount} round(s); cutting it clears everything."
 
 #. placeholder {0}: def.nameZh
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:332
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:342
 msgid "确定铲掉这株{0}？"
 msgstr "Dig up this {0}?"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:347
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:357
 msgid "砍树"
 msgstr "Cut down"
 
-#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:347
+#: apps/app/src/features/games/farm/components/plot-action-bar.tsx:357
 msgid "铲除"
 msgstr "Dig up"
 
 #: apps/app/src/features/games/farm/components/quest-sheet.tsx:52
-#: apps/app/src/features/games/farm/farm-page.tsx:231
+#: apps/app/src/features/games/farm/farm-page.tsx:246
 msgid "任务"
 msgstr "Quests"
 
@@ -13751,7 +13789,7 @@ msgid "/ 包，售价"
 msgstr "/ pack, price"
 
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:58
-#: apps/app/src/features/games/farm/farm-page.tsx:201
+#: apps/app/src/features/games/farm/farm-page.tsx:216
 msgid "仓库"
 msgstr "Warehouse"
 
@@ -13788,56 +13826,64 @@ msgstr "min"
 msgid "小时"
 msgstr "hours"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:108
+#: apps/app/src/features/games/farm/farm-page.tsx:111
 msgid "正在准备隐界农场……"
 msgstr "Preparing Yinjie Farm..."
 
-#: apps/app/src/features/games/farm/farm-page.tsx:116
+#: apps/app/src/features/games/farm/farm-page.tsx:119
 msgid "农场加载失败"
 msgstr "Failed to load farm"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:177
+#: apps/app/src/features/games/farm/farm-page.tsx:180
 #: apps/app/src/features/games/game-center-data.ts:250
 msgid "隐界农场"
 msgstr "Yinjie Farm"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:191
+#: apps/app/src/features/games/farm/farm-page.tsx:189
+msgid "点开音效"
+msgstr "Turn sound on"
+
+#: apps/app/src/features/games/farm/farm-page.tsx:189
+msgid "关掉音效"
+msgstr "Turn sound off"
+
+#: apps/app/src/features/games/farm/farm-page.tsx:206
 msgid "种子店"
 msgstr "Seed store"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:193
+#: apps/app/src/features/games/farm/farm-page.tsx:208
 msgid "种子袋共"
 msgstr "Seed bags total"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:193
+#: apps/app/src/features/games/farm/farm-page.tsx:208
 msgid "包"
 msgstr "pack"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:203
+#: apps/app/src/features/games/farm/farm-page.tsx:218
 msgid "存货共"
 msgstr "Stock total"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:213
+#: apps/app/src/features/games/farm/farm-page.tsx:228
 msgid "和邻居比一比"
 msgstr "Compare with neighbors"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:223
+#: apps/app/src/features/games/farm/farm-page.tsx:238
 msgid "连签 7 天有大礼"
 msgstr "7-day streak bonus!"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:233
+#: apps/app/src/features/games/farm/farm-page.tsx:248
 msgid "日常 + 成就"
 msgstr "Daily + Achievements"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:238
+#: apps/app/src/features/games/farm/farm-page.tsx:253
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。"
 msgstr "Crops ripen by real-world hours. When you're offline, world characters keep working their own fields — what you see on return is the result of world autonomy."
 
-#: apps/app/src/features/games/farm/farm-page.tsx:268
+#: apps/app/src/features/games/farm/farm-page.tsx:283
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 msgstr "Crops ripen by real-world hours. When you're offline, world characters keep working their own fields."
 
-#: apps/app/src/features/games/farm/farm-page.tsx:284
+#: apps/app/src/features/games/farm/farm-page.tsx:299
 msgid "升级！"
 msgstr "Level up!"
 
@@ -14858,17 +14904,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "Hold the base and wipe out 20 enemy tanks."
 
 #: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:269
-msgid "双人"
-msgstr "Co-op"
-
-#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "Pixel"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "Action"
+
+#: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:269
+msgid "双人"
+msgstr "Co-op"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -20182,7 +20228,7 @@ msgid "当前播放"
 msgstr "Now playing"
 
 #: apps/app/src/i18n/static-dom-seed.ts:461
-#: apps/app/src/routes/channels-page.tsx:3251
+#: apps/app/src/routes/channels-page.tsx:3277
 msgid "减少推荐"
 msgstr "Show less"
 
@@ -20191,12 +20237,12 @@ msgid "· 视频号动态"
 msgstr "· Channels post"
 
 #: apps/app/src/i18n/static-dom-seed.ts:463
-#: apps/app/src/routes/channels-page.tsx:3390
+#: apps/app/src/routes/channels-page.tsx:3416
 msgid "还没有评论，先聊一句。"
 msgstr "No comments yet. Start the conversation."
 
 #: apps/app/src/i18n/static-dom-seed.ts:464
-#: apps/app/src/routes/channels-page.tsx:3417
+#: apps/app/src/routes/channels-page.tsx:3443
 msgid "打开评论"
 msgstr "Open comments"
 
@@ -20906,7 +20952,7 @@ msgid "刚刚捕捉到的世界画面"
 msgstr "A world scene just captured"
 
 #: apps/app/src/i18n/static-dom-seed.ts:642
-#: apps/app/src/routes/channels-page.tsx:3401
+#: apps/app/src/routes/channels-page.tsx:3427
 #: apps/app/src/routes/live-companion-page.tsx:908
 msgid "短片"
 msgstr "Short"
@@ -20914,7 +20960,7 @@ msgstr "Short"
 #: apps/app/src/i18n/static-dom-seed.ts:643
 #: apps/app/src/routes/channel-author-page.tsx:928
 #: apps/app/src/routes/channel-author-page.tsx:979
-#: apps/app/src/routes/channels-page.tsx:3406
+#: apps/app/src/routes/channels-page.tsx:3432
 #: apps/app/src/routes/live-companion-page.tsx:908
 msgid "内容卡片"
 msgstr "Content card"
@@ -23206,7 +23252,7 @@ msgstr "Channels author"
 #: apps/app/src/routes/channel-author-page.tsx:435
 #: apps/app/src/routes/channel-author-page.tsx:469
 #: apps/app/src/routes/channel-author-page.tsx:567
-#: apps/app/src/routes/channels-page.tsx:3891
+#: apps/app/src/routes/channels-page.tsx:3917
 msgid "返回视频号"
 msgstr "Back to Channels"
 
@@ -23253,7 +23299,7 @@ msgstr "Current section: {activeCollectionLabel}, {0} items."
 #: apps/app/src/routes/channel-author-page.tsx:702
 #: apps/app/src/routes/channel-author-page.tsx:892
 #: apps/app/src/routes/channel-author-page.tsx:914
-#: apps/app/src/routes/channels-page.tsx:4008
+#: apps/app/src/routes/channels-page.tsx:4034
 msgid "{0} 播放"
 msgstr "{0} plays"
 
@@ -23509,37 +23555,37 @@ msgid "去推荐看看"
 msgstr "Browse recommendations"
 
 #. placeholder {0}: post.likeCount
-#: apps/app/src/routes/channels-page.tsx:3205
+#: apps/app/src/routes/channels-page.tsx:3231
 msgid "取消点赞，当前 {0} 赞"
 msgstr "Unlike, currently {0} likes"
 
 #. placeholder {0}: formatTimestamp(post.createdAt)
-#: apps/app/src/routes/channels-page.tsx:3285
+#: apps/app/src/routes/channels-page.tsx:3311
 msgid "{0} · 视频号动态"
 msgstr "{0} · Channels post"
 
-#: apps/app/src/routes/channels-page.tsx:3364
+#: apps/app/src/routes/channels-page.tsx:3390
 msgid "最近评论"
 msgstr "Recent comments"
 
-#: apps/app/src/routes/channels-page.tsx:3387
+#: apps/app/src/routes/channels-page.tsx:3413
 msgid "正在载入最近评论..."
 msgstr "Loading recent comments…"
 
-#: apps/app/src/routes/channels-page.tsx:3405
+#: apps/app/src/routes/channels-page.tsx:3431
 msgid "图集"
 msgstr "Photo gallery"
 
-#: apps/app/src/routes/channels-page.tsx:3811
-#: apps/app/src/routes/channels-page.tsx:3858
+#: apps/app/src/routes/channels-page.tsx:3837
+#: apps/app/src/routes/channels-page.tsx:3884
 msgid "关闭评论面板"
 msgstr "Close comments panel"
 
-#: apps/app/src/routes/channels-page.tsx:3913
+#: apps/app/src/routes/channels-page.tsx:3939
 msgid "还没有评论，先发第一句。"
 msgstr "No comments yet — say the first thing."
 
-#: apps/app/src/routes/channels-page.tsx:3970
+#: apps/app/src/routes/channels-page.tsx:3996
 msgid "说点什么..."
 msgstr "Say something..."
 
