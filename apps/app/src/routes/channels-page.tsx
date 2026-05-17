@@ -171,7 +171,11 @@ export function ChannelsPage() {
     decorationsQuery.data?.commentsPreviewByPostId;
   const getCommentsPreview = useCallback(
     (postId: string): FeedComment[] =>
-      commentsPreviewByPostId?.[postId] ?? [],
+      // 走查 R2（本轮）：兜底用 EMPTY_COMMENT_PREVIEW 而不是每次 `?? []` 新建
+      // literal——前者会让 placeholderData / commentsPreview prop 在 decorations
+      // 没回来前每帧都换 array identity，触发 MobileChannelsCard 的 React.memo
+      // shallow 比较打回 false，"卡片完全 memo 化"那条优化白做。
+      commentsPreviewByPostId?.[postId] ?? EMPTY_COMMENT_PREVIEW,
     [commentsPreviewByPostId],
   );
 
