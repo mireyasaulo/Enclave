@@ -301,6 +301,28 @@ function MobileGroupMemberPickerPage({
     () => new Map(allCandidateItems.map((item) => [item.id, item])),
     [allCandidateItems],
   );
+  // 走查新一轮 R1：和 create-group-page R1 同款问题——membersQuery / friendsQuery
+  // 60s staleTime 期间用户在另一台设备上把候选项打散了（add 模式：另一端把同一
+  // 个 character 也拉进群；remove 模式：另一端先把这个 character 移走），
+  // socket conversation_updated → 这里 invalidate → membersQuery 刷新 →
+  // allCandidateItems 把这个 id 摘掉。但 selectedIds 还攒着这个 stale id —
+  // 横滚「已选成员」里看不到（selectedItems 已经按 candidateMap 过滤），
+  // 顶部「确定(N)」按钮上的 N 多算一个；点确定时这一批 memberId 里仍带它，
+  // add 模式服务端遇重复 return existing 没问题，remove 模式直接 404 把整批
+  // 翻成"部分失败"。candidateMap 一旦重建就 reconcile：丢掉 map 里不再存在
+  // 的 id。candidateMap 还是 0 size 时（query 还在 loading）不动 selectedIds，
+  // 免得初始挂载就把刚选好的项清空。
+  useEffect(() => {
+    if (!candidateMap.size) {
+      return;
+    }
+    setSelectedIds((current) => {
+      if (current.every((id) => candidateMap.has(id))) {
+        return current;
+      }
+      return current.filter((id) => candidateMap.has(id));
+    });
+  }, [candidateMap]);
   const selectedItems = useMemo(
     () =>
       selectedIds.flatMap((id) => {

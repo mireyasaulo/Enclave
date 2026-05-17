@@ -1339,7 +1339,9 @@ export function GroupChatThreadPanel({
             <div className="mt-1 text-[11px] text-[color:var(--text-muted)]">
               {typingSummary
                 ? typingSummary
-                : t(msg`${(membersQuery.data?.length ?? 0).toString()} 人群聊`)}
+                : membersQuery.data
+                  ? t(msg`${membersQuery.data.length} 人群聊`)
+                  : t(msg`群聊`)}
             </div>
           </div>
 
