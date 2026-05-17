@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { registerAndroidBackInterceptor } from "../../runtime/android-back-button";
@@ -68,6 +68,7 @@ export function MobileMessageActionSheet({
   onDelete,
   deleteLabel = t(msg`删除`),
 }: MobileMessageActionSheetProps) {
+  const titleId = useId();
   // 原生壳硬件 Back 键打开时优先关 sheet，不让 BACK 同时 history.back 把
   // 用户从聊天页带回 chat list。
   useEffect(() => {
@@ -94,11 +95,26 @@ export function MobileMessageActionSheet({
         aria-label={t(msg`关闭消息操作菜单`)}
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
+      {/* 走查新一轮 R2：长按群消息冒出来的这个底部操作 sheet 没挂 role="dialog"
+          + aria-modal + aria-labelledby——和 mobile-details-action-sheet R(re)1
+          修过的同款 a11y 问题。屏幕阅读器（iOS VoiceOver / Android TalkBack）
+          不会把它当 modal 念，盲人用户长按群消息后只听到"按钮 取消"，听不到
+          "消息操作 / 回复 / 转发 / 撤回 / 删除" 这些 action 标题。补 dialog 语义。*/}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]"
+      >
         <div className="flex justify-center pb-1.5">
           <div className="h-1 w-10 rounded-full bg-[rgba(148,163,184,0.45)]" />
         </div>
-        <div className="pb-2.5 text-center text-[12px] text-[#8c8c8c]">{title}</div>
+        <div
+          id={titleId}
+          className="pb-2.5 text-center text-[12px] text-[#8c8c8c]"
+        >
+          {title}
+        </div>
         {preview ? (
           <div className="mb-2.5 overflow-hidden rounded-[14px] border border-[color:var(--border-subtle)] bg-white px-3 py-2.5">
             {preview.senderName ? (
