@@ -297,6 +297,14 @@ function renderEventSummary(event: {
       return `${event.actorName} ${t(msg`升级了`)}`;
     case "intimacy_change":
       return t(msg`好感度变化`);
+    case "fertilize":
+      return `${event.actorName} ${t(msg`施了肥`)}`;
+    case "pesticide":
+      return `${event.actorName} ${t(msg`喷了农药`)}`;
+    case "uproot":
+      return `${event.actorName} ${t(msg`铲掉了作物`)}`;
+    case "decorate":
+      return `${event.actorName} ${t(msg`摆了一件装饰`)}`;
     default:
       return event.kind;
   }
