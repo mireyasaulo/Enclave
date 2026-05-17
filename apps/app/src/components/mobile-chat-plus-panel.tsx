@@ -607,6 +607,14 @@ export function MobileChatPlusPanel({
                 // friendship.remarkName，给了备注的好友（如 "林医生 → 健康顾问"）
                 // 在挑名片时只看到原名，跟其它入口对不上。
                 const displayName = getFriendDisplayName(item);
+                // 走查（第 3 次会话）R3：char-default-self 的 name 与 relationship
+                // 都是 "我自己"，picker 上两行都写 "我自己"，自聊以外的会话里
+                // 自己会被列出来看着很怪。subtitle 跟主名相同就藏掉那一行。
+                const rawSubtitle = friendship.remarkName?.trim()
+                  ? character.name
+                  : character.relationship || t(msg`世界联系人`);
+                const subtitle =
+                  rawSubtitle.trim() === displayName.trim() ? null : rawSubtitle;
                 return (
                   <button
                     key={character.id}
@@ -638,11 +646,11 @@ export function MobileChatPlusPanel({
                       <div className="truncate text-[13px] text-[color:var(--text-primary)]">
                         {displayName}
                       </div>
-                      <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
-                        {friendship.remarkName?.trim()
-                          ? character.name
-                          : character.relationship || t(msg`世界联系人`)}
-                      </div>
+                      {subtitle ? (
+                        <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
+                          {subtitle}
+                        </div>
+                      ) : null}
                     </div>
                   </button>
                 );
