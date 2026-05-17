@@ -363,17 +363,25 @@ export class MomentsService implements OnModuleInit {
     // 几条；改成 DB 层 where authorType='character' AND authorId=id 一次性收敛。
     // 还要走一遍 canOwnerViewPost（如果该 char 不是好友/被屏蔽，仍然 0 条返回）。
     const trimmedCharId = input?.characterAuthorId?.trim();
+    // 走查 R1：postedAt 是秒级精度，同 1 秒发 2 条（NPC tick + 用户手动 / 两条
+    // schedule 出来的 ai post）只按 postedAt DESC 排序在 SQLite 下顺序未定，
+    // 翻页 slice 会把同时戳的两条在不同请求看到不同顺序。加 id DESC 做
+    // tiebreaker —— id 是 uuid，DESC 序虽然没语义但稳定，保证翻页一致。
+    const stableOrder = {
+      postedAt: 'DESC' as const,
+      id: 'DESC' as const,
+    };
     const baseFindOptions = input?.ownerOnly
       ? {
           where: { authorType: 'user', authorId: owner.id },
-          order: { postedAt: 'DESC' as const },
+          order: stableOrder,
         }
       : trimmedCharId
         ? {
             where: { authorType: 'character', authorId: trimmedCharId },
-            order: { postedAt: 'DESC' as const },
+            order: stableOrder,
           }
-        : { order: { postedAt: 'DESC' as const } };
+        : { order: stableOrder };
     const posts = await this.postRepo.find(baseFindOptions);
     const visiblePosts = posts.filter((post) =>
       this.canOwnerViewPost(
@@ -533,8 +541,19 @@ export class MomentsService implements OnModuleInit {
       replyToCommentId,
       replyToAuthorId,
     });
-    const saved = await this.commentRepo.save(comment);
-    await this.postRepo.increment({ id: postId }, 'commentCount', 1);
+    // 走查 R1：save + increment 之间崩溃（进程被 kill / DB busy timeout）会让
+    // 评论已写入但 commentCount 永远 -1，onModuleInit 的 recount 要等下次重启
+    // 才修。包成 transaction：commentCount 跟评论一起成功 / 一起回滚。
+    const saved = await this.dataSource.transaction(async (manager) => {
+      const persisted = await manager.save(MomentCommentEntity, comment);
+      await manager.increment(
+        MomentPostEntity,
+        { id: postId },
+        'commentCount',
+        1,
+      );
+      return persisted;
+    });
     // 朋友圈评论的 AI 回复链：
     // - 用户评论 / 其他角色评论 → 安排世界角色去回复
     // - 已经是「回复」的评论本身不再触发新回复，避免无限套娃
@@ -612,9 +631,14 @@ export class MomentsService implements OnModuleInit {
         status: HttpStatus.FORBIDDEN,
       });
     }
-    await this.commentRepo.delete({ postId });
-    await this.likeRepo.delete({ postId });
-    await this.postRepo.delete(postId);
+    // 走查 R1：三条独立 delete 之间没有事务保护——中间一条崩了会留下孤儿
+    // moment_comments / moment_likes 永远查不到也删不掉，磁盘累积。包成一次
+    // transaction：要么整组删，要么一行不删。
+    await this.dataSource.transaction(async (manager) => {
+      await manager.delete(MomentCommentEntity, { postId });
+      await manager.delete(MomentLikeEntity, { postId });
+      await manager.delete(MomentPostEntity, postId);
+    });
     return { success: true, id: postId };
   }
 
