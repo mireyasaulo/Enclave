@@ -47,6 +47,7 @@ import {
   isDesktopOnlyPath,
   navigateBackOrFallback,
 } from "../lib/history-back";
+import { describeRequestError } from "../lib/request-error";
 import { searchStringToObject } from "../lib/route-search";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -376,11 +377,16 @@ export function MobileFavoritesPage({
 
       <div className="space-y-3 px-4 py-3">
         {notice ? <InlineNotice tone="success">{notice}</InlineNotice> : null}
-        {removeMutation.isError && removeMutation.error instanceof Error ? (
-          <ErrorBlock message={removeMutation.error.message} />
+        {/* 走查 R1：之前直接渲染 error.message，错失 describeRequestError 的
+            i18n 兜底——removeFavorite/getFavorites 抛 ApiRequestError 时 message
+            可能是裸英文 "Invalid or expired cloud access token." / 网络错误的
+            "Failed to fetch"，en/ja/ko 用户也只看见原文。和 profile-feedback
+            / profile-subscription / profile-info-* 同款翻译口径。 */}
+        {removeMutation.isError ? (
+          <ErrorBlock message={describeRequestError(removeMutation.error)} />
         ) : null}
-        {favoritesQuery.isError && favoritesQuery.error instanceof Error ? (
-          <ErrorBlock message={favoritesQuery.error.message} />
+        {favoritesQuery.isError ? (
+          <ErrorBlock message={describeRequestError(favoritesQuery.error)} />
         ) : null}
 
         {favoritesQuery.isLoading && !favorites.length ? (
