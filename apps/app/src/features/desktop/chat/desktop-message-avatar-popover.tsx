@@ -107,20 +107,27 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
   const momentsReturnHash = navigationContext?.momentsReturnHash ?? defaultReturnHash;
   const hideMomentsAction = Boolean(navigationContext?.hideMomentsAction);
 
+  // 走查 R1：桌面 avatar popover 在「单聊消息列表点对方头像 / 群里点任一
+  // 头像」时挂载，6 份 cache 全部没 staleTime——上层 workspace / details
+  // panel 大概率刚拉过这些数据。公网 RTT ~600ms × 6 并发即"点头像后头像
+  // 卡片空白几百毫秒"。对齐 desktop-chat-details-panel.tsx 同款 15s/30s。
   const characterQuery = useQuery({
     queryKey: ["app-character", baseUrl, characterId],
     queryFn: () => getCharacter(characterId, baseUrl),
     enabled: !isOwner && Boolean(characterId),
+    staleTime: 15_000,
   });
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
     enabled: !isOwner,
+    staleTime: 15_000,
   });
   const friendRequestsQuery = useQuery({
     queryKey: ["app-friend-requests", baseUrl],
     queryFn: () => getFriendRequests(baseUrl),
     enabled: !isOwner && Boolean(characterId),
+    staleTime: 15_000,
   });
   const blockedQuery = useQuery({
     // 与 desktop-chat-workspace 的拉黑列表共用同一份 cache，否则桌面端
@@ -128,11 +135,13 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
     queryKey: ["app-chat-blocked-characters", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: !isOwner && Boolean(characterId),
+    staleTime: 30_000,
   });
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: !isOwner,
+    staleTime: 15_000,
   });
   const groupMembersQuery = useQuery({
     queryKey: ["app-group-members", baseUrl, threadContext?.id],
@@ -141,6 +150,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
       !isOwner &&
       threadContext?.type === "group" &&
       Boolean(threadContext.id),
+    staleTime: 15_000,
   });
 
   const startChatMutation = useMutation({

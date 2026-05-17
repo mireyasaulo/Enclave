@@ -222,31 +222,43 @@ function DirectChatDetailsPanel({
     return () => window.clearTimeout(timer);
   }, [notice]);
 
+  // 走查 R1：单聊「聊天信息」侧栏每次打开都重拉这 5 份 cache（详情按钮在
+  // header 右侧，用户切会话 / 打开 details / 关掉再开都会重 mount），其中
+  // app-character/app-friends/app-friend-requests/app-conversations/blocked
+  // 五个上一个页面（contacts/character-detail/workspace 60s 轮询）大概率刚
+  // 加载过。公网隧道 RTT ~600ms × 5 并发，明显的"开侧栏后空白几百毫秒"。
+  // 对齐其他页面（contacts-page / chat-details-page / character-detail-page
+  // 均为 15s）的 staleTime；blocked 与 contacts 走查同款给 30s。
   const characterQuery = useQuery({
     queryKey: ["app-character", baseUrl, targetCharacterId],
     queryFn: () => getCharacter(targetCharacterId, baseUrl),
     enabled: Boolean(targetCharacterId),
+    staleTime: 15_000,
   });
 
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    staleTime: 15_000,
   });
   const friendRequestsQuery = useQuery({
     queryKey: ["app-friend-requests", baseUrl],
     queryFn: () => getFriendRequests(baseUrl),
     enabled: Boolean(targetCharacterId),
+    staleTime: 15_000,
   });
 
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
+    staleTime: 15_000,
   });
 
   const blockedQuery = useQuery({
     queryKey: ["app-chat-details-blocked", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: Boolean(targetCharacterId),
+    staleTime: 30_000,
   });
 
   const targetCharacter = characterQuery.data;
@@ -1083,18 +1095,23 @@ function GroupChatDetailsPanel({
     }
   }, [actionRequest]);
 
+  // 同上方 DirectChatDetailsPanel 走查 R1：群聊「聊天信息」侧栏 3 份 cache
+  // 都缺 staleTime，开侧栏重 mount 3 路并发 RTT，对齐其他页面 15s。
   const groupQuery = useQuery({
     queryKey: ["app-group", baseUrl, conversation.id],
     queryFn: () => getGroup(conversation.id, baseUrl),
+    staleTime: 15_000,
   });
 
   const membersQuery = useQuery({
     queryKey: ["app-group-members", baseUrl, conversation.id],
     queryFn: () => getGroupMembers(conversation.id, baseUrl),
+    staleTime: 15_000,
   });
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    staleTime: 15_000,
   });
 
   const backgroundLabel = getChatBackgroundLabel(

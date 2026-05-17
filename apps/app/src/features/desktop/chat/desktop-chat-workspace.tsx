@@ -339,6 +339,11 @@ export function DesktopChatWorkspace({
     queryKey: ["app-chat-blocked-characters", baseUrl],
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: Boolean(ownerId),
+    // 切到聊天 tab / 重 mount workspace 时不必每次都重拉黑名单——这份
+    // 数据日常几乎不变（拉黑/解除是稀有操作，触发时都会主动 invalidate）。
+    // 公网隧道 RTT ~600ms，省一次是一次。与 desktop-message-avatar-popover
+    // / desktop-chat-details-panel 的 30s 对齐。
+    staleTime: 30_000,
   });
 
   useEffect(() => {
