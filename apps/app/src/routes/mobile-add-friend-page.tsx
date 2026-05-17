@@ -619,6 +619,20 @@ function MobileAddFriend() {
         result={sendDialogResult}
         ownerName={ownerName}
         pending={sendRequestDisplayedPending}
+        // 走查 R2：sendRequest 失败时 ErrorBlock 在 AppPage 文档流里渲染 (line ~544)
+        // 但 sheet 是 fixed inset-0 z-50 整屏覆盖，错误被完全盖住。用户只看到
+        // 按钮从"发送中"复位回"发送"，以为只是手抖没点中，再点一次又踩同一个
+        // 4xx，整个循环里没有任何"为什么失败"的反馈。把 mutation.error 透传进
+        // sheet 内部展示在 textarea 下方——既不关 sheet 也不丢用户已敲的 greeting，
+        // 用户能直接看到"对方拒绝/限流/网络断开"，再决定是否重试或改文案。只在
+        // sheet 仍开着的时候透传，免得关闭后又把"我自己"打来的过期 error 拍回来。
+        errorMessage={
+          sendDialogResult &&
+          sendRequestMutation.isError &&
+          sendRequestMutation.error instanceof Error
+            ? sendRequestMutation.error.message
+            : null
+        }
         onClose={() => setSendDialogCharacterId(null)}
         onSubmit={async (greeting) => {
           if (!sendDialogResult) {
@@ -868,6 +882,7 @@ type MobileAddFriendSendSheetProps = {
   result: AddFriendSearchResult | null;
   ownerName: string;
   pending: boolean;
+  errorMessage?: string | null;
   onClose: () => void;
   onSubmit: (greeting: string) => Promise<void> | void;
 };
@@ -877,6 +892,7 @@ function MobileAddFriendSendSheet({
   result,
   ownerName,
   pending,
+  errorMessage,
   onClose,
   onSubmit,
 }: MobileAddFriendSendSheetProps) {
@@ -1049,6 +1065,18 @@ function MobileAddFriendSendSheet({
               {greeting.length}/60
             </div>
           </div>
+
+          {/* 走查 R2：失败原因渲染在 sheet 内部（textarea 下方）。父端 page-level
+              的 ErrorBlock 被 z-50 sheet 完全盖住，不在这里二次展示用户就只能反复
+              踩同一个 4xx。 */}
+          {errorMessage ? (
+            <div
+              role="alert"
+              className="mt-2.5 rounded-[10px] border border-[rgba(220,38,38,0.18)] bg-[rgba(254,242,242,0.94)] px-3 py-2 text-[12px] leading-5 text-[color:var(--state-danger-text)]"
+            >
+              {errorMessage}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
