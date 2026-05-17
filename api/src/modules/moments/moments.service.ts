@@ -153,6 +153,12 @@ type MomentAvatarContext = {
   // 完全没读它，UI toggle 等于 dead flag。
   momentsHiddenFromMeCharacterIds: Set<string>;
   characterAvatarById: Map<string, string>;
+  // 走查 R2：和 ownerUsername 重映射对称——角色被改名后，历史 moment_post /
+  // moment_like / moment_comment 的 authorName 字段仍是写入快照那一刻的旧名字。
+  // 已有的 applyCharacterRemark 只能用 owner 主动设的备注覆盖；没设备注的角色
+  // 改名后所有历史互动都挂着旧名字。把当前角色的 displayName/name 也带进
+  // context，resolveMomentAuthorName 在没有 remark 时优先用 entity 当前名。
+  characterNameById: Map<string, string>;
   remarkMap: FriendRemarkMap;
 };
 
@@ -1393,21 +1399,17 @@ export class MomentsService implements OnModuleInit {
       commentCount: serializedComments.length,
       likes: serializedLikes,
       comments: serializedComments,
-      interactions: [
-        ...serializedLikes.map((like) => ({
-          characterId: like.authorId,
-          characterName: like.authorName,
-          type: 'like' as const,
-          createdAt: like.createdAt,
-        })),
-        ...serializedComments.map((comment) => ({
-          characterId: comment.authorId,
-          characterName: comment.authorName,
-          type: 'comment' as const,
-          commentText: comment.text,
-          createdAt: comment.createdAt,
-        })),
-      ],
+      // 走查 R1：interactions 字段是 likes + comments 的扁平+带类型标签复刻视图。
+      // grep 整个 monorepo（apps/app、apps/wiki、apps/admin、apps/site、所有 spec
+      // 和 script）找消费者：0 个客户端在读 moment.interactions，唯一引用只剩
+      // legacy MomentEntity（'moments' 表 21 行老数据，never queried by service）
+      // + contracts 类型定义本身。但每条帖子的 interactions 字段大小约 =
+      // likes 行数 × ~60 + 评论行数 × ~80 bytes：实测一条 54 评论帖单独占 9.8KB，
+      // 而 page=1 limit=20 整页拉到 145KB 里 interactions 占 30-50KB。
+      // 修法：保留 contract 字段（避免破坏向后兼容、type-check），server 始终
+      // emit []，省掉 JSON 序列化 + 网络传输 + 客户端 parse 三段开销。哪天真有
+      // 消费者要回填的时候再 inline 一次性恢复。
+      interactions: [],
     };
   }
 
@@ -1514,6 +1516,14 @@ export class MomentsService implements OnModuleInit {
       characterAvatarById: new Map(
         visibleCharacters.map((character) => [character.id, character.avatar]),
       ),
+      characterNameById: new Map(
+        // 角色没填 name 时（极少）退回空串，resolveMomentAuthorName 会自动
+        // fallthrough 到 currentName 快照——比强行返回空名字安全。
+        visibleCharacters.map((character) => [
+          character.id,
+          (character.name ?? '').trim(),
+        ]),
+      ),
       remarkMap,
     };
   }
@@ -1545,7 +1555,13 @@ export class MomentsService implements OnModuleInit {
   // 的 authorName 也是在写入那一刻拍快照。世界主人在「我」→「名字」改名后，
   // 历史的 post.authorName / like.authorName / comment.authorName 仍是旧名字，
   // 朋友圈页跟数据看起来好像没改名。这里在序列化时按当前 owner.username
-  // 覆盖（character 路径仍走 applyCharacterRemark 不受影响）。
+  // 覆盖。
+  //
+  // 走查 R2 补：character 路径之前完全依赖快照 + applyCharacterRemark 二选一，
+  // 角色被改名但 owner 没设备注时，所有历史 like/comment 还挂旧名字。这跟
+  // owner rename 是对称的 UX hole；优先用 characterNameById（entity 当前名）
+  // 覆盖，applyCharacterRemark 在外层 wrapper 里仍然有最高优先级——remark
+  // 永远 win over 当前名，跟之前语义一致。
   private resolveMomentAuthorName(
     authorType: string | null | undefined,
     authorId: string | null | undefined,
@@ -1558,6 +1574,12 @@ export class MomentsService implements OnModuleInit {
       avatarContext.ownerUsername
     ) {
       return avatarContext.ownerUsername;
+    }
+    if (authorType === 'character' && authorId) {
+      const liveName = avatarContext.characterNameById.get(authorId);
+      if (liveName) {
+        return liveName;
+      }
     }
     return currentName ?? '';
   }
