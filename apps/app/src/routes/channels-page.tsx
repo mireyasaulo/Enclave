@@ -1343,12 +1343,19 @@ export function ChannelsPage() {
     if (alreadyFavorited) {
       removeDesktopFavorite(sourceId);
     } else {
+      // 走查 2026-05-17 新会话 R2：description 直接吃 post.text，但某些 AI
+      // 生成贴的原文夹了 <tool_call>...</tool_call> / [TOOL_CALL] 等工具调用
+      // 残留——视频号卡上已经走 stripToolCallSyntax 过滤了，favorites 收藏
+      // 这层却直接存原文。用户从「我 → 收藏」打开能看到一坨 XML 标签和参数
+      // JSON 当成"动态正文"摘要在 line-clamp-2 里炸开，肉眼像乱码。同样
+      // 过滤一遍再落 localStorage，保证收藏列表里的描述跟卡片正文一致。
+      const cleanDescription = stripToolCallSyntax(post.text ?? "");
       upsertDesktopFavorite({
         id: `favorite-${sourceId}`,
         sourceId,
         category: "channels",
         title: post.authorName,
-        description: post.text,
+        description: cleanDescription,
         meta: formatTimestamp(post.createdAt),
         to: `/tabs/channels${routeHash ? `#${routeHash}` : ""}`,
         badge: t(msg`视频号`),
