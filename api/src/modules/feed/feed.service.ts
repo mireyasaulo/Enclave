@@ -398,6 +398,11 @@ export class FeedService implements OnModuleInit {
     const page = clampFeedPaginationPage(input?.page ?? 1);
     const limit = clampFeedPaginationLimit(input?.limit ?? 20);
 
+    // 走查 2026-05-17 新会话 R5：原代码当 section !== 'recommended' 时调用
+    // getVisibleChannelPosts 两次——两次都重复跑同样 5 个 IO（posts + blocked
+    // + notInterested + followed + friends），仅最后一道 section filter 不同。
+    // 拿 allVisiblePosts 后按需在内存里 re-filter 出 sectionFiltered，避免重复
+    // SELECT * + 重复 owner social 4 项查询。
     const allVisiblePosts = await this.getVisibleChannelPosts(
       owner.id,
       'recommended',
@@ -405,7 +410,11 @@ export class FeedService implements OnModuleInit {
     const postsForSection =
       section === 'recommended'
         ? allVisiblePosts
-        : await this.getVisibleChannelPosts(owner.id, section);
+        : await this.filterChannelPostsBySection(
+            allVisiblePosts,
+            owner.id,
+            section,
+          );
     const pagedPosts = paginate(postsForSection, page, limit);
 
     const [commentsPreviewMap, authors, liveEntries, sectionCounts] =
@@ -3199,6 +3208,42 @@ export class FeedService implements OnModuleInit {
 
     const [posts, total] = await qb.getManyAndCount();
     return { posts, total };
+  }
+
+  // 走查 2026-05-17 新会话 R5：在 allVisiblePosts （已经按 recommended 过过的
+  // baseline）之上按需补一道 friends/following/live section 过滤——只查 friends
+  // / followed 这两份小数据，不重新拉全表 + 5 个 IO。仅供 getChannelHomeDecorations
+  // 在 section!=='recommended' 时调用，等价于 getVisibleChannelPosts(section)
+  // 但省掉重复 IO。
+  private async filterChannelPostsBySection(
+    basePosts: FeedPostEntity[],
+    ownerId: string,
+    section: FeedChannelHomeSection,
+  ): Promise<FeedPostEntity[]> {
+    if (section === 'recommended') return basePosts;
+    if (section === 'live') {
+      return basePosts.filter(
+        (post) =>
+          post.sourceKind === 'live_clip' ||
+          (post.topicTags ?? []).some((tag) => tag.includes('直播')),
+      );
+    }
+    const [followedAuthorIds, friendIds] = await Promise.all([
+      section === 'following'
+        ? this.followRepo
+            .find({ where: { ownerId } })
+            .then((items) => new Set(items.map((item) => item.authorId)))
+        : Promise.resolve(new Set<string>()),
+      section === 'friends'
+        ? this.socialService
+            .getFriendCharacterIds(ownerId)
+            .then((ids) => new Set(ids))
+        : Promise.resolve(new Set<string>()),
+    ]);
+    if (section === 'friends') {
+      return basePosts.filter((post) => friendIds.has(post.authorId));
+    }
+    return basePosts.filter((post) => followedAuthorIds.has(post.authorId));
   }
 
   private async getVisibleChannelPosts(
