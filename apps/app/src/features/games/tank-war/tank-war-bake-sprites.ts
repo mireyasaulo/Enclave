@@ -165,7 +165,19 @@ function bake16(pixels: Pixels): HTMLCanvasElement {
   return c;
 }
 
+// 模块级缓存：TankWarGame 每次挂载都会 bakeSprites()，要 new 50+ HTMLCanvasElement
+// + drawImage 一遍像素串字面量。用户在 /tabs/games 点 X 退出后再次点 tank-war
+// 入口，TankWarGame 重新挂载就又跑一次（~10ms 帧抖 + 短期内存压力）。Sprite
+// 全是模块常量、跟 world 无关，烘焙一次永久复用。
+let _cachedSheet: SpriteSheet | null = null;
+
 export function bakeSprites(): SpriteSheet {
+  if (_cachedSheet) return _cachedSheet;
+  _cachedSheet = bakeSpritesUncached();
+  return _cachedSheet;
+}
+
+function bakeSpritesUncached(): SpriteSheet {
   // power tank 4 levels HP=4..1 颜色不同
   const powerUpsRecolor = (hp: number) => {
     const map =

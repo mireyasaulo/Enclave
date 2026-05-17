@@ -203,6 +203,10 @@ export function createSfx(): Sfx {
   }
 
   function setMoveActive(on: boolean): void {
+    // 短路：状态没变就别再 cancelScheduledValues + linearRampToValueAtTime
+    // 一遍。引擎每个 tick 都喊一次 setMoveActive(false)（非 playing 状态），
+    // 已经 false 还重排一次 gain ramp 是纯浪费 — RAF 频率下尤其明显。
+    if (moveActive === on) return;
     moveActive = on;
     ensureMoveOsc();
     applyMoveGain();

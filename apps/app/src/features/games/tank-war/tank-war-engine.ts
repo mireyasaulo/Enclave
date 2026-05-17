@@ -5,7 +5,6 @@ import {
   BATTLEFIELD,
   BULLET_SPEED_BASE,
   BULLET_SPEED_FAST,
-  ENEMY_QUOTA,
   ENEMY_SHIELD_MS,
   ENEMY_SPAWN_POINTS,
   ENEMY_SPEED,
@@ -16,7 +15,6 @@ import {
   HALF_W,
   HALF_H,
   HELMET_MS,
-  HUD_X,
   MAX_ENEMIES_ONFIELD,
   P1_SPAWN,
   P2_SPAWN,
@@ -26,7 +24,6 @@ import {
   SCORES,
   SHOVEL_MS,
   SPAWN_INTERVAL_MS,
-  STAGE_CLEAR_MS,
   STAGE_INTRO_MS,
   TILE_SIZE,
   TIMER_MS,
@@ -44,7 +41,6 @@ import {
   TILE_EMPTY,
   TILE_ICE,
   TILE_STEEL,
-  TILE_TREE,
   TILE_WATER,
   createEmptyInput,
   type Bullet,
@@ -53,7 +49,6 @@ import {
   type InputState,
   type Owner,
   type PlayerMode,
-  type PowerUp,
   type PowerUpKind,
   type Tank,
   type TankKind,
@@ -1055,9 +1050,3 @@ export function isGameOver(world: GameWorld): boolean {
   return world.status === "game-over";
 }
 
-export {
-  STAGE_INTRO_MS as STAGE_INTRO_DURATION_MS,
-  STAGE_CLEAR_MS as STAGE_CLEAR_DURATION_MS,
-  ENEMY_QUOTA as ENEMY_QUOTA_RE,
-  HUD_X as HUD_X_RE,
-};

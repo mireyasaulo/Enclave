@@ -46,9 +46,9 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
 
   useTankWarInput(inputRef, hud.status, hud.mode === "two-player");
 
-  // 触屏环境只挂了 P1 按键（见 tank-war-touch-controls），MenuOverlay 里仍允许
-  // 切「双人」会让 P2 在手机上无操作 — 静默把模式锁回单人，避免用户起一局
-  // 才发现 P2 不能动。桌面键盘双人本地对战不受影响。
+  // 触屏环境只挂了 P1 按键（见 tank-war-touch-controls）— MenuOverlay 里下面
+  // 把双人按钮直接藏掉 + 初始 mode 锁回单人 + 显示 "请用桌面键盘" 提示。
+  // 桌面键盘双人本地对战不受影响。
 
   useEffect(() => {
     spritesRef.current = bakeSprites();
