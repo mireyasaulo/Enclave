@@ -13,6 +13,12 @@ import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../../store/cloud-session-store";
 
 const RESEND_COOLDOWN_SECONDS = 60;
+// bcrypt 只 hash 密码前 72 字节，cloud-api 的 password-policy.ts 已经按 byte 长度卡。
+// 但客户端原来只看 newPassword.length（char count）：用户敲 25 个中文（75B）能通过
+// 客户端校验，到 cloud-api 才被拒 "密码不能超过 72 字节（含 emoji / 中文时上限更小）"，
+// 用户看到 "字节" 这种术语反而困惑。这里先在客户端用 TextEncoder 量字节长度同款拦截，
+// 提示语和 placeholder「8-32 位」保持一致语义。
+const MAX_PASSWORD_BYTES = 72;
 
 // 走查 R4：cooldown 之前只活在组件 useState 里，用户点完「发送验证码」 → 触发
 // cooldown → 切去任意子页（连切去 /profile/settings 都算）回来时组件 unmount /
@@ -201,6 +207,17 @@ export function AccountSecurityPanel() {
       setFeedback({
         tone: "danger",
         message: t(msg`新密码长度需在 8-32 位之间。`),
+      });
+      return;
+    }
+    // 中文 / emoji 在 char count 通过 32 后，byte 长度可能仍超 bcrypt 的 72B 上限——
+    // 此时让后端报 "密码不能超过 72 字节" 用户看到 "字节" 反而懵。先在客户端按字节拦。
+    if (new TextEncoder().encode(newPassword).length > MAX_PASSWORD_BYTES) {
+      setFeedback({
+        tone: "danger",
+        message: t(
+          msg`新密码超出长度上限（每个中文/表情占多个字节），请缩短后再试。`,
+        ),
       });
       return;
     }
