@@ -31,6 +31,7 @@ type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { EmptyState } from "../components/empty-state";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { stripToolCallSyntax } from "../features/moments/moment-content";
 import { resolveAppMediaUrl } from "../lib/media-url";
 import {
   buildDesktopChannelsRouteHash,
@@ -578,7 +579,7 @@ export function ChannelAuthorPage() {
                     )}
                   </div>
                   <div className="mt-2 line-clamp-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-                    {featuredLivePost.text}
+                    {stripToolCallSyntax(featuredLivePost.text)}
                   </div>
                 </div>
                 <span className="shrink-0 rounded-full border border-[rgba(127,29,29,0.12)] bg-white px-3 py-1 text-[11px] font-medium text-[#7f1d1d]">
@@ -662,7 +663,7 @@ export function ChannelAuthorPage() {
                             </div>
                           ) : null}
                           <div className="mt-2 line-clamp-3 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-                            {post.text}
+                            {stripToolCallSyntax(post.text)}
                           </div>
                           {post.topicTags?.length ? (
                             <div className="mt-3 flex flex-wrap gap-1.5">
