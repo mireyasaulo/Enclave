@@ -109,6 +109,9 @@ function MobileWorldCharactersPage() {
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    // 走查第七轮 R1：从 /tabs/contacts 进世界角色列表（"通讯录-世界角色"）
+    // 上一页 friend list 刚拉，这页又强制 refetch；跟 contacts-page 配齐 15s。
+    staleTime: 15_000,
   });
   const charactersQuery = useQuery({
     queryKey: ["app-characters", baseUrl],

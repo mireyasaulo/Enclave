@@ -144,6 +144,10 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
+    // 走查第七轮 R2：跟 contacts-page / character-detail-page 对齐 15s
+    // staleTime——chat-room 顶部点 ⋯ 进 details 时上一页 conversations
+    // 列表刚拉过，无须立刻 refetch。
+    staleTime: 15_000,
   });
 
   const conversation = useMemo(
@@ -166,6 +170,10 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    // 走查第七轮 R1：与 character-detail / contacts-page 共享同一 queryKey，
+    // 跟它们一起把 staleTime 对齐到 15s，避免从 chat-room 顶部点 ⋯ 进 details
+    // 又触发一次和列表页/资料页 15s 内已 fresh 的 friend list 重拉。
+    staleTime: 15_000,
   });
   const blockedQuery = useQuery({
     queryKey: ["app-chat-details-blocked", baseUrl],

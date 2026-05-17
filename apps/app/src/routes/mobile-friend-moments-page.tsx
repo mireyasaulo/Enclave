@@ -115,6 +115,10 @@ export function MobileFriendMomentsPage() {
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    // 走查第七轮 R1：跟 character-detail / contacts-page / chat-details 对齐
+    // 15s staleTime——用户在资料页点「TA 的朋友圈」过来，刚才上一个页面已经
+    // 拉过 friend 列表，这里不需要再 refetch 一次。
+    staleTime: 15_000,
   });
   // ?character=ID 服务端过滤，只回该角色发的几条 ≤几KB，省掉之前 getMoments
   // 全表 ~724KB 的浪费。和「我的朋友圈」（mine=true）走同一类模式，但每个角色

@@ -189,6 +189,12 @@ export function CharacterDetailPage() {
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
     queryFn: () => getFriends(baseUrl),
+    // 走查第七轮 R1：contacts-page / mobile-add-friend-page / tags-page /
+    // starred-friends-page / create-group-page 在挂这条 query 时都配了
+    // staleTime: 15_000，character-detail-page 反而缺，从 contacts tab 跳
+    // 资料页时 friend 列表刚刚 15s 内还热，又被强制 refetch 一次（默认
+    // staleTime=0 + refetchOnMount=true）。跟其它入口对齐避免无用重拉。
+    staleTime: 15_000,
   });
   const isAlreadyFriend = useMemo(
     () =>
@@ -214,6 +220,10 @@ export function CharacterDetailPage() {
     queryKey: ["app-friend-requests", baseUrl, "all"],
     queryFn: () => getFriendRequests(baseUrl, { direction: "all" }),
     enabled: !friendsQuery.isLoading && !isAlreadyFriend,
+    // 走查第七轮 R2：跟 mobile-add-friend-page / contacts-page 对齐 15s
+    // staleTime——同一 queryKey 在多个入口共享，缺 staleTime 时挂到一个
+    // 新页面就强制 refetch，浪费一次 round-trip。
+    staleTime: 15_000,
   });
   // 走查 R2 试过按 isAlreadyFriend gate 这条 query 省一次后台往返，但 R3 复查
   // 发现会留 TOCTOU 窗口：用户在好友页点「加入黑名单」→ blockMutation.onSuccess
@@ -233,6 +243,8 @@ export function CharacterDetailPage() {
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: isDesktopLayout,
+    // 走查第七轮 R2：跟 contacts-page 对齐 15s staleTime。
+    staleTime: 15_000,
   });
 
   useEffect(() => {
