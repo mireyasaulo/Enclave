@@ -128,9 +128,15 @@ function MobileGroupContactsPage() {
   // 页都在用的共享 cache，进通讯录前用户大概率刚停过 chat-list，命中率高；
   // 即使冷启 cache 没命中，落回单 seed 渲染（之前的行为），同时本页这次的
   // useQuery 也会顺手把 cache 填上，下次稳态就一致了。
+  // 走查 R1：原本没设 staleTime，每次进群聊列表都会立刻 refetch /conversations
+  // 一次——本页只用 conversations 来取 participants 给 GroupAvatarChip，对新鲜度
+  // 要求不高（即便落后几十秒，群头像 seed 也只是 4 个名字的 hash）。和兄弟页
+  // contacts-page (15s) / chat-list (10s) 同口径加 15s staleTime，避免每次从
+  // /tabs/chat 切回来都把全量 conversations 当场再拉一遍。
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
+    staleTime: 15_000,
   });
   const groupParticipantsMap = useMemo(() => {
     const map = new Map<string, string[]>();

@@ -280,6 +280,24 @@ export class GroupService {
     dto: AddMemberDto,
   ): Promise<GroupMemberEntity> {
     await this.requireOwnedGroup(groupId);
+    // 走查 R1：char-default-self（"我自己"自我镜像）本质就是用户自身，owner
+    // 已经以 memberType=user 在群里。前端 create-group-page / 群成员 picker /
+    // mention picker / group-chat-thread-panel 都已经按 SELF_CHARACTER_ID 过滤
+    // 渲染，但服务端这条路径漏掉——任何直连 API / 老版本客户端 / 第三方客户端
+    // 都能 POST 一条 memberType=character 的 SELF 进群，落库后用户在 mention
+    // picker / 通讯录里能看到"@我自己"，typing/AI reply 走 character 路径还会
+    // 在群里冒"我自己 正在回复..."——本质是用户在自言自语。yuanzui0728 实测
+    // 群 78a3d894-dd62-... 历史上就被加了这条 SELF 成员行，与前端各页注释一致。
+    // 和 createGroup R2 同口径，服务端硬挡：character 类型 SELF_CHARACTER_ID 直接 400。
+    if (
+      dto.memberType === 'character' &&
+      dto.memberId === SELF_CHARACTER_ID
+    ) {
+      throw new AppError('GROUP_CANNOT_ADD_SELF_AS_MEMBER', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Cannot add self mirror character as a group member',
+      });
+    }
     const existing = await this.memberRepo.findOne({
       where: { groupId, memberId: dto.memberId },
     });
@@ -714,6 +732,18 @@ export class GroupService {
   ): Promise<GroupMemberEntity> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.requireOwnedGroup(groupId);
+    // 走查 R1：原版 `nickname.trim() || member.memberName` 在 PATCH 传空/纯
+    // 空白时沉默保留旧昵称——客户端 group-chat-edit-page 自己 disable 了空
+    // 提交，但任何直连 API / 老客户端 / 第三方客户端发空昵称时返回 200 +
+    // 同一份旧昵称，调用方看着像"保存按钮没响应"或"清空昵称被默默撤回"。
+    // 和 createGroup / updateGroup 的 GROUP_REQUIRES_NAME 同口径直接 400。
+    const trimmedNickname = nickname?.trim();
+    if (!trimmedNickname) {
+      throw new AppError('GROUP_REQUIRES_NICKNAME', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: 'Group nickname cannot be empty',
+      });
+    }
     const member = await this.memberRepo.findOne({
       where: {
         groupId,
@@ -730,10 +760,17 @@ export class GroupService {
       });
     }
 
-    return this.memberRepo.save({
+    const saved = await this.memberRepo.save({
       ...member,
-      memberName: nickname.trim() || member.memberName,
+      memberName: trimmedNickname,
     });
+    // 走查 R1：和本服务其它写操作（updateGroup / updatePreferences / setGroupPinned
+    // / hideGroup / clearGroupMessages / addMember / removeMember）一致 emit
+    // conversation_updated。原本漏掉的话，多端在线（web + iOS shell / 双端同账号）
+    // 改完群昵称另一端的群信息页 / chat-list 会议项的 memberName 还显示旧值，
+    // 要等下次 60s 兜底轮询或用户手动 pull-to-refresh 才更新；socket 一推即同步。
+    await this.emitGroupConversationUpdated(groupId);
+    return saved;
   }
 
   async leaveGroup(groupId: string): Promise<{ success: true }> {
