@@ -130,7 +130,12 @@ export function ProfileInfoPage() {
               onClick={() => {
                 void handleCopyYinjieId();
               }}
-              ariaLabel={t(msg`复制隐界号`)}
+              // aria-label 设上后视觉上的「隐界号 yinjie_xxx Copy」按钮内容
+              // 都被屏蔽——VoiceOver/TalkBack 用户只听到 "复制隐界号"，不知
+              // 道自己即将复制哪个 ID。带上 yinjieIdText 让无障碍用户跟 sighted
+              // 用户拿到等量信息。data-i18n-skip 那个 span 是给 lingui 跳过
+              // 提取，但 aria-label 这里就是字符串拼接，编号字符走原文。
+              ariaLabel={t(msg`复制隐界号 ${yinjieIdText}`)}
             />
           ) : (
             <InfoRow
