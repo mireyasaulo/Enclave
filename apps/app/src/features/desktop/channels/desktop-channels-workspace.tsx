@@ -30,6 +30,7 @@ import {
   ChevronRight,
   ChevronUp,
   MessageCircleMore,
+  Music2,
   RadioTower,
   RefreshCcw,
   Share2,
@@ -740,13 +741,11 @@ function ChannelMediaSurface({
     post.coverUrl ?? imageAssets[0]?.url ?? post.mediaUrl ?? null;
   if (fallbackImage) {
     return (
-      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gradient-to-b from-[#1f2533] to-[#0a0c10]">
-        <img
-          src={resolveAppMediaUrl(fallbackImage)}
-          alt={post.title ?? post.authorName}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      </div>
+      <ChannelFallbackImage
+        src={fallbackImage}
+        alt={post.title ?? post.authorName}
+        isActive={isActive}
+      />
     );
   }
 
@@ -760,6 +759,44 @@ function ChannelMediaSurface({
           {t(msg`稍后再来看看`)}
         </div>
       </div>
+    </div>
+  );
+}
+
+// 走查 2026-05-17 新会话 R4：ChannelMediaSurface 的图集 / 文字帖兜底 cover——
+// 原直接挂 <img src=...>，没 onError 兜底 + 没 lazy 标签。
+//  - 失败时浏览器原生 broken-image 占位盖在沉浸式播放区，体感「卡片坏了」
+//  - 非 active 卡也 eager 拉图，10+ 张图集 slide 一起 load 浪费首屏带宽
+// 加 onError 切到渐变兜底（和 mobile ChannelAudioPictorial 同款），lazy
+// 仅在 active 时 eager。
+function ChannelFallbackImage({
+  src,
+  alt,
+  isActive,
+}: {
+  src: string;
+  alt: string;
+  isActive: boolean;
+}) {
+  const t = useRuntimeTranslator();
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gradient-to-b from-[#1f2533] to-[#0a0c10]">
+      {failed ? (
+        <div className="flex flex-col items-center gap-2 text-white/70">
+          <Music2 size={48} className="text-white/40" />
+          <div className="text-[12px]">{t(msg`封面暂时无法显示`)}</div>
+        </div>
+      ) : (
+        <img
+          src={resolveAppMediaUrl(src)}
+          alt={alt}
+          loading={isActive ? "eager" : "lazy"}
+          decoding="async"
+          onError={() => setFailed(true)}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
     </div>
   );
 }
