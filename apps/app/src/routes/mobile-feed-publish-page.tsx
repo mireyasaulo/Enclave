@@ -227,14 +227,19 @@ export function MobileFeedPublishPage() {
   }, [isDesktopLayout, navigate]);
 
   // ESC 关闭「放弃发表」确认弹窗（和 farm 的 sheet/modal 处理对齐）。
+  // 走查 R5：原版只看 `event.key === "Escape"`，但用户在文案 textarea 里
+  // 中文输入时按 ESC 想关 IME 候选窗（系统行为），keydown 一样冒到 window
+  // 上命中这条 handler 把 modal 关掉 → handleBack 再次触发就直接 performBack
+  // 把草稿丢了。WeChatCommentBar / desktop-feed-compose-panel R1 都已经按
+  // event.isComposing / keyCode===229 双判定兜过 IME，这里也补上保持一致。
   useEffect(() => {
     if (!discardConfirmOpen) {
       return;
     }
     const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setDiscardConfirmOpen(false);
-      }
+      if (event.key !== "Escape") return;
+      if (event.isComposing || event.keyCode === 229) return;
+      setDiscardConfirmOpen(false);
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
