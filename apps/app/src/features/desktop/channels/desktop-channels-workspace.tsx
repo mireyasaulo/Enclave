@@ -1440,6 +1440,14 @@ function DesktopChannelCommentsPanel({
 }) {
   const t = useRuntimeTranslator();
   const selectedPostId = selectedPost?.id ?? null;
+  // 走查 2026-05-17 R3：移动端 R5 早就按 canInteract 把非好友帖的「回复 / 赞 /
+  // textarea / 发送」按钮全部 disable，桌面侧一直没接——用户读完评论按"发送"
+  // → ChannelsPage.submitComment 走 ensureCommentPostCanInteract → setNotice
+  // 提示「需先加为好友才能互动」。这条 notice 走 successNotice prop 渲在 workspace
+  // 顶端，被 z-30 抽屉部分遮住后用户多半看不到，体感「按了发送什么都没发生」。
+  // 在评论 panel 内部也按 canInteract 把所有 mutation 入口锁死，并贴一行黄色
+  // 提示告知用户为什么不能动。
+  const cannotInteract = selectedPost?.canInteract === false;
   const inputRef = useRef<HTMLInputElement | null>(null);
   // 打开评论抽屉 / 点 "回复 X" 时，把焦点送到 input——和移动端 sheet 的处理
   // 一致（commit 2090+），用户开了抽屉就能直接敲字。
@@ -1635,6 +1643,7 @@ function DesktopChannelCommentsPanel({
               <DesktopThreadCommentCard
                 comment={rootComment}
                 active={replyTarget?.commentId === rootComment.id}
+                cannotInteract={cannotInteract}
                 commentAuthorNameMap={commentAuthorNameMap}
                 compact={false}
                 likePendingCommentId={likePendingCommentId}
@@ -1643,6 +1652,7 @@ function DesktopChannelCommentsPanel({
               />
               {replies.length ? (
                 <DesktopCommentThreadReplies
+                  cannotInteract={cannotInteract}
                   collapsed={collapsedThreadIds.includes(rootComment.id)}
                   replies={replies}
                   replyTarget={replyTarget}
@@ -1665,6 +1675,11 @@ function DesktopChannelCommentsPanel({
       ) : null}
 
       <div className="rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-3">
+        {cannotInteract ? (
+          <div className="mb-3 rounded-[12px] bg-[rgba(234,179,8,0.10)] px-3 py-2 text-[11px] leading-[1.35rem] text-[#854d0e]">
+            {t(msg`需先加为好友才能互动。`)}
+          </div>
+        ) : null}
         {replyTarget ? (
           <div className="mb-3 flex items-center justify-between gap-3 rounded-[12px] bg-[rgba(7,193,96,0.08)] px-3 py-2 text-[11px] text-[color:var(--brand-primary)]">
             <div className="truncate">
@@ -1695,24 +1710,37 @@ function DesktopChannelCommentsPanel({
               ) {
                 return;
               }
-              if (!selectedPost || !draft.trim() || submitPending) return;
+              if (
+                !selectedPost ||
+                cannotInteract ||
+                !draft.trim() ||
+                submitPending
+              )
+                return;
               event.preventDefault();
               onSubmit();
             }}
             placeholder={
-              replyTarget
-                ? t(msg`回复 ${replyTarget.authorName}...`)
-                : selectedPost
-                  ? t(msg`写下你对这条视频号内容的评论...`)
-                  : t(msg`先选择一条内容`)
+              cannotInteract
+                ? t(msg`需先加为好友才能评论`)
+                : replyTarget
+                  ? t(msg`回复 ${replyTarget.authorName}...`)
+                  : selectedPost
+                    ? t(msg`写下你对这条视频号内容的评论...`)
+                    : t(msg`先选择一条内容`)
             }
-            disabled={!selectedPost}
+            disabled={!selectedPost || cannotInteract}
             className="min-w-0 flex-1 rounded-xl border-[color:var(--border-faint)] bg-white py-2.5 shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
           />
           <Button
             variant="primary"
             size="sm"
-            disabled={!selectedPost || !draft.trim() || submitPending}
+            disabled={
+              !selectedPost ||
+              cannotInteract ||
+              !draft.trim() ||
+              submitPending
+            }
             onClick={onSubmit}
             className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
           >
@@ -1725,6 +1753,7 @@ function DesktopChannelCommentsPanel({
 }
 
 function DesktopCommentThreadReplies({
+  cannotInteract,
   collapsed,
   commentAuthorNameMap,
   likePendingCommentId,
@@ -1734,6 +1763,7 @@ function DesktopCommentThreadReplies({
   replies,
   replyTarget,
 }: {
+  cannotInteract: boolean;
   collapsed: boolean;
   commentAuthorNameMap: Map<string, string>;
   likePendingCommentId: string | null;
@@ -1788,6 +1818,7 @@ function DesktopCommentThreadReplies({
               key={comment.id}
               comment={comment}
               active={replyTarget?.commentId === comment.id}
+              cannotInteract={cannotInteract}
               commentAuthorNameMap={commentAuthorNameMap}
               compact
               likePendingCommentId={likePendingCommentId}
@@ -1803,6 +1834,7 @@ function DesktopCommentThreadReplies({
 
 function DesktopThreadCommentCard({
   active,
+  cannotInteract,
   comment,
   commentAuthorNameMap,
   compact,
@@ -1811,6 +1843,7 @@ function DesktopThreadCommentCard({
   onReplyToComment,
 }: {
   active: boolean;
+  cannotInteract: boolean;
   comment: FeedComment;
   commentAuthorNameMap: Map<string, string>;
   compact: boolean;
@@ -1819,9 +1852,18 @@ function DesktopThreadCommentCard({
   onReplyToComment: (comment: FeedComment) => void;
 }) {
   const t = useRuntimeTranslator();
+  // 走查 2026-05-17 R3：原代码只看本地 commentAuthorNameMap——它只覆盖当前
+  // 分页展示的评论。被回复的根评论若在分页之外 / 已删 / 已隐藏，map 是空，
+  // "回复 X" 整段就漏掉了。移动端 R3 早就改成「优先吃后端 serializeComment
+  // 给的 replyToAuthorName」，桌面这里也对齐。
   const replyTargetName = comment.replyToCommentId
-    ? commentAuthorNameMap.get(comment.replyToCommentId) ?? null
+    ? (comment.replyToAuthorName ??
+        commentAuthorNameMap.get(comment.replyToCommentId) ??
+        null)
     : null;
+  // 走查 2026-05-17 R3：评论正文同样跑 stripToolCallSyntax，避免 AI 角色 CoT
+  // 漏出的 <tool_call> / [TOOL_CALL] 标签原样在评论楼里显示一段 XML/JSON。
+  const cleanText = stripToolCallSyntax(comment.text);
 
   return (
     <div
@@ -1877,28 +1919,31 @@ function DesktopThreadCommentCard({
                 {"："}
               </span>
             ) : null}
-            {comment.text}
+            {cleanText}
           </div>
           <div className="mt-2 flex items-center gap-4 text-[11px] text-[color:var(--text-muted)]">
             <button
               type="button"
+              disabled={cannotInteract}
               onClick={() => onReplyToComment(comment)}
-              className="transition hover:text-[color:var(--text-primary)]"
+              className="transition hover:text-[color:var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t(msg`回复`)}
             </button>
             <button
               type="button"
               disabled={
+                cannotInteract ||
                 comment.likedByOwner ||
                 likePendingCommentId === comment.id
               }
               onClick={() => onLikeComment(comment)}
               className={cn(
-                "inline-flex items-center gap-1 transition",
+                "inline-flex items-center gap-1 transition disabled:cursor-not-allowed",
                 comment.likedByOwner
                   ? "text-[color:var(--brand-primary)]"
                   : "hover:text-[color:var(--text-primary)]",
+                cannotInteract && !comment.likedByOwner ? "opacity-50" : null,
               )}
             >
               <ThumbsUp size={12} />
