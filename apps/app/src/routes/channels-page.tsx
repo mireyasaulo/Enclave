@@ -942,19 +942,33 @@ export function ChannelsPage() {
     queryFn: () => getChannelAuthorProfile(syncedRouteSelectedAuthorId!, baseUrl),
     enabled: Boolean(isDesktopLayout && syncedRouteSelectedAuthorId),
   });
+  // 走查 R6（本轮）：原 label 直接吃 decorationsQuery / channelsQuery 返回的
+  // 服务端字段——后端 CHANNEL_HOME_SECTION_LABELS 把 推荐/朋友/关注/直播 硬编码
+  // 成中文，en-US / ja-JP / ko-KR 用户进视频号永远看到 4 个中文 tab，跟下面卡片
+  // 内 t(msg`视频号推荐`) / 卡片 meta 行的"音乐 · 38 秒"等本地化文案对不上。
+  // 只信任 server 的 key + count，label 一律走前端翻译。
   const channelSections = useMemo<
     Array<{ key: FeedChannelHomeSection; label: string; count: number }>
-  >(
-    () =>
-      decorationsQuery.data?.sections ??
-      channelsQuery.data?.sections ?? [
-        { key: "recommended", label: t(msg`推荐`), count: 0 },
-        { key: "friends", label: t(msg`朋友`), count: 0 },
-        { key: "following", label: t(msg`关注`), count: 0 },
-        { key: "live", label: t(msg`直播`), count: 0 },
-      ],
-    [decorationsQuery.data?.sections, channelsQuery.data?.sections, t],
-  );
+  >(() => {
+    const sectionLabels: Record<FeedChannelHomeSection, string> = {
+      recommended: t(msg`推荐`),
+      friends: t(msg`朋友`),
+      following: t(msg`关注`),
+      live: t(msg`直播`),
+    };
+    const sourceSections =
+      decorationsQuery.data?.sections ?? channelsQuery.data?.sections;
+    if (sourceSections) {
+      return sourceSections.map((section) => ({
+        key: section.key,
+        label: sectionLabels[section.key] ?? section.label,
+        count: section.count,
+      }));
+    }
+    return (
+      Object.keys(sectionLabels) as FeedChannelHomeSection[]
+    ).map((key) => ({ key, label: sectionLabels[key], count: 0 }));
+  }, [decorationsQuery.data?.sections, channelsQuery.data?.sections, t]);
   // 只把"拉首屏数据"和"按 URL 定位帖"这两种"读"失败放进 errorMessage——
   // 这才是真正的 "视频号暂时不可用"。点赞 / 收藏 / 关注 / 减少推荐 / 评论
   // 这些点操作失败时整个 home 还能用，不应该让大状态卡盖住推荐流；它们的
