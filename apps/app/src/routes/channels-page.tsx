@@ -71,6 +71,7 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const EMPTY_CHANNEL_POSTS: FeedPostListItem[] = [];
@@ -3559,6 +3560,22 @@ function MobileChannelCommentsSheet({
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
+  // 走查 2026-05-17 新会话 R4：Android 硬件 Back 键 — 评论 sheet 打开时按
+  // Back 应该收 sheet 而不是退掉整个 /discover/channels 页（默认行为会让
+  // capacitor App.backButton 走 history.back，把用户从视频号甩回上一页 /
+  // 主 tab，体感「我只是想关掉评论」)。和 wechat-comment-bar (line 149) /
+  // share-card-modal / moment-media-gallery viewer 同款拦截：preventDefault
+  // + 返回 true 消费按键。非 Android 平台 registerAndroidBackInterceptor 返
+  // 回 no-op 注销函数，无副作用。
+  useEffect(() => {
+    if (!open) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
   }, [open, onClose]);
 
   // Sheet 关闭时重置自动滚动 flag，下次再打开重新跑一次。previousCommentCountRef

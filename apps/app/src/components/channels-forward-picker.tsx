@@ -9,6 +9,7 @@ import {
   type FriendListItem,
 } from "@yinjie/contracts";
 import { Button } from "@yinjie/ui";
+import { registerAndroidBackInterceptor } from "../runtime/android-back-button";
 import { AvatarChip } from "./avatar-chip";
 
 const t = translateRuntimeMessage;
@@ -96,6 +97,19 @@ export function ChannelsForwardPicker({
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
+  // 走查 2026-05-17 新会话 R4：Android 硬件 Back 键 — picker 打开时按 Back
+  // 应该收 picker 而不是退掉整个视频号页。和 wechat-comment-bar /
+  // share-card-modal / mobile-channels-comments-sheet 同款拦截：preventDefault
+  // + 返回 true 消费按键。
+  useEffect(() => {
+    if (!open) return;
+    return registerAndroidBackInterceptor((event) => {
+      event.preventDefault();
+      onClose();
+      return true;
+    });
   }, [open, onClose]);
 
   // 锁背景滚动：picker 弹出时如果不锁，移动端两指滚 / 桌面滚轮会把底下的
