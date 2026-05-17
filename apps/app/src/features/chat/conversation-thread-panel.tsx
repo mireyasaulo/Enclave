@@ -226,6 +226,20 @@ export function ConversationThreadPanel({
     () => (participants[0] ? [participants[0]] : undefined),
     [participants],
   );
+  // 走查新一轮 R1：原版直接在 JSX 里 `threadContext={{ id, type, title }}` 每次
+  // render 都 new 一个对象 → ChatMessageList 内 imageMessages useMemo（line 1768）
+  // 把 threadContext 整对象作 dep，每个父帧失效 → 每帧 filter(visibleMessages)
+  // 找出所有图片消息再 map 一遍，长聊滚到 100+ 条历史里有 30 张图时这层 O(n)
+  // 每个 typing tick / 任何 state 变化都白跑一次；standaloneViewerItems 跟着
+  // 重算。和 contactPickerExcludeIds R2 同款修法，把引用稳定下来。
+  const messageListThreadContext = useMemo(
+    () => ({
+      id: conversationId,
+      type: "direct" as const,
+      title: conversationTitle,
+    }),
+    [conversationId, conversationTitle],
+  );
   const replyPreview = replyDraft
     ? {
         senderName: replyDraft.senderName,
@@ -735,11 +749,7 @@ export function ConversationThreadPanel({
 
             <ChatMessageList
               messages={renderedMessages}
-              threadContext={{
-                id: conversationId,
-                type: "direct",
-                title: conversationTitle,
-              }}
+              threadContext={messageListThreadContext}
               buildMessageReturnTo={buildMessageReturnTo}
               groupMode={conversationType === "group"}
               variant={isDesktop ? "desktop" : "mobile"}
