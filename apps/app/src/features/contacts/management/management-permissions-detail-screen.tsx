@@ -14,9 +14,17 @@ import { invalidateFriendVisibilityQueries } from "../invalidate-friend-display"
 
 type Props = {
   characterId: string;
+  // 新一轮走查：把当前屏 mutation 的 pending 状态向上回报给 modal，让 backdrop /
+  // Esc / Android Back / 顶部返回按钮在权限写入过程中暂时锁定，避免用户
+  // 误触关闭 → modal 卸载 → mutation 回调挂在 dead hook 上 → 缓存未 invalidate /
+  // 错误 notice 静默丢失。
+  onBusyChange?: (busy: boolean) => void;
 };
 
-export function ManagementPermissionsDetailScreen({ characterId }: Props) {
+export function ManagementPermissionsDetailScreen({
+  characterId,
+  onBusyChange,
+}: Props) {
   const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
@@ -66,8 +74,22 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
     // R2 复检：用专门给可见性更新的 invalidateFriendVisibilityQueries，
     // 不要复用 invalidateFriendDisplayQueries——后者会清 app-conversation-messages，
     // 而权限改动不影响任何消息文本，全量重拉所有打开会话的消息既慢又没必要。
-    onSuccess: () => {
-      void invalidateFriendVisibilityQueries(queryClient, baseUrl);
+    // 新一轮走查 R2：await invalidate 而不是 void，让 mutation.isPending
+    // 一直 true 直到 refetch 完成。原来的 fire-and-forget 写法在 mutation 完成
+    // 到 friendsQuery.isFetching 翻 true 之间有几十毫秒的"两个 flag 都是 false"
+    // 窗口，下面的 sync effect 会读到旧 friendship 把乐观状态盖回去 → 用户看到
+    // switch 抖一帧。invalidate 默认 refetchType:'active' 只重拉当前订阅的
+    // friends 查询，不会牵涉无关 query 慢链路。
+    // 关键：把 invalidate 的 reject 吃掉。tanstack v5 里 onSuccess 抛错会把
+    // mutation 整体翻成 error 态 → UI 弹"权限修改失败"红字，但其实服务端写入
+    // 早就成功了，只是 refetch 时网络抖断。catch 后留下 stale=true 即可，
+    // 下次访问 friendsQuery 会自然重拉。
+    onSuccess: async () => {
+      try {
+        await invalidateFriendVisibilityQueries(queryClient, baseUrl);
+      } catch {
+        // intentional: write 已成功，refetch 失败不应回报为 mutation 错误
+      }
     },
   });
 
@@ -95,6 +117,18 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
     mutation.isPending,
     friendsQuery.isFetching,
   ]);
+
+  // 新一轮走查：向 modal 上报 busy 状态——mutation 在飞或 invalidate 触发的
+  // refetch 还没回来时都算"权限写入中"，让 modal 暂时拦截关闭手势。卸载时
+  // 显式回报 false 兜底（理论上 modal 卸载链路会自然清栈，但用 onBusyChange?.
+  // 兜一手避免悬挂的 busy 状态把下次开 modal 卡死）。
+  const busy = mutation.isPending || friendsQuery.isFetching;
+  useEffect(() => {
+    onBusyChange?.(busy);
+    return () => {
+      onBusyChange?.(false);
+    };
+  }, [busy, onBusyChange]);
 
   const apply = (
     next: { hideTheir?: boolean; hideMine?: boolean; chatOnly?: boolean },
@@ -131,10 +165,31 @@ export function ManagementPermissionsDetailScreen({ characterId }: Props) {
     });
   };
 
+  // 新一轮走查：区分 "queries 还在 loading（首屏没数据）" vs "查完了但
+  // characterId 在 friends/characters 里都不命中"。原写法两种都展示
+  // "正在读取联系人..." → 用户在另一处把这个角色删了再返回详情时，看不到
+  // "无此联系人" 的明确反馈，会反复返回—进入—返回怀疑卡死。两条 query 都
+  // 不在 fetching 且 character 仍 null 时改成失踪态 + 后退提示。
   if (!character) {
+    const stillLoading = friendsQuery.isLoading || charactersQuery.isLoading;
+    if (stillLoading) {
+      return (
+        <div className="px-4 py-8 text-center text-[12px] text-[color:var(--text-muted)]">
+          {t(msg`正在读取联系人...`)}
+        </div>
+      );
+    }
     return (
-      <div className="px-4 py-8 text-center text-[12px] text-[color:var(--text-muted)]">
-        {t(msg`正在读取联系人...`)}
+      <div className="px-6 py-12 text-center">
+        <div className="mx-auto inline-flex rounded-full bg-[#eef2f6] px-3 py-1 text-[10px] font-medium text-[color:var(--text-muted)]">
+          {t(msg`朋友权限`)}
+        </div>
+        <div className="mt-3 text-[14px] font-medium text-[color:var(--text-primary)]">
+          {t(msg`联系人不存在或已被移除`)}
+        </div>
+        <p className="mx-auto mt-2 max-w-[18rem] text-[11px] leading-5 text-[color:var(--text-muted)]">
+          {t(msg`请返回上一页选择其他联系人。`)}
+        </p>
       </div>
     );
   }

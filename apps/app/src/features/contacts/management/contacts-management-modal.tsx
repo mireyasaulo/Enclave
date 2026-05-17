@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -52,6 +53,19 @@ export function ContactsManagementModal({
   // permissions list 搜索框：state 提到 modal，list ↔ detail 切换不丢词。
   // 模态关闭时一并清，下次重开从空白起始（跟 stack reset 节奏一致）。
   const [permissionsSearch, setPermissionsSearch] = useState("");
+  // 新一轮走查：permissions-detail 子屏写入权限期间 modal 不能被关 / pop /
+  // 顶部返回，避免 mutation 回调挂在 dead hook、错误 notice / 缓存失效全部
+  // 静默丢失。子屏通过 onBusyChange 回报 busy；切屏 / 子屏卸载会把 busy 重置。
+  const [busy, setBusy] = useState(false);
+  const handleBusyChange = useCallback((next: boolean) => setBusy(next), []);
+  const tryClose = useCallback(() => {
+    if (busy) return;
+    onClose();
+  }, [busy, onClose]);
+  const tryPop = useCallback(() => {
+    if (busy) return;
+    pop();
+  }, [busy, pop]);
   // R2 走查：原 dep 含 permissionsSearch → 用户每敲一字都触发 effect 跑一次
   //（即便 !open 分支永远走不到）。只看 open 就够，关闭瞬间 setState("") 安全。
   useEffect(() => {
@@ -159,6 +173,10 @@ export function ContactsManagementModal({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
+        // busy 时（权限写入中）吞掉 Esc，等 mutation / refetch 落地再放行。
+        if (busy) {
+          return;
+        }
         if (canGoBack) {
           pop();
         } else {
@@ -168,16 +186,20 @@ export function ContactsManagementModal({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, canGoBack, pop, onClose]);
+  }, [open, canGoBack, pop, onClose, busy]);
 
   // 原生壳硬件 Back：modal 打开时先消费 Back —— 能 pop 内屏就 pop，到根屏再
   // 把 Back 当成关 modal，避免被默认的 history.back 直接弹出 /tabs/contacts。
+  // busy 时硬件 Back 同样吞掉，跟键盘 Esc 行为一致。
   useEffect(() => {
     if (!open) {
       return;
     }
     const unregister = registerAndroidBackInterceptor((event) => {
       event.preventDefault();
+      if (busy) {
+        return true;
+      }
       if (canGoBack) {
         pop();
       } else {
@@ -186,7 +208,7 @@ export function ContactsManagementModal({
       return true;
     });
     return unregister;
-  }, [open, canGoBack, pop, onClose]);
+  }, [open, canGoBack, pop, onClose, busy]);
 
   if (!open) return null;
 
@@ -221,7 +243,10 @@ export function ContactsManagementModal({
         );
       case "permissions-detail":
         return (
-          <ManagementPermissionsDetailScreen characterId={current.characterId} />
+          <ManagementPermissionsDetailScreen
+            characterId={current.characterId}
+            onBusyChange={handleBusyChange}
+          />
         );
       case "root":
       default:
@@ -240,10 +265,11 @@ export function ContactsManagementModal({
     <ModalHeader
       title={titleText}
       canGoBack={canGoBack}
-      onBack={pop}
-      onClose={onClose}
+      onBack={tryPop}
+      onClose={tryClose}
       backLabel={t(msg`返回`)}
       closeLabel={t(msg`关闭`)}
+      disabled={busy}
     />
   );
 
@@ -253,7 +279,8 @@ export function ContactsManagementModal({
         <button
           type="button"
           aria-label={t(msg`关闭`)}
-          onClick={onClose}
+          onClick={tryClose}
+          disabled={busy}
           className="absolute inset-0"
         />
         <div className="relative flex max-h-[80vh] w-full max-w-[480px] flex-col overflow-hidden rounded-[16px] border border-[color:var(--border-faint)] bg-white shadow-[var(--shadow-overlay)]">
@@ -274,7 +301,8 @@ export function ContactsManagementModal({
       <button
         type="button"
         aria-label={t(msg`关闭`)}
-        onClick={onClose}
+        onClick={tryClose}
+        disabled={busy}
         className="absolute inset-0"
       />
       <div className="relative flex max-h-[88vh] w-full flex-col overflow-hidden rounded-t-[18px] bg-white pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-12px_28px_rgba(15,23,42,0.18)]">
@@ -300,6 +328,7 @@ function ModalHeader({
   onClose,
   backLabel,
   closeLabel,
+  disabled = false,
 }: {
   title: ReactNode;
   canGoBack: boolean;
@@ -307,6 +336,9 @@ function ModalHeader({
   onClose: () => void;
   backLabel: string;
   closeLabel: string;
+  // 新一轮走查：busy 时把顶部返回 / 关闭按钮一起禁用，避免「按钮看着可点
+  // 但点了没反应」的迷惑态——视觉上轻微降透明度提示用户当前在写入中。
+  disabled?: boolean;
 }) {
   return (
     <div className="flex h-12 shrink-0 items-center justify-between border-b border-[color:var(--border-faint)] bg-white px-3">
@@ -316,9 +348,10 @@ function ModalHeader({
             type="button"
             onClick={onBack}
             aria-label={backLabel}
+            disabled={disabled}
             className={cn(
               "flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--text-secondary)]",
-              "hover:bg-black/4 active:bg-black/8",
+              "hover:bg-black/4 active:bg-black/8 disabled:opacity-50",
             )}
           >
             <ArrowLeft size={18} />
@@ -337,7 +370,8 @@ function ModalHeader({
           type="button"
           onClick={onClose}
           aria-label={closeLabel}
-          className="flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--text-secondary)] hover:bg-black/4 active:bg-black/8"
+          disabled={disabled}
+          className="flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--text-secondary)] hover:bg-black/4 active:bg-black/8 disabled:opacity-50"
         >
           <X size={18} />
         </button>

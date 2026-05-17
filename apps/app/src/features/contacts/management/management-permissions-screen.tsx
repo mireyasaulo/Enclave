@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useDeferredValue, useMemo } from "react";
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Search, X } from "lucide-react";
@@ -44,6 +44,11 @@ export function ManagementPermissionsScreen({
   // matchesFriendSearch 默认 haystack 已 toLowerCase，needle 也得是 lowercase
   // 才能匹配上。直接传 trimmedSearch 会让用户输入 "Andrej" 找不到 "Andrej Karpathy"。
   const normalizedSearch = trimmedSearch.toLowerCase();
+  // 新一轮走查：把 normalizedSearch 套一层 useDeferredValue，让 sections
+  // 的重算切到低优先级。原本输入框每敲一个字 → 同步 filter + buildContactSections
+  // （含 A-Z 分段 + Collator 比较）→ 阻塞下一帧 input 重渲染，在好友 200+ 的
+  // 账号上能看到肉眼 100-200ms 的卡顿。useDeferredValue 让 input value 立刻
+  // 反映出来，sections 在下次空闲帧重算，体感跟 contacts-page 主搜索一致。
 
   // 拆 2 个 useMemo —— 原写法把 createFriendDirectoryItems（包含拼音 Collator
   // 排序，O(n log n)）和 filter+buildContactSections 放在同一个 useMemo 里，依赖
@@ -62,14 +67,15 @@ export function ManagementPermissionsScreen({
       ),
     [friendsQuery.data],
   );
+  const deferredSearch = useDeferredValue(normalizedSearch);
   const sections = useMemo(() => {
-    const filtered = normalizedSearch
+    const filtered = deferredSearch
       ? directoryItems.filter((item) =>
-          matchesFriendSearch(item, normalizedSearch),
+          matchesFriendSearch(item, deferredSearch),
         )
       : directoryItems;
     return buildContactSections(filtered);
-  }, [directoryItems, normalizedSearch]);
+  }, [directoryItems, deferredSearch]);
 
   const isLoading = friendsQuery.isLoading;
 
